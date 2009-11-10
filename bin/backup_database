@@ -1,0 +1,50 @@
+#!/usr/bin/env ruby
+
+require "yaml"
+require "fileutils"
+
+@user        = `whoami`.strip
+@environment = ENV["environment"] || ENV["RAILS_ENV"] || ENV["MERB_ENV"] || ENV["RACK_ENV"] || "production"
+@path        = ENV["application_path"] || "/home"
+@config      = YAML.load(`cat /#{@path}/#{@user}/shared/config/database.yml`)[@environment]
+@datestamp   = Time.now.strftime("%Y-%m-%d_%H:%M:%S")
+@adapter     = @config["adapter"].to_s.strip
+@username    = @config["username"].to_s.strip
+@database    = @config["database"].to_s.strip
+@password    = @config["password"].to_s.strip
+@host        = @config["host"].to_s.strip || "localhost"
+
+def log(message, file) ; %x{echo "#{@datestamp} #{message}" >> /home/#{@user}/backups/#{file}.log} ; end
+def fail(message)      ; log(message, :error) ; exit 1 ; end
+def succeed(message)   ; log(message, :backup) ; exit 0 ; end
+
+FileUtils.mkdir_p "/home/#{@user}/backups"
+
+fail("adapter not specified in shared/config/database.yml")  if @adapter.empty?
+fail("user not specified in shared/config/database.yml")     if @user.empty?
+fail("database not specified in shared/config/database.yml") if @database.empty?
+
+if @adapter == "mysql"
+
+  #@dump = `which mysqldump`.strip
+  @dump = "/usr/local/mysql/bin/mysqldump"
+  fail("mysqldump command not found") if @dump.empty?
+  @flags = "--add-drop-table --complete-insert --default-character-set=utf8 --quote-names --extended-insert --hex-blob"
+  @filename = "#{@database}##{@datestamp}.mysql"
+  @command = "#{@dump} #{@flags} --user=#{@username} -p#{@password} --quick #{@database} | bzip2 -c > ~/backups/#{@filename}.bz2"
+
+elsif @adapter == "postgresql"
+
+  @dump = `which pg_dump`.strip
+  fail("pg_dump command not found") if @dump.empty?
+  @flags = "-b -c -E UTF8 -O -x"
+  @filename = "#{@database}##{@datestamp}.psql"
+  @command = "#{@dump} #{@flags} -U #{@username} -h #{@host} -f ~/backups/#{@filename} #{@database} ; bzip2 ~/backups/#{@filename}"
+
+else
+  fail("unknown adapter")
+end
+
+system(@command)
+
+$? == 0 ? succeed("backup successful") : fail("backup failed, command: #{@command}")

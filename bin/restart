@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Author: Wayne E. Seguin
+# Version: 0.0.2
+
+bdsm restart $*
+

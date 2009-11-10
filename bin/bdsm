@@ -1,0 +1,459 @@
+#!/bin/bash
+
+# Author: Wayne E. Seguin
+
+#
+# Environment
+#
+cleanup_variables() {
+  :
+}
+
+load_profile() { if [[ -f $HOME/.bash_profile ]] ; then source $HOME/.bash_profile ; fi ; }
+
+load_bdsmrc() { if [[ -f "$HOME/.bdsmrc" ]] ; then source "$HOME/.bdsmrc" ; fi ; }
+
+
+load_defaults() {
+  :
+}
+
+initialize() {
+  if [ -z "$project" ] ; then
+  # TODO: Improve this line vv
+    if [ -d $HOME/current ] ; then
+      project=$(whoami)
+    else
+      echo -e "\$project was not specified."
+      exit 1
+    fi
+  fi
+  result=0
+  user=$(whoami)
+  remote=${remote:-"origin"}
+  branch=${branch:-"master"}
+  framework=${framework:-"rails"}
+  keep_releases=${keep_releases:-"10"}
+  timestamp="$(date +%m.%d.%Y-%H:%M:%S)"
+  current_dir="${current_dir:-$HOME/current}"
+  shared_path="${shared_path:-$HOME/shared}"
+  project_dir="${project_dir:-$HOME}"
+  current_dir="${current_dir:-$project_dir/current}"
+  RAILS_ENV="${RAILS_ENV:-"production"}" ; export RAILS_ENV
+  old_releases="$(ls -t | awk "NR > $keep_releases { print \$0 }")"
+
+  if [ -f ".${project}rc" ] ; then source ".${project}rc" ; fi
+
+  trap 'cleanup_variables ; rm -rf "/tmp/bdsm/$$" >/dev/null 2>&1' 0 1 2 3 15
+}
+
+#
+# Setup
+#
+setup() {
+  if [[ "root" = $(whoami) ]] ; then
+    echo "Must be run as the project user."
+    exit 1
+  fi
+  for dir in config log pids sockets "public/assets" tmp  ; do
+    mkdir -p "$HOME/shared/$dir"
+  done
+  touch $HOME/shared/config/database.yml
+  touch $HOME/.bash_profile
+
+  if ! awk "/^project/" "$HOME/.bash_profile" ; then
+    echo "project=\"$(user)\" ; export project" >> $HOME/.bash_profile
+  fi
+  if ! awk "/^environment/" "$HOME/.bash_profile" ; then
+    echo "environment=\"production\" ; export environment" >> $HOME/.bash_profile
+  fi
+  if ! awk "/^RAILS_ENV/" "$HOME/.bash_profile" ; then
+    echo "RAILS_ENV=\"\$environment\" ; export RAILS_ENV" >> $HOME/.bash_profile
+  fi
+  if ! awk '/current\/\.rvmrc/' "$HOME/.bash_profile" ; then
+    echo 'if [[ -d $HOME/current ]] && [[ -f $HOME/current/.rvmrc ]] ; then source $HOME/current/.rvmrc ; fi' >> $HOME/.bash_profile
+  fi
+  if ! awk '/scripts\/rvm/' "$HOME/.bash_profile" ; then
+    echo 'if [[ -s $HOME/.rvm/scripts/rvm ]] ; then source $HOME/.rvm/scripts/rvm ; fi' >> $HOME/.bash_profile
+  fi
+}
+
+#
+# Deploy
+#
+deploy() {
+  log "info" "Deploying..."
+  update_repository &&
+  update_current &&
+  configure &&
+  symlink &&
+  cleanup
+  if [[ -f "$current_dir/.post_deploy" ]] ; then
+    chmod +x "$current_dir/.post_deploy"
+    $current_dir/.post_deploy
+  fi
+
+  result=$?
+  log "info" "Deploy started at $timestamp and completed at $(date +%m.%d.%Y-%H:%M:%S)"
+  exit $result
+}
+
+update() {
+  update_repository && update_current
+  return $?
+}
+
+update_repository() {
+  log "Updating local repository in $shared_path/$application."
+  cd "$shared_path/$project" > /dev/null 2>&1
+  current_branch=$(git branch | awk '/\* /{print $2}')
+  # TODO: Improve error handling
+  if [ "$current_branch" != "$branch" ] ; then
+    log "Switching to branch $branch from $current_branch"
+    git checkout -b $branch --track $remote/$branch
+  fi
+  git pull $remote $branch
+
+  if [ -f .gitmodules ] ; then
+    log "Updating submodules."
+    git submodule init 2>/dev/null
+    git submodule update
+  fi
+}
+
+update_current() {
+  if [ -d $current_dir ] ; then
+    log "Moving aside previous release."
+    mkdir -p $HOME/previous
+    mv $current_dir $HOME/previous/$timestamp
+  fi
+  log "Installing new release to $current_dir"
+  rsync -ag --exclude=".git/*" $shared_path/$application/ $current_dir;
+}
+
+configure() {
+  cd $shared_path/config
+  log "Setting up persistent yaml files:"
+  for yaml_file in *.yml; do
+    log " - $yaml_file"
+    rm -f $current_dir/config/$yaml_file
+    ln -nfs $shared_path/config/$yaml_file $current_dir/config/$yaml_file
+  done
+
+  log "Setting up persistent config files:"
+  for config_file in $(ls $shared_path/config/*.conf); do
+    log " - $config_file"
+    rm -f $current_dir/config/$config_file
+    ln -nfs $shared_path/config/$config_file $current_dir/config/$config_file
+  done
+
+  log "Setting up persistent ruby config files:"
+  for config_file in $(ls $shared_path/config/*.rb); do
+    log " - $config_file"
+    rm -f $current_dir/config/$config_file
+    ln -nfs $shared_path/config/$config_file $current_dir/config/$config_file
+  done
+}
+
+symlink() {
+  log "Setting up persistent directories"
+  shared_dirs="log public/assets pids files"
+  for shared_dir in $shared_dirs ; do
+    if [ -d $shared_path/$shared_dir ] ; then
+      log " - $shared_dir"
+      rm -rf $current_dir/$shared_dir
+      ln -nfs $shared_path/$shared_dir $current_dir/$shared_dir
+    else
+      log "<i> $shared_path/$shared_dir does not exist, skipping."
+    fi
+  done
+}
+
+cleanup() {
+  log "Removing old releases..."
+  cd $HOME/previous
+  for release in $old_releases ; do
+    if [ -d $release ] ; then
+      log " - $release"
+      rm -rf $release
+    else
+      log "info" "Skipping ~/previous/$release as the directory does not exist."
+    fi
+  done
+  cd
+}
+
+#
+# Sphinx
+#
+sphinx() {
+  sphinx_config_file="$current_dir/config/$environment.sphinx.conf"
+  if [ -f $sphinx_config_file ] ; then
+    case "$1" in
+      stop)  sphinx_stop  ;;
+      start) sphinx_start ;;
+      index) sphinx_index ;;
+      restart)
+        sphinx_stop
+        sphinx_index
+        sphinx_start
+      ;;
+    esac
+  else
+    echo "$sphinx_config_file is missing, sphinx '$1' will not be performed."
+  fi
+}
+sphinx_index() { cd $current_dir ; rake thinking_sphinx:index ; }
+sphinx_stop()  { cd $current_dir ; rake thinking_sphinx:stop  ; }
+sphinx_start() { cd $current_dir ; rake thinking_sphinx:start ; }
+
+log() {
+  if [ ! -z "$2" ] ; then level=$1 ; shift ; else level="info" ; fi ; message=$1
+  case "$level" in
+    debug) shift ;
+      ((debug_flag)) && echo -e "$(tput setaf 5)<d>$(tput sgr0) $message $(tput setaf 5)</d> $(tput sgr0) "
+    ;;
+    info)  shift ; echo -e "$(tput setaf 2)<i>$(tput sgr0) $message $(tput setaf 2)</i> $(tput sgr0) " ;;
+    warn)  shift ; echo -e "$(tput setaf 3)<w>$(tput sgr0) $message $(tput setaf 3)</w> $(tput sgr0) " ;;
+    error) shift ; echo -e "$(tput setaf 1)<e>$(tput sgr0) $message $(tput setaf 1)</e> $(tput sgr0) " ;;
+    fail)  shift ; echo -e "$(tput setaf 1)<f>$(tput sgr0) $message $(tput setaf 1)</f> $(tput sgr0) " ; return 1 ;;
+    *) echo -e "$message"
+  esac
+}
+
+logtail() { tail -f $project_dir/shared/log/*.log ; }
+
+#
+# Rails
+#
+migrate() {
+  cd $current_dir
+  rake db:migrate --trace
+}
+
+console() {
+  cd $current_dir
+  if [[ -f script/console ]] ; then
+    ruby script/console
+  fi
+}
+
+dbconsole() {
+  cd $current_dir
+  if [[ -f script/console ]] ; then
+    ruby script/dbconsole
+  fi
+}
+
+#
+# Unicorn
+#
+unicorn() {
+  cd $current_dir
+  master_pid="$(ps auxww | grep '[u]nicorn' | grep 'master' | awk '/'${project}'/{print $2}')"
+  if [[ "$stop_flag" -eq 1 ]] || [[ "$graceful_flag" -eq 1 ]] ; then
+    kill -QUIT  $master_pid
+  elif [[ "$start_flag" -eq 1 ]] ; then
+    unicorn_rails -c $current_dir/config/unicorn.rb -E $RAILS_ENV -D
+    if [[ "$master_pid" -gt 0 ]] ; then
+      sleep 1 ; kill -QUIT  $master_pid
+    fi
+  elif [[ "$restart_flag" -eq 1 ]] ; then
+    unicorn_rails -c $current_dir/config/unicorn.rb -E $RAILS_ENV -D
+    if [[ "$master_pid" -gt 0 ]] ; then
+      sleep 1 ; kill -QUIT  $master_pid
+    fi
+  elif [[ "$pause_flag" -eq 1 ]] ; then
+    kill -WINCH $master_pid
+  elif [[ "$unpause_flag" -eq 1 ]] ; then
+    kill -WINCH $master_pid
+  elif [[ "$kill_flag" -eq 1 ]] ; then
+    kill -TERM  $master_pid
+  elif [[ "$increase_flag" -eq 1 ]] ; then
+    kill -TTOU  $master_pid
+  elif [[ "$decrease_flag" -eq 1 ]] ; then
+    kill -TTOU  $master_pid
+  elif [[ "$logs_flag" -eq 1 ]] ; then
+    kill -USR1  $master_pid
+  elif [[ "$reload_flag" -eq 1 ]] ; then
+    kill -HUP   $master_pid
+  else
+    :
+  fi
+}
+
+#
+# Passenger
+#
+passenger() {
+  case "$1" in
+    start) ;;
+    stop) ;;
+    restart)
+      # Default is passenger
+      log "Restarting Passenger Application."
+      mkdir -p $project_dir/tmp
+      touch $project_dir/tmp/restart.txt
+      log "Restart triggered."
+    ;;
+  esac
+}
+
+#
+# Mongrel
+#
+mongrel() {
+  cd $current_dir
+  if [ -f ".bdsmrc" ] ; then source .bdsmrc ; fi
+  if [ -f ".${project}rc" ] ; then source ".${project}rc" ; fi
+
+  master_pid="$(ps auxww | grep '[m]ongrel' | awk '/'${project}'/{print $2}')"
+  if [[! -z "$master_pid"]] && [[ $master_pid -gt 0 ]] ; then
+    mongrel restart
+  else # start
+    mongrel start
+  fi
+
+  cd $project_dir
+  case "$1" in
+        #trap "TERM" { log "TERM signal received."; stop }
+        #trap "USR1" {log "USR1 received, toggling $mongrel_debug_client to #{!$mongrel_debug_client}"; $mongrel_debug_client = !$mongrel_debug_client }
+        # restart
+        #trap "USR2" { log "USR2 signal received."; stop(true) }
+
+    stop|graceful) kill -TERM $master_pid  ;;
+    kill)          kill -INT $master_pid  ;;
+    logs)          kill -USR1 $master_pid  ;;
+    restart)       kill -USR1 $master_pid   ;;
+    increase)      mongrel_adjust "increase" ;;
+    decrease)      mongrel_adjust "decrease" ;;
+    start)
+
+    ;;
+    restart) mongrel start && sleep 1 && mongrel stop ;;
+  esac
+}
+
+mongrel_start() { mongrel -c $project_dir/config/mongrel.rb -E $RAILS_ENV -D ; }
+mongrel_stop() { : ; }
+mongrel_stop() { : ; }
+mongrel_adjust() { : ; }
+
+thin() { echo "thin has not yet been implemented." ; }
+rack() { echo "rack has not yet been implemented." ; }
+
+#
+# Setup
+#
+cleanup_variables
+load_profile
+load_bdsmrc
+initialize
+load_defaults
+
+# parse args
+while [ $# -gt 0 ] ; do
+  token="$1" ; shift
+  case "$token" in
+
+    nginx|apache|sphinx|solr|unicorn|mongrel|thin|passenger)
+      server=$token
+      action=${action:-$token}
+    ;;
+
+    start|stop|graceful|restart|reload|install|uninstall|pause|unpause|kill|increase|decrease|logs)
+      eval "${token/--/}_flag=1"
+    ;;
+
+    migrate|logtail|console|dbconsole|deploy)
+      action=$token
+    ;;
+
+    --trace)
+      trace_flag=1 ; debug_flag=1 ; set -x
+    ;;
+
+    --debug)
+      debug_flag=1
+    ;;
+
+    *)
+      if [[ -z "$action" ]] ; then
+        action="error"
+        error_message="An action must be specified."
+      else
+        if [[ -d "/data/$token" ]] ; then
+          project="$token"
+          project_dir="/data/$token"
+        elif [[ -d "/home/$token" ]] ; then
+          project="$token"
+          project_dir="/home/$token"
+        else
+          # determine sanity of project
+          action="error"
+          error_message="Unrecognized command line argument(s): '$token $@'"
+        fi
+      fi
+    ;;
+  esac
+  if [ ! -z "$parse_break" -o ! -z "$error_message" ] ; then unset parse_break; break; fi
+done
+
+if [ ! -z "$error_message" ] ; then exit 1 ; fi
+
+function version {
+  _author="Wayne E. Seguin"
+  _author_email="wayneeseguin@gmail.com"
+  _website="http://bdsm.beginrescueend.com/"
+  _version="0.0.1"
+  #_version="$(cat $bdsm_path/lib/VERSION.yml | tail -n 3 | sed 's/^.*: //g' | tr "\n" '.' | sed 's/\.$//')"
+  echo -e "bdsm ${_version} ${_website} by ${_author} (${_author_email})"
+}
+
+function usage {
+
+  version
+
+  echo -e "
+
+CLI
+
+  bdsm deploy [project]
+  bdsm install [server|project]
+  bdsm setup [server|project]  ((--force))
+  bdsm stop [server|project]
+  bdsm start [server|project]
+  bdsm restart [server|project]
+  bdsm reload [server|project]
+  bdsm migrate [project]
+  bdsm tail [project]   # Tail all logs in shared/log/*.log
+  bdsm console [project]
+  bdsm dbconsole [project]
+
+Notes:
+
+  [project] is required if root, otherwise use the current user name
+
+  http://bdsm.beginrescueend.com/
+  https://www.pivotaltracker.com/projects/26822
+
+" | ${PAGER:-less}
+}
+
+#
+# Main Logic
+#
+if [[ "$trace_flag" = 1 ]] ; then set -x ; else set +x ; fi
+result=0
+case "$action" in
+  unicorn) unicorn ;;
+  mongrel) unicorn ;;
+  thin)    unicorn ;;
+  sphinx)  sphinx  ;;
+  restart) unicorn ;;
+  deploy)  deploy  ;;
+  *)       usage   ;;
+esac
+result=$?
+exit $result
+

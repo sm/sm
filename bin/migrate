@@ -1,0 +1,5 @@
+#!/bin/bash
+# Author: Wayne E. Seguin
+
+bdsm migrate $*
+
