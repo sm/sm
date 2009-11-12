@@ -1,6 +1,9 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Author: Wayne E. Seguin
+# All Rights Reserved
+
+VERSION=0.0.1
 
 #
 # Environment
@@ -83,19 +86,26 @@ setup() {
 #
 deploy() {
   log "info" "Deploying..."
-  update_repository &&
-  update_current &&
-  configure &&
-  symlink &&
-  cleanup
-  if [[ -f "$current_dir/.post_deploy" ]] ; then
-    chmod +x "$current_dir/.post_deploy"
-    $current_dir/.post_deploy
-  fi
-
+  (
+    hook "before_deploy" &&
+    update_repository &&
+    hook "after_repository_update" &&
+    update_current &&
+    hook "after_update_current" &&
+    configure &&
+    hook "after_configure" &&
+    symlink &&
+    hook "after_symlink" &&
+    cleanup &&
+    hook "after_deploy"
+  )
   result=$?
   log "info" "Deploy started at $timestamp and completed at $(date +%m.%d.%Y-%H:%M:%S)"
   exit $result
+}
+
+hook() {
+  if [[ -f "$current_dir/.$1" ]] ; then source "$current_dir/.$1" ; fi
 }
 
 update() {
@@ -104,7 +114,7 @@ update() {
 }
 
 update_repository() {
-  log "Updating local repository in $shared_path/$application."
+  log "Updating local repository in $shared_path/$project."
   cd "$shared_path/$project" > /dev/null 2>&1
   current_branch=$(git branch | awk '/\* /{print $2}')
   # TODO: Improve error handling
@@ -128,7 +138,7 @@ update_current() {
     mv $current_dir $HOME/previous/$timestamp
   fi
   log "Installing new release to $current_dir"
-  rsync -ag --exclude=".git/*" $shared_path/$application/ $current_dir;
+  rsync -ag --exclude=".git/*" $shared_path/$project/ $current_dir;
 }
 
 configure() {
@@ -142,29 +152,30 @@ configure() {
 
   log "Setting up persistent config files:"
   for config_file in $(ls $shared_path/config/*.conf); do
-    log " - $config_file"
-    rm -f $current_dir/config/$config_file
-    ln -nfs $shared_path/config/$config_file $current_dir/config/$config_file
+    file_name=$(basename $config_file)
+    log " - $file_name"
+    rm -f $current_dir/config/$file_name
+    ln -nfs $shared_path/config/$file_name $current_dir/config/$file_name
   done
 
   log "Setting up persistent ruby config files:"
   for config_file in $(ls $shared_path/config/*.rb); do
-    log " - $config_file"
-    rm -f $current_dir/config/$config_file
-    ln -nfs $shared_path/config/$config_file $current_dir/config/$config_file
+    file_name=$(basename $config_file)
+    log " - $file_name"
+    rm -f $current_dir/config/$file_name
+    ln -nfs $shared_path/config/$file_name $current_dir/config/$file_name
   done
 }
 
 symlink() {
   log "Setting up persistent directories"
-  shared_dirs="log public/assets pids files"
-  for shared_dir in $shared_dirs ; do
-    if [ -d $shared_path/$shared_dir ] ; then
-      log " - $shared_dir"
-      rm -rf $current_dir/$shared_dir
-      ln -nfs $shared_path/$shared_dir $current_dir/$shared_dir
+  for dir in log public/assets pids files ; do
+    if [ -d $shared_path/$dir ] ; then
+      log " - $dir"
+      rm -rf $current_dir/$dir
+      ln -nfs $shared_path/$dir $current_dir/$dir
     else
-      log "<i> $shared_path/$shared_dir does not exist, skipping."
+      log "<i> $shared_path/$dir does not exist, skipping."
     fi
   done
 }
@@ -233,17 +244,17 @@ migrate() {
 
 console() {
   cd $current_dir
-  if [[ -f script/console ]] ; then
-    ruby script/console
-  fi
+  if [[ -f script/console ]] ; then ruby script/console ; fi
 }
 
 dbconsole() {
   cd $current_dir
-  if [[ -f script/console ]] ; then
-    ruby script/dbconsole
-  fi
+  if [[ -f script/console ]] ; then ruby script/dbconsole ; fi
 }
+
+restart() { eval "${server} restart" ; }
+start() { eval "${server} start" ; }
+stop() { eval "${server} stop" ; }
 
 #
 # Unicorn
@@ -356,7 +367,7 @@ while [ $# -gt 0 ] ; do
   token="$1" ; shift
   case "$token" in
 
-    nginx|apache|sphinx|solr|unicorn|mongrel|thin|passenger)
+    nginx|apache|sphinx|solr|unicorn|mongrel|thin|passenger|setup)
       server=$token
       action=${action:-$token}
     ;;
@@ -369,13 +380,9 @@ while [ $# -gt 0 ] ; do
       action=$token
     ;;
 
-    --trace)
-      trace_flag=1 ; debug_flag=1 ; set -x
-    ;;
-
-    --debug)
-      debug_flag=1
-    ;;
+    --trace) trace_flag=1 ; debug_flag=1 ; set -x ;;
+    --debug) debug_flag=1                         ;;
+    --version) action="version"                   ;;
 
     *)
       if [[ -z "$action" ]] ; then
@@ -405,8 +412,7 @@ function version {
   _author="Wayne E. Seguin"
   _author_email="wayneeseguin@gmail.com"
   _website="http://bdsm.beginrescueend.com/"
-  _version="0.0.1"
-  #_version="$(cat $bdsm_path/lib/VERSION.yml | tail -n 3 | sed 's/^.*: //g' | tr "\n" '.' | sed 's/\.$//')"
+  _version="$VERSION"
   echo -e "bdsm ${_version} ${_website} by ${_author} (${_author_email})"
 }
 
@@ -446,13 +452,18 @@ Notes:
 if [[ "$trace_flag" = 1 ]] ; then set -x ; else set +x ; fi
 result=0
 case "$action" in
-  unicorn) unicorn ;;
-  mongrel) unicorn ;;
-  thin)    unicorn ;;
-  sphinx)  sphinx  ;;
-  restart) unicorn ;;
-  deploy)  deploy  ;;
-  *)       usage   ;;
+  setup)     setup     ;;
+  console)   console   ;;
+  dbconsole) dbconsole ;;
+  logtail)   logtail   ;;
+  version)   version   ;;
+  unicorn)   unicorn   ;;
+  mongrel)   mongrel   ;;
+  thin)      thin      ;;
+  sphinx)    sphinx    ;;
+  restart)   restart   ;;
+  deploy)    deploy    ;;
+  *)         usage     ;;
 esac
 result=$?
 exit $result

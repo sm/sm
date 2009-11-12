@@ -1,6 +1,0 @@
-#!/bin/bash
-#
-# Author:  Wayne E. Seguin
-# Version: 0.0.6
-#
-bdsm deploy "$*"
