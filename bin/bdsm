@@ -260,20 +260,24 @@ stop() { eval "${server} stop" ; }
 # Unicorn
 #
 unicorn() {
-  cd $current_dir
   master_pid="$(ps auxww | grep '[u]nicorn' | grep 'master' | awk '/'${project}'/{print $2}')"
-  if [[ "$stop_flag" -eq 1 ]] || [[ "$graceful_flag" -eq 1 ]] ; then
+
+  cd $current_dir
+  if [[ "$start_flag" -eq 1 ]] ; then
+    unicorn_rails -c $current_dir/config/unicorn.rb -E $RAILS_ENV -D
+    if [[ "$master_pid" -gt 0 ]] ; then
+      sleep 1 ; kill -QUIT  $master_pid
+    fi
+    return $?
+  elif [[ "$master_pid" -le 0 ]] ; then
+    echo "unicorn is not running for $project yet."
+    return 1
+  elif [[ "$stop_flag" -eq 1 ]] || [[ "$graceful_flag" -eq 1 ]] ; then
     kill -QUIT  $master_pid
-  elif [[ "$start_flag" -eq 1 ]] ; then
-    unicorn_rails -c $current_dir/config/unicorn.rb -E $RAILS_ENV -D
-    if [[ "$master_pid" -gt 0 ]] ; then
-      sleep 1 ; kill -QUIT  $master_pid
-    fi
   elif [[ "$restart_flag" -eq 1 ]] ; then
-    unicorn_rails -c $current_dir/config/unicorn.rb -E $RAILS_ENV -D
-    if [[ "$master_pid" -gt 0 ]] ; then
-      sleep 1 ; kill -QUIT  $master_pid
-    fi
+    kill -USR2 $master_pid
+    sleep 1
+    kill -QUIT  $master_pid
   elif [[ "$pause_flag" -eq 1 ]] ; then
     kill -WINCH $master_pid
   elif [[ "$unpause_flag" -eq 1 ]] ; then
@@ -291,6 +295,7 @@ unicorn() {
   else
     :
   fi
+  return $?
 }
 
 #
