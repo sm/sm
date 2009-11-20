@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
+
 if [[ "root" = $(whoami) ]] ; then
   echo "Must be run as the project user."
   exit 1

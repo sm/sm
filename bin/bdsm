@@ -55,7 +55,7 @@ Notes:
 }
 
 # Setup
-prefix="${prefix:-/usr/local/}"
+prefix="${prefix:-/usr/local}"
 if [[ -f $HOME/.bash_profile ]] ; then source "$HOME/.bash_profile" ; fi
 if [[ -f "$HOME/.bdsmrc" ]]     ; then source "$HOME/.bdsmrc" ; fi
 source $prefix/bdsm/scripts/initialize
@@ -74,7 +74,7 @@ while [ $# -gt 0 ] ; do
       action="${action:-$token}"
     ;;
 
-    start|stop|graceful||reload|install|uninstall|pause|unpause|kill|increase|decrease|logs)
+    start|stop|graceful|reload|install|uninstall|pause|unpause|kill|increase|decrease|logs)
       eval "export ${token/--/}_flag=1"
     ;;
 

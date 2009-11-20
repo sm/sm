@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
+
 hook() {
   if [[ -f "$current_path/.$1" ]] ; then source "$current_path/.$1" ; fi
 }
@@ -10,18 +12,18 @@ update() {
 }
 
 update_repository() {
-  $scripts_path/log"Updating local repository in $shared_path/$project."
+  $scripts_path/log "info" "Updating local repository in $shared_path/$project."
   builtin cd "$shared_path/$project" > /dev/null 2>&1
   current_branch=$(git branch | awk '/\* /{print $2}')
   # TODO: Improve error handling
   if [ "$current_branch" != "$branch" ] ; then
-    $scripts_path/log"Switching to branch $branch from $current_branch"
+    $scripts_path/log "info" "Switching to branch $branch from $current_branch"
     git checkout -b $branch --track $remote/$branch
   fi
   git pull $remote $branch
 
   if [ -f .gitmodules ] ; then
-    $scripts_path/log"Updating submodules."
+    $scripts_path/log "info" "Updating submodules."
     git submodule init 2>/dev/null
     git submodule update
   fi
@@ -29,68 +31,68 @@ update_repository() {
 
 update_current() {
   if [ -d $current_path ] ; then
-    $scripts_path/log"Moving aside previous release."
+    $scripts_path/log "info" "Moving aside previous release."
     mkdir -p $project_path/previous
     mv $current_path $project_path/previous/$timestamp
   fi
-  $scripts_path/log"Installing new release to $current_path"
+  $scripts_path/log "info" "Installing new release to $current_path"
   rsync -ag --exclude=".git/*" $shared_path/$project/ $current_path;
 }
 
 configure() {
   builtin cd $shared_path/config
-  $scripts_path/log"Setting up persistent yaml files:"
+  $scripts_path/log "info" "Setting up persistent yaml files:"
   for yaml_file in *.yml; do
-    $scripts_path/log" - $yaml_file"
+    $scripts_path/log "info" " - $yaml_file"
     rm -f $current_path/config/$yaml_file
     ln -nfs $shared_path/config/$yaml_file $current_path/config/$yaml_file
   done
 
-  $scripts_path/log"Setting up persistent config files:"
+  $scripts_path/log "info" "Setting up persistent config files:"
   for config_file in $(ls $shared_path/config/*.conf); do
     file_name=$(basename $config_file)
-    $scripts_path/log" - $file_name"
+    $scripts_path/log "info" " - $file_name"
     rm -f $current_path/config/$file_name
     ln -nfs $shared_path/config/$file_name $current_path/config/$file_name
   done
 
-  $scripts_path/log"Setting up persistent ruby config files:"
+  $scripts_path/log "info" "Setting up persistent ruby config files:"
   for config_file in $(ls $shared_path/config/*.rb); do
     file_name=$(basename $config_file)
-    $scripts_path/log" - $file_name"
+    $scripts_path/log "info" " - $file_name"
     rm -f $current_path/config/$file_name
     ln -nfs $shared_path/config/$file_name $current_path/config/$file_name
   done
 }
 
 symlink() {
-  $scripts_path/log"Setting up persistent directories"
+  $scripts_path/log "info" "Setting up persistent directories"
   for dir in $scripts_path/logpublic/assets pids files ; do
     if [ -d $shared_path/$dir ] ; then
-      $scripts_path/log" - $dir"
+      $scripts_path/log "info" " - $dir"
       rm -rf $current_path/$dir
       ln -nfs $shared_path/$dir $current_path/$dir
     else
-      $scripts_path/log"<i> $shared_path/$dir does not exist, skipping."
+      $scripts_path/log "info" "<i> $shared_path/$dir does not exist, skipping."
     fi
   done
 }
 
 cleanup() {
-  $scripts_path/log"Removing old releases..."
+  $scripts_path/log "info" "Removing old releases..."
   builtin cd $project_path/previous
   for release in $old_releases ; do
     if [ -d $release ] ; then
-      $scripts_path/log" - $release"
+      $scripts_path/log "info" " - $release"
       rm -rf $release
     else
-      $scripts_path/log"info" "Skipping ~/previous/$release as the directory does not exist."
+      $scripts_path/log "info" "info" "Skipping ~/previous/$release as the directory does not exist."
     fi
   done
   cd
 }
 
-$scripts_path/log"info" "Deploying..."
+$scripts_path/log "info" "info" "Deploying..."
 (
   hook "before_deploy" &&
   update_repository &&
@@ -105,6 +107,7 @@ $scripts_path/log"info" "Deploying..."
   hook "after_deploy"
 )
 result=$?
-$scripts_path/log"info" "Deploy started at $timestamp and completed at $(date +%m.%d.%Y-%H:%M:%S)"
-exit $result
 
+$scripts_path/log "info" "info" "Deploy started at $timestamp and completed at $(date +%m.%d.%Y-%H:%M:%S)"
+
+exit $result

@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
-#
-# Unicorn
-#
+if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
+
 master_pid="$(ps auxww | grep '[u]nicorn' | grep 'master' | awk '/'${project}'/{print $2}')"
 
 builtin cd $current_path
