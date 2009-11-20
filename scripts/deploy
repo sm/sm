@@ -30,8 +30,8 @@ update_repository() {
 update_current() {
   if [ -d $current_path ] ; then
     $scripts_path/log"Moving aside previous release."
-    mkdir -p $HOME/previous
-    mv $current_path $HOME/previous/$timestamp
+    mkdir -p $project_path/previous
+    mv $current_path $project_path/previous/$timestamp
   fi
   $scripts_path/log"Installing new release to $current_path"
   rsync -ag --exclude=".git/*" $shared_path/$project/ $current_path;
@@ -78,7 +78,7 @@ symlink() {
 
 cleanup() {
   $scripts_path/log"Removing old releases..."
-  builtin cd $HOME/previous
+  builtin cd $project_path/previous
   for release in $old_releases ; do
     if [ -d $release ] ; then
       $scripts_path/log" - $release"

@@ -22,8 +22,8 @@ case "$1" in
   restart)
     # Default is passenger
     log "Restarting Passenger Application."
-    mkdir -p $project_dir/tmp
-    touch $project_dir/tmp/restart.txt
+    mkdir -p $project_path/tmp
+    touch $project_path/tmp/restart.txt
     log "Restart triggered."
   ;;
 esac
