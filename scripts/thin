@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 
-#
-# Thin
-#
-
 builtin cd $current_path
 if [ -f ".bdsmrc" ] ; then source .bdsmrc ; fi
 if [ -f ".${project}rc" ] ; then source ".${project}rc" ; fi
+
+start() { thin -c $project_path/config/thin.rb -E $RAILS_ENV -D ; }
+stop() { : ; }
+stop() { : ; }
+adjust() { : ; }
 
 master_pid="$(ps auxww | grep '[m]ongrel' | awk '/'${project}'/{print $2}')"
 if [[! -z "$master_pid"]] && [[ $master_pid -gt 0 ]] ; then
@@ -33,9 +34,3 @@ case "$1" in
   ;;
   restart) thin start && sleep 1 && thin stop ;;
 esac
-
-thin_start() { thin -c $project_path/config/thin.rb -E $RAILS_ENV -D ; }
-thin_stop() { : ; }
-thin_stop() { : ; }
-thin_adjust() { : ; }
-

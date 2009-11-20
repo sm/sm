@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+scripts_path="${scripts_path:-"${prefix}/scripts/"}"
+
 result=0
 user=$(whoami)
 if [ -z "$project" ] ; then

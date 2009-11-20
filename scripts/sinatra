@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+setup() {
+  :
+}
+
+start() {
+  :
+}
+
+stop() {
+  :
+}
+
+restart() {
+  :
+}
+
+

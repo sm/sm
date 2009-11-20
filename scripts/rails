@@ -18,10 +18,6 @@ dbconsole() {
   if [[ -f script/console ]] ; then ruby script/dbconsole ; fi
 }
 
-restart() { eval "${server} restart" ; }
-start() { eval "${server} start" ; }
-stop() { eval "${server} stop" ; }
-
 bootstrap() {
   # rake gems:install
   # rvm gems load

@@ -1,6 +1,21 @@
-#
-# Passenger
-#
+##!/usr/bin/env bash
+
+setup() {
+  :
+}
+
+start() {
+  :
+}
+
+stop() {
+  :
+}
+
+restart() {
+  :
+}
+
 case "$1" in
   start) ;;
   stop) ;;
