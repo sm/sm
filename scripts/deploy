@@ -1,0 +1,115 @@
+#!/usr/bin/env bash
+
+#
+# Deploy
+#
+deploy() {
+  log "info" "Deploying..."
+  (
+    hook "before_deploy" &&
+    update_repository &&
+    hook "after_repository_update" &&
+    update_current &&
+    hook "after_update_current" &&
+    configure &&
+    hook "after_configure" &&
+    symlink &&
+    hook "after_symlink" &&
+    cleanup &&
+    hook "after_deploy"
+  )
+  result=$?
+  log "info" "Deploy started at $timestamp and completed at $(date +%m.%d.%Y-%H:%M:%S)"
+  exit $result
+}
+
+hook() {
+  if [[ -f "$current_path/.$1" ]] ; then source "$current_path/.$1" ; fi
+}
+
+update() {
+  update_repository && update_current
+  return $?
+}
+
+update_repository() {
+  log "Updating local repository in $shared_path/$project."
+  builtin cd "$shared_path/$project" > /dev/null 2>&1
+  current_branch=$(git branch | awk '/\* /{print $2}')
+  # TODO: Improve error handling
+  if [ "$current_branch" != "$branch" ] ; then
+    log "Switching to branch $branch from $current_branch"
+    git checkout -b $branch --track $remote/$branch
+  fi
+  git pull $remote $branch
+
+  if [ -f .gitmodules ] ; then
+    log "Updating submodules."
+    git submodule init 2>/dev/null
+    git submodule update
+  fi
+}
+
+update_current() {
+  if [ -d $current_path ] ; then
+    log "Moving aside previous release."
+    mkdir -p $HOME/previous
+    mv $current_path $HOME/previous/$timestamp
+  fi
+  log "Installing new release to $current_path"
+  rsync -ag --exclude=".git/*" $shared_path/$project/ $current_path;
+}
+
+configure() {
+  builtin cd $shared_path/config
+  log "Setting up persistent yaml files:"
+  for yaml_file in *.yml; do
+    log " - $yaml_file"
+    rm -f $current_path/config/$yaml_file
+    ln -nfs $shared_path/config/$yaml_file $current_path/config/$yaml_file
+  done
+
+  log "Setting up persistent config files:"
+  for config_file in $(ls $shared_path/config/*.conf); do
+    file_name=$(basename $config_file)
+    log " - $file_name"
+    rm -f $current_path/config/$file_name
+    ln -nfs $shared_path/config/$file_name $current_path/config/$file_name
+  done
+
+  log "Setting up persistent ruby config files:"
+  for config_file in $(ls $shared_path/config/*.rb); do
+    file_name=$(basename $config_file)
+    log " - $file_name"
+    rm -f $current_path/config/$file_name
+    ln -nfs $shared_path/config/$file_name $current_path/config/$file_name
+  done
+}
+
+symlink() {
+  log "Setting up persistent directories"
+  for dir in log public/assets pids files ; do
+    if [ -d $shared_path/$dir ] ; then
+      log " - $dir"
+      rm -rf $current_path/$dir
+      ln -nfs $shared_path/$dir $current_path/$dir
+    else
+      log "<i> $shared_path/$dir does not exist, skipping."
+    fi
+  done
+}
+
+cleanup() {
+  log "Removing old releases..."
+  builtin cd $HOME/previous
+  for release in $old_releases ; do
+    if [ -d $release ] ; then
+      log " - $release"
+      rm -rf $release
+    else
+      log "info" "Skipping ~/previous/$release as the directory does not exist."
+    fi
+  done
+  cd
+}
+

@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+#
+# Sphinx
+#
+sphinx() {
+  sphinx_config_file="$current_path/config/$environment.sphinx.conf"
+  if [ -f $sphinx_config_file ] ; then
+    case "$1" in
+      stop)  sphinx_stop  ;;
+      start) sphinx_start ;;
+      index) sphinx_index ;;
+      restart)
+        sphinx_stop
+        sphinx_index
+        sphinx_start
+      ;;
+    esac
+  else
+    echo "$sphinx_config_file is missing, sphinx '$1' will not be performed."
+  fi
+}
+sphinx_index() { builtin cd $current_path ; rake thinking_sphinx:index ; }
+sphinx_stop()  { builtin cd $current_path ; rake thinking_sphinx:stop  ; }
+sphinx_start() { builtin cd $current_path ; rake thinking_sphinx:start ; }
+

@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+prefix="${prefix:-/usr/local}"
+
+for dir in bin scripts ; do
+  mkdir -p "${prefix}/bdsm/${dir}"
+  cp -R ./$dir/ "/usr/local/bdsm/$dir"
+done
+
+ln -nfs "${prefix}/bdsm/bin/bdsm" "${prefix}/bin/bdsm/bin/bdsm"
+

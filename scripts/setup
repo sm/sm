@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+if [[ "root" = $(whoami) ]] ; then
+  echo "Must be run as the project user."
+  exit 1
+fi
+
+for dir in config log pids sockets "public/assets" tmp  ; do
+  mkdir -p "$HOME/shared/$dir"
+done
+
+touch $HOME/shared/config/database.yml
+
+touch $HOME/.bash_profile
+
+if ! awk "/^project/" "$HOME/.bash_profile" ; then
+  echo "project=\"$(user)\" ; export project" >> $HOME/.bdsmrc
+fi
+
+if ! awk "/^environment/" "$HOME/.bash_profile" ; then
+  echo "environment=\"production\" ; export environment" >> $HOME/.bdsmrc
+fi
+
+if ! awk "/^RAILS_ENV/" "$HOME/.bash_profile" ; then
+  echo "RAILS_ENV=\"\$environment\" ; export RAILS_ENV" >> $HOME/.bdsmrc
+fi
+
+if ! awk '/current\/\.rvmrc/' "$HOME/.bash_profile" ; then
+  echo 'if [[ -d $HOME/current ]] && [[ -f $HOME/current/.rvmrc ]] ; then source $HOME/current/.rvmrc ; fi' >> $HOME/.bdsmrc
+fi
+
+if [[ ! -s "$HOME/.rvm/scripts/rvm" ]] ; then
+  git clone git://github.com/wayneeseguin/rvm.git && cd rvm && ./install
+fi
+
+echo -e "$project: &defaults\n  adapter: postgresql\n  username: $project\n  password: '$project'\n  database: ${project}_${environment}\n  pool: 5\n  timeout: 5000" >> $HOME/shared/config/database.yml
+

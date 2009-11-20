@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+#
+# Mongrel
+#
+builtin cd $current_path
+if [ -f ".bdsmrc" ] ; then source .bdsmrc ; fi
+if [ -f ".${project}rc" ] ; then source ".${project}rc" ; fi
+
+master_pid="$(ps auxww | grep '[m]ongrel' | awk '/'${project}'/{print $2}')"
+if [[! -z "$master_pid"]] && [[ $master_pid -gt 0 ]] ; then
+  mongrel restart
+else # start
+  mongrel start
+fi
+
+builtin cd $project_path
+case "$1" in
+      #trap "TERM" { log "TERM signal received."; stop }
+      #trap "USR1" {log "USR1 received, toggling $mongrel_debug_client to #{!$mongrel_debug_client}"; $mongrel_debug_client = !$mongrel_debug_client }
+      # restart
+      #trap "USR2" { log "USR2 signal received."; stop(true) }
+
+  stop|graceful) kill -TERM $master_pid  ;;
+  kill)          kill -INT $master_pid  ;;
+  logs)          kill -USR1 $master_pid  ;;
+  restart)       kill -USR1 $master_pid   ;;
+  increase)      mongrel_adjust "increase" ;;
+  decrease)      mongrel_adjust "decrease" ;;
+  start)
+
+  ;;
+  restart) mongrel start && sleep 1 && mongrel stop ;;
+esac
+
+mongrel_start() { mongrel -c $project_path/config/mongrel.rb -E $RAILS_ENV -D ; }
+mongrel_stop() { : ; }
+mongrel_stop() { : ; }
+mongrel_adjust() { : ; }
+
+

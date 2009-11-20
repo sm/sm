@@ -1,0 +1,15 @@
+#
+# Passenger
+#
+case "$1" in
+  start) ;;
+  stop) ;;
+  restart)
+    # Default is passenger
+    log "Restarting Passenger Application."
+    mkdir -p $project_dir/tmp
+    touch $project_dir/tmp/restart.txt
+    log "Restart triggered."
+  ;;
+esac
+

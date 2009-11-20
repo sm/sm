@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+result=0
+user=$(whoami)
+if [ -z "$project" ] ; then
+# TODO: Improve this line vv
+  if [ -d $HOME/shared/$user ] ; then
+    project=$user
+  else
+    echo -e "\$project was not specified."
+    exit 1
+  fi
+fi
+remote=${remote:-"origin"}
+branch=${branch:-"master"}
+framework=${framework:-"rails"}
+keep_releases=${keep_releases:-"10"}
+timestamp="$(date +%m.%d.%Y-%H:%M:%S)"
+
+project_path="${project_path:-$HOME}"
+shared_path="${shared_path:-$project_path/shared}"
+current_path="${current_path:-$project_path/current}"
+RAILS_ENV="${RAILS_ENV:-"production"}" ; export RAILS_ENV
+old_releases="$(ls -t | awk "NR > $keep_releases { print \$0 }")"
+
+if [ -f ".${project}rc" ] ; then source ".${project}rc" ; fi
+if [ -f ".rvmrc" ] ; then source ".rvmrc" ; fi
+
+trap 'cleanup_variables ; rm -rf "/tmp/bdsm/$$" >/dev/null 2>&1' 0 1 2 3 15
+
+export user project remote branch framework keep_releases timestamp project_path current_path shared_path RAILS_ENV old_releases
+

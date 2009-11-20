@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+#
+# Thin
+#
+
+builtin cd $current_path
+if [ -f ".bdsmrc" ] ; then source .bdsmrc ; fi
+if [ -f ".${project}rc" ] ; then source ".${project}rc" ; fi
+
+master_pid="$(ps auxww | grep '[m]ongrel' | awk '/'${project}'/{print $2}')"
+if [[! -z "$master_pid"]] && [[ $master_pid -gt 0 ]] ; then
+  thin restart
+else # start
+  thin start
+fi
+
+builtin cd $project_path
+case "$1" in
+      #trap "TERM" { log "TERM signal received."; stop }
+      #trap "USR1" {log "USR1 received, toggling $thin_debug_client to #{!$thin_debug_client}"; $thin_debug_client = !$thin_debug_client }
+      # restart
+      #trap "USR2" { log "USR2 signal received."; stop(true) }
+
+  stop|graceful) kill -TERM $master_pid  ;;
+  kill)          kill -INT $master_pid  ;;
+  logs)          kill -USR1 $master_pid  ;;
+  restart)       kill -USR1 $master_pid   ;;
+  increase)      thin_adjust "increase" ;;
+  decrease)      thin_adjust "decrease" ;;
+  start)
+
+  ;;
+  restart) thin start && sleep 1 && thin stop ;;
+esac
+
+thin_start() { thin -c $project_path/config/thin.rb -E $RAILS_ENV -D ; }
+thin_stop() { : ; }
+thin_stop() { : ; }
+thin_adjust() { : ; }
+
