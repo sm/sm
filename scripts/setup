@@ -14,19 +14,19 @@ touch $project_path/shared/config/database.yml
 touch $project_path/.bash_profile
 
 if ! awk "/^project/" "$HOME/.bash_profile" ; then
-  echo "project=\"$(user)\" ; export project" >> $HOME/.bdsmrc
+  echo "project=\"$(user)\" ; export project" >> $HOME/.bash_profile
 fi
 
 if ! awk "/^environment/" "$HOME/.bash_profile" ; then
-  echo "environment=\"production\" ; export environment" >> $HOME/.bdsmrc
+  echo "environment=\"production\" ; export environment" >> $HOME/.bash_profile
 fi
 
 if ! awk "/^RAILS_ENV/" "$HOME/.bash_profile" ; then
-  echo "RAILS_ENV=\"\$environment\" ; export RAILS_ENV" >> $HOME/.bdsmrc
+  echo "RAILS_ENV=\"\$environment\" ; export RAILS_ENV" >> $HOME/.bash_profile
 fi
 
 if ! awk '/current\/\.rvmrc/' "$HOME/.bash_profile" ; then
-  echo 'if [[ -d $HOME/current ]] && [[ -f $HOME/current/.rvmrc ]] ; then source $HOME/current/.rvmrc ; fi' >> $HOME/.bdsmrc
+  echo 'if [[ -d $HOME/current ]] && [[ -f $HOME/current/.rvmrc ]] ; then source $HOME/current/.rvmrc ; fi' >> $HOME/.bash_profile
 fi
 
 if [[ ! -s "$HOME/.rvm/scripts/rvm" ]] ; then
