@@ -14,18 +14,25 @@ update() {
 update_repository() {
   $scripts_path/log "info" "Updating local repository in $shared_path/$project."
   builtin cd "$shared_path/$project" > /dev/null 2>&1
-  current_branch=$(git branch | awk '/\* /{print $2}')
-  # TODO: Improve error handling
-  if [ "$current_branch" != "$branch" ] ; then
-    $scripts_path/log "info" "Switching to branch $branch from $current_branch"
-    git checkout -b $branch --track $remote/$branch
-  fi
-  git pull $remote $branch
 
-  if [ -f .gitmodules ] ; then
-    $scripts_path/log "info" "Updating submodules."
-    git submodule init 2>/dev/null
-    git submodule update
+  if [ "$vcs" = 'git' ]
+  then
+    current_branch=$(git branch | awk '/\* /{print $2}')
+    # TODO: Improve error handling
+    if [ "$current_branch" != "$branch" ] ; then
+      $scripts_path/log "info" "Switching to branch $branch from $current_branch"
+      git checkout -b $branch --track $remote/$branch
+    fi
+    git pull $remote $branch
+
+    if [ -f .gitmodules ] ; then
+      $scripts_path/log "info" "Updating submodules."
+      git submodule init 2>/dev/null
+      git submodule update
+    fi
+  elif [ "$vcs" = 'hg' ]
+    hg pull
+    hg update $branch
   fi
 }
 
@@ -36,7 +43,7 @@ update_current() {
     mv $current_path $project_path/previous/$timestamp
   fi
   $scripts_path/log "info" "Installing new release to $current_path"
-  rsync -ag --exclude=".git/*" $shared_path/$project/ $current_path;
+  rsync -ag --exclude=".$vcs/*" $shared_path/$project/ $current_path;
 }
 
 configure() {

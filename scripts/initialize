@@ -18,6 +18,7 @@ branch=${branch:-"master"}
 framework=${framework:-"rails"}
 keep_releases=${keep_releases:-"10"}
 timestamp="$(date +%m.%d.%Y-%H:%M:%S)"
+vcs=${vcs:-"git"}
 
 project_path="${project_path:-$HOME}"
 shared_path="${shared_path:-$project_path/shared}"
@@ -31,5 +32,5 @@ if [ -f ".rvmrc" ] ; then source ".rvmrc" ; fi
 
 trap 'rm -rf "/tmp/bdsm/$$" >/dev/null 2>&1' 0 1 2 3 15
 
-export user project remote branch framework keep_releases timestamp project_path current_path shared_path RAILS_ENV old_releases scripts_path
+export user project remote branch framework keep_releases timestamp project_path current_path shared_path RAILS_ENV old_releases scripts_path vcs
 
