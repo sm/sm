@@ -75,7 +75,7 @@ configure() {
 
 symlink() {
   $scripts_path/log "info" "Setting up persistent directories"
-  for dir in $scripts_path/logpublic/assets pids files ; do
+  for dir in tmp log public/assets pids files ; do
     if [ -d $shared_path/$dir ] ; then
       $scripts_path/log "info" " - $dir"
       rm -rf $current_path/$dir
