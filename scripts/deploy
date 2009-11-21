@@ -31,6 +31,7 @@ update_repository() {
       git submodule update
     fi
   elif [ "$vcs" = 'hg' ]
+  then
     hg pull
     hg update $branch
   fi
