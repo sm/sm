@@ -74,7 +74,7 @@ while [ $# -gt 0 ] ; do
       action="${action:-$token}"
     ;;
 
-    start|stop|graceful|reload|install|uninstall|pause|unpause|kill|increase|decrease|logs)
+    start|stop|graceful|reload|install|uninstall|pause|unpause|kill|increase|decrease|logs|restart)
       eval "export ${token/--/}_flag=1"
     ;;
 
