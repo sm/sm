@@ -11,10 +11,8 @@ if [[ "$start_flag" -eq 1 ]] ; then
   if [[ "$master_pid" -gt 0 ]] ; then
     sleep 1 ; kill -QUIT  $master_pid
   fi
-  #return $?
 elif [[ "$master_pid" -le 0 ]] ; then
   echo "unicorn is not running for $project yet."
-  #return 1
 elif [[ "$stop_flag" -eq 1 ]] || [[ "$graceful_flag" -eq 1 ]] ; then
   kill -QUIT  $master_pid
 elif [[ "$restart_flag" -eq 1 ]] ; then
