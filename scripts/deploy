@@ -15,8 +15,7 @@ update_repository() {
   $scripts_path/log "info" "Updating local repository in $shared_path/$project."
   builtin cd "$shared_path/$project" > /dev/null 2>&1
 
-  if [ "$vcs" = 'git' ]
-  then
+  if [[ "git" = "$vcs"]] ; then
     current_branch=$(git branch | awk '/\* /{print $2}')
     # TODO: Improve error handling
     if [ "$current_branch" != "$branch" ] ; then
@@ -30,8 +29,7 @@ update_repository() {
       git submodule init 2>/dev/null
       git submodule update
     fi
-  elif [ "$vcs" = 'hg' ]
-  then
+  elif [[ "hg" = "$vcs" ]] ; then
     hg pull
     hg update $branch
   fi
@@ -44,7 +42,7 @@ update_current() {
     mv $current_path $project_path/previous/$timestamp
   fi
   $scripts_path/log "info" "Installing new release to $current_path"
-  rsync -ag --exclude=".$vcs/*" $shared_path/$project/ $current_path;
+  rsync -ag --exclude=".${vcs}/*" $shared_path/$project/ $current_path;
 }
 
 configure() {
@@ -57,7 +55,7 @@ configure() {
   done
 
   $scripts_path/log "info" "Setting up persistent config files:"
-  for config_file in $(ls $shared_path/config/*.conf); do
+  for config_file in $(ls $shared_path/config/*.conf 2>/dev/null); do
     file_name=$(basename $config_file)
     $scripts_path/log "info" " - $file_name"
     rm -f $current_path/config/$file_name
@@ -65,7 +63,7 @@ configure() {
   done
 
   $scripts_path/log "info" "Setting up persistent ruby config files:"
-  for config_file in $(ls $shared_path/config/*.rb); do
+  for config_file in $(ls $shared_path/config/*.rb 2>/dev/null); do
     file_name=$(basename $config_file)
     $scripts_path/log "info" " - $file_name"
     rm -f $current_path/config/$file_name
@@ -88,6 +86,7 @@ symlink() {
 
 cleanup() {
   $scripts_path/log "info" "Removing old releases..."
+  mkdir -p $project_path/previous
   builtin cd $project_path/previous
   for release in $old_releases ; do
     if [ -d $release ] ; then

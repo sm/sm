@@ -18,14 +18,25 @@ branch=${branch:-"master"}
 framework=${framework:-"rails"}
 keep_releases=${keep_releases:-"10"}
 timestamp="$(date +%m.%d.%Y-%H:%M:%S)"
-vcs=${vcs:-"git"}
-
 project_path="${project_path:-$HOME}"
 shared_path="${shared_path:-$project_path/shared}"
 current_path="${current_path:-$project_path/current}"
 current_path="${current_path:-$project_path/current}"
 RAILS_ENV="${RAILS_ENV:-"production"}" ; export RAILS_ENV
 old_releases="$(ls -t | awk "NR > $keep_releases { print \$0 }")"
+
+# TODO: Make this even more flexible. eg. check
+if [[ -z "$vcs" ]] ; then
+  if [[ -d "$shared/$project/.git" ]] ; then
+    vcs="git"
+  elif [[ -d "$shared/$project/.svn" ]] ; then
+    vcs="svn"
+  elif [[ -d "$shared/$project/.hg" ]] ; then
+    vcs=hg
+  else
+    vcs="git" # default to awesome :)
+  fi
+fi
 
 if [ -f ".${project}rc" ] ; then source ".${project}rc" ; fi
 if [ -f ".rvmrc" ] ; then source ".rvmrc" ; fi
