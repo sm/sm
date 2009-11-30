@@ -15,7 +15,7 @@ update_repository() {
   $scripts_path/log "info" "Updating local repository in $shared_path/$project."
   builtin cd "$shared_path/$project" > /dev/null 2>&1
 
-  if [[ "git" = "$vcs"]] ; then
+  if [[ "git" = "$vcs" ]] ; then
     current_branch=$(git branch | awk '/\* /{print $2}')
     # TODO: Improve error handling
     if [ "$current_branch" != "$branch" ] ; then
