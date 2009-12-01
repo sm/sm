@@ -16,14 +16,14 @@ fi
 remote=${remote:-"origin"}
 branch=${branch:-"master"}
 framework=${framework:-"rails"}
-keep_releases=${keep_releases:-"10"}
+keep_releases=${keep_releases:-"4"}
 timestamp="$(date +%m.%d.%Y-%H:%M:%S)"
 project_path="${project_path:-$HOME}"
 shared_path="${shared_path:-$project_path/shared}"
 current_path="${current_path:-$project_path/current}"
 current_path="${current_path:-$project_path/current}"
 RAILS_ENV="${RAILS_ENV:-"production"}" ; export RAILS_ENV
-old_releases="$(ls -t | awk "NR > $keep_releases { print \$0 }")"
+old_releases="$(cd ~/previous && ls -t | awk "NR > $keep_releases { print \$0 }")"
 
 # TODO: Make this even more flexible. eg. check
 if [[ -z "$vcs" ]] ; then
@@ -39,7 +39,6 @@ if [[ -z "$vcs" ]] ; then
 fi
 
 if [ -f ".${project}rc" ] ; then source ".${project}rc" ; fi
-if [ -f ".rvmrc" ] ; then source ".rvmrc" ; fi
 
 trap 'rm -rf "/tmp/bdsm/$$" >/dev/null 2>&1' 0 1 2 3 15
 

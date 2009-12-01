@@ -74,7 +74,7 @@ configure() {
 symlink() {
   $scripts_path/log "info" "Setting up persistent directories"
   for dir in tmp log public/assets pids files ; do
-    if [ -d $shared_path/$dir ] ; then
+    if [[ -d $shared_path/$dir ]] ; then
       $scripts_path/log "info" " - $dir"
       rm -rf $current_path/$dir
       ln -nfs $shared_path/$dir $current_path/$dir
@@ -85,18 +85,20 @@ symlink() {
 }
 
 cleanup() {
-  $scripts_path/log "info" "Removing old releases..."
   mkdir -p $project_path/previous
-  builtin cd $project_path/previous
-  for release in $old_releases ; do
-    if [ -d $release ] ; then
-      $scripts_path/log "info" " - $release"
-      rm -rf $release
-    else
-      $scripts_path/log "info" "info" "Skipping ~/previous/$release as the directory does not exist."
-    fi
-  done
-  cd
+  if [[ ! -z "$old_releases" ]] ; then
+    $scripts_path/log "info" "Removing old releases..."
+    builtin cd $project_path/previous
+    for release in $(echo $old_releases) ; do
+      if [[ -d "$release" ]] ; then
+        $scripts_path/log "info" " - $release"
+        rm -rf $release
+      else
+        $scripts_path/log "info" "info" "Skipping ~/previous/$release as the directory does not exist."
+      fi
+    done
+    cd
+  fi
 }
 
 $scripts_path/log "info" "info" "Deploying..."

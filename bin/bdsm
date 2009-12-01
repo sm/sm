@@ -56,7 +56,6 @@ Notes:
 
 # Setup
 prefix="${prefix:-/usr/local}"
-if [[ -f $HOME/.bash_profile ]] ; then source "$HOME/.bash_profile" ; fi
 if [[ -f "$HOME/.bdsmrc" ]]     ; then source "$HOME/.bdsmrc" ; fi
 source $prefix/bdsm/scripts/initialize
 
