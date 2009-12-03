@@ -3,7 +3,9 @@
 if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
 
 hook() {
-  if [[ -f "$current_path/.$1" ]] ; then source "$current_path/.$1" ; fi
+  if [[ -f "$shared_path/$project/.$1" ]] ; then
+    source "$shared_path/$project/.$1"
+  fi
 }
 
 update() {
@@ -103,9 +105,8 @@ cleanup() {
 
 $scripts_path/log "info" "info" "Deploying..."
 (
-  hook "before_deploy" &&
   update_repository &&
-  hook "after_repository_update" &&
+  hook "before_deploy" &&
   update_current &&
   hook "after_update_current" &&
   configure &&
