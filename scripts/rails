@@ -18,6 +18,10 @@ dbconsole() {
   if [[ -f script/console ]] ; then ruby script/dbconsole ; fi
 }
 
+logtail() {
+  :
+}
+
 bootstrap() {
   # rake gems:install
   # rvm gems load

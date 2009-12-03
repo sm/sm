@@ -21,17 +21,23 @@ function usage {
 
 CLI
 
-  bdsm deploy
-  bdsm install [server]
-  bdsm setup [server]  ((--force))
-  bdsm stop [server]
-  bdsm start [server]
-  bdsm restart [server]
-  bdsm reload [server]
-  bdsm migrate
-  bdsm tail   # Tail all logs in shared/log/*.log
-  bdsm console
-  bdsm dbconsole
+  bdsm <service> <action>
+
+  Examples:
+    bdsm deploy
+
+    bdsm nginx install
+    bdsm nginx setup  ((--force))
+    bdsm nginx stop
+    bdsm nginx start
+    bdsm nginx restart
+    bdsm nginx reload
+
+    bdsm (rails) migrate
+    bdsm (rails) setup
+    bdsm (rails) logtail
+    bdsm (rails) console
+    bdsm (rails) dbconsole
 
 Notes:
 
@@ -64,13 +70,11 @@ while [ $# -gt 0 ] ; do
   token="$1" ; shift
   case "$token" in
 
-    migrate|logtail|console|dbconsole|deploy)
-      action=$token
-    ;;
+    deploy) action="deploy" ;;
 
-    nginx|apache|thinking_sphinx|solr|unicorn|mongrel|thin|passenger|setup)
-      server="$token"
-      action="${action:-$token}"
+    migrate|logtail|console|dbconsole|setup)
+      service="rails"
+      action=$token
     ;;
 
     start|stop|graceful|reload|install|uninstall|pause|unpause|kill|increase|decrease|logs|restart)
@@ -86,8 +90,14 @@ while [ $# -gt 0 ] ; do
 
     *)
       if [[ -z "$action" ]] ; then
-        action="error"
-        error_message="An action must be specified."
+        services=$(cd $scripts_path/services; ls *)
+        if $scripts_path/match "$token" $services ; then
+          service="$token"
+          action="${action:-$token}"
+        else
+          action="error"
+          error_message="An action must be specified."
+        fi
       else
         if [[ -d "/data/$token" ]] ; then
           project="$token"
@@ -103,6 +113,7 @@ while [ $# -gt 0 ] ; do
       fi
     ;;
   esac
+
   if [ ! -z "$parse_break" -o ! -z "$error_message" ] ; then unset parse_break; break; fi
 done
 

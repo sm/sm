@@ -1,0 +1,25 @@
+
+- On the server
+
+= As Root
+
+  * adduser to create new user account and home directory.  set password during process
+  * add user to sudoer's for nginx restart
+
+As User
+  bdsm setup --repo=Y --project X --environment Y
+  bdsm deploy # Creates ~/current and all necessary symlinks.
+
+  # Adjust database.yml for your own settings (password,adapter,host,etc...)
+  ${EDITOR:-vi} ~/shared/config/database.yml
+
+  bdsm bootstrap rails
+
+  ssh-keygen -t rsa -b 2048 -f "$HOME/.ssh/id_$project_$environment" -N '' -C "$project $environment rsa key."
+  # Message about setting up authorized keys.
+
+  bdsm <server> start
+
+As root:
+  copy /home/$project/shared/nginx/$project.conf /etc/nginx/servers
+
