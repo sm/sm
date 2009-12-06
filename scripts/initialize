@@ -23,7 +23,9 @@ shared_path="${shared_path:-$project_path/shared}"
 current_path="${current_path:-$project_path/current}"
 current_path="${current_path:-$project_path/current}"
 RAILS_ENV="${RAILS_ENV:-"production"}" ; export RAILS_ENV
-old_releases="$(cd ~/previous && ls -t | awk "NR > $keep_releases { print \$0 }")"
+if [[ -d "$project_path/previous" ]] ; then
+  old_releases="$(cd $project_path/previous && ls -t | awk "NR > $keep_releases { print \$0 }")"
+fi
 
 # TODO: Make this even more flexible. eg. check
 if [[ -z "$vcs" ]] ; then
