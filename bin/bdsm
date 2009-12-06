@@ -60,16 +60,21 @@ Notes:
 " | ${PAGER:-less}
 }
 
+#
 # Setup
+#
 prefix="${prefix:-/usr/local}"
 if [[ -f "$HOME/.bdsmrc" ]]     ; then source "$HOME/.bdsmrc" ; fi
 source $prefix/bdsm/scripts/initialize
 
+#
 # parse args
+#
 while [ $# -gt 0 ] ; do
   token="$1" ; shift
   case "$token" in
 
+    # TODO: deploy activates framework deploy after doing common deploy tasks (repo update, hooks).
     deploy) action="deploy" ;;
 
     migrate|logtail|console|dbconsole|setup)
@@ -124,19 +129,17 @@ if [ ! -z "$error_message" ] ; then exit 1 ; fi
 #
 if [[ "$trace_flag" = 1 ]] ; then set -x ; else set +x ; fi
 result=0
-case "$action" in
-  setup)           $scripts_path/setup           ;;
-  console)         $scripts_path/rails console   ;;
-  dbconsole)       $scripts_path/rails dbconsole ;;
-  logtail)         $scripts_path/logtail         ;;
-  version)         version                       ;;
-  unicorn)         $scripts_path/unicorn         ;;
-  mongrel)         $scripts_path/mongrel         ;;
-  thin)            $scripts_path/thin            ;;
-  thinking_sphinx) $scripts_path/thinking_sphinx ;;
-  deploy)          $scripts_path/deploy          ;;
-  *)               usage                         ;;
-esac
+
+if [[ ! -z "$service" ]] && [[ ! -z "$action" ]] ; then
+  if [[ -z "$services_path/$service/$action" ]] ; then
+    $services_path/$service/$action "$*"
+  fi
+elif [[ "$action" = "version" ]] ; then
+  version
+else
+  usage
+fi
+
 result=$?
 
 exit $result
