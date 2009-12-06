@@ -7,5 +7,9 @@ for dir in bin scripts ; do
   rsync -agz ./$dir/ /usr/local/bdsm/$dir/
 done
 
+if [[ ! -s "$prefix/bdsm/config/user" ]] ; then
+  echo '# Users settings file, overrides db file settings and persists across installs.' >> $prefix/bdsm/config/user
+fi
+
 ln -nfs "${prefix}/bdsm/bin/bdsm" "${prefix}/bin/bdsm"
 
