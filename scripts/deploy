@@ -105,7 +105,7 @@ cleanup() {
 
 $scripts_path/log "info" "info" "Deploying..."
 (
-  update_repository &&
+  update_repository
   hook "before_deploy" &&
   update_current &&
   hook "after_update_current" &&

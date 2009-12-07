@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-scripts_path="${scripts_path:-"${prefix}/bdsm/scripts"}"
-
+bdsm_path="${bdsm_path:-"${prefix}/bdsm"}"
 result=0
 user=$(whoami)
 if [ -z "$project" ] ; then
@@ -13,6 +12,11 @@ if [ -z "$project" ] ; then
     exit 1
   fi
 fi
+scripts_path="${scripts_path:-"${bdsm_path}/scripts"}"
+services_path="${services_path:-"${bdsm_path}/services"}"
+templates_path="${templates_path:-"${bdsm_path}/templates"}"
+config_path="${config_path:-"${bdsm_path}/config"}"
+
 remote=${remote:-"origin"}
 branch=${branch:-"master"}
 framework=${framework:-"rails"}

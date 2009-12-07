@@ -75,7 +75,9 @@ while [ $# -gt 0 ] ; do
   case "$token" in
 
     # TODO: deploy activates framework deploy after doing common deploy tasks (repo update, hooks).
-    deploy) action="deploy" ;;
+    deploy)
+      action="deploy"
+    ;;
 
     migrate|logtail|console|dbconsole|setup)
       service="rails"
@@ -94,27 +96,22 @@ while [ $# -gt 0 ] ; do
     --version)         action="version"                                   ;;
 
     *)
-      if [[ -z "$action" ]] ; then
-        services=$(cd $scripts_path/services; ls *)
-        if $scripts_path/match "$token" $services ; then
-          service="$token"
-          action="${action:-$token}"
-        else
-          action="error"
-          error_message="An action must be specified."
-        fi
+      #if $scripts_path/match "$token" $services ; then
+      if [[ -z "$service" ]] ; then
+        if [[ -d "$services_path/$token" ]] ; then service="$token" ; fi
+        if [[ -s "$services_path/$service/$token" ]] ; then action="$token" ; fi
+      elif [[ -z "$action" ]] ; then
+        if [[ -s "$services_path/$service/$token" ]] ; then action="$token" ; fi
+      elif [[ -d "/data/$token" ]] ; then
+        project="$token"
+        project_path="/data/$token"
+      elif [[ -d "/home/$token" ]] ; then
+        project="$token"
+        project_path="/home/$token"
       else
-        if [[ -d "/data/$token" ]] ; then
-          project="$token"
-          project_path="/data/$token"
-        elif [[ -d "/home/$token" ]] ; then
-          project="$token"
-          project_path="/home/$token"
-        else
-          # determine sanity of project
-          action="error"
-          error_message="Unrecognized command line argument(s): '$token $@'"
-        fi
+        # determine sanity of project
+        action="error"
+        error_message="Unrecognized command line argument(s): '$token $@'"
       fi
     ;;
   esac
@@ -130,8 +127,10 @@ if [ ! -z "$error_message" ] ; then exit 1 ; fi
 if [[ "$trace_flag" = 1 ]] ; then set -x ; else set +x ; fi
 result=0
 
-if [[ ! -z "$service" ]] && [[ ! -z "$action" ]] ; then
-  if [[ -z "$services_path/$service/$action" ]] ; then
+if [[ "deploy" = "$action" ]] ; then
+  $scripts_path/deploy "$*"
+elif [[ ! -z "$service" ]] && [[ ! -z "$action" ]] ; then
+  if [[ -s "$services_path/$service/$action" ]] ; then
     $services_path/$service/$action "$*"
   fi
 elif [[ "$action" = "version" ]] ; then
