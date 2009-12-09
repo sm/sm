@@ -34,6 +34,11 @@ update_repository() {
   elif [[ "hg" = "$vcs" ]] ; then
     hg pull
     hg update $branch
+  elif  [[ "svn" = "$vcs" ]] ; then
+    # TODO: specific revision / branch handling
+    svn update
+  else
+    $scripts_path/log "warn" "No repository found (git,hg,svn)"
   fi
 }
 

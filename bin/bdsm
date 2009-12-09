@@ -116,7 +116,7 @@ while [ $# -gt 0 ] ; do
     ;;
   esac
 
-  if [[ ! -z "$parse_break" -o ! -z "$error_message" ]] ; then unset parse_break ; break; fi
+  if [[ ! -z "$parse_break" ]] || [[ ! -z "$error_message" ]] ; then unset parse_break ; break; fi
 done
 
 if [[ ! -z "$error_message" ]] ; then exit 1 ; fi
