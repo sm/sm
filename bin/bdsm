@@ -84,9 +84,9 @@ while [ $# -gt 0 ] ; do
       action=$token
     ;;
 
-    start|stop|graceful|reload|install|uninstall|pause|unpause|kill|increase|decrease|logs|restart)
-      eval "export ${token/--/}_flag=1"
-    ;;
+    #start|stop|graceful|reload|install|uninstall|pause|unpause|kill|increase|decrease|logs|restart)
+    #  eval "export ${token/--/}_flag=1"
+    #;;
 
     --project)         export project="$1" ;;
     --environment)     export environment="$1" ;;
@@ -116,10 +116,10 @@ while [ $# -gt 0 ] ; do
     ;;
   esac
 
-  if [ ! -z "$parse_break" -o ! -z "$error_message" ] ; then unset parse_break; break; fi
+  if [[ ! -z "$parse_break" -o ! -z "$error_message" ]] ; then unset parse_break ; break; fi
 done
 
-if [ ! -z "$error_message" ] ; then exit 1 ; fi
+if [[ ! -z "$error_message" ]] ; then exit 1 ; fi
 
 #
 # Main Logic
@@ -128,10 +128,10 @@ if [[ "$trace_flag" = 1 ]] ; then set -x ; else set +x ; fi
 result=0
 
 if [[ "deploy" = "$action" ]] ; then
-  $scripts_path/deploy "$*"
+  $scripts_path/deploy $*
 elif [[ ! -z "$service" ]] && [[ ! -z "$action" ]] ; then
   if [[ -s "$services_path/$service/$action" ]] ; then
-    $services_path/$service/$action "$*"
+    $services_path/$service/$action $*
   fi
 elif [[ "$action" = "version" ]] ; then
   version

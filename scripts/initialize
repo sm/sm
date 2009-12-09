@@ -33,11 +33,11 @@ fi
 
 # TODO: Make this even more flexible. eg. check
 if [[ -z "$vcs" ]] ; then
-  if [[ -d "$shared/$project/.git" ]] ; then
+  if [[ -d "$shared_path/$project/.git" ]] ; then
     vcs="git"
-  elif [[ -d "$shared/$project/.svn" ]] ; then
+  elif [[ -d "$shared_path/$project/.svn" ]] ; then
     vcs="svn"
-  elif [[ -d "$shared/$project/.hg" ]] ; then
+  elif [[ -d "$shared_path/$project/.hg" ]] ; then
     vcs=hg
   else
     vcs="git" # default to awesome :)
