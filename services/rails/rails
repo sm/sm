@@ -27,4 +27,5 @@ bootstrap() {
   # rvm gems load
   # rake db:create
   # rake db:migrate
+  :
 }

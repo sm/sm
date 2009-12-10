@@ -69,6 +69,7 @@ Notes:
 prefix="${prefix:-/usr/local}"
 if [[ -f "$HOME/.bdsmrc" ]]     ; then source "$HOME/.bdsmrc" ; fi
 source $prefix/bdsm/scripts/initialize
+source $prefix/bdsm/scripts/functions
 
 #
 # parse args
@@ -96,9 +97,6 @@ while [ $# -gt 0 ] ; do
       if [[ -z "$service" ]] ; then
         if [[ -d "$services_path/$token" ]] ; then
           export service="$token"
-        fi
-        if [[ -x "$services_path/$service/$token" ]] ; then
-          export action="$token"
         fi
       elif [[ -z "$action" ]] ; then
         if [[ -x "$services_path/$service/$token" ]] ; then
@@ -134,7 +132,7 @@ if [[ ! -z "$service" ]] && [[ ! -z "$action" ]] ; then
     $services_path/$service/$action $*
   fi
 elif [[ ! -z "$service" ]] ; then
-  echo "bdsm $service: {$(ls $services_path/$service | tr ' ' ',')}"
+  echo $(actions_for_service $service)
 elif [[ "$action" = "version" ]] ; then
   version
 else
