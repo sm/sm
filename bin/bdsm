@@ -41,10 +41,13 @@ CLI
 
 Notes:
 
-  [project] is required
+  [service] is required, default may be set in ~/.bdsmrc
+  [action] is required as a command line parameter
+
+  [project] is required as an environment variable
    - if non root, otherwise defaults to the current user name if not set
 
-  [project|environment|repository]
+  [project|environment|repository|service]
    - may be exported as environment varaibles
    - or set in the ~/.bdsmrc
    - or specified as for example --project X
@@ -75,18 +78,11 @@ while [ $# -gt 0 ] ; do
   case "$token" in
 
     # TODO: deploy activates framework deploy after doing common deploy tasks (repo update, hooks).
-    deploy)
-      action="deploy"
-    ;;
+    deploy) service="bdsm" ; action="deploy" ;;
 
     migrate|logtail|console|dbconsole|setup)
-      service="rails"
-      action=$token
+      service="rails" ; action=$token
     ;;
-
-    #start|stop|graceful|reload|install|uninstall|pause|unpause|kill|increase|decrease|logs|restart)
-    #  eval "export ${token/--/}_flag=1"
-    #;;
 
     --project)         export project="$1" ;;
     --environment)     export environment="$1" ;;
@@ -98,10 +94,16 @@ while [ $# -gt 0 ] ; do
     *)
       #if $scripts_path/match "$token" $services ; then
       if [[ -z "$service" ]] ; then
-        if [[ -d "$services_path/$token" ]] ; then service="$token" ; fi
-        if [[ -s "$services_path/$service/$token" ]] ; then action="$token" ; fi
+        if [[ -d "$services_path/$token" ]] ; then
+          export service="$token"
+        fi
+        if [[ -x "$services_path/$service/$token" ]] ; then
+          export action="$token"
+        fi
       elif [[ -z "$action" ]] ; then
-        if [[ -s "$services_path/$service/$token" ]] ; then action="$token" ; fi
+        if [[ -x "$services_path/$service/$token" ]] ; then
+          export action="$token"
+        fi
       elif [[ -d "/data/$token" ]] ; then
         project="$token"
         project_path="/data/$token"
@@ -124,15 +126,15 @@ if [[ ! -z "$error_message" ]] ; then exit 1 ; fi
 #
 # Main Logic
 #
-if [[ "$trace_flag" = 1 ]] ; then set -x ; else set +x ; fi
 result=0
 
-if [[ "deploy" = "$action" ]] ; then
-  $scripts_path/deploy $*
-elif [[ ! -z "$service" ]] && [[ ! -z "$action" ]] ; then
+if [[ "$trace_flag" = 1 ]] ; then set -x ; else set +x ; fi
+if [[ ! -z "$service" ]] && [[ ! -z "$action" ]] ; then
   if [[ -s "$services_path/$service/$action" ]] ; then
     $services_path/$service/$action $*
   fi
+elif [[ ! -z "$service" ]] ; then
+  echo "bdsm $service: {$(ls $services_path/$service | tr ' ' ',')}"
 elif [[ "$action" = "version" ]] ; then
   version
 else

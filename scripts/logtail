@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-exec tail -f $project_path/shared/log/*.log
