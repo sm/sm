@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
+
+builtin cd $current_path
+
+if [[ -s $bdsm_dir/unicorn/templates/unicorn.rb ]] ; then
+  echo -e "ERROR: $bdsm_dir/unicorn/templates/unicorn.rb template is missing."
+  exit 1
+fi
+
+mkdir -p $shared_path/config/
+
+cp $bdsm_dir/unicorn/templates/unicorn.rb $shared_path/config/
+exit $?

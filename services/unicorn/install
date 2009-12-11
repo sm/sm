@@ -2,5 +2,7 @@
 
 if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
 
-builtin cd $current_path
+cd $current_path
+
+gem install unicorn --no-rdoc --no-ri -q
 
