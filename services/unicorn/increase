@@ -9,9 +9,8 @@ builtin cd $current_path
 if [[ "$master_pid" -le 0 ]] ; then
   echo "unicorn is not running for $project yet."
 else
-  kill -USR2 $master_pid
-  sleep 5
-  kill -QUIT $master_pid
+  kill -TTOU  $master_pid
 fi
 
 exit $?
+

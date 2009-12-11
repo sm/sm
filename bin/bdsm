@@ -21,13 +21,13 @@ function usage {
 
 CLI
 
-  bdsm <service> <action>
+  bdsm <service> <action> <<arguments>>
 
   Examples:
     bdsm deploy
 
     bdsm nginx install
-    bdsm nginx setup  ((--force))
+    bdsm nginx setup
     bdsm nginx stop
     bdsm nginx start
     bdsm nginx restart
@@ -101,6 +101,8 @@ while [ $# -gt 0 ] ; do
       elif [[ -z "$action" ]] ; then
         if [[ -x "$services_path/$service/$token" ]] ; then
           export action="$token"
+          bdsm_args="$@"
+          parse_break=1
         fi
       elif [[ -d "/data/$token" ]] ; then
         project="$token"

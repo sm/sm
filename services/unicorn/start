@@ -1,2 +1,15 @@
 #!/usr/bin/env bash
 
+if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
+
+master_pid="$(ps auxww | grep '[u]nicorn' | grep 'master' | awk '/'${project}'/{print $2}')"
+
+builtin cd $current_path
+
+if [[ "$master_pid" -gt 0 ]] ; then
+  echo -e "Unicorns are already running for $project."
+else
+  unicorn_rails -c $current_path/config/unicorn.rb -E $RAILS_ENV -D
+fi
+
+exit $?

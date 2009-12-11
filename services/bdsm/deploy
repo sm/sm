@@ -25,7 +25,6 @@ update_repository() {
       git checkout -b $branch --track $remote/$branch
     fi
     git pull $remote $branch
-
     if [ -f .gitmodules ] ; then
       $scripts_path/log "info" "Updating submodules."
       git submodule init 2>/dev/null
@@ -33,10 +32,19 @@ update_repository() {
     fi
   elif [[ "hg" = "$vcs" ]] ; then
     hg pull
-    hg update $branch
+    if [[ ! -z "$revision" ]] ; then
+      hg update $branch $revision # TODO: Find out if this is how it's done for hg ;)
+    else
+      hg update $branch
+    fi
   elif  [[ "svn" = "$vcs" ]] ; then
     # TODO: specific revision / branch handling
-    svn update
+    if [[ "$revision" -gt 0 ]] ; then
+      svn update
+      svn checkout -r $revision
+    else
+      svn update
+    fi
   else
     $scripts_path/log "warn" "No repository found (git,hg,svn)"
   fi
