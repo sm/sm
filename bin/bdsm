@@ -90,7 +90,7 @@ while [ $# -gt 0 ] ; do
     --repo|repository) export repository="$1" ;;
     --trace)           export trace_flag=1 ; export debug_flag=1 ; set -x ;;
     --debug)           export debug_flag=1                                ;;
-    --version)         action="version"                                   ;;
+    -v|--version)      action="version"                                   ;;
 
     *)
       #if $scripts_path/match "$token" $services ; then
@@ -130,7 +130,9 @@ result=0
 
 if [[ "$trace_flag" = 1 ]] ; then set -x ; else set +x ; fi
 
-if [[ ! -z "$service" ]] && [[ ! -z "$action" ]] ; then
+if [[ "version" = "$action" ]] ; then
+  version
+elif [[ ! -z "$service" ]] && [[ ! -z "$action" ]] ; then
   if [[ -z "$project" ]] ; then
     echo -e "\$project is unspecified."
     exit 1
