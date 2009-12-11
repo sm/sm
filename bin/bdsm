@@ -79,7 +79,7 @@ while [ $# -gt 0 ] ; do
   case "$token" in
 
     # TODO: deploy activates framework deploy after doing common deploy tasks (repo update, hooks).
-    deploy) service="bdsm" ; action="deploy" ;;
+    deploy|backup_database) service="bdsm" ; action="$token" ;;
 
     migrate|logtail|console|dbconsole|setup)
       service="rails" ; action=$token
