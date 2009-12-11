@@ -1,32 +1,32 @@
 #!/usr/bin/env bash
 
-bdsm_path="${bdsm_path:-"${prefix}/bdsm"}"
-result=0
-user=$(whoami)
+export bdsm_path="${bdsm_path:-"${prefix}/bdsm"}"
+
 if [ -z "$project" ] ; then
 # TODO: Improve this line vv
   if [ -d $HOME/shared/$user ] ; then
-    project=$user
-  else
-    echo -e "\$project was not specified."
-    exit 1
+    export project=$user
   fi
 fi
-scripts_path="${scripts_path:-"${bdsm_path}/scripts"}"
-services_path="${services_path:-"${bdsm_path}/services"}"
-templates_path="${templates_path:-"${bdsm_path}/templates"}"
-config_path="${config_path:-"${bdsm_path}/config"}"
 
-remote=${remote:-"origin"}
-branch=${branch:-"master"}
-framework=${framework:-"rails"}
-keep_releases=${keep_releases:-"4"}
-timestamp="$(date +%m.%d.%Y-%H:%M:%S)"
-project_path="${project_path:-$HOME}"
-shared_path="${shared_path:-$project_path/shared}"
-current_path="${current_path:-$project_path/current}"
-current_path="${current_path:-$project_path/current}"
-RAILS_ENV="${RAILS_ENV:-"production"}" ; export RAILS_ENV
+export scripts_path="${scripts_path:-"${bdsm_path}/scripts"}"
+export services_path="${services_path:-"${bdsm_path}/services"}"
+export templates_path="${templates_path:-"${bdsm_path}/templates"}"
+export config_path="${config_path:-"${bdsm_path}/config"}"
+export remote=${remote:-"origin"}
+export branch=${branch:-"master"}
+export framework=${framework:-"rails"}
+export keep_releases=${keep_releases:-"4"}
+export timestamp="$(date +%m.%d.%Y-%H:%M:%S)"
+export project_path="${project_path:-$HOME}"
+export shared_path="${shared_path:-$project_path/shared}"
+export current_path="${current_path:-$project_path/current}"
+export current_path="${current_path:-$project_path/current}"
+export RAILS_ENV="${RAILS_ENV:-"production"}"
+
+result=0
+user=$(whoami)
+
 if [[ -d "$project_path/previous" ]] ; then
   old_releases="$(cd $project_path/previous && ls -t | awk "NR > $keep_releases { print \$0 }")"
 fi

@@ -129,14 +129,18 @@ if [[ ! -z "$error_message" ]] ; then exit 1 ; fi
 result=0
 
 if [[ "$trace_flag" = 1 ]] ; then set -x ; else set +x ; fi
+
 if [[ ! -z "$service" ]] && [[ ! -z "$action" ]] ; then
+  if [[ -z "$project" ]] ; then
+    echo -e "\$project is unspecified."
+    exit 1
+  fi
+
   if [[ -s "$services_path/$service/$action" ]] ; then
     $services_path/$service/$action $*
   fi
 elif [[ ! -z "$service" ]] ; then
   echo $(actions_for_service $service)
-elif [[ "$action" = "version" ]] ; then
-  version
 else
   usage
 fi
