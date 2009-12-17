@@ -6,7 +6,7 @@ prefix    = (%x{uname}.strip == "Linux") ? "/home/#{project}/shared" : "tmp/"
   :preload_app => { "development" => false, "qa" => true, "ci" => true, "staging" => true, "production" => true },
   :pid => { "development" => "#{prefix}/#{project}.pid", "ci" => "#{prefix}/#{project}.pid", "qa" => "#{prefix}/#{project}.pid", "staging" => "#{prefix}/#{project}.pid", "production" => "#{prefix}/#{project}.pid" },
   :listen => { "development" => "#{prefix}/#{project}.sock", "ci" => "#{prefix}/#{project}.sock", "qa" => "#{prefix}/#{project}.sock", "staging" => "#{prefix}/#{project}.sock", "production" => "#{prefix}/#{project}.sock" },
-  :worker_processes => { "development" => 2, "ci" => 1, "qa" => 2, "staging" => 2, "production" => 6 }
+  :worker_processes => { "development" => 2, "ci" => 2, "qa" => 2, "staging" => 2, "production" => 6 }
 }
 
 preload_app @config[:preload_app][rails_env]
