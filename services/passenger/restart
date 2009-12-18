@@ -1,2 +1,9 @@
 #!/usr/bin/env bash
 
+if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
+
+$scripts_path/log "info" "Triggering restart of Passenger application."
+mkdir -p ~/current/tmp
+touch ~/current/tmp/restart.txt
+$scripts_path/log "info" echo -e "Restart triggered."
+
