@@ -3,9 +3,15 @@
 if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
 
 hook() {
-  if [[ -f "$shared_path/$project/.$1" ]] ; then
+  pushd $current_path &>/dev/null
+  if [[ -f "$shared_path/deploy/.$1" ]] ; then
+    source "$shared_path/deploy/.$1"
+  elif [[ -f "$shared_path/$project/.$1" ]] ; then
     source "$shared_path/$project/.$1"
+  elif [[ -f "$shared_path/$project/.$1" ]] ; then
+    source "$current_path/$project/.$1"
   fi
+  popd
 }
 
 update() {
@@ -19,12 +25,20 @@ update_repository() {
 
   if [[ "git" = "$vcs" ]] ; then
     current_branch=$(git branch | awk '/\* /{print $2}')
-    # TODO: Improve error handling
+
     if [ "$current_branch" != "$branch" ] ; then
       $scripts_path/log "info" "Switching to branch $branch from $current_branch"
-      git checkout -b $branch --track $remote/$branch
+      if [ -z "$(git branch | awk "/$branch/")" ] ; then
+        git checkout -b $branch --track $remote/$branch 2>/dev/null
+      elif [ -z "$(git branch | awk "/\* $branch/")" ] ; then
+        git checkout $branch 2>/dev/null
+      else
+        $scripts_path/log "error" "Branch $remote/$branch not found."
+      fi
     fi
+
     git pull $remote $branch
+
     if [ -f .gitmodules ] ; then
       $scripts_path/log "info" "Updating submodules."
       git submodule init 2>/dev/null
