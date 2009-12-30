@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 
+if [[ ! -z "$HOME/.bashrc" ]] ; then source "$HOME/.bashrc" ; fi
+
 if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
 
-builtin cd $current_path
+cd $current_path
+if [[ ! -z ".rvmrc" ]] ; then source ".rvmrc" ; fi
 
 if [[ -s $bdsm_dir/unicorn/templates/unicorn.rb ]] ; then
   echo -e "ERROR: $bdsm_dir/unicorn/templates/unicorn.rb template is missing."

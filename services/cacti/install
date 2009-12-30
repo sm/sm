@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+export CFLAGS="-O3 -fPIC"
+
+install_package() {
+  prefix_path="${prefix_path:-/usr/local/src}"
+  set -x
+  echo "Installing $package $version to $prefix_path"
+  mkdir -p $prefix_path
+  pushd $prefix_path 2>/dev/null
+  wget "${base_url}/${package}-${version}.tar.gz" && tar zxf "${package}-${version}.tar.gz" && cd "${package}-${version}" && ./configure --prefix=/usr/local $configure_args && make && make install
+  popd $prefix_path 2>/dev/null
+  unset configure_args
+  set +x
+}
+
+base_url="http://pkgconfig.freedesktop.org/releases" ; package="pkg-config" ; version="0.23" ; install_package
+
+base_url="ftp://ftp.simplesystems.org/pub/png/src"
+package="libpng"   ; version="1.2.41" ; install_package
+
+base_url="http://oss.oetiker.ch/rrdtool/pub/libs"
+
+package="zlib"     ; version="1.2.3" ; install_package
+
+package="freetype" ; version="2.3.5"  ; install_package
+
+package="libxml2"  ; version="2.6.32"  ; install_package
+
+base_url="http://fontconfig.org/release/"
+configure_args="--with-freetype-config=$prefix_path/bin/freetype-config"
+package="fontconfig" ; version="2.8.0" ; install_package
+
+base_url="http://oss.oetiker.ch/rrdtool/pub/libs"
+package="pixman"     ; version="0.10.0"  ; install_package
+
+configure_args="--enable-xlib=no --enable-xlib-render=no --enable-win32=no"
+package="cairo"      ; version="1.6.4"  ; install_package
+
+package="glib"      ; version="2.15.4"  ; install_package
+
+configure_args="--without-x"
+package="pango" ; version="1.21.1"  ; install_package
+
+configure_args="--disable-tcl --disable-python"
+package="rrdtool" ; version="1.4.2"  ; install_package
+package="cacti"   ; version="0.8.7e" ; install_package
+

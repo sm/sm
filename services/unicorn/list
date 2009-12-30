@@ -10,9 +10,12 @@ cd $current_path
 if [[ ! -z ".rvmrc" ]] ; then source ".rvmrc" ; fi
 
 if [[ "$master_pid" -le 0 ]] ; then
-  echo "unicorn is not running for $project yet."
+  echo "There are no unicorns running for $project."
 else
-  kill -TERM  $master_pid
+  ps auxww | grep '[u]nicorn' | grep master
+  echo
+  ps auxwww | grep '[u]nicorn' | grep $project | grep $environment | grep worker
 fi
 
 exit $?
+

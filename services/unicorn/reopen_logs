@@ -4,7 +4,8 @@ if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
 
 master_pid="$(ps auxww | grep '[u]nicorn' | grep 'master' | awk '/'${project}'/{print $2}')"
 
-builtin cd $current_path
+cd $current_path
+if [[ ! -z ".rvmrc" ]] ; then source ".rvmrc" ; fi
 
 if [[ "$master_pid" -le 0 ]] ; then
   echo "unicorn is not running for $project yet."
