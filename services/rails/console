@@ -1,1 +1,8 @@
 #!/usr/bin/env bash
+
+cd $current_path
+
+if [[ -s script/console ]] ; then
+  ruby script/console
+fi
+

@@ -1,2 +1,7 @@
 #!/usr/bin/env bash
 
+cd $project_path
+
+if [[ -s script/console ]] ; then
+  ruby script/dbconsole
+fi

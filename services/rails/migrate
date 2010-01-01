@@ -1,2 +1,5 @@
 #!/usr/bin/env bash
 
+cd $current_path
+
+rake db:migrate --trace

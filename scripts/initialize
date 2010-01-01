@@ -21,7 +21,6 @@ export timestamp="$(date +%m.%d.%Y-%H:%M:%S)"
 export project_path="${project_path:-$HOME}"
 export shared_path="${shared_path:-$project_path/shared}"
 export current_path="${current_path:-$project_path/current}"
-export current_path="${current_path:-$project_path/current}"
 export RAILS_ENV="${RAILS_ENV:-"production"}"
 
 result=0

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+cd $current_path
+
+rvm gems load
+
+rake gems:install
+rake db:create
+rake db:migrate
