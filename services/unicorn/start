@@ -10,8 +10,11 @@ cd $current_path
 if [[ ! -z ".rvmrc" ]] ; then source ".rvmrc" ; fi
 
 if [[ "$master_pid" -gt 0 ]] ; then
-  echo -e "Unicorns are already running for $project."
+  $scripts_path/log "info" "Unicorn herd is already running for $project."
 else
+  $scripts_path/log "info" "Starting unicorn herd for $project."
   unicorn_rails -c $current_path/config/unicorn.rb -E $RAILS_ENV -D
+  sleep 2
+  $scripts_path/log "info" "Unicorn herd is now running for $project."
 fi
 exit $?

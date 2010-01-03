@@ -7,11 +7,18 @@ master_pid="$(ps auxww | grep '[u]nicorn' | grep 'master' | awk '/'${project}'/{
 builtin cd $current_path
 
 if [[ "$master_pid" -le 0 ]] ; then
-  echo "unicorn is not running for $project yet."
+  echo "Unicorn herd is not running for $project yet."
 else
+  echo "Signaling herd master for $project to shut down."
   kill -USR2 $master_pid
   sleep 5
+
+  $scripts_path/log "info" "Ensuring unicorn herd is down $project."
   kill -QUIT $master_pid
+
+  $scripts_path/log "info" "Starting unicorn herd is for $project."
+  unicorn_rails -c $current_path/config/unicorn.rb -E $RAILS_ENV -D
+  $scripts_path/log "info" "Unicorn herd is now running for $project."
 fi
 
 exit $?
