@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
 cd $project_path
-
-gem install rails --no-rdoc --no-ri
+gem install god --no-rdoc --no-ri
 

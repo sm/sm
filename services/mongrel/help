@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+echo -e "
+Usage
+  $0 {install,setup,start,stop,help}
+Actions
+  install  - Install the mongrel gem.
+  setup    - Place the config.mongrel template in $current_path/config/config.mongrel
+  start    - Startup mongrel.
+  stop     - Stop mongrel.
+  help     - Display this help text.
+"
+exit $?

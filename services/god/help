@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+echo -e "
+Usage
+  $0 {install,setup,start,stop,services,enable,disable,help}
+Actions
+  install  - Install the god gem.
+  setup    - Place the config.god template in $current_path/config/config.god
+  start    - Startup god.
+  stop     - Stop god.
+  services - Specify services to be setup, configs go in $current_path/config/\$service.god
+  enable   - Enable specified services.
+  disable  - Disable specified services.
+  help     - Display this help text.
+"

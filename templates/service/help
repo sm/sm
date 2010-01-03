@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+echo -e "
+Usage
+  $0 {install,setup,start,stop,restart,status,help}
+Actions
+  install  - Install the unicorn gem.
+  setup    - Setup the unicorn config file with a template in $current_path/config/
+  start    - Start service.
+  stop     - Stop service.
+  restart  - Restart service.
+  status   - Display service status.
+  help     - Display this help text.
+"
+exit $?

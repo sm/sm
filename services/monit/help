@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+echo -e "
+Usage
+  $0 {install,setup,start,stop,help}
+Actions
+  install  - Install the monit gem.
+  setup    - Place the config.monit template in $current_path/config/config.monit
+  start    - Startup monit.
+  stop     - Stop monit.
+  help     - Display this help text.
+"
+exit $?

@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+echo -e "
+Usage
+  $0 {install,setup,start,stop,help}
+Actions
+  install  - Install the passenger gem.
+  start    - Start passenger.
+  stop     - Stop  passenger.
+  restart  - Restart passenger.
+  help     - Display this help text.
+"
+exit $?

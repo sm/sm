@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+result=0
+
+for service in $* ; do
+  if [[ -s "$config_path/$service.god" ]] ; then
+    if [[ ! -z "$(echo "$*" | awk '/--force/')" ]] ; then
+      $scripts_path/log "info" "$config_path/$service.god already exists. Overwriting with template since --force used."
+      cp "$services_path/god/templates/$service.god" "$config_path/$service.god"
+      result=$?
+    else
+      $scripts_path/log "info" "$config_path/$service.god already exists, not overwriting. (Use --force to overwrite config with the template.)"
+    fi
+  else
+    $scripts_path/log "info" "Creating $service.god template $config_path/$service.god"
+    cp "$services_path/god/templates/$service.god" "$config_path/$service.god"
+    result=$?
+    $scripts_path/log "info" "Remember to edit template $config_path/$service.god and adjust to your needs."
+  fi
+done
+
+exit $result

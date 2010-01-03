@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+cd $project_path
+if [[ ! -s "$config_path/config.god" ]] ; then
+  cp "$services_path/god/templates/config.god" "$config_path/config.god"
+fi
+exit $?

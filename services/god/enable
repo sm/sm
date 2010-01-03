@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+result=0
+cd $project_path
+
+for service in $* ; do
+  if [[ -z "$(awk '/'$service'/' "$config_path/config.god")" ]] ; then
+    echo "God.load(\"$config_path/$service.god\")" >> "$config_path/config.god"
+  fi
+done
+
+exit $result
+

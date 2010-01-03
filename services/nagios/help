@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+echo -e "
+Usage
+  $0 {install,setup,start,stop,help}
+Actions
+  install  - Install the nagios gem.
+  setup    - Setup Nagios configuration.
+  start    - Startup nagios.
+  stop     - Stop nagios.
+  restart  - Restart nagios.
+  help     - Display this help text.
+"
+exit $?

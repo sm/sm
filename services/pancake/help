@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+echo -e "
+Usage
+  $0 {install,setup,start,stop,help}
+Actions
+  install  - Install the pancake gem.
+  setup    - Pancake configuration files.
+  start    - Startup pancake.
+  stop     - Stop pancake.
+  help     - Display this help text.
+"
+

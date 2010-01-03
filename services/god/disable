@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+result=0
+cd $project_path
+
+# TODO: get services from templates path?
+for service in $* ; do
+  if [[ ! -z "$(awk '/unicorn/' "$config_path/config.god")" ]] ; then
+    sed -i.bak "s#^God.load(\"${service}\").*$##" $database_file
+  fi
+done
+exit $result
+

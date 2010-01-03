@@ -1,20 +1,31 @@
-rails_env = ENV["RAILS_ENV"] || "production"
-project   = ENV["project"] || raise "The 'project' environment variable must be set."
-prefix    = (%x{uname}.strip == "Linux") ? "/home/#{project}/shared" : "tmp/"
+#
+# Setup
+#
+@user         = %x{whoami}.strip
+@project      = ENV["project"]          || raise "The 'project' environment variable must be set."
+@project_path = ENV["project_path"]     || "/home/#{user}"
+@rails_env    = ENV["RAILS_ENV"]        || "production"
+@prefix       = (%x{uname}.strip == "Linux") ? "/home/#{@user}/shared" : "tmp/"
+@timeout      = ENV["timeout"].to_i > 0 ? ENV["timeout"].to_i : 45
 
+#
+# Configuration
+#
 @config = {
   :preload_app => { "development" => false, "qa" => true, "ci" => true, "staging" => true, "production" => true },
-  :pid => { "development" => "#{prefix}/#{project}.pid", "ci" => "#{prefix}/#{project}.pid", "qa" => "#{prefix}/#{project}.pid", "staging" => "#{prefix}/#{project}.pid", "production" => "#{prefix}/#{project}.pid" },
-  :listen => { "development" => "#{prefix}/#{project}.sock", "ci" => "#{prefix}/#{project}.sock", "qa" => "#{prefix}/#{project}.sock", "staging" => "#{prefix}/#{project}.sock", "production" => "#{prefix}/#{project}.sock" },
+  :pid => { "development" => "#{@prefix}/pids/#{@project}.pid", "ci" => "#{@prefix}/pids/#{@project}.pid", "qa" => "#{@prefix}/pids/#{@project}.pid", "staging" => "#{@prefix}/pids/#{@project}.pid", "production" => "#{@prefix}/pids/#{@project}.pid" },
+  :listen => { "development" => "#{@prefix}/#{@project}.sock", "ci" => "#{@prefix}/#{@project}.sock", "qa" => "#{@prefix}/#{@project}.sock", "staging" => "#{@prefix}/#{@project}.sock", "production" => "#{@prefix}/#{@project}.sock" },
   :worker_processes => { "development" => 2, "ci" => 2, "qa" => 2, "staging" => 2, "production" => 6 }
 }
 
-preload_app @config[:preload_app][rails_env]
-pid @config[:pid][rails_env]
-worker_processes @config[:worker_processes][rails_env]
-listen @config[:listen][rails_env], :backlog => 2048 # :tcp_nopush => true
-
-timeout 45
+#
+# Settings
+#
+preload_app @config[:preload_app][@rails_env]
+pid @config[:pid][@rails_env]
+worker_processes @config[:worker_processes][@rails_env]
+listen @config[:listen][@rails_env], :backlog => 2048 # :tcp_nopush => true
+timeout @timeout
 
 # We are running on 1.9, no need to uncomment cow functionality.
 # GC.respond_to?(:copy_on_write_friendly=) and GC.copy_on_write_friendly = true

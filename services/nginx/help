@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+echo -e "
+Usage
+  $0 {install,setup,start,stop,help}
+Actions
+  install  - Install the nginx gem.
+  setup    - Setup Nginx configuration.
+  start    - Startup nginx.
+  stop     - Stop nginx.
+  restart  - Restart nginx.
+  help     - Display this help text.
+"
+exit $?

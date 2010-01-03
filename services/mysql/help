@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+echo -e "
+Usage
+  $0 {install,setup,start,stop,help}
+Actions
+  install  - Install the mysql gem.
+  setup    - Place the config.mysql template in $current_path/config/config.mysql
+  start    - Startup mysql.
+  stop     - Stop mysql.
+  help     - Display this help text.
+"
+exit $?

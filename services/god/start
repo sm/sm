@@ -2,5 +2,5 @@
 
 cd $project_path
 
-gem install rails --no-rdoc --no-ri
+god -c "$config_path/config.god" -D
 
