@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+# NOTE: This will be going away soon.
+
 require "yaml"
 require "fileutils"
 

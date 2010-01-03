@@ -1,2 +1,3 @@
 #!/usr/bin/env bash
 
+# Notes: This will do a generic install. Use the 'passenger' module for passenger Nginx.

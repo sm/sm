@@ -2,7 +2,6 @@
 
 # Author: Wayne E. Seguin
 # All Rights Reserved
-
 VERSION=0.0.2
 
 function version {
@@ -14,53 +13,8 @@ function version {
 }
 
 function usage {
-
   version
-
-  echo -e "
-
-CLI
-
-  bdsm <service> <action> <<arguments>>
-
-  Examples:
-    bdsm deploy
-
-    bdsm nginx install
-    bdsm nginx setup
-    bdsm nginx stop
-    bdsm nginx start
-    bdsm nginx restart
-    bdsm nginx reload
-
-    bdsm (rails) migrate
-    bdsm (rails) setup
-    bdsm (rails) logtail
-    bdsm (rails) console
-    bdsm (rails) dbconsole
-
-Notes:
-
-  [service] is required, default may be set in ~/.bdsmrc
-  [action] is required as a command line parameter
-
-  [project] is required as an environment variable
-   - if non root, otherwise defaults to the current user name if not set
-
-  [project|environment|repository|service]
-   - may be exported as environment varaibles
-   - or set in the ~/.bdsmrc
-   - or specified as for example --project X
-
-  prerequisites:
-   - git
-   - curl
-   - ruby OR prereqs for rvm (preferred)
-
-  http://bdsm.beginrescueend.com/
-  https://www.pivotaltracker.com/projects/26822
-
-" | ${PAGER:-less}
+  $services_path/bdsm/help | ${PAGER:-less}
 }
 
 #
@@ -81,13 +35,12 @@ while [ $# -gt 0 ] ; do
     # TODO: deploy activates framework deploy after doing common deploy tasks (repo update, hooks).
     deploy|backup_database) service="bdsm" ; action="$token" ;;
 
-    migrate|logtail|console|dbconsole|setup)
-      service="rails" ; action=$token
-    ;;
-
+    # TODO: service detection "did you mean"
     --project)         export project="$1" ;;
     --environment)     export environment="$1" ;;
     --repo|repository) export repository="$1" ;;
+    --database)        export database="$1" ;;
+    --server)          export server="$1" ;; # better name for this?
     --trace)           export trace_flag=1 ; export debug_flag=1 ; set -x ;;
     --debug)           export debug_flag=1                                ;;
     -v|--version)      action="version"                                   ;;

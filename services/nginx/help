@@ -9,6 +9,9 @@ Actions
   start    - Startup nginx.
   stop     - Stop nginx.
   restart  - Restart nginx.
+  enable   - Enable servers.
+  disable  - Disable servers.
+  server   - Add new server(s) --enable.
   help     - Display this help text.
 "
 exit $?

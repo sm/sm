@@ -4,8 +4,8 @@ echo -e "
 Usage
   $0 {install,setup,start,stop,restart,status,help}
 Actions
-  install  - Install the $service gem.
-  setup    - Setup and Configure $service.
+  install  - Install $service.
+  setup    - Setup the unicorn config file with a template in $current_path/config/
   start    - Start service.
   stop     - Stop service.
   restart  - Restart service.

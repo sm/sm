@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+result=0
+if [[ ! -z "$install_flag" ]] ; then
+  if [[ ! -z "$head_flag" ]] ; then
+    for service in $* ; do
+    done
+  else
+    for service in $* ; do
+      curl -O
+    done
+  fi
+elif [[ ! -z "$uninstall_flag" ]] ; then
+  for service in $* ; do
+    if [[ -d "$services_path/$service/" ]] ; then
+      rm -rf "$services_path/$service/"
+      $scripts_path/log "info" "$service removed."
+    fi
+  done
+else
+  $scripts_path/log "error" "One action {install,uninstall} must be specified for listed services."
+  exit 1
+fi
+exit $result

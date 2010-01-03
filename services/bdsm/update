@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+result=0
+
+mkdir -p "$src_path"
+__pushpop "$src_path"
+
+ruby="$(which ruby 2>/dev/null)"
+system_ruby="$(rvm system ; which ruby 2>/dev/null)"
+if [[ ! -x "$ruby" ]] ; then
+  if [[ ! -x "$system" ]] ; then
+    unset ruby
+  else
+    ruby=$system_ruby
+  fi
+fi
+
+if [[ "head" = "$ruby_revision" ]] || [[ -z "$system_ruby" ]] ; then
+  if [[ -d "$src_path/rvm/.git" ]] ; then
+    builtin cd $src_path/rvm/ && git pull origin master && ./scripts/install
+  else
+    builtin cd $src_path && git clone git://github.com/wayneeseguin/rvm.git && builtin cd rvm/ && ./install
+  fi
+else
+  if [[ "true" = "$($ruby -S gem list rvm --installed)" ]]; then
+    $ruby -S gem update rvm $gem_options
+  else
+    $ruby -S gem install rvm $gem_options
+  fi
+  # TODO: Check all gem paths instead of simply assuming the last one...
+  builtin cd "$($ruby -S gem env | grep "\- $HOME" | awk '{print $NF}' | head -n 1)/gems/rvm-$(gem list rvm | sed 's/.*(//' | sed 's/).*//' | awk -F',' '{print $1 ; exit}')" && ./install
+fi
+unset ruby system_ruby
+__pushpop
+$scripts_path/hook "after_update"
+
+#$scripts_path/log "error" "One action {install,uninstall} must be specified for listed services."
+
+exit $result
