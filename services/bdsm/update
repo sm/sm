@@ -3,10 +3,12 @@
 result=0
 
 mkdir -p "$src_path"
+
 __pushpop "$src_path"
 
 ruby="$(which ruby 2>/dev/null)"
 system_ruby="$(rvm system ; which ruby 2>/dev/null)"
+
 if [[ ! -x "$ruby" ]] ; then
   if [[ ! -x "$system" ]] ; then
     unset ruby
@@ -30,8 +32,11 @@ else
   # TODO: Check all gem paths instead of simply assuming the last one...
   builtin cd "$($ruby -S gem env | grep "\- $HOME" | awk '{print $NF}' | head -n 1)/gems/rvm-$(gem list rvm | sed 's/.*(//' | sed 's/).*//' | awk -F',' '{print $1 ; exit}')" && ./install
 fi
+
 unset ruby system_ruby
+
 __pushpop
+
 $scripts_path/hook "after_update"
 
 #$scripts_path/log "error" "One action {install,uninstall} must be specified for listed services."
