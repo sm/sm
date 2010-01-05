@@ -22,11 +22,13 @@ export keep_releases=${keep_releases:-"4"}
 export timestamp="$(date +%m.%d.%Y-%H:%M:%S)"
 export project_path="${project_path:-$HOME}"
 export shared_path="${shared_path:-$project_path/shared}"
+export previous_path="${previous_path:-$project_path/previous}"
 export current_path="${current_path:-$project_path/current}"
+export discarded_path="${discarded_path:-$project_path/discard}"
 export RAILS_ENV="${RAILS_ENV:-"production"}"
+export user=$(whoami)
 
 result=0
-user=$(whoami)
 
 if [[ -d "$project_path/previous" ]] ; then
   old_releases="$(cd $project_path/previous && ls -t | awk "NR > $keep_releases { print \$0 }")"
