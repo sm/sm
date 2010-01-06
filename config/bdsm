@@ -1,2 +1,5 @@
 releases_url=http://bdsm.beginrescueend.com/releases/
 services_url=http://bdsm.beginrescueend.com/services/
+releases_url=http://bdsm.beginrescueend.com/releases/latest.tar.gz
+bdsm_repo_url=git://github.com/wayneeseguin/bdsm.git
+service_repo_url=git://github.com/wayneeseguin/bdsm-services.git

@@ -2,6 +2,8 @@
 
 result=0
 
+#TODO: set bdsm_repo_url
+
 mkdir -p "$src_path"
 
 __pushpop "$src_path"
@@ -19,9 +21,9 @@ fi
 
 if [[ "head" = "$ruby_revision" ]] || [[ -z "$system_ruby" ]] ; then
   if [[ -d "$src_path/rvm/.git" ]] ; then
-    builtin cd $src_path/rvm/ && git pull origin master && ./scripts/install
+    builtin cd $src_path/rvm/ && git pull origin && ./scripts/install
   else
-    builtin cd $src_path && git clone git://github.com/wayneeseguin/rvm.git && builtin cd rvm/ && ./install
+    builtin cd $src_path && git clone "$bdsm_repo_url" && builtin cd rvm/ && ./install
   fi
 else
   if [[ "true" = "$($ruby -S gem list rvm --installed)" ]]; then

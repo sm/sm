@@ -14,16 +14,17 @@ function version {
 
 function usage {
   version
-  $services_path/bdsm/help | ${PAGER:-less}
+  "$services_path"/bdsm/help | ${PAGER:-less}
 }
 
 #
 # Setup
 #
 prefix="${prefix:-/usr/local}"
-if [[ -f "$HOME/.bdsmrc" ]]     ; then source "$HOME/.bdsmrc" ; fi
-source $prefix/bdsm/scripts/initialize
-source $prefix/bdsm/scripts/functions
+if [[ -s "$HOME/.bdsmrc" ]]     ; then source "$HOME/.bdsmrc" ; fi
+source "$prefix"/bdsm/scripts/initialize
+source "$prefix"/bdsm/scripts/functions
+result=0
 
 #
 # parse args
@@ -31,16 +32,13 @@ source $prefix/bdsm/scripts/functions
 while [ $# -gt 0 ] ; do
   token="$1" ; shift
   case "$token" in
-
-    # TODO: deploy activates framework deploy after doing common deploy tasks (repo update, hooks).
-    deploy|backup_database) service="bdsm" ; action="$token" ;;
-
     # TODO: service detection "did you mean"
     --project)         export project="$1" ;;
     --environment)     export environment="$1" ;;
     --repo|repository) export repository="$1" ;;
     --database)        export database="$1" ;;
     --server)          export server="$1" ;; # better name for this?
+    --head)            export head_flag=1                                ;;
     --trace)           export trace_flag=1 ; export debug_flag=1 ; set -x ;;
     --debug)           export debug_flag=1                                ;;
     -v|--version)      action="version"                                   ;;
@@ -50,8 +48,11 @@ while [ $# -gt 0 ] ; do
       if [[ -z "$service" ]] ; then
         if [[ -d "$services_path/$token" ]] ; then
           export service="$token"
+        else
+          export service="${service:-bdsm}"
         fi
-      elif [[ -z "$action" ]] ; then
+      fi
+      if [[ -z "$action" ]] ; then
         if [[ -x "$services_path/$service/$token" ]] ; then
           export action="$token"
           bdsm_args="$@"
@@ -79,18 +80,14 @@ if [[ ! -z "$error_message" ]] ; then exit 1 ; fi
 #
 # Main Logic
 #
-result=0
-
 if [[ "$trace_flag" = 1 ]] ; then set -x ; else set +x ; fi
 
 if [[ "version" = "$action" ]] ; then
   version
 elif [[ ! -z "$service" ]] && [[ ! -z "$action" ]] ; then
   if [[ -z "$project" ]] ; then
-    echo -e "\$project is unspecified."
-    exit 1
+    echo -e "\$project is unspecified." ; exit 1
   fi
-
   if [[ -s "$services_path/$service/$action" ]] ; then
     $services_path/$service/$action $*
   fi
@@ -99,7 +96,6 @@ elif [[ ! -z "$service" ]] ; then
 else
   usage
 fi
-
 result=$?
 
 exit $result
