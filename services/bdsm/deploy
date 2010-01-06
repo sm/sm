@@ -2,12 +2,21 @@
 
 if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
 
+# TODO:
+#
+#   * Crank up the verbosity on errors
+#
+
 hook() {
-  if [[ -f "$shared_path/deploy/.$1" ]] ; then
-    source "$shared_path/deploy/.$1"
-  elif [[ -f "$shared_path/$project/.$1" ]] ; then
-    source "$shared_path/$project/.$1"
-  elif [[ -f "$shared_path/$project/.$1" ]] ; then
+  # Server Level
+  if [[ -s "$shared_path/config/deploy/$1" ]] ; then
+    source "$shared_path/config/deploy/$1"
+  fi
+
+  # Project Level
+  if [[ -s "$shared_path/$project/config/deploy/$1" ]] ; then
+    source "$shared_path/$project/config/deploy/$1"
+  elif [[ -s "$shared_path/$project/.$1" ]] ; then
     source "$current_path/$project/.$1"
   fi
 }
@@ -130,16 +139,11 @@ cleanup() {
 
 $scripts_path/log "info" "info" "Deploying..."
 (
-  update_repository
-  hook "before_deploy" &&
-  update_current &&
-  hook "after_update_current" &&
-  configure &&
-  hook "after_configure" &&
-  symlink &&
-  hook "after_symlink" &&
-  cleanup &&
-  hook "after_deploy"
+  update_repository ; hook "before_deploy"
+  update_current    ; hook "after_update_current"
+  configure         ; hook "after_configure"
+  symlink           ; hook "after_symlink"
+  cleanup           ; hook "after_deploy"
 )
 result=$?
 
