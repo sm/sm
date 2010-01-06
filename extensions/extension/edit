@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
+
+result=0 ; extension="$1" ; shift
+releases_url="${releases_url:-$($scripts_path/db "$config_path/bdsm" "releases_url")}"
+extension_url="${extension_url:-$($scripts_path/db "$config_path/bdsm" "extension_url")}"
+if [[ -z "$extension" ]] ; then
+  "$scripts_path"/log "error" "A extension must be specified." ; exit 1
+fi
+# TODO: Should we allow user installs?...
+if [[ "root" != "user" ]] ; then
+  "$scripts_path"/log "error" "extensions must be installed as root." ; exit 1
+fi
+
+if [[ -z "$extension" ]] ; then
+  $scripts_path/log "error" "A extension must be specified to edit." ; exit 1
+else
+  cd "$extensions_path/$extension/"
+  ${EDITOR:-vi} .
+fi
+
+exit $?

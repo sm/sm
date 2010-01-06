@@ -4,12 +4,12 @@ echo -e "
 
 Usage
 
-  bdsm <service> <action> <<arguments>>
+  bdsm <extension> <action> <<arguments>>
 
 Examples
 
   (as root:)
-  bdsm service add nginx
+  bdsm extension add nginx
 
   bdsm nginx install
   bdsm nginx setup
@@ -19,8 +19,8 @@ Examples
   bdsm nginx reload
   ...
 
-  bdsm service add rails
-  bdsm service add unicorn
+  bdsm extension add rails
+  bdsm extension add unicorn
   ...
 
   (as a user:)
@@ -44,13 +44,13 @@ Examples
 
 Notes
 
-  [service] is required, default may be set in ~/.bdsmrc
+  [extension] is required, default may be set in ~/.bdsmrc
   [action] is required as a command line parameter
 
   [project] is required as an environment variable
    - if non root, otherwise defaults to the current user name if not set
 
-  [project|environment|repository|service]
+  [project|environment|repository|extension]
    - may be exported as environment varaibles
    - or set in the ~/.bdsmrc
    - or specified as for example --project X

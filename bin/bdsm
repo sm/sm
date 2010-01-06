@@ -24,7 +24,7 @@ function version {
 
 function usage {
   version
-  "$services_path"/bdsm/help | ${PAGER:-less}
+  "$extensions_path"/bdsm/help | ${PAGER:-less}
 }
 
 #
@@ -33,7 +33,12 @@ function usage {
 while [ $# -gt 0 ] ; do
   token="$1" ; shift
   case "$token" in
-    # TODO: service detection "did you mean"
+    # TODO: extension detection "did you mean"
+
+    # TODO: Fall back on default actions instead of specifying them here
+    #       In case the user has set their default serfice in the environment.
+    deploy|rollback|backup_database) export extension="bdsm"; export action="$token" ;;
+    extend)            export extension="extension" ;;
     --project)         export project="$1"     ;;
     --environment)     export environment="$1" ;;
     --repo|repository) export repository="$1"  ;;
@@ -45,16 +50,16 @@ while [ $# -gt 0 ] ; do
     -v|--version)      action="version"                                   ;;
 
     *)
-      #if $scripts_path/match "$token" $services ; then
-      if [[ -z "$service" ]] ; then
-        if [[ -d "$services_path/$token" ]] ; then
-          export service="$token"
+      #if $scripts_path/match "$token" $extensions ; then
+      if [[ -z "$extension" ]] ; then
+        if [[ -d "$extensions_path/$token" ]] ; then
+          export extension="$token"
         else
-          export service="${service:-bdsm}"
+          export extension="${extension:-bdsm}"
         fi
       fi
       if [[ -z "$action" ]] ; then
-        if [[ -x "$services_path/$service/$token" ]] ; then
+        if [[ -x "$extensions_path/$extension/$token" ]] ; then
           export action="$token"
           bdsm_args="$@"
           parse_break=1
@@ -85,15 +90,15 @@ if [[ "$trace_flag" = 1 ]] ; then set -x ; else set +x ; fi
 
 if [[ "version" = "$action" ]] ; then
   version
-elif [[ ! -z "$service" ]] && [[ ! -z "$action" ]] ; then
+elif [[ ! -z "$extension" ]] && [[ ! -z "$action" ]] ; then
   if [[ -z "$project" ]] ; then
     echo -e "\$project is unspecified." ; exit 1
   fi
-  if [[ -s "$services_path/$service/$action" ]] ; then
-    "$services_path/$service/$action" $*
+  if [[ -s "$extensions_path/$extension/$action" ]] ; then
+    "$extensions_path/$extension/$action" $*
   fi
-elif [[ ! -z "$service" ]] ; then
-  echo $(actions_for_service $service)
+elif [[ ! -z "$extension" ]] ; then
+  echo $(actions_for_extension $extension)
 else
   usage
 fi

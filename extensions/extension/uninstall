@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
+
+result=0 ; extensions="$1" ; shift
+releases_url="${releases_url:-$($scripts_path/db "$config_path/bdsm" "releases_url")}"
+extension_url="${extension_url:-$($scripts_path/db "$config_path/bdsm" "extension_url")}"
+if [[ -z "$extensions" ]] ; then
+  "$scripts_path"/log "error" "A extension must be specified." ; exit 1
+fi
+# TODO: Should we allow user installs?...
+if [[ "root" != "user" ]] ; then
+  "$scripts_path"/log "error" "extensions must be uninstalled as root." ; exit 1
+fi
+
+
+for extension in ${extensions//,/ } ; do
+  if [[ -d "$extensions_path/$extension" ]] ; then
+    rm -rf "$extensions_path/$extension"
+  else
+    "$scripts_path"/log "error" "$extensions_path/$extension" ; result=1
+  fi
+
+  if [[ -d "$extensions_path/$extension/" ]] ; then
+    rm -rf "$extensions_path/$extension/"
+    "$scripts_path"/log "info" "$extension removed."
+  else
+    "$scripts_path"/log "info" "$extension is already non-existant."
+  fi
+done
+
+exit $result

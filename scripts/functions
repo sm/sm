@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-actions_for_service() {
+actions_for_extension() {
   if [[ ! -z "$1" ]] ; then
-    echo "bdsm $1: {$(ls -p $services_path/$1/ | awk '/[^\/]$/' | tr "\n" ' ' | sed 's/\s\+/, /g' | sed 's/,\s*$//')}"
+    echo "bdsm $1: {$(ls -p $extensions_path/$1/ | awk '/[^\/]$/' | tr "\n" ' ' | sed 's/\s\+/, /g' | sed 's/,\s*$//')}"
   fi
 }

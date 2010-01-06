@@ -10,11 +10,11 @@ if [ -z "$project" ] ; then
 fi
 
 export scripts_path="${scripts_path:-"${bdsm_path}/scripts"}"
-export services_path="${services_path:-"${bdsm_path}/services"}"
+export extensions_path="${extensions_path:-"${bdsm_path}/extensions"}"
 export templates_path="${templates_path:-"${bdsm_path}/templates"}"
 export config_path="${config_path:-"${bdsm_path}/config"}"
 export src_path="${src_path:-"${bdsm_path}/src"}"
-export bin_path="${bin_path:-"${bdsm_path}/src"}"
+export bin_path="${bin_path:-"${bdsm_path}/bin"}"
 export archives_path="${archives_path:-"${bdsm_path}/archives"}"
 export remote=${remote:-"origin"}
 export branch=${branch:-"master"}

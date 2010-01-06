@@ -7,14 +7,16 @@ if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
 master_pid="$(ps auxww | grep '[u]nicorn' | grep 'master' | awk '/'${project}'/{print $2}')"
 
 cd $current_path
+
 if [[ -s ".rvmrc" ]] ; then source ".rvmrc" ; fi
 
 if [[ "$master_pid" -gt 0 ]] ; then
-  $scripts_path/log "info" "Unicorn herd is already running for $project."
+  $scripts_path/log "info" "Unicorn herd master is already running for $project."
 else
-  $scripts_path/log "info" "Starting unicorn herd for $project."
+  $scripts_path/log "info" "Starting unicorn herd master for $project."
   unicorn_rails -c $current_path/config/unicorn.rb -E $RAILS_ENV -D
   sleep 2
-  $scripts_path/log "info" "Unicorn herd is now running for $project."
+  $scripts_path/log "info" "Unicorn herd master is now running for $project."
 fi
+
 exit $?

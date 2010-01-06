@@ -41,6 +41,6 @@ __pushpop
 
 $scripts_path/hook "after_update"
 
-#$scripts_path/log "error" "One action {install,uninstall} must be specified for listed services."
+#$scripts_path/log "error" "One action {install,uninstall} must be specified for listed extensions."
 
 exit $result

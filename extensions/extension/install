@@ -2,38 +2,38 @@
 
 if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
 
-result=0 ; services="$1" ; shift
+result=0 ; extensions="$1" ; shift
 releases_url="${releases_url:-$($scripts_path/db "$config_path/bdsm" "releases_url")}"
-service_url="${service_url:-$($scripts_path/db "$config_path/bdsm" "service_url")}"
-if [[ -z "$services" ]] ; then
-  "$scripts_path"/log "error" "A service must be specified." ; exit 1
+extension_url="${extension_url:-$($scripts_path/db "$config_path/bdsm" "extension_url")}"
+if [[ -z "$extensions" ]] ; then
+  "$scripts_path"/log "error" "A extension must be specified." ; exit 1
 fi
 # TODO: Should we allow user installs?...
 if [[ "root" != "user" ]] ; then
-  "$scripts_path"/log "error" "Services must be installed as root." ; exit 1
+  "$scripts_path"/log "error" "extensions must be installed as root." ; exit 1
 fi
 
-# TODO: Allow ',' separated service list.
+# TODO: Allow ',' separated extension list.
 
 mkdir -p "$src_path/bdsm/"
 
-for service in ${services//,/ } ; do
+for extension in ${extensions//,/ } ; do
 
   if [[ ! -z "$head_flag" ]] ; then
 
-    if [[ ! -d "$src_path/$service/.git" ]] ; then
+    if [[ ! -d "$src_path/$extension/.git" ]] ; then
 
-      "$scripts_path"/log "info" "Updating $service repository."
-      cd "$src_path/$service"/.git
+      "$scripts_path"/log "info" "Updating $extension repository."
+      cd "$src_path/$extension"/.git
       # TODO: Branch update logic.
       git pull origin "${branch:-master}"
 
     else
 
-      "$scripts_path"/log "info" "Cloning $service repository from $service_repo_url."
-      cd "$src_path/$service/"
+      "$scripts_path"/log "info" "Cloning $extension repository from $extension_repo_url."
+      cd "$src_path/$extension/"
       # TODO: git/hg/svn url detection, git for now
-      git clone "$service_repo_url"
+      git clone "$extension_repo_url"
 
     fi
 

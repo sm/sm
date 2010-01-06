@@ -5,8 +5,8 @@
 @project      = ENV["project"]          || raise "The 'project' environment variable must be set."
 @project_path = ENV["project_path"]     || "/home/#{user}"
 @rails_env    = ENV["RAILS_ENV"]        || "production"
-@prefix       = (%x{uname}.strip == "Linux") ? "/home/#{@user}/shared" : "tmp/"
 @timeout      = ENV["timeout"].to_i > 0 ? ENV["timeout"].to_i : 45
+@prefix       = ["Linux","FreeBSD"].include?(%x{uname}.strip) ? "/home/#{@user}/shared" : "tmp/"
 
 #
 # Configuration

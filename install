@@ -7,12 +7,19 @@ if [[ -s "$HOME/.bdsmrc" ]]     ; then source "$HOME/.bdsmrc" ; fi
 source scripts/initialize
 source scripts/functions
 
-for dir in bin scripts config services ; do
+for dir in bin scripts config extensions ; do
   mkdir -p "${bdsm_path}/${dir}"
   rsync -agz ./$dir/ "${bdsm_path}"/$dir/
 done
 
+for file in LICENCE VERSION README ; do
+  if [[ -s $file ]] ; then
+    cp $file "${bdsm_path}/"
+  fi
+done
+
 touch $config_path/user
 
+rm -f "${prefix}/bin/bdsm"
 ln -nfs "${bin_path}/bdsm" "${prefix}/bin/bdsm"
 
