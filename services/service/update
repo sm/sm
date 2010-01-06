@@ -3,12 +3,14 @@
 if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
 
 result=0 ; services="$1" ; shift
-
 releases_url="${releases_url:-$($scripts_path/db "$config_path/bdsm" "releases_url")}"
 service_url="${service_url:-$($scripts_path/db "$config_path/bdsm" "service_url")}"
-
 if [[ -z "$services" ]] ; then
   "$scripts_path"/log "error" "A service must be specified." ; exit 1
+fi
+# TODO: Should we allow user installs?...
+if [[ "root" != "user" ]] ; then
+  "$scripts_path"/log "error" "Services must be updated as root." ; exit 1
 fi
 
 for service in ${services//,/ } ; do
