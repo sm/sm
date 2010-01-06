@@ -1,22 +1,27 @@
+= Rails setup
 
-- On the server
-
-= As Root
+As Root
 
   * adduser to create new user account and home directory.  set password during process
   * add user to sudoer's for nginx restart
+  bdsm service install nginx
+  bdsm nginx install
+  bdsm nginx setup
+  bdsm nginx server <project>
+  bdsm service install rails
+  bdsm service install unicorn
 
 As User
-  bdsm setup --repo=Y --project X --environment Y
-  bdsm deploy # Creates ~/current and all necessary symlinks.
+  ssh-keygen -t rsa -b 2048 -f "$HOME/.ssh/id_${project}_${environment}" -N '' -C "$project $environment rsa key."
+  echo "IdentityFile ~/.ssh/id_${project}_${environment}" >> ~/.ssh/config
+  # Message about setting up authorized keys.
+
+  bdsm rails setup --repo=Y --project X --environment Y --database Z
 
   # Adjust database.yml for your own settings (password,adapter,host,etc...)
   ${EDITOR:-vi} ~/shared/config/database.yml
 
-  bdsm bootstrap rails
-
-  ssh-keygen -t rsa -b 2048 -f "$HOME/.ssh/id_$project_$environment" -N '' -C "$project $environment rsa key."
-  # Message about setting up authorized keys.
+  bdsm deploy # Creates ~/current and all necessary symlinks.
 
   bdsm <server> start
 

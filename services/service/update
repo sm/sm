@@ -7,51 +7,34 @@ result=0 ; services="$1" ; shift
 releases_url="${releases_url:-$($scripts_path/db "$config_path/bdsm" "releases_url")}"
 service_url="${service_url:-$($scripts_path/db "$config_path/bdsm" "service_url")}"
 
-# TODO: Should we allow user installs?...
-if [[ "root" != "user" ]] ; then
-  "$scripts_path"/log "error" "Services must be installed as root." ; exit 1
+if [[ -z "$services" ]] ; then
+  "$scripts_path"/log "error" "A service must be specified." ; exit 1
 fi
-
-# TODO: Allow ',' separated service list.
-
-mkdir -p "$src_path/bdsm/"
-
-releases_url="${releases_url:-$($scripts_path/db "$config_path/bdsm" "releases_url")}"
-service_url="${service_url:-$($scripts_path/db "$config_path/bdsm" "service_url")}"
-
 
 for service in ${services//,/ } ; do
 
+  mkdir -p "$src_path"
   if [[ ! -z "$head_flag" ]] ; then
-
     if [[ ! -d "$src_path/$service/.git" ]] ; then
-
       "$scripts_path"/log "info" "Updating $service repository."
       cd "$src_path/$service"/.git
       # TODO: Branch update logic.
       git pull origin "${branch:-master}"
-
     else
-
       "$scripts_path"/log "info" "Cloning $service repository from $service_repo_url."
       cd "$src_path/$service/"
-      # TODO: git/hg/svn url detection, git for now
+      # TODO: git/hg/svn detection, git for now
       git clone "$service_repo_url"
-
     fi
-
   else
-
-    rm -rf "$src_path/bdsm/latest"
-    mkdir -p "$src_path/bdsm/latest"
-    curl -O "$releases_url" | tar xf - -C "$src_path/bdsm/latest"
+    rm -rf "$src_path/latest"
+    mkdir -p "$src_path/latest"
+    curl -O "$releases_url" | tar xf - -C "$src_path/latest"
     # TODO: error check and exit on error.
-    cd "$src_path/bdsm/latest"/bdsm-*
+    cd "$src_path/latest"/bdsm-*
     ./install
-
   fi
 
 done
 
 exit $result
-
