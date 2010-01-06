@@ -2,7 +2,17 @@
 
 # Author: Wayne E. Seguin
 # All Rights Reserved
-VERSION=0.0.2
+
+#
+# Setup
+#
+prefix="${prefix:-/usr/local}"
+if [[ -s "$HOME/.bdsmrc" ]]     ; then source "$HOME/.bdsmrc" ; fi
+source "${scripts_path:-"$prefix/bdsm/scripts"}"/initialize
+source "${scripts_path}"/functions
+result=0
+
+VERSION="$(cat "$bdsm_path"/VERSION)"
 
 function version {
   _author="Wayne E. Seguin"
@@ -18,27 +28,18 @@ function usage {
 }
 
 #
-# Setup
-#
-prefix="${prefix:-/usr/local}"
-if [[ -s "$HOME/.bdsmrc" ]]     ; then source "$HOME/.bdsmrc" ; fi
-source "$prefix"/bdsm/scripts/initialize
-source "$prefix"/bdsm/scripts/functions
-result=0
-
-#
 # parse args
 #
 while [ $# -gt 0 ] ; do
   token="$1" ; shift
   case "$token" in
     # TODO: service detection "did you mean"
-    --project)         export project="$1" ;;
+    --project)         export project="$1"     ;;
     --environment)     export environment="$1" ;;
-    --repo|repository) export repository="$1" ;;
-    --database)        export database="$1" ;;
-    --server)          export server="$1" ;; # better name for this?
-    --head)            export head_flag=1                                ;;
+    --repo|repository) export repository="$1"  ;;
+    --database)        export database="$1"    ;;
+    --server)          export server="$1"      ;; # better name for this?
+    --head)            export head_flag=1                                 ;;
     --trace)           export trace_flag=1 ; export debug_flag=1 ; set -x ;;
     --debug)           export debug_flag=1                                ;;
     -v|--version)      action="version"                                   ;;
@@ -89,7 +90,7 @@ elif [[ ! -z "$service" ]] && [[ ! -z "$action" ]] ; then
     echo -e "\$project is unspecified." ; exit 1
   fi
   if [[ -s "$services_path/$service/$action" ]] ; then
-    $services_path/$service/$action $*
+    "$services_path/$service/$action" $*
   fi
 elif [[ ! -z "$service" ]] ; then
   echo $(actions_for_service $service)

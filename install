@@ -2,12 +2,17 @@
 
 prefix="${prefix:-/usr/local}"
 
-for dir in bin scripts config services templates ; do
-  mkdir -p "${prefix}/bdsm/${dir}"
-  rsync -agz ./$dir/ /usr/local/bdsm/$dir/
+if [[ -s "$HOME/.bdsmrc" ]]     ; then source "$HOME/.bdsmrc" ; fi
+
+source scripts/initialize
+source scripts/functions
+
+for dir in bin scripts config services ; do
+  mkdir -p "${bdsm_path}/${dir}"
+  rsync -agz ./$dir/ "${bdsm_path}"/$dir/
 done
 
-touch $prefix/bdsm/config/user
+touch $config_path/user
 
-ln -nfs "${prefix}/bdsm/bin/bdsm" "${prefix}/bin/bdsm"
+ln -nfs "${bin_path}/bdsm" "${prefix}/bin/bdsm"
 
