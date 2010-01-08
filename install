@@ -1,11 +1,9 @@
 #!/usr/bin/env bash
 
-prefix="${prefix:-/usr/local}"
+if [[ "$1" = "--trace" ]] ; then set -x ; fi
 
-if [[ -s "$HOME/.bdsmrc" ]]     ; then source "$HOME/.bdsmrc" ; fi
-
-source scripts/initialize
-source scripts/functions
+source ./scripts/initialize
+source ./scripts/functions
 
 for dir in bin scripts config extensions ; do
   mkdir -p "${bdsm_path}/${dir}"

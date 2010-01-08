@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-cd $project_path
-gem install god --no-rdoc --no-ri
-

@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-
-$services_path/thin/stop &&
-$services_path/thin/start

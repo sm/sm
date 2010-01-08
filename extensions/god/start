@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-
-cd $project_path
-
-god -c "$config_path/config.god" -D
-

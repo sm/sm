@@ -6,9 +6,9 @@
 #
 # Setup
 #
-prefix="${prefix:-/usr/local}"
+bdsm_prefix="${bdsm_prefix:-/usr/local}"
 if [[ -s "$HOME/.bdsmrc" ]]     ; then source "$HOME/.bdsmrc" ; fi
-source "${scripts_path:-"$prefix/bdsm/scripts"}"/initialize
+source "${scripts_path:-"$bdsm_prefix/bdsm/scripts"}"/initialize
 source "${scripts_path}"/functions
 result=0
 
@@ -91,9 +91,6 @@ if [[ "$trace_flag" = 1 ]] ; then set -x ; else set +x ; fi
 if [[ "version" = "$action" ]] ; then
   version
 elif [[ ! -z "$extension" ]] && [[ ! -z "$action" ]] ; then
-  if [[ -z "$project" ]] ; then
-    echo -e "\$project is unspecified." ; exit 1
-  fi
   if [[ -s "$extensions_path/$extension/$action" ]] ; then
     "$extensions_path/$extension/$action" $*
   fi

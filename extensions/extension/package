@@ -7,21 +7,28 @@ result=0 ; extensions="$1" ; shift
 if [[ -z "$extensions" ]] ; then
   "$scripts_path"/log "error" "A extension must be specified." ; exit 1
 fi
-# TODO: Should we allow user installs?...
-if [[ "root" != "user" ]] ; then
-  "$scripts_path"/log "error" "extensions must be installed as root." ; exit 1
-fi
+
+# TODO: This should only check to ensure that the current user has write perms to the directory.
+#if [[ "root" != "user" ]] ; then
+#  "$scripts_path"/log "error" "extensions must be installed as root." ; exit 1
+#fi
 
 mkdir -p "$archives_path/"
 
 for extension in ${extensions//,/ } ; do
-  version="$(cat $extensions_path/$extension/VERSION)"
+  if [[ -s "$extensions_path/$extension/VERSION" ]] ; then
+    version="$(cat "$extensions_path/$extension/VERSION")"
+  else
+    "$scripts_path"/log "error" "the version must be specified in $extensions_path/$extension/VERSION" ; exit 1
+  fi
+
   cwd=$(pwd)
   release_name="${extension}-${version}"
-  releases_path="#{extensions_path}/${extension}/archives/"
-  release_path="${releases_path}/${release_name}/"
+  releases_path="${extensions_path}/${extension}/archives"
+  release_path="${releases_path}/${release_name}"
 
-  rsync -avgz --delete --exclude ".git" --exclude ".svn" --exclude "archives"./ $release_path
+  mkdir -p $release_path/
+  rsync -avgz --delete --exclude ".git" --exclude ".svn" --exclude "archives" ${extensions_path}/${extension}/ $release_path/
 
   cd $releases_path
 

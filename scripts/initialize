@@ -1,14 +1,11 @@
 #!/usr/bin/env bash
 
-export bdsm_path="${bdsm_path:-"${prefix}/bdsm"}"
 
-if [ -z "$project" ] ; then
-# TODO: Improve this line vv
-  if [ -d $HOME/shared/$user ] ; then
-    export project=$user
-  fi
-fi
+if [[ -s "/etc/bdsmrc" ]]  ; then source "/etc/bdsmrc" ; fi
+if [[ -s "$HOME/.bdsmrc" ]] ; then source "$HOME/.bdsmrc" ; fi
 
+export bdsm_prefix="${bdsm_prefix:-/usr/local}"
+export bdsm_path="${bdsm_path:-"${bdsm_prefix}/bdsm"}"
 export scripts_path="${scripts_path:-"${bdsm_path}/scripts"}"
 export extensions_path="${extensions_path:-"${bdsm_path}/extensions"}"
 export templates_path="${templates_path:-"${bdsm_path}/templates"}"
@@ -21,36 +18,47 @@ export branch=${branch:-"master"}
 export framework=${framework:-"rails"}
 export keep_releases=${keep_releases:-"4"}
 export timestamp="$(date +%m.%d.%Y-%H:%M:%S)"
-export project_path="${project_path:-$HOME}"
-export shared_path="${shared_path:-$project_path/shared}"
-export previous_path="${previous_path:-$project_path/previous}"
-export current_path="${current_path:-$project_path/current}"
-export discarded_path="${discarded_path:-$project_path/discard}"
-export RAILS_ENV="${RAILS_ENV:-"production"}"
 export user=$(whoami)
 
-result=0
+if [[ "root" != "$(whoami)" ]] ; then
+  if [[ -z "$project" ]] ; then
+  # TODO: Improve this line vv
+    if [ -d $HOME/shared/$user ] ; then
+      export project=$user
+    fi
+  fi
 
-if [[ -d "$project_path/previous" ]] ; then
-  old_releases="$(cd $project_path/previous && ls -t | awk "NR > $keep_releases { print \$0 }")"
-fi
+  if [[ ! -z "$project" ]] ; then
+    # TODO: RAILS_ENV should only be in rails scripts :-p
+    export RAILS_ENV="${RAILS_ENV:-"production"}"
+    export project_path="${project_path:-$HOME}"
+    export shared_path="${shared_path:-$project_path/shared}"
+    export previous_path="${previous_path:-$project_path/previous}"
+    export current_path="${current_path:-$project_path/current}"
+    export discarded_path="${discarded_path:-$project_path/discard}"
+    if [[ -d "$project_path/previous" ]] ; then
+      export old_releases="$(cd $project_path/previous && ls -t | awk "NR > $keep_releases { print \$0 }")"
+    fi
 
-# TODO: Make this even more flexible. eg. check
-if [[ -z "$vcs" ]] ; then
-  if [[ -d "$shared_path/$project/.git" ]] ; then
-    vcs="git"
-  elif [[ -d "$shared_path/$project/.svn" ]] ; then
-    vcs="svn"
-  elif [[ -d "$shared_path/$project/.hg" ]] ; then
-    vcs=hg
-  else
-    vcs="git" # default to awesome :)
+    # TODO: Make this even more flexible. eg. check
+    if [[ -z "$vcs" ]] ; then
+      if [[ -d "$shared_path/$project/.git" ]] ; then
+        vcs="git"
+      elif [[ -d "$shared_path/$project/.svn" ]] ; then
+        vcs="svn"
+      elif [[ -d "$shared_path/$project/.hg" ]] ; then
+        vcs=hg
+      else
+        vcs="git" # default to awesome :)
+      fi
+    fi
+    export vcs
+
+    if [ -f ".${project}rc" ] ; then source ".${project}rc" ; fi
   fi
 fi
 
-if [ -f ".${project}rc" ] ; then source ".${project}rc" ; fi
+result=0
 
 trap 'rm -rf "/tmp/bdsm/$$" >/dev/null 2>&1' 0 1 2 3 15
-
-export user project remote branch framework keep_releases timestamp project_path current_path shared_path RAILS_ENV old_releases scripts_path vcs
 
