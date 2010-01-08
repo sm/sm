@@ -33,24 +33,27 @@ update_repository() {
   builtin cd "$shared_path/$project" > /dev/null 2>&1
 
   if [[ "git" = "$vcs" ]] ; then
-    current_branch=$(git branch | awk '/\* /{print $2}')
-    git pull $remote
+    git checkout master -f -q
+    git reset --hard HEAD 2>/dev/null # There should be *no* changes to the pristine repo.
 
-    if [ "$current_branch" != "$branch" ] ; then
-      $scripts_path/log "info" "Switching to branch $branch from $current_branch"
-      git reset --hard HEAD # There should be *no* changes to the pristine repo.
-      if [ -z "$(git branch | awk "/$branch/")" ] ; then
-        git checkout -b $branch --track $remote/$branch 2>/dev/null
-      elif [ -z "$(git branch | awk "/\* $branch/")" ] ; then
-        git checkout $branch 2>/dev/null
-      else
-        $scripts_path/log "error" "Branch $remote/$branch not found."
-        return 1
-      fi
+    #current_branch=$(git branch | awk '/\* /{print $2}')
+
+    $scripts_path/log "info" "Pulling updates from $remote"
+    git fetch $remote
+
+    $scripts_path/log "info" "Switching to branch $branch"
+    if [ -z "$(git branch | awk "/$branch/")" ] ; then
+      git checkout -b $branch --track $remote/$branch 2>/dev/null
+    elif [ -z "$(git branch | awk "/\* $branch/")" ] ; then
+      git checkout $branch 2>/dev/null
+    else
+      $scripts_path/log "error" "Branch $remote/$branch not found."
+      return 1
     fi
+    git pull
 
     if [[ ! -z "$revision" ]] ; then
-      git checkout $revision
+      git checkout $revision >/dev/null 2>&1
     fi
 
     if [ -f .gitmodules ] ; then
@@ -66,7 +69,7 @@ update_repository() {
     else
       hg update $branch
     fi
-  elif  [[ "svn" = "$vcs" ]] ; then
+  elif [[ "svn" = "$vcs" ]] ; then
     # TODO: specific revision / branch handling
     if [[ "$revision" -gt 0 ]] ; then
       svn update

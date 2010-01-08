@@ -38,17 +38,17 @@ while [ $# -gt 0 ] ; do
     # TODO: Fall back on default actions instead of specifying them here
     #       In case the user has set their default serfice in the environment.
     deploy|rollback|backup_database) export extension="bdsm"; export action="$token" ;;
-    extend)            export extension="extension" ;;
-    --project)         export project="$1"     ;;
-    --environment)     export environment="$1" ;;
-    --repo|repository) export repository="$1"  ;;
-    --revision)        export revision="$1"    ;;
-    --database)        export database="$1"    ;;
-    --server)          export server="$1"      ;; # better name for this?
+    extend)            export extension="extension"   ;;
+    --project)         export project="$1"            ;;
+    --environment)     export environment="$1"        ;;
+    --repo|repository) export repository="$1"         ;;
+    --revision)        export revision="$1" ; shift   ;;
+    --database)        export database="$1"           ;;
+    --server)          export server="$1"             ;; # better name for this?
     --head)            export head_flag=1                                 ;;
     --trace)           export trace_flag=1 ; export debug_flag=1 ; set -x ;;
     --debug)           export debug_flag=1                                ;;
-    -v|--version)      action="version"                                   ;;
+    -v|--version)      export action="version" ;;
 
     *)
       #if $scripts_path/match "$token" $extensions ; then
