@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
+
+result=0 ; extensions="$1" ; shift
+
+if [[ -z "$extensions" ]] ; then
+  "$scripts_path"/log "error" "A extension must be specified." ; exit 1
+fi
+# TODO: Should we allow user installs?...
+if [[ "root" != "user" ]] ; then
+  "$scripts_path"/log "error" "extensions must be installed as root." ; exit 1
+fi
+
+mkdir -p "$archives_path/"
+
+for extension in ${extensions//,/ } ; do
+  version="$(cat $extensions_path/$extension/VERSION)"
+  cwd=$(pwd)
+  release_name="${extension}-${version}"
+  releases_path="#{extensions_path}/${extension}/archives/"
+  release_path="${releases_path}/${release_name}/"
+
+  rsync -avgz --delete --exclude ".git" --exclude ".svn" --exclude "archives"./ $release_path
+
+  cd $releases_path
+
+  tar zcvf ${release_name}.tar.gz ${release_name}/
+
+  rm -rf "$release_path/"
+
+done
+
+exit $result
+
+

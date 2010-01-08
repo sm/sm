@@ -13,8 +13,6 @@ if [[ "root" != "user" ]] ; then
   "$scripts_path"/log "error" "extensions must be installed as root." ; exit 1
 fi
 
-# TODO: Allow ',' separated extension list.
-
 mkdir -p "$src_path/bdsm/"
 
 for extension in ${extensions//,/ } ; do

@@ -11,12 +11,10 @@ if [[ -d "$previous" ]] ; then
 
   $scripts_path/log "info" "info" "Rolling back to $previous ..."
   mv "$previous" "${current_path%/}"
+  $scripts_path/log "info" "info" "Rolled back to $previous."
 else
   $scripts_path/log "error" "info" "Previous release was not found in $previous_path/"
 fi
 result=$?
 
-$scripts_path/log "info" "info" "Rolled back to $previous."
-
 exit $result
-
