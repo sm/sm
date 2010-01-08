@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-
 if [[ -s "/etc/bdsmrc" ]]  ; then source "/etc/bdsmrc" ; fi
 if [[ -s "$HOME/.bdsmrc" ]] ; then source "$HOME/.bdsmrc" ; fi
 
@@ -13,12 +12,12 @@ export config_path="${config_path:-"${bdsm_path}/config"}"
 export src_path="${src_path:-"${bdsm_path}/src"}"
 export bin_path="${bin_path:-"${bdsm_path}/bin"}"
 export archives_path="${archives_path:-"${bdsm_path}/extensions/archives"}"
-export remote=${remote:-"origin"}
-export branch=${branch:-"master"}
-export framework=${framework:-"rails"}
-export keep_releases=${keep_releases:-"4"}
+export remote="${remote:-"origin"}"
+export branch="${branch:-"master"}"
+export framework="${framework:-"rails"}"
+export keep_releases="${keep_releases:-"4"}"
 export timestamp="$(date +%m.%d.%Y-%H:%M:%S)"
-export user=$(whoami)
+export user="$(whoami)"
 
 if [[ "root" != "$(whoami)" ]] ; then
   if [[ -z "$project" ]] ; then
@@ -36,6 +35,7 @@ if [[ "root" != "$(whoami)" ]] ; then
     export previous_path="${previous_path:-$project_path/previous}"
     export current_path="${current_path:-$project_path/current}"
     export discarded_path="${discarded_path:-$project_path/discard}"
+    export database_name="${database_name:-"${project}_${environment}"}"
     if [[ -d "$project_path/previous" ]] ; then
       export old_releases="$(cd $project_path/previous && ls -t | awk "NR > $keep_releases { print \$0 }")"
     fi
@@ -47,7 +47,7 @@ if [[ "root" != "$(whoami)" ]] ; then
       elif [[ -d "$shared_path/$project/.svn" ]] ; then
         vcs="svn"
       elif [[ -d "$shared_path/$project/.hg" ]] ; then
-        vcs=hg
+        vcs="hg"
       else
         vcs="git" # default to awesome :)
       fi

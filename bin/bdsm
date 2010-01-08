@@ -42,6 +42,7 @@ while [ $# -gt 0 ] ; do
     --project)         export project="$1"     ;;
     --environment)     export environment="$1" ;;
     --repo|repository) export repository="$1"  ;;
+    --revision)        export revision="$1"    ;;
     --database)        export database="$1"    ;;
     --server)          export server="$1"      ;; # better name for this?
     --head)            export head_flag=1                                 ;;

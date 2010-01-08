@@ -6,7 +6,6 @@ if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
 #
 #   * Crank up the verbosity on errors
 #
-
 hook() {
   # Server Level
   if [[ -s "$shared_path/config/deploy/$1" ]] ; then
@@ -30,31 +29,36 @@ update() {
 
 update_repository() {
   $scripts_path/log "info" "Updating local repository in $shared_path/$project."
+
   builtin cd "$shared_path/$project" > /dev/null 2>&1
 
   if [[ "git" = "$vcs" ]] ; then
     current_branch=$(git branch | awk '/\* /{print $2}')
+    git pull $remote
 
     if [ "$current_branch" != "$branch" ] ; then
       $scripts_path/log "info" "Switching to branch $branch from $current_branch"
       git reset --hard HEAD # There should be *no* changes to the pristine repo.
-      git pull $remote
       if [ -z "$(git branch | awk "/$branch/")" ] ; then
         git checkout -b $branch --track $remote/$branch 2>/dev/null
       elif [ -z "$(git branch | awk "/\* $branch/")" ] ; then
         git checkout $branch 2>/dev/null
       else
         $scripts_path/log "error" "Branch $remote/$branch not found."
+        return 1
       fi
     fi
 
-    git pull $remote $branch
+    if [[ ! -z "$revision" ]] ; then
+      git checkout $revision
+    fi
 
     if [ -f .gitmodules ] ; then
       $scripts_path/log "info" "Updating submodules."
       git submodule init 2>/dev/null
       git submodule update
     fi
+
   elif [[ "hg" = "$vcs" ]] ; then
     hg pull
     if [[ ! -z "$revision" ]] ; then
