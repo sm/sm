@@ -19,6 +19,7 @@ export keep_releases="${keep_releases:-"4"}"
 export timestamp="$(date +%m.%d.%Y-%H:%M:%S)"
 export user="$(whoami)"
 
+# TODO: Move this code to a 'project' initializer:
 if [[ "root" != "$(whoami)" ]] ; then
   if [[ -z "$project" ]] ; then
   # TODO: Improve this line vv

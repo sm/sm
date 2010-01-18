@@ -42,9 +42,9 @@ update_repository() {
     git fetch $remote
 
     $scripts_path/log "info" "Switching to branch $branch"
-    if [ -z "$(git branch | awk "/$branch/")" ] ; then
+    if [[ -z "$(git branch | awk "/$branch/")" ]] ; then
       git checkout -b $branch --track $remote/$branch 2>/dev/null
-    elif [ -z "$(git branch | awk "/\* $branch/")" ] ; then
+    elif [[ -z "$(git branch | awk "/\* $branch/")" ]] ; then
       git checkout $branch 2>/dev/null
     else
       $scripts_path/log "error" "Branch $remote/$branch not found."
@@ -56,7 +56,7 @@ update_repository() {
       git checkout $revision >/dev/null 2>&1
     fi
 
-    if [ -f .gitmodules ] ; then
+    if [[ -f .gitmodules ]] ; then
       $scripts_path/log "info" "Updating submodules."
       git submodule init 2>/dev/null
       git submodule update
@@ -120,7 +120,7 @@ configure() {
 
 symlink() {
   $scripts_path/log "info" "Setting up persistent directories"
-  for dir in tmp log public/assets pids files ; do
+  for dir in tmp log public/* pids files ; do
     if [[ -d $shared_path/$dir ]] ; then
       $scripts_path/log "info" " - $dir"
       rm -rf $current_path/$dir

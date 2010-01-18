@@ -93,7 +93,12 @@ if [[ "version" = "$action" ]] ; then
   version
 elif [[ ! -z "$extension" ]] && [[ ! -z "$action" ]] ; then
   if [[ -s "$extensions_path/$extension/$action" ]] ; then
+    export extension_path="$extensions_path/$extension"
+    export extension_config_path="$extensions_path/$extension"
+    export extension_scripts_path="$extensions_path/$extension"
+
     "$extensions_path/$extension/$action" $*
+    unset extensions_path extension_config_path extension_scripts_path
   fi
 elif [[ ! -z "$extension" ]] ; then
   echo $(actions_for_extension $extension)

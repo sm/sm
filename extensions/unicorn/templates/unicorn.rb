@@ -2,7 +2,7 @@
 # Setup
 #
 @user         = %x{whoami}.strip
-@project      = ENV["project"]          || raise "The 'project' environment variable must be set."
+@project      = ENV["project"]          || raise("The 'project' environment variable must be set.")
 @project_path = ENV["project_path"]     || "/home/#{user}"
 @rails_env    = ENV["RAILS_ENV"]        || "production"
 @timeout      = ENV["timeout"].to_i > 0 ? ENV["timeout"].to_i : 45
