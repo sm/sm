@@ -3,7 +3,7 @@
 #
 @user         = %x{whoami}.strip
 @project      = ENV["project"]          || raise("The 'project' environment variable must be set.")
-@project_path = ENV["project_path"]     || "/home/#{user}"
+@project_path = ENV["project_path"]     || "/home/#{@user}"
 @rails_env    = ENV["RAILS_ENV"]        || "production"
 @timeout      = ENV["timeout"].to_i > 0 ? ENV["timeout"].to_i : 45
 @prefix       = ["Linux","FreeBSD"].include?(%x{uname}.strip) ? "/home/#{@user}/shared" : "tmp/"
@@ -15,7 +15,7 @@
   :preload_app => { "development" => false, "qa" => true, "ci" => true, "staging" => true, "production" => true },
   :pid => { "development" => "#{@prefix}/pids/#{@project}.pid", "ci" => "#{@prefix}/pids/#{@project}.pid", "qa" => "#{@prefix}/pids/#{@project}.pid", "staging" => "#{@prefix}/pids/#{@project}.pid", "production" => "#{@prefix}/pids/#{@project}.pid" },
   :listen => { "development" => "#{@prefix}/#{@project}.sock", "ci" => "#{@prefix}/#{@project}.sock", "qa" => "#{@prefix}/#{@project}.sock", "staging" => "#{@prefix}/#{@project}.sock", "production" => "#{@prefix}/#{@project}.sock" },
-  :worker_processes => { "development" => 2, "ci" => 2, "qa" => 2, "staging" => 2, "production" => 6 }
+  :worker_processes => { "development" => 2, "ci" => 2, "qa" => 2, "staging" => 2, "production" => 2 }
 }
 
 #

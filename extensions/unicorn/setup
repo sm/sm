@@ -1,18 +1,17 @@
 #!/usr/bin/env bash
 
-if [[ ! -z "$HOME/.bashrc" ]] ; then source "$HOME/.bashrc" ; fi
+if [[ -s "$HOME/.bashrc" ]] ; then source "$HOME/.bashrc" ; fi
+if [[ -s "$HOME/.rvm/scripts/rvm" ]] && [[ -z "$rvm_loaded_flag" ]] ; then source "$HOME/.rvm/scripts/rvm" ; fi
 
 if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
 
-cd $current_path
-if [[ ! -z ".rvmrc" ]] ; then source ".rvmrc" ; fi
+if [[ -s "$current_path/.rvmrc" ]] ; then source "$current_path/.rvmrc" ; fi
 
-if [[ -s $bdsm_dir/unicorn/templates/unicorn.rb ]] ; then
-  echo -e "ERROR: $bdsm_dir/unicorn/templates/unicorn.rb template is missing."
+if [[ -s "$extensions_path/unicorn/templates/unicorn.rb" ]] ; then
+  if [[ ! -d "$shared_path/config/" ]] ; then mkdir -p $shared_path/config/ ; fi
+  cp "$extensions_path/unicorn/templates/unicorn.rb" "$shared_path/config/"
+  exit $?
+else
+  echo -e "ERROR: $extensions_path/unicorn/templates/unicorn.rb template is missing."
   exit 1
 fi
-
-mkdir -p $shared_path/config/
-
-cp $bdsm_dir/unicorn/templates/unicorn.rb $shared_path/config/
-exit $?

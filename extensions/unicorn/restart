@@ -9,16 +9,11 @@ builtin cd $current_path
 if [[ "$master_pid" -le 0 ]] ; then
   echo "Unicorn herd is not running for $project yet."
 else
-  echo "Signaling herd master for $project to shut down."
+  echo "Signaling herd master for $project $environment to re-execute the running binary."
   kill -USR2 $master_pid
   sleep 5
-
-  $scripts_path/log "info" "Ensuring unicorn herd is down $project."
+  $scripts_path/log "info" "Sending QUIT to original herd master for $project $environment."
   kill -QUIT $master_pid
-
-  $scripts_path/log "info" "Starting unicorn herd is for $project."
-  unicorn_rails -c $current_path/config/unicorn.rb -E $RAILS_ENV -D
-  $scripts_path/log "info" "Unicorn herd is now running for $project."
 fi
 
 exit $?

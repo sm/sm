@@ -32,7 +32,7 @@ update_repository() {
 
   builtin cd "$shared_path/$project" > /dev/null 2>&1
 
-  if [[ "git" = "$vcs" ]] ; then
+  if [[ "git" = "$scm" ]] ; then
     git checkout master -f -q
     git reset --hard HEAD 2>/dev/null # There should be *no* changes to the pristine repo.
 
@@ -42,16 +42,16 @@ update_repository() {
     git fetch $remote
 
     $scripts_path/log "info" "Switching to branch $branch"
-    if [[ -z "$(git branch | awk "/$branch/")" ]] ; then
+    if [[ -z "$(git branch | awk "/$branch$/")" ]] ; then
       git checkout -b $branch --track $remote/$branch 2>/dev/null
-    elif [[ -z "$(git branch | awk "/\* $branch/")" ]] ; then
+    elif [[ -z "$(git branch | awk "/\* $branch$/")" ]] ; then
       git checkout $branch 2>/dev/null
       if [[ $? -gt 0 ]] ; then
         $scripts_path/log "error" "Branch $remote/$branch not found. Skipping remainder of update."
         return 1
       fi
     else
-      $scripts_path/log "info" "Already on $branch."
+      $scripts_path/log "info" "Already on branch '$branch'."
     fi
     git pull
 
@@ -65,14 +65,14 @@ update_repository() {
       git submodule update
     fi
 
-  elif [[ "hg" = "$vcs" ]] ; then
+  elif [[ "hg" = "$scm" ]] ; then
     hg pull
     if [[ ! -z "$revision" ]] ; then
       hg update $branch $revision # TODO: Find out if this is how it's done for hg ;)
     else
       hg update $branch
     fi
-  elif [[ "svn" = "$vcs" ]] ; then
+  elif [[ "svn" = "$scm" ]] ; then
     # TODO: specific revision / branch handling
     if [[ "$revision" -gt 0 ]] ; then
       svn update
@@ -81,7 +81,8 @@ update_repository() {
       svn update
     fi
   else
-    $scripts_path/log "warn" "No repository found (git,hg,svn)"
+    $scripts_path/log "warn" "No scm specified found (git,hg,svn)"
+    exit 1
   fi
 }
 
@@ -92,7 +93,7 @@ update_current() {
     mv $current_path $project_path/previous/$timestamp
   fi
   $scripts_path/log "info" "Installing new release to $current_path"
-  rsync -ag --exclude=".${vcs}/*" $shared_path/$project/ $current_path;
+  rsync -ag --exclude=".${scm}/*" $shared_path/$project/ $current_path;
 }
 
 configure() {
@@ -150,6 +151,20 @@ cleanup() {
     cd
   fi
 }
+
+detect_scm() {
+  if [[ -z "$scm" ]] ; then
+    if [[ -d "$shared_path/$project/.git" ]] ; then
+      scm="git"
+    elif [[ -d "$shared_path/$project/.svn" ]] ; then
+      scm="svn"
+    elif [[ -d "$shared_path/$project/.hg" ]] ; then
+      scm="hg"
+    fi
+  fi
+}
+
+detect_scm
 
 $scripts_path/log "info" "info" "Deploying..."
 (
