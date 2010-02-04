@@ -13,7 +13,18 @@ if [[ "root" != "user" ]] ; then
   "$scripts_path"/log "error" "extensions must be installed as root." ; exit 1
 fi
 
-mkdir -p "$src_path/bdsm/"
+if [[ ! -d "$src_path/extensions/" ]] ; then
+  mkdir -p "$src_path/extensions/"
+fi
+
+if [[ ! -d "$archives_path/" ]] ; then
+  mkdir -p "$archives_path/"
+fi
+
+# bdsm extension --url=http://bdsm.beginrescueend.com/extensions/<name>-<version>.tar.gz install
+# bdsm extension --url=git://github.com/... install
+
+# bdsm extension package A,B,C
 
 for extension in ${extensions//,/ } ; do
 

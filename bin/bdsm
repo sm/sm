@@ -7,7 +7,7 @@
 # Setup
 #
 bdsm_prefix="${bdsm_prefix:-/usr/local}"
-if [[ -s "$HOME/.bdsmrc" ]]     ; then source "$HOME/.bdsmrc" ; fi
+if [[ -s "$HOME/.bdsmrc" ]] ; then source "$HOME/.bdsmrc" ; fi
 source "${scripts_path:-"$bdsm_prefix/bdsm/scripts"}"/initialize
 source "${scripts_path}"/functions
 result=0
@@ -38,7 +38,7 @@ while [ $# -gt 0 ] ; do
     # TODO: Fall back on default actions instead of specifying them here
     #       In case the user has set their default serfice in the environment.
     deploy|rollback|backup_database) export extension="bdsm"; export action="$token" ;;
-    extend)            export extension="extension"   ;;
+    extend|extension)  export extension="extension"   ;;
     --project)         export project="$1"            ;;
     --environment)     export environment="$1"        ;;
     --repo|repository) export repository="$1"         ;;
@@ -94,11 +94,22 @@ if [[ "version" = "$action" ]] ; then
 elif [[ ! -z "$extension" ]] && [[ ! -z "$action" ]] ; then
   if [[ -s "$extensions_path/$extension/$action" ]] ; then
     export extension_path="$extensions_path/$extension"
-    export extension_config_path="$extensions_path/$extension"
-    export extension_scripts_path="$extensions_path/$extension"
+    export extension_config_path="$extensions_path/$extension/config"
+    export extension_templates_path="$extensions_path/$extension/templates"
+    export extension_scripts_path="$extensions_path/$extension/scripts"
 
+    pushd "$extensions_path/$extension" > /dev/null 2>&1
+    # TODO: log action output with tee
     "$extensions_path/$extension/$action" $*
-    unset extensions_path extension_config_path extension_scripts_path
+    result=$?
+    if [[ "$result" -gt 0 ]] ; then
+      : # log error
+    else
+      : # log success
+    fi
+
+    popd > /dev/null 2>&1
+    unset extensions_path extension_config_path extension_templates_path extension_scripts_path
   fi
 elif [[ ! -z "$extension" ]] ; then
   echo $(actions_for_extension $extension)

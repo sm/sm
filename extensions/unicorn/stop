@@ -13,7 +13,7 @@ if [[ "$master_pid" -le 0 ]] ; then
   $scripts_path/log "info" "Unicorn herd is not running for $project yet."
 else
   $scripts_path/log "info" "Signaling unicorn master to quit for $project."
-  kill -QUIT  $master_pid
+  kill -QUIT $master_pid
 fi
 
 exit $?

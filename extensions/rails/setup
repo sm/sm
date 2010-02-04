@@ -2,12 +2,12 @@
 
 if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
 
-
 while [ $# -gt 0 ] ; do
   token="$1" ; shift
   case "$token" in
-    --repo)        repo="$1"     ; shift ;;
-    --database)    database="$1" ; shift ;;
+    --repo)        repo="$1"        ; shift ;;
+    --database)    database="$1"    ; shift ;;
+    --server)      server="$1"      ; shift ;;
     --environment) environment="$1" ; shift ;;
     *)
       echo "rails setup: unrecognized argument(s) $*"
@@ -119,6 +119,17 @@ if [[ ! -z "$database" ]] ; then
     gem install mysql --no-rdoc --no-ri
   else
     gem install sqlite --no-rdoc --no-ri
+  fi
+fi
+
+if [[ ! -z "$server" ]] ; then
+  if [[ "unicorn" = "$server" ]] ; then
+    # TODO: Extension check
+    "$bin_path/bdsm unicorn setup"
+  elif [[ "mongrel" = "$server" ]] ; then
+    "$bin_path/bdsm mongrel setup"
+  elif [[ "thin" = "$server" ]] ; then
+    "$bin_path/bdsm thin setup"
   fi
 fi
 

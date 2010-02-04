@@ -13,8 +13,11 @@ fi
 #  "$scripts_path"/log "error" "extensions must be installed as root." ; exit 1
 #fi
 
-mkdir -p "$archives_path/"
+if [[ ! -d "$archives_path/" ]] ; then
+  mkdir -p "$archives_path/"
+fi
 
+# bdsm extension package A,B,C
 for extension in ${extensions//,/ } ; do
   if [[ -s "$extensions_path/$extension/VERSION" ]] ; then
     version="$(cat "$extensions_path/$extension/VERSION")"

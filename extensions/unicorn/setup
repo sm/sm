@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 
-if [[ -s "$HOME/.bashrc" ]] ; then source "$HOME/.bashrc" ; fi
-if [[ -s "$HOME/.rvm/scripts/rvm" ]] && [[ -z "$rvm_loaded_flag" ]] ; then source "$HOME/.rvm/scripts/rvm" ; fi
-
 if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
 
+if [[ -s "$HOME/.rvm/scripts/rvm" ]] && [[ -z "$rvm_loaded_flag" ]] ; then source "$HOME/.rvm/scripts/rvm" ; fi
 if [[ -s "$current_path/.rvmrc" ]] ; then source "$current_path/.rvmrc" ; fi
 
 if [[ -s "$extensions_path/unicorn/templates/unicorn.rb" ]] ; then
