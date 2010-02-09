@@ -1,13 +1,6 @@
 #!/usr/bin/env bash
 
-if [[ ! -z "$HOME/.bashrc" ]] ; then source "$HOME/.bashrc" ; fi
-
-if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
-
-master_pid="$(ps auxww | grep '[u]nicorn' | grep 'master' | awk '/'${user}'/{print $2}')"
-
-cd $current_path
-if [[ -s ".rvmrc" ]] ; then source ".rvmrc" ; fi
+source $extension_scripts_path/initialize
 
 if [[ "$master_pid" -le 0 ]] ; then
   $scripts_path/log "info" "Unicorn herd is not running for $project yet."

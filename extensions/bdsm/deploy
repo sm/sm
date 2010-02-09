@@ -99,6 +99,8 @@ update_current() {
 }
 
 configure() {
+  if [[ ! -d "$current_path/config" ]] ; then mkdir -p "$current_path/config" ; fi
+
   builtin cd $shared_path/config
   $scripts_path/log "info" "Setting up persistent yaml files:"
   for yaml_file in *.yml; do

@@ -4,7 +4,7 @@
 @user         = %x{whoami}.strip
 @project      = ENV["project"]          || raise("The 'project' environment variable must be set.")
 @project_path = ENV["project_path"]     || "/home/#{@user}"
-@rails_env    = ENV["RAILS_ENV"]        || "production"
+@rails_env    = ENV["RAILS_ENV"] || ENV["RAILS_ENV"] || "production"
 @timeout      = ENV["timeout"].to_i > 0 ? ENV["timeout"].to_i : 45
 @prefix       = ["Linux","FreeBSD"].include?(%x{uname}.strip) ? "/home/#{@user}/shared" : "tmp/"
 

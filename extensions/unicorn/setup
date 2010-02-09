@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 
-if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
-
-if [[ -s "$HOME/.rvm/scripts/rvm" ]] && [[ -z "$rvm_loaded_flag" ]] ; then source "$HOME/.rvm/scripts/rvm" ; fi
-if [[ -s "$current_path/.rvmrc" ]] ; then source "$current_path/.rvmrc" ; fi
+source $extension_scripts_path/initialize
 
 if [[ -s "$extensions_path/unicorn/templates/unicorn.rb" ]] ; then
   if [[ ! -d "$shared_path/config/" ]] ; then mkdir -p $shared_path/config/ ; fi

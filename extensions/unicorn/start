@@ -1,19 +1,22 @@
 #!/usr/bin/env bash
 
-if [[ ! -z "$HOME/.bashrc" ]] ; then source "$HOME/.bashrc" ; fi
-if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
-
-master_pid="$(ps auxww | grep '[u]nicorn' | grep 'master' | awk '/'${project}'/{print $2}')"
-
-cd $current_path
-
-if [[ -s ".rvmrc" ]] ; then source ".rvmrc" ; fi
+source $extension_scripts_path/initialize
 
 if [[ "$master_pid" -gt 0 ]] ; then
   $scripts_path/log "info" "Unicorn herd master is already running for $project."
 else
   $scripts_path/log "info" "Starting unicorn herd master for $project."
-  unicorn_rails -c $current_path/config/unicorn.rb -E $environment -D
+
+  if [[ -s "$current_path/config/unicorn.rb" ]] ; then
+    if [[ -s "$current_path/config.ru" ]] ; then
+      unicorn -c $current_path/config/unicorn.rb -E $environment -D
+    else
+      unicorn_rails -c $current_path/config/unicorn.rb -E $environment -D
+    fi
+  else
+    $scripts_path/log "error" "config/unicorn.rb not found, aborting start."
+    exit 1
+  fi
   sleep 2
   $scripts_path/log "info" "Unicorn herd master is now running for $project."
 fi

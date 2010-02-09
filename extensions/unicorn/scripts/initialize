@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+if [[ -s "$HOME/.rvm/scripts/rvm" ]] && [[ -z "$rvm_loaded_flag" ]] ; then source "$HOME/.rvm/scripts/rvm" ; fi
+if [[ ! -z "$HOME/.bashrc" ]] ; then source "$HOME/.bashrc" ; fi
+if [[ ! -z "$HOME/.bdsmrc" ]] ; then source "$HOME/.bdsmrc" ; fi
+if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
+
+master_pid="$(ps auxww | grep '[u]nicorn' | grep 'master' | awk '/'${project}'/{print $2}')"
+
+builtin cd $current_path
+
+if [[ -s "$current_path/.rvmrc" ]] ; then source "$current_path/.rvmrc" ; fi
+
