@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
+if [[ -s "/etc/bdsmrc" ]]    ; then source "/etc/bdsmrc" ; fi
+if [[ -s "$HOME/.bdsmrc" ]]  ; then source "$HOME/.bdsmrc" ; fi
 
 # TODO:
 #
