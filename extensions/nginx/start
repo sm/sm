@@ -1,2 +1,9 @@
 #!/usr/bin/env bash
 
+source $extension_scripts_path/initialize
+
+if [[ "$master_pid" -gt 0 ]] ; then
+  echo -e "Nginx is already running"
+else
+  /sbin/nginx -c /etc/nginx/nginx.conf
+fi

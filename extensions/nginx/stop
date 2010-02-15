@@ -1,2 +1,9 @@
 #!/usr/bin/env bash
 
+source $extension_scripts_path/initialize
+
+if [[ -z "$master_pid" ]] ; then
+  echo -e "Nginx is already stopped"
+else
+  kill -QUIT $master_pid
+fi

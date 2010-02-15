@@ -128,7 +128,8 @@ configure() {
 
 symlink() {
   $scripts_path/log "info" "Setting up persistent directories"
-  for dir in tmp log public/* pids files ; do
+  dirs="tmp log pids files $(ls -A $shared_path/public/)"
+  for dir in tmp log pids files ; do
     if [[ -d $shared_path/$dir ]] ; then
       $scripts_path/log "info" " - $dir"
       rm -rf $current_path/$dir
@@ -136,6 +137,11 @@ symlink() {
     else
       $scripts_path/log "info" "<i> $shared_path/$dir does not exist, skipping."
     fi
+  done
+  for dir in $(ls -A $shared_path/public/)" ; do
+      $scripts_path/log "info" " - public/$dir"
+      rm -rf $current_path/public/$dir
+      ln -nfs $shared_path/public/$dir $current_path/public/$dir
   done
 }
 
