@@ -6,9 +6,9 @@
 #
 # Setup
 #
-bdsm_prefix="${bdsm_prefix:-/usr/local}"
+prefix="${prefix:-/usr/local}"
 if [[ -s "$HOME/.bdsmrc" ]] ; then source "$HOME/.bdsmrc" ; fi
-source "${scripts_path:-"$bdsm_prefix/bdsm/scripts"}"/initialize
+source "${scripts_path:-"$prefix/bdsm/scripts"}"/initialize
 source "${scripts_path}"/functions
 result=0
 
@@ -24,7 +24,7 @@ function version {
 
 function usage {
   version
-  "$extensions_path"/bdsm/help | ${PAGER:-less}
+  "$extensions_path"/bdsm/bin/help | ${PAGER:-less}
 }
 
 #
@@ -62,7 +62,7 @@ while [ $# -gt 0 ] ; do
       if [[ -z "$action" ]] ; then
         if [[ -x "$extensions_path/$extension/$token" ]] ; then
           export action="$token"
-          bdsm_args="$@"
+          export cli_args="$@"
           parse_break=1
         fi
       elif [[ -d "/data/$token" ]] ; then
@@ -92,15 +92,16 @@ if [[ "$trace_flag" = 1 ]] ; then set -x ; else set +x ; fi
 if [[ "version" = "$action" ]] ; then
   version
 elif [[ ! -z "$extension" ]] && [[ ! -z "$action" ]] ; then
-  if [[ -s "$extensions_path/$extension/$action" ]] ; then
+  if [[ -s "$extensions_path/$extension/bin/$action" ]] ; then
     export extension_path="$extensions_path/$extension"
     export extension_config_path="$extensions_path/$extension/config"
     export extension_templates_path="$extensions_path/$extension/templates"
     export extension_scripts_path="$extensions_path/$extension/scripts"
+    export extension_bin_path="$extensions_path/$extension/bin"
 
     pushd "$extensions_path/$extension" > /dev/null 2>&1
     # TODO: log action output with tee
-    "$extensions_path/$extension/$action" $*
+    "$extensions_path/$extension/bin/$action" $*
     result=$?
     if [[ "$result" -gt 0 ]] ; then
       : # log error

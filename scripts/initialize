@@ -3,8 +3,8 @@
 if [[ -s "/etc/bdsmrc" ]]  ; then source "/etc/bdsmrc" ; fi
 if [[ -s "$HOME/.bdsmrc" ]] ; then source "$HOME/.bdsmrc" ; fi
 
-export bdsm_prefix="${bdsm_prefix:-/usr/local}"
-export bdsm_path="${bdsm_path:-"${bdsm_prefix}/bdsm"}"
+export prefix="${prefix:-/usr/local}"
+export bdsm_path="${bdsm_path:-"${prefix}/bdsm"}"
 export scripts_path="${scripts_path:-"${bdsm_path}/scripts"}"
 export extensions_path="${extensions_path:-"${bdsm_path}/extensions"}"
 export templates_path="${templates_path:-"${bdsm_path}/templates"}"

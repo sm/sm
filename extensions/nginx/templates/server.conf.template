@@ -1,0 +1,39 @@
+upstream {{project}} {
+    server unix:/home/{{project}}/shared/{{project}}.sock fail_timeout=0;
+}
+
+server {
+  listen 80;
+  client_max_body_size 50M;
+
+  server_name {{project}}.com;
+
+  root /home/{{project}}/current/public;
+
+  access_log /home/{{project}}/shared/log/{{project}}.com.access.log main;
+  error_log  /home/{{project}}/shared/log/{{project}}.com.error.log  info;
+
+  # This is a ruby application, deny other common types.
+  location ~ \.(php|asp|aspx|jsp|cfm|dll)$ {
+    deny all;
+    break;
+  }
+
+  if (-f $document_root/system/maintenance.html) {
+    rewrite  ^(.*)$  /system/maintenance.html last;
+    break;
+  }
+
+  location / {
+    include /etc/nginx/conf/proxy.conf;
+    if (!-f $request_filename) {
+      proxy_pass http://{{project}};
+      break;
+    }
+  }
+
+  error_page   500 502 503 504  /500.html;
+  location = /500.html {
+    root   /home/{{project}}/current/public;
+  }
+}

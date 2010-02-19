@@ -96,6 +96,7 @@ update_current() {
   fi
   $scripts_path/log "info" "Installing new release to $current_path"
   rsync -ag --exclude=".${scm}/*" $shared_path/$project/ $current_path;
+  mkdir -p $current_path/public
 }
 
 configure() {
@@ -128,7 +129,7 @@ configure() {
 
 symlink() {
   $scripts_path/log "info" "Setting up persistent directories"
-  dirs="tmp log pids files $(ls -A $shared_path/public/)"
+
   for dir in tmp log pids files ; do
     if [[ -d $shared_path/$dir ]] ; then
       $scripts_path/log "info" " - $dir"
@@ -138,10 +139,11 @@ symlink() {
       $scripts_path/log "info" "<i> $shared_path/$dir does not exist, skipping."
     fi
   done
-  for dir in $(ls -A $shared_path/public/)" ; do
-      $scripts_path/log "info" " - public/$dir"
-      rm -rf $current_path/public/$dir
-      ln -nfs $shared_path/public/$dir $current_path/public/$dir
+
+  for dir in $(ls -A $shared_path/public/) ; do
+    $scripts_path/log "info" " - public/$dir"
+    rm -rf $current_path/public/$dir
+    ln -nfs $shared_path/public/$dir $current_path/public/$dir
   done
 }
 

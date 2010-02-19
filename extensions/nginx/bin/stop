@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+source $extension_scripts_path/initialize
+
+if [[ -z "$master_pid" ]] ; then
+  $scripts_path/log "warn" "Nginx is already stopped."
+else
+  $scripts_path/log "info" "Sending QUIT signal to unicorn herd master $master_pid"
+  kill -QUIT $master_pid
+fi

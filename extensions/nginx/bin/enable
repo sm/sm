@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+
+# Enable a 'server'
+# This renames /etc/nginx/servers/X.conf.disabled to X.conf
+
