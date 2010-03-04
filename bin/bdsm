@@ -6,6 +6,7 @@
 #
 # Setup
 #
+if echo "$*" | grep -q 'trace' ; then echo "$*" ; set -x ; fi
 prefix="${prefix:-/usr/local}"
 if [[ -s "$HOME/.bdsmrc" ]] ; then source "$HOME/.bdsmrc" ; fi
 source "${scripts_path:-"$prefix/bdsm/scripts"}"/initialize
@@ -38,12 +39,12 @@ while [ $# -gt 0 ] ; do
     # TODO: Fall back on default actions instead of specifying them here
     #       In case the user has set their default serfice in the environment.
     deploy|rollback|backup_database)
-      export extension="bdsm"
-      export action="$token"
+      extension="bdsm"
+      action="$token"
       parse_break=1
     ;;
 
-    extend|extension)  export extension="extension"           ;;
+    extend|extension)  extension="extension"           ;;
     --no-hooks)        export hooks_flag=0                    ;;
     --project)         export project="$1"            ; shift ;;
     --environment)     export environment="$1"        ; shift ;;
