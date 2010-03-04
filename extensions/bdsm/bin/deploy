@@ -9,17 +9,19 @@ if [[ -s "$HOME/.bdsmrc" ]]  ; then source "$HOME/.bdsmrc" ; fi
 #   * Crank up the verbosity on errors
 #
 hook() {
-  # Server Level
-  if [[ -s "$shared_path/config/deploy/$1" ]] ; then
-    source "$shared_path/config/deploy/$1"
-  fi
+  if [[ "$hooks_flag" -ne 0 ]] ; then
+    # Server Level
+    if [[ -s "$shared_path/config/deploy/$1" ]] ; then
+      source "$shared_path/config/deploy/$1"
+    fi
 
-  # Project Level
-  if [[ -d "$shared_path/$project" ]] ; then
-    if [[ -s "$shared_path/$project/config/deploy/$1" ]] ; then
-      source "$shared_path/$project/config/deploy/$1"
-    elif [[ -s "$shared_path/$project/.$1" ]] ; then
-      source "$shared_path/$project/.$1"
+    # Project Level
+    if [[ -d "$shared_path/$project" ]] ; then
+      if [[ -s "$shared_path/$project/config/deploy/$1" ]] ; then
+        source "$shared_path/$project/config/deploy/$1"
+      elif [[ -s "$shared_path/$project/.$1" ]] ; then
+        source "$shared_path/$project/.$1"
+      fi
     fi
   fi
 }

@@ -18,6 +18,7 @@ export framework="${framework:-"rails"}"
 export keep_releases="${keep_releases:-"4"}"
 export timestamp="$(date +%m.%d.%Y-%H:%M:%S)"
 export user="$(whoami)"
+export hooks_flag="1"
 
 # TODO: Move this code to a 'project' initializer:
 if [[ "root" != "$(whoami)" ]] ; then

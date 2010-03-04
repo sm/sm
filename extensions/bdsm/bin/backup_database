@@ -1,52 +1,75 @@
 #!/usr/bin/env ruby
 
-# NOTE: This will be going away soon.
-
 require "yaml"
 require "fileutils"
 
-@user        = `whoami`.strip
-@environment = ENV["environment"] || ENV["RAILS_ENV"] || ENV["MERB_ENV"] || ENV["RACK_ENV"] || "production"
-@path        = ENV["application_path"] || "/home"
-@config      = YAML.load(`cat /#{@path}/#{@user}/shared/config/database.yml`)[@environment]
-@datestamp   = Time.now.strftime("%Y-%m-%d_%H:%M:%S")
-@adapter     = @config["adapter"].to_s.strip
-@username    = @config["username"].to_s.strip
-@database    = @config["database"].to_s.strip
-@password    = @config["password"].to_s.strip
-@host        = @config["host"].to_s.strip || "localhost"
-
-def log(message, file) ; %x{echo "#{@datestamp} #{message}" >> /home/#{@user}/backups/#{file}.log} ; end
+def log(message, file) ; %x{echo "#{@timestamp}:#{@application}:#{@environment}:#{message}" >> #{@target_path}/backup.#{file}.log} ; end
 def fail(message)      ; log(message, :error) ; exit 1 ; end
 def succeed(message)   ; log(message, :backup) ; exit 0 ; end
 
-FileUtils.mkdir_p "/home/#{@user}/backups"
+@trace=1 if ENV["trace_flag"]
 
-fail("adapter not specified in shared/config/database.yml")  if @adapter.empty?
-fail("user not specified in shared/config/database.yml")     if @user.empty?
-fail("database not specified in shared/config/database.yml") if @database.empty?
+puts "Loading BDSM Database Backup Utility." if @trace
+#
+# Setup & Extract variables
+#
+@user = %x{whoami}.strip
+@application = ARGV.shift
+fail("application must be specified as the first argument.")  if @application.nil? || @application.empty?
+@environment = ARGV.shift
+@environment ||= ENV["environment"] || ENV["RAILS_ENV"] || ENV["MERB_ENV"] || ENV["RACK_ENV"] || "production"
+@config      = YAML.load_file("#{ENV["HOME"]}/shared/config/database.yml")[@environment]
+@timestamp   = Time.now.strftime("%Y-%m-%dT%H:%M:%S")
+@adapter     = @config["adapter"].to_s.strip
 
+fail("adapter not specified in shared/config/database.yml")  if @adapter.nil? || @adapter.empty?
+
+@username    = @config["username"].to_s.strip
+fail("username not specified in shared/config/database.yml") if @username.nil? || @username.empty?
+
+@database    = @config["database"].to_s.strip
+fail("database not specified in shared/config/database.yml") if @database.nil? || @database.empty?
+
+@password    = @config["password"].to_s.strip
+@hostname    = @config["host"] || "localhost"
+@port        = @config["port"] || "5432"
+@target_path = "#{ENV["HOME"]}/shared/backups/#{@application}/#{@environment}"
+
+FileUtils.mkdir_p(@target_path)
+
+#
+# Perform the backup
+#
 if @adapter == "mysql"
 
-  #@dump = `which mysqldump`.strip
-  @dump = "/usr/local/mysql/bin/mysqldump"
+  @dump = %x{which mysqldump}.strip
   fail("mysqldump command not found") if @dump.empty?
-  @flags = "--add-drop-table --complete-insert --default-character-set=utf8 --quote-names --extended-insert --hex-blob"
-  @filename = "#{@database}##{@datestamp}.mysql"
-  @command = "#{@dump} #{@flags} --user=#{@username} -p#{@password} --quick #{@database} | bzip2 -c > ~/backups/#{@filename}.bz2"
+  @flags = "--add-drop-table --complete-insert --default-character-set=utf8 --quote-names --extended-insert"
+  @filename = "#{@database}%#{@timestamp}.mysql"
+  @command = "#{@dump} #{@flags} --user=#{@username} -p#{@password} --quick #{@database} | bzip2 -c > #{@target_path}/#{@filename}.bz2"
 
 elsif @adapter == "postgresql"
 
-  @dump = `which pg_dump`.strip
+  @dump = %x{which pg_dump}.strip
   fail("pg_dump command not found") if @dump.empty?
   @flags = "-b -c -E UTF8 -O -x"
-  @filename = "#{@database}##{@datestamp}.psql"
-  @command = "#{@dump} #{@flags} -U #{@username} -h #{@host} -f ~/backups/#{@filename} #{@database} ; bzip2 ~/backups/#{@filename}"
+  @filename = "#{@database}%#{@timestamp}.psql"
+
+  File.open("/home/#{@user}/.pgpass", 'w') { |file| file.write "#{@hostname}:#{@port}:#{@database}:#{@username}:#{@password}" }
+  %x{chmod 0600 /home/#{@user}/.pgpass}
+  @command = "#{@dump} #{@flags} -U#{@username} -h #{@hostname} #{@database} | bzip2 -c - > #{@target_path}/#{@filename}.bz2"
 
 else
-  fail("unknown adapter")
+
+  fail("unknown adapter, should be either mysql or postgresql")
+  %x{rm -f ~/.pgpass}
+
 end
 
+puts "Executing: '#{@command}'" if @trace
 system(@command)
 
+%x{rm -f ~/.pgpass}
+
 $? == 0 ? succeed("backup successful") : fail("backup failed, command: #{@command}")
+

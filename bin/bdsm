@@ -37,17 +37,23 @@ while [ $# -gt 0 ] ; do
 
     # TODO: Fall back on default actions instead of specifying them here
     #       In case the user has set their default serfice in the environment.
-    deploy|rollback|backup_database) export extension="bdsm"; export action="$token" ;;
-    extend|extension)  export extension="extension"   ;;
+    deploy|rollback|backup_database)
+      export extension="bdsm"
+      export action="$token"
+      parse_break=1
+    ;;
+
+    extend|extension)  export extension="extension"           ;;
+    --no-hooks)        export hooks_flag=0                    ;;
     --project)         export project="$1"            ; shift ;;
     --environment)     export environment="$1"        ; shift ;;
     --repo|repository) export repository="$1"         ; shift ;;
     --revision)        export revision="$1"           ; shift ;;
     --database)        export database="$1"           ; shift ;;
     --server)          export server="$1"             ; shift ;; # better name for this?
-    --head)            export head_flag=1                                 ;;
+    --head)            export head_flag=1                     ;;
+    --debug)           export debug_flag=1                    ;;
     --trace)           export trace_flag=1 ; export debug_flag=1 ; set -x ;;
-    --debug)           export debug_flag=1                                ;;
     -v|--version)      export action="version" ;;
 
     *)
@@ -60,9 +66,8 @@ while [ $# -gt 0 ] ; do
         fi
       fi
       if [[ -z "$action" ]] ; then
-        if [[ -x "$extensions_path/$extension/$token" ]] ; then
+        if [[ -x "$extensions_path/$extension/bin/$token" ]] ; then
           export action="$token"
-          export cli_args="$@"
           parse_break=1
         fi
       elif [[ -d "/data/$token" ]] ; then
