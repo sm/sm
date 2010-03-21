@@ -107,7 +107,7 @@ if [[ ! -s "$project_path/shared/config/database.yml" ]] ; then
   echo -e "${environment}: &defaults\n  adapter: ${database:-postgresql}\n  username: $project\n  password: '$project'\n  database: ${project}_${environment}\n  pool: 5\n  timeout: 5000" > "$project_path/shared/config/database.yml"
 fi
 
-if [[ -s "$project_path/shared/$project/.rvmrc" ]] ; then
+if [[ -d "$project_path/shared/$project/" ]] && [[ -s "$project_path/shared/$project/.rvmrc" ]] ; then
   export rvm_install_on_use_flag=1
   "source $project_path/shared/$project/.rvmrc"
 fi
