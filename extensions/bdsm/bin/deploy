@@ -143,9 +143,11 @@ symlink() {
   done
 
   for dir in $(ls -A $shared_path/public/) ; do
-    $scripts_path/log "info" " - public/$dir"
-    rm -rf $current_path/public/$dir
-    ln -nfs $shared_path/public/$dir $current_path/public/$dir
+    if [[ ! -z "$dir" ]] ; then
+      $scripts_path/log "info" " - public/$dir"
+      rm -rf $current_path/public/$dir
+      ln -nfs $shared_path/public/$dir $current_path/public/$dir
+    fi
   done
 }
 

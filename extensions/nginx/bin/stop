@@ -3,7 +3,7 @@
 source $extension_scripts_path/initialize
 
 if [[ -z "$master_pid" ]] ; then
-  $scripts_path/log "warn" "Nginx is already stopped."
+  $scripts_path/log "warn" "Nginx is not running."
 else
   $scripts_path/log "info" "Sending QUIT signal to unicorn herd master $master_pid"
   kill -QUIT $master_pid

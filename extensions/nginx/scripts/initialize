@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 
-if [[ ! -z "$HOME/.bashrc" ]] ; then source "$HOME/.bashrc" ; fi
-if [[ -s "$HOME/.rvm/scripts/rvm" ]] && [[ -z "$rvm_loaded_flag" ]] ; then source "$HOME/.rvm/scripts/rvm" ; fi
-
-if [[ ! -z "$HOME/.bdsmrc" ]] ; then source "$HOME/.bdsmrc" ; fi
+export PATH="/sbin:/usr/sbin:/usr/local/sbin:/opt/sbin:/opt/local:sbin:$PATH"
+if [[ -s "/etc/bdsmrc" ]] ; then source "/etc/bdsmrc" ; fi
 
 if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
 
 master_pid="$(ps auxww |  awk '/[n]ginx: master/{print $2}' | head -n 1)"
+config_file="${config_file:-"/etc/nginx/nginx.conf"}"
 
