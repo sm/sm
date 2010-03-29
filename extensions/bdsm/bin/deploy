@@ -17,10 +17,10 @@ hook() {
 
     # Project Level
     if [[ -d "$shared_path/$project" ]] ; then
-      if [[ -s "$shared_path/$project/config/deploy/$1" ]] ; then
-        source "$shared_path/$project/config/deploy/$1"
-      elif [[ -s "$shared_path/$project/.$1" ]] ; then
-        source "$shared_path/$project/.$1"
+      if [[ -x "$shared_path/$project/config/deploy/$1" ]] ; then
+        "$shared_path/$project/config/deploy/$1"
+      elif [[ -x "$shared_path/$project/.$1" ]] ; then
+        "$shared_path/$project/.$1"
       fi
     fi
   fi
