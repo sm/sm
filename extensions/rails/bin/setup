@@ -112,7 +112,7 @@ if [[ -d "$project_path/shared/$project/" ]] && [[ -s "$project_path/shared/$pro
   "source $project_path/shared/$project/.rvmrc"
 fi
 
-if [[ ! -z "$database" ]] ; then
+if [[ ! -z "$database" ]] && command -v gem > /dev/null; then
   if [[ "postgresql" = "$database" ]] ; then
     gem install pg --no-rdoc --no-ri
   elif [[ "mysql" = "$database" ]] ; then

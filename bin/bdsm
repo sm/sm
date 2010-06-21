@@ -6,16 +6,30 @@
 #
 # Setup
 #
+# If the user is requesting a trace, turn shell internal trace mode on.
 if echo "$*" | grep -q 'trace' ; then echo "$*" ; set -x ; fi
-prefix="${prefix:-/usr/local}"
-if [[ -s "$HOME/.bdsmrc" ]] ; then source "$HOME/.bdsmrc" ; fi
-source "${scripts_path:-"$prefix/bdsm/scripts"}"/initialize
-source "${scripts_path}"/functions
-result=0
 
+# The default prefix is /usr/local,
+# this should be set to where BDSM is installed to in /etc/bdsmrc
+prefix="${prefix:-/usr/local}"
+
+# Load System Configuration, if it exists.
+if [[ -s "/etc/bdsmrc" ]] ; then source "/etc/bdsmrc" ; fi
+
+# Load User Configuration, if it exists.
+if [[ -s "$HOME/.bdsmrc" ]] ; then source "$HOME/.bdsmrc" ; fi
+
+
+# Initialize BDSM framework and variables.
+source "${scripts_path:-"$prefix/bdsm/scripts"}"/initialize
+
+# Load BDSM framework functions.
+source "${scripts_path}"/functions
+
+# Load the BDSM framework version.
 VERSION="$(cat "$bdsm_path"/VERSION)"
 
-function version {
+_version() {
   _author="Wayne E. Seguin"
   _author_email="wayneeseguin@gmail.com"
   _website="http://bdsm.beginrescueend.com/"
@@ -23,8 +37,8 @@ function version {
   echo -e "bdsm ${_version} ${_website} by ${_author} (${_author_email})"
 }
 
-function usage {
-  version
+usage() {
+  _version
   "$extensions_path"/bdsm/bin/help | ${PAGER:-less}
 }
 
@@ -38,24 +52,25 @@ while [ $# -gt 0 ] ; do
 
     # TODO: Fall back on default actions instead of specifying them here
     #       In case the user has set their default serfice in the environment.
-    deploy|rollback|backup_database)
-      extension="bdsm"
+
+    deploy|rollback)
+      extension="deploy"
       action="$token"
       parse_break=1
     ;;
 
     extend|extension)  extension="extension"           ;;
-    --no-hooks)        export hooks_flag=0                    ;;
-    --project)         export project="$1"            ; shift ;;
-    --environment)     export environment="$1"        ; shift ;;
-    --repo|repository) export repository="$1"         ; shift ;;
-    --revision)        export revision="$1"           ; shift ;;
-    --database)        export database="$1"           ; shift ;;
-    --server)          export server="$1"             ; shift ;; # better name for this?
-    --head)            export head_flag=1                     ;;
-    --debug)           export debug_flag=1                    ;;
-    --trace)           export trace_flag=1 ; export debug_flag=1 ; set -x ;;
-    -v|--version)      export action="version" ;;
+    --no-hooks)        hooks_flag=0                    ;;
+    --project)         project="$1"            ; shift ;;
+    --environment)     environment="$1"        ; shift ;;
+    --repo|repository) repository="$1"         ; shift ;;
+    --revision)        revision="$1"           ; shift ;;
+    --database)        database="$1"           ; shift ;;
+    --server)          server="$1"             ; shift ;; # better name for this?
+    --head)            head_flag=1                     ;;
+    --debug)           debug_flag=1                    ;;
+    --trace)           trace_flag=1 ; export debug_flag=1 ; set -x ;;
+    -v|--version)      action="version" ;;
 
     *)
       #if $scripts_path/match "$token" $extensions ; then
@@ -99,15 +114,23 @@ if [[ "version" = "$action" ]] ; then
   version
 elif [[ ! -z "$extension" ]] && [[ ! -z "$action" ]] ; then
   if [[ -s "$extensions_path/$extension/bin/$action" ]] ; then
-    export extension_path="$extensions_path/$extension"
-    export extension_config_path="$extensions_path/$extension/config"
-    export extension_templates_path="$extensions_path/$extension/templates"
-    export extension_scripts_path="$extensions_path/$extension/scripts"
-    export extension_bin_path="$extensions_path/$extension/bin"
+    extension_path="$extensions_path/$extension"
+    extension_config_path="$extensions_path/$extension/config"
+    extension_templates_path="$extensions_path/$extension/templates"
+    extension_scripts_path="$extensions_path/$extension/scripts"
+    extension_bin_path="$extensions_path/$extension/bin"
+    export extension_path extension_config_path extension_templates_path extension_scripts_path extension_bin_path
+    export hooks_flag project environment repository revision database server head_flag debug_flag trace_flag action extension tag branch
 
     pushd "$extensions_path/$extension" > /dev/null 2>&1
-    # TODO: log action output with tee
-    "$extensions_path/$extension/bin/$action" $*
+    #
+    # TODO: allow output control.
+    #
+    #if [[ -z "$verbose_flag" ]] ; then
+      "$extensions_path/$extension/bin/$action" $*
+    #else
+    # "$extensions_path/$extension/bin/$action" $* >2
+    #fi
     result=$?
     if [[ "$result" -gt 0 ]] ; then
       : # log error

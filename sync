@@ -12,7 +12,7 @@ for host in $hosts ; do
 
   echo "Syncing to $host"
 
-  rsync -avgz --delete --exclude ".git" --exclude "site/" --exclude "test/" --exclude "gems/" --exclude "release/" --exclude "releases/" ./ $host:/usr/local/src/bdsm/ &&
+  rsync -avgz --delete --exclude ".git" --exclude "site/" --exclude "test/" --exclude "logo/" --exclude "gems/" --exclude "release/" --exclude "releases/" ./ $host:/usr/local/src/bdsm/ &&
   ssh $host 'cd /usr/local/src/bdsm && ./install'
 
 done
