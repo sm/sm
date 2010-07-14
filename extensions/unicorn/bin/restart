@@ -3,13 +3,21 @@
 source $extension_scripts_path/initialize
 
 if [[ "$master_pid" -le 0 ]] ; then
-  echo "Unicorn herd is not running for $project yet."
+  echo "Unicorn herd is not running for $project yet, starting."
+  if [[ -s "$current_path/config/unicorn.rb" ]] ; then
+    if [[ -s "$current_path/config.ru" ]] ; then
+      unicorn -c $current_path/config/unicorn.rb -E $environment -D
+    else
+      unicorn_rails -c $current_path/config/unicorn.rb -E $environment -D
+    fi
+  else
+    $scripts_path/log "error" "config/unicorn.rb not found, aborting start."
+    exit 1
+  fi
 else
   echo "Signaling herd master for $project $environment to re-execute the running binary."
   kill -USR2 $master_pid
-  sleep 5
-  $scripts_path/log "info" "Sending QUIT to original herd master for $project $environment."
-  kill -QUIT $master_pid
+  echo "Unicorn should restart within a few seconds, as requests finish processing workers will be replaced."
 fi
 
 exit $?

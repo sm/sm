@@ -7,7 +7,6 @@ if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
 
 master_pid="$(ps auxww | grep '[u]nicorn' | grep 'master' | awk '/'${project}'/{print $2}')"
 
-builtin cd $current_path
-
-if [[ -s "$current_path/.rvmrc" ]] ; then source "$current_path/.rvmrc" ; fi
+[[ -d $current_path ]] && builtin cd $current_path
+[[ -s "$current_path/.rvmrc" ]] && source "$current_path/.rvmrc"
 
