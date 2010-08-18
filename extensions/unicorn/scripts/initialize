@@ -22,7 +22,7 @@ elif [[ -n "$running_pid" ]] && [[ -d "/proc/${running_pid}" ]] ; then
     running_pid="$(ps auxww | grep '[u]nicorn' | grep 'master' | awk '/'${project}'/{print $2}')"
   else
     $bdsm_scripts_path/log "warn" "'project' should be set in ~/.bdsmrc"
-    running_pid="$(ps auxww | grep '[u]nicorn' | grep 'master' | awk '/'${user}'/{print $2}')"
+    running_pid="$(ps auxww | grep '[u]nicorn' | grep 'master' | awk '{print $2}')"
   fi
   printf "$running_pid" > "$pidfile" # Make sure the correct running pid is in the pidfile.
   master_pid="$running_pid" # Set to the found running pidfile.
