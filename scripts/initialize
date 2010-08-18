@@ -1,24 +1,26 @@
 #!/usr/bin/env bash
 
-if [[ -s "/etc/bdsmrc" ]]  ; then source "/etc/bdsmrc" ; fi
-if [[ -s "$HOME/.bdsmrc" ]] ; then source "$HOME/.bdsmrc" ; fi
+[[ -s "/etc/bdsmrc" ]]  && . "/etc/bdsmrc"
+[[ -s "$HOME/.bdsmrc" ]] && . "$HOME/.bdsmrc"
 
-export prefix="${prefix:-/usr/local}"
-export bdsm_path="${bdsm_path:-"${prefix}/bdsm"}"
-export scripts_path="${scripts_path:-"${bdsm_path}/scripts"}"
-export extensions_path="${extensions_path:-"${bdsm_path}/extensions"}"
-export templates_path="${templates_path:-"${bdsm_path}/templates"}"
-export config_path="${config_path:-"${bdsm_path}/config"}"
-export src_path="${src_path:-"${bdsm_path}/src"}"
-export bin_path="${bin_path:-"${bdsm_path}/bin"}"
-export archives_path="${archives_path:-"${bdsm_path}/archives"}"
-export remote="${remote:-"origin"}"
-export branch="${branch:-"master"}"
-export framework="${framework:-"rails"}"
-export keep_releases="${keep_releases:-"4"}"
-export timestamp="$(date +%m.%d.%Y-%H:%M:%S)"
-export user="$(whoami)"
-export hooks_flag="1"
+prefix="${prefix:-/usr/local}"
+bdsm_path="${bdsm_path:-"${prefix}/bdsm"}"
+scripts_path="${scripts_path:-"${bdsm_path}/scripts"}"
+extensions_path="${extensions_path:-"${bdsm_path}/extensions"}"
+templates_path="${templates_path:-"${bdsm_path}/templates"}"
+config_path="${config_path:-"${bdsm_path}/config"}"
+src_path="${src_path:-"${bdsm_path}/src"}"
+bin_path="${bin_path:-"${bdsm_path}/bin"}"
+archives_path="${archives_path:-"${bdsm_path}/archives"}"
+remote="${remote:-"origin"}"
+branch="${branch:-"master"}"
+framework="${framework:-"rails"}"
+keep_releases="${keep_releases:-"4"}"
+timestamp="$(date +%m.%d.%Y-%H:%M:%S)"
+user="$(whoami)"
+hooks_flag="1"
+
+export prefix bdsm_path scripts_path extensions_path templates_path config_path src_path bin_path archives_path remote branch framework keep_releases timestamp user hooks_flag
 
 # TODO: Move this code to a 'project' initializer:
 if [[ "root" != "$(whoami)" ]] ; then
@@ -41,6 +43,7 @@ if [[ "root" != "$(whoami)" ]] ; then
     if [[ -d "$project_path/previous" ]] ; then
       export old_releases="$(cd $project_path/previous && ls -t | awk "NR > $keep_releases { print \$0 }")"
     fi
+    export RAILS_ENV project_path shared_path previous_path current_path discarded_path database_name old_releases
 
     # TODO: Make this even more flexible. eg. check
     if [[ -z "$vcs" ]] ; then

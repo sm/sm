@@ -3,7 +3,7 @@
 source $extension_scripts_path/initialize
 
 if [[ "$master_pid" -le 0 ]] ; then
-  echo "Unicorn herd is not running for $project yet, starting."
+  printf "\nUnicorn herd master not found running for $project $environment, starting."
   if [[ -s "$current_path/config/unicorn.rb" ]] ; then
     if [[ -s "$current_path/config.ru" ]] ; then
       unicorn -c $current_path/config/unicorn.rb -E $environment -D
@@ -15,9 +15,12 @@ if [[ "$master_pid" -le 0 ]] ; then
     exit 1
   fi
 else
-  echo "Signaling herd master for $project $environment to re-execute the running binary."
-  kill -USR2 $master_pid
-  echo "Unicorn should restart within a few seconds, as requests finish processing workers will be replaced."
+  printf "\nMaster pid '$master_pid' found."
+  printf "\nSignaling herd master '$master_pid' for $project $environment to re-execute the running binary."
+
+  kill -USR2 ${master_pid}
+
+  printf "\nUnicorn master '$master_pid' for $project $environment should restart within a few seconds, as requests finish processing workers will be replaced."
 fi
 
 exit $?

@@ -7,34 +7,30 @@
 # Setup
 #
 # If the user is requesting a trace, turn shell internal trace mode on.
-if echo "$*" | grep -q 'trace' ; then echo "$*" ; set -x ; fi
+echo "$*" | grep -q 'trace' && echo "$*" && set -x
+
+# Load System Configuration, if it exists.
+[ -s "/etc/bdsmrc" ] && . /etc/bdsmrc
+
+# Load User Configuration, if it exists.
+[ -s "$HOME/.bdsmrc" ] && . "$HOME/.bdsmrc"
 
 # The default prefix is /usr/local,
 # this should be set to where BDSM is installed to in /etc/bdsmrc
 prefix="${prefix:-/usr/local}"
-
-# Load System Configuration, if it exists.
-if [[ -s "/etc/bdsmrc" ]] ; then source "/etc/bdsmrc" ; fi
-
-# Load User Configuration, if it exists.
-if [[ -s "$HOME/.bdsmrc" ]] ; then source "$HOME/.bdsmrc" ; fi
-
+bindir="${bindir:-/usr/local/bin}"
 
 # Initialize BDSM framework and variables.
-source "${scripts_path:-"$prefix/bdsm/scripts"}"/initialize
+. "${scripts_path:-"$prefix/bdsm/scripts"}"/initialize
 
 # Load BDSM framework functions.
-source "${scripts_path}"/functions
+. "${scripts_path}"/functions
 
 # Load the BDSM framework version.
-VERSION="$(cat "$bdsm_path"/VERSION)"
+[ -s "${bdsm_path}/VERSION" ] && VERSION="$(cat "${bdsm_path}/VERSION")"
 
-_version() {
-  _author="Wayne E. Seguin"
-  _author_email="wayneeseguin@gmail.com"
-  _website="http://bdsm.beginrescueend.com/"
-  _version="$VERSION"
-  echo -e "bdsm ${_version} ${_website} by ${_author} (${_author_email})"
+version() {
+  printf "\nbdsm ${VERSION} http://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)\n\n"
 }
 
 usage() {

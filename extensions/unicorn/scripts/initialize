@@ -1,12 +1,36 @@
 #!/usr/bin/env bash
 
 if [[ -s "$HOME/.rvm/scripts/rvm" ]] && [[ -z "$rvm_loaded_flag" ]] ; then source "$HOME/.rvm/scripts/rvm" ; fi
-if [[ ! -z "$HOME/.bashrc" ]] ; then source "$HOME/.bashrc" ; fi
-if [[ ! -z "$HOME/.bdsmrc" ]] ; then source "$HOME/.bdsmrc" ; fi
-if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
+[[ ! -z "$HOME/.bashrc" ]] && . "$HOME/.bashrc" # Load the non-interactive environment.
+[[ ! -z "$HOME/.bdsmrc" ]] && . "$HOME/.bdsmrc"
+[[ "$trace_flag" -eq 1 ]] && set -x
 
-master_pid="$(ps auxww | grep '[u]nicorn' | grep 'master' | awk '/'${project}'/{print $2}')"
+
+if [[ ! -n "$environment" ]] ; then $scripts_path/log "warn" "'environment' is not set (bdsmrc)" ; fi
+if [[ ! -n "$RAILS_ENV" ]] ; then $scripts_path/log "warn" "'RAILS_ENV' is not set (bdsmrc)" ; fi
+if [[ ! -n "$project" ]] ; then $scripts_path/log "warn" "'project' is not set (bdsmrc)" ; fi
+
+pidfile="$current_path/pids/$project.pid"
+pidfile_pid="$(cat $pidfile)"
+
+if [[ -n "$pidfile_pid" ]] && [[ -d "/proc/${pidfile_pid}" ]] ; then
+
+  master_pid="$pidfile_pid" # Running and matches pidfile.
+
+elif [[ -n "$running_pid" ]] && [[ -d "/proc/${running_pid}" ]] ; then
+  if [[ -n "$project" ]] ; then
+    running_pid="$(ps auxww | grep '[u]nicorn' | grep 'master' | awk '/'${project}'/{print $2}')"
+  else
+    $bdsm_scripts_path/log "warn" "'project' should be set in ~/.bdsmrc"
+    running_pid="$(ps auxww | grep '[u]nicorn' | grep 'master' | awk '/'${user}'/{print $2}')"
+  fi
+  printf "$running_pid" > "$pidfile" # Make sure the correct running pid is in the pidfile.
+  master_pid="$running_pid" # Set to the found running pidfile.
+else
+  unset master_pid # Not found!
+fi
 
 [[ -d $current_path ]] && builtin cd $current_path
+
 [[ -s "$current_path/.rvmrc" ]] && source "$current_path/.rvmrc"
 

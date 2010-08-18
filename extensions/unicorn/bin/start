@@ -17,8 +17,7 @@ else
     $scripts_path/log "error" "config/unicorn.rb not found, aborting start."
     exit 1
   fi
-  sleep 2
-  $scripts_path/log "info" "Unicorn herd master is now running for $project."
+  $scripts_path/log "info" "Unicorn herd master has been launched $project."
 fi
 
 exit $?
