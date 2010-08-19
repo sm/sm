@@ -9,25 +9,23 @@ events {
 }
 
 http {
-  include /etc/nginx/conf/passenger;
-  include /etc/nginx/conf/mime.types;
-
-  server_names_hash_bucket_size 128;
-  client_max_body_size 50M;
-  charset utf-8;
-
-  default_type  application/octet-stream;
-
   log_format main '$remote_addr - $remote_user [$time_local] '
                   '$status - "$request" ("$request_filename": $body_bytes_sent bytes) from "$http_referer" '
                   '"$http_user_agent" "$http_x_forwarded_for"';
 
   access_log /var/log/nginx/access.log main;
 
+  include /etc/nginx/conf/passenger;
+  include /etc/nginx/conf/mime.types;
+
+  server_names_hash_bucket_size 128;
+  client_max_body_size 50M;
+  charset utf-8;
+  default_type  application/octet-stream;
   sendfile          on;
   tcp_nopush        on;
 
-  # Keepalive is good to a point
+  # Keepalive is good up to to a certain point
   # 2 seconds seems to give the client enough time to request all of the files needed for a
   #  page without having to open multiple connections while still allowing
   #  termination of the connection soon enough to be able to handle many more clients.
