@@ -7,12 +7,12 @@ if [[ ! -z "$2" ]] ; then level=$1 ; shift ; else level="info" ; fi
 message=$1
 
 case "$level" in
-  debug) shift ; echo -e "<d> $message "     ;;
-  info)  shift ; echo -e "<i> $message "     ;;
-  warn)  shift ; echo -e "<w> $message "     ;;
-  error) shift ; echo -e "<e> $message " >&2 ;;
-  fail)  shift ; echo -e "<f> $message " >&2 ;;
-  *) echo -e "$message"
+  debug) shift ; printf "\nd: $message "     ;;
+  info)  shift ; printf "\ni: $message "     ;;
+  warn)  shift ; printf "\nw: $message "     ;;
+  error) shift ; printf "\ne: $message " >&2 ;;
+  fail)  shift ; printf "\nf: $message " >&2 ;;
+  *) printf "\n$message"
 esac
 
 exit 0

@@ -7,7 +7,7 @@
 # Setup
 #
 # If the user is requesting a trace, turn shell internal trace mode on.
-echo "$*" | grep -q 'trace' && echo "$*" && set -x
+echo "$*" | grep -q 'trace' && echo "$*" && set -x && export trace_flag=1
 
 # Load System Configuration, if it exists.
 [ -s "/etc/bdsmrc" ] && . /etc/bdsmrc

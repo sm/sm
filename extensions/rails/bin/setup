@@ -1,18 +1,23 @@
 #!/usr/bin/env bash
 
-if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
+[[ "$trace_flag" -eq 1 ]] && set -x
+
+. "$scripts_path/initialize"
 
 while [ $# -gt 0 ] ; do
   token="$1" ; shift
   case "$token" in
     --repo)        repo="$1"        ; shift ;;
+    --environment) environment="$1" ; shift ;;
+    --project)     project="$1"     ; shift ;;
     --database)    database="$1"    ; shift ;;
     --server)      server="$1"      ; shift ;;
-    --environment) environment="$1" ; shift ;;
-    *)
-      echo "rails setup: unrecognized argument(s) $*"
+    *) echo "rails setup: unrecognized argument(s) $*"
   esac
 done
+
+environment="${environment:-"production"}"
+RAILS_ENV="${RAILS_ENV:-$environment}"
 
 #
 # Sanity checks
@@ -22,7 +27,7 @@ if [[ "root" = $(whoami) ]] ; then
   exit 1
 fi
 
-touch "$HOME/.bash_profile" "$HOME/.bdsmrc"
+touch "$HOME/.bash_profile" "$HOME/.bashrc" "$HOME/.bdsmrc"
 
 if [[ -z "$project" ]] ; then
   $scripts_path/log "error" "project variable must be set for extension $extension."
@@ -71,7 +76,7 @@ if [[ ! -z "$repo" ]] ; then
 fi
 
 for dir in config log pids sockets "public/assets" tmp ; do
-  mkdir -p "$project_path/shared/$dir"
+  mkdir -p "$shared_path/$dir"
 done
 
 #

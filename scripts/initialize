@@ -25,26 +25,22 @@ export prefix bdsm_path scripts_path extensions_path templates_path config_path 
 # TODO: Move this code to a 'project' initializer:
 if [[ "root" != "$(whoami)" ]] ; then
   if [[ -z "$project" ]] ; then
-  # TODO: Improve this line vv
-    if [ -d $HOME/shared/$user ] ; then
-      export project=$user
-    fi
+    # TODO: Improve this line vv
+    [[ -d $HOME/shared/$user ]] && export project=$user
   fi
 
-  if [[ ! -z "$project" ]] ; then
-    # TODO: RAILS_ENV should only be in rails scripts :-p
-    export RAILS_ENV="${RAILS_ENV:-"production"}"
-    export project_path="${project_path:-$HOME}"
-    export shared_path="${shared_path:-$project_path/shared}"
-    export previous_path="${previous_path:-$project_path/previous}"
-    export current_path="${current_path:-$project_path/current}"
-    export discarded_path="${discarded_path:-$project_path/discard}"
-    export database_name="${database_name:-"${project}_${environment}"}"
-    if [[ -d "$project_path/previous" ]] ; then
-      export old_releases="$(cd $project_path/previous && ls -t | awk "NR > $keep_releases { print \$0 }")"
-    fi
-    export RAILS_ENV project_path shared_path previous_path current_path discarded_path database_name old_releases
+  project_path="${project_path:-$HOME}"
+  shared_path="${shared_path:-$project_path/shared}"
+  previous_path="${previous_path:-$project_path/previous}"
+  current_path="${current_path:-$project_path/current}"
+  discarded_path="${discarded_path:-$project_path/discard}"
 
+  if [[ -d "$project_path/previous" ]] ; then
+    old_releases="$(cd $project_path/previous && ls -t | awk "NR > $keep_releases { print \$0 }")"
+  fi
+
+  if [[ -n "$project" ]] ; then
+    database_name="${database_name:-"${project}_${environment}"}"
     # TODO: Make this even more flexible. eg. check
     if [[ -z "$vcs" ]] ; then
       if [[ -d "$shared_path/$project/.git" ]] ; then
@@ -57,9 +53,10 @@ if [[ "root" != "$(whoami)" ]] ; then
         vcs="git" # default to awesome :)
       fi
     fi
-    export vcs
 
-    if [ -f ".${project}rc" ] ; then source ".${project}rc" ; fi
+    export project_path shared_path previous_path current_path discarded_path database_name old_releases vcs
+
+    [[ -s ".${project}rc" ]] && . ".${project}rc"
   fi
 fi
 

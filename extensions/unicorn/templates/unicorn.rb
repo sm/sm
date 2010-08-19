@@ -8,6 +8,10 @@
 @timeout      = ENV["timeout"].to_i > 0 ? ENV["timeout"].to_i : 45
 @prefix       = ["Linux","FreeBSD"].include?(%x{uname}.strip) ? "/home/#{@user}/shared" : "tmp/"
 
+# Important for debugging during daemonization
+stderr_path "#{@project_path}/shared/log/unicorn.stderr.log"
+stdout_path "#{@project_path}/shared/log/unicorn.stdout.log"
+
 #
 # Configuration
 #
