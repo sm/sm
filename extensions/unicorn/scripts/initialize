@@ -1,17 +1,16 @@
 #!/usr/bin/env bash
 
-if [[ -s "$HOME/.rvm/scripts/rvm" ]] && [[ -z "$rvm_loaded_flag" ]] ; then source "$HOME/.rvm/scripts/rvm" ; fi
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && [[ -z "$rvm_loaded_flag" ]] && . "$HOME/.rvm/scripts/rvm"
 [[ ! -z "$HOME/.bashrc" ]] && . "$HOME/.bashrc" # Load the non-interactive environment.
 [[ ! -z "$HOME/.bdsmrc" ]] && . "$HOME/.bdsmrc"
 [[ "$trace_flag" -eq 1 ]] && set -x
-
 
 if [[ ! -n "$environment" ]] ; then $scripts_path/log "warn" "'environment' is not set (bdsmrc)" ; fi
 if [[ ! -n "$RAILS_ENV" ]] ; then $scripts_path/log "warn" "'RAILS_ENV' is not set (bdsmrc)" ; fi
 if [[ ! -n "$project" ]] ; then $scripts_path/log "warn" "'project' is not set (bdsmrc)" ; fi
 
 pidfile="$current_path/pids/$project.pid"
-pidfile_pid="$(cat $pidfile)"
+[[ -s "$pidfile" ]] && pidfile_pid="$(cat "$pidfile")"
 
 if [[ -n "$pidfile_pid" ]] && [[ -d "/proc/${pidfile_pid}" ]] ; then
 

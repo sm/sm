@@ -116,7 +116,7 @@ elif [[ ! -z "$extension" ]] && [[ ! -z "$action" ]] ; then
     extension_scripts_path="$extensions_path/$extension/scripts"
     extension_bin_path="$extensions_path/$extension/bin"
     export extension_path extension_config_path extension_templates_path extension_scripts_path extension_bin_path
-    export hooks_flag project environment repository revision database server head_flag debug_flag trace_flag action extension tag branch
+    export action branch database debug_flag environment extension head_flag hooks_flag project repository revision server tag trace_flag
 
     pushd "$extensions_path/$extension" > /dev/null 2>&1
     #

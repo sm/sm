@@ -3,7 +3,7 @@
 source $extension_scripts_path/initialize
 
 if [[ -s "$extensions_path/unicorn/templates/unicorn.rb" ]] ; then
-  if [[ ! -d "$shared_path/config/" ]] ; then mkdir -p $shared_path/config/ ; fi
+  [[ ! -d "$shared_path/config/" ]] && mkdir -p "$shared_path/config/"
   cp "$extensions_path/unicorn/templates/unicorn.rb" "$shared_path/config/"
   exit $?
 else
