@@ -19,6 +19,14 @@ server {
     break;
   }
 
+  location /nginx/health {
+    access_log /var/log/nginx/health.log main;
+    index index.html;
+    auth_basic off;
+    root /etc/nginx;
+    break;
+  }
+
   if (-f $document_root/system/maintenance.html) {
     rewrite  ^(.*)$  /system/maintenance.html last;
     break;

@@ -1,0 +1,47 @@
+server {
+  listen 443 default;
+
+  server_name {{project}.com *.{{project}}.com;
+
+  client_max_body_size 50M;
+  root /home/{{project}}/current/public;
+
+  access_log /home/{{project}}/shared/log/{{project}}.org.access.log main;
+  error_log  /home/{{project}}/shared/log/{{project}}.org.error.log  info;
+
+  ssl                  on;
+  ssl_certificate      /etc/nginx/ssl/{{project}}.org.crt;
+  ssl_certificate_key  /etc/nginx/ssl/{{project}}.org.key;
+  ssl_session_timeout  5m;
+  ssl_protocols        SSLv2 SSLv3 TLSv1;
+  ssl_ciphers          ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP;
+  ssl_prefer_server_ciphers   on;
+
+  location /nginx/health/ {
+    access_log /var/log/nginx/health.log main;
+    index index.html;
+    auth_basic off;
+    root /etc/nginx;
+    break;
+  }
+
+  if (-f $document_root/system/maintenance.html) {
+    rewrite  ^(.*)$  /system/maintenance.html last;
+    break;
+  }
+
+  location / {
+    include /etc/nginx/conf/proxy.conf;
+
+    if (!-f $request_filename) {
+      proxy_pass http://{{project}};
+      break;
+    }
+  }
+
+  error_page   500 502 503 504  /500.html;
+  location = /500.html {
+    root   /home/{{project}}/current/public;
+  }
+}
+

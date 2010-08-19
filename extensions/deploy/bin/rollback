@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
+
+mkdir -p "$previous_path" "$discarded_path"
+
+previous="$(\ls -t "$previous_path"/ | head -n 1)"
+if [[ -d "$previous" ]] ; then
+  $scripts_path/log "info" "info" "discarding current to $discarded_path/$timestamp ..."
+  mv "$current_path" "$discarded_path/$timestamp"
+
+  $scripts_path/log "info" "info" "Rolling back to $previous ..."
+  mv "$previous" "${current_path%/}"
+  $scripts_path/log "info" "info" "Rolled back to $previous."
+else
+  $scripts_path/log "error" "info" "Previous release was not found in $previous_path/"
+fi
+result=$?
+
+exit $result

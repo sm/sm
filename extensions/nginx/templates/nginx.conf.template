@@ -1,5 +1,5 @@
 worker_processes  2;
-user nginx;
+user nginx nginx;
 
 error_log  /var/log/nginx/error.log info;
 pid        /var/run/nginx.pid;
@@ -9,33 +9,36 @@ events {
 }
 
 http {
-  # include /etc/nginx/conf/mime.types;
+  include /etc/nginx/conf/passenger;
+  include /etc/nginx/conf/mime.types;
 
   server_names_hash_bucket_size 128;
+  client_max_body_size 50M;
   charset utf-8;
 
   default_type  application/octet-stream;
 
   log_format main '$remote_addr - $remote_user [$time_local] '
                   '$status - "$request" ("$request_filename": $body_bytes_sent bytes) from "$http_referer" '
-                  '"$http_user_agent" "$http_x_forwarded_for"' ;
+                  '"$http_user_agent" "$http_x_forwarded_for"';
 
   access_log /var/log/nginx/access.log main;
-
-  # Keepalive is good to a point ;
-  # 2 seconds seems to give the client enough time to request all of the files needed for a  ;
-  #  page without having to open multiple connections while still allowing ;
-  #  termination of the connection soon enough to be able to handle many more clients. ;
-  keepalive_timeout  2;
 
   sendfile        on;
   #tcp_nopush     on;
 
-  gzip              on;
+  # Keepalive is good to a point
+  # 2 seconds seems to give the client enough time to request all of the files needed for a
+  #  page without having to open multiple connections while still allowing
+  #  termination of the connection soon enough to be able to handle many more clients.
+  keepalive_timeout  2;
+
+  gzip  on;
   gzip_http_version 1.0;
-  gzip_comp_level   2;
+  gzip_comp_level   8;
   gzip_proxied      any;
-  gzip_types        text/plain text/css application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+  gzip_types        text/plain text/html text/css application/x-javascript text/xml application/xml application/xml+rss text/javascript;
 
   include /etc/nginx/servers/*.conf;
 }
+
