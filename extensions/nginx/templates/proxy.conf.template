@@ -9,13 +9,18 @@ proxy_set_header  X_FORWARDED_PROTO $scheme;
 proxy_redirect off;
 proxy_max_temp_file_size 0;
 
-# serve any existing file
+# Serve existing files first.
 if (-f $request_filename) {
   break;
 }
-
-# serve any standard Rails page cache file with .html extension
 if (-f $request_filename.html) {
   rewrite (.*) $1.html break;
 }
 
+# Serve application cache files next
+if (-f $document_root/cache/$host$uri.html) {
+  rewrite (.*) /cache/$host$1.html break;
+}
+if (-f $document_root/cache/$host$uri) {
+  rewrite (.*) /cache/$host$1 break;
+}
