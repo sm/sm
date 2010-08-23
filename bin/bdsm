@@ -20,8 +20,14 @@ echo "$*" | grep -q 'trace' && echo "$*" && set -x && export trace_flag=1
 prefix="${prefix:-/usr/local}"
 bindir="${bindir:-/usr/local/bin}"
 
+if echo "$prefix" | grep -q '.$' ; then
+  bdsm_path="${bdsm_path:-"${prefix}bdsm"}"
+else
+  bdsm_path="${bdsm_path:-"${prefix}/bdsm"}"
+fi
+
 # Initialize BDSM framework and variables.
-. "${scripts_path:-"$prefix/bdsm/scripts"}"/initialize
+. "${scripts_path:-"${bdsm_path}/scripts"}"/initialize
 
 # Load BDSM framework functions.
 . "${scripts_path}"/functions

@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+source $extension_scripts_path/initialize
+
+if [[ "$master_pid" -le 0 ]] ; then
+  echo "There are no rainbowss running for $project."
+else
+  ps auxww | grep '[r]ainbows' | grep master
+  echo
+  ps auxwww | grep '[r]ainbows' | grep $project | grep $environment | grep worker
+fi
+
+exit $?
+

@@ -2,7 +2,8 @@
 
 echo -e "
 Usage
-  $0 {install,setup,start,stop,help}
+  bdsm unicorn [action]
+
 Actions
   install  - Install the unicorn gem.
   setup    - Setup the unicorn config file with a template in $current_path/config/

@@ -15,12 +15,12 @@ if [[ "$master_pid" -le 0 ]] ; then
     exit 1
   fi
 else
-  printf "\nMaster pid '$master_pid' found."
-  printf "\nSignaling herd master '$master_pid' for $project $environment to re-execute the running binary."
+  $scripts_path/log "info" "Master pid '$master_pid' found."
+  $scripts_path/log "info" "Signaling herd master '$master_pid' for $project $environment to re-execute the running binary."
 
   kill -USR2 ${master_pid}
 
-  printf "\nUnicorn master '$master_pid' for $project $environment should restart within a few seconds, as requests finish processing workers will be replaced."
+  $scripts_path/log "info" "Unicorn master '$master_pid' for $project $environment should restart within a few seconds, as requests finish processing workers will be replaced."
 fi
 
 exit $?

@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+source $extension_scripts_path/initialize
+
+if [[ -s "$extensions_path/rainbows/templates/rainbows.rb" ]] ; then
+  [[ ! -d "$shared_path/config/" ]] && mkdir -p "$shared_path/config/"
+  cp "$extensions_path/rainbows/templates/rainbows.rb" "$shared_path/config/"
+  exit $?
+else
+  echo -e "ERROR: $extensions_path/rainbows/templates/rainbows.rb template is missing."
+  exit 1
+fi

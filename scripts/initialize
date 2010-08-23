@@ -4,7 +4,14 @@
 [[ -s "$HOME/.bdsmrc" ]] && . "$HOME/.bdsmrc"
 
 prefix="${prefix:-/usr/local}"
-bdsm_path="${bdsm_path:-"${prefix}/bdsm"}"
+bindir="${bindir:-/usr/local/bin}"
+
+if echo "$prefix" | grep -q '.$' ; then
+  bdsm_path="${bdsm_path:-"${prefix}bdsm"}"
+else
+  bdsm_path="${bdsm_path:-"${prefix}/bdsm"}"
+fi
+
 scripts_path="${scripts_path:-"${bdsm_path}/scripts"}"
 extensions_path="${extensions_path:-"${bdsm_path}/extensions"}"
 templates_path="${templates_path:-"${bdsm_path}/templates"}"

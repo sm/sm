@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+source $extension_scripts_path/initialize
+
+if [[ "$master_pid" -le 0 ]] ; then
+  echo "rainbows is not running for $project yet."
+else
+  kill -USR1 $master_pid
+fi
+
+exit $?

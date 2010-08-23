@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+source $extension_scripts_path/initialize
+
+if [[ "$master_pid" -gt 0 ]] ; then
+  $scripts_path/log "info" "Rainbows leprechaun master is already running for $project."
+else
+  $scripts_path/log "info" "Starting rainbows leprechaun master for $project."
+
+  if [[ -s "$current_path/config/rainbows.rb" ]] ; then
+    if [[ -s "$current_path/config.ru" ]] ; then
+      rainbows -c $current_path/config/rainbows.rb -E $environment -D
+    else
+      rainbows_rails -c $current_path/config/rainbows.rb -E $environment -D
+    fi
+  else
+    $scripts_path/log "error" "config/rainbows.rb not found, aborting start."
+    exit 1
+  fi
+  $scripts_path/log "info" "Rainbows leprechaun master has been launched $project."
+fi
+
+exit $?

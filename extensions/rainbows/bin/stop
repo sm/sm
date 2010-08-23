@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+source $extension_scripts_path/initialize
+
+if [[ "$master_pid" -le 0 ]] ; then
+  $scripts_path/log "info" "Rainbows leprechaun is not running for $project yet."
+else
+  $scripts_path/log "info" "Signaling rainbows leprechaun master to quit for $project."
+  kill -QUIT $master_pid
+fi
+
+exit $?

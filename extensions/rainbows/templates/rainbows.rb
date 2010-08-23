@@ -5,20 +5,20 @@
 @project      = ENV["project"]          || raise("The 'project' environment variable must be set.")
 @project_path = ENV["project_path"]     || "/home/#{@user}"
 @rails_env    = ENV["RAILS_ENV"] || ENV["RAILS_ENV"] || "production"
-@timeout      = ENV["timeout"].to_i > 0 ? ENV["timeout"].to_i : 45
+@timeout      = ENV["timeout"].to_i > 0 ? ENV["timeout"].to_i : 600 # 10 minutes
 @prefix       = ["Linux","FreeBSD"].include?(%x{uname}.strip) ? "/home/#{@user}/shared" : "tmp/"
 
 # Important for debugging during daemonization
-stderr_path "#{@project_path}/shared/log/unicorn.error.log"
-stdout_path "#{@project_path}/shared/log/unicorn.log"
+stderr_path "#{@project_path}/shared/log/rainbows.error.log"
+stdout_path "#{@project_path}/shared/log/rainbows.log"
 
 #
 # Configuration
 #
 @config = {
   :preload_app => { "development" => false, "qa" => true, "ci" => true, "staging" => true, "production" => true },
-  :pid => { "development" => "#{@prefix}/pids/#{@project}.pid", "ci" => "#{@prefix}/pids/#{@project}.pid", "qa" => "#{@prefix}/pids/#{@project}.pid", "staging" => "#{@prefix}/pids/#{@project}.pid", "production" => "#{@prefix}/pids/#{@project}.pid" },
-  :listen => { "development" => "#{@prefix}/#{@project}.sock", "ci" => "#{@prefix}/#{@project}.sock", "qa" => "#{@prefix}/#{@project}.sock", "staging" => "#{@prefix}/#{@project}.sock", "production" => "#{@prefix}/#{@project}.sock" },
+  :pid => { "development" => "#{@prefix}/pids/#{@project}.rainbows.pid", "ci" => "#{@prefix}/pids/#{@project}.rainbows.pid", "qa" => "#{@prefix}/pids/#{@project}.rainbows.pid", "staging" => "#{@prefix}/pids/#{@project}.rainbows.pid", "production" => "#{@prefix}/pids/#{@project}.rainbows.pid" },
+  :listen => { "development" => "#{@prefix}/#{@project}.rainbows.sock", "ci" => "#{@prefix}/#{@project}.rainbows.sock", "qa" => "#{@prefix}/#{@project}.rainbows.sock", "staging" => "#{@prefix}/#{@project}.rainbows.sock", "production" => "#{@prefix}/#{@project}.rainbows.sock" },
   :worker_processes => { "development" => 2, "ci" => 2, "qa" => 2, "staging" => 2, "production" => 2 }
 }
 

@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+source $extension_scripts_path/initialize
+
+if [[ "$master_pid" -le 0 ]] ; then
+  printf "\nRainbows leprechaun master found running for $project $environment, starting."
+  if [[ -s "$current_path/config/rainbows.rb" ]] ; then
+    if [[ -s "$current_path/config.ru" ]] ; then
+      rainbows -c $current_path/config/rainbows.rb -E $environment -D
+    else
+      rainbows_rails -c $current_path/config/rainbows.rb -E $environment -D
+    fi
+  else
+    $scripts_path/log "error" "config/rainbows.rb not found, aborting start."
+    exit 1
+  fi
+else
+  $scripts_path/log "info" "Master pid '$master_pid' found."
+  $scripts_path/log "info" "Signaling leprechaun master '$master_pid' for $project $environment to re-execute the running binary."
+
+  kill -USR2 ${master_pid}
+
+  $scripts_path/log "info" "Rainbows leprechaun master '$master_pid' for $project $environment should restart within a few seconds, as requests finish processing workers will be replaced."
+fi
+
+exit $?

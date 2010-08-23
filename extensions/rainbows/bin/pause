@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+if [[ ! -z "$HOME/.bashrc" ]] ; then source "$HOME/.bashrc" ; fi
+
+if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
+
+master_pid="$(ps auxww | grep '[r]ainbows' | grep 'master' | awk '/'${project}'/{print $2}')"
+
+cd $current_path
+if [[ ! -z ".rvmrc" ]] ; then source ".rvmrc" ; fi
+
+if [[ "$master_pid" -le 0 ]] ; then
+  echo "rainbows is not running for $project yet."
+else
+  kill -WINCH $master_pid
+fi
+
+exit $?

@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+echo -e "
+Usage
+  bdsm rainbows [action]
+
+Actions
+  install  - Install the rainbows gem.
+  setup    - Setup the rainbows config file with a template in $current_path/config/
+  start    - Start Rainbows leprechaun master.
+  stop     - Stop Rainbows leprechaun master.
+  restart  - Restart Rainbows leprechaun master.
+  reload   - Reload rainbows configuration file.
+  logs     - Reopen log files.
+  increase - Increase the number of rainbows worker processes.
+  decrease - Decrease the number of rainbows worker processes.
+  kill     - Forcedly kill off rainbows leprechaun master.
+  list     - List all running rainbows for $project $environment.
+  pause    - Pause all rainbows workers.
+  unpause  - Un pause all rainbows workers.
+  help     - Display this help text.
+"
+exit $?
