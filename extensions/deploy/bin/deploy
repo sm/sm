@@ -35,7 +35,7 @@ update() {
 update_repository() {
   $scripts_path/log "info" "Updating local repository in $shared_path/$project."
 
-  builtin cd "$shared_path/$project" > /dev/null 2>&1
+  pushd "$shared_path/$project" > /dev/null 2>&1
 
   if [[ "git" = "$scm" ]] ; then
     git checkout master -f -q
@@ -89,6 +89,8 @@ update_repository() {
     $scripts_path/log "warn" "No scm specified found (git,hg,svn)"
     exit 1
   fi
+
+  popd > /dev/null 2>&1
 }
 
 update_current() {

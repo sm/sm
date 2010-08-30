@@ -1,16 +1,15 @@
 #!/usr/bin/env bash
 
-if [[ ! -z "$HOME/.bashrc" ]] ; then source "$HOME/.bashrc" ; fi
+[[ ! -z "$HOME/.bashrc" ]] && \. "$HOME/.bashrc"
+[[ "$trace_flag" -eq 1 ]]  && set -x
 
-if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
+master_pid="$(ps auxww | \grep '[u]nicorn' | \grep 'master' | awk '/'${project}'/{print $2}')"
 
-master_pid="$(ps auxww | grep '[u]nicorn' | grep 'master' | awk '/'${project}'/{print $2}')"
-
-cd $current_path
-if [[ ! -z ".rvmrc" ]] ; then source ".rvmrc" ; fi
+\cd $current_path
+[[ ! -z ".rvmrc" ]] && \. ".rvmrc"
 
 if [[ "$master_pid" -le 0 ]] ; then
-  echo "unicorn is not running for $project yet."
+  $scripts_path/log "info" "Unicorn is not running for $project yet."
 else
   kill -WINCH $master_pid
 fi

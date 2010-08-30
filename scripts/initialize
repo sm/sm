@@ -6,7 +6,7 @@
 prefix="${prefix:-/usr/local}"
 bindir="${bindir:-/usr/local/bin}"
 
-if echo "$prefix" | grep -q '.$' ; then
+if [[ "$prefix" = "$HOME" ]] ; then
   bdsm_path="${bdsm_path:-"${prefix}bdsm"}"
 else
   bdsm_path="${bdsm_path:-"${prefix}/bdsm"}"

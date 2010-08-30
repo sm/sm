@@ -31,6 +31,13 @@ worker_processes @config[:worker_processes][@rails_env]
 listen @config[:listen][@rails_env], :backlog => 2048 # :tcp_nopush => true
 timeout @timeout
 
+Rainbows! do
+  use :ThreadSpawn # concurrency model to use
+  worker_connections 400
+  keepalive_timeout 5 # 5 is default, zero disables keepalives entirely
+  client_max_body_size 10*1024*1024 # 10 megabytes
+end
+
 # We are running on 1.9, no need to uncomment cow functionality.
 # GC.respond_to?(:copy_on_write_friendly=) and GC.copy_on_write_friendly = true
 before_fork do |server, worker|

@@ -3,11 +3,11 @@
 source $extension_scripts_path/initialize
 
 if [[ "$master_pid" -le 0 ]] ; then
-  echo "There are no unicorns running for $project."
+  $scripts_path/log "info" "There are no unicorns running for $project."
 else
-  ps auxww | grep '[u]nicorn' | grep master
+  ps auxww | \grep '[u]nicorn' | \grep master
   echo
-  ps auxwww | grep '[u]nicorn' | grep $project | grep $environment | grep worker
+  ps auxwww | \grep '[u]nicorn' | \grep $project | \grep $environment | \grep worker
 fi
 
 exit $?

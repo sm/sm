@@ -1,4 +1,5 @@
 releases_url=http://bdsm.beginrescueend.com/releases/
+extensions_url=http://extensions.beginrescueend.com/
 service_url=http://bdsm.beginrescueend.com/services/
 bdsm_repo_url=git://github.com/wayneeseguin/bdsm.git
 service_repo_url=git://github.com/wayneeseguin/bdsm-services.git

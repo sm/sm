@@ -5,7 +5,7 @@
 [[ "$trace_flag" -eq 1 ]] && set -x
 
 if [[ -d "$current_path" ]] ; then
-  cd "$current_path"
+  \cd "$current_path"
   [[ -s ".rvmrc" ]] && . ".rvmrc"
 fi
 

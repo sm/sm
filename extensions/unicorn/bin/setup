@@ -4,9 +4,9 @@ source $extension_scripts_path/initialize
 
 if [[ -s "$extensions_path/unicorn/templates/unicorn.rb" ]] ; then
   [[ ! -d "$shared_path/config/" ]] && mkdir -p "$shared_path/config/"
-  cp "$extensions_path/unicorn/templates/unicorn.rb" "$shared_path/config/"
+  \cp "$extensions_path/unicorn/templates/unicorn.rb" "$shared_path/config/"
   exit $?
 else
-  echo -e "ERROR: $extensions_path/unicorn/templates/unicorn.rb template is missing."
+  $scripts_path/log "error" "ERROR: $extensions_path/unicorn/templates/unicorn.rb template is missing."
   exit 1
 fi

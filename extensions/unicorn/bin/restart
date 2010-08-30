@@ -3,7 +3,7 @@
 source $extension_scripts_path/initialize
 
 if [[ "$master_pid" -le 0 ]] ; then
-  printf "\nUnicorn herd master not found running for $project $environment, starting."
+  $scripts_path/log "info" "Unicorn herd master not found running for $project $environment, starting."
   if [[ -s "$current_path/config/unicorn.rb" ]] ; then
     if [[ -s "$current_path/config.ru" ]] ; then
       unicorn -c $current_path/config/unicorn.rb -E $environment -D

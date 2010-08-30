@@ -7,7 +7,9 @@
 # Setup
 #
 # If the user is requesting a trace, turn shell internal trace mode on.
-echo "$*" | grep -q 'trace' && echo "$*" && set -x && export trace_flag=1
+if echo "$*" | grep -q 'trace' ; then
+  echo "$*"  ; set -x ; export trace_flag=1
+fi
 
 # Load System Configuration, if it exists.
 [ -s "/etc/bdsmrc" ] && . /etc/bdsmrc
@@ -20,7 +22,7 @@ echo "$*" | grep -q 'trace' && echo "$*" && set -x && export trace_flag=1
 prefix="${prefix:-/usr/local}"
 bindir="${bindir:-/usr/local/bin}"
 
-if echo "$prefix" | grep -q '.$' ; then
+if [[ "$prefix" = "$HOME" ]] ; then
   bdsm_path="${bdsm_path:-"${prefix}bdsm"}"
 else
   bdsm_path="${bdsm_path:-"${prefix}/bdsm"}"
@@ -28,12 +30,13 @@ fi
 
 # Initialize BDSM framework and variables.
 . "${scripts_path:-"${bdsm_path}/scripts"}"/initialize
+set +x
 
 # Load BDSM framework functions.
 . "${scripts_path}"/functions
 
 # Load the BDSM framework version.
-[ -s "${bdsm_path}/VERSION" ] && VERSION="$(cat "${bdsm_path}/VERSION")"
+[ -s "$bdsm_path/VERSION" ] && VERSION="$(cat "$bdsm_path/VERSION")"
 
 version() {
   printf "\nbdsm ${VERSION} http://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)\n\n"
@@ -43,6 +46,8 @@ usage() {
   _version
   "$extensions_path"/bdsm/bin/help | ${PAGER:-less}
 }
+
+user=$(whoami)
 
 #
 # parse args
@@ -61,6 +66,12 @@ while [ $# -gt 0 ] ; do
       parse_break=1
     ;;
 
+    bdsmrc)
+      extension="bdsm"
+      action=$token
+      parse_break=1
+    ;;
+
     extend|extension)  extension="extension"           ;;
     --no-hooks)        hooks_flag=0                    ;;
     --project)         project="$1"            ; shift ;;
@@ -69,6 +80,7 @@ while [ $# -gt 0 ] ; do
     --revision)        revision="$1"           ; shift ;;
     --database)        database="$1"           ; shift ;;
     --server)          server="$1"             ; shift ;; # better name for this?
+    --user)            user="$1"               ; shift ;; # better name for this?
     --head)            head_flag=1                     ;;
     --debug)           debug_flag=1                    ;;
     --trace)           trace_flag=1 ; export debug_flag=1 ; set -x ;;
@@ -78,14 +90,14 @@ while [ $# -gt 0 ] ; do
       #if $scripts_path/match "$token" $extensions ; then
       if [[ -z "$extension" ]] ; then
         if [[ -d "$extensions_path/$token" ]] ; then
-          export extension="$token"
+          extension="$token"
         else
-          export extension="${extension:-bdsm}"
+          extension="${extension:-bdsm}"
         fi
       fi
       if [[ -z "$action" ]] ; then
         if [[ -x "$extensions_path/$extension/bin/$token" ]] ; then
-          export action="$token"
+          action="$token"
           parse_break=1
         fi
       elif [[ -d "/data/$token" ]] ; then
@@ -122,7 +134,7 @@ elif [[ ! -z "$extension" ]] && [[ ! -z "$action" ]] ; then
     extension_scripts_path="$extensions_path/$extension/scripts"
     extension_bin_path="$extensions_path/$extension/bin"
     export extension_path extension_config_path extension_templates_path extension_scripts_path extension_bin_path
-    export action branch database debug_flag environment extension head_flag hooks_flag project repository revision server tag trace_flag
+    export action branch database debug_flag environment extension head_flag hooks_flag project repository revision server tag trace_flag user
 
     pushd "$extensions_path/$extension" > /dev/null 2>&1
     #

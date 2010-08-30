@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+if [[ -s "$extension_templates_path/bdsmrc" ]] ; then
+
+  if [[ -s .bdsmrc ]] ; then
+    timestamp=$(date +%m.%d.%Y-%H:%M:%S)
+    $scripts_path/log "info" "Found an existing $HOME/.bdsmrc file, moving it to $HOME/.bdsmrc.$timestamp."
+    \mv "$HOME/.bdsmrc" "$HOME/.bdsmrc.$timestamp"
+  fi
+
+  project=${project:-$user}
+  repository_url=${repository_url:-"git@github.com:username/repository.git"}
+  environment=${environment:-"production"}
+
+  \sed -e "s#{{project}}#$project#g" \
+       -e "s#{{repository_url}}#$repository_url#g" \
+       -e "s#{{environment}}#$environment#g" \
+       "$extension_templates_path/bdsmrc" \
+       > "$HOME/.bdsmrc"
+
+  exit $?
+else
+  echo -e "ERROR: $extension_templates_path/bdsmrc template is missing."
+  exit 1
+fi
+

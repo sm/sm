@@ -1,0 +1,39 @@
+#
+# Environmental Settings. By default we assume that this will be a production environment.
+#
+
+# This is the logical environment that we are operating in.
+# This is used in several path and file calculations.
+
+export environment="{{environment}}"
+
+# For Rails projects, we need to set RAILS_ENV
+# be sure that config/environments/$environment.rb exists.
+# It should be safe to copy config/environments/production.rb to create it.
+
+export RAILS_ENV="$environment"
+
+#
+#  The below settings are for repository options.
+#
+
+# The name of the project, The repository is expected to be in ~/shared/$project
+
+export project="{{project}}"
+
+# The repository URL that is used to retrieve the code.
+
+repository="{{repository_url}}"
+
+# The branch of your application
+
+branch="master"
+
+# The tag of your application, if any.
+
+# tag="v1.0.0"
+
+# If you wanted to run BDSM out of a user directory you can put the paths in the users ~/.bdsmrc file like so:
+# binpath=$HOME/bin
+# prefix=$HOME/.bdsm
+

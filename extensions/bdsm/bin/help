@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+echo -e "
+Usage
+  bdsm [action]
+
+Actions
+  bdsmrc  - Copy the .bdsmrc template file into ~/.bdsmrc
+  help     - Display this help text.
+"
+exit $?
+
