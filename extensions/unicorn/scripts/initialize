@@ -9,22 +9,29 @@ if [[ ! -n "$environment" ]] ; then $scripts_path/log "warn" "'environment' is n
 if [[ ! -n "$RAILS_ENV" ]] ; then $scripts_path/log "warn" "'RAILS_ENV' is not set (bdsmrc)" ; fi
 if [[ ! -n "$project" ]] ; then $scripts_path/log "warn" "'project' is not set (bdsmrc)" ; fi
 
+# Fetch the pidfile pid.
 pidfile="$current_path/pids/$project.pid"
-[[ -s "$pidfile" ]] && pidfile_pid="$(cat "$pidfile")"
+if [[ -s "$pidfile" ]] ; then
+  pidfile_pid="$(cat "$pidfile")"
+else
+  pidfile_pid=""
+fi
 
-if [[ -n "$pidfile_pid" ]] && [[ -d "/proc/${pidfile_pid}" ]] ; then
+# Fetch the running pid.
+if [[ -n "$project" ]] ; then
+  running_pid="$(ps auxww | \grep '[u]nicorn' | \grep 'master' | awk '/'${project}'/{print $2}')"
+else
+  $bdsm_scripts_path/log "warn" "'project' should be set in ~/.bdsmrc"
+fi
+if [[ -z "$running_pid" ]] ; then
+  running_pid="$(ps auxww | \grep '[u]nicorn' |  awk '/master/{print $2}')"
+fi
 
-  master_pid="$pidfile_pid" # Running and matches pidfile.
-
-elif [[ -n "$running_pid" ]] && [[ -d "/proc/${running_pid}" ]] ; then
-  if [[ -n "$project" ]] ; then
-    running_pid="$(ps auxww | \grep '[u]nicorn' | \grep 'master' | awk '/'${project}'/{print $2}')"
-  else
-    $bdsm_scripts_path/log "warn" "'project' should be set in ~/.bdsmrc"
-    running_pid="$(ps auxww | \grep '[u]nicorn' | \grep 'master' | awk '{print $2}')"
-  fi
+if [[ -n "$running_pid" ]] && [[ -d "/proc/${running_pid}" ]] ; then
   printf "$running_pid" > "$pidfile" # Make sure the correct running pid is in the pidfile.
   master_pid="$running_pid" # Set to the found running pidfile.
+elif [[ -n "$pidfile_pid" ]] && [[ -d "/proc/${pidfile_pid}" ]] ; then
+  master_pid="$pidfile_pid" # Running and matches pidfile.
 else
   unset master_pid # Not found!
 fi
