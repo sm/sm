@@ -1,12 +1,111 @@
 #!/usr/bin/env bash
 
-echo -e "
+description() {
+  printf "Bash Deployment & Server Management Framework - Core Extension"
+}
+
+actions() {
+  printf "
+  bdsmrc  - Copy the .bdsmrc template file into ~/.bdsmrc
+  help    - Display this help text.
+  "
+}
+
+extensions() {
+  for extension in $(\ls extensions/ | awk '{print "  "$NF}' | sed -e 's/\///') ; do
+    if [[ -x "$bdsm_path/extensions/$extension/bin/help" ]] ; then
+      description=$("$bdsm_path/extensions/$extension/bin/help" description 2>&1 | head -n 1)
+    fi
+    printf "  $extension - ${description:-"'$extension/bin/help description' command not found, BAD PROGRAMMING MONKEY! NO DOUGNUT!"}\n"
+  done
+
+  printf "\n"
+}
+
+usage() {
+printf "
+Description
+
+  BDSM $(description)
+
 Usage
-  bdsm [action]
+
+  bdsm <extension> <action> <<arguments>>
 
 Actions
-  bdsmrc  - Copy the .bdsmrc template file into ~/.bdsmrc
-  help     - Display this help text.
-"
-exit $?
+  $(actions)
+Extensions
+  $(extensions)
+Examples
 
+  (as root:)
+  bdsm extension add nginx
+
+  bdsm nginx install
+  bdsm nginx setup
+  bdsm nginx stop
+  bdsm nginx start
+  bdsm nginx restart
+  bdsm nginx reload
+  ...
+
+  bdsm extension add rails
+  bdsm extension add unicorn
+  ...
+
+  (as a user:)
+  bdsm deploy
+
+  bdsm rails setup --database postgresql --repo git@github.com/wayneeseguin/bdsm_docs.git --server unicorn
+  bdsm rails migrate
+  bdsm rails logtail
+  bdsm rails console
+  bdsm rails dbconsole
+  ...
+
+  bdsm unicorn install
+  bdsm unicorn setup
+  bdsm unicorn start
+  bdsm unicorn stop
+  bdsm unicorn restart
+  bdsm unicorn increase
+  bdsm unicorn decrease
+  ...
+
+Notes
+
+  [extension] is required, default may be set in ~/.bdsmrc
+  [action] is required as a command line parameter
+
+  [project] is required as an environment variable
+   - if non root, otherwise defaults to the current user name if not set
+
+  [project|environment|repository|extension]
+   - may be exported as environment varaibles
+   - or set in the ~/.bdsmrc
+   - or specified as for example --project X
+
+  prerequisites:
+   - git
+   - curl
+   - rsync
+
+  http://bdsm.beginrescueend.com/
+  https://www.pivotaltracker.com/projects/26822
+
+"
+}
+
+command="usage" # Default
+while [[ $# -gt 0 ]] ; do
+  token="$1" ; shift
+  case "$token" in
+    description) command="description" ;;
+    actions)     command="actions"     ;;
+    *)           command="usage"       ;;
+  esac
+done
+
+$command
+
+exit $?

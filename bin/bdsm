@@ -43,8 +43,8 @@ version() {
 }
 
 usage() {
-  _version
-  "$extensions_path"/bdsm/bin/help | ${PAGER:-less}
+  version
+  "$extensions_path"/bdsm/bin/help usage | ${PAGER:-less}
 }
 
 user=$(whoami)
@@ -70,6 +70,14 @@ while [ $# -gt 0 ] ; do
       extension="bdsm"
       action=$token
       parse_break=1
+    ;;
+
+    help)
+      action="help"
+      if [[ -n "$1" ]] ; then
+        extension="$1"
+        parse_break=1
+      fi
     ;;
 
     extend|extension)  extension="extension"           ;;

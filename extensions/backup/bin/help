@@ -1,12 +1,17 @@
-#!/usr/bin/env bash
-
 description() {
-  printf "Deployment management extension."
+  printf "Extension for managing Backups (http://extensions.beginrescueend.com/backups/)."
 }
 
 actions() {
   printf "
-  rollback - Reset ~/current to the most recent previous release.
+  install  - Install the backup gem.
+  setup    - Setup Nginx configuration.
+  start    - Startup backup.
+  stop     - Stop backup.
+  restart  - Restart backup.
+  enable   - Enable servers.
+  disable  - Disable servers.
+  server   - Add new server(s) --enable.
   help     - Display this help text.
   "
 }
@@ -19,26 +24,10 @@ Description
 
 Usage
 
-  bdsm deploy <action> <<arguments>>
+  bdsm backup [action]
 
 Actions
   $(actions)
-Notes
-
-  [None currently]
-
-Prerequisites
-
-   - git
-   - subversion / mercurial (depending on your repository).
-   - curl
-   - rsync
-
-Resources
-
-  http://extensions.beginrescueend.com/deploy/
-  https://www.pivotaltracker.com/projects/26822
-
 "
 }
 

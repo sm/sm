@@ -1,16 +1,48 @@
 #!/usr/bin/env bash
 
-echo -e "
-Usage
-  $0 {install,setup,start,stop,help}
-Actions
+description() {
+  printf "Extension for managing Rails (http://rubyonrails.org/)."
+}
+
+actions() {
+  printf "
   install    - Install the rails gem.
-  bootstrap  - Bootstrap the current user's directory for a
+  setup      - Bootstrap the current user's directory for a
                rails application deployment.
   logtail    - Tail all logs in shared/log.
   console    - Start an irb rails console.
   dbconsole  - Start a database console.
   migrate    - Run migrations.
   help       - Display this help text.
+  "
+}
+
+usage() {
+printf "
+Description
+
+  BDSM $(description)
+
+Usage
+
+  bdsm rails [action]
+
+Actions
+  $(actions)
 "
+}
+
+command="usage" # Default
+while [[ $# -gt 0 ]] ; do
+  token="$1" ; shift
+  case "$token" in
+    description) command="description" ;;
+    actions)     command="actions"     ;;
+    *)           command="usage"       ;;
+  esac
+done
+
+$command
+
 exit $?
+

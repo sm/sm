@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 
-echo -e "
-Usage
-  bdsm unicorn [action]
+description() {
+  printf "Extension for managing Unicorn (http://unicorn.bogomips.org/)."
+}
 
-Actions
+actions() {
+  printf "
   install  - Install the unicorn gem.
   setup    - Setup the unicorn config file with a template in $current_path/config/
   start    - Start.
@@ -19,5 +20,33 @@ Actions
   pause    - Pause all unicorn workers.
   unpause  - Un pause all unicorn workers.
   help     - Display this help text.
+  "
+}
+
+usage() {
+printf "
+Description
+
+  BDSM $(description)
+
+Usage
+
+  bdsm unicorn [action]
+
+Actions
+  $(actions)
 "
+}
+
+action="usage" # Default
+while [[ $# -gt 0 ]] ; do
+  token="$1" ; shift
+  case "$token" in
+    description) action=description ;;
+    *)           action=usage ;;
+  esac
+done
+
+$action
+
 exit $?
