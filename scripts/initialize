@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 
 [[ -s "/etc/bdsmrc" ]]  && . "/etc/bdsmrc"
+
 [[ -s "$HOME/.bdsmrc" ]] && . "$HOME/.bdsmrc"
 
 prefix="${prefix:-/usr/local}"
+
 bindir="${bindir:-/usr/local/bin}"
 
 if [[ "$prefix" = "$HOME" ]] ; then
@@ -22,18 +24,21 @@ archives_path="${archives_path:-"${bdsm_path}/archives"}"
 remote="${remote:-"origin"}"
 branch="${branch:-"master"}"
 framework="${framework:-"rails"}"
-keep_releases="${keep_releases:-"4"}"
 timestamp="$(date +%m.%d.%Y-%H:%M:%S)"
 user="$(whoami)"
-hooks_flag="1"
-
-export prefix bdsm_path scripts_path extensions_path templates_path config_path src_path bin_path archives_path remote branch framework keep_releases timestamp user hooks_flag
+keep_releases=${keep_releases:-4}
+hooks_flag="${hooks_flag:-1}"
 
 # TODO: Move this code to a 'project' initializer:
 if [[ "root" != "$(whoami)" ]] ; then
+
   if [[ -z "$project" ]] ; then
+
     # TODO: Improve this line vv
-    [[ -d $HOME/shared/$user ]] && export project=$user
+    if [[ -d "$HOME/shared/$user" ]] ; then
+      export project="$user"
+    fi
+
   fi
 
   project_path="${project_path:-$HOME}"
@@ -43,29 +48,49 @@ if [[ "root" != "$(whoami)" ]] ; then
   discarded_path="${discarded_path:-$project_path/discard}"
 
   if [[ -d "$project_path/previous" ]] ; then
-    old_releases="$(cd $project_path/previous && ls -t | awk "NR > $keep_releases { print \$0 }")"
+
+    old_releases="$(
+    find "$project_path/previous/" -mindepth 1 -maxdepth 1 -type d |
+    sort -r | awk "NR > ${keep_releases:-3} { print \$0 }"
+    )"
+
   fi
 
   if [[ -n "$project" ]] ; then
+
     database_name="${database_name:-"${project}_${environment}"}"
+
     # TODO: Make this even more flexible. eg. check
+
     if [[ -z "$vcs" ]] ; then
+
       if [[ -d "$shared_path/$project/.git" ]] ; then
+
         vcs="git"
+
       elif [[ -d "$shared_path/$project/.svn" ]] ; then
+
         vcs="svn"
+
       elif [[ -d "$shared_path/$project/.hg" ]] ; then
+
         vcs="hg"
+
       else
+
         vcs="git" # default to awesome :)
+
       fi
+
     fi
 
-    export project_path shared_path previous_path current_path discarded_path database_name old_releases vcs
+    export database_name old_releases vcs
 
     [[ -s ".${project}rc" ]] && . ".${project}rc"
   fi
 fi
+
+export prefix timestamp user framework remote branch keep_releases $(env | awk -F= -v ORS=' ' '/_path$/{print $1}') $(env | awk -F= -v ORS=' ' '/_flag$/{print $1}')
 
 result=0
 

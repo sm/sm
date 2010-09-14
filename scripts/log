@@ -8,7 +8,7 @@ message=$1
 
 case "$level" in
   debug) shift ; printf "\nd: $message "     ;;
-  info)  shift ; printf "\ni: $message "     ;;
+  info)  shift ; printf "\n$message "        ;;
   warn)  shift ; printf "\nw: $message "     ;;
   error) shift ; printf "\ne: $message " >&2 ;;
   fail)  shift ; printf "\nf: $message " >&2 ;;

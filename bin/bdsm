@@ -8,14 +8,14 @@
 #
 # If the user is requesting a trace, turn shell internal trace mode on.
 if echo "$*" | grep -q 'trace' ; then
-  echo "$*"  ; set -x ; export trace_flag=1
+  echo "$*"  ; set -o xtrace ; set -o verbose ; export trace_flag=1
 fi
 
 # Load System Configuration, if it exists.
-[ -s "/etc/bdsmrc" ] && . /etc/bdsmrc
+[[ -s "/etc/bdsmrc" ]] && . /etc/bdsmrc
 
 # Load User Configuration, if it exists.
-[ -s "$HOME/.bdsmrc" ] && . "$HOME/.bdsmrc"
+[[ -s "$HOME/.bdsmrc" ]] && . "$HOME/.bdsmrc"
 
 # The default prefix is /usr/local,
 # this should be set to where BDSM is installed to in /etc/bdsmrc
@@ -23,28 +23,32 @@ prefix="${prefix:-/usr/local}"
 bindir="${bindir:-/usr/local/bin}"
 
 if [[ "$prefix" = "$HOME" ]] ; then
+
   bdsm_path="${bdsm_path:-"${prefix}bdsm"}"
+
 else
+
   bdsm_path="${bdsm_path:-"${prefix}/bdsm"}"
+
 fi
 
 # Initialize BDSM framework and variables.
 . "${scripts_path:-"${bdsm_path}/scripts"}"/initialize
-set +x
 
 # Load BDSM framework functions.
 . "${scripts_path}"/functions
 
 # Load the BDSM framework version.
-[ -s "$bdsm_path/VERSION" ] && VERSION="$(cat "$bdsm_path/VERSION")"
+[[ -s "$bdsm_path/VERSION" ]] && VERSION="$(cat "$bdsm_path/VERSION")"
 
 version() {
-  printf "\nbdsm ${VERSION} http://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)\n\n"
+  printf "\n%s\n\n" "bdsm ${VERSION:-"vX.X.X"} http://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)"
 }
 
 usage() {
   version
-  "$extensions_path"/bdsm/bin/help usage | ${PAGER:-less}
+
+  "$extensions_path"/bdsm/bin/help usage | less
 }
 
 user=$(whoami)
@@ -52,8 +56,10 @@ user=$(whoami)
 #
 # parse args
 #
-while [ $# -gt 0 ] ; do
+while [[ $# -gt 0 ]] ; do
+
   token="$1" ; shift
+
   case "$token" in
     # TODO: extension detection "did you mean"
 
@@ -87,87 +93,124 @@ while [ $# -gt 0 ] ; do
     --repo|repository) repository="$1"         ; shift ;;
     --revision)        revision="$1"           ; shift ;;
     --database)        database="$1"           ; shift ;;
-    --server)          server="$1"             ; shift ;; # better name for this?
+    --appserver)       appserver="$1"          ; shift ;; # better name for this?
     --user)            user="$1"               ; shift ;; # better name for this?
     --head)            head_flag=1                     ;;
     --debug)           debug_flag=1                    ;;
-    --trace)           trace_flag=1 ; export debug_flag=1 ; set -x ;;
-    -v|--version)      action="version" ;;
+    --trace)           trace_flag=1 ; debug_flag=1     ;;
+    -v|--version)      action="version"                ;;
+
+    --) args="$@" # Stop processing arguments.
+      ;;
 
     *)
       #if $scripts_path/match "$token" $extensions ; then
       if [[ -z "$extension" ]] ; then
+
         if [[ -d "$extensions_path/$token" ]] ; then
+
           extension="$token"
+
         else
+
           extension="${extension:-bdsm}"
+
         fi
+
       fi
+
       if [[ -z "$action" ]] ; then
+
         if [[ -x "$extensions_path/$extension/bin/$token" ]] ; then
+
           action="$token"
+
           parse_break=1
+
         fi
+
       elif [[ -d "/data/$token" ]] ; then
+
         project="$token"
+
         project_path="/data/$token"
+
       elif [[ -d "/home/$token" ]] ; then
+
         project="$token"
+
         project_path="/home/$token"
+
       else
+
         # determine sanity of project
         action="error"
+
         error_message="Unrecognized command line argument(s): '$token $@'"
+
       fi
+
     ;;
   esac
 
-  if [[ ! -z "$parse_break" ]] || [[ ! -z "$error_message" ]] ; then unset parse_break ; break; fi
+  if [[ -n "$parse_break" || ! -z "$error_message" ]] ; then
+    unset parse_break ; break
+  fi
 done
 
-if [[ ! -z "$error_message" ]] ; then exit 1 ; fi
+if [[ -n "$error_message" ]] ; then exit 1 ; fi
 
 #
 # Main Logic
 #
-if [[ "$trace_flag" = 1 ]] ; then set -x ; else set +x ; fi
+if [[ "$trace_flag" = 1 ]] ; then set -o xtrace ; set -o verbose ; else set +x ; fi
 
 if [[ "version" = "$action" ]] ; then
+
   version
+
 elif [[ ! -z "$extension" ]] && [[ ! -z "$action" ]] ; then
+
   if [[ -s "$extensions_path/$extension/bin/$action" ]] ; then
+
     extension_path="$extensions_path/$extension"
     extension_config_path="$extensions_path/$extension/config"
     extension_templates_path="$extensions_path/$extension/templates"
     extension_scripts_path="$extensions_path/$extension/scripts"
     extension_bin_path="$extensions_path/$extension/bin"
-    export extension_path extension_config_path extension_templates_path extension_scripts_path extension_bin_path
-    export action branch database debug_flag environment extension head_flag hooks_flag project repository revision server tag trace_flag user
 
-    pushd "$extensions_path/$extension" > /dev/null 2>&1
+    export action args database environment extension project repository revision server tag user prefix timestamp user framework remote branch keep_releases $(env | awk -F= -v ORS=' ' '/_path$/{print $1}') $(env | awk -F= -v ORS=' ' '/_flag$/{print $1}')
+
+    cd "$extensions_path/$extension" > /dev/null 2>&1
+
     #
     # TODO: allow output control.
     #
     #if [[ -z "$verbose_flag" ]] ; then
-      "$extensions_path/$extension/bin/$action" $*
+
+    "$extensions_path/$extension/bin/$action" $* ; result=$?
+
     #else
     # "$extensions_path/$extension/bin/$action" $* >2
     #fi
-    result=$?
     if [[ "$result" -gt 0 ]] ; then
       : # log error
     else
       : # log success
     fi
 
-    popd > /dev/null 2>&1
-    unset extensions_path extension_config_path extension_templates_path extension_scripts_path
   fi
-elif [[ ! -z "$extension" ]] ; then
+
+elif [[ -n "$extension" ]] ; then
+
   echo $(actions_for_extension $extension)
+
 else
+
   usage
+
 fi
+
 result=$?
 
 exit $result
