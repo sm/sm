@@ -53,6 +53,8 @@ usage() {
 
 user=$(whoami)
 
+# TODO: set log location based on root or user calling
+
 #
 # parse args
 #
@@ -93,8 +95,8 @@ while [[ $# -gt 0 ]] ; do
     --repo|repository) repository="$1"         ; shift ;;
     --revision)        revision="$1"           ; shift ;;
     --database)        database="$1"           ; shift ;;
-    --appserver)       appserver="$1"          ; shift ;; # better name for this?
-    --user)            user="$1"               ; shift ;; # better name for this?
+    --appserver)       appserver="$1"          ; shift ;;
+    --user)            user="$1"               ; shift ;;
     --head)            head_flag=1                     ;;
     --debug)           debug_flag=1                    ;;
     --trace)           trace_flag=1 ; debug_flag=1     ;;
@@ -163,7 +165,13 @@ if [[ -n "$error_message" ]] ; then exit 1 ; fi
 #
 # Main Logic
 #
-if [[ "$trace_flag" = 1 ]] ; then set -o xtrace ; set -o verbose ; else set +x ; fi
+if [[ ${trace_flag:-0} = 1 ]] ; then
+  set -o xtrace
+  set -o verbose
+else
+  set +o xtrace
+  set +o verbose
+fi
 
 if [[ "version" = "$action" ]] ; then
 
@@ -179,7 +187,10 @@ elif [[ ! -z "$extension" ]] && [[ ! -z "$action" ]] ; then
     extension_scripts_path="$extensions_path/$extension/scripts"
     extension_bin_path="$extensions_path/$extension/bin"
 
-    export action args database environment extension project repository revision server tag user prefix timestamp user framework remote branch keep_releases $(env | awk -F= -v ORS=' ' '/_path$/{print $1}') $(env | awk -F= -v ORS=' ' '/_flag$/{print $1}')
+    paths=$(env | awk -F= -v ORS=' ' '/_path$/{print $1}')
+    flags=$(env | awk -F= -v ORS=' ' '/_flag$/{print $1}')
+
+    export action args database environment extension project repository revision server tag user prefix timestamp user framework remote branch keep_releases $paths $flags
 
     cd "$extensions_path/$extension" > /dev/null 2>&1
 
@@ -187,16 +198,14 @@ elif [[ ! -z "$extension" ]] && [[ ! -z "$action" ]] ; then
     # TODO: allow output control.
     #
     #if [[ -z "$verbose_flag" ]] ; then
-
     "$extensions_path/$extension/bin/$action" $* ; result=$?
-
     #else
-    # "$extensions_path/$extension/bin/$action" $* >2
+    # "$extensions_path/$extension/bin/$action" $* >> $log 2>> ${log/%log/error.log}
     #fi
     if [[ "$result" -gt 0 ]] ; then
-      : # log error
+      "$scripts_path/log" "error" "'$action $*' returned error"
     else
-      : # log success
+      "$scripts_path/log" "info" "'$action $*' returned success"
     fi
 
   fi

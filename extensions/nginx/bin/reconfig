@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+nginx_path="${nginx_path:-/etc/nginx}"
+cp "$extension_templates_path/nginx.conf.template" "$nginx_path/"
+cp "$extension_templates_path/proxy.conf.template" "$nginx_path/conf/proxy.conf"
+
