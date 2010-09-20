@@ -6,7 +6,7 @@ description() {
 
 actions() {
   printf "
-  install  - Install the nginx gem.
+  install  - Install nginx on the system.
   setup    - Setup Nginx configuration.
   start    - Startup nginx.
   stop     - Stop nginx.

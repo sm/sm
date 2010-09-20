@@ -3,18 +3,30 @@
 source $extension_scripts_path/initialize
 
 if [[ -z "$project" ]] ; then
-  echo -e "project must be specified for 'nginx server'"
+
+  printf "project must be specified for 'nginx server'\n"
+
 fi
 
-nginx_config_path="/etc/nginx"
+nginx_config_path="${nginx_config_path:-"/etc/nginx"}"
 
 if [[ -s "$extension_templates_path/server.conf.template" ]] ; then
-  if [[ ! -d "$shared_path/config/" ]] ; then mkdir -p $shared_path/config/ ; fi
-  cp "$extension_templates_path/server.conf.template" "$nginx_config_path/servers/$project.conf"
-  sed -i -e "s#{{project}}#$project#g" $nginx_config_path/servers/$project.conf
+
+  if [[ ! -d "$nginx_config_path/servers/" ]] ; then
+    mkdir -p "$nginx_config_path/servers/"
+  fi
+
+  sed -e "s#{{project}}#$project#g" \
+    "$extension_templates_path/server.conf.template" \
+    > "$nginx_config_path/servers/$project.conf"
+
   exit $?
+
 else
-  echo -e "ERROR: $extension_templates_path/server.conf template is missing."
+
+  printf "ERROR: $extension_templates_path/server.conf template is missing.\n"
+
   exit 1
+
 fi
 

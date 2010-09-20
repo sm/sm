@@ -2,9 +2,14 @@
 
 source "$extension_scripts_path/initialize"
 
-if [[ -z "$master_pid" ]] ; then
-  $scripts_path/log "warn" "Nginx is not running."
-else
-  $scripts_path/log "info" "Sending QUIT signal to unicorn herd master $master_pid"
+if [[ ${master_pid:-0} -gt 0 ]] ; then
+
+  printf "Signaling Nginx ($master_pid) to quit\n(from pidfile: $nginx_pid)\n"
+
   kill -QUIT $master_pid
+
+else
+
+  printf "It appears that Nginx is already not running\n(from pidfile: $nginx_pid)\n"
+
 fi

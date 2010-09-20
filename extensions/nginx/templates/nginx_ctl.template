@@ -43,7 +43,6 @@ nginx_log_path="${nginx_log_path:-/var/log/nginx}"
 usage() {
 
   printf "
-
   Usage:
 
     $0 start stop restart reload log shutdown check help [options]
@@ -72,8 +71,18 @@ usage() {
 }
 
 start() {
-  # TODO: Pass through the --pid and --log here.
-  $nginx -c "$nginx_conf"
+
+  if [[ ${master_pid:-0} -gt 0 ]] ; then
+
+    printf "It appears that Nginx ($master_pid) is already running\n(from pidfile: $nginx_pid)\n"
+
+  else
+
+    # TODO: Pass through the --pid and --log here.
+    $nginx -c "$nginx_conf"
+
+  fi
+
 }
 
 stop() {
@@ -94,7 +103,7 @@ restart() {
 
   if [[ ${master_pid:-0} -gt 0 ]] ; then
 
-    printf "Hot upgrading running Nginx binary."
+    printf "Hot upgrading Nginx ($master_pid) running binary."
 
     kill -USR2 $master_pid
 
@@ -110,7 +119,7 @@ reload() {
 
   if [[ ${master_pid:-0} -gt 0 ]] ; then
 
-    printf "Reloading configuration for Nginx master($master_pid)."
+    printf "Reloading Nginx ($master_pid) configuration."
 
     kill -HUP $master_pid
 
@@ -126,7 +135,7 @@ log() {
 
   if [[ ${master_pid:-0} -gt 0 ]] ; then
 
-    printf "Re-opening logs for Nginx master ($master_pid)."
+    printf "Re-opening Nginx ($master_pid) logs."
 
     kill -USR1 $master_pid
 
@@ -144,7 +153,7 @@ shutdown() {
 
   if [[ ${master_pid:-0} -gt 0 ]] ; then
 
-    printf "Gracefully shutting down workers for Nginx master ($master_pid).\n  (workers will finish current request first)"
+    printf "Gracefully shutting down Nginx ($master_pid) workers.\n  (workers will finish current request first)"
 
     kill -WINCH $master_pid
 
