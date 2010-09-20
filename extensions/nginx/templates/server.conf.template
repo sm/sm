@@ -6,7 +6,7 @@ server {
   listen 80;
   client_max_body_size 50M;
 
-  server_name {{project}}.com;
+  server_name {{project}}.com *.{{project}}.com;
 
   root /home/{{project}}/current/public;
 

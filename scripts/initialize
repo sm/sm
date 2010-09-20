@@ -84,13 +84,11 @@ if [[ "root" != "$(whoami)" ]] ; then
 
     fi
 
-    export database_name old_releases vcs
-
     [[ -s ".${project}rc" ]] && . ".${project}rc"
   fi
 fi
 
-export prefix timestamp user framework remote branch keep_releases $(env | awk -F= -v ORS=' ' '/_path$/{print $1}') $(env | awk -F= -v ORS=' ' '/_flag$/{print $1}')
+export vcs project database_name old_releases bdsm_path current_path discarded_path previous_path project_path shared_path archives_path bin_path bindir branch config_path extensions_path framework hooks_flag keep_releases prefix remote result scripts_path src_path templates_path timestamp user
 
 result=0
 

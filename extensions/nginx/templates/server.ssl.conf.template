@@ -1,7 +1,7 @@
 server {
   listen 443 default;
 
-  server_name {{project}.com *.{{project}}.com;
+  server_name {{project}}.com *.{{project}}.com;
 
   client_max_body_size 50M;
   root /home/{{project}}/current/public;

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+source "$extension_scripts_path/initialize"
+

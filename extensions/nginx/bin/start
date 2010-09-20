@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source $extension_scripts_path/initialize
+source "$extension_scripts_path/initialize"
 
 if [[ "$master_pid" -gt 0 ]] ; then
   echo -e "Nginx is already running with master pid: $master_pid"

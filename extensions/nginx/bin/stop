@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source $extension_scripts_path/initialize
+source "$extension_scripts_path/initialize"
 
 if [[ -z "$master_pid" ]] ; then
   $scripts_path/log "warn" "Nginx is not running."

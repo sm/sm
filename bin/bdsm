@@ -32,11 +32,13 @@ else
 
 fi
 
+export scripts_path="${scripts_path:-"${bdsm_path}/scripts"}"
+
 # Initialize BDSM framework and variables.
-. "${scripts_path:-"${bdsm_path}/scripts"}"/initialize
+. "$scripts_path/initialize"
 
 # Load BDSM framework functions.
-. "${scripts_path}"/functions
+. "${scripts_path}/functions"
 
 # Load the BDSM framework version.
 [[ -s "$bdsm_path/VERSION" ]] && VERSION="$(cat "$bdsm_path/VERSION")"
@@ -187,10 +189,10 @@ elif [[ ! -z "$extension" ]] && [[ ! -z "$action" ]] ; then
     extension_scripts_path="$extensions_path/$extension/scripts"
     extension_bin_path="$extensions_path/$extension/bin"
 
-    paths=$(env | awk -F= -v ORS=' ' '/_path$/{print $1}')
-    flags=$(env | awk -F= -v ORS=' ' '/_flag$/{print $1}')
+    paths=$(env | awk -F= -v ORS=' ' '/_path/{print $1}')
+    flags=$(env | awk -F= -v ORS=' ' '/_flag/{print $1}')
 
-    export action args database environment extension project repository revision server tag user prefix timestamp user framework remote branch keep_releases $paths $flags
+    export action appserver args bdsm_path bindir database debug_flag environment error_message extension extension_bin_path extension_config_path extension_path extension_scripts_path extension_templates_path flags head_flag hooks_flag parse_break paths prefix project project_path repository result revision scripts_path trace_flag user
 
     cd "$extensions_path/$extension" > /dev/null 2>&1
 
@@ -202,10 +204,11 @@ elif [[ ! -z "$extension" ]] && [[ ! -z "$action" ]] ; then
     #else
     # "$extensions_path/$extension/bin/$action" $* >> $log 2>> ${log/%log/error.log}
     #fi
+
     if [[ "$result" -gt 0 ]] ; then
-      "$scripts_path/log" "error" "'$action $*' returned error"
+      "$scripts_path/log" "error" "'$action $*' returned error\n\n"
     else
-      "$scripts_path/log" "info" "'$action $*' returned success"
+      "$scripts_path/log" "info" "'$action $*' returned success\n\n"
     fi
 
   fi

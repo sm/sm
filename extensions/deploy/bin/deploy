@@ -1,9 +1,31 @@
 #!/usr/bin/env bash
 
-[[ "$trace_flag" -eq 1 ]] && set -x
-[[ -s "/etc/bdsmrc" ]]    && . "/etc/bdsmrc"
-[[ -s "$HOME/.bdsmrc" ]]  && . "$HOME/.bdsmrc"
-[[ -s "$HOME/.bashrc" ]]  && . "$HOME/.bashrc"
+set -o errtrace
+export PS4='+[${BASH_SOURCE}] : ${LINENO} : ${FUNCNAME[0]:+${FUNCNAME[0]}() $ }'
+
+if [[ ${trace_flag:-0} -eq 1 ]] ; then
+  set -o xtrace
+fi
+
+if [[ ${debug_flag:-0} -eq 1 ]] ; then
+  set -o verbose
+fi
+
+# Attempt to load RVM
+files=( "$HOME/.rvm/scripts/rvm" "/usr/local/scripts/rvm" )
+for file in "${files[@]}" ; do
+  if [[ -s "$file" ]] ; then
+    source "$file"
+    break # stop after loading first one found.
+  fi
+done
+
+files=( "$HOME/.bashrc" "/etc/.bdsmrc" "$HOME/.bdsmrc" )
+for file in "${files[@]}" ; do
+  if [[ -s "$file" ]] ; then
+    source "$file"
+  fi
+done
 
 # TODO:
 #

@@ -1,10 +1,26 @@
 #!/usr/bin/env bash
 
-export PATH="/sbin:/usr/sbin:/usr/local/sbin:/opt/sbin:/opt/local:sbin:$PATH"
-if [[ -s "/etc/bdsmrc" ]] ; then source "/etc/bdsmrc" ; fi
+set -o errtrace
+export PS4='+[${BASH_SOURCE}] : ${LINENO} : ${FUNCNAME[0]:+${FUNCNAME[0]}() $ }'
 
-if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
+if [[ ${trace_flag:-0} -eq 1 ]] ; then
+  set -o xtrace
+fi
+
+if [[ ${debug_flag:-0} -eq 1 ]] ; then
+  set -o verbose
+fi
+
+files=( "/etc/.bdsmrc" "$HOME/.bdsmrc" )
+for file in "${files[@]}" ; do
+  if [[ -s "$file" ]] ; then
+    source "$file"
+  fi
+done
+
+export PATH="/sbin:/usr/sbin:/usr/local/sbin:/opt/sbin:/opt/local:sbin:$PATH"
 
 master_pid="$(ps auxww |  awk '/[n]ginx: master/{print $2}' | head -n 1)"
+
 config_file="${config_file:-"/etc/nginx/nginx.conf"}"
 

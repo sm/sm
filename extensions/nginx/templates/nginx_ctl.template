@@ -1,0 +1,202 @@
+#!/usr/bin/env bash
+
+# Author: Wayne E. Seguin
+#         wayneeseguin@gmail.com
+#
+# Nginx control file.
+#
+#   May be either in the $PATH as nginx_ctl
+#   or used as /etc/init.d/nginx
+#
+
+action="${1:-""}"
+
+tokens=($@)
+
+for token in "${tokens[@]}" ; do
+  case $token in
+    start|stop|restart|reload|log|shutdown|check|help)
+      action=$token
+      ;;
+    --confd) nginx_confd="$2"     ; shift ;;
+    --path)  nginx_path="$2"      ; shift ;;
+    --conf)  nginx_conf="$2"      ; shift ;;
+    --pid)   nginx_pid="$2"       ; shift ;;
+    --log)   nginx_log_path="$2"  ; shift ;;
+    --bin)   nginx="$2"           ; shift ;;
+    *)       action="error" ;;
+  esac
+done
+
+nginx_confd="${nginx_confd:-"/etc/conf.d/nginx"}"
+
+if [[ -s "$nginx_confd" ]] ; then
+  source "$nginx_confd"
+fi
+
+nginx="${nginx:-/sbin/nginx}"
+nginx_path="${nginx_path:-/etc/nginx}"
+nginx_conf="${nginx_conf:-"$nginx_path/nginx.conf"}"
+nginx_pid="${nginx_pid:-/var/run/nginx.pid}"
+nginx_log_path="${nginx_log_path:-/var/log/nginx}"
+
+usage() {
+
+  printf "
+
+  Usage:
+
+    $0 start stop restart reload log shutdown check help [options]
+
+  Options:
+
+    --confd  - Path to conf.d file, optional
+    --path)  - Path to configuration files
+    --conf)  - Path to nginx.conf
+    --pid)   - Path to nginx pidfile
+    --log)   - Path to nginx logs
+    --bin)   - Path to nginx binary
+
+  Description:
+
+    start    - Start Nginx
+    stop     - Stop Nginx
+    restart  - Restart Nginx
+    reload   - Reload Nginx configuration files in running nginx
+    log      - Reopen log files in running nginx
+    shutdown - Gracefully shut down workers
+    check    - Check Nginx configuration for errors
+    help     - Display this usage information
+
+"
+}
+
+start() {
+  $nginx -c "$nginx_conf"
+}
+
+stop() {
+
+  if [[ ${master_pid:-0} -gt 0 ]] ; then
+
+    kill -QUIT $master_pid
+
+  else
+
+    printf "It appears that Nginx is no already not running\n(from pidfile: $nginx_pid)\n"
+
+  fi
+
+}
+
+restart() {
+
+  if [[ ${master_pid:-0} -gt 0 ]] ; then
+
+    printf "Hot upgrading running Nginx binary."
+
+    kill -USR2 $master_pid
+
+  else
+
+    printf "
+It appears that Nginx is no already not running
+  (using pidfile: $nginx_pid)
+Starting Nginx.
+"
+
+    start
+  fi
+}
+
+reload() {
+
+  if [[ ${master_pid:-0} -gt 0 ]] ; then
+
+    printf "Reloading configuration for Nginx master($master_pid)."
+
+    kill -HUP $master_pid
+
+  else
+
+    printf "It appears that Nginx is no already not running\n(from pidfile: $nginx_pid)\n"
+
+    printf "Starting Nginx.\n"
+
+    start
+  fi
+}
+
+log() {
+
+  if [[ ${master_pid:-0} -gt 0 ]] ; then
+
+    printf "Re-opening logs for Nginx master ($master_pid)."
+
+    kill -USR1 $master_pid
+
+  else
+
+    printf "It appears that Nginx is no already not running\n(from pidfile: $nginx_pid)\n"
+
+    printf "Starting Nginx.\n"
+
+    start
+  fi
+
+}
+
+
+shutdown() {
+
+  if [[ ${master_pid:-0} -gt 0 ]] ; then
+
+    printf "Gracefully shutting down workers for Nginx master ($master_pid).\n  (workers will finish current request first)"
+
+    kill -WINCH $master_pid
+
+  else
+
+    printf "It appears that Nginx is no already not running\n(from pidfile: $nginx_pid)\n"
+
+    printf "Starting Nginx.\n"
+
+    start
+  fi
+
+}
+
+check() {
+
+  nginx -t -c "$nginx_conf"
+
+  local result=$?
+
+  if [[ $result -gt 0 ]] ; then
+
+    printf "\n$nginx_conf syntax NOT OK\n"
+
+  else
+
+    printf "\n$nginx_conf syntax OK\n"
+
+  fi
+
+  return $result
+}
+
+declare -i master_pid=$(cat "$nginx_pid")
+
+case "$action" in
+  start)    start   ;;
+  stop)     stop    ;;
+  restart)  restart ;;
+  reload)   reload  ;;
+  check)    check   ;;
+  log)      log     ;;
+  shutdown) shutdown ;;
+  help)     usage   ;;
+  *)        usage ; exit 1 ;;
+esac
+
+exit $?
