@@ -11,7 +11,9 @@ source_path="${source_path:-/usr/local/src}"
 mkdir -p $source_path && cd $source_path
 
 package="nginx"
+
 version="0.7.67"
+
 archive_format="tar.gz"
 
 packge_url="http://nginx.org/download/$package-$version.$archive_format"

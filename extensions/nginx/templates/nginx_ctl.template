@@ -72,6 +72,7 @@ usage() {
 }
 
 start() {
+  # TODO: Pass through the --pid and --log here.
   $nginx -c "$nginx_conf"
 }
 
@@ -83,7 +84,7 @@ stop() {
 
   else
 
-    printf "It appears that Nginx is no already not running\n(from pidfile: $nginx_pid)\n"
+    printf "It appears that Nginx is already not running\n(from pidfile: $nginx_pid)\n"
 
   fi
 
@@ -99,11 +100,7 @@ restart() {
 
   else
 
-    printf "
-It appears that Nginx is no already not running
-  (using pidfile: $nginx_pid)
-Starting Nginx.
-"
+    printf "It appears that Nginx is not running.\n  (using pidfile: $nginx_pid)\nStarting Nginx."
 
     start
   fi
@@ -119,9 +116,7 @@ reload() {
 
   else
 
-    printf "It appears that Nginx is no already not running\n(from pidfile: $nginx_pid)\n"
-
-    printf "Starting Nginx.\n"
+    printf "It appears that Nginx is not running.\n(from pidfile: $nginx_pid)\nStarting Nginx.\n"
 
     start
   fi
@@ -137,9 +132,7 @@ log() {
 
   else
 
-    printf "It appears that Nginx is no already not running\n(from pidfile: $nginx_pid)\n"
-
-    printf "Starting Nginx.\n"
+    printf "It appears that Nginx is already not running\n(from pidfile: $nginx_pid)\nStarting Nginx.\n"
 
     start
   fi
@@ -157,11 +150,8 @@ shutdown() {
 
   else
 
-    printf "It appears that Nginx is no already not running\n(from pidfile: $nginx_pid)\n"
+    printf "It appears that Nginx is not running.\n(from pidfile: $nginx_pid)\nStarting Nginx.\n"
 
-    printf "Starting Nginx.\n"
-
-    start
   fi
 
 }

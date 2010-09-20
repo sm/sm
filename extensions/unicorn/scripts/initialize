@@ -20,7 +20,14 @@ for file in "${files[@]}" ; do
   fi
 done
 
-files=( "$HOME/.bashrc" "/etc/.bdsmrc" "$HOME/.bdsmrc" )
+files=( "$HOME/.bashrc" "/etc/bdsmrc" "$HOME/.bdsmrc" )
+for file in "${files[@]}" ; do
+  if [[ -s "$file" ]] ; then
+    source "$file"
+  fi
+done
+
+files=( "/etc/rvmrc" "$HOME/.rvmrc" )
 for file in "${files[@]}" ; do
   if [[ -s "$file" ]] ; then
     source "$file"
@@ -43,36 +50,57 @@ fi
 pidfile="$shared_path/pids/$project.pid"
 
 if [[ -d "$shared_path/pids" && -s "$pidfile" ]] ; then
+
   pidfile_pid="$(cat "$pidfile")"
+
 else
+
   pidfile_pid=""
+
 fi
 
 # Fetch the running pid.
 if [[ -n "$project" ]] ; then
+
   running_pid="$(ps auxww | \grep '[u]nicorn' | \grep 'master' | awk '/'${project}'/{print $2}')"
+
 else
+
   $bdsm_scripts_path/log "warn" "'project' should be set in ~/.bdsmrc"
+
 fi
 
 if [[ -z "$running_pid" ]] ; then
+
   running_pid="$(ps auxww | \grep '[u]nicorn' |  awk '/master/{print $2}')"
+
 fi
 
 if [[ -n "$running_pid" ]] && [[ -d "/proc/${running_pid}" ]] ; then
+
   printf "$running_pid" > "$pidfile" # Make sure the correct running pid is in the pidfile.
+
   master_pid="$running_pid" # Set to the found running pidfile.
+
 elif [[ -n "$pidfile_pid" ]] && [[ -d "/proc/${pidfile_pid}" ]] ; then
+
   master_pid="$pidfile_pid" # Running and matches pidfile.
+
 else
+
   unset master_pid # Not found!
+
 fi
 
 if [[ -d $current_path ]] ; then
-  builtin cd $current_path
-fi
 
-if [[ -s "$current_path/.rvmrc" ]] ; then
-  source "$current_path/.rvmrc"
+  builtin cd $current_path
+
+  if [[ -s "$current_path/.rvmrc" ]] ; then
+
+    source "$current_path/.rvmrc"
+
+  fi
+
 fi
 
