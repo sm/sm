@@ -11,19 +11,19 @@
 
 action="${1:-""}"
 
-tokens=($@)
-
-for token in "${tokens[@]}" ; do
+while [[ $# -gt 0 ]] ; do
+  token="$1" ; shift
   case $token in
     start|stop|restart|reload|log|shutdown|check|help)
       action=$token
       ;;
-    --confd) nginx_confd="$2"     ; shift ;;
-    --path)  nginx_path="$2"      ; shift ;;
-    --conf)  nginx_conf="$2"      ; shift ;;
-    --pid)   nginx_pid="$2"       ; shift ;;
-    --log)   nginx_log_path="$2"  ; shift ;;
-    --bin)   nginx="$2"           ; shift ;;
+    --confd) nginx_confd="$1"     ; shift ;;
+    --path)  nginx_path="$1"      ; shift ;;
+    --conf)  nginx_conf="$1"      ; shift ;;
+    --pid)   nginx_pid="$1"       ; shift ;;
+    --log)   nginx_log_path="$1"  ; shift ;;
+    --bin)   nginx="$1"           ; shift ;;
+    --lock)  nginx_lock="$1"      ; shift ;;
     *)       action="error" ;;
   esac
 done
@@ -34,6 +34,10 @@ if [[ -s "$nginx_confd" ]] ; then
   source "$nginx_confd"
 fi
 
+nginx_lock="${nginx_lock:-/var/lock/nginx}"
+if [[ -z "${nginx:-""}" ]] ; then
+  nginx="$(command -v nginx)"
+fi
 nginx="${nginx:-/sbin/nginx}"
 nginx_path="${nginx_path:-/etc/nginx}"
 nginx_conf="${nginx_conf:-"$nginx_path/nginx.conf"}"
@@ -49,12 +53,13 @@ usage() {
 
   Options:
 
-    --confd  - Path to conf.d file, optional
-    --path)  - Path to configuration files
-    --conf)  - Path to nginx.conf
-    --pid)   - Path to nginx pidfile
-    --log)   - Path to nginx logs
-    --bin)   - Path to nginx binary
+    --confd - Path to conf.d file, optional
+    --path  - Path to configuration files
+    --conf  - Path to nginx.conf
+    --pid   - Path to nginx pidfile
+    --log   - Path to nginx logs
+    --bin   - Path to nginx binary
+    --lock  - Path to nginx startup lock file
 
   Description:
 
@@ -80,6 +85,9 @@ start() {
 
     # TODO: Pass through the --pid and --log here.
     $nginx -c "$nginx_conf"
+    result=$?
+
+    [[ $result -eq 0 ]] && touch $nginx_lock
 
   fi
 
@@ -90,6 +98,9 @@ stop() {
   if [[ ${master_pid:-0} -gt 0 ]] ; then
 
     kill -QUIT $master_pid
+    result=$?
+
+    [[ $retval -eq 0 ]] && rm -f $nginx_lock
 
   else
 
@@ -103,13 +114,13 @@ restart() {
 
   if [[ ${master_pid:-0} -gt 0 ]] ; then
 
-    printf "Hot upgrading Nginx ($master_pid) running binary."
+    printf "Hot upgrading Nginx ($master_pid) running binary.\n"
 
     kill -USR2 $master_pid
 
   else
 
-    printf "It appears that Nginx is not running.\n  (using pidfile: $nginx_pid)\nStarting Nginx."
+    printf "It appears that Nginx is not running.\n  (using pidfile: $nginx_pid)\nStarting Nginx.\n"
 
     start
   fi
@@ -153,7 +164,7 @@ shutdown() {
 
   if [[ ${master_pid:-0} -gt 0 ]] ; then
 
-    printf "Gracefully shutting down Nginx ($master_pid) workers.\n  (workers will finish current request first)"
+    printf "Gracefully shutting down Nginx ($master_pid) workers.\n  (workers will finish current request first)\n"
 
     kill -WINCH $master_pid
 
@@ -184,7 +195,13 @@ check() {
   return $result
 }
 
-declare -i master_pid=$(cat "$nginx_pid")
+declare -i master_pid
+
+if [[ -f "$nginx_pid" ]] ;then
+  master_pid=$(cat "$nginx_pid")
+else
+  master_pid=0
+fi
 
 case "$action" in
   start)    start   ;;

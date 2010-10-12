@@ -13,37 +13,59 @@ fi
 
 # Attempt to load RVM
 files=( "$HOME/.rvm/scripts/rvm" "/usr/local/scripts/rvm" )
+
 for file in "${files[@]}" ; do
+
   if [[ -s "$file" ]] ; then
+
     source "$file"
+
     break # stop after loading first one found.
+
   fi
+
 done
 
 files=( "$HOME/.bashrc" "/etc/bdsmrc" "$HOME/.bdsmrc" )
+
 for file in "${files[@]}" ; do
+
   if [[ -s "$file" ]] ; then
+
     source "$file"
+
   fi
+
 done
 
 files=( "/etc/rvmrc" "$HOME/.rvmrc" )
+
 for file in "${files[@]}" ; do
+
   if [[ -s "$file" ]] ; then
+
     source "$file"
+
   fi
+
 done
 
-if [[ ! -n "$environment" ]] ; then
+if [[ -z "$environment" ]] ; then
+
   $scripts_path/log "warn" "'environment' is not set (bdsmrc)"
+
 fi
 
-if [[ ! -n "$RAILS_ENV" ]] ; then
+if [[ -z "$RAILS_ENV" ]] ; then
+
   $scripts_path/log "warn" "'RAILS_ENV' is not set (bdsmrc)"
+
 fi
 
-if [[ ! -n "$project" ]] ; then
+if [[ -z "$project" ]] ; then
+
   $scripts_path/log "warn" "'project' is not set (bdsmrc)"
+
 fi
 
 # Fetch the pidfile pid.
@@ -51,50 +73,50 @@ pidfile="$shared_path/pids/$project.pid"
 
 if [[ -d "$shared_path/pids" && -s "$pidfile" ]] ; then
 
-  pidfile_pid="$(cat "$pidfile")"
+  pidfile_pid=$(cat "$pidfile")
 
 else
 
-  pidfile_pid=""
+  pidfile_pid=0
 
 fi
 
 # Fetch the running pid.
-if [[ -n "$project" ]] ; then
+if [[ -n "${project:-""}" ]] ; then
 
-  running_pid="$(ps auxww | \grep '[u]nicorn' | \grep 'master' | awk '/'${project}'/{print $2}')"
+  running_pid=$(ps auxww | \grep '[u]nicorn' | \grep 'master' | awk '/'${project}'/{print $2}')
 
 else
+
+  if [[ -z "$running_pid" ]] ; then
+
+    running_pid=$(ps auxww | \grep '[u]nicorn' | awk '/master/{print $2}')
+
+  fi
 
   $bdsm_scripts_path/log "warn" "'project' should be set in ~/.bdsmrc"
 
 fi
 
-if [[ -z "$running_pid" ]] ; then
+if [[ ${running_pid:-0} -gt 0 && -d "/proc/${running_pid}" ]] ; then
 
-  running_pid="$(ps auxww | \grep '[u]nicorn' |  awk '/master/{print $2}')"
+  printf $running_pid > "$pidfile" # Make sure the correct running pid is in the pidfile.
 
-fi
+  master_pid=$running_pid # Set to the found running pidfile.
 
-if [[ -n "$running_pid" ]] && [[ -d "/proc/${running_pid}" ]] ; then
+elif [[ ${pidfile_pid:-0} -gt 0 && -d "/proc/${pidfile_pid}" ]] ; then
 
-  printf "$running_pid" > "$pidfile" # Make sure the correct running pid is in the pidfile.
-
-  master_pid="$running_pid" # Set to the found running pidfile.
-
-elif [[ -n "$pidfile_pid" ]] && [[ -d "/proc/${pidfile_pid}" ]] ; then
-
-  master_pid="$pidfile_pid" # Running and matches pidfile.
+  master_pid=$pidfile_pid # Running and matches pidfile.
 
 else
 
-  unset master_pid # Not found!
+  master_pid=0 # Not found!
 
 fi
 
-if [[ -d $current_path ]] ; then
+if [[ -d "$current_path" ]] ; then
 
-  builtin cd $current_path
+  builtin cd "$current_path"
 
   if [[ -s "$current_path/.rvmrc" ]] ; then
 

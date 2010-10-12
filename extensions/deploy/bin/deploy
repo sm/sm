@@ -13,125 +13,238 @@ fi
 
 # Attempt to load RVM
 files=( "$HOME/.rvm/scripts/rvm" "/usr/local/scripts/rvm" )
+
 for file in "${files[@]}" ; do
+
   if [[ -s "$file" ]] ; then
+
     source "$file"
+
     break # stop after loading first one found.
+
   fi
+
 done
 
 files=( "$HOME/.bashrc" "/etc/.bdsmrc" "$HOME/.bdsmrc" )
+
 for file in "${files[@]}" ; do
+
   if [[ -s "$file" ]] ; then
+
     source "$file"
+
   fi
+
 done
 
 # TODO:
 #
 #   * Crank up the verbosity on errors
 #
+# This will run any deploy hooks that are called
+#   (by hook file name)
+# Hooks are sourced into a subshell IF they are executable.
+# This means that users may disable hooks by changing their
+# execute bit.
+#
 hook() {
+
+  hook="$1"
+
   if [[ "$hooks_flag" -ne 0 ]] ; then
-    # Server Level
-    if [[ -s "$shared_path/config/deploy/$1" ]] ; then
-      "$shared_path/config/deploy/$1"
+
+    # Server
+    if [[ -s "$shared_path/deploy/$hook" ]] ; then
+
+      ( source "$shared_path/deploy/$hook" )
+
     fi
 
-    # Project Level
-    if [[ -d "$shared_path/$project" ]] ; then
-      if [[ -x "$shared_path/$project/config/deploy/$1" ]] ; then
-        "$shared_path/$project/config/deploy/$1"
-      elif [[ -x "$shared_path/$project/.$1" ]] ; then
-        "$shared_path/$project/.$1"
+    # Server, Environment specific
+    if [[ -n "${environment:-""}" ]] ; then
+
+      if [[ -x "$shared_path/deploy/#{$environment}$hook" ]] ; then
+
+        ( source "$shared_path/deploy/#{$environment}$hook" )
+
       fi
+
     fi
+
+    # Project
+    if [[ -d "$shared_path/$project" ]] ; then
+
+      if [[ -x "$shared_path/$project/config/deploy/$hook" ]] ; then
+
+        ( source "$shared_path/$project/config/deploy/$hook" )
+
+        # Original project deploy hooks... phase out soon:
+      elif [[ -x "$shared_path/$project/.$hook" ]] ; then
+
+        ( source "$shared_path/$project/.$hook" )
+
+      fi
+
+    fi
+
+    # Project, Environment specific
+    if [[ -n "${environment:-""}" ]] ; then
+
+      if [[ -x "$shared_path/project/config/deploy/$environment/$hook" ]] ; then
+
+        ( source "$shared_path/project/config/deploy/$environment/$hook" )
+
+      fi
+
+    fi
+
   fi
 }
 
 update() {
-  update_repository && update_current
+
+  update_repository \
+    && update_current
+
   return $?
 }
 
 update_repository() {
-  $scripts_path/log "info" "Updating local repository in $shared_path/$project."
+  $scripts_path/log "info" \
+    "Updating local repository in $shared_path/$project.\n"
 
   pushd "$shared_path/$project" > /dev/null 2>&1
 
   if [[ "git" = "$scm" ]] ; then
+
     git checkout master -f -q
-    git reset --hard HEAD 2>/dev/null # There should be *no* changes to the pristine repo.
+
+    # There should be *no* changes to the pristine repo.
+    git reset --hard HEAD 2>/dev/null
 
     #current_branch=$(git branch | awk '/\* /{print $2}')
 
     $scripts_path/log "info" "Pulling updates from $remote"
+
     git fetch $remote
 
     $scripts_path/log "info" "Switching to branch $branch"
+
     if [[ -z "$(git branch | awk "/$branch$/")" ]] ; then
+
       git checkout -b $branch --track $remote/$branch 2>/dev/null
+
     elif [[ -z "$(git branch | awk "/\* $branch$/")" ]] ; then
+
       git checkout $branch 2>/dev/null
+
       if [[ $? -gt 0 ]] ; then
-        $scripts_path/log "error" "Branch $remote/$branch not found. Skipping remainder of update."
+
+        $scripts_path/log "error" \
+          "Branch $remote/$branch not found. Skipping remainder of update."
+
         return 1
+
       fi
+
     else
+
       $scripts_path/log "info" "Already on branch '$branch'."
+
     fi
+
     git pull
 
-    if [[ ! -z "$revision" ]] ; then
+    if [[ -n "$revision" ]] ; then
+
       git checkout $revision >/dev/null 2>&1
+
     fi
 
     if [[ -f .gitmodules ]] ; then
+
       $scripts_path/log "info" "Updating submodules."
+
       git submodule init 2>/dev/null
+
       git submodule update
+
     fi
 
   elif [[ "hg" = "$scm" ]] ; then
+
     hg pull
+
     if [[ ! -z "$revision" ]] ; then
-      hg update $branch $revision # TODO: Find out if this is how it's done for hg ;)
+
+      # TODO: Find out if this is how it's done for hg ;)
+      hg update $branch $revision
+
     else
+
       hg update $branch
+
     fi
+
   elif [[ "svn" = "$scm" ]] ; then
+
     # TODO: specific revision / branch handling
     if [[ "$revision" -gt 0 ]] ; then
+
       svn update
+
       svn checkout -r $revision
+
     else
+
       svn update
+
     fi
+
   else
+
     $scripts_path/log "warn" "No scm specified found (git,hg,svn)"
+
     exit 1
+
   fi
 
   popd > /dev/null 2>&1
 }
 
 update_current() {
+
   if [ -d $current_path ] ; then
+
     $scripts_path/log "info" "Moving aside previous release."
+
+
     mkdir -p $project_path/previous
+
     mv $current_path $project_path/previous/$timestamp
+
   fi
+
   $scripts_path/log "info" "Installing new release to $current_path"
+
   rsync -ag --exclude=".${scm}/" $shared_path/$project/ $current_path;
+
   mkdir -p $current_path/public
 }
 
 configure() {
+
   if [[ ! -d "$shared_path/config" ]] ; then
+
     $scripts_path/log "info" "No shared config path found, skipping."
+
     return 0
+
   else
+
     mkdir -p "$current_path/config"
+
   fi
 
   local item config_item
@@ -139,61 +252,118 @@ configure() {
   builtin cd $shared_path/config
 
   "$scripts_path/log" "info" "Setting up persistent config files:"
+
   for config_item in $shared_path/config/* ; do
+
     item=$(basename $config_item)
+
     "$scripts_path/log" "info" " - $item"
+
     rm -rf "$current_path/config/$item"
+
     ln -nfs "$shared_path/config/$item" "$current_path/config/$item"
+
   done
 }
 
 symlink() {
+
   $scripts_path/log "info" "Setting up persistent directories"
 
   for dir in tmp log pids files ; do
+
     if [[ -d $shared_path/$dir ]] ; then
+
       $scripts_path/log "info" " - $dir"
+
       rm -rf $current_path/$dir
+
       ln -nfs $shared_path/$dir $current_path/$dir
+
     fi
+
   done
 
   for dir in $(ls -A $shared_path/public/) ; do
+
     if [[ ! -z "$dir" ]] ; then
+
       $scripts_path/log "info" " - public/$dir"
+
       rm -rf $current_path/public/$dir
+
       ln -nfs $shared_path/public/$dir $current_path/public/$dir
+
     fi
+
   done
 }
 
 cleanup() {
+
   mkdir -p $project_path/previous
+
   if [[ ! -z "$old_releases" ]] ; then
+
+    (
     $scripts_path/log "info" "Removing old releases..."
+
     builtin cd $project_path/previous
+
     for release in $(echo $old_releases) ; do
+
       if [[ -d "$release" ]] ; then
+
         $scripts_path/log "info" " - $release"
+
         rm -rf $release
+
       else
-        $scripts_path/log "info" "info" "Skipping ~/previous/$release as the directory does not exist."
+
+        $scripts_path/log "info" "info" \
+          "Skipping ~/previous/$release as the directory does not exist."
+
       fi
+
     done
-    cd
+    )
+
   fi
 }
 
+record()
+{
+  cd "$shared_path/$project"
+
+  echo $(git log --no-color -1 | head -n 1 | cut -c 7-47) \
+    >> "$current_path/revision"
+
+  echo $(git branch --no-color | awk '/^* /{print $2}') \
+    >> "$current_path/branch"
+
+  return 0
+}
+
 detect_scm() {
+
   if [[ -z "$scm" ]] ; then
+
     if [[ -d "$shared_path/$project/.git" ]] ; then
+
       scm="git"
+
     elif [[ -d "$shared_path/$project/.svn" ]] ; then
+
       scm="svn"
+
     elif [[ -d "$shared_path/$project/.hg" ]] ; then
+
       scm="hg"
+
     fi
+
   fi
+
 }
 
 detect_scm
@@ -205,9 +375,11 @@ $scripts_path/log "info" "info" "Deploying..."
   configure         ; hook "after_configure"
   symlink           ; hook "after_symlink"
   cleanup           ; hook "after_deploy"
+  record            ; hook "after_record"
 )
 result=$?
 
-$scripts_path/log "info" "Deploy started at $timestamp and completed at $(date +%m.%d.%Y-%H:%M:%S)\n"
+$scripts_path/log "info" \
+  "Deploy started at $timestamp and completed at $(date +%m.%d.%Y-%H:%M:%S)\n"
 
 exit $result
