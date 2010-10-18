@@ -24,3 +24,4 @@ master_pid="$(ps auxww |  awk '/[n]ginx: master/{print $2}' | head -n 1)"
 
 config_file="${config_file:-"/etc/nginx/nginx.conf"}"
 
+nginx_config_path="/etc/nginx"

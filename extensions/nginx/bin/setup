@@ -2,3 +2,22 @@
 
 source "$extension_scripts_path/initialize"
 
+if [[ -s "$extension_templates_path/unicorn.rb" ]] ; then
+
+  if [[ ! -d "/etc/nginx/config/" ]] ; then
+    mkdir -p "$shared_path/config/"
+  fi
+
+  cp "$extension_templates_path/unicorn.rb" "$shared_path/config/"
+
+  exit $?
+
+else
+
+  $scripts_path/log "error" \
+    "ERROR: $extension_templates_path/nginx.conf.rb template is missing."
+
+  exit 1
+
+fi
+
