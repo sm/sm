@@ -45,6 +45,7 @@ if [[ "root" != "$(whoami)" ]] ; then
   shared_path="${shared_path:-$project_path/shared}"
   previous_path="${previous_path:-$project_path/previous}"
   current_path="${current_path:-$project_path/current}"
+  stage_path="${stage_path:-$project_path/stage}"
   discarded_path="${discarded_path:-$project_path/discard}"
 
   if [[ -d "$project_path/previous" ]] ; then

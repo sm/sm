@@ -105,7 +105,7 @@ hook() {
 update() {
 
   update_repository \
-    && update_current
+    && replace_current
 
   return $?
 }
@@ -213,43 +213,49 @@ update_repository() {
   popd > /dev/null 2>&1
 }
 
-update_current() {
+stage_current() {
+  "$scripts_path/log" "info" "Staging new release to $stage_path"
 
-  if [ -d $current_path ] ; then
+  rsync -ag --exclude=".${scm}/" "$shared_path/$project/" "$stage_path"
 
-    $scripts_path/log "info" "Moving aside previous release."
+  mkdir -p "$stage_path/public"
+}
 
+replace_current() {
 
-    mkdir -p $project_path/previous
+  if [[ -d "$current_path" ]] ; then
 
-    mv $current_path $project_path/previous/$timestamp
+    "$scripts_path/log" "info" "Moving aside previous release."
+
+    mkdir -p "$project_path/previous"
+
+    mv "$current_path" "$project_path/previous/$timestamp"
 
   fi
 
-  $scripts_path/log "info" "Installing new release to $current_path"
+  "$scripts_path/log" "info" "Moving staged release to $current_path"
 
-  rsync -ag --exclude=".${scm}/" $shared_path/$project/ $current_path;
+  mv "$stage_path" "$current_path"
 
-  mkdir -p $current_path/public
 }
 
 configure() {
 
   if [[ ! -d "$shared_path/config" ]] ; then
 
-    $scripts_path/log "info" "No shared config path found, skipping."
+    "$scripts_path/log" "info" "No shared config path found, skipping."
 
     return 0
 
   else
 
-    mkdir -p "$current_path/config"
+    mkdir -p "$stage_path/config"
 
   fi
 
   local item config_item
 
-  builtin cd $shared_path/config
+  builtin cd "$shared_path/config"
 
   "$scripts_path/log" "info" "Setting up persistent config files:"
 
@@ -259,9 +265,9 @@ configure() {
 
     "$scripts_path/log" "info" " - $item"
 
-    rm -rf "$current_path/config/$item"
+    rm -rf "$stage_path/config/$item"
 
-    ln -nfs "$shared_path/config/$item" "$current_path/config/$item"
+    ln -nfs "$shared_path/config/$item" "$stage_path/config/$item"
 
   done
 }
@@ -272,27 +278,27 @@ symlink() {
 
   for dir in tmp log pids files ; do
 
-    if [[ -d $shared_path/$dir ]] ; then
+    if [[ -d "$shared_path/$dir" ]] ; then
 
-      $scripts_path/log "info" " - $dir"
+      "$scripts_path/log" "info" " - $dir"
 
-      rm -rf $current_path/$dir
+      rm -rf "$stage_path/$dir"
 
-      ln -nfs $shared_path/$dir $current_path/$dir
+      ln -nfs "$shared_path/$dir" "$stage_path/$dir"
 
     fi
 
   done
 
-  for dir in $(ls -A $shared_path/public/) ; do
+  for dir in $(ls -A "$shared_path/public/") ; do
 
     if [[ ! -z "$dir" ]] ; then
 
-      $scripts_path/log "info" " - public/$dir"
+      "$scripts_path/log" "info" " - public/$dir"
 
-      rm -rf $current_path/public/$dir
+      rm -rf "$stage_path/public/$dir"
 
-      ln -nfs $shared_path/public/$dir $current_path/public/$dir
+      ln -nfs "$shared_path/public/$dir" "$stage_path/public/$dir"
 
     fi
 
@@ -370,12 +376,37 @@ detect_scm
 
 $scripts_path/log "info" "info" "Deploying..."
 (
-  update_repository ; hook "before_deploy"
-  update_current    ; hook "after_update_current"
-  configure         ; hook "after_configure"
-  symlink           ; hook "after_symlink"
-  cleanup           ; hook "after_deploy"
-  record            ; hook "after_record"
+  hook "before_update_repository"
+  update_repository
+  hook "after_update_repository"
+
+  hook "before_deploy"
+
+  hook "before_stage"
+  stage_current
+  hook "after_stage"
+
+  hook "before_configure"
+  configure
+  hook "after_configure"
+
+  hook "before_symlink"
+  symlink
+  hook "after_symlink"
+
+  hook "before_replace_current"
+  replace_current
+  hook "after_replace_current"
+
+  hook "before_cleanup"
+  cleanup
+  hook "after_cleanup"
+
+  hook "before_record"
+  record
+  hook "after_record"
+
+  hook "after_deploy"
 )
 result=$?
 
