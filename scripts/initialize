@@ -29,6 +29,14 @@ user="$(whoami)"
 keep_releases=${keep_releases:-4}
 hooks_flag="${hooks_flag:-1}"
 
+project_path="${project_path:-$HOME}"
+shared_path="${shared_path:-$project_path/shared}"
+previous_path="${previous_path:-$project_path/previous}"
+current_path="${current_path:-$project_path/current}"
+stage_path="${stage_path:-$project_path/stage}"
+discarded_path="${discarded_path:-$project_path/discard}"
+export project_path shared previous_path current_path stage_path discarded_path
+
 # TODO: Move this code to a 'project' initializer:
 if [[ "root" != "$(whoami)" ]] ; then
 
@@ -40,13 +48,6 @@ if [[ "root" != "$(whoami)" ]] ; then
     fi
 
   fi
-
-  project_path="${project_path:-$HOME}"
-  shared_path="${shared_path:-$project_path/shared}"
-  previous_path="${previous_path:-$project_path/previous}"
-  current_path="${current_path:-$project_path/current}"
-  stage_path="${stage_path:-$project_path/stage}"
-  discarded_path="${discarded_path:-$project_path/discard}"
 
   if [[ -d "$project_path/previous" ]] ; then
 
