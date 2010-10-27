@@ -12,7 +12,8 @@ mkdir -p $source_path && cd $source_path
 
 package="nginx"
 
-version="0.7.67"
+# TODO: allow version specification from command line args.
+version="0.8.53"
 
 archive_format="tar.gz"
 
