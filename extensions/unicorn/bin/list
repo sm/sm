@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 
-source $extension_scripts_path/initialize
+source "$extension_scripts_path/initialize"
 
 if [[ "$master_pid" -le 0 ]] ; then
 
-  $scripts_path/log "info" "There are no unicorns running for $project."
+  "$scripts_path/log" "info" \
+    "There are no unicorns running for $project."
 
 else
 

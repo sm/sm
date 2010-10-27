@@ -110,7 +110,8 @@ else
 
   fi
 
-  $bdsm_scripts_path/log "warn" "'project' should be set in ~/.bdsmrc"
+  "$bdsm_scripts_path/log" "warn" \
+    "'project' should be set in ~/.bdsmrc"
 
 fi
 

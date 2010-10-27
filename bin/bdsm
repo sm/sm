@@ -49,7 +49,7 @@ usage() {
   "$extensions_path"/bdsm/bin/help usage | less
 }
 
-user=$(whoami)
+user="$USER"
 
 # TODO: set log location based on root or user calling
 

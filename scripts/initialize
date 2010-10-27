@@ -25,7 +25,7 @@ remote="${remote:-"origin"}"
 branch="${branch:-"master"}"
 framework="${framework:-"rails"}"
 timestamp="$(date +%m.%d.%Y-%H:%M:%S)"
-user="$(whoami)"
+user="$USER"
 keep_releases=${keep_releases:-4}
 hooks_flag="${hooks_flag:-1}"
 
@@ -38,7 +38,7 @@ discarded_path="${discarded_path:-$project_path/discard}"
 export project_path shared previous_path current_path stage_path discarded_path
 
 # TODO: Move this code to a 'project' initializer:
-if [[ "root" != "$(whoami)" ]] ; then
+if [[ "root" != "$USER" ]] ; then
 
   if [[ -z "$project" ]] ; then
 
@@ -89,6 +89,9 @@ if [[ "root" != "$(whoami)" ]] ; then
     [[ -s ".${project}rc" ]] && . ".${project}rc"
   fi
 fi
+
+# In case bdsm is being called from within a hook for example, we unset these:
+unset extension action
 
 export vcs project database_name old_releases bdsm_path current_path discarded_path previous_path project_path shared_path archives_path bin_path bindir branch config_path extensions_path framework hooks_flag keep_releases prefix remote result scripts_path src_path templates_path timestamp user
 

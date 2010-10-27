@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
-description() {
+description()
+{
   printf "Extension for managing Unicorn (http://unicorn.bogomips.org/)."
 }
 
-actions() {
+actions()
+{
   printf "
   install  - Install the unicorn gem.
   setup    - Setup the unicorn config file with a template in $current_path/config/
@@ -23,7 +25,8 @@ actions() {
   "
 }
 
-usage() {
+usage()
+{
 printf "
 Description
 
@@ -39,14 +42,27 @@ Actions
 }
 
 action="usage" # Default
+
 while [[ $# -gt 0 ]] ; do
-  token="$1" ; shift
+
+  token="$1"
+
+  shift
+
   case "$token" in
-    description) action=description ;;
-    *)           action=usage ;;
+
+    description)
+      action="description"
+      ;;
+
+    *)
+      action="usage"
+      ;;
+
   esac
+
 done
 
-$action
+"$action"
 
 exit $?
