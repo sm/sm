@@ -6,7 +6,7 @@ if [[ ${master_pid:-0} -gt 0 ]] ; then
 
   printf "Signaling Nginx ($master_pid) to quit\n(from pidfile: $nginx_pid)\n"
 
-  kill -QUIT $master_pid
+  kill -QUIT "$master_pid"
 
 else
 

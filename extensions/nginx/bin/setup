@@ -4,11 +4,46 @@ source "$extension_scripts_path/initialize"
 
 if [[ -s "$extension_templates_path/unicorn.rb" ]] ; then
 
-  if [[ ! -d "/etc/nginx/config/" ]] ; then
-    mkdir -p "$shared_path/config/"
+  for directory in "$nginx_config_path" "$nginx_servers_path" ; do
+
+    if [[ ! -d "$directory" ]] ; then
+
+      mkdir -p "$directory"
+
+    fi
+
+  done
+
+  # nginx.conf.template => /etc/nginx.conf
+  cp "$extension_templates_path/nginx.conf.template" \
+    "/etc/nginx/"
+
+  # nginx_ctl.template => /etc/init.d/nginx
+  if [[ -d /etc/init.d ]] ; then
+
+    cp "$extension_templates_path/nginx_ctl.template" \
+      "/etc/init.d/"
+
+    chmod +x /etc/init.d/nginx
+
+  elif [[ -d /etc/rc.d ]] ; then
+
+    cp "$extension_templates_path/nginx_ctl.template" \
+      "/etc/rc.d/"
+
+    chmod +x /etc/rc.d/nginx
+
+  else
+
+    $scripts_path/log "warn" \
+      "Did not find /etc/init.d nor /etc/rc.d to place the init script."
+
   fi
 
-  cp "$extension_templates_path/unicorn.rb" "$shared_path/config/"
+  # proxy.conf.template => /etc/nginx/conf/proxy.conf
+  cp "$extension_templates_path/proxy.conf.template" \
+    "/etc/nginx/conf/"
+
 
   exit $?
 
