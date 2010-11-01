@@ -64,9 +64,9 @@ hook() {
     # Server, Environment specific
     if [[ -n "${environment:-""}" ]] ; then
 
-      if [[ -x "$shared_path/deploy/#{$environment}$hook" ]] ; then
+      if [[ -x "$shared_path/deploy/#{$environment}/$hook" ]] ; then
 
-        ( source "$shared_path/deploy/#{$environment}$hook" )
+        ( source "$shared_path/deploy/#{$environment}/$hook" )
 
       fi
 
