@@ -4,11 +4,28 @@ source "$extension_scripts_path/initialize"
 
 echo -e "\nNote: This will do a standard install. Use the 'passenger' extension for installing passenger Nginx.\n"
 
-configure_flags=" --prefix=/usr/local/nginx --conf-path=/etc/nginx/nginx.conf --sbin-path=/usr/sbin/nginx --pid-path=/var/run/nginx.pid --lock-path=/var/lock/nginx.lock --http-client-body-temp-path=/var/spool/nginx/client_body_temp --http-proxy-temp-path=/var/spool/nginx/proxy_temp --http-fastcgi-temp-path=/var/spool/nginx/fastcgi_temp --http-log-path=/var/log/nginx/access.log --error-log-path=/var/log/nginx/error.log --with-imap --with-imap_ssl_module --with-http_ssl_module --with-http_stub_status_module --with-pcre"
+configure_flags=( --prefix=/usr/local/nginx
+  --conf-path=/etc/nginx/nginx.conf
+  --sbin-path=/usr/sbin/nginx
+  --pid-path=/var/run/nginx.pid
+  --lock-path=/var/lock/nginx.lock
+  --http-client-body-temp-path=/var/spool/nginx/client_body_temp
+  --http-proxy-temp-path=/var/spool/nginx/proxy_temp
+  --http-fastcgi-temp-path=/var/spool/nginx/fastcgi_temp
+  --http-log-path=/var/log/nginx/access.log
+  --error-log-path=/var/log/nginx/error.log
+  --with-imap
+  --with-imap_ssl_module
+  --with-http_ssl_module
+  --with-http_stub_status_module
+  --with-pcre
+)
 
 source_path="${source_path:-/usr/local/src}"
 
-mkdir -p $source_path && cd $source_path
+mkdir -p "$source_path"
+
+cd "$source_path"
 
 package="nginx"
 
@@ -19,25 +36,53 @@ archive_format="tar.gz"
 
 packge_url="http://nginx.org/download/$package-$version.$archive_format"
 
-curl -O -L $packge_url
+curl -O -L "$packge_url"
 
-tar zxf $package-$version.tar.gz
+tar zxf "$package-$version.tar.gz"
 
-cd $package-$version
+cd "$package-$version"
 
-./configure $configure_flags
+./configure ${configure_flags[@]}
 
-make &&
+make
 
 make install
 
-mkdir -p /var/spool/nginx/client_body_temp
+config_directories=(/var/spool/nginx/client_body_temp /var/log/nginx
+  /etc/nginx/conf /etc/nginx/servers
+)
+for directory in "${config_directories[@]}" ; do
+  mkdir -p "$directory"
+done
+
+files=( fastcgi.conf fastcgi.conf.default fastcgi_params
+ fastcgi_params.default koi-utf koi-win mime.types mime.types.default
+ nginx.conf.default scgi_params scgi_params.default uwsgi_params
+ uwsgi_params.default win-utf
+)
+
+for file in "${files[@]}" ; do
+
+  if [[ -f "/etc/nginx/$file" ]] ; then
+
+    mv "/etc/nginx/$file" "/etc/nginx/conf/$file"
+
+  fi
+
+done
+
+touch /etc/nginx/conf/passenger
 
 cp "$extension_templates_path/nginx_ctl.template" /etc/init.d/nginx
 
 chmod +x /etc/init.d/nginx
 
-cp "$extension_templates_path/nginx.conf.template" /etc/nginx/
+cp "$extension_templates_path/nginx.conf.template" /etc/nginx/nginx.conf
 
 cp "$extension_templates_path/proxy.conf.template" /etc/nginx/conf/proxy.conf
 
+adduser nginx
+
+for directory in "${config_directories[@]}" ; do
+  chown -R nginx:nginx "$directory"
+done

@@ -8,7 +8,8 @@ if [[ -z "$project" ]] ; then
 
 fi
 
-nginx_config_path="${nginx_config_path:-"/etc/nginx"}"
+# TODO: Account for user name being different from project name.
+nginx_config_path="${nginx_config_path:-"/etc/nginx/conf"}"
 
 if [[ -s "$extension_templates_path/server.conf.template" ]] ; then
 
@@ -18,7 +19,7 @@ if [[ -s "$extension_templates_path/server.conf.template" ]] ; then
 
   sed -e "s#{{project}}#$project#g" \
     "$extension_templates_path/server.conf.template" \
-    > "$nginx_config_path/servers/$project.conf"
+    > "$nginx_path/servers/$project.conf"
 
   exit $?
 

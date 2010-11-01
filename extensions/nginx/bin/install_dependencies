@@ -2,41 +2,31 @@
 
 source "$extension_scripts_path/initialize"
 
+if [[ "Linux" = "$(uname)" ]] ; then
 
-if [[ "Linux" = "$system" ]] ; then
-
-  for file in /etc/*-release ; do
-    release="( $(cat $file) )" ; break
-  done
-
-  printf "\n\nNotes for ${system} $release\n"
-
-  aptitude_binary="$(command -v aptitude || command -v apt-get)"
-  emerge_binary="$(command -v emerge)"
-  pacman_binary="$(command -v pacman)"
-  yum_binary="$(command -v yum)"
-
-  if [[ ! -z "$aptitude_binary" ]] ; then
-
-   aptitude install build-essential openssl curl zlib1g zlib1g-dev libssl-dev pcre pcre-dev
-
-  elif [[ ! -z "$emerge_binary" ]] ; then
-
-    printf "TODO: Tell wayne how to install pcre, openssl and zlib dev headers on gentoo."
-
-  elif [[ ! -z "$pacman_binary" ]] ; then
+  if command -v pacman ; then
 
     pacman -S --noconfirm patch curl zlib pcre openssl make base-devel
 
-  elif [[ ! -z "$yum_binary" ]] ; then
+  elif command -v aptitude || command -v apt-get ; then
+
+   aptitude install build-essential openssl curl zlib1g zlib1g-dev libssl-dev pcre pcre-dev
+
+  elif command -v yum ; then
 
     yum install -y gcc-c++ patch zlib zlib-devel openssl openssl-devel pcre pcre-devel
 
+  elif command -v emerge ; then
+
+    printf "TODO: Tell wayne how to install pcre, openssl and zlib dev headers on gentoo."
+
   else
+
     printf "TODO: Install zlib openssl pcre via curl, complile install."
 
   fi
-elif [[ "Darwin" = "$system"  ]] ; then
+
+elif [[ "Darwin" = "$(uname)"  ]] ; then
 
   release="( $(sw_vers -productName) )"
 
@@ -45,10 +35,6 @@ elif [[ "Darwin" = "$system"  ]] ; then
     For Snow Leopard be sure to have Xcode Tools Version 3.2.1 (1613) or later
     You should download the latest Xcode tools from developer.apple.com.
       (This is since the dvd install for Snow Leopard contained bugs).
-
-    If you intend on installing MacRuby you must install LLVM first.
-    If you intend on installing JRuby you must install the JDK.
-    If you intend on installing IronRuby you must install Mono (version 2.6 or greater is recommended).
   "
 fi
 
