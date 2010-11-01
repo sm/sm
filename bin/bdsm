@@ -39,11 +39,14 @@ export scripts_path="${scripts_path:-"${bdsm_path}/scripts"}"
 # Load the BDSM framework version.
 [[ -s "$bdsm_path/VERSION" ]] && VERSION="$(cat "$bdsm_path/VERSION")"
 
-version() {
-  printf "\n%s\n\n" "bdsm ${VERSION:-"vX.X.X"} http://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)"
+version()
+{
+  printf "\n%s\n\n" \
+    "bdsm ${VERSION:-"vX.X.X"} http://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)"
 }
 
-usage() {
+usage()
+{
   version
 
   "$extensions_path"/bdsm/bin/help usage | less
@@ -87,7 +90,7 @@ while [[ $# -gt 0 ]] ; do
     ;;
 
     extend|extension)  extension="extension"           ;;
-    --no-hooks)        hooks_flag=0                    ;;
+    --disable-hooks)   hooks_flag=0                    ;;
     --project)         project="$1"            ; shift ;;
     --environment)     environment="$1"        ; shift ;;
     --repo|repository) repository="$1"         ; shift ;;
@@ -164,12 +167,15 @@ if [[ -n "$error_message" ]] ; then exit 1 ; fi
 # Main Logic
 #
 if [[ ${trace_flag:-0} -eq 1 ]] ; then
+
   export trace_flag
   set -o xtrace
 
 elif [[ ${debug_flag:-0} -eq 1 ]] ; then
+
   export debug_flag
   set -o verbose
+
 fi
 
 if [[ "version" = "$action" ]] ; then
@@ -203,9 +209,15 @@ elif [[ ! -z "$extension" ]] && [[ ! -z "$action" ]] ; then
     #fi
 
     if [[ "$result" -gt 0 ]] ; then
-      "$scripts_path/log" "error" "'$action $*' returned error\n\n"
+
+      "$scripts_path/log" "error" \
+        "'$action $*' returned error\n\n"
+
     else
-      "$scripts_path/log" "info" "'$action $*' returned success\n\n"
+
+      "$scripts_path/log" "info" \
+        "'$action $*' returned success\n\n"
+
     fi
 
   fi
