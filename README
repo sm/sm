@@ -1,13 +1,36 @@
-BDSM's target audience is people stuck setting up their own servers not on a cloud extension.
-Essentially I am building it to be a 'core' such that people can create 'plugins' for it which are called "extensions"
-There are only a few requirements for the 'extensions' like that it's a directory with executable files in it and with a few rules on what should be available (like $extension/help)
-This means that the contents can be C compiled binaries, Ruby Scripts, python, lua, whatever
-of course the extensions *I* write will likely be in bash ;)
+= About
 
-I am creating it with completely pluggable architecture so that people can write their own as I do not want to support everything myself So I will make the core and encourage extension building
+Bash Deployment & Server Manager (BDSM) is a scripting framework.
+
+= Goal
+
+The goal of BDSM is to create a framework for maintaining and sharing server
+side scripts while exposing them through a consistent command line interface (CLI).
+
+= Architecture
+
+BDSM itself is the core framework. Users may write / install 'extensions'
+(think plugins) to the core framework in order to add CLI functionality to BDSM.
+
+= Creating Extensions
+
+There are only a few requirements for the 'extensions'. The extension must be a
+directory. Within this directory are (at least) the subdirectory bin/ with at
+least one executable file called 'help'. Additionally in the root of the
+extension directory there must be a text file called VERSION with a version
+number that follows semantic versioning (http://semver.org/) in the format of
+X.Y.Z where X,Y and Z are positive integers.
+
+The contents of the bin directory can be *any* execuatble file.  This means for
+example that C compiled binaries, Ruby Scripts, python, lua, etc... may all be
+used according to requrements and/or user preferences.  Of course the extensions
+which *I* write will likely be in bash ;)
 
 
-that's up to the extension builder
-each $extension/ dir has a templates/ dir that the extension will use for it's own purposes
-I'm debating on releasing it in the next two weeks
-mutle: so do you think it would be useful for people?
+  ~Wayne
+
+Wayne E. Seguin
+wayneeseguin@gmail.com
+http://github.com/wayneeseguin
+http://twitter.com/wayneeseguin
+
