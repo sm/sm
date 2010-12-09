@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-
-
-# Disable a 'server'
-# This renames /etc/nginx/servers/X.conf to X.conf.disabled
-#

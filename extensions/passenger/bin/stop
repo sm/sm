@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-
-if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
-
-$scripts_path/log "info" "Passenger Applications are stopped by stopping Nginx/Apache."
-
