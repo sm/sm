@@ -4,8 +4,8 @@ Bash Deployment & Server Manager (BDSM) is a scripting framework.
 
 = Goal
 
-The goal of BDSM is to create a framework for maintaining and sharing server
-side scripts while exposing them through a consistent command line interface (CLI).
+The goal is to create a framework for maintaining and sharing server side
+scripts while exposing them through a consistent command line interface (CLI).
 
 = Architecture
 
@@ -19,7 +19,8 @@ directory. Within this directory are (at least) the subdirectory bin/ with at
 least one executable file called 'help'. Additionally in the root of the
 extension directory there must be a text file called VERSION with a version
 number that follows semantic versioning (http://semver.org/) in the format of
-X.Y.Z where X,Y and Z are positive integers.
+X.Y.Z where X,Y and Z are positive integers. An extension must also have a
+README file in which you should explain about the extension.
 
 The contents of the bin directory can be *any* execuatble file.  This means for
 example that C compiled binaries, Ruby Scripts, python, lua, etc... may all be
