@@ -34,45 +34,13 @@ Usage
 
 Actions
   $(actions)
+
 Extensions
   $(extensions)
-Examples
-
-  (as root:)
-  bdsm extension add nginx
-
-  bdsm nginx install
-  bdsm nginx setup
-  bdsm nginx stop
-  bdsm nginx start
-  bdsm nginx restart
-  bdsm nginx reload
-  ...
-
-  bdsm extension add rails
-  bdsm extension add unicorn
-  ...
-
-  (as a user:)
-  bdsm deploy
-
-  bdsm rails setup --database postgresql --repo git@github.com/wayneeseguin/bdsm_docs.git --server unicorn
-  bdsm rails migrate
-  bdsm rails logtail
-  bdsm rails console
-  bdsm rails dbconsole
-  ...
-
-  bdsm unicorn install
-  bdsm unicorn setup
-  bdsm unicorn start
-  bdsm unicorn stop
-  bdsm unicorn restart
-  bdsm unicorn increase
-  bdsm unicorn decrease
-  ...
 
 Notes
+
+  See website for extension documentation.
 
   [extension] is required, default may be set in ~/.bdsmrc
   [action] is required as a command line parameter

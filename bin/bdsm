@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Author: Wayne E. Seguin
-# All Rights Reserved
+# See bdsm LICENSE file for license information.
 
 #
 # Setup
@@ -19,13 +19,9 @@ prefix="${prefix:-/usr/local}"
 bindir="${bindir:-/usr/local/bin}"
 
 if [[ "$prefix" = "$HOME" ]] ; then
-
   bdsm_path="${bdsm_path:-"${prefix}bdsm"}"
-
 else
-
   bdsm_path="${bdsm_path:-"${prefix}/bdsm"}"
-
 fi
 
 export scripts_path="${scripts_path:-"${bdsm_path}/scripts"}"
@@ -159,6 +155,7 @@ while [[ $# -gt 0 ]] ; do
   if [[ -n "$parse_break" || ! -z "$error_message" ]] ; then
     unset parse_break ; break
   fi
+
 done
 
 if [[ -n "$error_message" ]] ; then exit 1 ; fi
@@ -208,15 +205,19 @@ elif [[ ! -z "$extension" ]] && [[ ! -z "$action" ]] ; then
     # "$extensions_path/$extension/bin/$action" $* >> $log 2>> ${log/%log/error.log}
     #fi
 
-    if [[ "$result" -gt 0 ]] ; then
+    if [[ ${verbose_flag:-0} -eq 1 ]]; then
 
-      "$scripts_path/log" "error" \
-        "'$action $*' returned error\n\n"
+      if [[ "$result" -gt 0 ]] ; then
 
-    else
+        "$scripts_path/log" "error" \
+          "'$action $*' returned error\n\n"
 
-      "$scripts_path/log" "info" \
-        "'$action $*' returned success\n\n"
+      else
+
+        "$scripts_path/log" "info" \
+          "'$action $*' returned success\n\n"
+
+      fi
 
     fi
 

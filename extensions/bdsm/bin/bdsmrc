@@ -19,8 +19,11 @@ if [[ -s "$extension_templates_path/bdsmrc" ]] ; then
        > "$HOME/.bdsmrc"
 
   exit $?
-else
-  echo -e "ERROR: $extension_templates_path/bdsmrc template is missing."
-  exit 1
-fi
 
+else
+
+  echo -e "ERROR: $extension_templates_path/bdsmrc template is missing."
+
+  exit 1
+
+fi
