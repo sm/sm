@@ -1,17 +1,15 @@
 #!/usr/bin/env bash
 
 [[ -s "/etc/bdsmrc" ]]  && . "/etc/bdsmrc"
-
 [[ -s "$HOME/.bdsmrc" ]] && . "$HOME/.bdsmrc"
 
-prefix="${prefix:-/usr/local}"
-
-bindir="${bindir:-/usr/local/bin}"
+true "${prefix:=/usr/local}"
+true "${bindir:=/usr/local/bin}"
 
 if [[ "$prefix" = "$HOME" ]] ; then
-  bdsm_path="${bdsm_path:-"${prefix}bdsm"}"
+  true "${bdsm_path:="${prefix}bdsm"}"
 else
-  bdsm_path="${bdsm_path:-"${prefix}/bdsm"}"
+  true "${bdsm_path:="${prefix}/bdsm"}"
 fi
 
 scripts_path="${scripts_path:-"${bdsm_path}/scripts"}"
@@ -35,10 +33,11 @@ previous_path="${previous_path:-$project_path/previous}"
 current_path="${current_path:-$project_path/current}"
 stage_path="${stage_path:-$project_path/stage}"
 discarded_path="${discarded_path:-$project_path/discard}"
+
 export project_path shared previous_path current_path stage_path discarded_path
 
 # TODO: Move this code to a 'project' initializer:
-if [[ "root" != "$USER" ]] ; then
+if [[ $UID -gt 0 ]] ; then
 
   if [[ -z "$project" ]] ; then
 
