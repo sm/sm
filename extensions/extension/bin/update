@@ -16,7 +16,7 @@ fi
 for extension in ${extensions//,/ } ; do
 
   mkdir -p "$src_path"
-  if [[ ! -z "$head_flag" ]] ; then
+  if [[ -n "$head_flag" ]] ; then
     if [[ ! -d "$src_path/$extension/.git" ]] ; then
       "$scripts_path"/log "info" "Updating $extension repository."
       cd "$src_path/$extension"/.git
