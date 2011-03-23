@@ -2,17 +2,74 @@
 
 source "$scripts_path/initialize"
 
-extensions=$(find "$extensions_path" -mindepth 1 -maxdepth 1 -type d)
+list_help()
+{
+  printf "
 
-for extension in ${extensions} ; do
-  case ${extension} in
-    bdsm|extension)
-      true # Ignore for now.
-      ;;
-    *)
-      printf "${extension//*\//}\n"
-      ;;
-  esac
-done
+Usage:
+
+  bdsm extension list <action>
+
+Actions:
+
+  installed - List installed extensions
+  available - List available extensions
+  help      - Show this help text
+
+"
+}
+
+list_installed()
+{
+  extensions=$(find "$extensions_path" -mindepth 1 -maxdepth 1 -type d)
+
+  for extension in ${extensions} ; do
+    case ${extension} in
+      bdsm|extension)
+        true # Ignore for now.
+        ;;
+      *)
+        printf "${extension//*\//}\n"
+        ;;
+    esac
+  done
+}
+
+list_available()
+{
+  if [[ -d "/usr/local/src/bdsm-extensions" ]] ; then
+    extensions=$(find "/usr/local/src/bdsm-extensions" -mindepth 1 -maxdepth 1 -type d)
+
+    for extension in ${extensions} ; do
+      case ${extension} in
+        bdsm|extension)
+          true # Ignore for now.
+          ;;
+        *)
+          printf "${extension//*\//}\n"
+          ;;
+      esac
+    done
+  else
+    printf "No extensions found in /usr/local/src/bdsm-extensions/\n"
+  fi
+}
+
+action="$1"
+
+case "$action" in
+  installed
+  ;;
+  available
+  ;;
+  help|usage)
+  ;;
+
+  *)
+    printf "ERROR: "
+    list_help
+    exit 1
+  ;;
+esac
 
 exit 0
