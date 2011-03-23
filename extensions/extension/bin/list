@@ -58,11 +58,16 @@ list_available()
 action="$1"
 
 case "$action" in
-  installed
+  installed)
+    list_installed
   ;;
-  available
+
+  available)
+    list_available
   ;;
+
   help|usage)
+    list_help
   ;;
 
   *)
