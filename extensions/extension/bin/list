@@ -2,7 +2,7 @@
 
 source "$scripts_path/initialize"
 
-extensions=$(cd extensions_path ; find . -mindepth 1 -maxdepth 1 -type d)
+extensions=$(find "$extensions_path" -mindepth 1 -maxdepth 1 -type d)
 
 for extension in ${extensions} ; do
   case ${extension} in
@@ -10,7 +10,7 @@ for extension in ${extensions} ; do
       true # Ignore for now.
       ;;
     *)
-      printf "${extension}\n"
+      printf "${extension//*\//}\n"
       ;;
   esac
 done
