@@ -42,7 +42,7 @@ list_available()
 
     for extension in ${extensions} ; do
       case ${extension} in
-        bdsm|extension)
+        bdsm|extension|.*)
           true # Ignore for now.
           ;;
         *)
