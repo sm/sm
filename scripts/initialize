@@ -20,19 +20,21 @@ true \
   "${tmp_path:="${bdsm_path}/tmp"}" \
   "${bin_path:="${bdsm_path}/bin"}" \
   "${archives_path:="${bdsm_path}/archives"}" \
-  "${shared_path:=$project_path/shared}" \
-  "${previous_path:=$project_path/previous}" \
-  "${current_path:=$project_path/current}" \
-  "${stage_path:=$project_path/stage}" \ # This should be set in the deploy ext.
-  "${discarded_path:=$project_path/discard}" \
   "${remote:="origin"}" \
   "${branch:="master"}" \
   "${language:="bash"}" \
   "${user:=$USER}" \
   "${keep_releases:=4}" \
   "${hooks_flag:=1}" \
-  "${project_path:="$HOME"}" \
   "${PAGER:=cat -v}"
+
+true \
+  "${project_path:="$HOME"}" \
+  "${shared_path:=$project_path/shared}" \
+  "${previous_path:=$project_path/previous}" \
+  "${current_path:=$project_path/current}" \
+  "${stage_path:=$project_path/stage}" \ # This should be set in the deploy ext.
+  "${discarded_path:=$project_path/discard}" \
 
 export project_path shared previous_path current_path stage_path discarded_path
 
