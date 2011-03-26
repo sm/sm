@@ -18,7 +18,7 @@ source_files()
   local file
 
   for file in "$@" ; do
-    file=${file/\~\//$HOME\/} # Expand ~/
+    file=${file/\~\//$HOME\/} # Expand ~/ to full value of $HOME
 
     if [[ -s "${file}" ]] ; then
       source "${file}"
@@ -34,9 +34,42 @@ source_files()
   return 0
 }
 
+# safely source the first file found
+nonempty_files()
+{
+  local file
+
+  for file in "${@}" ; do
+    if [[ -s "$file" ]] ; then
+      printf "$file"
+    fi
+  done
+
+  return 0
+}
+
+first()
+{
+  printf "$1"
+
+  return 0
+}
+
+ensure_paths_exist()
+{
+  local _path
+
+  for _path in "$@" ; do
+    if [[ -d "${_path}" ]] ; then
+      mkdir -p "${_path}"
+    fi
+  done
+}
+
 match()
 {
   local value="$1" regex="$2"
+
   shopt -s extglob
 
   case "$value" in
@@ -44,4 +77,13 @@ match()
     *)      return 1 ;;
   esac
 }
+
+# Source bdsmrc files, cascaded.
+bdsmrc()
+{
+  source_files "/etc/bdsmrc" "$HOME/.bdsmrc"
+}
+
+[[ ${trace_flag:-0} -eq 1 ]] && set -o xtrace
+[[ ${debug_flag:-0} -eq 1 ]] && set -o verbose
 

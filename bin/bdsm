@@ -3,9 +3,6 @@
 # Author: Wayne E. Seguin
 # See bdsm LICENSE file for license information.
 
-#
-# Setup
-#
 shopt -s extglob # Extended globs
 
 # Load System Configuration, if it exists.
@@ -158,7 +155,9 @@ elif [[ -n "$extension" && -n "$action" ]] ; then
     cd "$extensions_path/$extension" > /dev/null 2>&1
 
     action_file="$extensions_path/$extension/bin/$action"
-    case "$(file "$action_file")" in
+    action_file_type="$(file "$action_file")"
+
+    case "$action_file_type" in
       *sh script*|*POSIX shell*|*Bourne-Again*)
         action_type="bash"
         ;;
@@ -196,7 +195,7 @@ elif [[ -n "$extension" && -n "$action" ]] ; then
     case "${action_type}" in
       bash)
         (
-        source_files "${scripts_path}/bash/functions"
+        source_files "${scripts_path}/bash/bdsm"
         source "$action_file"
         )
         ;;
