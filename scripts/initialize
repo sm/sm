@@ -85,6 +85,15 @@ result=0
 # In case bdsm is being called from within a hook for example, we unset these:
 unset extension action
 
+if [[ ${trace_flag:-0} -eq 1 ]] ; then
+  export trace_flag
+  set -o xtrace
+elif [[ ${debug_flag:-0} -eq 1 ]] ; then
+  export debug_flag
+  set -o verbose
+fi
+
+
 export vcs project database_name old_releases bdsm_path current_path discarded_path previous_path project_path shared_path archives_path bin_path bindir branch config_path extensions_path framework hooks_flag keep_releases prefix remote result scripts_path src_path tmp_path templates_path timestamp user
 
 timestamp="$(date +%m.%d.%Y-%H:%M:%S)"

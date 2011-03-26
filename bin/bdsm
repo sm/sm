@@ -124,18 +124,6 @@ done
 #
 # Main Logic
 #
-if [[ ${trace_flag:-0} -eq 1 ]] ; then
-
-  export trace_flag
-  set -o xtrace
-
-elif [[ ${debug_flag:-0} -eq 1 ]] ; then
-
-  export debug_flag
-  set -o verbose
-
-fi
-
 if [[ "version" = "$action" ]] ; then
   version
 elif [[ -n "$extension" && -n "$action" ]] ; then
@@ -150,7 +138,7 @@ elif [[ -n "$extension" && -n "$action" ]] ; then
     paths=$(env | awk -F= -v ORS=' ' '/_path/{print $1}')
     flags=$(env | awk -F= -v ORS=' ' '/_flag/{print $1}')
 
-    export action args bdsm_path bindir database debug_flag environment error_message extension extension_bin_path extension_config_path extension_path extension_scripts_path extension_templates_path flags head_flag hooks_flag parse_break paths prefix project project_path repository result revision scripts_path trace_flag user
+    export extension action args bdsm_path bindir database debug_flag environment error_message extension_bin_path extension_config_path extension_path extension_scripts_path extension_templates_path flags head_flag hooks_flag parse_break paths prefix project project_path repository result revision scripts_path trace_flag user
 
     cd "$extensions_path/$extension" > /dev/null 2>&1
 
