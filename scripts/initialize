@@ -28,18 +28,17 @@ true \
   "${hooks_flag:=1}" \
   "${PAGER:=cat -v}"
 
-true \
-  "${project_path:="$HOME"}" \
-  "${shared_path:=$project_path/shared}" \
-  "${previous_path:=$project_path/previous}" \
-  "${current_path:=$project_path/current}" \
-  "${stage_path:=$project_path/stage}" \ # This should be set in the deploy ext.
-  "${discarded_path:=$project_path/discard}" \
-
-export project_path shared previous_path current_path stage_path discarded_path
-
 # TODO: Move this code to a 'project' initializer:
-if [[ $UID -gt 0 ]] ; then
+if [[ $UID -ne 0 ]] ; then
+  true \
+    "${project_path:="$HOME"}" \
+    "${shared_path:=$project_path/shared}" \
+    "${previous_path:=$project_path/previous}" \
+    "${current_path:=$project_path/current}" \
+    "${stage_path:=$project_path/stage}" \ # This should be set in the deploy ext.
+    "${discarded_path:=$project_path/discard}" \
+
+  export project_path shared previous_path current_path stage_path discarded_path
 
   if [[ -z "$project" ]] ; then
     # TODO: Improve this vv
