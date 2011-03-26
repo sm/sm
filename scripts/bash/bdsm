@@ -89,6 +89,21 @@ bdsmrc()
   source_files "/etc/bdsmrc" "$HOME/.bdsmrc"
 }
 
+init_scripts_path()
+{
+  if [[ $UID -eq 0 ]] ; then
+    if [[ -d /etc/init.d ]] ; then
+      printf "/etc/init.d"
+    elif [[ -d /etc/rc.d ]] ; then
+      printf "/etc/rc.d"
+    else
+      fail "Unknown init scripts directory (/etc/init.d or /etc/rc.d not found)."
+    fi
+  else
+    printf "$HOME/.init.d/"
+  fi
+}
+
 [[ ${trace_flag:-0} -eq 1 ]] && set -o xtrace
 [[ ${debug_flag:-0} -eq 1 ]] && set -o verbose
 
