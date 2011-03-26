@@ -3,8 +3,7 @@
 [[ -s "/etc/bdsmrc" ]]  && . "/etc/bdsmrc"
 [[ -s "$HOME/.bdsmrc" ]] && . "$HOME/.bdsmrc"
 
-true "${prefix:=/usr/local}"
-true "${bindir:=/usr/local/bin}"
+true "${prefix:=/usr/local}" "${bindir:=/usr/local/bin}"
 
 if [[ "$prefix" = "$HOME" ]] ; then
   true "${bdsm_path:="${prefix}bdsm"}"
@@ -18,23 +17,22 @@ true \
   "${templates_path:="${bdsm_path}/templates"}" \
   "${config_path:="${bdsm_path}/config"}" \
   "${src_path:="${bdsm_path}/src"}" \
+  "${tmp_path:="${bdsm_path}/tmp"}" \
   "${bin_path:="${bdsm_path}/bin"}" \
   "${archives_path:="${bdsm_path}/archives"}" \
-  "${remote:="origin"}" \
-  "${branch:="master"}" \
-  "${framework:="rails"}" \
-  "${user:=$USER}" \
-  "${keep_releases:=4}" \
-  "${hooks_flag:=1}" \
-  "${project_path:=$HOME}" \
   "${shared_path:=$project_path/shared}" \
   "${previous_path:=$project_path/previous}" \
   "${current_path:=$project_path/current}" \
-  "${stage_path:=$project_path/stage}" \
+  "${stage_path:=$project_path/stage}" \ # This should be set in the deploy ext.
   "${discarded_path:=$project_path/discard}" \
+  "${remote:="origin"}" \
+  "${branch:="master"}" \
+  "${language:="bash"}" \
+  "${user:=$USER}" \
+  "${keep_releases:=4}" \
+  "${hooks_flag:=1}" \
+  "${project_path:="$HOME"}" \
   "${PAGER:=cat -v}"
-
-timestamp="$(date +%m.%d.%Y-%H:%M:%S)"
 
 export project_path shared previous_path current_path stage_path discarded_path
 
@@ -66,21 +64,30 @@ if [[ $UID -gt 0 ]] ; then
         vcs="svn"
       elif [[ -d "$shared_path/$project/.hg" ]] ; then
         vcs="hg"
+        # TODO:
+        # elif [[ ... ]] ; then
+        # vcs="fossil"
       else
         vcs="git" # default
       fi
     fi
 
-    [[ -s ".${project}rc" ]] && . ".${project}rc"
+    source_files ".${project}rc"
   fi
 fi
+
+true \
+  "${releases_url:=$(db "$config_path/bdsm" "releases_url")}" \
+  "${extension_url:=$(db "$config_path/bdsm" "extension_url")}"
+
+result=0
 
 # In case bdsm is being called from within a hook for example, we unset these:
 unset extension action
 
-export vcs project database_name old_releases bdsm_path current_path discarded_path previous_path project_path shared_path archives_path bin_path bindir branch config_path extensions_path framework hooks_flag keep_releases prefix remote result scripts_path src_path templates_path timestamp user
+export vcs project database_name old_releases bdsm_path current_path discarded_path previous_path project_path shared_path archives_path bin_path bindir branch config_path extensions_path framework hooks_flag keep_releases prefix remote result scripts_path src_path tmp_path templates_path timestamp user
 
-result=0
+timestamp="$(date +%m.%d.%Y-%H:%M:%S)"
 
-trap 'rm -rf "/tmp/bdsm/$$" >/dev/null 2>&1' 0 1 2 3 15
+trap "[[ -e ${tmp_path}/$$ ]] && rm -rf '${tmp_path}/$$' >/dev/null 2>&1" 0 1 2 3 15
 

@@ -5,6 +5,11 @@ log()  {
   return $?
 }
 
+succeed() {
+  log "\n$*\n"
+  exit 0
+}
+
 fail() {
   log "\nERROR: $*\n"
   exit 1

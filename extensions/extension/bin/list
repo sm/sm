@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 
-source "$scripts_path/initialize"
-
-shopt -s extglob
-
 list_help()
 {
   printf "

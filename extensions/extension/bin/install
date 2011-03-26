@@ -1,25 +1,8 @@
 #!/usr/bin/env bash
 
-if [[ "$trace_flag" -eq 1 ]] ; then set -x ; fi
+[[ -n "$extensions" ]] || fail "At least onte extension must be specified."
 
-result=0 ; extensions="$1" ; shift
-releases_url="${releases_url:-$($scripts_path/db "$config_path/bdsm" "releases_url")}"
-extension_url="${extension_url:-$($scripts_path/db "$config_path/bdsm" "extension_url")}"
-if [[ -z "$extensions" ]] ; then
-  "$scripts_path"/log "error" "A extension must be specified." ; exit 1
-fi
-# TODO: Should we allow user installs?...
-if [[ "root" != "user" ]] ; then
-  "$scripts_path"/log "error" "extensions must be installed as root." ; exit 1
-fi
-
-if [[ ! -d "$src_path/extensions/" ]] ; then
-  mkdir -p "$src_path/extensions/"
-fi
-
-if [[ ! -d "$archives_path/" ]] ; then
-  mkdir -p "$archives_path/"
-fi
+ensure_paths_exist "$src_path/extensions/" "$archives_path/"
 
 # bdsm extension --url=http://bdsm.beginrescueend.com/extensions/<name>-<version>.tar.gz install
 # bdsm extension --url=git://github.com/... install
@@ -28,36 +11,30 @@ fi
 
 for extension in ${extensions//,/ } ; do
 
-  if [[ ! -z "$head_flag" ]] ; then
+  if [[ ${head_flag:=0} -eq 1 ]] ; then
 
     if [[ ! -d "$src_path/$extension/.git" ]] ; then
-
       "$scripts_path"/log "info" "Updating $extension repository."
       cd "$src_path/$extension"/.git
       # TODO: Branch update logic.
       git pull origin "${branch:-master}"
-
     else
 
       "$scripts_path"/log "info" "Cloning $extension repository from $extension_repo_url."
       cd "$src_path/$extension/"
       # TODO: git/hg/svn url detection, git for now
       git clone "$extension_repo_url"
-
     fi
 
   else
-
     rm -rf "$src_path/bdsm/latest"
     mkdir -p "$src_path/bdsm/latest"
     curl -O "$releases_url" | tar xf - -C "$src_path/bdsm/latest"
     # TODO: error check and exit on error.
     cd "$src_path/bdsm/latest"/bdsm-*
     ./install
-
   fi
 
 done
 
 exit $result
-

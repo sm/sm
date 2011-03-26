@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
-log()  { printf "$*\n" ; return $? ;  }
+[[ "$trace_flag" -eq 1 ]] && set -o xtrace
 
-fail() { log "\nERROR: $*\n" ; exit 1 ; }
+result=0
+extensions="$*" ; shift
 
+true \
+  "${releases_url:=$(db "$config_path/bdsm" "releases_url")}"\
+  "${extension_url:=$(db "$config_path/bdsm" "extension_url")}"

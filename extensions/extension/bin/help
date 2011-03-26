@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+usage()
+{
+  printf "
+Usage:
+
+
+"
+}
