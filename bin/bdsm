@@ -196,7 +196,7 @@ elif [[ -n "$extension" && -n "$action" ]] ; then
     case "${action_type}" in
       bash)
         (
-        source "${scripts_path}/bash/functions"
+        source_files "${scripts_path}/bash/functions"
         source "$action_file"
         )
         ;;
