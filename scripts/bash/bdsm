@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+log()  {
+  printf "$*\n"
+  return $?
+}
+
+fail() {
+  log "\nERROR: $*\n"
+  exit 1
+}
+
+# Safely source files and notify the user if they do not exist.
+# Recommended to put in /etc/bash.bashrc or ~/.bashrc and be sure
+# it is sourced from ~/.bash_profile
+source_files()
+{
+  local file
+
+  for file in "$@" ; do
+    file=${file/\~\//$HOME\/} # Expand ~/
+
+    if [[ -s "${file}" ]] ; then
+      source "${file}"
+    else
+      if [[ ! -e "${file}" ]] ; then
+        printf "NOTICE: ${file} does not exist, not loading.\n"
+      else
+        true # simply an empty file, no warning necessary.
+      fi
+    fi
+  done
+
+  return 0
+}
+
+match()
+{
+  local value="$1" regex="$2"
+  shopt -s extglob
+
+  case "$value" in
+    $regex) return 0 ;;
+    *)      return 1 ;;
+  esac
+}
+

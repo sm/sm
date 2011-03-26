@@ -6,6 +6,7 @@
 #
 # Setup
 #
+shopt -s extglob # Extended globs
 
 # Load System Configuration, if it exists.
 [[ -s "/etc/bdsmrc" ]] && . /etc/bdsmrc
@@ -19,38 +20,23 @@ prefix="${prefix:-/usr/local}"
 bindir="${bindir:-/usr/local/bin}"
 
 if [[ "$prefix" = "$HOME" ]] ; then
-  bdsm_path="${bdsm_path:-"${prefix}bdsm"}"
+  true "${bdsm_path:="${prefix}bdsm"}"
 else
-  bdsm_path="${bdsm_path:-"${prefix}/bdsm"}"
+  true "${bdsm_path:="${prefix}/bdsm"}"
 fi
 
 export scripts_path="${scripts_path:-"${bdsm_path}/scripts"}"
 
-# Initialize BDSM framework and variables.
-. "$scripts_path/initialize"
+# Load BDSM bash helper functions
+source "${scripts_path}/bash/bdsm"
 
-# Load BDSM framework functions.
-. "${scripts_path}/functions"
+# Initialize BDSM framework and variables and functions.
+source_files "${scripts_path}/initialize" "${scripts_path}/functions"
 
 # Load the BDSM framework version.
 [[ -s "$bdsm_path/VERSION" ]] && VERSION="$(cat "$bdsm_path/VERSION")"
 
-version()
-{
-  printf "\n%s\n\n" \
-    "bdsm ${VERSION:-"vX.X.X"} http://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)"
-}
-
-usage()
-{
-  version
-
-  "$extensions_path"/bdsm/bin/help usage | less
-}
-
 user="$USER"
-
-# TODO: set log location based on root or user calling
 
 #
 # parse args
@@ -73,7 +59,7 @@ while [[ $# -gt 0 ]] ; do
 
     bdsmrc)
       extension="bdsm"
-      action=$token
+      action="$token"
       parse_break=1
     ;;
 
@@ -85,14 +71,12 @@ while [[ $# -gt 0 ]] ; do
       fi
     ;;
 
-    extend|extension)  extension="extension"           ;;
+    exten*)            extension="extension"           ;;
     --disable-hooks)   hooks_flag=0                    ;;
     --project)         project="$1"            ; shift ;;
     --environment)     environment="$1"        ; shift ;;
     --repo|repository) repository="$1"         ; shift ;;
     --revision)        revision="$1"           ; shift ;;
-    --database)        database="$1"           ; shift ;;
-    --appserver)       appserver="$1"          ; shift ;;
     --user)            user="$1"               ; shift ;;
     --head)            head_flag=1                     ;;
     --debug)           debug_flag=1                    ;;
@@ -105,60 +89,40 @@ while [[ $# -gt 0 ]] ; do
     *)
       #if $scripts_path/match "$token" $extensions ; then
       if [[ -z "$extension" ]] ; then
-
         if [[ -d "$extensions_path/$token" ]] ; then
-
           extension="$token"
-
         else
-
           extension="${extension:-bdsm}"
-
         fi
-
       fi
 
       if [[ -z "$action" ]] ; then
-
         if [[ -x "$extensions_path/$extension/bin/$token" ]] ; then
-
           action="$token"
-
           parse_break=1
-
         fi
-
       elif [[ -d "/data/$token" ]] ; then
-
         project="$token"
-
         project_path="/data/$token"
-
       elif [[ -d "/home/$token" ]] ; then
-
         project="$token"
-
         project_path="/home/$token"
-
       else
-
         # determine sanity of project
         action="error"
-
         error_message="Unrecognized command line argument(s): '$token $@'"
-
       fi
-
     ;;
   esac
 
-  if [[ -n "$parse_break" || ! -z "$error_message" ]] ; then
-    unset parse_break ; break
+  if [[ -n "$parse_break" || -n "$error_message" ]] ; then
+    unset parse_break
+    break
   fi
 
 done
 
-if [[ -n "$error_message" ]] ; then exit 1 ; fi
+[[ -n "$error_message" ]] && fail "$error_message"
 
 #
 # Main Logic
@@ -176,13 +140,10 @@ elif [[ ${debug_flag:-0} -eq 1 ]] ; then
 fi
 
 if [[ "version" = "$action" ]] ; then
-
   version
-
-elif [[ ! -z "$extension" ]] && [[ ! -z "$action" ]] ; then
+elif [[ -n "$extension" && -n "$action" ]] ; then
 
   if [[ -s "$extensions_path/$extension/bin/$action" ]] ; then
-
     extension_path="$extensions_path/$extension"
     extension_config_path="$extensions_path/$extension/config"
     extension_templates_path="$extensions_path/$extension/templates"
@@ -192,47 +153,78 @@ elif [[ ! -z "$extension" ]] && [[ ! -z "$action" ]] ; then
     paths=$(env | awk -F= -v ORS=' ' '/_path/{print $1}')
     flags=$(env | awk -F= -v ORS=' ' '/_flag/{print $1}')
 
-    export action appserver args bdsm_path bindir database debug_flag environment error_message extension extension_bin_path extension_config_path extension_path extension_scripts_path extension_templates_path flags head_flag hooks_flag parse_break paths prefix project project_path repository result revision scripts_path trace_flag user
+    export action args bdsm_path bindir database debug_flag environment error_message extension extension_bin_path extension_config_path extension_path extension_scripts_path extension_templates_path flags head_flag hooks_flag parse_break paths prefix project project_path repository result revision scripts_path trace_flag user
 
     cd "$extensions_path/$extension" > /dev/null 2>&1
 
-    #
-    # TODO: allow output control.
-    #
-    #if [[ -z "$verbose_flag" ]] ; then
-    "$extensions_path/$extension/bin/$action" $* ; result=$?
-    #else
-    # "$extensions_path/$extension/bin/$action" $* >> $log 2>> ${log/%log/error.log}
-    #fi
+    action_file="$extensions_path/$extension/bin/$action"
+    case "$(file "$action_file")" in
+      *sh script*|*POSIX shell*|*Bourne-Again*)
+        action_type="bash"
+        ;;
 
-    if [[ ${verbose_flag:-0} -eq 1 ]]; then
+      *ASCII*)
+        # Launch with helper functions, if possible.
+        extension="${action_file//.}"
+        case "${extension}" in
+          bash|sh) action_type="bash" ;;
+          #rb) action_type="ruby"   ;;
+          *)
+            if [[ -x "${action_file}" ]] ; then
+              action_type="binary"
+            else
+              action_type="not executable"
+            fi
+            ;;
+        esac
+        result=$?
+        ;;
 
-      if [[ "$result" -gt 0 ]] ; then
+      cannot open)
+        action_type="dne"
+        ;;
 
-        "$scripts_path/log" "error" \
-          "'$action $*' returned error\n\n"
+      *)
+        if [[ -x "${action_file}" ]] ; then
+          action_type="binary"
+        else
+          action_type="noexec"
+        fi
+        ;;
+    esac
 
-      else
-
-        "$scripts_path/log" "info" \
-          "'$action $*' returned success\n\n"
-
-      fi
-
-    fi
-
+    case "${action_type}" in
+      bash)
+        (
+        source "${scripts_path}/bash/functions"
+        source "$action_file"
+        )
+        ;;
+      # ruby|python|lua|javascript)
+      #   # ADD "${scripts_path}/${action_type}/" to the lib path so the script can require "bdsm"
+      #  "${action_file}"
+      #  ;;
+      dne|noexec)
+        fail "processing ${action} failed, does not exist or is not executable."
+        ;;
+      binary|*)
+        "${action_file}"
+        ;;
+    esac
   fi
-
 elif [[ -n "$extension" ]] ; then
-
   echo $(actions_for_extension $extension)
-
 else
-
   usage
-
 fi
-
 result=$?
+
+if [[ ${verbose_flag:-0} -eq 1 ]]; then
+  if [[ ${result} -gt 0 ]] ; then
+    log "'$action $*' returned error ($result)\n\n"
+  else
+    log "'$action $*' returned success ($result)\n\n"
+  fi
+fi
 
 exit $result

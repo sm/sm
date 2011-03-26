@@ -1,7 +1,21 @@
 #!/usr/bin/env bash
 
 actions_for_extension() {
-  if [[ ! -z "$1" ]] ; then
+  if [[ -n "${1:-}" ]] ; then
     echo "bdsm $1: {$(ls -p $extensions_path/$1/ | awk '/[^\/]$/' | tr "\n" ' ' | sed 's/\s\+/, /g' | sed 's/,\s*$//')}"
   fi
 }
+
+version()
+{
+  printf "\n%s\n\n" \
+    "bdsm ${VERSION:-"?.?.?"} http://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)"
+}
+
+usage()
+{
+  version
+
+  "${extensions_path}/bdsm/bin/help" usage | ${PAGER}
+}
+

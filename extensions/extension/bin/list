@@ -39,7 +39,6 @@ list_installed()
 
 list_available()
 {
-
   if [[ -d "/usr/local/src/bdsm-extensions" ]] ; then
     extensions=$(find "/usr/local/src/bdsm-extensions" -mindepth 1 -maxdepth 1 -type d)
 

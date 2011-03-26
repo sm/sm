@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+log()  { printf "$*\n" ; return $? ;  }
+
+fail() { log "\nERROR: $*\n" ; exit 1 ; }
+
