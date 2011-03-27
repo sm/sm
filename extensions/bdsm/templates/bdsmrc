@@ -36,7 +36,7 @@ branch="master"
 # If you wanted to run BDSM out of a user directory you can put the paths
 #   in the users ~/.bdsmrc file like so:
 #
-# binpath=$HOME/bin
-# prefix=$HOME/.bdsm
-# bdsm_path="$HOME/.bdsm"
+# prefix=/opt/local
+# # bin_path=$prefix/bin
+# # bdsm_path="$prefix/bdsm"
 
