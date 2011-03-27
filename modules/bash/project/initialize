@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+#
+# BDSM project module initialization
+#
+# When run as root, we must ensure that project and project_path are set.
+if [[ $UID -eq 0 ]] ; then
+  ensure_set \
+    "project" \
+    "project_path"
+fi
+
+true \
+  "${project:="$USER"}" \
+  "${project_path:="$HOME"}" \
+  "${shared_path:=${project_path}/shared}" \
+  "${release_path:=${project_path}/current}" \
+  "${vcs:=$(vcs "${shared_path}/${project}")}"
+
+export project project_path shared previous_path release_path stage_path
+
+database_name="${database_name:-"${project}_${environment}"}"
+
+source_files ".${project}rc"

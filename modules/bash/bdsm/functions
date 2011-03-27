@@ -1,0 +1,239 @@
+#!/usr/bin/env bash
+
+bdsm_path()
+{
+  if [[ $UID -eq 0 ]] ; then
+    true "${prefix:=/usr/local}"
+    true "${bin_path:=$prefix/bin}"
+  else
+    true "${prefix:=$HOME}"
+    true "${bin_path:=$prefix/bin}"
+  fi
+
+  if [[ "$prefix" = "$HOME" ]] ; then
+    true "${bdsm_path:="${prefix}bdsm"}"
+  else
+    true "${bdsm_path:="${prefix}/bdsm"}"
+  fi
+}
+
+bdsm_exports()
+{
+  # In case bdsm is being called from within a hook for example, we unset these:
+  unset extension action
+
+  # TODO: Filter this list of exports down.
+  export project database_name old_releases bdsm_path current_path previous_path project_path shared_path archives_path bin_path bin_path branch config_path extensions_path framework hooks_flag keep_releases prefix remote result scripts_path src_path tmp_path templates_path timestamp user
+}
+
+bdsm_set_trap()
+{
+  trap "[[ -e ${tmp_path}/$$ ]] && rm -rf '${tmp_path}/$$' >/dev/null 2>&1" 0 1 2 3 15
+}
+
+modules()
+{
+  local _module _bdsm _extension _path
+
+  for _module in "$@" ; do
+    _bdsm="${scripts_path}/bash/${_module}"
+    _extension="${extension_scripts_path}/bash/${_module}"
+
+    for _path in "${_bdsm}" "${_extension}" ; do
+      for file in "functions" "initialize" ; do
+        if [[ -s "${_path}/${_file}" ]] ; then
+          source "${_path}/${_file}"
+        fi
+      done
+    done
+  done
+}
+
+actions_for_extension() {
+  if [[ -n "${1:-}" ]] ; then
+    echo "bdsm $1: {$(ls -p $extensions_path/$1/ | awk '/[^\/]$/' | tr "\n" ' ' | sed 's/\s\+/, /g' | sed 's/,\s*$//')}"
+  fi
+}
+
+version()
+{
+  log "\nbdsm ${VERSION:-"?.?.?"} http://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)\n"
+}
+
+usage()
+{
+  version
+
+  "${extensions_path}/bdsm/bin/help" usage | ${PAGER}
+}
+
+fetch()
+{
+  if fetch_command=$(which curl) ; then
+    fetch_command="$fetch_command -O -L --create-dirs -C - " # -s for silent
+  else
+    fail "bdsm requires curl, which was not found in the PATH :(\nPlease install curl and try again."
+  fi
+
+  (
+  cd "$archives_path"
+
+  [[ -n "${1}" ]] || fail "BUG: $0 called without an argument :/"
+
+  archive=$(basename "$1")
+  download=1
+
+  debug "Fetching $archive"
+
+  # Check first if we have the correct archive
+  if [[ -e "$archive" && -e "$archive.md5" ]] ; then
+    debug "Found archive and its md5, testing correctness"
+
+    if [[ $(md5sum --status -c "$archive.md5") -gt 0 ]] ; then
+      debug "Archive is bad, downloading"
+      download=1
+    else
+      debug "Archive is good, not downloading"
+      download=0
+      result=0
+    fi
+  else
+    debug "No archive or no MD5, downloading"
+    download=1
+  fi
+
+  if [[ $download -gt 0 ]] ; then
+    if ! eval $fetch_command "$1" ; then
+      retry=0
+      if [[ $result -eq 78 ]] ; then
+        error "The requested url does not exist: '$1'"
+      elif [[ $result -eq 18 ]] ; then
+        error "Only a part of the file was transferred. Removing and re-trying."
+        rm -f "$archive"
+        retry=1
+      elif [[ $result -eq 33 ]] ; then
+        debug "Server does not support 'range' command, removing '$archive'"
+        rm -f "$archive"
+        retry=1
+      else
+        error "There was an error, please check $log_path/*.error.log"
+      fi
+
+      if [[ $retry -eq 1 ]] ; then
+        if ! eval $fetch_command "$1" ; then
+          error "There was an error, please check $log_path/*.error.log"
+        fi
+      fi
+    fi
+  fi
+  )
+
+  return $0
+}
+
+fetch_version()
+{
+  version=$(curl -B "${releases_url}/latest-version.txt" 2>/dev/null)
+}
+
+fetch_md5()
+{
+  md5=$(curl -B "${releases_url}/bdsm-${version}.tar.gz.md5" 2>/dev/null)
+}
+
+md5_match()
+{
+  local archive="$1"
+
+  case "$(uname)" in
+    Darwin|FreeBSD)
+      archive_md5="$(/sbin/md5 -q "${archive}")"
+      ;;
+
+    OpenBSD)
+      archive_md5="$(/bin/md5 -q "${archive}")"
+      ;;
+
+    Linux|*)
+      archive_md5="$(md5sum "${archive}" | awk '{print $1}')"
+      ;;
+  esac
+
+  [[ "$archive_md5" == "$md5" ]]
+
+  return $?
+}
+
+install_release()
+{
+  archive="$archives_path/bdsm-${version}.tar.gz"
+
+  fetch_md5
+
+  if [[ -s $archive ]] && ! md5_match ; then
+    # Remove old installs, if they exist and have incorrect md5.
+    [[ -f "$archives_path/bdsm-${version}.tar.gz" ]] &&
+      rm -f "$archives_path/bdsm-${version}.tar.gz"
+  fi
+
+  curl -L "${releases_url}/bdsm-${version}.tar.gz" -o "$archive"
+
+  if ! md5_match "$archive" ; then
+    fail "ERROR:
+
+Archive package downloaded does not match it's calculated md5 checksum ${md5}:
+
+  $archives_path/bdsm-${version}.tar.gz
+
+Retry the installation and/or check your networking setup.
+
+Halting installation.
+"
+  fi
+
+  tar zxf "${archives_path}/bdsm-${version}.tar.gz" -C "$src_path/"
+
+  cd "$src_path/bdsm-${version}"
+}
+
+install_head()
+{
+  local remote="origin"
+
+  if [[ -d "${src_path}/bdsm/.git" ]] ; then
+    builtin cd "${src_path}/bdsm/"
+
+    if [[ -z "$(git branch | awk "/$branch$/")" ]] ; then
+      if ! git checkout -b "$branch" --track "$remote/$branch" 2>/dev/null ; then
+        fail "$remote $branch remote branch not found."
+      fi
+    elif [[ -z "$(git branch | awk "/\* $branch$/{print \$2}")" ]] ; then
+      if ! git checkout $branch 2>/dev/null ; then
+        fail "Unable to checkout $branch."
+      fi
+    fi
+
+    git pull --rebase origin $branch
+  else
+    builtin cd "${src_path}"
+
+    if ! git clone --depth 1 git://github.com/wayneeseguin/bdsm.git ; then
+      if !  git clone https://github.com/wayneeseguin/bdsm.git ; then
+        fail "Unable to clone the BDSM repository, attempted both git:// and https://"
+      fi
+    fi
+  fi
+
+  builtin cd "${src_path}/bdsm/"
+
+  return 0
+}
+
+# Source bdsmrc files, cascaded.
+bdsmrc()
+{
+  source_files \
+    "/etc/bdsmrc" \
+    "$HOME/.bdsmrc"
+}
+

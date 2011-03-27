@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+shopt -s extglob # Extended globs must always be on for BDSM.
+
+bdsm_path
+
+true \
+  "${scripts_path:="${bdsm_path}/scripts"}" \
+  "${extensions_path:="${bdsm_path}/extensions"}" \
+  "${templates_path:="${bdsm_path}/templates"}" \
+  "${config_path:="${bdsm_path}/config"}" \
+  "${src_path:="${bdsm_path}/src"}" \
+  "${extensions_src_path:="${src_path}/extensions"}" \
+  "${tmp_path:="${bdsm_path}/tmp"}" \
+  "${bin_path:="${bdsm_path}/bin"}" \
+  "${archives_path:="${bdsm_path}/archives"}" \
+  "${remote:="origin"}" \
+  "${branch:="master"}" \
+  "${language:="bash"}" \
+  "${user:=$USER}" \
+  "${keep_releases:=4}" \
+  "${hooks_flag:=1}" \
+  "${PAGER:=cat -v}" \
+
+true \
+  "${releases_url:=$(hash_file "$config_path/bdsm" "releases_url")}" \
+  "${extensions_url:=$(hash_file "$config_path/bdsm" "extensions_url")}"\
+
+bdsm_exports
+
+timestamp="$(date +%m.%d.%Y-%H:%M:%S)"
+
+bdsmrc # Load bdsmrc files.
+
+# Modules that should be available to *all* bdsm extensions.
+modules trace logging variables
+
+bdsm_set_trap
+

@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+#
+# BDSM trace module initialization
+#
+
+set -o errtrace
+
+export PS4='+[${BASH_SOURCE}] : ${LINENO} : ${FUNCNAME[0]:+${FUNCNAME[0]}() $ }'
+
+if [[ ${trace_flag:-0} -eq 1 ]] ; then
+  export trace_flag
+  set -o xtrace
+elif [[ ${debug_flag:-0} -eq 1 ]] ; then
+  export debug_flag
+  set -o verbose
+fi
+

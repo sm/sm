@@ -12,7 +12,7 @@
 # The default prefix is /usr/local,
 # this should be set to where BDSM is installed to in /etc/bdsmrc
 prefix="${prefix:-/usr/local}"
-bindir="${bindir:-/usr/local/bin}"
+bin_path="${bin_path:-/usr/local/bin}"
 
 if [[ "$prefix" = "$HOME" ]] ; then
   true "${bdsm_path:="${prefix}bdsm"}"
@@ -22,13 +22,9 @@ fi
 
 export scripts_path="${scripts_path:-"${bdsm_path}/scripts"}"
 
-# Load BDSM bash DSL functions to use for BDSM core itself.
-source "${scripts_path}/bash/bdsm"
-
-# Initialize BDSM framework and variables and functions.
-source_files \
-  "${scripts_path}/functions"\
-  "${scripts_path}/initialize"
+# Load BDSM bash DSL functions and initialize for BDSM core itself manually.
+source "${scripts_path}/modules/bash/bdsm/functions"
+source "${scripts_path}/modules/bash/bdsm/initialize"
 
 # Load the BDSM framework version.
 [[ -s "$bdsm_path/VERSION" ]] && VERSION="$(cat "$bdsm_path/VERSION")"
@@ -140,7 +136,7 @@ elif [[ -n "$extension" && -n "$action" ]] ; then
     paths=$(env | awk -F= -v ORS=' ' '/_path/{print $1}')
     flags=$(env | awk -F= -v ORS=' ' '/_flag/{print $1}')
 
-    export extension action extension_args bdsm_path bindir database debug_flag environment error_message extension_bin_path extension_config_path extension_path extension_scripts_path extension_templates_path flags head_flag hooks_flag parse_break paths prefix project project_path repository result revision scripts_path trace_flag user extension_action
+    export extension action extension_args bdsm_path bin_path database debug_flag environment error_message extension_bin_path extension_config_path extension_path extension_scripts_path extension_templates_path flags head_flag hooks_flag parse_break paths prefix project project_path repository result revision scripts_path trace_flag user extension_action
 
     cd "$extensions_path/$extension" > /dev/null 2>&1
 

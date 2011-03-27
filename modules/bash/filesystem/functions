@@ -1,0 +1,221 @@
+#!/usr/bin/env bash
+
+#
+# BDSM filesystem module DSL functions
+#
+
+# Safely source files and notify the user if they do not exist.
+# Recommended to put in /etc/bash.bashrc or ~/.bashrc and be sure
+# it is sourced from ~/.bash_profile
+source_files()
+{
+  local _file
+
+  for _file in "$@" ; do
+    _file=${_file/\~\//$HOME\/} # Expand ~/ to full value of $HOME
+
+    if [[ -s "${_file}" ]] ; then
+      source "${_file}"
+    else
+      if [[ -e "${_file}" ]] ; then
+        true # simply an empty file, no warning necessary.
+      else
+        printf "NOTICE: ${_file} does not exist, not loading.\n"
+      fi
+    fi
+  done
+}
+
+# safely source the first file found
+nonempty_files()
+{
+  local _file
+
+  for _file in "${@}" ; do
+    [[ -s "$_file" ]] && printf "$_file"
+  done
+}
+
+ensure_paths_exist()
+{
+  local _path
+  for _path in "$@" ; do
+    [[ -d "${_path}" ]] || mkdir -p "${_path}"
+  done
+}
+
+remove_files()
+{
+  local _file
+
+  for _file in "$@" ; do
+    if [[ -f "${_file}" || -L "${_file}" ]] ; then
+      rm -f "${_file}"
+    elif [[ -d "${_file}" ]] ; then
+      error "${_file} is a directory! "
+    elif [[ -e "${_directory}" ]] ; then
+      error "Unknown entry at ${_directory}, cannot remove."
+    else
+      true # already gone
+    fi
+  done
+}
+
+remove_directories()
+{
+  local _directory
+
+  for _directory in "$@" ; do
+    if [[ -f "${_directory}" ]] ; then
+      error "${_directory} is a file! "
+    elif [[ -L "${_directory}" ]] ; then
+      error "${_directory} is a symlink! "
+    elif [[ -d "${_directory}" ]] ; then
+      rm -rf "${_directory}"
+    elif [[ -e "${_directory}" ]] ; then
+      error "Unknown entry at ${_directory}, cannot remove."
+    else
+      true # already gone
+    fi
+  done
+}
+
+ensure_files_exist()
+{
+  local _file
+
+  for _file in "$@" ; do
+    [[ -e "${_file}" ]] || touch "${_file}"
+  done
+}
+
+ensure_files_are_executable()
+{
+  local _file="$1"
+
+  ensure_files_exist "${_file}"
+
+  if [[ -d "${_file}" ]] ; then
+    fail "Cannot make ${_file} executable, it is a directory."
+  else
+    chmod +x "${_file}"
+  fi
+}
+
+#
+# Link files
+#
+# The following usages are equivalent
+#
+# link from /home/user/.vim/vimrc to /home/user/.vimrc
+# link /home/user/.vim/vimrc to /home/user/.vimrc
+# link /home/user/.vim/vimrc /home/user/.vimrc
+#
+link()
+{
+  local _source _target
+
+  while [[ $# -gt 0 ]] ; do
+    case "${1}" in
+      to|from)
+        shift
+        ;;
+
+      *)
+        if [[ -z "${_source}" ]] ; then
+          _source="$1" ; shift
+        elif [[ -z "${_target}" ]] ; then
+          _target="$1" ; shift
+          break # When we have a target we are done.
+          # An alternative idea would be to allow an array of multiple targets
+          # to symlink to...
+        fi
+        ;;
+    esac
+  done
+
+  # TODO: What should we do if files already exist?
+  if [[ -f "${_target}" ]] ; then
+    error "Cannot link ${_source} to ${_target} exists and is a file!"
+  elif [[ -d "${_target}" ]] ; then
+    error "Cannot link ${_source} to ${_target} exists and is a directory"
+  else
+    ln -fs "${_source}" "${_target}"
+  fi
+}
+
+copy_files_to()
+{
+  local _path="$1" _file ; shift
+  ensure_paths_exist "${_path}"
+  for _file in "$@" ; do
+    [[ -s "${_file}" ]] && cp "${_file}" "${_path}/${_file}"
+  done
+}
+
+copy_directories_to()
+{
+  local _path="${1}" _directory ; shift
+  ensure_paths_exist "${_path}"
+  for _directory in "$@" ; do
+    rsync -a "${_directory}/" "${_path}/${_directory}/"
+  done
+}
+
+move_files_to()
+{
+  local _path="$1" _file ; shift
+  ensure_paths_exist "${_path}"
+  for _file in "$@" ; do
+    [[ -f "${_file}" ]] && mv "${_file}" "${_path}/${_file}"
+  done
+}
+
+chown_paths()
+{
+  local _idenity="$1" _path; shift
+  for _path in "${@}" ; do
+    chown -R ${_idenity} "${_path}"
+  done
+}
+
+enter()
+{
+  local _path="$1"
+  if ! builtin cd "${_path}" ; then
+    fail "Could not enter directory ${_path}."
+  fi
+  return 0
+}
+
+hash_file()
+{
+  [[ -f "$1" ]] || fail "db() => Usage: $0 database key [value]"
+
+  database_file="$1" ; shift
+  key="$1"           ; shift
+
+  ensure_paths_exist $(dirname $database_file)
+  ensure_files_exist "$database_file"
+
+  [[ -n "$key" ]] || fail "usage: $0 database key [value]"
+
+  value="$*"
+  case "$value" in
+    unset|delete)
+      sed -i.tmp "s#^$key=.*\$##" $database_file
+      ;;
+    *)
+      if [[ -z "$value" ]] ; then # get
+        awk -F= '/^'"${key}"'=/{print $2}' "$database_file"
+      else # set
+        if ! awk -F= "/^'"$key"'=/{print $2}" "$database_file" >/dev/null 2>&1; then
+          echo "$key=$value" >> $database_file
+        else # overwrite
+          sed -i.tmp "s#^$key=.*\$#$key=$value#" "$database_file"
+        fi
+      fi
+      ;;
+  esac
+}
+

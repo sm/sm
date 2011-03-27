@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+#
+# BDSM project module DSL functions
+#
+vcs()
+{
+  local _path="$1"
+  (
+  if [[ -d "${_path}/.git" ]] ; then
+    vcs="git"
+  elif [[ -d "${_path}/.svn" ]] ; then
+    vcs="svn"
+  elif [[ -d "${_path}/.hg" ]] ; then
+    vcs="hg"
+    # TODO:
+    # elif [[ ... ]] ; then
+    # vcs="fossil"
+  else
+    vcs="git" # default
+  fi
+  )
+}
+

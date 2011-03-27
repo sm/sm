@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+#
+# BDSM logging module DSL functions
+#
+log()
+{
+  printf "$*\n"
+  return $?
+}
+
+error()
+{
+  printf "\nERROR: $*\n"
+}
+
+warn()
+{
+  printf "\nWARNING: $*\n"
+}
+
+debug()
+{
+  [[ ${debug_flag:-0} -eq 1 ]] && printf "DEBUG: $*\n"
+}
+
+succeed() {
+  log "\n$*\n" ; exit 0
+}
+
+fail() {
+  error "$*" ; exit 1
+}
+
