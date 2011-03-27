@@ -23,7 +23,9 @@ true "${modules_path:="${bdsm_path}/modules"}"
 source "./modules/bash/bdsm/functions"
 source "./modules/bash/bdsm/initialize"
 
-modules filesystem
+# filesystem DSL
+source "./modules/bash/filesystem/functions"
+source "./modules/bash/filesystem/initialize"
 
 directories=(bin modules config extensions)
 
