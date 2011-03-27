@@ -20,11 +20,11 @@ else
   true "${bdsm_path:="${prefix}/bdsm"}"
 fi
 
-export modules_path="${modules_path:-"${bdsm_path}/modules"}"
+true "${modules_path:="${bdsm_path}/modules"}"
 
 # Load BDSM bash DSL functions and initialize for BDSM core itself manually.
-source "${modules_path}/modules/bash/bdsm/functions"
-source "${modules_path}/modules/bash/bdsm/initialize"
+source "${modules_path}/bash/bdsm/functions"
+source "${modules_path}/bash/bdsm/initialize"
 
 # Load the BDSM framework version.
 [[ -s "$bdsm_path/VERSION" ]] && VERSION="$(cat "$bdsm_path/VERSION")"
