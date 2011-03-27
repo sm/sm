@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Author: Wayne E. Seguin
-# See bdsm LICENSE file for license information.
+# See BDSM LICENSE file for Apache 2.0 license information.
 
 # Load System Configuration, if it exists.
 [[ -s "/etc/bdsmrc" ]] && . /etc/bdsmrc

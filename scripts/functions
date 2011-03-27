@@ -180,3 +180,11 @@ install_head()
   return 0
 }
 
+# Source bdsmrc files, cascaded.
+bdsmrc()
+{
+  source_files \
+    "/etc/bdsmrc" \
+    "$HOME/.bdsmrc"
+}
+

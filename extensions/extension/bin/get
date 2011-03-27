@@ -1,15 +1,5 @@
 #!/usr/bin/env bash
 
-cd "${extensions_src_path}"
-
-true \
-  ${remote:="origin"} \
-  ${branch:="master"} \
-  "${extensions_repository_url:=$(hash_file "$config_path/bdsm" "extensions_repository_url")}" \
-  ${releases_url:=$(hash_file "${config_path}/bdsm" "releases_url")}
-
-#!/usr/bin/env bash
-
 source_files \
   "$scripts_path/base" \
   "$scripts_path/version"
@@ -33,9 +23,9 @@ get_latest()
 
   ensure_paths_exist "$src_path/"
 
-  # NOTE: This is the content as in binscripts/rvm-update-latest
+  # NOTE: This is the content as in binscripts/bdsm-update-latest
 
-  stable_version=$(curl -B $version_url 2>/dev/null)
+  version=$(curl -B $version_url 2>/dev/null)
 
   get_version $stable_version
 }
@@ -44,13 +34,13 @@ get_version()
 {
   version="$1"
 
-  md5=$(curl -B http://rvm.beginrescueend.com/releases/rvm-${version}.tar.gz.md5 2>/dev/null)
+  md5=$(curl -B http://bdsm.beginrescueend.com/releases/bdsm-${version}.tar.gz.md5 2>/dev/null)
 
-  echo "rvm-${version}"
+  echo "bdsm-${version}"
 
-  archive="$archives_path/rvm-${version}.tar.gz"
+  archive="$archives_path/bdsm-${version}.tar.gz"
 
-  curl -L "http://rvm.beginrescueend.com/releases/rvm-${version}.tar.gz" \
+  curl -L "http://bdsm.beginrescueend.com/releases/bdsm-${version}.tar.gz" \
     -o "$archive"
   case "$(uname)" in
     Darwin|FreeBSD)
@@ -66,121 +56,51 @@ get_version()
 
   if [[ "$archive_md5" != "$md5" ]]; then
     printf "ERROR:
-    Archive package rvm-${version}.tar.gz downloaded does not match it's md5 checksum ${md5}.
-    Aborting RVM Installation.
+    Archive package bdsm-${version}.tar.gz downloaded does not match it's md5 checksum ${md5}.
+    Aborting BDSM Installation.
   "
     exit 1
   fi
 
-  tar zxf "${path}/archives/rvm-${version}.tar.gz" -C "$rvm_extensions_src_path/"
+  tar zxf "${path}/archives/bdsm-${version}.tar.gz" -C "$extensions_src_path/"
 
   (
-    cd "$extensions_src_path/rvm-${version}"
+    cd "$src_path/bdsm-${version}"
 
-    chmod +x ./scripts/install
+    chmod +x ./install
 
-    ./scripts/install
+    ./install
   )
 
-  log "\nInstalled RVM version:"
-  ( source $scripts_path/rvm ; rvm --version )
+  log "\nInstalled BDSM version:"
+  ( source $scripts_path/bdsm ; bdsm --version )
 
   hook="after_update"
 
   source "$scripts_path/hook"
-}
-
-get_head()
-{
-  log "\nOriginal installed RVM version:"
-
-  __version
-
-  (
-    if [[ ! -d "${extensions_src_path}" ]] ; then
-      \mkdir -p "${extensions_src_path}"
-    fi
-
-    builtin cd "${extensions_src_path}"
-
-    if [[ -d "${extensions_src_path}/rvm/.git" ]] ; then
-
-      builtin cd "${extensions_src_path}/rvm/" && \
-        git pull origin master && \
-        ./scripts/install
-
-    else
-
-      builtin cd "${extensions_src_path}" && \
-        ( git clone --depth 1 git://github.com/wayneeseguin/rvm.git || \
-          git clone https://github.com/wayneeseguin/rvm.git ) && \
-        builtin cd rvm/ && ./scripts/install
-    fi
-  )
-
-  log "\nInstalled RVM HEAD version:"
-  ( source $scripts_path/rvm ; rvm --version )
-
-  hook="after_update"
-
-  source "$scripts_path/hook"
-
-  return 0
 }
 
 get_branch()
 {
-  log "\nOriginal installed RVM version:"
-
-  __version
-
   (
-    if [[ ! -d "${extensions_src_path}" ]] ; then
-      \mkdir -p "${extensions_src_path}"
-    fi
-
-    builtin cd "${extensions_src_path}"
-
-    if [[ -d "${extensions_src_path}/rvm/.git" ]] ; then
-      builtin cd "${extensions_src_path}/rvm/" && \
-        git pull origin master && \
-        ./scripts/install
+    if [[ -d "${extensions_src_path}/bdsm/.git" ]] ; then
+      enter "${extensions_src_path}/bdsm/"
+      git fetch ${remote}
+      git pull --rebase --force ${remote} ${branch}
     else
-      builtin cd "${extensions_src_path}" && \
-        (
+      (
       git clone --depth 1 ${extensions_repository_url} || \
-          git clone https://github.com/wayneeseguin/rvm.git
-      ) && \
-        builtin cd rvm/ && ./scripts/install
+        git clone ${extensions_repository_url/git:\/\//https://}
+      )
+
+      enter "bdsm"
     fi
+    chmod +x ./install
+    ./install
   )
-
-  log "\nInstalled RVM HEAD version:"
-  ( source $scripts_path/rvm ; rvm --version )
-
-  hook="after_update"
-
-  source "$scripts_path/hook"
-
-  return 0
-
 }
 
-args=($*)
-action="${args[$__array_start]}"
-args[$__array_start]=""
-args=(${args[@]})
-
-case "$action" in
-
-  latest)
-    get_latest
-    ;;
-
-  head|master)
-    get_head
-    ;;
-
+case "$extension_action" in
   [0-9]*.[0-9]*.[0-9]*)
     get_version "$action"
     ;;
@@ -190,8 +110,12 @@ case "$action" in
     true
     ;;
 
-  *)
-    false
+  head|master)
+    get_branch
+    ;;
+
+  latest|*)
+    get_latest
     ;;
 esac
 

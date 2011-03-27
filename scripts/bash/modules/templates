@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+#
+# BDSM templating DSL Module
+#
+
+install_template()
+{
+  local _name _target _source
+
+  while [[ $# -gt 0 ]] ; do
+    case "${1}" in
+      to)
+        shift ; _target="$1" ; shift
+        ;;
+      from)
+        shift ; _source="$1" ; shift
+        ;;
+
+      *)
+        if [[ -z "${_name}" ]] ; then
+          _name="$1" ; shift
+        elif [[ -z "${_target}" ]] ; then
+          _target="$1" ; shift
+          break # When we have a target we are done.
+          # An alternative idea would be to allow an array of multiple targets
+          # to symlink to...
+        fi
+        ;;
+    esac
+  done
+
+  local _template="${extension_templates_path}/${_template}.template"
+
+  ensure_paths_exist "$(dirname "${_target}")"
+
+  if [[ -f "${_template}" ]] ; then
+    if [[ -d "${_target}" ]] ; then
+      fail "${_target} is a directory, cannot install template ${_name}"
+    else
+      cp -f "${_template}" "${_target}"
+    fi
+  else
+    fail "Template missing: #{_template}"
+  fi
+}
+
