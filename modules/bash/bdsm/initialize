@@ -26,10 +26,10 @@ bdsm_exports
 
 timestamp="$(date +%m.%d.%Y-%H:%M:%S)"
 
-bdsmrc # Load bdsmrc files.
-
 # Modules that should be available to *all* bdsm extensions.
-modules trace logging variables
+modules trace logging variables filesystem
+
+bdsmrc # Load bdsmrc files.
 
 bdsm_set_trap
 
