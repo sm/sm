@@ -249,7 +249,8 @@ install_head()
 # Source bdsmrc files, cascaded.
 bdsmrc()
 {
-  [[ -s "/etc/bdsmrc" ]] && source "/etc/bdsmrc"
-  [[ -s "$HOME/.bdsmrc" ]] && source "$HOME/.bdsmrc"
+  source_files \
+    source "/etc/bdsmrc" \
+    source "$HOME/.bdsmrc"
 }
 

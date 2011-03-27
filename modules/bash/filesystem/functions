@@ -13,16 +13,7 @@ source_files()
 
   for _file in "$@" ; do
     _file=${_file/\~\//$HOME\/} # Expand ~/ to full value of $HOME
-
-    if [[ -s "${_file}" ]] ; then
-      source "${_file}"
-    else
-      if [[ -e "${_file}" ]] ; then
-        true # simply an empty file, no warning necessary.
-      else
-        printf "NOTICE: ${_file} does not exist, not loading.\n"
-      fi
-    fi
+    [[ -s "${_file}" ]] && source "${_file}"
   done
 }
 
