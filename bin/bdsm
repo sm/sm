@@ -24,7 +24,7 @@ fi
 
 export scripts_path="${scripts_path:-"${bdsm_path}/scripts"}"
 
-# Load BDSM bash helper functions
+# Load BDSM bash DSL functions to use for BDSM core itself.
 source "${scripts_path}/bash/bdsm"
 
 # Initialize BDSM framework and variables and functions.

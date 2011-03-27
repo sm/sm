@@ -260,6 +260,37 @@ install_template()
   fi
 }
 
+hash_file()
+{
+  [[ -f "$1" ]] || fail "db() => Usage: $0 database key [value]"
+
+  database_file="$1" ; shift
+  key="$1"           ; shift
+
+  ensure_paths_exist $(dirname $database_file)
+  ensure_files_exist "$database_file"
+
+  [[ -n "$key" ]] || fail "usage: $0 database key [value]"
+
+  value="$*"
+  case "$value" in
+    unset|delete)
+      sed -i.tmp "s#^$key=.*\$##" $database_file
+      ;;
+    *)
+      if [[ -z "$value" ]] ; then # get
+        awk -F= '/^'"${key}"'=/{print $2}' "$database_file"
+      else # set
+        if ! awk -F= "/^'"$key"'=/{print $2}" "$database_file" >/dev/null 2>&1; then
+          echo "$key=$value" >> $database_file
+        else # overwrite
+          sed -i.tmp "s#^$key=.*\$#$key=$value#" "$database_file"
+        fi
+      fi
+      ;;
+  esac
+}
+
 [[ ${trace_flag:-0} -eq 1 ]] && set -o xtrace
 [[ ${debug_flag:-0} -eq 1 ]] && set -o verbose
 
