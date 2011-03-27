@@ -1,18 +1,18 @@
 #!/bin/bash
 
+source ./scripts/bash/bdsm
+
 hosts="$*"
-if [[ -z "$hosts" ]] ; then
-  echo "hosts must be specified."
-  exit 1
-fi
+[[ -n "$hosts" ]] || fail "hosts must be specified."
 
-set -x
+set -o xtrace
 
-for host in $hosts ; do
-
+for host in ${hosts} ; do
   echo "Syncing to $host"
 
-  rsync -avgz --delete --exclude ".git" --exclude "site/" --exclude "test/" --exclude "logo/" --exclude "gems/" --exclude "release/" --exclude "releases/" ./ $host:/usr/local/src/bdsm/ &&
-  ssh $host 'cd /usr/local/src/bdsm && ./install'
+  rsync -avgz --delete \
+    --exclude ".git" --exclude "site/" --exclude "test/" --exclude "logo/" \
+    --exclude "gems/" --exclude "release/" --exclude "releases/" \
+    ./ $host:/usr/local/src/bdsm/ &&
+    ssh $host 'cd /usr/local/src/bdsm && ./install'
 done
-exit $?

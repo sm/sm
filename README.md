@@ -1,18 +1,18 @@
-= About
+# About
 
 Bash Deployment & Server Manager (BDSM) is a scripting framework.
 
-= Goal
+# Goal
 
 The goal is to create a framework for maintaining and sharing server side
 scripts while exposing them through a consistent command line interface (CLI).
 
-= Architecture
+# Architecture
 
-BDSM itself is the core framework. Users may write / install 'extensions'
+BDSM itself is a scripting framework. Users may write and/or install 'extensions'
 (think plugins) to the core framework in order to add CLI functionality to BDSM.
 
-= Creating Extensions
+# Creating Extensions
 
 There are only a few requirements for the 'extensions'. The extension must be a
 directory. Within this directory are (at least) the subdirectory bin/ with at
@@ -25,8 +25,9 @@ README file in which you should explain about the extension.
 The contents of the bin directory can be *any* execuatble file.  This means for
 example that C compiled binaries, Ruby Scripts, python, lua, etc... may all be
 used according to requrements and/or user preferences.  Of course the extensions
-which *I* write will likely be in bash ;)
-
+which *I* write will likely be in bash ;) Additionally if you write your
+extensions in bash a nice DSL is automatically loaded for you. Read more
+about the DSL in the online documentation.
 
   ~Wayne
 

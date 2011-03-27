@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+#
+# This file contains the functions that compries the BDSM framework DSL.
+#
 log()
 {
   printf "$*\n"
@@ -16,14 +19,17 @@ warn()
   printf "\nWARNING: $*\n"
 }
 
+debug()
+{
+  [[ ${debug_flag:-0} -eq 1 ]] && printf "DEBUG: $*\n"
+}
+
 succeed() {
-  log "\n$*\n"
-  exit 0
+  log "\n$*\n" ; exit 0
 }
 
 fail() {
-  error "$*"
-  exit 1
+  error "$*" ; exit 1
 }
 
 # Safely source files and notify the user if they do not exist.
@@ -87,7 +93,9 @@ match()
 # Source bdsmrc files, cascaded.
 bdsmrc()
 {
-  source_files "/etc/bdsmrc" "$HOME/.bdsmrc"
+  source_files \
+    "/etc/bdsmrc" \
+    "$HOME/.bdsmrc"
 }
 
 init_scripts_path()
@@ -123,6 +131,7 @@ remove_files()
 ensure_files_exist()
 {
   local _file
+
   for _file in "$@" ; do
     [[ -e "${_file}" ]] || touch "${_file}"
   done
