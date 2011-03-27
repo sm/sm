@@ -131,6 +131,7 @@ if [[ "version" = "$action" ]] ; then
 elif [[ -n "$extension" && -n "$action" ]] ; then
 
   if [[ -s "$extensions_path/$extension/bin/$action" ]] ; then
+    extension_action="$1" ; shift
     extension_path="$extensions_path/$extension"
     extension_config_path="$extensions_path/$extension/config"
     extension_templates_path="$extensions_path/$extension/templates"
