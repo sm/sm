@@ -1,23 +1,34 @@
 #!/usr/bin/env bash
 
-if [[ "$1" = "--trace" ]] ; then set -x ; fi
+source ./scripts/bash/bdsm
 
-source ./scripts/initialize
-source ./scripts/functions
+source_files \
+  scripts/initialize \
+  scripts/functions
 
-for dir in bin scripts config extensions ; do
-  mkdir -p "${bdsm_path}/${dir}"
-  rsync -agz ./$dir/ "${bdsm_path}"/$dir/
-done
+directories=$(bin scripts config extensions)
 
-for file in LICENCE VERSION README ; do
-  if [[ -s $file ]] ; then
-    cp $file "${bdsm_path}/"
-  fi
-done
+(
+  cd "${bdsm_path}"
+  ensure_paths_exist "${directories[@]}"
+)
 
-touch $config_path/user
+copy_directories_to "${bdsm_path}" \
+  "${directories[@]}"
 
-rm -f "${prefix}/bin/bdsm"
-ln -nfs "${bin_path}/bdsm" "${prefix}/bin/bdsm"
+copy_files_to "${bdsm_path}/" \
+  LICENCE \
+  VERSION \
+  README
+
+ensure_files_exist \
+  "${config_path}/user" \
+  "${config_path}/db"
+
+remove_files \
+  "${prefix}/bin/bdsm"
+
+link \
+  "${bin_path}/bdsm" \
+  "${prefix}/bin/bdsm"
 

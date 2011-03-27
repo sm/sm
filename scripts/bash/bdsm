@@ -1,8 +1,19 @@
 #!/usr/bin/env bash
 
-log()  {
+log()
+{
   printf "$*\n"
   return $?
+}
+
+error()
+{
+  printf "\nERROR: $*\n"
+}
+
+warn()
+{
+  printf "\nWARNING: $*\n"
 }
 
 succeed() {
@@ -11,7 +22,7 @@ succeed() {
 }
 
 fail() {
-  log "\nERROR: $*\n"
+  error "$*"
   exit 1
 }
 
@@ -20,44 +31,36 @@ fail() {
 # it is sourced from ~/.bash_profile
 source_files()
 {
-  local file
+  local _file
 
-  for file in "$@" ; do
-    file=${file/\~\//$HOME\/} # Expand ~/ to full value of $HOME
+  for _file in "$@" ; do
+    _file=${_file/\~\//$HOME\/} # Expand ~/ to full value of $HOME
 
-    if [[ -s "${file}" ]] ; then
-      source "${file}"
+    if [[ -s "${_file}" ]] ; then
+      source "${_file}"
     else
-      if [[ ! -e "${file}" ]] ; then
-        printf "NOTICE: ${file} does not exist, not loading.\n"
-      else
+      if [[ -e "${_file}" ]] ; then
         true # simply an empty file, no warning necessary.
+      else
+        printf "NOTICE: ${_file} does not exist, not loading.\n"
       fi
     fi
   done
-
-  return 0
 }
 
 # safely source the first file found
 nonempty_files()
 {
-  local file
+  local _file
 
-  for file in "${@}" ; do
-    if [[ -s "$file" ]] ; then
-      printf "$file"
-    fi
+  for _file in "${@}" ; do
+    [[ -s "$_file" ]] && printf "$_file"
   done
-
-  return 0
 }
 
 first()
 {
   printf "$1"
-
-  return 0
 }
 
 ensure_paths_exist()
@@ -65,21 +68,19 @@ ensure_paths_exist()
   local _path
 
   for _path in "$@" ; do
-    if [[ -d "${_path}" ]] ; then
-      mkdir -p "${_path}"
-    fi
+    [[ -d "${_path}" ]] || mkdir -p "${_path}"
   done
 }
 
 match()
 {
-  local value="$1" regex="$2"
+  local _value="$1" _regex="$2"
 
   shopt -s extglob
 
-  case "$value" in
-    $regex) return 0 ;;
-    *)      return 1 ;;
+  case "${_value}" in
+    ${_regex}) return 0 ;;
+    *)        return 1 ;;
   esac
 }
 
@@ -92,9 +93,9 @@ bdsmrc()
 init_scripts_path()
 {
   if [[ $UID -eq 0 ]] ; then
-    if [[ -d /etc/init.d ]] ; then
+    if [[ -d "/etc/init.d" ]] ; then
       printf "/etc/init.d"
-    elif [[ -d /etc/rc.d ]] ; then
+    elif [[ -d "/etc/rc.d" ]] ; then
       printf "/etc/rc.d"
     else
       fail "Unknown init scripts directory (/etc/init.d or /etc/rc.d not found)."
@@ -102,6 +103,89 @@ init_scripts_path()
   else
     printf "$HOME/.init.d/"
   fi
+}
+
+remove_files()
+{
+  local _file
+
+  for _file in "$@" ; do
+    if [[ -f "${_file}" ]] ; then
+      rm -f "${_file}"
+    elif [[ -d "${_file}" ]] ; then
+      error "${_file} is a directory! "
+    elif [[ -L "${_file}" ]] ; then
+      error "${_file} is a symlink! "
+    fi
+  done
+}
+
+ensure_files_exist()
+{
+  local _file
+  for _file in "$@" ; do
+    [[ -e "${_file}" ]] || touch "${_file}"
+  done
+}
+
+#
+# Link files
+#
+# The following usages are equivalent
+#
+# link from /home/user/.vim/vimrc to /home/user/.vimrc
+# link /home/user/.vim/vimrc to /home/user/.vimrc
+# link /home/user/.vim/vimrc /home/user/.vimrc
+#
+link()
+{
+  local _source _target
+
+  while [[ $# -gt 0 ]] ; do
+    case "${1}" in
+      to|from)
+        shift
+        ;;
+
+      *)
+        if [[ -z "${_source}" ]] ; then
+          _source="$1" ; shift
+        elif [[ -z "${_target}" ]] ; then
+          _target="$1" ; shift
+          break # When we have a target we are done.
+          # An alternative idea would be to allow an array of multiple targets
+          # to symlink to...
+        fi
+        ;;
+    esac
+  done
+
+  # TODO: What should we do if files already exist?
+  if [[ -f "${_target}" ]] ; then
+    error "Cannot link ${_source} to ${_target} exists and is a file!"
+  elif [[ -d "${_target}" ]] ; then
+    error "Cannot link ${_source} to ${_target} exists and is a directory"
+  else
+    ln -fs "${_source}" "${_target}"
+  fi
+}
+
+copy_files_to()
+{
+  local _path="$1" _file
+
+  for _file in "$@" ; do
+    [[ -s "${_file}" ]] && cp $file "${_path}/"
+  done
+}
+
+copy_directories_to()
+{
+  local _path="${1}" _directory
+
+  for _directory in "$@" ; do
+    cp -Rf "${_directory}" "${_path}/${directory}/"
+  done
 }
 
 [[ ${trace_flag:-0} -eq 1 ]] && set -o xtrace
