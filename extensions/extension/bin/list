@@ -19,11 +19,16 @@ Actions:
 
 list_installed()
 {
-  extensions=$(find "$extensions_path" -mindepth 1 -maxdepth 1 -type d)
+  version_files=($(
+  find "${extensions_path}"/* -name 'VERSION' -mindepth 1 -maxdepth 1 -type f
+  ))
 
-  for extension in ${extensions} ; do
-    case ${extension} in
-      bdsm|extension|[[=.=]]*)
+  for version_file in ${version_files[@]} ; do
+    extension_source_path="${version_file/%\/VERSION}"
+    extension_name="${extension_source_path//*\/}"
+
+    case ${extension_name} in
+      bdsm|[[=.=]]*)
         true # Ignore for now.
         ;;
       *)
@@ -36,10 +41,17 @@ list_installed()
 list_available()
 {
   if [[ -d "/usr/local/src/bdsm-extensions" ]] ; then
-    extensions=$(find "/usr/local/src/bdsm-extensions" -mindepth 1 -maxdepth 1 -type d)
+    version_files=($(
+      find "${src_path}"/* -name 'VERSION' -mindepth 1 -maxdepth 1 -type f
+    ))
 
-    for extension in ${extensions} ; do
-      case ${extension} in
+    for version_file in ${version_files[@]} ; do
+      extension_source_path="${version_file/%\/VERSION}"
+      extension_name="${extension_source_path//*\/}"
+
+      [[ -s "$version_file" ]] || continue
+
+      case ${extension_name} in
         bdsm|extension|[[=.=]]*)
           true # Ignore for now.
           ;;
