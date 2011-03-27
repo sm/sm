@@ -16,7 +16,7 @@ directories=(bin scripts config extensions)
 copy_directories_to "${bdsm_path}" \
   "${directories[@]}"
 
-copy_files_to "${bdsm_path}/" \
+copy_files_to "${bdsm_path}" \
   LICENCE \
   VERSION \
   README
