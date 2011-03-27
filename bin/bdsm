@@ -178,6 +178,7 @@ elif [[ -n "$extension" && -n "$action" ]] ; then
         ;;
     esac
 
+
     case "${action_type}" in
       bash)
         run "${action_file}" "${extension_args}"

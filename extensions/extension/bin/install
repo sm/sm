@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-[[ -n "$extension" ]] || fail "At least onte extension must be specified."
-
 # bdsm extension install $extension --url=http://bdsm.beginrescueend.com/extensions/<name>-<version>.tar.gz install
 # bdsm extension install $extension --url=git://github.com/...
 
@@ -40,6 +38,8 @@ extend_from_tarball()
   cp -Rf "${extension_src_path}/${extension_name}-${extension_version}" "$bdsm_path/extensions/"
 
 }
+
+[[ $# -gt 1 ]] || fail "At least one extension must be specified."
 
 extension_src_path="${src_path}/extensions"
 ensure_paths_exist "$extension_src_path"
