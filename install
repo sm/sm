@@ -21,11 +21,12 @@ true "${modules_path:="${bdsm_path}/modules"}"
 
 # Load BDSM bash DSL functions and initialize for BDSM core itself manually.
 source "./modules/bash/bdsm/functions"
+# filesystem DSL
+source "./modules/bash/filesystem/initialize"
+source "./modules/bash/filesystem/functions"
+
 source "./modules/bash/bdsm/initialize"
 
-# filesystem DSL
-source "./modules/bash/filesystem/functions"
-source "./modules/bash/filesystem/initialize"
 
 directories=(bin modules config extensions)
 
