@@ -40,7 +40,7 @@ list_installed()
 
 list_available()
 {
-  if [[ -d "/usr/local/src/bdsm-extensions" ]] ; then
+  if [[ -d "${src_path}" ]] ; then
     version_files=($(
       find "${src_path}"/* -mindepth 1 -maxdepth 1 -name 'VERSION' -type f
     ))
@@ -61,7 +61,7 @@ list_available()
       esac
     done
   else
-    printf "No extensions found in /usr/local/src/bdsm-extensions/\n"
+    fail "No extensions found. ( ${src_path} )\n"
   fi
 }
 
