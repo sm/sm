@@ -187,7 +187,7 @@ elif [[ -n "$extension" && -n "$action" ]] ; then
         (
         source_files \
           "${scripts_path}/bash/bdsm" \
-          "${extension_scripts_path}/functions"
+          "${extension_scripts_path}/functions" \
           "${extension_scripts_path}/initialize"
 
         . "$action_file"
