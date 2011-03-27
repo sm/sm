@@ -3,8 +3,8 @@
 source ./scripts/bash/bdsm
 
 source_files \
-  scripts/initialize \
-  scripts/functions
+  scripts/functions \
+  scripts/initialize
 
 directories=$(bin scripts config extensions)
 
