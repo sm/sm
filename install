@@ -1,5 +1,24 @@
 #!/usr/bin/env bash
 
+# Load System Configuration, if it exists.
+[[ -s "/etc/bdsmrc" ]] && . /etc/bdsmrc
+
+# Load User Configuration, if it exists.
+[[ -s "$HOME/.bdsmrc" ]] && . "$HOME/.bdsmrc"
+
+# The default prefix is /usr/local,
+# this should be set to where BDSM is installed to in /etc/bdsmrc
+prefix="${prefix:-/usr/local}"
+bin_path="${bin_path:-/usr/local/bin}"
+
+if [[ "$prefix" = "$HOME" ]] ; then
+  true "${bdsm_path:="${prefix}bdsm"}"
+else
+  true "${bdsm_path:="${prefix}/bdsm"}"
+fi
+
+true "${modules_path:="${bdsm_path}/modules"}"
+
 # Load BDSM bash DSL functions and initialize for BDSM core itself manually.
 source "./modules/bash/bdsm/functions"
 source "./modules/bash/bdsm/initialize"

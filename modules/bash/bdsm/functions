@@ -33,14 +33,14 @@ bdsm_set_trap()
 
 modules()
 {
-  local _module _bdsm _extension _path
+  local _module _bdsm _extension _path _file
 
   for _module in "$@" ; do
     _bdsm="${modules_path}/bash/${_module}"
     _extension="${extension_modules_path}/bash/${_module}"
 
     for _path in "${_bdsm}" "${_extension}" ; do
-      for file in "functions" "initialize" ; do
+      for _file in "functions" "initialize" ; do
         if [[ -s "${_path}/${_file}" ]] ; then
           source "${_path}/${_file}"
         fi
