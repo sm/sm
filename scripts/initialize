@@ -7,7 +7,7 @@ shopt -s extglob # Extended globs
 
 set -o errtrace
 
-export PS4='+ ${BASH_SOURCE} : ${FUNCNAME[0]:+${FUNCNAME[0]}()} ${LINENO}>  '
+export PS4="+ \${BASH_SOURCE} : \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO}\n>  "
 
 true "${prefix:=/usr/local}" "${bindir:=/usr/local/bin}"
 

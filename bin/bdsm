@@ -3,8 +3,6 @@
 # Author: Wayne E. Seguin
 # See bdsm LICENSE file for license information.
 
-shopt -s extglob # Extended globs
-
 # Load System Configuration, if it exists.
 [[ -s "/etc/bdsmrc" ]] && . /etc/bdsmrc
 
