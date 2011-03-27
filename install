@@ -49,5 +49,5 @@ ensure_files_exist \
 remove_files \
   "${prefix}/bin/bdsm"
 
-link "${bin_path}/bdsm" to "${prefix}/bin/bdsm"
+link "${bdsm_path}/bin/bdsm" to "${bin_path}/bdsm"
 
