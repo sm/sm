@@ -187,8 +187,7 @@ link()
 
 copy_files_to()
 {
-  local _path="$1" _file
-
+  local _path="$1" _file ; shift
   for _file in "$@" ; do
     [[ -s "${_file}" ]] && cp $file "${_path}/"
   done
@@ -196,8 +195,7 @@ copy_files_to()
 
 copy_directories_to()
 {
-  local _path="${1}" _directory
-  shift
+  local _path="${1}" _directory ; shift
   for _directory in "$@" ; do
     cp -Rf "${_directory}" "${_path}/${_directory}/"
   done
@@ -205,8 +203,7 @@ copy_directories_to()
 
 move_files_to()
 {
-  local _path="$1" _file
-
+  local _path="$1" _file ; shift
   for _file in "$@" ; do
     [[ -f "${_file}" ]] && mv "${_file}" "${_path}/${_file}"
   done
@@ -214,9 +211,7 @@ move_files_to()
 
 chown_paths()
 {
-  local _idenity="$1" ; shift
-  local _path
-
+  local _idenity="$1" _path; shift
   for _path in "${@}" ; do
     chown -R ${_idenity} "${_path}"
   done
