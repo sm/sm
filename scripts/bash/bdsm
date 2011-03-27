@@ -188,6 +188,7 @@ link()
 copy_files_to()
 {
   local _path="$1" _file ; shift
+  ensure_paths_exist "${_path}"
   for _file in "$@" ; do
     [[ -s "${_file}" ]] && cp $file "${_path}/"
   done
@@ -196,6 +197,7 @@ copy_files_to()
 copy_directories_to()
 {
   local _path="${1}" _directory ; shift
+  ensure_paths_exist "${_path}"
   for _directory in "$@" ; do
     cp -Rf "${_directory}" "${_path}/${_directory}/"
   done
@@ -204,6 +206,7 @@ copy_directories_to()
 move_files_to()
 {
   local _path="$1" _file ; shift
+  ensure_paths_exist "${_path}"
   for _file in "$@" ; do
     [[ -f "${_file}" ]] && mv "${_file}" "${_path}/${_file}"
   done
