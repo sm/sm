@@ -32,7 +32,7 @@ list_installed()
         true # Ignore for now.
         ;;
       *)
-        printf "${extension//*\//}\n"
+        printf "${extension_name//*\//}\n"
         ;;
     esac
   done
@@ -56,7 +56,7 @@ list_available()
           true # Ignore for now.
           ;;
         *)
-          printf "${extension//*\//}\n"
+          printf "${extension_name//*\//}\n"
           ;;
       esac
     done

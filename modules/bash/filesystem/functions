@@ -10,7 +10,6 @@
 source_files()
 {
   local _file
-
   for _file in "$@" ; do
     _file=${_file/\~\//$HOME\/} # Expand ~/ to full value of $HOME
     [[ -s "${_file}" ]] && source "${_file}"
@@ -21,7 +20,6 @@ source_files()
 nonempty_files()
 {
   local _file
-
   for _file in "${@}" ; do
     [[ -s "$_file" ]] && printf "$_file"
   done
@@ -38,7 +36,6 @@ ensure_paths_exist()
 remove_files()
 {
   local _file
-
   for _file in "$@" ; do
     if [[ -f "${_file}" || -L "${_file}" ]] ; then
       rm -f "${_file}"
@@ -55,7 +52,6 @@ remove_files()
 remove_directories()
 {
   local _directory
-
   for _directory in "$@" ; do
     if [[ -f "${_directory}" ]] ; then
       error "${_directory} is a file! "
@@ -74,7 +70,6 @@ remove_directories()
 ensure_files_exist()
 {
   local _file
-
   for _file in "$@" ; do
     [[ -e "${_file}" ]] || touch "${_file}"
   done
@@ -83,9 +78,7 @@ ensure_files_exist()
 ensure_files_are_executable()
 {
   local _file="$1"
-
   ensure_files_exist "${_file}"
-
   if [[ -d "${_file}" ]] ; then
     fail "Cannot make ${_file} executable, it is a directory."
   else
@@ -105,7 +98,6 @@ ensure_files_are_executable()
 link()
 {
   local _source _target
-
   while [[ $# -gt 0 ]] ; do
     case "${1}" in
       to|from)
