@@ -6,7 +6,7 @@ source_files \
   scripts/functions \
   scripts/initialize
 
-directories=$(bin scripts config extensions)
+directories=(bin scripts config extensions)
 
 (
   cd "${bdsm_path}"
