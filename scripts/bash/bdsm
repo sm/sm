@@ -198,7 +198,7 @@ copy_directories_to()
   local _path="${1}" _directory ; shift
   ensure_paths_exist "${_path}"
   for _directory in "$@" ; do
-    cp -Rf "${_directory}" "${_path}/${_directory}/"
+    rsync -a "${_directory}/" "${_path}/${_directory}/"
   done
 }
 
