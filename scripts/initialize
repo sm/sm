@@ -2,7 +2,7 @@
 
 shopt -s extglob # Extended globs
 set -o errtrace
-export PS4="+ \${BASH_SOURCE} : \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO}\n>  "
+export PS4="+ \${BASH_SOURCE} : \${FUNCNAME[0]:+\${FUNCNAME[0]}()}\n    \${LINENO} > "
 
 [[ -s "/etc/bdsmrc" ]]  && . "/etc/bdsmrc"
 [[ -s "$HOME/.bdsmrc" ]] && . "$HOME/.bdsmrc"
