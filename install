@@ -2,6 +2,9 @@
 
 source ./scripts/bash/bdsm
 
+modules \
+  filesystem
+
 source_files \
   scripts/functions \
   scripts/initialize
@@ -28,7 +31,5 @@ ensure_files_exist \
 remove_files \
   "${prefix}/bin/bdsm"
 
-link \
-  "${bin_path}/bdsm" \
-  "${prefix}/bin/bdsm"
+link  "${bin_path}/bdsm" to "${prefix}/bin/bdsm"
 
