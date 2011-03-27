@@ -53,7 +53,7 @@ list_available()
   fi
 }
 
-case "$action" in
+case "$extension_action" in
   installed)
     list_installed
   ;;
