@@ -169,7 +169,7 @@ elif [[ -n "$extension" && -n "$action" ]] ; then
         result=$?
         ;;
 
-      cannot open)
+      cannot[[:space:]]open)
         action_type="dne"
         ;;
 
