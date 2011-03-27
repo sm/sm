@@ -4,7 +4,7 @@ shopt -s extglob # Extended globs
 
 set -o errtrace
 
-export PS4='+[${BASH_SOURCE}] : ${LINENO} : ${FUNCNAME[0]:+${FUNCNAME[0]}() $ }'
+export PS4='+[${BASH_SOURCE}] : ${FUNCNAME[0]:+${FUNCNAME[0]}() : ${LINENO} }'
 
 #
 # This file contains the functions that compries the BDSM framework DSL.
