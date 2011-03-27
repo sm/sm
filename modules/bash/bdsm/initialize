@@ -22,10 +22,6 @@ true \
   "${hooks_flag:=1}" \
   "${PAGER:=cat -v}" \
 
-true \
-  "${releases_url:=$(hash_file "$config_path/bdsm" "releases_url")}" \
-  "${extensions_url:=$(hash_file "$config_path/bdsm" "extensions_url")}"\
-
 bdsm_exports
 
 timestamp="$(date +%m.%d.%Y-%H:%M:%S)"

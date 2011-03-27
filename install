@@ -27,7 +27,6 @@ source "./modules/bash/filesystem/functions"
 
 source "./modules/bash/bdsm/initialize"
 
-
 directories=(bin modules config extensions)
 
 (
