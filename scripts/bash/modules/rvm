@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+#
+# BDSM RVM DSL module
+#
 source_files "/etc/rvmrc" "$HOME/.rvmrc"
 
 # Attempt to load RVM

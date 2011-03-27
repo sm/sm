@@ -8,10 +8,14 @@ shopt -s extglob # Extended globs must always be on for BDSM.
 
 modules()
 {
-  local _module
+  local _module _bdsm_module _extension_module
+
   for _module in "$@" ; do
-    [[ -s "${scripts_path}/bash/${_module}" ]] && \
-      source  "${scripts_path}/bash/${_module}"
+    _bdsm_module="${scripts_path}/bash/${_module}"
+    _extension_module="${extension_scripts_path}/bash/${_module}"
+
+    [[ -s "${_bdsm_module}" ]] && source  "${_bdsm_module}"
+    [[ -s "${_extension_module}" ]] && source "${_extension_module}"
   done
 }
 

@@ -33,54 +33,6 @@ true \
   "${hooks_flag:=1}" \
   "${PAGER:=cat -v}"
 
-# TODO: Move this code to a 'project' initializer:
-if [[ $UID -ne 0 ]] ; then
-  true \
-    "${project_path:="$HOME"}" \
-    "${shared_path:=$project_path/shared}" \
-    "${previous_path:=$project_path/previous}" \
-    "${current_path:=$project_path/current}" \
-    "${stage_path:=$project_path/stage}" \ # This should be set in the deploy ext.
-
-  export project_path shared previous_path current_path stage_path
-
-  if [[ -z "$project" ]] ; then
-    # TODO: Improve this vv
-    if [[ -d "$HOME/shared/$user" ]] ; then
-      export project="$user"
-    fi
-  fi
-
-  if [[ -d "$project_path/previous" ]] ; then
-    old_releases="$(
-    find "$project_path/previous/" -mindepth 1 -maxdepth 1 -type d |
-    sort -r | awk "NR > ${keep_releases:-3} { print \$0 }"
-    )"
-  fi
-
-  if [[ -n "$project" ]] ; then
-
-    database_name="${database_name:-"${project}_${environment}"}"
-
-    if [[ -z "$vcs" ]] ; then
-      if [[ -d "$shared_path/$project/.git" ]] ; then
-        vcs="git"
-      elif [[ -d "$shared_path/$project/.svn" ]] ; then
-        vcs="svn"
-      elif [[ -d "$shared_path/$project/.hg" ]] ; then
-        vcs="hg"
-        # TODO:
-        # elif [[ ... ]] ; then
-        # vcs="fossil"
-      else
-        vcs="git" # default
-      fi
-    fi
-
-    source_files ".${project}rc"
-  fi
-fi
-
 true \
   "${releases_url:=$(hash_file "$config_path/bdsm" "releases_url")}" \
   "${extensions_url:=$(hash_file "$config_path/bdsm" "extensions_url")}"\

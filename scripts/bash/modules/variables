@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+
+#
+# BDSM variable manipulation DSL module
+#
 first()
 {
   printf "$1"

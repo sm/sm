@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+#
+# BDSM system DSL module
+#
 init_scripts_path()
 {
   if [[ $UID -eq 0 ]] ; then
