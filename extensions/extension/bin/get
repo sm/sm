@@ -1,0 +1,198 @@
+#!/usr/bin/env bash
+
+cd "${extensions_src_path}"
+
+true \
+  ${remote:="origin"} \
+  ${branch:="master"} \
+  "${extensions_repository_url:=$(hash_file "$config_path/bdsm" "extensions_repository_url")}" \
+  ${releases_url:=$(hash_file "${config_path}/bdsm" "releases_url")}
+
+#!/usr/bin/env bash
+
+source_files \
+  "$scripts_path/base" \
+  "$scripts_path/version"
+
+get_help()
+{
+  cat -v "$help_path/get"
+}
+
+#
+# TODO: There is a lot of redundency in the get_X() functions, reduce it.
+#
+
+get_latest()
+{
+  local version_url stable_version archive
+
+  version_url="${releases_url}/version.txt"
+
+  stable_version=$(curl -s $version_url)
+
+  ensure_paths_exist "$src_path/"
+
+  # NOTE: This is the content as in binscripts/rvm-update-latest
+
+  stable_version=$(curl -B $version_url 2>/dev/null)
+
+  get_version $stable_version
+}
+
+get_version()
+{
+  version="$1"
+
+  md5=$(curl -B http://rvm.beginrescueend.com/releases/rvm-${version}.tar.gz.md5 2>/dev/null)
+
+  echo "rvm-${version}"
+
+  archive="$archives_path/rvm-${version}.tar.gz"
+
+  curl -L "http://rvm.beginrescueend.com/releases/rvm-${version}.tar.gz" \
+    -o "$archive"
+  case "$(uname)" in
+    Darwin|FreeBSD)
+      archive_md5="$(/sbin/md5 -q "${archive}")"
+      ;;
+    OpenBSD)
+      archive_md5="$(/bin/md5 -q "${archive}")"
+      ;;
+    Linux|*)
+      archive_md5="$(md5sum "${archive}" | awk '{print $1}')"
+      ;;
+  esac
+
+  if [[ "$archive_md5" != "$md5" ]]; then
+    printf "ERROR:
+    Archive package rvm-${version}.tar.gz downloaded does not match it's md5 checksum ${md5}.
+    Aborting RVM Installation.
+  "
+    exit 1
+  fi
+
+  tar zxf "${path}/archives/rvm-${version}.tar.gz" -C "$rvm_extensions_src_path/"
+
+  (
+    cd "$extensions_src_path/rvm-${version}"
+
+    chmod +x ./scripts/install
+
+    ./scripts/install
+  )
+
+  log "\nInstalled RVM version:"
+  ( source $scripts_path/rvm ; rvm --version )
+
+  hook="after_update"
+
+  source "$scripts_path/hook"
+}
+
+get_head()
+{
+  log "\nOriginal installed RVM version:"
+
+  __version
+
+  (
+    if [[ ! -d "${extensions_src_path}" ]] ; then
+      \mkdir -p "${extensions_src_path}"
+    fi
+
+    builtin cd "${extensions_src_path}"
+
+    if [[ -d "${extensions_src_path}/rvm/.git" ]] ; then
+
+      builtin cd "${extensions_src_path}/rvm/" && \
+        git pull origin master && \
+        ./scripts/install
+
+    else
+
+      builtin cd "${extensions_src_path}" && \
+        ( git clone --depth 1 git://github.com/wayneeseguin/rvm.git || \
+          git clone https://github.com/wayneeseguin/rvm.git ) && \
+        builtin cd rvm/ && ./scripts/install
+    fi
+  )
+
+  log "\nInstalled RVM HEAD version:"
+  ( source $scripts_path/rvm ; rvm --version )
+
+  hook="after_update"
+
+  source "$scripts_path/hook"
+
+  return 0
+}
+
+get_branch()
+{
+  log "\nOriginal installed RVM version:"
+
+  __version
+
+  (
+    if [[ ! -d "${extensions_src_path}" ]] ; then
+      \mkdir -p "${extensions_src_path}"
+    fi
+
+    builtin cd "${extensions_src_path}"
+
+    if [[ -d "${extensions_src_path}/rvm/.git" ]] ; then
+      builtin cd "${extensions_src_path}/rvm/" && \
+        git pull origin master && \
+        ./scripts/install
+    else
+      builtin cd "${extensions_src_path}" && \
+        (
+      git clone --depth 1 ${extensions_repository_url} || \
+          git clone https://github.com/wayneeseguin/rvm.git
+      ) && \
+        builtin cd rvm/ && ./scripts/install
+    fi
+  )
+
+  log "\nInstalled RVM HEAD version:"
+  ( source $scripts_path/rvm ; rvm --version )
+
+  hook="after_update"
+
+  source "$scripts_path/hook"
+
+  return 0
+
+}
+
+args=($*)
+action="${args[$__array_start]}"
+args[$__array_start]=""
+args=(${args[@]})
+
+case "$action" in
+
+  latest)
+    get_latest
+    ;;
+
+  head|master)
+    get_head
+    ;;
+
+  [0-9]*.[0-9]*.[0-9]*)
+    get_version "$action"
+    ;;
+
+  help)
+    get_help
+    true
+    ;;
+
+  *)
+    false
+    ;;
+esac
+
+exit $?

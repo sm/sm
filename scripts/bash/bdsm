@@ -77,6 +77,16 @@ ensure_paths_exist()
   done
 }
 
+ensure_set()
+{
+  local _variable
+  for _variable in "$@" ; do
+    if eval "[[ -z \"\${${_variable}}\" ]]" ; then
+      fail "${_variable} is required to be set however it is empty (set in bdsmrc)."
+    fi
+  done
+}
+
 match()
 {
   local _value="$1" _regex="$2"
@@ -117,12 +127,33 @@ remove_files()
   local _file
 
   for _file in "$@" ; do
-    if [[ -f "${_file}" ]] ; then
+    if [[ -f "${_file}" || -L "${_file}" ]] ; then
       rm -f "${_file}"
     elif [[ -d "${_file}" ]] ; then
       error "${_file} is a directory! "
-    elif [[ -L "${_file}" ]] ; then
-      error "${_file} is a symlink! "
+    elif [[ -e "${_directory}" ]] ; then
+      error "Unknown entry at ${_directory}, cannot remove."
+    else
+      true # already gone
+    fi
+  done
+}
+
+remove_directories()
+{
+  local _directory
+
+  for _directory in "$@" ; do
+    if [[ -f "${_directory}" ]] ; then
+      error "${_directory} is a file! "
+    elif [[ -L "${_directory}" ]] ; then
+      error "${_directory} is a symlink! "
+    elif [[ -d "${_directory}" ]] ; then
+      rm -rf "${_directory}"
+    elif [[ -e "${_directory}" ]] ; then
+      error "Unknown entry at ${_directory}, cannot remove."
+    else
+      true # already gone
     fi
   done
 }
@@ -283,6 +314,15 @@ hash_file()
       fi
       ;;
   esac
+}
+
+enter()
+{
+  local _path="$1"
+  if ! builtin cd "${_path}" ; then
+    fail "Could not enter directory ${_path}."
+  fi
+  return 0
 }
 
 shopt -s extglob # Extended globs

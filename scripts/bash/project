@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+# When run as root, we must ensure that project and project_path are set.
+if [[ $UID -eq 0 ]] ; then
+  ensure_set \
+    "project" \
+    "project_path"
+fi
+
+true \
+  "${project:="$USER"}" \
+  "${project_path:="$HOME"}" \
+  "${shared_path:=${project_path}/shared}" \
+  "${release_path:=${project_path}/current}"
+
+export project project_path shared previous_path release_path stage_path
+
+database_name="${database_name:-"${project}_${environment}"}"
+
+if [[ -z "$vcs" ]] ; then
+  if [[ -d "$shared_path/$project/.git" ]] ; then
+    vcs="git"
+  elif [[ -d "$shared_path/$project/.svn" ]] ; then
+    vcs="svn"
+  elif [[ -d "$shared_path/$project/.hg" ]] ; then
+    vcs="hg"
+    # TODO:
+    # elif [[ ... ]] ; then
+    # vcs="fossil"
+  else
+    vcs="git" # default
+  fi
+fi
+
+source_files ".${project}rc"

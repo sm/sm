@@ -1,87 +1,5 @@
 #!/usr/bin/env bash
 
-actions_for_extension() {
-  if [[ -n "${1:-}" ]] ; then
-    echo "bdsm $1: {$(ls -p $extensions_path/$1/ | awk '/[^\/]$/' | tr "\n" ' ' | sed 's/\s\+/, /g' | sed 's/,\s*$//')}"
-  fi
-}
-
-version()
-{
-  log "\nbdsm ${VERSION:-"?.?.?"} http://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)\n"
-}
-
-usage()
-{
-  version
-
-  "${extensions_path}/bdsm/bin/help" usage | ${PAGER}
-}
-
-fetch()
-{
-  if fetch_command=$(which curl) ; then
-    fetch_command="$fetch_command -O -L --create-dirs -C - " # -s for silent
-  else
-    fail "bdsm requires curl, which was not found in the PATH :(\nPlease install curl and try again."
-  fi
-
-  (
-  cd "$archives_path"
-
-  [[ -n "${1}" ]] || fail "BUG: $0 called without an argument :/"
-
-  archive=$(basename "$1")
-  download=1
-
-  debug "Fetching $archive"
-
-  # Check first if we have the correct archive
-  if [[ -e "$archive" && -e "$archive.md5" ]] ; then
-    debug "Found archive and its md5, testing correctness"
-
-    if [[ $(md5sum --status -c "$archive.md5") -gt 0 ]] ; then
-      debug "Archive is bad, downloading"
-      download=1
-    else
-      debug "Archive is good, not downloading"
-      download=0
-      result=0
-    fi
-  else
-    debug "No archive or no MD5, downloading"
-    download=1
-  fi
-
-  if [[ $download -gt 0 ]] ; then
-    if ! eval $fetch_command "$1" ; then
-      retry=0
-      if [[ $result -eq 78 ]] ; then
-        error "The requested url does not exist: '$1'"
-      elif [[ $result -eq 18 ]] ; then
-        error "Only a part of the file was transferred. Removing and re-trying."
-        rm -f "$archive"
-        retry=1
-      elif [[ $result -eq 33 ]] ; then
-        debug "Server does not support 'range' command, removing '$archive'"
-        rm -f "$archive"
-        retry=1
-      else
-        error "There was an error, please check $log_path/*.error.log"
-      fi
-
-      if [[ $retry -eq 1 ]] ; then
-        if ! eval $fetch_command "$1" ; then
-          error "There was an error, please check $log_path/*.error.log"
-        fi
-      fi
-    fi
-  fi
-  )
-
-  return $0
-}
-
 fetch_version()
 {
   version=$(curl -B "${releases_url}/latest-version.txt" 2>/dev/null)
@@ -179,4 +97,5 @@ install_head()
 
   return 0
 }
+
 

@@ -21,6 +21,7 @@ true \
   "${templates_path:="${bdsm_path}/templates"}" \
   "${config_path:="${bdsm_path}/config"}" \
   "${src_path:="${bdsm_path}/src"}" \
+  "${extensions_src_path:="${src_path}/extensions"}" \
   "${tmp_path:="${bdsm_path}/tmp"}" \
   "${bin_path:="${bdsm_path}/bin"}" \
   "${archives_path:="${bdsm_path}/archives"}" \
@@ -40,9 +41,8 @@ if [[ $UID -ne 0 ]] ; then
     "${previous_path:=$project_path/previous}" \
     "${current_path:=$project_path/current}" \
     "${stage_path:=$project_path/stage}" \ # This should be set in the deploy ext.
-    "${discarded_path:=$project_path/discard}" \
 
-  export project_path shared previous_path current_path stage_path discarded_path
+  export project_path shared previous_path current_path stage_path
 
   if [[ -z "$project" ]] ; then
     # TODO: Improve this vv
@@ -83,7 +83,7 @@ fi
 
 true \
   "${releases_url:=$(hash_file "$config_path/bdsm" "releases_url")}" \
-  "${extension_url:=$(hash_file "$config_path/bdsm" "extension_url")}"
+  "${extensions_url:=$(hash_file "$config_path/bdsm" "extensions_url")}"\
 
 result=0
 
@@ -98,7 +98,7 @@ elif [[ ${debug_flag:-0} -eq 1 ]] ; then
   set -o verbose
 fi
 
-export vcs project database_name old_releases bdsm_path current_path discarded_path previous_path project_path shared_path archives_path bin_path bindir branch config_path extensions_path framework hooks_flag keep_releases prefix remote result scripts_path src_path tmp_path templates_path timestamp user
+export vcs project database_name old_releases bdsm_path current_path previous_path project_path shared_path archives_path bin_path bindir branch config_path extensions_path framework hooks_flag keep_releases prefix remote result scripts_path src_path tmp_path templates_path timestamp user
 
 timestamp="$(date +%m.%d.%Y-%H:%M:%S)"
 
