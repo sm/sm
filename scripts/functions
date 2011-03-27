@@ -108,6 +108,7 @@ fetch()
       fi
     fi
   fi
+  )
 
   return $0
 }
