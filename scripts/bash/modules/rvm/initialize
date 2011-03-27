@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# BDSM RVM DSL module
+# BDSM RVM module initialization
 #
 source_files "/etc/rvmrc" "$HOME/.rvmrc"
 

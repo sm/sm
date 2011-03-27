@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
-
 #
-# BDSM filesystem DSL module
+# BDSM filesystem module DSL functions
 #
 
 # Safely source files and notify the user if they do not exist.

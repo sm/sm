@@ -1,35 +1,9 @@
 #!/usr/bin/env bash
 
 #
-# BDSM project setup and DSL module
+# BDSM project module initialization
 #
 # When run as root, we must ensure that project and project_path are set.
-
-#
-# Module Functions
-#
-vcs()
-{
-  local _path="$1"
-  (
-  if [[ -d "${_path}/.git" ]] ; then
-    vcs="git"
-  elif [[ -d "${_path}/.svn" ]] ; then
-    vcs="svn"
-  elif [[ -d "${_path}/.hg" ]] ; then
-    vcs="hg"
-    # TODO:
-    # elif [[ ... ]] ; then
-    # vcs="fossil"
-  else
-    vcs="git" # default
-  fi
-  )
-}
-
-#
-# Module Initialization
-#
 if [[ $UID -eq 0 ]] ; then
   ensure_set \
     "project" \

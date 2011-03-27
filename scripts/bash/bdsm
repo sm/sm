@@ -1,21 +1,27 @@
 #!/usr/bin/env bash
 
 #
-# This file contains the functions that compries the BDSM framework DSL.
+# This file contains the modules function that allows loading of BDSM framework
+# DSL components.
 #
 
 shopt -s extglob # Extended globs must always be on for BDSM.
 
 modules()
 {
-  local _module _bdsm_module _extension_module
+  local _module _bdsm _extension _path
 
   for _module in "$@" ; do
-    _bdsm_module="${scripts_path}/bash/${_module}"
-    _extension_module="${extension_scripts_path}/bash/${_module}"
+    _bdsm="${scripts_path}/bash/${_module}"
+    _extension="${extension_scripts_path}/bash/${_module}"
 
-    [[ -s "${_bdsm_module}" ]] && source  "${_bdsm_module}"
-    [[ -s "${_extension_module}" ]] && source "${_extension_module}"
+    for _path in "${_bdsm}" "${_extension}" ; do
+      for file in "functions" "initialize" ; do
+        if [[ -s "${_path}/${_file}" ]] ; then
+          source "${_path}/${_file}"
+        fi
+      done
+    done
   done
 }
 

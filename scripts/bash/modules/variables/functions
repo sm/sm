@@ -2,7 +2,7 @@
 
 
 #
-# BDSM variable manipulation DSL module
+# BDSM variables module DSL functions
 #
 first()
 {

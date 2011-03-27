@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# BDSM templating DSL Module
+# BDSM templates module DSL functions
 #
 
 install_template()

@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-
-#
-# BDSM paranoid module, used for script bugging and paranoid sysadmins.
-#
-set -o errexit
-set -o pipefail
-set -o nounset
-

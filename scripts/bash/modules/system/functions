@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# BDSM system DSL module
+# BDSM system module DSL functions
 #
 init_scripts_path()
 {
