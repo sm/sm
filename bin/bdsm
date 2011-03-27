@@ -28,7 +28,9 @@ export scripts_path="${scripts_path:-"${bdsm_path}/scripts"}"
 source "${scripts_path}/bash/bdsm"
 
 # Initialize BDSM framework and variables and functions.
-source_files "${scripts_path}/initialize" "${scripts_path}/functions"
+source_files \
+  "${scripts_path}/functions"\
+  "${scripts_path}/initialize"
 
 # Load the BDSM framework version.
 [[ -s "$bdsm_path/VERSION" ]] && VERSION="$(cat "$bdsm_path/VERSION")"
