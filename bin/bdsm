@@ -180,14 +180,7 @@ elif [[ -n "$extension" && -n "$action" ]] ; then
 
     case "${action_type}" in
       bash)
-        (
-        source_files \
-          "${scripts_path}/bash/bdsm" \
-          "${extension_scripts_path}/functions" \
-          "${extension_scripts_path}/initialize"
-
-        . "$action_file"
-        )
+        run "${action_file}" "${extension_args}"
         ;;
       # ruby|python|lua|javascript)
       #   # ADD "${scripts_path}/${action_type}/" to the lib path so the script can require "bdsm"
