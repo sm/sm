@@ -148,7 +148,7 @@ elif [[ -n "$extension" && -n "$action" ]] ; then
     action_file_type="$(file "$action_file")"
 
     case "$action_file_type" in
-      *sh script*|*POSIX shell*|*Bourne-Again*)
+      *sh[[:space:]]script*|*POSIX[[:space:]]shell*|*Bourne-Again*)
         action_type="bash"
         ;;
 
