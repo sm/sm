@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 
-[[ -s "/etc/bdsmrc" ]]  && . "/etc/bdsmrc"
-[[ -s "$HOME/.bdsmrc" ]] && . "$HOME/.bdsmrc"
-
 shopt -s extglob # Extended globs
 
 set -o errtrace
 
 export PS4="+ \${BASH_SOURCE} : \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO}\n>  "
+
+[[ -s "/etc/bdsmrc" ]]  && . "/etc/bdsmrc"
+[[ -s "$HOME/.bdsmrc" ]] && . "$HOME/.bdsmrc"
+
 
 true "${prefix:=/usr/local}" "${bindir:=/usr/local/bin}"
 

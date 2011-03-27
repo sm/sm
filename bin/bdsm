@@ -80,7 +80,7 @@ while [[ $# -gt 0 ]] ; do
     --trace)           trace_flag=1 ; debug_flag=1     ;;
     -v|--version)      action="version"                ;;
 
-    --) args="$@" # Stop processing arguments.
+    --) extension_args="$@" # Stop processing arguments.
       ;;
 
     *)
@@ -130,6 +130,7 @@ elif [[ -n "$extension" && -n "$action" ]] ; then
 
   if [[ -s "$extensions_path/$extension/bin/$action" ]] ; then
     extension_action="$1" ; shift
+    extension_args="$*"
     extension_path="$extensions_path/$extension"
     extension_config_path="$extensions_path/$extension/config"
     extension_templates_path="$extensions_path/$extension/templates"
@@ -139,7 +140,7 @@ elif [[ -n "$extension" && -n "$action" ]] ; then
     paths=$(env | awk -F= -v ORS=' ' '/_path/{print $1}')
     flags=$(env | awk -F= -v ORS=' ' '/_flag/{print $1}')
 
-    export extension action args bdsm_path bindir database debug_flag environment error_message extension_bin_path extension_config_path extension_path extension_scripts_path extension_templates_path flags head_flag hooks_flag parse_break paths prefix project project_path repository result revision scripts_path trace_flag user extension_action
+    export extension action extension_args bdsm_path bindir database debug_flag environment error_message extension_bin_path extension_config_path extension_path extension_scripts_path extension_templates_path flags head_flag hooks_flag parse_break paths prefix project project_path repository result revision scripts_path trace_flag user extension_action
 
     cd "$extensions_path/$extension" > /dev/null 2>&1
 
