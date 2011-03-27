@@ -20,11 +20,11 @@ else
   true "${bdsm_path:="${prefix}/bdsm"}"
 fi
 
-export scripts_path="${scripts_path:-"${bdsm_path}/scripts"}"
+export modules_path="${modules_path:-"${bdsm_path}/modules"}"
 
 # Load BDSM bash DSL functions and initialize for BDSM core itself manually.
-source "${scripts_path}/modules/bash/bdsm/functions"
-source "${scripts_path}/modules/bash/bdsm/initialize"
+source "${modules_path}/modules/bash/bdsm/functions"
+source "${modules_path}/modules/bash/bdsm/initialize"
 
 # Load the BDSM framework version.
 [[ -s "$bdsm_path/VERSION" ]] && VERSION="$(cat "$bdsm_path/VERSION")"
@@ -80,7 +80,7 @@ while [[ $# -gt 0 ]] ; do
       ;;
 
     *)
-      #if $scripts_path/match "$token" $extensions ; then
+      #if $modules_path/match "$token" $extensions ; then
       if [[ -z "$extension" ]] ; then
         if [[ -d "$extensions_path/$token" ]] ; then
           extension="$token"
@@ -130,13 +130,13 @@ elif [[ -n "$extension" && -n "$action" ]] ; then
     extension_path="$extensions_path/$extension"
     extension_config_path="$extensions_path/$extension/config"
     extension_templates_path="$extensions_path/$extension/templates"
-    extension_scripts_path="$extensions_path/$extension/scripts"
+    extension_modules_path="$extensions_path/$extension/modules"
     extension_bin_path="$extensions_path/$extension/bin"
 
     paths=$(env | awk -F= -v ORS=' ' '/_path/{print $1}')
     flags=$(env | awk -F= -v ORS=' ' '/_flag/{print $1}')
 
-    export extension action extension_args bdsm_path bin_path database debug_flag environment error_message extension_bin_path extension_config_path extension_path extension_scripts_path extension_templates_path flags head_flag hooks_flag parse_break paths prefix project project_path repository result revision scripts_path trace_flag user extension_action
+    export extension action extension_args bdsm_path bin_path database debug_flag environment error_message extension_bin_path extension_config_path extension_path extension_modules_path extension_templates_path flags head_flag hooks_flag parse_break paths prefix project project_path repository result revision modules_path trace_flag user extension_action
 
     cd "$extensions_path/$extension" > /dev/null 2>&1
 
@@ -183,7 +183,7 @@ elif [[ -n "$extension" && -n "$action" ]] ; then
         run "${action_file}" "${extension_args}"
         ;;
       # ruby|python|lua|javascript)
-      #   # ADD "${scripts_path}/${action_type}/" to the lib path so the script can require "bdsm"
+      #   # ADD "${modules_path}/${action_type}/" to the lib path so the script can require "bdsm"
       #  "${action_file}"
       #  ;;
       dne|noexec)

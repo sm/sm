@@ -5,7 +5,7 @@ shopt -s extglob # Extended globs must always be on for BDSM.
 bdsm_path
 
 true \
-  "${scripts_path:="${bdsm_path}/scripts"}" \
+  "${modules_path:="${bdsm_path}/modules"}" \
   "${extensions_path:="${bdsm_path}/extensions"}" \
   "${templates_path:="${bdsm_path}/templates"}" \
   "${config_path:="${bdsm_path}/config"}" \

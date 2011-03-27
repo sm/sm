@@ -1,15 +1,11 @@
 #!/usr/bin/env bash
 
-source ./scripts/bash/bdsm
+source modules/bdsm/functions
+source modules/bdsm/initialize
 
-modules \
-  filesystem
+modules filesystem
 
-source_files \
-  scripts/functions \
-  scripts/initialize
-
-directories=(bin scripts config extensions)
+directories=(bin modules config extensions)
 
 (
   cd "${bdsm_path}"

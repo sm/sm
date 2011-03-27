@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 source_files \
-  "$scripts_path/base" \
-  "$scripts_path/version"
+  "$modules_path/base" \
+  "$modules_path/version"
 
 get_help()
 {
@@ -23,7 +23,7 @@ get_latest()
 
   ensure_paths_exist "$src_path/"
 
-  # NOTE: This is the content as in binscripts/bdsm-update-latest
+  # NOTE: This is the content as in binmodules/bdsm-update-latest
 
   version=$(curl -B $version_url 2>/dev/null)
 
@@ -73,11 +73,11 @@ get_version()
   )
 
   log "\nInstalled BDSM version:"
-  ( source $scripts_path/bdsm ; bdsm --version )
+  ( source $modules_path/bdsm ; bdsm --version )
 
   hook="after_update"
 
-  source "$scripts_path/hook"
+  source "$modules_path/hook"
 }
 
 get_branch()

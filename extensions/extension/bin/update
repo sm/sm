@@ -8,12 +8,12 @@ for extension in ${extensions//,/ } ; do
 
   if [[ -n "$head_flag" ]] ; then
     if [[ ! -d "$src_path/$extension/.git" ]] ; then
-      "$scripts_path"/log "info" "Updating $extension repository."
+      "$modules_path"/log "info" "Updating $extension repository."
       cd "$src_path/$extension"/.git
       # TODO: Branch update logic.
       git pull origin "${branch:-master}"
     else
-      "$scripts_path"/log "info" "Cloning $extension repository from $extension_repo_url."
+      "$modules_path"/log "info" "Cloning $extension repository from $extension_repo_url."
       cd "$src_path/$extension/"
       # TODO: git/hg/svn detection, git for now
       git clone "$extension_repo_url"

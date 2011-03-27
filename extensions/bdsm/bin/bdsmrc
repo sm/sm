@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-source "${scripts_path}/bash/project"
+source "${modules_path}/bash/project"
 
 if [[ -s "$extension_templates_path/bdsmrc" ]] ; then
   if [[ -s .bdsmrc ]] ; then
     timestamp=$(date +%m.%d.%Y-%H:%M:%S)
-    $scripts_path/log "info" "Found an existing $HOME/.bdsmrc file, moving it to $HOME/.bdsmrc.$timestamp."
+    $modules_path/log "info" "Found an existing $HOME/.bdsmrc file, moving it to $HOME/.bdsmrc.$timestamp."
     \mv "$HOME/.bdsmrc" "$HOME/.bdsmrc.$timestamp"
   fi
 
