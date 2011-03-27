@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 # Load BDSM bash DSL functions and initialize for BDSM core itself manually.
-source "${modules_path}/bash/bdsm/functions"
-source "${modules_path}/bash/bdsm/initialize"
+source "./bash/bdsm/functions"
+source "./bash/bdsm/initialize"
 
 modules filesystem
 
