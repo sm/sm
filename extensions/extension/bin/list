@@ -53,8 +53,6 @@ list_available()
   fi
 }
 
-action="$1"
-
 case "$action" in
   installed)
     list_installed
