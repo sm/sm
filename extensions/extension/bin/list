@@ -20,7 +20,7 @@ Actions:
 list_installed()
 {
   version_files=($(
-  find "${extensions_path}"/* -name 'VERSION' -mindepth 1 -maxdepth 1 -type f
+  find "${extensions_path}"/* -mindepth 1 -maxdepth 1 -name 'VERSION' -type f
   ))
 
   for version_file in ${version_files[@]} ; do
@@ -42,7 +42,7 @@ list_available()
 {
   if [[ -d "/usr/local/src/bdsm-extensions" ]] ; then
     version_files=($(
-      find "${src_path}"/* -name 'VERSION' -mindepth 1 -maxdepth 1 -type f
+      find "${src_path}"/* -mindepth 1 -maxdepth 1 -name 'VERSION' -type f
     ))
 
     for version_file in ${version_files[@]} ; do
