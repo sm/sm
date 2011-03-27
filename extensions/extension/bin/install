@@ -1,40 +1,56 @@
 #!/usr/bin/env bash
 
-[[ -n "$extensions" ]] || fail "At least onte extension must be specified."
+[[ -n "$extension" ]] || fail "At least onte extension must be specified."
 
-ensure_paths_exist "$src_path/extensions/" "$archives_path/"
+# bdsm extension install $extension --url=http://bdsm.beginrescueend.com/extensions/<name>-<version>.tar.gz install
+# bdsm extension install $extension --url=git://github.com/...
 
-# bdsm extension --url=http://bdsm.beginrescueend.com/extensions/<name>-<version>.tar.gz install
-# bdsm extension --url=git://github.com/... install
+extend_from_repository()
+{
+  (
+  if [[ -d "$extension_src_path/.git" ]] ; then
+    log "Updating $extension repository."
+    enter "$extension_src_path"
+    git fetch ${remote:-origin}
 
-# bdsm extension package A,B,C
+    # TODO: Branch switching logic
 
-for extension in ${extensions//,/ } ; do
-
-  if [[ ${head_flag:=0} -eq 1 ]] ; then
-
-    if [[ ! -d "$src_path/$extension/.git" ]] ; then
-      "$modules_path"/log "info" "Updating $extension repository."
-      cd "$src_path/$extension"/.git
-      # TODO: Branch update logic.
-      git pull origin "${branch:-master}"
-    else
-
-      log "Cloning $extension repository from $extension_repo_url."
-      cd "$src_path/$extension/"
-      # TODO: git/hg/svn url detection, git for now
-      git clone "$extension_repo_url"
-    fi
-
+    git reset --hard HEAD
+    git pull --rebase --force ${remote:-origin} "${branch:-master}"
   else
-    rm -rf "$src_path/bdsm/latest"
-    mkdir -p "$src_path/bdsm/latest"
-    curl -O "$releases_url" | tar xf - -C "$src_path/bdsm/latest"
-    # TODO: error check and exit on error.
-    cd "$src_path/bdsm/latest"/bdsm-*
-    ./install
+    log "Cloning $extension repository from $extension_repo_url."
+    enter "$extension_src_path"
+
+    # TODO: git/hg/svn url detection, only git to start for now
+
+    git clone --depth 1 "${extension_repo_url}" "${extension}"
   fi
+  )
+  cp -Rf "${extension_src_path}/${extension_name}" "$bdsm_path/extensions/"
 
-done
+}
 
-exit $result
+extend_from_tarball()
+{
+  curl -L "${releases_url}/${extension}-${extension_version}.tar.bz2" \
+    -o "${extension_src_path}/${extension}-${extension_version}.tar.bz2"
+
+  tar xf "${extension_src_path}/${extension_version}.tar.bz2" -C "${extension_src_path}/extensions"
+
+  cp -Rf "${extension_src_path}/${extension_name}-${extension_version}" "$bdsm_path/extensions/"
+
+}
+
+extension_src_path="${src_path}/extensions"
+ensure_paths_exist "$extension_src_path"
+
+case "${extension_version:-head}" in
+  *([[:digit:]]).*([[:digit:]]).*([[:digit:]]))
+    extend_from_tarball
+    ;;
+
+  head|master)
+    extend_from_repository # default is head
+    ;;
+esac
+

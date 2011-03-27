@@ -1,29 +1,42 @@
 #!/usr/bin/env bash
 
-[[ -n "$extensions" ]] || fail "A extension must be specified."
+#
+# need to figure out the following items
+#  * Where extension will be stored (done)
+#    => ${extensions_src_path}/${extension}/${version:-head}
+#  * where to store metadata information, like extension repository url.
+#  * Where extension sources will be stored
+#  * How an extension will be updated
+#
+[[ -n "$extensions" ]] || fail "At least one extension must be specified."
 
 for extension in ${extensions//,/ } ; do
 
-  ensure_paths_exist "$src_path"
+  extensions_src_path="$src_path/extensions"
 
+  ensure_paths_exist "$extensions_src_path"
+
+  # Default load from bdsm extensions repository...
   if [[ -n "$head_flag" ]] ; then
+
     if [[ ! -d "$src_path/$extension/.git" ]] ; then
-      "$modules_path"/log "info" "Updating $extension repository."
-      cd "$src_path/$extension"/.git
+      log "Updating $extension repository."
+      enter "$extensions_src_path"
+
       # TODO: Branch update logic.
-      git pull origin "${branch:-master}"
+      git fetch ${remote:-origin}
+      git pull --rebase --force ${remote:-origin} "${branch:-master}"
     else
-      "$modules_path"/log "info" "Cloning $extension repository from $extension_repo_url."
-      cd "$src_path/$extension/"
+      log "Cloning $extension repository from $extension_repo_url."
+      enter "$extensions_src_path"
       # TODO: git/hg/svn detection, git for now
       git clone "$extension_repo_url"
     fi
   else
-    rm -rf "$src_path/latest"
-    mkdir -p "$src_path/latest"
-    curl -O "$releases_url" | tar xf - -C "$src_path/latest"
+    curl -O "$releases_url" | tar xf - -C "$extensions_src_path"
     # TODO: error check and exit on error.
-    cd "$src_path/latest"/bdsm-*
+    enter "$extensions_src_path/"
+    ensure_files_are_executable install
     ./install
   fi
 
