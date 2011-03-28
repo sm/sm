@@ -24,25 +24,25 @@ extend_from_repository()
     git clone --depth 1 "${extension_repo_url}" "${extension}"
   fi
   )
-  cp -Rf "${extension_src_path}/${extension_name}" "$bdsm_path/extensions/"
-
+  cp -Rf \
+    "${extension_src_path}/${extension_name}" \
+    "$bdsm_path/extensions/"
 }
 
 extend_from_tarball()
 {
-  curl -L "${releases_url}/${extension}-${extension_version}.tar.bz2" \
+  curl \
+    -L "${releases_url}/${extension}-${extension_version}.tar.bz2" \
     -o "${extension_src_path}/${extension}-${extension_version}.tar.bz2"
 
-  tar xf "${extension_src_path}/${extension_version}.tar.bz2" -C "${extension_src_path}/extensions"
+  tar \
+    xf "${extension_src_path}/${extension_version}.tar.bz2" \
+    -C "${extension_src_path}/extensions"
 
-  cp -Rf "${extension_src_path}/${extension_name}-${extension_version}" "$bdsm_path/extensions/"
-
+  cp -Rf \
+    "${extension_src_path}/${extension_name}-${extension_version}" \
+    "$bdsm_path/extensions/"
 }
-
-[[ $# -gt 1 ]] || fail "At least one extension must be specified."
-
-extension_src_path="${src_path}/extensions"
-ensure_paths_exist "$extension_src_path"
 
 case "${extension_version:-head}" in
   *([[:digit:]]).*([[:digit:]]).*([[:digit:]]))

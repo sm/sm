@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 
-[[ "$trace_flag" -eq 1 ]] && set -o xtrace
-
-result=0
-extensions="$*"
-
 true \
   "${releases_url:=$(hash_file "$config_path/bdsm" "releases_url")}"\
   "${extension_url:=$(hash_file "$config_path/bdsm" "extension_url")}" \
   "${extensions_repository_url:=$(hash_file "$config_path/bdsm" "extensions_repository_url")}" \
   ${remote:="origin"} \
   ${branch:="master"}
+
+[[ -n "${extension_args}" ]] || \
+  fail "At least one extension must be specified."
+
+extension_src_path="${src_path}/extensions"
 
 ensure_paths_exist "${extensions_src_path}"
 

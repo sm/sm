@@ -49,23 +49,6 @@ modules()
   done
 }
 
-# Run simulates calling as a script with parameters :)
-run()
-{
-  local _action_file="$1" ; shift
-  local _command="$1" ; shift
-  (
-  modules bdsm
-
-  source_files \
-    "${extension_modules_path}/functions" \
-    "${extension_modules_path}/initialize"
-
-  source "${_action_file}"
-  )
-
-}
-
 actions_for_extension() {
   if [[ -n "${1:-}" ]] ; then
     echo "bdsm $1: {$(ls -p $extensions_path/$1/ | awk '/[^\/]$/' | tr "\n" ' ' | sed 's/\s\+/, /g' | sed 's/,\s*$//')}"
