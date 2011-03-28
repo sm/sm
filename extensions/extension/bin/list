@@ -81,7 +81,7 @@ case "$extension_action" in
   ;;
 
   *)
-    fail $(list_help)
+    fail "$(list_help)"
   ;;
 esac
 
