@@ -6,9 +6,9 @@
 extend_from_repository()
 {
   (
-  if [[ -d "$extension_src_path/.git" ]] ; then
+  if [[ -d "$extensions_src_path/.git" ]] ; then
     log "Updating $extension repository."
-    enter "$extension_src_path"
+    enter "$extensions_src_path"
     git fetch ${remote:-origin}
 
     # TODO: Branch switching logic
@@ -18,31 +18,28 @@ extend_from_repository()
   else
     log "Cloning $extension repository from ${extensions_repository_url}"
 
-    enter "$extension_src_path"
+    enter "$extensions_src_path"
 
     # TODO: git/hg/svn url detection, only git to start for now
 
     git clone --depth 1 "${extensions_repository_url}" "extensions"
   fi
   )
-  cp -Rf \
-    "${extension_src_path}/${extension}" \
-    "$bdsm_path/extensions/"
+  enter "${extensions_src_path}/${extension}"
+
 }
 
 extend_from_tarball()
 {
   curl \
     -L "${releases_url}/${extension}-${extension_version}.tar.bz2" \
-    -o "${extension_src_path}/${extension}-${extension_version}.tar.bz2"
+    -o "${extensions_src_path}/${extension}-${extension_version}.tar.bz2"
 
   tar \
-    xf "${extension_src_path}/${extension_version}.tar.bz2" \
-    -C "${extension_src_path}/extensions"
+    xf "${extensions_src_path}/${extension_version}.tar.bz2" \
+    -C "${extensions_src_path}/extensions"
 
-  cp -Rf \
-    "${extension_src_path}/${extension}-${extension_version}" \
-    "$bdsm_path/extensions/"
+  enter "${extensions_src_path}/${extension}-${extension_version}"
 }
 
 case "${extension_version:-head}" in
@@ -54,4 +51,16 @@ case "${extension_version:-head}" in
     extend_from_repository # default is head
     ;;
 esac
+
+for _extension in "${extension_args}" ; do
+  extension_src_path="${extensions_src_path}/${_extension}" \
+
+  if [[ -s "${extension_src_path}/VERSION" && -x "${extension_src_path}/bin/help" ]] ; then
+    cp -Rf \
+      "${extension_src_path}" \
+      "$bdsm_path/extensions/"
+  else
+    error "${extension_src_path}/${extension} is not a proper extension."
+  fi
+done
 
