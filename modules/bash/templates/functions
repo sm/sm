@@ -4,6 +4,13 @@
 # BDSM templates module DSL functions
 #
 
+template_exists()
+{
+  local _template="${extension_templates_path}/${_template}.template"
+
+  [[ -s "${_template}" ]]
+}
+
 install_template()
 {
   local _name _target _source
