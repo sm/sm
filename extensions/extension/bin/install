@@ -16,12 +16,12 @@ extend_from_repository()
     git reset --hard HEAD
     git pull --rebase --force ${remote:-origin} "${branch:-master}"
   else
-    log "Cloning $extension repository from $extension_repo_url."
+    log "Cloning $extension repository from ${extensions_repository_url}"
     enter "$extension_src_path"
 
     # TODO: git/hg/svn url detection, only git to start for now
 
-    git clone --depth 1 "${extension_repo_url}" "${extension}"
+    git clone --depth 1 "${extensions_repository_url}" "${extension}"
   fi
   )
   cp -Rf \
