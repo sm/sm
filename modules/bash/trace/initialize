@@ -6,7 +6,7 @@
 
 set -o errtrace
 
-export PS4="+ \${BASH_SOURCE} : \${FUNCNAME[0]:+\${FUNCNAME[0]}()}\n  \${LINENO} > "
+export PS4="+ \${BASH_SOURCE} : \${FUNCNAME[0]:+\${FUNCNAME[0]}()}  \${LINENO} > "
 
 if [[ ${trace_flag:-0} -eq 1 ]] ; then
   export trace_flag
