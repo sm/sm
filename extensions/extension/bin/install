@@ -25,7 +25,7 @@ extend_from_repository()
   fi
   )
   cp -Rf \
-    "${extension_src_path}/${extension_name}" \
+    "${extension_src_path}/${extension}" \
     "$bdsm_path/extensions/"
 }
 
@@ -40,7 +40,7 @@ extend_from_tarball()
     -C "${extension_src_path}/extensions"
 
   cp -Rf \
-    "${extension_src_path}/${extension_name}-${extension_version}" \
+    "${extension_src_path}/${extension}-${extension_version}" \
     "$bdsm_path/extensions/"
 }
 
