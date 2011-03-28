@@ -39,6 +39,8 @@ list_available()
   fi
 }
 
+modules extensions
+
 extension_action=${extension_args[0]}
 
 case "$extension_action" in
