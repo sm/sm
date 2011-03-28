@@ -58,10 +58,8 @@ while [[ $# -gt 0 ]] ; do
 
     help)
       action="help"
-      if [[ -n "$1" ]] ; then
-        extension="$1"
-        parse_break=1
-      fi
+      extension="${1:-bdsm}"
+      parse_break=1
     ;;
 
     --disable-hooks)   hooks_flag=0                    ;;
