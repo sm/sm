@@ -188,7 +188,7 @@ elif [[ -n "$extension" && -n "$action" ]] ; then
           "${extension_modules_path}/functions" \
           "${extension_modules_path}/initialize"
 
-        source "${_action_file}"
+        source "${action_file}"
         )
         ;;
       # ruby|python|lua|javascript)
