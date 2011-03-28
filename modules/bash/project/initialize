@@ -5,9 +5,8 @@
 #
 # When run as root, we must ensure that project and project_path are set.
 if [[ $UID -eq 0 ]] ; then
-  ensure_set \
-    "project" \
-    "project_path"
+  [[ -n "$project" ]] || fail "'project' must be set in bdsmrc"
+  [[ -n "$project_path" ]] || fail "'project_path' is not set."
 fi
 
 true \

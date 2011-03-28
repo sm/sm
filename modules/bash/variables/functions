@@ -9,18 +9,6 @@ first()
   printf "$1"
 }
 
-ensure_set()
-{
-  local _variable
-
-  for _variable in "$@" ; do
-    [[ -z "${_variable}" ]] && continue
-    if eval "[[ -z \"\${${_variable}:-}\" ]]" ; then
-      fail "${_variable} is required to be set however it is empty (set in bdsmrc)."
-    fi
-  done
-}
-
 match()
 {
   local _value="$1" _regex="$2"
