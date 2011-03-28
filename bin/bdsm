@@ -64,7 +64,6 @@ while [[ $# -gt 0 ]] ; do
       fi
     ;;
 
-    exten*)            extension="extension"           ;;
     --disable-hooks)   hooks_flag=0                    ;;
     --project)         project="$1"            ; shift ;;
     --environment)     environment="$1"        ; shift ;;
@@ -77,6 +76,11 @@ while [[ $# -gt 0 ]] ; do
     --trace)
       trace_flag=1
       source "${modules_path}/bash/trace/initialize"
+      ;;
+
+    exten*)
+      extension="extension"
+      extension_args=("$@")
       ;;
 
     --) extension_args=("$@") # Stop processing arguments.
