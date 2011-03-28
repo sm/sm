@@ -80,7 +80,6 @@ while [[ $# -gt 0 ]] ; do
 
     exten*)
       extension="extension"
-      extension_args=("$@")
       ;;
 
     --) extension_args=("$@") # Stop processing arguments.
