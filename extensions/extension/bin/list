@@ -2,7 +2,7 @@
 
 list_help()
 {
-  printf "
+  log "
 
 Usage:
 
@@ -65,6 +65,8 @@ list_available()
   fi
 }
 
+extension_action=${extension_args[0]}
+
 case "$extension_action" in
   installed)
     list_installed
@@ -79,9 +81,7 @@ case "$extension_action" in
   ;;
 
   *)
-    printf "ERROR: "
-    list_help
-    exit 1
+    fail <(list_help)
   ;;
 esac
 

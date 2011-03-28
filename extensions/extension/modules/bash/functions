@@ -33,69 +33,44 @@ md5_match()
   return $?
 }
 
-install_release()
+extend_from_repository()
 {
-  archive="$archives_path/bdsm-${version}.tar.gz"
+  (
+  if [[ -d "$extensions_src_path/.git" ]] ; then
+    log "Updating $extension repository."
+    enter "$extensions_src_path"
+    git fetch ${remote:-origin}
 
-  fetch_md5
+    # TODO: Branch switching logic
 
-  if [[ -s $archive ]] && ! md5_match ; then
-    # Remove old installs, if they exist and have incorrect md5.
-    [[ -f "$archives_path/bdsm-${version}.tar.gz" ]] &&
-      rm -f "$archives_path/bdsm-${version}.tar.gz"
-  fi
-
-  curl -L "${releases_url}/bdsm-${version}.tar.gz" -o "$archive"
-
-  if ! md5_match "$archive" ; then
-    fail "ERROR:
-
-Archive package downloaded does not match it's calculated md5 checksum ${md5}:
-
-  $archives_path/bdsm-${version}.tar.gz
-
-Retry the installation and/or check your networking setup.
-
-Halting installation.
-"
-  fi
-
-  tar zxf "${archives_path}/bdsm-${version}.tar.gz" -C "$src_path/"
-
-  cd "$src_path/bdsm-${version}"
-}
-
-install_head()
-{
-  local remote="origin"
-
-  if [[ -d "${src_path}/bdsm/.git" ]] ; then
-    builtin cd "${src_path}/bdsm/"
-
-    if [[ -z "$(git branch | awk "/$branch$/")" ]] ; then
-      if ! git checkout -b "$branch" --track "$remote/$branch" 2>/dev/null ; then
-        fail "$remote $branch remote branch not found."
-      fi
-    elif [[ -z "$(git branch | awk "/\* $branch$/{print \$2}")" ]] ; then
-      if ! git checkout $branch 2>/dev/null ; then
-        fail "Unable to checkout $branch."
-      fi
-    fi
-
-    git pull --rebase origin $branch
+    git reset --hard HEAD
+    git pull --rebase --force ${remote:-origin} "${branch:-master}"
   else
-    builtin cd "${src_path}"
+    log "Cloning $extension repository from ${extensions_repository_url}"
 
-    if ! git clone --depth 1 git://github.com/wayneeseguin/bdsm.git ; then
-      if !  git clone https://github.com/wayneeseguin/bdsm.git ; then
-        fail "Unable to clone the BDSM repository, attempted both git:// and https://"
-      fi
-    fi
+    enter "${src_path}"
+
+    # TODO: git/hg/svn url detection, only git to start for now
+
+    git clone --depth 1 "${extensions_repository_url}" "extensions"
   fi
+  )
+  enter "${extensions_src_path}/${extension}"
 
-  builtin cd "${src_path}/bdsm/"
-
-  return 0
 }
 
+extend_from_tarball()
+{
+  curl \
+    -L "${releases_url}/${extension}-${extension_version}.tar.bz2" \
+    -o "${extensions_src_path}/${extension}-${extension_version}.tar.bz2"
 
+  # TODO: md5 check using fetch_md5() and md5_match()
+
+  tar \
+    xf "${extensions_src_path}/${extension_version}.tar.bz2" \
+    -C "${extensions_src_path}/extensions"
+
+  enter "${extensions_src_path}/${extension}-${extension_version}"
+
+}
