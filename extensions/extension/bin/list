@@ -44,7 +44,7 @@ list_installed()
 
 list_available()
 {
-  [[ -d "extensions_src_path" ]] || fetch_repository
+  [[ -d "${extensions_src_path}" ]] || fetch_repository
 
   if [[ -d "${src_path}" ]] ; then
     version_files=($(
