@@ -39,12 +39,12 @@ fetch_repository()
   if [[ -d "$extensions_src_path/.git" ]] ; then
     log "Updating $extension repository."
     enter "$extensions_src_path"
-    git fetch ${remote:-origin}
+    git fetch ${remote:-origin} >/dev/null 2>&1
 
     # TODO: Branch switching logic
 
-    git reset --hard HEAD
-    git pull --rebase --force ${remote:-origin} "${branch:-master}"
+    git reset --hard HEAD >/dev/null 2>&1
+    git pull --rebase --force ${remote:-origin} "${branch:-master}" >/dev/null 2>&1
   else
     log "Cloning $extension repository from ${extensions_repository_url}"
 
@@ -52,7 +52,7 @@ fetch_repository()
 
     # TODO: git/hg/svn url detection, only git to start for now
 
-    git clone --depth 1 "${extensions_repository_url}" "extensions"
+    git clone --depth 1 "${extensions_repository_url}" "extensions" >/dev/null 2>&1
   fi
   )
   enter "${extensions_src_path}/${extension}"
@@ -71,5 +71,4 @@ fetch_tarball()
     -C "${extensions_src_path}/extensions"
 
   enter "${extensions_src_path}/${extension}-${extension_version}"
-
 }
