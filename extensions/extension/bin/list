@@ -48,7 +48,7 @@ list_available()
 
   if [[ -d "${src_path}" ]] ; then
     version_files=($(
-      find "${src_path}"/* -mindepth 1 -maxdepth 1 -name 'VERSION' -type f
+      find "${extensions_src_path}"/* -mindepth 1 -maxdepth 1 -name 'VERSION' -type f
     ))
 
     for version_file in ${version_files[@]} ; do
