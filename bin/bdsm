@@ -129,13 +129,13 @@ if [[ "version" = "$action" ]] ; then
 elif [[ -n "$extension" && -n "$action" ]] ; then
 
   if [[ -s "$extensions_path/$extension/bin/$action" ]] ; then
-    extension_action="$1" ; shift
-    extension_args="$*"
-    extension_path="$extensions_path/$extension"
-    extension_config_path="$extensions_path/$extension/config"
-    extension_templates_path="$extensions_path/$extension/templates"
-    extension_modules_path="$extensions_path/$extension/modules"
-    extension_bin_path="$extensions_path/$extension/bin"
+    true \
+      ${extension_args:="$*"} \
+      ${extension_path:="$extensions_path/$extension"} \
+      ${extension_config_path:="$extensions_path/$extension/config"} \
+      ${extension_templates_path:="$extensions_path/$extension/templates"} \
+      ${extension_modules_path:="$extensions_path/$extension/modules"} \
+      ${extension_bin_path:="$extensions_path/$extension/bin"}
 
     paths=$(env | awk -F= -v ORS=' ' '/_path/{print $1}')
     flags=$(env | awk -F= -v ORS=' ' '/_flag/{print $1}')
