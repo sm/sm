@@ -76,7 +76,7 @@ while [[ $# -gt 0 ]] ; do
       source "${modules_path}/bash/trace/initialize"
       ;;
 
-    exten*)
+    ext*)
       extension="extension"
       ;;
 
