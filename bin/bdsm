@@ -73,8 +73,11 @@ while [[ $# -gt 0 ]] ; do
     --user)            user="$1"               ; shift ;;
     --head)            head_flag=1                     ;;
     --debug)           debug_flag=1                    ;;
-    --trace)           trace_flag=1 ; debug_flag=1     ;;
     -v|--version)      action="version"                ;;
+    --trace)
+      trace_flag=1
+      source "${modules_path}/bash/trace/initialize"
+      ;;
 
     --) extension_args="$@" # Stop processing arguments.
       ;;
@@ -92,6 +95,7 @@ while [[ $# -gt 0 ]] ; do
       if [[ -z "$action" ]] ; then
         if [[ -x "$extensions_path/$extension/bin/$token" ]] ; then
           action="$token"
+          extension_args="$*"
           parse_break=1
         fi
       elif [[ -d "/data/$token" ]] ; then
