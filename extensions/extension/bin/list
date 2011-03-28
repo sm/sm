@@ -20,6 +20,7 @@ Actions:
 list_installed()
 {
   extensions=($(installed_extensions))
+
   if [[ ${#extensions[@]} -gt 0 ]] ; then
     log "${extensions[@]}"
   else
@@ -32,6 +33,7 @@ list_available()
   [[ -d "${extensions_src_path}" ]] || fetch_extensions_repository
 
   extensions=($(available_extensions))
+
   if [[ ${#extensions[@]} -gt 0 ]] ; then
     log "${extensions[@]}"
   else

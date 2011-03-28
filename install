@@ -33,7 +33,7 @@ ensure_paths_exist \
 directories=(bin modules config extensions)
 
 (
-  cd "${bdsm_path}"
+  enter "${bdsm_path}"
   ensure_paths_exist "${directories[@]}"
 )
 
