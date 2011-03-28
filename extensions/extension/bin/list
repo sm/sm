@@ -20,26 +20,32 @@ Actions:
 list_installed()
 {
   version_files=($(
-  find "${extensions_path}"/* -mindepth 1 -maxdepth 1 -name 'VERSION' -type f
+    find "${extensions_path}"/* -mindepth 1 -maxdepth 1 -name 'VERSION' -type f
   ))
 
-  for version_file in ${version_files[@]} ; do
-    extension_source_path="${version_file/%\/VERSION}"
-    extension_name="${extension_source_path//*\/}"
+  if [[ ${#version_files[@]} -eq 0 ]] ; then
+    log "No extensions currently installed."
+  else
+    for version_file in ${version_files[@]} ; do
+      extension_source_path="${version_file/%\/VERSION}"
+      extension_name="${extension_source_path//*\/}"
 
-    case ${extension_name} in
-      bdsm|[[=.=]]*)
-        true # Ignore for now.
-        ;;
-      *)
-        printf "${extension_name//*\//}\n"
-        ;;
-    esac
-  done
+      case ${extension_name} in
+        bdsm|[[=.=]]*)
+          true # Ignore for now.
+          ;;
+        *)
+          log "${extension_name//*\//}"
+          ;;
+      esac
+    done
+  fi
 }
 
 list_available()
 {
+  fetch_repository
+
   if [[ -d "${src_path}" ]] ; then
     version_files=($(
       find "${src_path}"/* -mindepth 1 -maxdepth 1 -name 'VERSION' -type f

@@ -5,11 +5,11 @@
 
 case "${extension_version:-head}" in
   *([[:digit:]]).*([[:digit:]]).*([[:digit:]]))
-    extend_from_tarball
+    fetch_tarball
     ;;
 
   head|master)
-    extend_from_repository # default is head
+    fetch_repository # default is head
     ;;
 esac
 

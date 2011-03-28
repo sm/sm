@@ -33,7 +33,7 @@ md5_match()
   return $?
 }
 
-extend_from_repository()
+fetch_repository()
 {
   (
   if [[ -d "$extensions_src_path/.git" ]] ; then
@@ -56,10 +56,9 @@ extend_from_repository()
   fi
   )
   enter "${extensions_src_path}/${extension}"
-
 }
 
-extend_from_tarball()
+fetch_tarball()
 {
   curl \
     -L "${releases_url}/${extension}-${extension_version}.tar.bz2" \
