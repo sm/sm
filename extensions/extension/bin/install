@@ -18,7 +18,7 @@ extend_from_repository()
   else
     log "Cloning $extension repository from ${extensions_repository_url}"
 
-    enter "$extensions_src_path"
+    enter "${src_path}"
 
     # TODO: git/hg/svn url detection, only git to start for now
 
