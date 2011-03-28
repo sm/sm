@@ -5,10 +5,8 @@ description() {
 }
 
 actions() {
-  log "
-  bdsmrc  - Copy the .bdsmrc template file into ~/.bdsmrc
-  help    - Display this help text.
-  "
+  log "  bdsmrc  - Copy the .bdsmrc template file into ~/.bdsmrc
+  help    - Display this help text."
 }
 
 usage() {
@@ -22,10 +20,12 @@ Usage
   bdsm <extension> <action> <<arguments>>
 
 Actions
-  $(actions)
+
+$(actions)
 
 Extensions
-  $(installed_extensions)
+
+$(installed_extensions)
 
 Notes
 
