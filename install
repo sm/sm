@@ -27,6 +27,9 @@ source "./modules/bash/filesystem/functions"
 
 source "./modules/bash/bdsm/initialize"
 
+ensure_paths_exist \
+  "${bdsm_path}"
+
 directories=(bin modules config extensions)
 
 (
