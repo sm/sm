@@ -31,7 +31,13 @@ case "$extension_action" in
   ;;
 
   all)
-    install_extensions "$(list_installed)"
+    extensions=($(installed_extensions))
+    if [[ ${#extensions[@]} -gt 0 ]] ; then
+      fetch_extensions_repository
+      install_extensions "${extensions[@]}"
+    else
+      log "No extensions to update."
+    fi
     ;;
 
   *)
