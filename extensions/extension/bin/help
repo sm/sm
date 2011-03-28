@@ -3,8 +3,13 @@
 usage()
 {
   printf "
+
 Usage:
 
+  bdsm extension install X      - Install extension X
+  bdsm extensions install X Y Z - Install extensions X Y and Z
+  bdsm extensions update all    - Update all installed extensions
+  bdsm extensions update X      - Update extension X
 
 "
 }
