@@ -28,10 +28,6 @@ case "$extension_action" in
     list_available
   ;;
 
-  update)
-    fetch_repository
-  ;;
-
   help|usage)
     list_help
   ;;

@@ -8,38 +8,25 @@
 #  * Where extension sources will be stored
 #  * How an extension will be updated
 #
-[[ -n "$extensions" ]] || fail "At least one extension must be specified."
 
-for extension in ${extensions//,/ } ; do
+extension_action=${extension_args[0]}
 
-  extensions_src_path="$src_path/extensions"
+case "$extension_action" in
+  repository|extensions|update)
+    fetch_repository
+  ;;
 
-  ensure_paths_exist "$extensions_src_path"
+  available)
+    list_available
+  ;;
 
-  # Default load from bdsm extensions repository...
-  if [[ -n "$head_flag" ]] ; then
+  help|usage)
+    list_help
+  ;;
 
-    if [[ ! -d "$src_path/$extension/.git" ]] ; then
-      log "Updating $extension repository."
-      enter "$extensions_src_path"
+  *)
+    fail "$(list_help)"
+  ;;
+esac
 
-      # TODO: Branch update logic.
-      git fetch ${remote:-origin}
-      git pull --rebase --force ${remote:-origin} "${branch:-master}"
-    else
-      log "Cloning $extension repository from $extension_repo_url."
-      enter "$extensions_src_path"
-      # TODO: git/hg/svn detection, git for now
-      git clone "$extension_repo_url"
-    fi
-  else
-    curl -O "$releases_url" | tar xf - -C "$extensions_src_path"
-    # TODO: error check and exit on error.
-    enter "$extensions_src_path/"
-    ensure_files_are_executable install
-    ./install
-  fi
-
-done
-
-exit $result
+exit 0
