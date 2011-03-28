@@ -1,29 +1,18 @@
 #!/usr/bin/env bash
 
 description() {
-  printf "Bash Deployment & Server Management Framework - Core Extension"
+  log "Bash Deployment & Server Management Framework - Core Extension"
 }
 
 actions() {
-  printf "
+  log "
   bdsmrc  - Copy the .bdsmrc template file into ~/.bdsmrc
   help    - Display this help text.
   "
 }
 
-extensions() {
-  for extension in $(\ls extensions/ | awk '{print "  "$NF}' | sed -e 's/\///') ; do
-    if [[ -x "$bdsm_path/extensions/$extension/bin/help" ]] ; then
-      description=$("$bdsm_path/extensions/$extension/bin/help" description 2>&1 | head -n 1)
-    fi
-    printf "  $extension - ${description:-"'$extension/bin/help description' command not found, BAD PROGRAMMING MONKEY! NO DOUGNUT!"}\n"
-  done
-
-  printf "\n"
-}
-
 usage() {
-printf "
+  log "
 Description
 
   BDSM $(description)
@@ -36,7 +25,7 @@ Actions
   $(actions)
 
 Extensions
-  $(extensions)
+  $(installed_extensions)
 
 Notes
 
@@ -64,7 +53,10 @@ Notes
 "
 }
 
+modules extensions
+
 command="usage" # Default
+
 while [[ $# -gt 0 ]] ; do
   token="$1" ; shift
   case "$token" in
