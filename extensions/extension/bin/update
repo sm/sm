@@ -8,6 +8,16 @@
 #  * Where extension sources will be stored
 #  * How an extension will be updated
 #
+usage()
+{
+  log "
+
+Usage:
+
+  bdsm extensions repository update
+
+"
+}
 
 extension_action=${extension_args[0]}
 
@@ -16,16 +26,13 @@ case "$extension_action" in
     fetch_repository
   ;;
 
-  available)
-    list_available
-  ;;
-
   help|usage)
-    list_help
+    usage
   ;;
 
   *)
-    fail "$(list_help)"
+    usage
+    exit 1
   ;;
 esac
 
