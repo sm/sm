@@ -79,7 +79,7 @@ while [[ $# -gt 0 ]] ; do
       source "${modules_path}/bash/trace/initialize"
       ;;
 
-    --) extension_args="$@" # Stop processing arguments.
+    --) extension_args=("$@") # Stop processing arguments.
       ;;
 
     *)
@@ -95,7 +95,7 @@ while [[ $# -gt 0 ]] ; do
       if [[ -z "$action" ]] ; then
         if [[ -x "$extensions_path/$extension/bin/$token" ]] ; then
           action="$token"
-          extension_args="$*"
+          extension_args=("$@")
           parse_break=1
         fi
       elif [[ -d "/data/$token" ]] ; then

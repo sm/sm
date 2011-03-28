@@ -7,7 +7,7 @@ true \
   ${remote:="origin"} \
   ${branch:="master"}
 
-[[ -n "${extension_args}" ]] || \
+[[ ${#extension_args[@]} -gt 0 ]] || \
   fail "At least one extension must be specified."
 
 extensions_src_path="${src_path}/extensions"

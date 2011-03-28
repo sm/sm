@@ -52,7 +52,7 @@ case "${extension_version:-head}" in
     ;;
 esac
 
-for _extension in "${extension_args}" ; do
+for _extension in "${extension_args[@]}" ; do
   extension_src_path="${extensions_src_path}/${_extension}" \
 
   if [[ -s "${extension_src_path}/VERSION" && -x "${extension_src_path}/bin/help" ]] ; then
