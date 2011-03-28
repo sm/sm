@@ -14,7 +14,7 @@ usage()
 
 Usage:
 
-  bdsm extensions repository update
+  bdsm extensions update repository
 
 "
 }
@@ -22,17 +22,27 @@ Usage:
 extension_action=${extension_args[0]}
 
 case "$extension_action" in
-  repository|extensions|update)
-    fetch_repository
+  repository)
+    fetch_extensions_repository
   ;;
 
   help|usage)
     usage
   ;;
 
+  all)
+    install_extensions "$(list_installed)"
+    ;;
+
   *)
-    usage
-    exit 1
+    if [[ -d "${extensions_path}/${extension_action}/VERSION" ]] ; then
+      fetch_extensions_repository
+
+      install_extensions "${extension_action}" "${extension_args[@]}"
+    else
+      usage
+      exit 1
+    fi
   ;;
 esac
 

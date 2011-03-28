@@ -33,7 +33,7 @@ md5_match()
   return $?
 }
 
-fetch_repository()
+fetch_extensions_repository()
 {
   (
   if [[ -d "$extensions_src_path/.git" ]] ; then
@@ -73,6 +73,23 @@ fetch_tarball()
   enter "${extensions_src_path}/${extension}-${extension_version}"
 }
 
+install_extensions()
+{
+  local _extension
+
+  for _extension in "$@" ; do
+    extension_src_path="${extensions_src_path}/${_extension}" \
+
+    if [[ -s "${extension_src_path}/VERSION" && -x "${extension_src_path}/bin/help" ]] ; then
+      cp -Rf \
+        "${extension_src_path}" \
+        "$bdsm_path/extensions/"
+    else
+      error "${extension_src_path}/${extension} is not a proper extension."
+    fi
+  done
+}
+
 list_installed()
 {
   version_files=($(
@@ -100,7 +117,7 @@ list_installed()
 
 list_available()
 {
-  [[ -d "${extensions_src_path}" ]] || fetch_repository
+  [[ -d "${extensions_src_path}" ]] || fetch_extensions_repository
 
   if [[ -d "${src_path}" ]] ; then
     version_files=($(
