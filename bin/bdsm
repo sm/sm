@@ -185,8 +185,8 @@ elif [[ -n "$extension" && -n "$action" ]] ; then
         modules bdsm
 
         source_files \
-          "${extension_modules_path}/functions" \
-          "${extension_modules_path}/initialize"
+          "${extension_modules_path}/bash/functions" \
+          "${extension_modules_path}/bash/initialize"
 
         source "${action_file}"
         )

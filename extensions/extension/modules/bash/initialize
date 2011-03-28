@@ -10,6 +10,8 @@ true \
 [[ -n "${extension_args}" ]] || \
   fail "At least one extension must be specified."
 
+ensure_set "${extension_name}
+
 extension_src_path="${src_path}/extensions"
 
 ensure_paths_exist "${extensions_src_path}"
