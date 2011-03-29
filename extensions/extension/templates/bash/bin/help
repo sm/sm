@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
 
-echo -e "
+succeed "
+
 Usage
+
   $0 {install,setup,start,stop,restart,status,help}
+
 Actions
+
   install  - Install the $extension gem.
   setup    - Setup and Configure $extension.
   start    - Start extension.
@@ -11,5 +15,5 @@ Actions
   restart  - Restart extension.
   status   - Display extension status.
   help     - Display this help text.
+
 "
-exit $?

@@ -14,9 +14,10 @@ true \
   "${project_path:="$HOME"}" \
   "${shared_path:=${project_path}/shared}" \
   "${release_path:=${project_path}/current}" \
-  "${vcs:=$(vcs "${shared_path}/${project}")}"
+  "${vcs:=$(vcs "${shared_path}/${project}")}" \
+  "${environment:="production"}"
 
-export project project_path shared previous_path release_path stage_path
+export project environment project_path shared previous_path release_path stage_path
 
 database_name="${database_name:-"${project}_${environment}"}"
 

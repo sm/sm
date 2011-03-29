@@ -1,1 +1,10 @@
 #!/usr/bin/env bash
+
+install_template "${extension}" to \
+  "${init_scripts_path}"
+
+ensure_files_are_executable \
+  "${init_scripts_path}/${extension}"
+
+install_template "${extension}.conf" to \
+  "${init_scripts_path}/${extension}/${extension}.conf"

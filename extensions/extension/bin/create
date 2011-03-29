@@ -1,24 +1,29 @@
 #!/usr/bin/env bash
 
-[[ -n "$extensions" ]] || fail "At least one extension name must be specified."
+[[ ${#extension_args[@]} -gt 0 ]] || \
+  fail "At least one extension name must be specified."
 
-for extension in ${extensions//,/ } ; do
 
-  if [[ ! -d "$extensions_path/extension" ]] ; then
+for extension in ${extension_args[@]} ; do
 
-    if [[ -d "${extensions_path}/extension/templates/${language}" ]] ; then
-      cp -Rf \
-        "$extensions_path/extension/templates/${language}" \
-        "$extensions_path/$extension/"
-
-      succeed "Extension created from template at ${extensions_path}/${extension}/"
-    else
-      fail "Extension template files for are missing from $extensions_path/extension/templates/${language}."
-    fi
-  else
+  [[ -d "$extensions_path/extension" ]] &&
     fail "Extension '$extension' already exists at ${extensions_path}/${extension}."
-  fi
+
+  [[ -d "${extensions_path}/extension/templates/${language}" ]] ||
+    fail "Extension template files for are missing from $extensions_path/extension/templates/${language}."
+
+  (
+  enter "$extensions_path/extension/templates/${language:-bash}"
+
+  copy_directories_to "$extensions_path/$extension/" \
+    bin modules templates
+
+  copy_files_to "$extensions_path/$extension/" \
+    README.md VERSION
+  )
+
+  log "Extension created from template at ${extensions_path}/${extension}/"
 
 done
 
-succeed "Removed extensions ${extensions}"
+succeed "Created extensions ${extension_args[@]}"

@@ -100,7 +100,12 @@ link()
   local _source _target
   while [[ $# -gt 0 ]] ; do
     case "${1}" in
-      to|from)
+      to)
+        _target="${1}"
+        shift
+        ;;
+      from)
+        _source="${1}"
         shift
         ;;
 
@@ -127,6 +132,41 @@ link()
   fi
 }
 
+rename()
+{
+  move "${1:+@}"
+}
+
+move()
+{
+  local _source _target
+  while [[ $# -gt 0 ]] ; do
+    case "${1}" in
+      to)
+        _target="${1}"
+        shift
+        ;;
+      from)
+        _source="${1}"
+        shift
+        ;;
+
+      *)
+        if [[ -z "${_source}" ]] ; then
+          _source="$1" ; shift
+        elif [[ -z "${_target}" ]] ; then
+          _target="$1" ; shift
+          break # When we have a target we are done.
+          # An alternative idea would be to allow an array of multiple targets
+          # to symlink to...
+        fi
+        ;;
+    esac
+  done
+
+  mv "${_source}" "${_target}"
+}
+
 copy_files_to()
 {
   local _path="$1" _file ; shift
@@ -141,7 +181,7 @@ copy_directories_to()
   local _path="${1}" _directory ; shift
   ensure_paths_exist "${_path}"
   for _directory in "$@" ; do
-    rsync -a "${_directory}/" "${_path}/${_directory}/"
+    cp -Rf "${_directory}" "${_path}/"
   done
 }
 

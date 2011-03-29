@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
-[[ -n "$extensions" ]] || fail "At least one extension name must be specified."
+[[ ${#extension_args[@]} -gt 0 ]] || \
+  fail "At least one extension name must be specified."
 
-cd "$extensions_path/$extension/"
+enter "$extensions_path/${extension_args[0]}/"
 
 exec ${EDITOR:-vi} .

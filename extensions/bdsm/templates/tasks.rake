@@ -4,7 +4,7 @@ module BDSM
 
   def bdsm(environment,command)
     @servers[environment.to_sym].each do |server|
-      `ssh #{server} "bash -l -c 'bdsm #{command}'"`
+      %x{ssh #{server} "bash -l -c 'bdsm #{command}'"}
     end
   end
 
@@ -17,6 +17,7 @@ module BDSM
     end
   end
 
+  # TODO: allow dynamic action specification.
   module Unicorn
     namespace :unicorn do
       task :start    do bdsm(@environment, :start)    ; end

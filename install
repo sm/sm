@@ -9,7 +9,6 @@
 # The default prefix is /usr/local,
 # this should be set to where BDSM is installed to in /etc/bdsmrc
 prefix="${prefix:-/usr/local}"
-bin_path="${bin_path:-/usr/local/bin}"
 
 if [[ "$prefix" = "$HOME" ]] ; then
   true "${bdsm_path:="${prefix}bdsm"}"
@@ -52,5 +51,5 @@ ensure_files_exist \
 remove_files \
   "${prefix}/bin/bdsm"
 
-link "${bdsm_path}/bin/bdsm" to "${bin_path}/bdsm"
+link "${bdsm_path}/bin/bdsm" to "${prefix}/bin/bdsm"
 

@@ -37,6 +37,7 @@ branch="master"
 #   in the users ~/.bdsmrc file like so:
 #
 # prefix=/opt/local
-# # bin_path=$prefix/bin
-# # bdsm_path="$prefix/bdsm"
+#
+# bdsm_path will then be set to /opt/local/bdsm
+#
 

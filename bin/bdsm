@@ -3,16 +3,13 @@
 # Author: Wayne E. Seguin
 # See BDSM LICENSE file for Apache 2.0 license information.
 
-# Load System Configuration, if it exists.
+# Load System then User Configuration, if exists.
 [[ -s "/etc/bdsmrc" ]] && . /etc/bdsmrc
-
-# Load User Configuration, if it exists.
 [[ -s "$HOME/.bdsmrc" ]] && . "$HOME/.bdsmrc"
 
 # The default prefix is /usr/local,
 # this should be set to where BDSM is installed to in /etc/bdsmrc
 prefix="${prefix:-/usr/local}"
-bin_path="${bin_path:-/usr/local/bin}"
 
 if [[ "$prefix" = "$HOME" ]] ; then
   true "${bdsm_path:="${prefix}bdsm"}"
@@ -140,7 +137,7 @@ elif [[ -n "$extension" && -n "$action" ]] ; then
     paths=$(env | awk -F= -v ORS=' ' '/_path/{print $1}')
     flags=$(env | awk -F= -v ORS=' ' '/_flag/{print $1}')
 
-    export extension action extension_args bdsm_path bin_path database debug_flag environment error_message extension_bin_path extension_config_path extension_path extension_modules_path extension_templates_path flags head_flag hooks_flag parse_break paths prefix project project_path repository result revision modules_path trace_flag user extension_action
+    export extension action extension_args bdsm_path database debug_flag environment error_message extension_bin_path extension_config_path extension_path extension_modules_path extension_templates_path flags head_flag hooks_flag parse_break paths prefix project project_path repository result revision modules_path trace_flag user extension_action
 
     cd "$extensions_path/$extension" > /dev/null 2>&1
 
@@ -208,7 +205,7 @@ elif [[ -n "$extension" && -n "$action" ]] ; then
     esac
   fi
 elif [[ -n "$extension" ]] ; then
-  echo $(actions_for_extension $extension)
+  log "$(actions_for_extension $extension)"
 else
   usage
 fi

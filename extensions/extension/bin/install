@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 [[ ${#extension_args[@]} -gt 0 ]] || \
-  fail "At least one extension must be specified."
+  fail "At least one extension name must be specified."
 
 case "${extension_version:-head}" in
   *([[:digit:]]).*([[:digit:]]).*([[:digit:]]))

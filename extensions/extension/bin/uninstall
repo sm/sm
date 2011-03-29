@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
-[[ -n "$extensions" ]] || fail "At least one extension name must be specified."
+[[ ${#extension_args[@]} -gt 0 ]] || \
+  fail "At least one extension name must be specified."
 
-for extension in ${extensions//,/ } ; do
-  [[ -d "$extensions_path/$extension/" ]] && rm -rf "$extensions_path/$extension/"
+for extension in "${extensions[@]}" ; do
+  remove_directories "$extensions_path/$extension/"
 done
 
 succeed "Removed extensions ${extensions}"

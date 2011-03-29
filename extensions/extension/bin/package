@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 
-[[ -n "$extensions" ]] || fail "A extension must be specified."
+[[ ${#extension_args[@]} -gt 0 ]] || \
+  fail "At least one extension name must be specified."
 
 ensure_paths_exist "$archives_path/"
 
 # bdsm extension package A,B,C
-for extension in ${extensions//,/ } ; do
+for extension in "${extensions[@]}" ; do
 
-  if [[ -s "$extensions_path/$extension/VERSION" ]] ; then
-    version="$(cat "$extensions_path/$extension/VERSION")"
-  else
+  [[ -s "$extensions_path/$extension/VERSION" ]] || \
     fail "The version must be specified in $extensions_path/$extension/VERSION"
-  fi
+
+  version="$(cat "$extensions_path/$extension/VERSION")"
 
   release_name="${extension}-${version}"
   releases_path="${extensions_path}/${extension}/archives"
@@ -19,14 +19,13 @@ for extension in ${extensions//,/ } ; do
 
   rsync -avgz --delete \
     --exclude ".git" --exclude ".svn" --exclude ".hg" --exclude "archives" \
-    "${extensions_path}/${extension}/" "$release_path/"
+    "${extensions_path}/${extension}/" \
+    "$release_path/"
 
-  cd "${releases_path}"
+  enter "${releases_path}"
 
   tar zcvf "${release_name}.tar.gz" "${release_name}/"
 
-  rm -rf "$release_path/"
+  remove_directories "$release_path/"
 
 done
-
-exit $result
