@@ -97,7 +97,7 @@ ensure_files_are_executable()
 #
 link()
 {
-  local token _source _target
+  local token _source _target _force_flag=1
 
   while [[ $# -gt 0 ]] ; do
     token="$1" ; shift
@@ -109,24 +109,24 @@ link()
       from)
         _source="${token}"
         ;;
+      --force)
+        _force_flag=1
+        ;;
 
       *)
         if [[ -z "${_source}" ]] ; then
           _source="$token"
         elif [[ -z "${_target}" ]] ; then
           _target="$token"
-          break # When we have a target we are done.
-          # An alternative idea would be to allow an array of multiple targets
-          # to symlink to...
         fi
         ;;
     esac
   done
 
   # TODO: What should we do if files already exist?
-  if [[ -f "${_target}" ]] ; then
+  if [[ -f "${_target}" && ${_force_flag} -eq 0 ]] ; then
     error "Cannot link ${_source} to ${_target} exists and is a file!"
-  elif [[ -d "${_target}" ]] ; then
+  elif [[ -d "${_target}" && ${_force_flag} -eq 0  ]] ; then
     error "Cannot link ${_source} to ${_target} exists and is a directory"
   else
     ln -fs "${_source}" "${_target}"
