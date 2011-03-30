@@ -104,10 +104,10 @@ link()
 
     case "${token}" in
       to)
-        _target="${token}"
+        _target="${1}" ; shift
         ;;
       from)
-        _source="${token}"
+        _source="${1}" ; shift
         ;;
       --force)
         _force_flag=1
