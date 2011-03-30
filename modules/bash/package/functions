@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+
+fetch_package_md5()
+{
+  true ${md5_url:=${1}.md5}
+  curl \
+    -L "${md5_url}/${package_file}.md5" \
+    -o "${md5_url##*\/}"
+}
+
+fetch_package()
+{
+  true ${url:=$1}
+  curl \
+    -L "${url}/${package_file}" \
+    -o "${url##*\/}"
+}
+
+extract_package()
+{
+  case "$1" in
+    *.tar.gz|*.tgz|*.xz)
+      tar zxf "${1}"
+      ;;
+    *.tar.bz2)
+      tar jxf "${1}"
+      ;;
+    *.zip)
+      unzip "${1}" -C ${source_path}
+      ;;
+    *)
+      fail "Unknown archive format for ${1}"
+      ;;
+  esac
+}
+
+configure_package()
+{
+  ./configure ${configure_flags[@]:-}
+}
+
+make_package()
+{
+  # TODO: make this robust, -j4 for example.
+  make
+}
+
+install_package()
+{
+  # TODO: make this robust
+  make install
+}
+
+build_package()
+{
+  ensure_paths_exist "${source_path}"
+
+  enter "${source_path}"
+
+  fetch_package
+
+  extract_package
+
+  enter "${package}-${package_version}"
+
+  configure_package
+
+  make_package
+
+  install_package
+}
+

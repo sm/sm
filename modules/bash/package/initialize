@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+# Ensure that default values are set.
+true \
+  "${source_path:=/usr/local/src}" \
+  "${archive_format:=tar.gz}" \
+  "${package_file:="${package}-${package_version}.${archive_format}"}"
+
