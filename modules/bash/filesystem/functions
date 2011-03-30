@@ -97,23 +97,24 @@ ensure_files_are_executable()
 #
 link()
 {
-  local _source _target
+  local token _source _target
+
   while [[ $# -gt 0 ]] ; do
-    case "${1}" in
+    token="$1" ; shift
+
+    case "${token}" in
       to)
-        _target="${1}"
-        shift
+        _target="${token}"
         ;;
       from)
-        _source="${1}"
-        shift
+        _source="${token}"
         ;;
 
       *)
         if [[ -z "${_source}" ]] ; then
-          _source="$1" ; shift
+          _source="$token"
         elif [[ -z "${_target}" ]] ; then
-          _target="$1" ; shift
+          _target="$token"
           break # When we have a target we are done.
           # An alternative idea would be to allow an array of multiple targets
           # to symlink to...

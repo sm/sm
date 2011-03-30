@@ -3,7 +3,7 @@
 installed_extensions()
 {
   version_files=($(
-    find "${extensions_path}"/* -mindepth 1 -maxdepth 1 -name 'VERSION' -type f
+    find "${extensions_path}/" -mindepth 2 -maxdepth 2 -name 'VERSION' -type f
   ))
 
   for version_file in ${version_files[@]} ; do
@@ -24,7 +24,7 @@ installed_extensions()
 available_extensions()
 {
   version_files=($(
-  find "${extensions_src_path}"/* -mindepth 1 -maxdepth 1 -name 'VERSION' -type f
+  find "${extensions_src_path}/" -mindepth 2 -maxdepth 2 -name 'VERSION' -type f
   ))
 
   for version_file in ${version_files[@]} ; do

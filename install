@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+set -x
 # Load System Configuration, if it exists.
 [[ -s "/etc/bdsmrc" ]] && . /etc/bdsmrc
 
