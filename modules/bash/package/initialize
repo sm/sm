@@ -2,7 +2,12 @@
 
 # Ensure that default values are set.
 true \
-  "${source_path:=/usr/local/src}" \
+  "${package_name:=$package}" \
+  "${prefix_path:="/usr/local"}"
+
+true \
+  "${bin_path:="${prefix_path}/bin"}" \
+  "${source_path:="${prefix_path}/src"}" \
   "${archive_format:=tar.gz}" \
-  "${package_file:="${package}-${package_version}.${archive_format}"}"
+  "${package_file:="${package_name}-${package_version}.${archive_format}"}"
 

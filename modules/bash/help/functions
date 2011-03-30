@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+show_help()
+{
+  while [[ $# -gt 0 ]] ; do
+    token="$1" ; shift
+
+    case "$token" in
+      desc*|description)
+        description
+        ;;
+      actions)
+        actions
+        ;;
+      help|usage|*)
+        usage
+        ;;
+    esac
+  done
+}
+
+description() { help_description="$*" ; }
+
+actions(){ help_actions="$*" ; }
+
+notes() { help_notes="$*" ; }
+
+dependencies() { help_dependencies="$*" ; }
+
+resources() { help_resources="$*" ; }
+
+usage()
+{
+  log "\nUsage\n\n    bdsm ${extension} <action> <<arguments>>\n"
+
+  [[ -n "${help_description}" ]] && \
+    log "\nDescription\n    BDSM ${help_description}"
+
+  log "\nActions\n"
+  [[ -n "${help_actions}" ]] && \
+    log "${help_actions}\n"
+  log "  help - Display this help text."
+
+  [[ -n "${help_notes}" ]] && \
+    log "\nNotes\n${help_notes}"
+
+  [[ -n "${help_dependencies}" ]] && \
+    log "\nDependencies\n${help_dependencies}"
+
+  [[ -n "${help_resources}" ]] && \
+    log "\nResources\n${help_resources}"
+}
+

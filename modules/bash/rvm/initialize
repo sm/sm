@@ -6,9 +6,10 @@
 source_files "/etc/rvmrc" "$HOME/.rvmrc"
 
 # Attempt to load RVM
-source_files first $(
+source_files $(first $(
   nonempty_files \
     "$rvm_path/.rvm/scripts/rvm" \
     "$HOME/.rvm/scripts/rvm" \
     "/usr/local/scripts/rvm"
+  )
 )
