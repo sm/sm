@@ -3,26 +3,27 @@
 [[ ${#extension_args[@]} -gt 0 ]] || \
   fail "At least one extension name must be specified."
 
+target_path="$PWD" # extensions_path
 
 for extension in ${extension_args[@]} ; do
 
-  [[ -d "$extensions_path/extension" ]] &&
-    fail "Extension '$extension' already exists at ${extensions_path}/${extension}."
+  [[ -d "$target_path/extension" ]] &&
+    fail "Extension '$extension' already exists at ${target_path}/${extension}."
 
-  [[ -d "${extensions_path}/extension/templates/${language}" ]] ||
-    fail "Extension template files for are missing from $extensions_path/extension/templates/${language}."
+  [[ -d "${target_path}/extension/templates/${language}" ]] ||
+    fail "Extension template files for are missing from $target_path/extension/templates/${language}."
 
   (
-  enter "$extensions_path/extension/templates/${language:-bash}"
+  enter "$target_path/extension/templates/${language:-bash}"
 
-  copy_directories_to "$extensions_path/$extension/" \
+  copy_directories_to "$target_path/$extension/" \
     bin modules templates
 
-  copy_files_to "$extensions_path/$extension/" \
+  copy_files_to "$target_path/$extension/" \
     README.md VERSION
   )
 
-  log "Extension created from template at ${extensions_path}/${extension}/"
+  log "Extension created from template at ${target_path}/${extension}/"
 
 done
 
