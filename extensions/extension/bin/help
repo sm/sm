@@ -1,15 +1,17 @@
 #!/usr/bin/env bash
 
-usage()
-{
-  printf "
+description "BDSM Extension manager."
 
-Usage:
-
-  bdsm extension install X      - Install extension X
-  bdsm extensions install X Y Z - Install extensions X Y and Z
-  bdsm extensions update all    - Update all installed extensions
-  bdsm extensions update X      - Update extension X
-
+actions "  update repository - Update main BDSM Extension repository from remote (git).
+  install        - install named extension
+  create         - create a new extension from the default template in the current directory.
+  list available - List extensions available in the main repository.
+  list installed - List all installed extensions.
+  update X       - update extension X
+  update all     - update all installed extensions
 "
-}
+
+resources "http://bdsm.beginrescueend.com/${extension}/"
+
+show_help
+
