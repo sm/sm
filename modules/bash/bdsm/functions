@@ -235,3 +235,15 @@ bdsmrc()
     source "$HOME/.bdsmrc"
 }
 
+reload_extension()
+{
+  source_files \
+    "${extension_modules_path}/bash/functions" \
+    "${extension_modules_path}/bash/initialize"
+}
+
+reinit_extension()
+{
+  source_files \
+    "${extension_modules_path}/bash/initialize"
+}

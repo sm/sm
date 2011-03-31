@@ -54,7 +54,7 @@ define_package()
 }
 
 # TODO: much more error checking and conditional branching.
-build_package()
+install_package()
 {
   ensure_nonempty \
     "package_name" \
@@ -71,11 +71,15 @@ build_package()
 
   enter "${package}-${package_version}"
 
+  if command -v patch_package 2>/dev/null ; then
+    patch_package
+  fi
+
   configure_package
 
   make_package
 
-  install_package
+  make_install_package
 }
 
 fetch_package_md5()
@@ -123,7 +127,7 @@ make_package()
   make
 }
 
-install_package()
+make_install_package()
 {
   # TODO: make this robust
   make install
