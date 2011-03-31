@@ -21,10 +21,23 @@ true "${modules_path:="${bdsm_path}/modules"}"
 # Load BDSM bash DSL functions and initialize for BDSM core itself manually.
 source "./modules/bash/bdsm/functions"
 # filesystem DSL
-source "./modules/bash/filesystem/initialize"
-source "./modules/bash/filesystem/functions"
+for module in filesystem trace bdsm ; do
+  for file in functions initialize  ; do
+    source "./modules/bash/${module}/${file}"
+  done
+done
 
-source "./modules/bash/bdsm/initialize"
+modules trace
+
+while [[ $# -gt 0 ]] ; do
+  token="$1" ; shift
+  case "$token" in
+    --trace)
+      export trace_flag=1
+      enable_trace
+      ;;
+  esac
+done
 
 ensure_paths_exist \
   "${bdsm_path}"
@@ -51,5 +64,5 @@ ensure_files_exist \
 remove_files \
   "${prefix}/bin/bdsm"
 
-link "${bdsm_path}/bin/bdsm" to "${prefix}/bin/bdsm"
+link "${bdsm_path}/bin/bdsm" to "${prefix}/bin/bdsm" --force
 

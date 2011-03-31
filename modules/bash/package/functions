@@ -1,5 +1,83 @@
 #!/usr/bin/env bash
 
+# Example Usage:
+#
+# define_package \
+#   name "bash"
+#   version "4.2"
+#   url "ftp.gnu.org/gnu/bash/"
+#
+define_package()
+{
+  while [[ $# -gt 0 ]] ; do
+    key="$1" ; shift
+    if [[ -n "${1:-}" ]] ; then
+      value="$1" ; shift
+    else
+      fail "${extension} : ${action} : define_package() : Missing value for key '${key}'"
+    fi
+
+    case "$key" in
+      name)
+        package_name="${value}"
+        ;;
+      version)
+        package_version="${value}"
+        ;;
+      url)
+        package_url="${value}"
+        ;;
+      md5_url)
+        package_md5_url="${value}"
+        ;;
+      bin_path)
+        bin_path="${value}"
+        ;;
+      prefix_path)
+        prefix_path="${value}"
+        ;;
+      source_path)
+        source_path="${value}"
+        ;;
+      archive_format)
+        archive_format="${value}"
+        ;;
+      # TODO: Simplify into
+      #(+([[[:alnum:]]|])_path|name|version|url|md5_url)
+      #  eval "${key}=${value}"
+      #  ;;
+      *)
+        fail "Unknown key for define_package() : '${key}' (value: ${value})"
+      ;;
+    esac
+  done
+}
+
+# TODO: much more error checking and conditional branching.
+build_package()
+{
+  ensure_nonempty \
+    "package_name" \
+    "package_version" \
+    "archive_format"
+
+  ensure_paths_exist "${source_path}"
+
+  enter "${source_path}"
+
+  fetch_package
+
+  extract_package
+
+  enter "${package}-${package_version}"
+
+  configure_package
+
+  make_package
+
+  install_package
+}
+
 fetch_package_md5()
 {
   true ${md5_url:=${1}.md5}
@@ -49,24 +127,5 @@ install_package()
 {
   # TODO: make this robust
   make install
-}
-
-build_package()
-{
-  ensure_paths_exist "${source_path}"
-
-  enter "${source_path}"
-
-  fetch_package
-
-  extract_package
-
-  enter "${package}-${package_version}"
-
-  configure_package
-
-  make_package
-
-  install_package
 }
 
