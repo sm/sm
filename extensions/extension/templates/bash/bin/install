@@ -7,7 +7,8 @@ while [[ $# -gt 0 ]] ; do
 
   case "$token" in
     --trace)
-      set -o xtrace
+      trace_flag=1
+      enable_trace
       ;;
     --version)
       version="$1"
@@ -23,22 +24,6 @@ while [[ $# -gt 0 ]] ; do
   esac
 done
 
-# Functions exist in the extension directory modules/bash/functions file.
-
-download_${extension}
-
-extract_${extension}
-
-build_${extension}
-
-install_${extension}
-
-setup_${extension}_user
-
-create_${extension}_directories
-
-install_init_script
-
-install_${extension}_conf
+build_package
 
 succeed "Installation Complete."
