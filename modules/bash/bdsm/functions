@@ -21,7 +21,7 @@ bdsm_exports()
   unset extension action
 
   # TODO: Filter this list of exports down.
-  export project database_name old_releases bdsm_path current_path previous_path project_path shared_path archives_path branch config_path extensions_path framework hooks_flag keep_releases prefix remote result modules_path src_path tmp_path templates_path timestamp user
+  export project database_name old_releases bdsm_path release_path previous_path project_path shared_path archives_path branch config_path extensions_path framework hooks_flag keep_releases prefix remote result modules_path src_path tmp_path templates_path timestamp user
 }
 
 bdsm_set_trap()
