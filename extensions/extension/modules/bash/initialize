@@ -7,6 +7,8 @@ true \
   ${remote:="origin"} \
   ${branch:="master"}
 
+modules extensions
+
 extensions_src_path="${src_path}/extensions"
 
 ensure_paths_exist "${extensions_src_path}"
