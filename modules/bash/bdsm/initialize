@@ -2,8 +2,6 @@
 
 shopt -s extglob # Extended globs must always be on for BDSM.
 
-export initial_pwd="$PWD"
-
 bdsm_path
 
 true \
