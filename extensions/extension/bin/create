@@ -3,7 +3,7 @@
 [[ ${#extension_args[@]} -gt 0 ]] || \
   fail "At least one extension name must be specified."
 
-target_path="$PWD" # extensions_path
+target_path="$initial_pwd" # extensions_path
 
 for extension in ${extension_args[@]} ; do
 
