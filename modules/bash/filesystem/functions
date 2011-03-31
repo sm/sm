@@ -123,10 +123,14 @@ link()
     esac
   done
 
+  if [[ ${_force_flag} -eq 1 ]] ; then
+    remove_files "${_target}"
+  fi
+
   # TODO: What should we do if files already exist?
-  if [[ -f "${_target}" && ${_force_flag} -eq 0 ]] ; then
+  if [[ -f "${_target}" -eq 0 ]] ; then
     error "Cannot link ${_source} to ${_target} exists and is a file!"
-  elif [[ -d "${_target}" && ${_force_flag} -eq 0  ]] ; then
+  elif [[ -d "${_target}" -eq 0 ]] ; then
     error "Cannot link ${_source} to ${_target} exists and is a directory"
   else
     ln -fs "${_source}" "${_target}"
