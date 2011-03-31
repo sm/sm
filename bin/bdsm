@@ -7,6 +7,9 @@
 [[ -s "/etc/bdsmrc" ]] && . /etc/bdsmrc
 [[ -s "$HOME/.bdsmrc" ]] && . "$HOME/.bdsmrc"
 
+# In case bdsm is being called from within a hook for example, we unset these:
+unset extension action
+
 # The default prefix is /usr/local,
 # this should be set to where BDSM is installed to in /etc/bdsmrc
 prefix="${prefix:-/usr/local}"
@@ -29,6 +32,7 @@ source "${modules_path}/bash/bdsm/initialize"
 [[ -s "$bdsm_path/VERSION" ]] && VERSION="$(cat "$bdsm_path/VERSION")"
 
 user="$USER"
+
 
 #
 # parse args
@@ -139,9 +143,9 @@ elif [[ -n "$extension" && -n "$action" ]] ; then
     paths=$(env | awk -F= -v ORS=' ' '/_path/{print $1}')
     flags=$(env | awk -F= -v ORS=' ' '/_flag/{print $1}')
 
-    export extension action extension_args bdsm_path database debug_flag environment error_message extension_bin_path extension_config_path extension_path extension_modules_path extension_templates_path flags head_flag hooks_flag parse_break paths prefix project project_path repository result revision modules_path trace_flag user extension_action
-
     cd "$extensions_path/$extension" > /dev/null 2>&1
+
+    bdsm_exports
 
     action_file="$extensions_path/$extension/bin/$action"
     action_file_type="$(file "$action_file")"

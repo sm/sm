@@ -2,12 +2,13 @@
 
 # Ensure that default values are set.
 true \
-  "${package_name:=$package}" \
-  "${prefix_path:="/usr/local"}"
+  "${prefix_path:="/usr/local"}" \
+  "${archive_format:=tar.gz}" \
+  "${package_name:=${extension}}"
 
 true \
   "${bin_path:="${prefix_path}/bin"}" \
-  "${source_path:="${prefix_path}/src"}" \
-  "${archive_format:=tar.gz}" \
-  "${package_file:="${package_name}-${package_version}.${archive_format}"}"
+  "${source_path:="${prefix_path}/src"}"
+
+export package_name prefix_path package_name package_version archive_format package_file package_url package_md5_url prefix_path bin_path source_path
 

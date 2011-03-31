@@ -21,3 +21,13 @@ match()
   esac
 }
 
+ensure_nonempty()
+{
+  local variable
+
+  for variable in "$@" ; do
+    if eval "[[ -z \"\${${variable}}\" ]]" ; then
+      fail "${extension} ${action} Required variable '$variable' is not set."
+    fi
+  done
+}

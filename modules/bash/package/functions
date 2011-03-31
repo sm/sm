@@ -24,8 +24,17 @@ define_package()
       version)
         package_version="${value}"
         ;;
+      file)
+        package_file="${value}"
+        ;;
+      dir)
+        package_dir="${value}"
+        ;;
       url)
         package_url="${value}"
+        ;;
+      base_url)
+        package_base_url="${value}"
         ;;
       md5_url)
         package_md5_url="${value}"
@@ -61,6 +70,8 @@ install_package()
     "package_version" \
     "archive_format"
 
+  true "${package_dir:="${package_name}-${package_version}"}"
+
   ensure_paths_exist "${source_path}"
 
   enter "${source_path}"
@@ -69,8 +80,9 @@ install_package()
 
   extract_package
 
-  enter "${package}-${package_version}"
+  enter "${package_dir}"
 
+  # If the extension has defined a patch_package function, call it.
   if command -v patch_package 2>/dev/null ; then
     patch_package
   fi
@@ -79,57 +91,103 @@ install_package()
 
   make_package
 
-  make_install_package
+  if make_install_package ; then
+    log "Installed ${package_name} ${package_version}."
+  else
+    fail "Failed to install ${package_name} ${package_version} to ${prefix_path}."
+  fi
+}
+
+uninstall_package()
+{
+  ensure_nonempty \
+    "package_name" \
+    "package_version" \
+    "archive_format"
+
+  true "${package_dir:="${package_name}-${package_version}"}"
+
+  if ! make_uninstall_package ; then
+    log "Uninstalled ${package_name} from ${prefix_path}."
+  else
+    fail "Failed to uninstall ${package_name} from ${prefix_path}."
+  fi
 }
 
 fetch_package_md5()
 {
-  true ${md5_url:=${1}.md5}
-  curl \
-    -L "${md5_url}/${package_file}.md5" \
-    -o "${md5_url##*\/}"
+  ensure_nonempty package_name package_version archive_format
+
+  local download_url
+
+  true "${package_file:="${package_name}-${package_version}.${archive_format}"}"
+  true "${packge_md5_url:="${package_base_url}/${package_file}.md5"}"
+
+  if ! curl -L "${packge_md5_url}" -o "${package_file}.md5" ; then
+    package_md5=$(cat "${package_file}.md5")
+  else
+    fail "Fetching md5 from '${package_md5_url}' failed."
+  fi
 }
 
 fetch_package()
 {
-  true ${url:=$1}
-  curl \
-    -L "${url}/${package_file}" \
-    -o "${url##*\/}"
+  ensure_nonempty package_name package_version archive_format
+
+  true "${package_file:="${package_name}-${package_version}.${archive_format}"}"
+  true "${package_url:="${package_base_url}/${package_file}"}"
+
+  if ! curl -L "${package_url}" -o "${package_file}" ; then
+    fail "Downloading ${package_name} from '${package_url}' to '${package_file}' failed "
+  fi
 }
 
 extract_package()
 {
-  case "$1" in
-    *.tar.gz|*.tgz|*.xz)
-      tar zxf "${1}"
+  true "${package_file:="${package_name}-${package_version}.${archive_format}"}"
+
+  case "${archive_format}" in
+    tar.gz|tgz|xz)
+      tar xf "${package_file}"
       ;;
-    *.tar.bz2)
-      tar jxf "${1}"
+    tar.bz2)
+      tar jxf "${package_file}"
       ;;
-    *.zip)
-      unzip "${1}" -C ${source_path}
+    zip)
+      unzip "${package_file}" -C ${source_path}
       ;;
     *)
-      fail "Unknown archive format for ${1}"
+      fail "Unknown archive format for ${package_file}"
       ;;
   esac
 }
 
 configure_package()
 {
-  ./configure ${configure_flags[@]:-}
+  enter "${package_dir}"
+  if ./configure --prefix="${prefix_path}" ${configure_flags[@]:-} ; then
+    log "Configuration of ${package} successful."
+  else
+    fail "Configuration of ${package} failed, seek help..."
+  fi
 }
 
 make_package()
 {
-  # TODO: make this robust, -j4 for example.
-  make
+  enter "${package_dir}"
+  make # TODO: make this robust, -j4 for example.
 }
 
 make_install_package()
 {
-  # TODO: make this robust
-  make install
+  enter "${package_dir}"
+  make install # TODO: make this robust
+}
+
+
+make_uninstall_package()
+{
+  enter "${package_dir}"
+  make uninstall # TODO: make this robust
 }
 

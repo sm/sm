@@ -17,11 +17,8 @@ bdsm_path()
 
 bdsm_exports()
 {
-  # In case bdsm is being called from within a hook for example, we unset these:
-  unset extension action
-
+  export action archives_path bdsm_path branch config_path database database_name debug_flag environment error_message extension extension_action extension_args extension_bin_path extension_config_path extension_modules_path extension_path extension_templates_path extensions_path flags framework head_flag hooks_flag keep_releases modules_path old_releases parse_break paths prefix previous_path project project_path release_path remote repository result revision shared_path src_path templates_path timestamp tmp_path trace_flag user
   # TODO: Filter this list of exports down.
-  export project database_name old_releases bdsm_path release_path previous_path project_path shared_path archives_path branch config_path extensions_path framework hooks_flag keep_releases prefix remote result modules_path src_path tmp_path templates_path timestamp user
 }
 
 bdsm_set_trap()
