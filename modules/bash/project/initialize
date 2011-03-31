@@ -11,11 +11,15 @@ fi
 
 true \
   "${project:="$USER"}" \
-  "${project_path:="$HOME"}" \
+  "${project_path:="$HOME"}"
+
+true \
   "${shared_path:=${project_path}/shared}" \
   "${release_path:=${project_path}/current}" \
-  "${vcs:=$(vcs "${shared_path}/${project}")}" \
   "${environment:="production"}"
+
+true \
+  "${vcs:=$(vcs "${shared_path}/${project}")}"
 
 export project environment project_path shared previous_path release_path stage_path
 
