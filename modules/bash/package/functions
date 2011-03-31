@@ -36,6 +36,9 @@ define_package()
       base_url)
         package_base_url="${value}"
         ;;
+      patches_url)
+        package_patches_url="${value}"
+        ;;
       md5_url)
         package_md5_url="${value}"
         ;;
@@ -164,7 +167,6 @@ extract_package()
 
 configure_package()
 {
-  enter "${package_dir}"
   if ./configure --prefix="${prefix_path}" ${configure_flags[@]:-} ; then
     log "Configuration of ${package} successful."
   else
@@ -174,20 +176,17 @@ configure_package()
 
 make_package()
 {
-  enter "${package_dir}"
   make # TODO: make this robust, -j4 for example.
 }
 
 make_install_package()
 {
-  enter "${package_dir}"
   make install # TODO: make this robust
 }
 
 
 make_uninstall_package()
 {
-  enter "${package_dir}"
   make uninstall # TODO: make this robust
 }
 
