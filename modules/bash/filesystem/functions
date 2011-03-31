@@ -128,9 +128,9 @@ link()
   fi
 
   # TODO: What should we do if files already exist?
-  if [[ -f "${_target}" -eq 0 ]] ; then
+  if [[ -f "${_target}" ]] ; then
     error "Cannot link ${_source} to ${_target} exists and is a file!"
-  elif [[ -d "${_target}" -eq 0 ]] ; then
+  elif [[ -d "${_target}" ]] ; then
     error "Cannot link ${_source} to ${_target} exists and is a directory"
   else
     ln -fs "${_source}" "${_target}"
