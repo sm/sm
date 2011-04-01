@@ -204,7 +204,7 @@ install_head()
       fi
     elif [[ -z "$(git branch | awk "/\* $branch$/{print \$2}")" ]] ; then
       if ! git checkout $branch 2>/dev/null ; then
-        fail "Unable to checkout $branch."
+        fail "Unable to checkout $branch.\nCould not get head. Sucks to be you... or rather... doesn't suck :-p"
       fi
     fi
 
@@ -214,14 +214,14 @@ install_head()
 
     if ! git clone --depth 1 git://github.com/wayneeseguin/bdsm.git ; then
       if !  git clone https://github.com/wayneeseguin/bdsm.git ; then
-        fail "Unable to clone the BDSM repository, attempted both git:// and https://"
+        fail "Unable to clone the BDSM repository, attempted both git:// and https://\nCould not get head, terribly sorry about the blue balls :("
       fi
     fi
   fi
 
-  builtin cd "${src_path}/bdsm/"
+  log "Ahh... that's better...\nIt always feels so nice to get head.\nQuite a load this time eh?\nRemember to get head often!\n"
 
-  return 0
+  builtin cd "${src_path}/bdsm/"
 }
 
 # Source bdsmrc files, cascaded.
