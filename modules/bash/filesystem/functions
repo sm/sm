@@ -210,10 +210,11 @@ chown_paths()
 enter()
 {
   local _path="$1"
-  if ! builtin cd "${_path}" ; then
+  if [[ ! -d "${_path}" ]] ; then
     fail "Could not enter directory ${_path}."
+  else
+    builtin cd "${_path}"
   fi
-  return 0
 }
 
 hash_file()
