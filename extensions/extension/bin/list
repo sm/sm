@@ -51,6 +51,6 @@ case "$extension_action" in
   ;;
 
   *)
-    fail "$(list_help)"
+    list_installed
   ;;
 esac
