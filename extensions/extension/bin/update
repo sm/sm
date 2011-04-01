@@ -48,10 +48,7 @@ case "$extension_action" in
 
       install_extensions "${extension_action}" "${extension_args[@]}"
     else
-      usage
-      exit 1
+      fetch_extensions_repository
     fi
   ;;
 esac
-
-exit 0
