@@ -55,7 +55,6 @@ fetch_extensions_repository()
     git clone --depth 1 "${extensions_repository_url}" "extensions" >/dev/null 2>&1
   fi
   )
-  enter "${extensions_src_path}/${extension}"
 }
 
 fetch_tarball()
