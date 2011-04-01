@@ -12,7 +12,8 @@ usage()
 }
 
 true \
-  ${repository_url:="git://github.com/wayneeseguin/bdsm"}
+  ${repository_url:="git://github.com/wayneeseguin/bdsm"} \
+  ${releases_url:="http://bdsm.beginrescueend.com/releases"}
 
 command="usage" # Default
 

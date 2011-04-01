@@ -7,7 +7,7 @@ fetch_version()
 
 fetch_md5()
 {
-  md5=$(curl -B "${releases_url}/rvm-${version}.tar.gz.md5" 2>/dev/null)
+  md5=$(curl -B "${releases_url}/bdsm-${version}.tar.gz.md5" 2>/dev/null)
 }
 
 md5_match()
