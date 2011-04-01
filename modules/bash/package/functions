@@ -190,3 +190,16 @@ make_uninstall_package()
   make uninstall # TODO: make this robust
 }
 
+cleanup_install_files()
+{
+  log "#cleaning install files for ${package} ${package_version}...\n"
+
+  enter "${src_path}"
+
+  local files=($(
+  find "$src_path/" -mindepth 1 -maxdepth 1 -iname "${package}*${package_version}*"
+  ))
+
+  remove_files "${files[@]}"
+}
+
