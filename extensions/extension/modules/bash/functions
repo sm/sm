@@ -90,3 +90,73 @@ install_extensions()
   done
 }
 
+#
+# Package given extension.
+#
+package_extension()
+{
+  local sha1="" version
+
+  extension_path="${extensions_path}/${extension}"
+
+  if ! version="$(cat "$extension_path/VERSION" 2>/dev/null)" ; then
+    fail "${extension_path}/VERSION file is missing. Halting packaging."
+  fi
+
+  # TODO: add a sanity check to ensure that VERSION matches x.y.x
+
+  true ${releases_path:="${source_path}/bdsm-extensions/releases"}
+
+  true \
+    ${release_name:="${extension}-${version}"} \
+    ${release_path:="${releases_path}/${release_name}"} \
+    ${remote:=origin} \
+    ${branch:=master}
+
+  ensure_paths_exist "$releases_path/" "$release_path/"
+
+  enter "${extension_path}"
+
+  if [[ -d ".git" ]] ; then
+    sha1=$(git log -n 1 | head -1 | awk '{print $2}')
+
+    # Tag & push
+    git tag "${version}"
+    git push "${remote}" "${version}"
+    git push "${remote}" "${branch}"
+  fi
+
+  release_files=(VERSION README.md)
+  for file in "${release_files[@]}" ; do
+    if [[ -f "${file}" ]] ; then
+      cp -f "${file}" "${release_path}/"
+    else
+      log "WARNING: Missing extension file: '${file}'"
+    fi
+  done
+
+  release_directories=(bin config modules templates)
+  for directory in "${release_directories[@]}" ; do
+    if [[ -d "${directory}" ]] ; then
+      cp -Rf "${directory}" "${release_path}/"
+    else
+      log "WARNING: Missing extension directory: '${directory}'"
+    fi
+  done
+
+  if [[ -n "${sha1}" ]] ; then
+    echo "${sha1:0:7}" > "${release_path}/sha1"
+  fi
+
+  enter "$releases_path"
+
+  tar zcvf "$release_name".tar.gz "$release_name/"
+  md5 "${release_name}.tar.gz" | awk '{print $NF}' > "${release_name}.tar.gz.md5"
+
+  tar jcvf "$release_name".tar.bz2 "$release_name/"
+  md5 "${release_name}.tar.bz2" | awk '{print $NF}' > "${release_name}.tar.bz2.md5"
+
+  remove_directories "${release_name}/"
+
+  log "Packaging of extension ${release_name} complete."
+}

@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
 
+#
+#
+# TODO: put all of this into a module.
+#
+#
+#
+#
 [[ ${#extension_args[@]} -gt 0 ]] || \
   fail "At least one extension name must be specified."
-
-ensure_paths_exist "$archives_path/"
 
 # bdsm extension package A,B,C
 for extension in "${extensions[@]}" ; do
@@ -13,19 +18,9 @@ for extension in "${extensions[@]}" ; do
 
   version="$(cat "$extensions_path/$extension/VERSION")"
 
-  release_name="${extension}-${version}"
-  releases_path="${extensions_path}/${extension}/archives"
-  release_path="${releases_path}/${release_name}"
-
-  rsync -avgz --delete \
-    --exclude ".git" --exclude ".svn" --exclude ".hg" --exclude "archives" \
-    "${extensions_path}/${extension}/" \
-    "$release_path/"
-
-  enter "${releases_path}"
-
-  tar zcvf "${release_name}.tar.gz" "${release_name}/"
-
-  remove_directories "$release_path/"
+  package_extension
 
 done
+
+exit 0
+
