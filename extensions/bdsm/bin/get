@@ -1,0 +1,146 @@
+#!/usr/bin/env bash
+
+# modules filesystem
+
+usage()
+{
+  modules help
+  description "BDSM self-installer."
+  actions "  head   - Get the latest BDSM from the git repository master branch
+    latest - Download and install the latest BDSM release package"
+  show_help
+}
+
+fetch_version()
+{
+  version=$(curl -B "${releases_url}/latest-version.txt" 2>/dev/null)
+}
+
+fetch_md5()
+{
+  md5=$(curl -B "${releases_url}/rvm-${version}.tar.gz.md5" 2>/dev/null)
+}
+
+md5_match()
+{
+  local archive="$1"
+
+  case "$(uname)" in
+    Darwin|FreeBSD)
+      archive_md5="$(/sbin/md5 -q "${archive}")"
+      ;;
+
+    OpenBSD)
+      archive_md5="$(/bin/md5 -q "${archive}")"
+      ;;
+
+    Linux|*)
+      archive_md5="$(md5sum "${archive}" | awk '{print $1}')"
+      ;;
+  esac
+
+  [[ "$archive_md5" == "$md5" ]]
+
+  return $?
+}
+
+install_release()
+{
+  archive="$archives_path/bdsm-${version}.tar.gz"
+
+  fetch_md5
+
+  if [[ -s $archive ]] && ! md5_match ; then
+    # Remove old installs, if they exist and have incorrect md5.
+    [[ -f "$archives_path/bdsm-${version}.tar.gz" ]] &&
+      rm -f "$archives_path/bdsm-${version}.tar.gz"
+  fi
+
+  curl -L "${releases_url}/bdsm-${version}.tar.gz" -o "$archive"
+
+  if ! md5_match "$archive" ; then
+    fail "ERROR:
+
+Archive package downloaded does not match it's calculated md5 checksum ${md5}:
+
+  $archives_path/bdsm-${version}.tar.gz
+
+Retry the installation and/or check your networking setup.
+
+Halting installation.
+"
+  fi
+
+  tar xf "${archives_path}/bdsm-${version}.tar.gz" -C "$source_path/"
+
+  enter "$source_path/bdsm-${version}"
+}
+
+install_head()
+{
+  local remote="origin"
+
+  if [[ -d "${source_path}/bdsm/.git" ]] ; then
+    enter "${source_path}/bdsm/"
+
+    if [[ -z "$(git branch | awk "/$branch$/")" ]] ; then
+      if ! git checkout -b "$branch" --track "$remote/$branch" 2>/dev/null ; then
+        fail "$remote $branch remote branch not found."
+      fi
+    elif [[ -z "$(git branch | awk "/\* $branch$/{print \$2}")" ]] ; then
+      if ! git checkout $branch 2>/dev/null ; then
+        fail "Unable to checkout $branch."
+      fi
+    fi
+
+    git pull --rebase origin $branch
+  else
+    enter "${source_path}"
+
+    if ! git clone --depth 1 git://github.com/wayneeseguin/bdsm.git ; then
+      if !  git clone https://github.com/wayneeseguin/bdsm.git ; then
+        fail "Unable to clone the bdsm repository, attempted both git:// and https://"
+      fi
+    fi
+  fi
+
+  enter "${source_path}/bdsm/"
+}
+
+true \
+  ${repository_url:="git://github.com/wayneeseguin/bdsm"}
+
+command="usage" # Default
+
+while [[ $# -gt 0 ]] ; do
+  token="$1" ; shift
+  case "$token" in
+    head|master)
+      install_head
+      ;;
+
+    +([[:digit:]]).+([[:digit:]]).+([[:digit:]])) # x.y.z
+      version="${token}"
+      install_release
+      ;;
+
+    latest|release)
+      install_release
+      ;;
+
+    help|usage)
+      usage
+      exit 0
+      ;;
+
+    *)
+      usage
+      exit 1
+      ;;
+  esac
+done
+
+ensure_files_are_executable \
+  "install"
+
+./install

@@ -65,6 +65,13 @@ while [[ $# -gt 0 ]] ; do
       parse_break=1
     ;;
 
+    get)
+      extension="bdsm"
+      action="get"
+      extension_args=("@")
+      parse_break=1
+    ;;
+
     --disable-hooks)   hooks_flag=0                    ;;
     --project)         project="$1"            ; shift ;;
     --environment)     environment="$1"        ; shift ;;
