@@ -35,14 +35,14 @@ md5_match()
 
 install_release()
 {
-  archive="$archives_path/bdsm-${version}.tar.gz"
+  archive="$source_path/bdsm-${version}.tar.gz"
 
   fetch_md5
 
   if [[ -s $archive ]] && ! md5_match ; then
     # Remove old installs, if they exist and have incorrect md5.
-    [[ -f "$archives_path/bdsm-${version}.tar.gz" ]] &&
-      rm -f "$archives_path/bdsm-${version}.tar.gz"
+    [[ -f "$source_path/bdsm-${version}.tar.gz" ]] &&
+      rm -f "$source_path/bdsm-${version}.tar.gz"
   fi
 
   curl -L "${releases_url}/bdsm-${version}.tar.gz" -o "$archive"
@@ -52,7 +52,7 @@ install_release()
 
 Archive package downloaded does not match it's calculated md5 checksum ${md5}:
 
-  $archives_path/bdsm-${version}.tar.gz
+  $source_path/bdsm-${version}.tar.gz
 
 Retry the installation and/or check your networking setup.
 
@@ -60,7 +60,7 @@ Halting installation.
 "
   fi
 
-  tar xf "${archives_path}/bdsm-${version}.tar.gz" -C "$source_path/"
+  tar xf "${source_path}/bdsm-${version}.tar.gz" -C "$source_path/"
 
   enter "$source_path/bdsm-${version}"
 }
