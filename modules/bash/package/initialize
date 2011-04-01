@@ -10,5 +10,7 @@ true \
   "${bin_path:="${prefix_path}/bin"}" \
   "${source_path:="${prefix_path}/src"}"
 
+export LDFLAGS="${LDFLAGS:-} -L${prefix_path}/lib"
+
 export package_name prefix_path package_name package_version archive_format package_file package_url package_md5_url prefix_path bin_path source_path
 
