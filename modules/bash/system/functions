@@ -27,4 +27,87 @@ init_scripts_path()
   fi
 }
 
-# TODO: OS type functions.
+# Example:
+#
+#   ensure_user_exists "nginx" group "nginx"
+ensure_user_exists()
+{
+  local _token _group
+  # parse arguments
+  while [[ $# -gt 0 ]] ; do
+    _token="$1" ; shift
+
+    case "${_token}" in
+      group)
+        _group="${1}" ; shift
+        ;;
+      with)
+        continue # Syntatic sugar, ignore, next!
+        ;;
+      from)
+        _source="${1}" ; shift
+        ;;
+      --force)
+        _force_flag=1
+        ;;
+
+      *)
+        if [[ -z "${_group}" ]] ; then
+          _group="${_token}"
+          break
+        fi
+        ;;
+    esac
+  done
+
+  if [[ $UID -eq 0 ]] ; then
+    (
+    case "$(uname)" in
+      "OpenBSD")
+        groupadd "$redis_user"
+        useradd -g "$redis_user" "$redis_user" -s /bin/bash
+        usermod -s /bin/bash "$redis_user"
+        ;;
+      "FreeBSD")
+        pw groupadd -q "$redis_user"
+        ;;
+      "Linux")
+        # groupadd nginx
+        # useradd -G nginx -M nginx
+        if [[ -f "/etc/SuSE-release" ]] ; then
+          groupadd "$redis_user"
+        else
+          groupadd -f "$redis_user"
+        fi
+        useradd -g "$redis_user" -s /bin/bash -d /var/lib/redis "$redis_user"
+        usermod -s /bin/bash "$redis_user"
+      ;;
+
+      "Darwin")
+        gid="501" #only gids > 500 show up in user preferences
+
+        #Find an open gid
+        while true; do
+          name=$(dscl . search /groups PrimaryGroupID $gid | cut -f1 -s)
+          if [ -z "$name" ] ; then
+            break
+          fi
+          gid=$[$gid +1]
+        done
+
+        #Create the group
+        dscl . -create "/Groups/$redis_user"
+        dscl . -create "/Groups/$redis_user" gid "$gid"
+        dscl . -create "/Users/${redis_user}" PrimaryGroupID "$gid" # UserShell /bin/bash
+      ;;
+      "SunOS")
+        groupadd "$redis_user"
+        useradd -g "$redis_user" -s /bin/bash -d /var/lib/redis "$redis_user"
+        usermod -s /bin/bash "$redis_user"
+        ;;
+    esac
+    ) || true # Ignore failures with this for now...
+  else
+    fail "Users and groups may be manipulated only by the super user (root) via su or sudo."
+  fi
+}

@@ -45,7 +45,11 @@ install_template()
 
   if [[ -f "${_template}" ]] ; then
     if [[ -d "${_target}" ]] ; then
-      fail "${_target} is a directory, cannot install template ${_name}"
+      if [[ -d "${_target}/${_name}" ]] ; then
+        fail "${_target}/${_name} is a directory, cannot install template ${_name}"
+      else
+        cp -f "${_template}" "${_target}/${_name}"
+      fi
     else
       cp -f "${_template}" "${_target}"
     fi
