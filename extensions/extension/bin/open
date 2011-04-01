@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+[[ ${#extension_args[@]} -gt 0 ]] || \
+  fail "At least one extension name must be specified."
+
+enter "$extensions_path/${extension_args[0]}/"
+
+# TODO: Adjust this for different platforms, this is rather OSX specific for now.
+
+open .
