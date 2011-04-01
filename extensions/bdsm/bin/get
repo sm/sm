@@ -30,6 +30,7 @@ while [[ $# -gt 0 ]] ; do
       ;;
 
     latest|release)
+      fetch_version
       install_release
       ;;
 
