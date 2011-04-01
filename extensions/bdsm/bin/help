@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 description() {
-  log "Bash Deployment & Server Management Framework - Core Extension"
+  log "Bash Deployment & System Management Framework - Core Extension"
 }
 
 actions() {

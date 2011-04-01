@@ -107,7 +107,7 @@ fetch()
         rm -f "$archive"
         retry=1
       elif [[ $result -eq 33 ]] ; then
-        debug "Server does not support 'range' command, removing '$archive'"
+        debug "Remote server does not support 'range' command, removing '$archive'"
         rm -f "$archive"
         retry=1
       else
