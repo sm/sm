@@ -10,6 +10,7 @@
 source_files()
 {
   local _file
+
   for _file in "$@" ; do
     _file=${_file/\~\//$HOME\/} # Expand ~/ to full value of $HOME
     [[ -s "${_file}" ]] && source "${_file}"
@@ -20,6 +21,7 @@ source_files()
 nonempty_files()
 {
   local _file
+
   for _file in "${@}" ; do
     [[ -s "$_file" ]] && printf "$_file"
   done
@@ -28,6 +30,7 @@ nonempty_files()
 ensure_paths_exist()
 {
   local _path
+
   for _path in "$@" ; do
     [[ -d "${_path}" ]] || mkdir -p "${_path}"
   done
@@ -36,6 +39,7 @@ ensure_paths_exist()
 remove_files()
 {
   local _file
+
   for _file in "$@" ; do
     if [[ -f "${_file}" || -L "${_file}" ]] ; then
       rm -f "${_file}"
@@ -70,6 +74,7 @@ remove_directories()
 ensure_files_exist()
 {
   local _file
+
   for _file in "$@" ; do
     [[ -e "${_file}" ]] || touch "${_file}"
   done
@@ -78,7 +83,9 @@ ensure_files_exist()
 ensure_files_are_executable()
 {
   local _file="$1"
+
   ensure_files_exist "${_file}"
+
   if [[ -d "${_file}" ]] ; then
     fail "Cannot make ${_file} executable, it is a directory."
   else
@@ -145,6 +152,7 @@ rename()
 move()
 {
   local _source _target
+
   while [[ $# -gt 0 ]] ; do
     case "${1}" in
       to)
@@ -175,7 +183,9 @@ move()
 copy_files_to()
 {
   local _path="$1" _file ; shift
+
   ensure_paths_exist "${_path}"
+
   for _file in "$@" ; do
     [[ -s "${_file}" ]] && cp "${_file}" "${_path}/${_file}"
   done
@@ -184,7 +194,9 @@ copy_files_to()
 copy_directories_to()
 {
   local _path="${1}" _directory ; shift
+
   ensure_paths_exist "${_path}"
+
   for _directory in "$@" ; do
     cp -Rf "${_directory}" "${_path}/"
   done
@@ -193,7 +205,9 @@ copy_directories_to()
 move_files_to()
 {
   local _path="$1" _file ; shift
+
   ensure_paths_exist "${_path}"
+
   for _file in "$@" ; do
     [[ -f "${_file}" ]] && mv "${_file}" "${_path}/${_file}"
   done
@@ -202,14 +216,25 @@ move_files_to()
 chown_paths()
 {
   local _idenity="$1" _path; shift
+
   for _path in "${@}" ; do
     chown -R ${_idenity} "${_path}"
+  done
+}
+
+chmod_paths()
+{
+  local _permissions="$1" _path; shift
+
+  for _path in "${@}" ; do
+    chmod -R ${_permissions} "${_path}"
   done
 }
 
 enter()
 {
   local _path="$1"
+
   if [[ ! -d "${_path}" ]] ; then
     fail "Could not enter directory ${_path}."
   else

@@ -124,3 +124,9 @@ run_as_user()
   su - "${_user}" -c "${_command}"
 }
 
+os_is_linux() { [[ "$MACHTYPE" = *linux* ]] ; }
+os_is_darwin() { [[ "$MACHTYPE" = *darwin* ]] ; }
+os_is_bsd() { [[ "$MACHTYPE" = *bsd* ]] ; }
+os_is_solaris() { [[ "$MACHTYPE" = *solaris* ]] ; }
+os_is_aix() { [[ "$MACHTYPE" = *aix* ]] ; }
+
