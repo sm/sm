@@ -21,7 +21,6 @@ Usage:
 
 extension_action=${extension_args[0]}
 
-# TODO: Updates for released extensions instead of only from repository.
 case "$extension_action" in
   repository)
     fetch_extensions_repository
@@ -35,6 +34,7 @@ case "$extension_action" in
   all)
     extensions=($(installed_extensions))
 
+    # TODO: Updates for released extensions instead of only from repository.
     if [[ ${#extensions[@]} -gt 0 ]] ; then
       fetch_extensions_repository
 
@@ -45,13 +45,9 @@ case "$extension_action" in
     ;;
 
   *)
-    if [[ -d "${extensions_path}/${extension_action}/VERSION" ]] ; then
-      fetch_extensions_repository
-
-      install_extensions "${extension_action}" "${extension_args[@]}"
-    else
-      fetch_extensions_repository
-    fi
+    # TODO: Updates for released extensions instead of only from repository.
+    fetch_extensions_repository
+    install_extensions "${extension_action}" "${extension_args[@]}"
   ;;
 esac
 
