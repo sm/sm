@@ -3,6 +3,6 @@
 [[ ${#extension_args[@]} -gt 0 ]] || \
   fail "An extension name must be specified."
 
-enter "${extensions_src_path}/${extension_args[0]}/"
+enter "${extensions_development_path}/${extension_args[0]}/"
 
 exec ${EDITOR:-vi} .

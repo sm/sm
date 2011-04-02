@@ -3,4 +3,4 @@
 [[ ${#extension_args[@]} -gt 0 ]] || \
   fail "An extension name must be specified."
 
-printf "${extensions_src_path}/${extension_args[0]}/"
+printf "${extensions_development_path}/${extension_args[0]}/"

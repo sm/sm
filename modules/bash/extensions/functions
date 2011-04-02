@@ -20,11 +20,11 @@ development_extensions()
 
 extensions_in()
 {
-  local _path="${1:-}"
-
   (
+  path="${1:-}"
+
   version_files=($(
-    find "${_path}" -mindepth 2 -maxdepth 2 -name 'VERSION' -type f
+    find "${path}" -mindepth 2 -maxdepth 2 -name 'VERSION' -type f
   ))
 
   extensions=()

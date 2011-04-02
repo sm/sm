@@ -6,5 +6,4 @@
 enter "$extensions_path/${extension_args[0]}/"
 
 # TODO: Adjust this for different platforms, this is rather OSX specific for now.
-
 open .
