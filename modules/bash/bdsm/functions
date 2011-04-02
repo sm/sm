@@ -45,9 +45,23 @@ modules()
 }
 
 actions_for_extension() {
-  if [[ -n "${1:-}" ]] ; then
-    echo "bdsm $1: {$(ls -p $extensions_path/$1/ | awk '/[^\/]$/' | tr "\n" ' ' | sed 's/\s\+/, /g' | sed 's/,\s*$//')}"
+  local _extension="${1:-}"
+
+  (
+  if [[ -n "${_extension}" ]] ; then
+    actions=($(
+      find "$extensions_path/${_extension}/bin" -mindepth 1 -maxdepth 1
+    ))
+
+    executables=()
+    for action in "${actions[@]}" ; do
+      [[ -x "${_action}" ]] && \
+        executables[${#executables[@]}]="${_action//*\/}"
+    done
+
+    printf "${executables[@]}"
   fi
+  )
 }
 
 version()

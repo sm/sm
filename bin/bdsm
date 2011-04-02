@@ -141,7 +141,7 @@ if [[ -n ${extension} ]] ; then
   elif [[ -n "${action}" ]] ; then
     extension_action "${extension}" "${action}"
   else
-    log "$(actions_for_extension $extension)"
+    log "bdsm ${extension} actions: $(actions_for_extension "${extension}")"
   fi
 else
   usage
