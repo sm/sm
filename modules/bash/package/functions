@@ -51,6 +51,9 @@ define_package()
       source_path)
         source_path="${value}"
         ;;
+      target_path)
+        target_path="${value}"
+        ;;
       archive_format)
         archive_format="${value}"
         ;;
