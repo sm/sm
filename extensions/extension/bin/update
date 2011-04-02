@@ -26,7 +26,6 @@ case "$extension_action" in
   repository)
     fetch_extensions_repository
     install_extensions "${extensions[@]}"
-    log "Updated extensions: ${extensions[@]}"
   ;;
 
   help|usage)
@@ -55,3 +54,6 @@ case "$extension_action" in
     fi
   ;;
 esac
+
+log "Updated extensions: ${extensions[@]}"
+
