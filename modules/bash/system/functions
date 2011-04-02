@@ -111,3 +111,16 @@ ensure_user_exists()
     fail "Users and groups may be manipulated only by the super user (root) via su or sudo."
   fi
 }
+
+running_as_root() { [[ $UID -eq 0 ]] ; }
+running_as_superuser() { [[ $UID -eq 0 ]] ; }
+running_as_user() { [[ $UID -ne 0 ]] ; }
+
+run_as_user()
+{
+  local _user="$1" ; shift
+  local _command="$*"
+
+  su - "${_user}" -c "${_command}"
+}
+

@@ -150,10 +150,13 @@ extract_package()
   true "${package_file:="${package_name}-${package_version}.${archive_format}"}"
 
   case "${archive_format}" in
-    tar.gz|tgz|xz)
-      tar xf "${package_file}"
+    tar.gz|tgz) # gzip
+      tar zxf "${package_file}"
       ;;
-    tar.bz2)
+    xz) # LZMA
+      tar Jxf "${package_file}"
+      ;;
+    tar.bz2) # bzip
       tar jxf "${package_file}"
       ;;
     zip)
@@ -175,19 +178,25 @@ configure_package()
 }
 
 make_package()
-{
-  make # TODO: make this robust, -j4 for example.
+{ # TODO: make this robust, -j4 for example.
+  if ! make ; then
+    fail "Compilation failed! "
+  fi
 }
 
 make_install_package()
-{
-  make install # TODO: make this robust
+{ # TODO: make this robust
+  if ! make install  ; then
+    fail "make install failed! "
+  fi
 }
 
 
 make_uninstall_package()
-{
-  make uninstall # TODO: make this robust
+{ # TODO: make this robust
+  if ! make uninstall ; then
+    fail "make uninstall failed! "
+  fi
 }
 
 cleanup_install_files()
@@ -197,7 +206,8 @@ cleanup_install_files()
   enter "${src_path}"
 
   local files=($(
-  find "$src_path/" -mindepth 1 -maxdepth 1 -iname "${package}*${package_version}*"
+    find "$src_path/" -mindepth 1 -maxdepth 1 \
+      -iname "${package}*${package_version}*"
   ))
 
   remove_files "${files[@]}"
