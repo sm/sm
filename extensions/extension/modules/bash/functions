@@ -78,7 +78,7 @@ install_extensions()
 
   for _extension in "$@" ; do
 
-    [[ "${_extension#\/}" = "extension" ]] && continue
+    [[ "${_extension#\/}" = "extension" || -z "${_extension}" ]] && continue
 
     extension_src_path="${extensions_src_path}/${_extension}" \
 
