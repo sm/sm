@@ -281,7 +281,7 @@ extension_action()
   (
   extension="$1" ; shift
   action="$1" ; shift
-  extension_args="$@"
+  true "${extension_args:="$@"}"
 
   if [[ -z "$extension" || -z "$action" ]] ; then
     fail ""
