@@ -58,8 +58,8 @@ actions_for_extension() {
       [[ -x "${action}" ]] && \
         executables[${#executables[@]}]="${action//*\/}"
     done
-
-    printf "${executables[@]}"
+    executables="${executables[@]}"
+    printf "${executables}"
   fi
   )
 }
@@ -73,7 +73,7 @@ usage()
 {
   version
 
-  "${extensions_path}/bdsm/bin/help" usage | ${PAGER}
+  extension_action "bdsm" "help"
 }
 
 fetch()
@@ -262,6 +262,9 @@ reinit_extension()
 
 extension_version()
 {
+  (
+  extension="$1" ; shift
+
   true \
     ${extension_path:="$extensions_path/$extension"} \
 
@@ -270,13 +273,14 @@ extension_version()
   else
     log "Unknown version for extension ${extension}"
   fi
+  )
 }
 
 extension_action()
 {
   (
   extension="$1" ; shift
-  action="" ; shift
+  action="$1" ; shift
   extension_args="$@"
 
   if [[ -z "$extension" || -z "$action" ]] ; then
