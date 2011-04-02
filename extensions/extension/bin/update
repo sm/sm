@@ -21,9 +21,12 @@ Usage:
 
 extension_action=${extension_args[0]}
 
+# TODO: Updates for released extensions instead of only from repository.
 case "$extension_action" in
   repository)
     fetch_extensions_repository
+    install_extensions "${extensions[@]}"
+    log "Updated extensions: ${extensions[@]}"
   ;;
 
   help|usage)
