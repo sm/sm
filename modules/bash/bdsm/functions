@@ -50,13 +50,13 @@ actions_for_extension() {
   (
   if [[ -n "${_extension}" ]] ; then
     actions=($(
-      find "$extensions_path/${_extension}/bin" -mindepth 1 -maxdepth 1
+      find "$extensions_path/${_extension}/bin" -mindepth 1 -maxdepth 1 -type f
     ))
 
     executables=()
     for action in "${actions[@]}" ; do
-      [[ -x "${_action}" ]] && \
-        executables[${#executables[@]}]="${_action//*\/}"
+      [[ -x "${action}" ]] && \
+        executables[${#executables[@]}]="${action//*\/}"
     done
 
     printf "${executables[@]}"
