@@ -135,90 +135,14 @@ done
 #
 # Main Logic
 #
-if [[ "version" = "$action" ]] ; then
-  version
-elif [[ -n "$extension" && -n "$action" ]] ; then
-
-  if [[ -s "$extensions_path/$extension/bin/$action" ]] ; then
-    true \
-      ${extension_path:="$extensions_path/$extension"} \
-      ${extension_config_path:="$extensions_path/$extension/config"} \
-      ${extension_templates_path:="$extensions_path/$extension/templates"} \
-      ${extension_modules_path:="$extensions_path/$extension/modules"} \
-      ${extension_bin_path:="$extensions_path/$extension/bin"}
-
-    paths=$(env | awk -F= -v ORS=' ' '/_path/{print $1}')
-    flags=$(env | awk -F= -v ORS=' ' '/_flag/{print $1}')
-
-    cd "$extensions_path/$extension" > /dev/null 2>&1
-
-    bdsm_exports
-
-    action_file="$extensions_path/$extension/bin/$action"
-    action_file_type="$(file "$action_file")"
-
-    case "$action_file_type" in
-      *sh[[:space:]]script*|*POSIX[[:space:]]shell*|*Bourne-Again*)
-        action_type="bash"
-        ;;
-
-      *ASCII*)
-        # Launch with helper functions, if possible.
-        extension="${action_file//.}"
-        case "${extension}" in
-          bash|sh) action_type="bash" ;;
-          #rb) action_type="ruby"   ;;
-          *)
-            if [[ -x "${action_file}" ]] ; then
-              action_type="binary"
-            else
-              action_type="not executable"
-            fi
-            ;;
-        esac
-        result=$?
-        ;;
-
-      cannot[[:space:]]open)
-        action_type="dne"
-        ;;
-
-      *)
-        if [[ -x "${action_file}" ]] ; then
-          action_type="binary"
-        else
-          action_type="noexec"
-        fi
-        ;;
-    esac
-
-
-    case "${action_type}" in
-      bash)
-        (
-        modules bdsm
-
-        source_files \
-          "${extension_modules_path}/bash/functions" \
-          "${extension_modules_path}/bash/initialize"
-
-        source "${action_file}"
-        )
-        ;;
-      # ruby|python|lua|javascript)
-      #   ADD "${modules_path}/${action_type}/" to the lib path so the script can require "bdsm"
-      #  "${action_file}"
-      #  ;;
-      dne|noexec)
-        fail "processing ${action} failed, does not exist or is not executable."
-        ;;
-      binary|*)
-        "${action_file}"
-        ;;
-    esac
+if [[ -n ${extension} ]] ; then
+  if [[ "${action}" = "version" ]] ; then
+    extension_version "${extension}" "${action}"
+  elif [[ -n "${action}" ]] ; then
+    extension_action "${extension}" "${action}"
+  else
+    log "$(actions_for_extension $extension)"
   fi
-elif [[ -n "$extension" ]] ; then
-  log "$(actions_for_extension $extension)"
 else
   usage
 fi
