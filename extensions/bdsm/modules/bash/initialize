@@ -2,7 +2,6 @@
 
 modules package
 
-
 # Ensure that default values are set.
 true \
   "${prefix_path:="/usr/local"}" \
@@ -13,4 +12,11 @@ true \
   "${bin_path:="${prefix_path}/bin"}" \
   "${source_path:="${prefix_path}/src"}"
 
+# Load the BDSM framework version.
+[[ -s "$bdsm_path/VERSION" ]] && \
+  VERSION="$(cat "$bdsm_path/VERSION")"
+
+user="$USER"
+
 export prefix_path bin_path source_path
+
