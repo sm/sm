@@ -47,7 +47,9 @@ case "$extension_action" in
   *)
     # TODO: Updates for released extensions instead of only from repository.
     fetch_extensions_repository
-    install_extensions "${extension_action}" "${extension_args[@]}"
+    if [[ "${extension_action}" != "extension" ]] ; then
+      install_extensions "${extension_action}" "${extension_args[@]}"
+    fi
   ;;
 esac
 
