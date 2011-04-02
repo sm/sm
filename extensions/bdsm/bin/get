@@ -15,10 +15,8 @@ true \
   ${repository_url:="git://github.com/wayneeseguin/bdsm"} \
   ${releases_url:="http://bdsm.beginrescueend.com/releases"}
 
-command="usage" # Default
-
-while [[ $# -gt 0 ]] ; do
-  token="$1" ; shift
+while [[ ${#extension_args[@]} -gt 0 ]] ; do
+  token="${extension_args}}" ; shift
   case "$token" in
     head|master)
       install_head
