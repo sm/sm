@@ -16,8 +16,11 @@ true \
   ${releases_url:="http://bdsm.beginrescueend.com/releases"}
 
 # TODO: Abstract this functionality out into a modules/bash/parse_args hook
-for ((index=0 ; index < ${#extension_args[@]} ; index++)) ; do
+number_of_args=${#extension_args[@]}
+for ((index=0 ; index < $number_of_args ; index++)) ; do
+
   token="${extension_args[$index]}"
+
   case "$token" in
     head|master)
       install_head

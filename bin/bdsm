@@ -68,7 +68,7 @@ while [[ $# -gt 0 ]] ; do
     get)
       extension="bdsm"
       action="get"
-      extension_args=("@")
+      extension_args=("$@")
       parse_break=1
     ;;
 
