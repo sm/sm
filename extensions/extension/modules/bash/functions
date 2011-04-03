@@ -158,7 +158,7 @@ package_extension()
   tar jcvf "$release_name".tar.bz2 "$release_name/"
   md5 "${release_name}.tar.bz2" | awk '{print $NF}' > "${release_name}.tar.bz2.md5"
 
-  remove_directories "${release_name}/"
+  remove_paths "${release_name}/"
 
   log "Packaging of extension ${release_name} complete."
 }

@@ -4,7 +4,7 @@
   fail "At least one extension name must be specified."
 
 for extension in "${extensions[@]}" ; do
-  remove_directories "$extensions_path/$extension/"
+  remove_paths "$extensions_path/$extension/"
 done
 
 succeed "Uninstalled extensions: ${extensions}"

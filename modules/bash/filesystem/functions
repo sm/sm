@@ -45,27 +45,27 @@ remove_files()
       rm -f "${_file}"
     elif [[ -d "${_file}" ]] ; then
       error "${_file} is a directory! "
-    elif [[ -e "${_directory}" ]] ; then
-      error "Unknown entry at ${_directory}, cannot remove."
+    elif [[ -e "${_file}" ]] ; then
+      error "Unknown entry at ${_file}, cannot remove."
     else
       true # already gone
     fi
   done
 }
 
-remove_directories()
+remove_paths()
 {
-  local _directory
+  local _path
 
-  for _directory in "$@" ; do
-    if [[ -f "${_directory}" ]] ; then
-      error "${_directory} is a file! "
-    elif [[ -L "${_directory}" ]] ; then
-      rm -f "${_directory}"
-    elif [[ -d "${_directory}" ]] ; then
-      rm -rf "${_directory}"
-    elif [[ -e "${_directory}" ]] ; then
-      error "Unknown entry at ${_directory}, cannot remove."
+  for _path in "$@" ; do
+    if [[ -f "${_path}" ]] ; then
+      error "${_path} is a file! "
+    elif [[ -L "${_path}" ]] ; then
+      rm -f "${_path}"
+    elif [[ -d "${_path}" ]] ; then
+      rm -rf "${_path}"
+    elif [[ -e "${_path}" ]] ; then
+      error "Unknown entry at ${_path}, cannot remove."
     else
       true # already gone
     fi
