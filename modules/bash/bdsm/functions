@@ -48,7 +48,7 @@ load()
 {
   local _file
 
-  for _file in "$@" ; do
+  for _file in "$*" ; do
     source_files "${extension_modules_path:-"$modules_path"}/bash/${file}"
   done
 }
