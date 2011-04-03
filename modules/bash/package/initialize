@@ -8,7 +8,20 @@ true \
 
 true \
   "${bin_path:="${prefix_path}/bin"}" \
-  "${source_path:="${prefix_path}/src"}"
+  "${source_path:="${prefix_path}/src"}" \
+
+if running_as_root ; then
+  true \
+    "${log_path:="${prefix_path}/log"}" \
+    "${data_path:="/var/db/${package_name}"}" \
+    "${log_path:="/var/log/${package_name}"}" \
+    "${package_user:="${package_name}"}"
+else
+  true \
+    "${log_path:="${prefix_path}/log"}" \
+    "${data_path:="${prefix_path}/.${package_name}"}" \
+    "${package_user:="$USER"}"
+fi
 
 export LDFLAGS="${LDFLAGS:-} -L${prefix_path}/lib"
 

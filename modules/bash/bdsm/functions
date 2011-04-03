@@ -355,6 +355,7 @@ extension_action()
         "${extension_modules_path}/bash/functions" \
         "${extension_modules_path}/bash/initialize"
 
+
       source "${action_file}"
       )
       ;;
