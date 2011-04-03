@@ -135,11 +135,31 @@ fetch_package_md5()
   true "${package_file:="${package_name}-${package_version}.${archive_format}"}"
   true "${packge_md5_url:="${package_base_url}/${package_file}.md5"}"
 
-  if ! curl -L "${packge_md5_url}" -o "${package_file}.md5" ; then
-    package_md5=$(cat "${package_file}.md5")
-  else
-    fail "Fetching md5 from '${package_md5_url}' failed."
+  package_md5=$(hash_file "$extension_config_path/md5" "${package_file}")
+
+  if [[ -z "${package_md5}" ]] ; then
+    if ! curl -L "${packge_md5_url}" -o "${package_file}.md5" ; then
+      package_md5=$(cat "${package_file}.md5")
+    else
+      fail "Fetching md5 from '${package_md5_url}' failed."
+    fi
   fi
+
+}
+
+file_matches_md5()
+{
+  local file="$1" md5="$1" file_md5
+
+  if [[ "$MACHTYPE" = *linux* ]] ; then
+    command="md5sum"
+  elif [[ "$MACHTYPE" = *darwin* ]] ; then
+    command="/sbin/md5 -q"
+  fi
+
+  file_md5=$($command "$file")
+
+  [[ "${file_md5// *}" = "$md5" ]]
 }
 
 fetch_package()
@@ -149,8 +169,10 @@ fetch_package()
   true "${package_file:="${package_name}-${package_version}.${archive_format}"}"
   true "${package_url:="${package_base_url}/${package_file}"}"
 
-  if ! curl -L "${package_url}" -o "${package_file}" ; then
-    fail "Downloading ${package_name} from '${package_url}' to '${package_file}' failed "
+  if ! file_matches_md5 "${package_file}" "$package_md5" ; then
+    if ! curl -L "${package_url}" -o "${package_file}" ; then
+      fail "Downloading ${package_name} from '${package_url}' to '${package_file}' failed "
+    fi
   fi
 }
 
