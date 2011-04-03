@@ -83,7 +83,7 @@ ensure_user_exists()
         fi
 
         useradd -g "${package_user}" "${package_user}"
-        usermod -d "${data_path}" "${package_user}"
+        usermod -d "${data_path%\/*}" "${package_user}"
         usermod -s /bin/bash "${package_user}"
       ;;
 
