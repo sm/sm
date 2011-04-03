@@ -27,7 +27,7 @@ bdsm_exports
 timestamp="$(date +%m.%d.%Y-%H:%M:%S)"
 
 # Modules that should be available to *all* bdsm extensions.
-modules trace logging variables filesystem
+modules trace logging variables filesystem extensions
 
 bdsmrc # Load bdsmrc files.
 
