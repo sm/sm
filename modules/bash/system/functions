@@ -64,23 +64,23 @@ ensure_user_exists()
     (
     case "$(uname)" in
       "OpenBSD")
-        groupadd "$redis_user"
-        useradd -g "$redis_user" "$redis_user" -s /bin/bash
-        usermod -s /bin/bash "$redis_user"
+        groupadd "$package_user"
+        useradd -g "$package_user" "$package_user" -s /bin/bash
+        usermod -s /bin/bash "$package_user"
         ;;
       "FreeBSD")
-        pw groupadd -q "$redis_user"
+        pw groupadd -q "$package_user"
         ;;
       "Linux")
         # groupadd nginx
         # useradd -G nginx -M nginx
         if [[ -f "/etc/SuSE-release" ]] ; then
-          groupadd "$redis_user"
+          groupadd "$package_user"
         else
-          groupadd -f "$redis_user"
+          groupadd -f "$package_user"
         fi
-        useradd -g "$redis_user" -s /bin/bash -d /var/lib/redis "$redis_user"
-        usermod -s /bin/bash "$redis_user"
+        useradd -g "$package_user" -s /bin/bash -d /var/lib/redis "$package_user"
+        usermod -s /bin/bash "$package_user"
       ;;
 
       "Darwin")
@@ -96,14 +96,14 @@ ensure_user_exists()
         done
 
         #Create the group
-        dscl . -create "/Groups/$redis_user"
-        dscl . -create "/Groups/$redis_user" gid "$gid"
-        dscl . -create "/Users/${redis_user}" PrimaryGroupID "$gid" # UserShell /bin/bash
+        dscl . -create "/Groups/$package_user"
+        dscl . -create "/Groups/$package_user" gid "$gid"
+        dscl . -create "/Users/${package_user}" PrimaryGroupID "$gid" # UserShell /bin/bash
       ;;
       "SunOS")
-        groupadd "$redis_user"
-        useradd -g "$redis_user" -s /bin/bash -d /var/lib/redis "$redis_user"
-        usermod -s /bin/bash "$redis_user"
+        groupadd "$package_user"
+        useradd -g "$package_user" -s /bin/bash -d /var/lib/redis "$package_user"
+        usermod -s /bin/bash "$package_user"
         ;;
     esac
     ) || true # Ignore failures with this for now...
