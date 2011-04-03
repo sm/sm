@@ -137,7 +137,7 @@ fetch_package_md5()
 
   package_md5=$(hash_file "$extension_config_path/md5" "${package_file}")
 
-  if [[ -z "${package_md5}" ]] ; then
+  if [[ -z "${package_md5}" && -n "${package_md5_url}" ]] ; then
     if ! curl -L "${packge_md5_url}" -o "${package_file}.md5" ; then
       package_md5=$(cat "${package_file}.md5")
     else
@@ -169,7 +169,11 @@ fetch_package()
   true "${package_file:="${package_name}-${package_version}.${archive_format}"}"
   true "${package_url:="${package_base_url}/${package_file}"}"
 
-  if ! file_matches_md5 "${package_file}" "$package_md5" ; then
+  fetch_package_md5
+
+  if ! file_matches_md5 "${package_file}" "${package_md5}" ; then
+    remove_files "${package_file}"
+
     if ! curl -L "${package_url}" -o "${package_file}" ; then
       fail "Downloading ${package_name} from '${package_url}' to '${package_file}' failed "
     fi
