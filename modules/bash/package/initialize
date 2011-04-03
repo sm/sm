@@ -18,12 +18,15 @@ if running_as_root ; then
     "${data_path:="/var/db/${package_name}"}" \
     "${log_path:="/var/log/${package_name}"}" \
     "${package_user:="${package_name}"}"
+
 else
   true \
     "${log_path:="${prefix_path}/log"}" \
     "${data_path:="${prefix_path}/.${package_name}"}" \
     "${package_user:="$USER"}"
 fi
+
+init_scripts_path="$(init_scripts_path)"
 
 export LDFLAGS="${LDFLAGS:-} -L${prefix_path}/lib"
 
