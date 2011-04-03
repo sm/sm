@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
 
+extension_licence()
+{
+  if [[ -d "${extension_path:-}" ]] ; then
+    log "License:\n\n$(cat -v ${extension_path}/LICENCE)\n"
+  fi
+}
+
 installed_extensions()
 {
   extensions_in "${extensions_path}"
-
 }
 
 available_extensions()
