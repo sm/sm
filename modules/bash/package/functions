@@ -173,7 +173,7 @@ extract_package()
 
 configure_package()
 {
-  if ./configure --prefix="${prefix_path}" ${configure_flags[@]:-} ; then
+  if ./configure --prefix="${prefix_path}" ${configure_flags[@]:-} > configure.log 2>&1; then
     log "Configuration of ${package} successful."
   else
     fail "Configuration of ${package} failed, seek help..."
@@ -182,14 +182,14 @@ configure_package()
 
 make_package()
 { # TODO: make this robust, -j4 for example.
-  if ! make ; then
+  if ! make > make.log 2>&1 ; then
     fail "Compilation failed! "
   fi
 }
 
 make_install_package()
 { # TODO: make this robust
-  if ! make install  ; then
+  if ! make install > make.install.log 2>&1 ; then
     fail "make install failed! "
   fi
 }
@@ -197,7 +197,7 @@ make_install_package()
 
 make_uninstall_package()
 { # TODO: make this robust
-  if ! make uninstall ; then
+  if ! make uninstall > make.uninstall.log 2>&1 ; then
     fail "make uninstall failed! "
   fi
 }

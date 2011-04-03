@@ -56,6 +56,7 @@ remove_files()
 remove_directories()
 {
   local _directory
+
   for _directory in "$@" ; do
     if [[ -f "${_directory}" ]] ; then
       error "${_directory} is a file! "
