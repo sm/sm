@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+modules system templates
+
 # Ensure that default values are set.
 true \
   "${prefix_path:="/usr/local"}" \
