@@ -151,6 +151,8 @@ file_matches_md5()
 {
   local file="$1" md5="$1" file_md5
 
+  [[ -s "${file}" ]] || return 1
+
   if [[ "$MACHTYPE" = *linux* ]] ; then
     command="md5sum"
   elif [[ "$MACHTYPE" = *darwin* ]] ; then
