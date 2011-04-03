@@ -60,7 +60,7 @@ remove_directories()
     if [[ -f "${_directory}" ]] ; then
       error "${_directory} is a file! "
     elif [[ -L "${_directory}" ]] ; then
-      error "${_directory} is a symlink! "
+      rm -f "${_directory}"
     elif [[ -d "${_directory}" ]] ; then
       rm -rf "${_directory}"
     elif [[ -e "${_directory}" ]] ; then
