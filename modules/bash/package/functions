@@ -149,7 +149,7 @@ fetch_package_md5()
 
 file_matches_md5()
 {
-  local file="$1" md5="$1" file_md5
+  local file="$1" md5="$2" file_md5
 
   [[ -s "${file}" ]] || return 1
 
@@ -159,7 +159,7 @@ file_matches_md5()
     command="/sbin/md5 -q"
   fi
 
-  file_md5=$($command "$file")
+  file_md5="$($command "$file")"
 
   [[ "${file_md5// *}" = "$md5" ]]
 }
