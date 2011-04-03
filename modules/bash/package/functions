@@ -82,21 +82,27 @@ install_package()
 
   enter "${source_path}"
 
+  log "Downloading ${package_name} ${package_version}"
   fetch_package
 
+  log "Extracting ${package_name} ${package_version}"
   extract_package
 
   enter "${package_dir}"
 
   # If the extension has defined a patch_package function, call it.
   if command -v patch_package 2>/dev/null ; then
+    log "Patching ${package_name} ${package_version}"
     patch_package
   fi
 
+  log "Configuring ${package_name} ${package_version}"
   configure_package
 
+  log "Building ${package_name} ${package_version}"
   make_package
 
+  log "Installing ${package_name} ${package_version}"
   if make_install_package ; then
     log "Installed ${package_name} ${package_version}."
   else
