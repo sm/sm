@@ -68,9 +68,11 @@ ensure_user_exists()
         useradd -g "$package_user" "$package_user" -s /bin/bash
         usermod -s /bin/bash "$package_user"
         ;;
+
       "FreeBSD")
         pw groupadd -q "$package_user"
         ;;
+
       "Linux")
         # groupadd nginx
         # useradd -G nginx -M nginx
@@ -79,8 +81,11 @@ ensure_user_exists()
         else
           groupadd -f "$package_user"
         fi
-        useradd -g "$package_user" -s /bin/bash -d /var/lib/redis "$package_user"
-        usermod -s /bin/bash "$package_user"
+
+        useradd "${package_user}"
+        usermod -g "${package_user}" "${package_user}"
+        usermod -d "${data_path}" "${package_user}"
+        usermod -s /bin/bash "${package_user}"
       ;;
 
       "Darwin")
@@ -100,6 +105,7 @@ ensure_user_exists()
         dscl . -create "/Groups/$package_user" gid "$gid"
         dscl . -create "/Users/${package_user}" PrimaryGroupID "$gid" # UserShell /bin/bash
       ;;
+
       "SunOS")
         groupadd "$package_user"
         useradd -g "$package_user" -s /bin/bash -d /var/lib/redis "$package_user"
