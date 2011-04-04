@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+read_default()
+{
+  local key variable token value
+
+  key="${1:-}" ; shift
+
+  [[ -n "${key}" ]] || \
+    fail "$extension $action read_default() no arguments passed! "
+
+  while [[ $# -gt 0 ]] ; do
+    token="$1" ; shift
+    case "$1" in
+      into)
+        true # ignore
+        ;;
+      *)
+        variable="$token"
+        break
+      ;;
+    esac
+  done
+
+  true "${variable:="$key"}"
+
+  value="$(hash_file "$extension_config_path/defaults" "version")"
+
+  eval "${variable}=\"${value}\""
+}
