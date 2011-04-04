@@ -81,6 +81,8 @@ ensure_files_exist()
   done
 }
 
+# TODO: change this to be a fail function if one is not
+#       make this into make_files_executable or some such
 ensure_files_are_executable()
 {
   local _file="$1"
@@ -273,4 +275,6 @@ hash_file()
       ;;
   esac
 }
+
+is_executable() { [[ -x "$1" ]] ; }
 
