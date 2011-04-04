@@ -11,9 +11,9 @@ read_default()
 
   while [[ $# -gt 0 ]] ; do
     token="$1" ; shift
-    case "$1" in
+    case "$token" in
       into)
-        true # ignore
+        variable="$1" ; shift
         ;;
       *)
         variable="$token"
@@ -28,3 +28,4 @@ read_default()
 
   eval "${variable}=\"${value}\""
 }
+
