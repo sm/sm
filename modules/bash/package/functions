@@ -220,14 +220,14 @@ configure_package()
 
 make_package()
 { # TODO: make this robust, -j4 for example.
-  if ! make ${make_args[@]:-} > make.log 2>&1 ; then
+  if ! make ${make_flags[@]:-} > make.log 2>&1 ; then
     fail "Compilation if ${package_name} ${package_version} failed! "
   fi
 }
 
 make_install_package()
 { # TODO: make this robust
-  if ! make ${make_install_args[@]:-install} > make.install.log 2>&1 ; then
+  if ! make ${make_install_flags[@]:-install} > make.install.log 2>&1 ; then
     fail "make install of ${package_name} ${package_version} failed! "
   fi
 }
@@ -235,7 +235,7 @@ make_install_package()
 
 make_uninstall_package()
 { # TODO: make this robust
-  if ! make ${make_uninstall_args[@]:-uninstall } > make.uninstall.log 2>&1 ; then
+  if ! make ${make_uninstall_flags[@]:-uninstall } > make.uninstall.log 2>&1 ; then
     fail "make uninstall ${package_name} ${package_version} failed! "
   fi
 }
