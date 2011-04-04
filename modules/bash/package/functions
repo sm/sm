@@ -207,10 +207,14 @@ extract_package()
 
 configure_package()
 {
-  if ./configure --prefix="${prefix_path}" ${configure_flags[@]:-} > configure.log 2>&1; then
-    log "Configuration of ${package_name} ${package_version} successful."
+  if [[ -x ./configure ]] ; then
+    if ./configure --prefix="${prefix_path}" ${configure_flags[@]:-} > configure.log 2>&1; then
+      log "Configuration of ${package_name} ${package_version} successful."
+    else
+      fail "Configuration of ${package_name} ${package_version} failed, seek help..."
+    fi
   else
-    fail "Configuration of ${package_name} ${package_version} failed, seek help..."
+    log "./configure not found, skipping configuration step."
   fi
 }
 
