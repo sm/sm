@@ -152,7 +152,8 @@ move()
   local _source _target
 
   while [[ $# -gt 0 ]] ; do
-    case "${1}" in
+    token="$1" ; shift
+    case "${token}" in
       to)
         _target="${1}"
         shift
@@ -164,9 +165,9 @@ move()
 
       *)
         if [[ -z "${_source}" ]] ; then
-          _source="$1" ; shift
+          _source="$token" ; shift
         elif [[ -z "${_target}" ]] ; then
-          _target="$1" ; shift
+          _target="$token" ; shift
           break # When we have a target we are done.
           # An alternative idea would be to allow an array of multiple targets
           # to symlink to...
