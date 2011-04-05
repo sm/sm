@@ -207,27 +207,50 @@ extract_package()
 
 configure_package()
 {
-  if [[ -x ./configure ]] ; then
-    if ./configure --prefix="${prefix_path}" ${configure_flags[@]:-} > configure.log 2>&1; then
-      log "Configuration of ${package_name} ${package_version} successful."
-    else
-      fail "Configuration of ${package_name} ${package_version} failed, seek help..."
-    fi
+  local command
+
+  if [[ -n ${configure_command:-} ]] ; then
+    command="${configure_command}"
   else
-    log "./configure not found, skipping configuration step."
+    command="./configure --prefix=\"${prefix_path}\" ${configure_flags[@]:-}"
+    if [[ ! -x ./configure ]] ; then
+      log "./configure not found, skipping configuration step." && return 0
+    fi
+  fi
+
+  if ${command} > configure.log 2>&1; then
+    log "Configuration of ${package_name} ${package_version} successful."
+  else
+    fail "Configuration of ${package_name} ${package_version} failed, seek help..."
   fi
 }
 
 make_package()
 { # TODO: make this robust, -j4 for example.
-  if ! make ${make_flags[@]:-} > make.log 2>&1 ; then
+  local command
+
+  if [[ -n ${make_command:-} ]] ; then
+    command="${make_command}"
+  else
+    command="make ${make_flags[@]:-}"
+  fi
+
+  if ! ${command} > make.log 2>&1 ; then
     fail "Compilation if ${package_name} ${package_version} failed! "
   fi
 }
 
 make_install_package()
 { # TODO: make this robust
-  if ! make ${make_install_flags[@]:-install} > make.install.log 2>&1 ; then
+  local command
+
+  if [[ -n ${make_command:-} ]] ; then
+    command="${make_command}"
+  else
+    command="make ${make_install_flags[@]:-install}"
+  fi
+
+  if ${command} !  > make.install.log 2>&1 ; then
     fail "make install of ${package_name} ${package_version} failed! "
   fi
 }
@@ -235,7 +258,15 @@ make_install_package()
 
 make_uninstall_package()
 { # TODO: make this robust
-  if ! make ${make_uninstall_flags[@]:-uninstall } > make.uninstall.log 2>&1 ; then
+  local command
+
+  if [[ -n ${make_command:-} ]] ; then
+    command="${make_command}"
+  else
+    command="make ${make_install_flags[@]:-uninstall}"
+  fi
+
+  if ! ${command} > make.uninstall.log 2>&1 ; then
     fail "make uninstall ${package_name} ${package_version} failed! "
   fi
 }
