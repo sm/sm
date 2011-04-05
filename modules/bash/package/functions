@@ -287,21 +287,19 @@ cleanup_install_files()
 
 activate_package()
 {
-  local _name= "$1" ; shift
-  local _version= "$1" ; shift
+  true ${package_name:="$1"} ${package_version:="$2"}
 
-  deactivate_package "${_name}" "${_version}"
+  deactivate_package "${package_name}"
 
-  link "${install_base_path}/${_name}-${_version}" \
-    to "${install_base_path}/${_name}"
+  link "${install_base_path}/${package_name}-${package_version}" \
+    to "${install_base_path}/${package_name}"
 }
 
 deactivate_package()
 {
-  local _name= "$1" ; shift
-  local _version= "$1" ; shift
+  true ${package_name:="$1"}
 
-  ensure_nonempty _name _version
+  ensure_nonempty package_name
 
-  remove_files "${install_base_path}/${_name}"
+  remove_files "${install_base_path}/${package_name}"
 }
