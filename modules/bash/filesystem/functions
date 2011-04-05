@@ -294,6 +294,9 @@ hash_file()
 is_executable() { [[ -x "$1" ]] ; }
 file_exists() { [[ -f "$1" ]] ; }
 file_is_nonempty() { [[ -s "$1" ]] ; }
+file_is_empty() { [[ -f "$1" && ! -s "$1" ]] ; }
+file_is_missing() { [[ ! -f "$1" ]] ; }
+file_is_empty_or_missing() { [[ ! -f "$1" ]] || [[ ! -s "$1" ]] ; }
 file_contains()
 {
   local _file="${1}" _string="${2}"
