@@ -32,5 +32,5 @@ ensure_nonempty()
   done
 }
 
-variable_is_nonempty() { eval "[[ -z \"\${${1}}\" ]]" ; }
+variable_is_nonempty() { eval "[[ -n \"\${${1}}\" ]]" ; }
 
