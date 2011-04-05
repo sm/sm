@@ -11,6 +11,7 @@ true \
 true \
   "${bin_path:="${prefix_path}/bin"}" \
   "${source_path:="${prefix_path}/src"}" \
+  "${install_base_path:="${prefix_path}/${package_name}"}"
 
 if running_as_root ; then
   true \
