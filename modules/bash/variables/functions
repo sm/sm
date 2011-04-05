@@ -31,3 +31,6 @@ ensure_nonempty()
     fi
   done
 }
+
+variable_is_nonempty() { eval "[[ -z \"\${${1}}\" ]]" ; }
+
