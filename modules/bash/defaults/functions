@@ -2,7 +2,7 @@
 
 read_default()
 {
-  local key variable token value
+  local key variable token value prefix
 
   key="${1:-}" ; shift
 
@@ -12,8 +12,11 @@ read_default()
   while [[ $# -gt 0 ]] ; do
     token="$1" ; shift
     case "$token" in
-      into)
+      into|as)
         variable="$1" ; shift
+        ;;
+      prefix)
+        prefix="$1" ; shift
         ;;
       *)
         variable="$token"
@@ -22,7 +25,13 @@ read_default()
     esac
   done
 
-  true "${variable:="$key"}"
+  if [[ -z "${variable:-}" ]] ; then
+    if [[ -n "${prefix:-}" ]] ; then
+      "${variable:="${prefix:-}_$key"}"
+    else
+      "${variable:="$key"}"
+    fi
+  fi
 
   value="$(hash_file "${extension_config_path}/defaults" "${key}")"
 
