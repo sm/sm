@@ -291,7 +291,7 @@ hash_file()
 }
 
 # File conditional functions
-is_executable() { [[ -x "$1" ]] ; }
+file_is_executable() { [[ -x "$1" ]] ; }
 file_exists() { [[ -f "$1" ]] ; }
 file_is_nonempty() { [[ -s "$1" ]] ; }
 file_is_empty() { [[ -f "$1" && ! -s "$1" ]] ; }

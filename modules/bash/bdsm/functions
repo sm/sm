@@ -289,24 +289,22 @@ extension_action()
 {
   (
   unset extension action
-  extension="$1" ; shift
-  action="$1" ; shift
-  true "${extension_args:="$@"}"
+  export extension="$1" ; shift
+  export action="$1" ; shift
+  export extension_args="$@"
 
   if [[ -z "$extension" || -z "$action" ]] ; then
-    fail ""
+    fail "WTF??? extension and action must be set."
   fi
 
-  if [[ ! -s "$extensions_path/$extension/bin/$action" ]] ; then
+  file_exists "$extensions_path/$extension/bin/$action" ||
     fail "Action ${action} missing for extension ${extension}"
-  fi
 
-  true \
-    ${extension_path:="$extensions_path/$extension"} \
-    ${extension_config_path:="$extensions_path/$extension/config"} \
-    ${extension_templates_path:="$extensions_path/$extension/templates"} \
-    ${extension_modules_path:="$extensions_path/$extension/modules"} \
-    ${extension_bin_path:="$extensions_path/$extension/bin"}
+  extension_path="$extensions_path/$extension"
+  extension_config_path="$extensions_path/$extension/config"
+  extension_templates_path="$extensions_path/$extension/templates"
+  extension_modules_path="$extensions_path/$extension/modules"
+  extension_bin_path="$extensions_path/$extension/bin"
 
   paths=$(env | awk -F= -v ORS=' ' '/_path/{print $1}')
   flags=$(env | awk -F= -v ORS=' ' '/_flag/{print $1}')
