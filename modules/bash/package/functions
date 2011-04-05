@@ -7,7 +7,7 @@
 #   version "4.2"
 #   url "ftp.gnu.org/gnu/bash/"
 #
-define_package()
+package_definition()
 {
   while [[ $# -gt 0 ]] ; do
     key="$1" ; shift
@@ -212,7 +212,7 @@ configure_package()
   if [[ -n ${configure_command:-} ]] ; then
     command="${configure_command}"
   else
-    command="./configure --prefix ${prefix_path} ${configure_flags[@]:-}"
+    command="./configure ${configure_flags[@]:-"--prefix=${prefix_path}"}"
     if [[ ! -x ./configure ]] ; then
       log "./configure not found, skipping configuration step." && return 0
     fi
@@ -293,6 +293,10 @@ activate_package()
 
   link "${install_base_path}/${package_name}-${package_version}" \
     to "${install_base_path}/${package_name}"
+
+  if running_as_root &&  [[ -d "${install_base_path}/${package_name}/lib" ]] ; then
+
+  fi
 }
 
 deactivate_package()
