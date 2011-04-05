@@ -10,3 +10,17 @@ rvm_install()
   chmod +x rvm-installer
   ./rvm-installer
 }
+
+install_gem()
+{
+  gem install --no-rdoc --no-ri -q "$*"
+}
+
+install_gems() {
+  local _gem
+
+  for _gem in "$*" ; do
+    gem install ${_gem} --no-rdoc --no-ri
+  done
+}
+

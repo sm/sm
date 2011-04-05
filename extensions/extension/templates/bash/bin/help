@@ -2,11 +2,11 @@
 
 description "${extension} BDSM extension."
 
-actions "install  - Install the $extension gem.
+actions "install  - Install $extension .
   setup    - Setup and Configure $extension.
-  start    - Start extension.
-  stop     - Stop extension.
-  restart  - Restart extension.
-  status   - Display extension status."
+  start    - Start ${extensoin}.
+  stop     - Stop ${extension}.
+  restart  - Restart ${extension}.
+  status   - Display ${extension} status."
 
 show_help
