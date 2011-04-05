@@ -216,12 +216,30 @@ move_files_to()
   done
 }
 
+chown_files()
+{
+  local _idenity="$1" _file; shift
+
+  for _file in "${@}" ; do
+    [[ -f "${_file}" ]] && chown -R ${_idenity} "${_file}"
+  done
+}
+
 chown_paths()
 {
   local _idenity="$1" _path; shift
 
   for _path in "${@}" ; do
-    chown -R ${_idenity} "${_path}"
+    [[ -d "${_file}" ]] && chown -R ${_idenity} "${_path}"
+  done
+}
+
+chmod_files()
+{
+  local _permissions="$1" _file; shift
+
+  for _path in "${@}" ; do
+    [[ -f "${_file}" ]] && chmod ${_permissions} "${_file}"
   done
 }
 
@@ -230,7 +248,7 @@ chmod_paths()
   local _permissions="$1" _path; shift
 
   for _path in "${@}" ; do
-    chmod -R ${_permissions} "${_path}"
+    [[ -d "${_path}" ]] && chmod -R ${_permissions} "${_path}"
   done
 }
 
@@ -277,4 +295,7 @@ hash_file()
 }
 
 is_executable() { [[ -x "$1" ]] ; }
+file_exists() { [[ -f "$1" ]] ; }
+file_nonempty() { [[ -s "$1" ]] ; }
+directory_exists() { [[ -d "$1" ]] ; }
 
