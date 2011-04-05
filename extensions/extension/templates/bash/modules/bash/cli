@@ -13,7 +13,7 @@ usage() {
     --data)    - specify data directory
     --user)    - specify user to install as
     --version) - specify version to install
-    --licence) - view licence
+    --license) - view license
     --help)    - view this usage information
 
 "
@@ -42,8 +42,8 @@ for ((index=0 ; index < $number_of_args ; index++)) ; do
     --version)
       package_version="${extension_args[$((++index))]}"
       ;;
-    --licence)
-      display_extension_licence
+    --license)
+      display_extension_license
       exit 0
       ;;
     --help)
