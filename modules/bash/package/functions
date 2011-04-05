@@ -212,7 +212,7 @@ configure_package()
   if [[ -n ${configure_command:-} ]] ; then
     command="${configure_command}"
   else
-    command="./configure --prefix '${prefix_path}' ${configure_flags[@]:-}"
+    command="./configure --prefix ${prefix_path} ${configure_flags[@]:-}"
     if [[ ! -x ./configure ]] ; then
       log "./configure not found, skipping configuration step." && return 0
     fi
