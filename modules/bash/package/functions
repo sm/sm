@@ -294,9 +294,9 @@ activate_package()
   link "${install_base_path}/${package_name}-${package_version}" \
     to "${install_base_path}/${package_name}"
 
-  if running_as_root &&  [[ -d "${install_base_path}/${package_name}/lib" ]] ; then
+  #if running_as_root &&  [[ -d "${install_base_path}/${package_name}/lib" ]] ; then
 
-  fi
+  #fi
 }
 
 deactivate_package()
