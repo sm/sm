@@ -6,7 +6,7 @@
 
 template_exists()
 {
-  local _template="${extension_templates_path}/${_template}.template"
+  local _template="${extension_templates_path}/${1}.template"
 
   [[ -s "${_template}" ]]
 }
