@@ -288,6 +288,7 @@ extension_version()
 extension_action()
 {
   (
+  unset extension action
   extension="$1" ; shift
   action="$1" ; shift
   true "${extension_args:="$@"}"
