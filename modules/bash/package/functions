@@ -285,3 +285,23 @@ cleanup_install_files()
   remove_files "${files[@]}"
 }
 
+activate_package()
+{
+  local _name= "$1" ; shift
+  local _version= "$1" ; shift
+
+  deactivate_package "${_name}" "${_version}"
+
+  link "${install_base_path}/${_name}-${_version}" \
+    to "${install_base_path}/${_name}"
+}
+
+deactivate_package()
+{
+  local _name= "$1" ; shift
+  local _version= "$1" ; shift
+
+  ensure_nonempty _name _version
+
+  remove_files "${install_base_path}/${_name}"
+}
