@@ -24,7 +24,7 @@ read_default()
 
   true "${variable:="$key"}"
 
-  value="$(hash_file "${extension_config_path}/defaults" "${variable}")"
+  value="$(hash_file "${extension_config_path}/defaults" "${key}")"
 
   eval "${variable}=\"${value}\""
 }
