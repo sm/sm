@@ -8,3 +8,5 @@ actions "install  - Install the $extension gem.
   stop     - Stop extension.
   restart  - Restart extension.
   status   - Display extension status."
+
+show_help

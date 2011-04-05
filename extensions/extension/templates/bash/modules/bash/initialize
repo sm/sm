@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
 
-# modules <<space separated list of modules>>
+modules defaults
 
+read_default version into package_version

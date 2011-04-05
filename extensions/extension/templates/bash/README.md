@@ -1,2 +1,1 @@
-# Extension Template
-
+# TODO: Write Extension README

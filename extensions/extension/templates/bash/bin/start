@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-[[ -x "${init_scripts_path}/${extension}" ]] || \
+is_executable "${init_scripts_path}/${extension}" || \
   fail "${init_scripts_path}/${extension} is missing or not executable."
 
 exec "${init_scripts_path}/${extension}" "${action}"
