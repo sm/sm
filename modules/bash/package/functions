@@ -138,11 +138,10 @@ fetch_package_md5()
   package_md5=$(hash_file "$extension_config_path/md5" "${package_file}")
 
   if [[ -z "${package_md5}" && -n "${package_md5_url}" ]] ; then
-    if ! curl -L "${packge_md5_url}" -o "${package_file}.md5" ; then
-      package_md5=$(cat "${package_file}.md5")
-    else
+    curl -L "${packge_md5_url}" -o "${package_file}.md5" ||
       fail "Fetching md5 from '${package_md5_url}' failed."
-    fi
+
+    package_md5=$(cat "${package_file}.md5")
   fi
 
 }
