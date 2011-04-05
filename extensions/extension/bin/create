@@ -17,7 +17,7 @@ for extension in ${extension_args[@]} ; do
   enter "$extensions_path/extension/templates/${language:-bash}"
 
   copy_directories_to "$target_path/$extension/" \
-    bin modules templates
+    bin modules templates config
 
   copy_files_to "$target_path/$extension/" \
     README.md VERSION
