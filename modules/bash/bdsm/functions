@@ -364,7 +364,6 @@ extension_action()
         "${extension_modules_path}/bash/functions" \
         "${extension_modules_path}/bash/initialize"
 
-
       source "${action_file}"
       )
       ;;
@@ -376,7 +375,7 @@ extension_action()
       fail "processing ${action} failed, does not exist or is not executable."
       ;;
     binary|*)
-      "${action_file}"
+      "${action_file}" "${extension_action}" "${extension_args[@]}"
       ;;
   esac
   )
