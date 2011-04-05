@@ -27,9 +27,9 @@ read_default()
 
   if [[ -z "${variable:-}" ]] ; then
     if [[ -n "${prefix:-}" ]] ; then
-      "${variable:="${prefix:-}_$key"}"
+      true "${variable:="${prefix:-}_$key"}"
     else
-      "${variable:="$key"}"
+      true "${variable:="$key"}"
     fi
   fi
 
