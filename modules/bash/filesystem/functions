@@ -234,7 +234,7 @@ chmod_files()
 {
   local _permissions="$1" _file; shift
 
-  for _path in "${@}" ; do
+  for _file in "${@}" ; do
     [[ -f "${_file}" ]] && chmod ${_permissions} "${_file}"
   done
 }
