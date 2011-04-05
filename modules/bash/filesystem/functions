@@ -149,7 +149,7 @@ link()
 
 rename()
 {
-  move "${1:+@}"
+  move "${*}"
 }
 
 move()
