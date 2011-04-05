@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+true "${bdsm_development_path:="$source_path/bdsm"}"
+
+enter "${bdsm_development_path}/${extension_args[0]}/"
+
+exec ${EDITOR:-vi} .
