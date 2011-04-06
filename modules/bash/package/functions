@@ -275,7 +275,9 @@ package_make_install()
     command="make ${make_install_flags[@]:-install}"
   fi
 
-  if ${command} !  > make.install.log 2>&1 ; then
+  if ${command} > make.install.log 2>&1  ; then
+    log "Installation of ${package_name} ${package_version} was successful! "
+  else
     fail "make install of ${package_name} ${package_version} failed! "
   fi
 }
