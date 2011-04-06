@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
 
-modules filesystem system templates environment defaults
+modules \
+  filesystem system templates environment defaults
 
 # Ensure that default values are set.
-true \
-  "${prefix_path:="/usr/local"}" \
-  "${archive_format:=tar.gz}" \
-  "${package_name:=${extension}}"
+
+# Our default bdsm installation location is to /usr/local
+true "${prefix_path:="/usr/local"}"
+
+# Default name for the package is the extension name.
+true "${package_name:=${extension}}"
 
 true \
   "${bin_path:="${prefix_path}/bin"}" \
@@ -15,7 +18,6 @@ true \
 
 if running_as_root ; then
   true \
-    "${log_path:="${prefix_path}/log"}" \
     "${data_path:="/var/db/${package_name}"}" \
     "${log_path:="/var/log/${package_name}"}" \
     "${package_user:="${package_name}"}"
@@ -23,7 +25,7 @@ if running_as_root ; then
 else
   true \
     "${log_path:="${prefix_path}/log"}" \
-    "${data_path:="${prefix_path}/.${package_name}"}" \
+    "${data_path:="${prefix_path}/db/${package_name}"}" \
     "${package_user:="$USER"}"
 fi
 
@@ -42,6 +44,12 @@ variable_is_nonempty package_base_url || \
 
 variable_is_nonempty init_scripts_path || \
   init_scripts_path="$(init_scripts_path)"
+
+variable_is_nonempty archive_format || \
+  read_default archive_format
+
+true \
+  "${archive_format:=tar.gz}" # Default extension is tar.gz
 
 export LDFLAGS="${LDFLAGS:-} -L${prefix_path}/lib"
 
