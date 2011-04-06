@@ -136,7 +136,7 @@ patch_package()
   true # noop for now
 }
 
-uninstall_package()
+package_uninstall()
 {
   ensure_nonempty \
     "package_name" \
