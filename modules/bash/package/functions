@@ -2,7 +2,7 @@
 
 # Example Usage:
 #
-# define_package \
+# package_definition \
 #   name "bash"
 #   version "4.2"
 #   url "ftp.gnu.org/gnu/bash/"
@@ -14,7 +14,7 @@ package_definition()
     if [[ -n "${1:-}" ]] ; then
       value="$1" ; shift
     else
-      fail "${extension} : ${action} : define_package() : Missing value for key '${key}'"
+      fail "${extension} : ${action} : package_definition() : Missing value for key '${key}'"
     fi
 
     case "$key" in
@@ -62,7 +62,7 @@ package_definition()
       #  eval "${key}=${value}"
       #  ;;
       *)
-        fail "Unknown key for define_package() : '${key}' (value: ${value})"
+        fail "Unknown key for package_definition() : '${key}' (value: ${value})"
       ;;
     esac
   done
@@ -120,7 +120,7 @@ install_package()
   fi
 
   if command_exists "${package_name}_install" ; then
-    "${package}_install"
+    "${package_name}_install"
   else
     log "Installing ${package_name} ${package_version}"
     if package_install ; then
