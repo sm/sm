@@ -291,7 +291,7 @@ extension_action()
   unset extension action
   export extension="$1" ; shift
   export action="$1" ; shift
-  export extension_args="$@"
+  export extension_args="${extension_args:-$@}"
 
   if [[ -z "$extension" || -z "$action" ]] ; then
     fail "WTF??? extension and action must be set."
