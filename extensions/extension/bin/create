@@ -20,7 +20,7 @@ for extension in ${extension_args[@]} ; do
     bin modules templates config
 
   copy_files_to "$target_path/$extension/" \
-    README.md VERSION
+    README.md VERSION CHANGELOG.md TODO.md
   )
 
   log "Extension created from template at ${target_path}/${extension}/"
