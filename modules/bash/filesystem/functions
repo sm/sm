@@ -225,8 +225,8 @@ chown_paths()
 {
   local _idenity="$1" _path; shift
 
-  for _path in "${@}" ; do
-    [[ -d "${_file}" ]] && chown -R ${_idenity} "${_path}"
+  for _path in "$*" ; do
+    [[ -d "${_path}" ]] && chown -R ${_idenity} "${_path}"
   done
 }
 

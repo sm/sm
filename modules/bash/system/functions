@@ -95,7 +95,6 @@ ensure_user_exists()
         next_uid=$((current_max_uid+1))
 
         if ! dscl . -list /Users | grep -q "^${package_user}$" ; then
-          #Create the group
           dscl . -create "/Groups/$package_user"
           dscl . -create "/Groups/$package_user" gid "$next_gid"
           dscl . -create "/Users/${package_user}"
