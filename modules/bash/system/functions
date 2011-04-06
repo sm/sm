@@ -199,9 +199,15 @@ running_as_user() { [[ $UID -ne 0 ]] ; }
 run_as_user()
 {
   local _user="$1" ; shift
-  local _command="$*"
 
-  su - "${_user}" -c "${_command}"
+  su "${_user}" -c "$*"
+}
+
+run_as_login_user()
+{
+  local _user="$1" ; shift
+
+  su - "${_user}" -c "$*"
 }
 
 os_is_linux() { [[ "$MACHTYPE" = *linux* ]] ; }
