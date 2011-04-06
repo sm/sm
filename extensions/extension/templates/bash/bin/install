@@ -1,29 +1,6 @@
 #!/usr/bin/env bash
 
-# TODO: refactor the argument processing.
-while [[ $# -gt 0 ]] ; do
+# load cli
 
-  token="$1" ; shift
+package_install
 
-  case "$token" in
-    --trace)
-      trace_flag=1
-      enable_trace
-      ;;
-    --version)
-      version="$1"
-      shift
-      ;;
-    --url)
-      package_url="$1"
-      shift
-      ;;
-    *)
-      fail "Unknown command line argument for bdsm ${extension}: '$token'"
-      ;;
-  esac
-done
-
-build_package
-
-succeed "Installation Complete."
