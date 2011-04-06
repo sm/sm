@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-modules filesystem system templates environment
+modules filesystem system templates environment defaults
 
 # Ensure that default values are set.
 true \
@@ -27,7 +27,21 @@ else
     "${package_user:="$USER"}"
 fi
 
-init_scripts_path="$(init_scripts_path)"
+# Ensure that package_version is set at this point
+variable_is_nonempty package_version || \
+  read_default version prefix package
+
+if variable_is_nonempty package_version ; then
+  install_path="${install_base_path}/${package_version}"
+else
+  log "ERROR: package_version must be defined when using package module. \n(Hint: set version=x.y.z in the extension's config/defaults file.)"
+fi
+
+variable_is_nonempty package_base_url || \
+  read_default base_url prefix package
+
+variable_is_nonempty init_scripts_path || \
+  init_scripts_path="$(init_scripts_path)"
 
 export LDFLAGS="${LDFLAGS:-} -L${prefix_path}/lib"
 
