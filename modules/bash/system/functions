@@ -88,21 +88,25 @@ ensure_user_exists()
       ;;
 
       "Darwin")
-        gid="501" #only gids > 500 show up in user preferences
+        current_max_gid=$(dscl . -list /Groups gid | awk '{print $2}' | sort -g -r | head -1)
+        next_gid=$((current_max_gid+1))
 
-        #Find an open gid
-        while true; do
-          name=$(dscl . search /groups PrimaryGroupID $gid | cut -f1 -s)
-          if [ -z "$name" ] ; then
-            break
-          fi
-          gid=$[$gid +1]
-        done
+        current_max_uid=$(dscl . -list /Users UniqueID | awk '{print $2}' | sort -g -r | head -1)
+        next_uid=$((current_max_uid+1))
 
-        #Create the group
-        dscl . -create "/Groups/$package_user"
-        dscl . -create "/Groups/$package_user" gid "$gid"
-        dscl . -create "/Users/${package_user}" PrimaryGroupID "$gid" # UserShell /bin/bash
+        if ! dscl . -list /Users | grep -q "^${package_user}$" ; then
+          #Create the group
+          dscl . -create "/Groups/$package_user"
+          dscl . -create "/Groups/$package_user" gid "$next_gid"
+          dscl . -create "/Users/${package_user}"
+          dscl . -create "/Users/${package_user}" PrimaryGroupID "$gid" # UserShell /bin/bash
+          dscl . -create "/Users/${package_user}" uid "$next_uid"
+          dscl . -create "/Users/${package_user}" realname "Postgresql User"
+          dscl . -create "/Users/${package_user}" home "${data_path%\/*}"
+          dscl . -create "/Users/${package_user}" shell "/bin/bash"
+          dscl . -create "/Users/${package_user}" gid "$gid"
+          dscl . -create "/Users/${package_user}" passwd "*"
+        fi
       ;;
 
       "SunOS")
