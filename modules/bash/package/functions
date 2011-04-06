@@ -102,7 +102,7 @@ package_install()
     "${package_name}_patch"
   else
     log "Patching ${package_name} ${package_version}"
-    patch_package
+    package_patch
   fi
 
   if command_exists "${package_name}_configure" ; then
@@ -131,7 +131,7 @@ package_install()
   fi
 }
 
-patch_package()
+package_patch()
 {
   true # noop for now
 }
@@ -237,7 +237,7 @@ package_configure()
   if [[ -n ${configure_command:-} ]] ; then
     command="${configure_command}"
   else
-    command="./configure ${configure_flags[@]:-"--prefix=${prefix_path}"}"
+    command="./configure ${configure_flags[@]:-"--prefix=${install_path:-$prefix_path}"}"
     if [[ ! -x ./configure ]] ; then
       log "./configure not found, skipping configuration step." && return 0
     fi
