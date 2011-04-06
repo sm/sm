@@ -82,32 +82,58 @@ install_package()
 
   enter "${source_path}"
 
-  log "Downloading ${package_name} ${package_version}"
-  fetch_package
+  if command_exists "${package_name}_download" ; then
+    "${package_name}_download"
+  else
+    log "Downloading ${package_name} ${package_version}"
+    package_fetch
+  fi
 
-  log "Extracting ${package_name} ${package_version}"
-  extract_package
+  if command_exists "${package_name}_extract" ; then
+    "${package_name}_extract"
+  else
+    log "Extracting ${package_name} ${package_version}"
+    package_extract
+  fi
 
   enter "${package_dir}"
 
-  # If the extension has defined a patch_package function, call it.
-  if command -v patch_package 2>/dev/null ; then
+  if command_exists "${package_name}_patch" ; then
+    "${package_name}_patch"
+  else
     log "Patching ${package_name} ${package_version}"
     patch_package
   fi
 
-  log "Configuring ${package_name} ${package_version}"
-  configure_package
-
-  log "Building ${package_name} ${package_version}"
-  make_package
-
-  log "Installing ${package_name} ${package_version}"
-  if make_install_package ; then
-    log "Installed ${package_name} ${package_version}."
+  if command_exists "${package_name}_configure" ; then
+    "${package_name}_configure"
   else
-    fail "Failed to install ${package_name} ${package_version} to ${prefix_path}."
+    log "Configuring ${package_name} ${package_version}"
+    package_configure
   fi
+
+  if command_exists "${package_name}_build" ; then
+    "${package_name}_build"
+  else
+    log "Building ${package_name} ${package_version}"
+    package_build
+  fi
+
+  if command_exists "${package_name}_install" ; then
+    "${package}_install"
+  else
+    log "Installing ${package_name} ${package_version}"
+    if package_install ; then
+      log "Installed ${package_name} ${package_version}."
+    else
+      fail "Failed to install ${package_name} ${package_version} to ${prefix_path}."
+    fi
+  fi
+}
+
+patch_package()
+{
+  true # noop for now
 }
 
 uninstall_package()
@@ -126,7 +152,7 @@ uninstall_package()
   fi
 }
 
-fetch_package_md5()
+package_fetch_md5()
 {
   ensure_nonempty package_name package_version archive_format
 
@@ -163,14 +189,14 @@ file_matches_md5()
   [[ "${file_md5// *}" = "$md5" ]]
 }
 
-fetch_package()
+package_fetch()
 {
   ensure_nonempty package_name package_version archive_format
 
   true "${package_file:="${package_name}-${package_version}.${archive_format}"}"
   true "${package_url:="${package_base_url}/${package_file}"}"
 
-  fetch_package_md5
+  package_fetch_md5
 
   if ! file_matches_md5 "${package_file}" "${package_md5}" ; then
     remove_files "${package_file}"
@@ -181,7 +207,7 @@ fetch_package()
   fi
 }
 
-extract_package()
+package_extract()
 {
   true "${package_file:="${package_name}-${package_version}.${archive_format}"}"
 
@@ -204,7 +230,7 @@ extract_package()
   esac
 }
 
-configure_package()
+package_configure()
 {
   local command
 
@@ -224,7 +250,7 @@ configure_package()
   fi
 }
 
-make_package()
+package_build()
 { # TODO: make this robust, -j4 for example.
   local command
 
@@ -239,7 +265,7 @@ make_package()
   fi
 }
 
-make_install_package()
+package_install()
 { # TODO: make this robust
   local command
 

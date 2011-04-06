@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-modules filesystem system templates
+modules filesystem system templates environment
 
 # Ensure that default values are set.
 true \
