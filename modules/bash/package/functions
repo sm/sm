@@ -371,9 +371,8 @@ package_ldconfig()
 
 package_conf_d()
 {
-  directory_exists "${install_base_path}/active/bin" ||
-    return 0 # No bin/ directory for activated package, no need to update PATH
-
+  ensure_path_exists "${install_base_path}/active/bin"
+  # return 0 # No bin/ directory for activated package, no need to update PATH
   ensure_set package_name
 
   if running_as_root ; then
