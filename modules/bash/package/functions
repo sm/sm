@@ -243,6 +243,7 @@ package_configure()
   if [[ -n ${configure_command:-} ]] ; then
     command="${configure_command}"
   else
+    export PREFIX="${install_base_path}/${package_version}"
     command="./configure ${configure_flags[@]:-"--prefix=${install_path:-$prefix_path}"}"
     if [[ ! -x ./configure ]] ; then
       log "./configure not found, skipping configuration step." && return 0
