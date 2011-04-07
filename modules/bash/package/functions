@@ -320,8 +320,8 @@ package_activate()
 
   package_deactivate "${package_name}"
 
-  link "${install_base_path}/${package_name}/${package_version}" \
-    to "${install_base_path}/${package_name}/active"
+  link "${install_base_path}/${package_version}" \
+    to "${install_base_path}/active"
 
   package_ldconfig
 
@@ -334,8 +334,8 @@ package_deactivate()
 
   ensure_nonempty package_name
 
-  symlink_exists "${install_base_path}/${package_name}/active" &&
-    remove_files "${install_base_path}/${package_name}/active"
+  symlink_exists "${install_base_path}/active" &&
+    remove_files "${install_base_path}/active"
 
   file_exists "/etc/ld.so.conf.d/${package_name}.conf" &&
     remove_files "/etc/ld.so.conf.d/${package_name}.conf"
@@ -348,13 +348,13 @@ package_activate_if_first()
 {
   ensure_nonempty package_name package_version
 
-  symlink_exists "${install_base_path}/${package_name}/active" ||
+  symlink_exists "${install_base_path}/active" ||
     package_activate "${package_name}" "${package_version}"
 }
 
 package_ldconfig()
 {
-  directory_exists "${install_base_path}/${package_name}/lib" ||
+  directory_exists "${install_base_path}/lib" ||
     return 0 # no lib/ directory for activated package, no need to update ldconfig
 
   ensure_set package_name
@@ -362,7 +362,7 @@ package_ldconfig()
   # TODO: Figure out if solaris and freebsd have an analog to this?
   if running_as_root && os_is_linux ; then
     ensure_paths_exist "/etc/ld.so.conf.d"
-    printf "%s" "${install_base_path}/${package_name}/active/lib" \
+    printf "%s" "${install_base_path}/active/lib" \
       > "/etc/ld.so.conf.d/${package_name}.conf"
     chmod 0644 "/etc/ld.so.conf.d/${package_name}.conf"
     ldconfig
@@ -371,14 +371,14 @@ package_ldconfig()
 
 package_conf_d()
 {
-  directory_exists "${install_base_path}/${package_name}/active/bin" ||
+  directory_exists "${install_base_path}/active/bin" ||
     return 0 # No bin/ directory for activated package, no need to update PATH
 
   ensure_set package_name
 
   if running_as_root ; then
     ensure_paths_exist "/etc/conf.d"
-    printf "%s" "PATH=\"\$PATH\":${install_base_path}/${package_name}/active/bin" \
+    printf "%s" "PATH=\"\$PATH\":${install_base_path}/active/bin" \
       > "/etc/conf.d/${package_name}.sh"
     chmod 0644 "/etc/conf.d/${package_name}.sh"
   fi
