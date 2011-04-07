@@ -70,6 +70,12 @@ while [[ $# -gt 0 ]] ; do
       extension="extension"
       ;;
 
+    edit|open)
+      extension="extension"
+      action="edit"
+      extension_args=("$@")
+      parse_break=1
+      ;;
 
     --disable-hooks)
       hooks_flag=0
