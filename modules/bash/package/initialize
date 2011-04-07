@@ -18,7 +18,6 @@ true \
 
 if running_as_root ; then
   true \
-    "${data_path:="/var/db/${package_name}/${package_version}"}" \
     "${data_base_path:="/var/db/${package_name}"}" \
     "${log_path:="/var/log/${package_name}"}" \
     "${package_user:="${package_name}"}"
@@ -27,7 +26,6 @@ else
   true \
     "${log_path:="${prefix_path}/log"}" \
     "${data_base_path:="${prefix_path}/db/${package_name}"}" \
-    "${data_path:="${prefix_path}/db/${package_name}/${package_version}"}" \
     "${package_user:="$USER"}"
 fi
 
@@ -61,7 +59,8 @@ variable_is_nonempty archive_format || \
   read_default archive_format
 
 true \
-  "${archive_format:=tar.gz}" # Default extension is tar.gz
+  "${archive_format:=tar.gz}" \
+  "${data_path:="${data_base_path}/${package_version}"}" \
 
 export LDFLAGS="${LDFLAGS:-} -L${prefix_path}/lib"
 
