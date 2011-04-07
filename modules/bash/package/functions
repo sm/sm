@@ -392,7 +392,7 @@ package_profile_d()
     fi
 
     printf "%s\n" \
-      "[ -d \"${prefix_path}/${_package}/active/bin\" ] && PATH=\"\$PATH:${prefix_path}/${_package}/active/bin\"" \
+      "if test -d \"${prefix_path}/${_package}/active/bin\" ; then PATH=\"\$PATH:${prefix_path}/${_package}/active/bin\" ; export PATH ; fi " \
       > "/etc/profile.d/${_package}.sh"
     chmod 0755 "/etc/profile.d/${_package}.sh"
   fi
