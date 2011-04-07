@@ -364,7 +364,7 @@ package_ldconfig()
 
   ensure_nonempty _package
 
-  directory_exists "${prefix_path}/${_package}/lib" ||
+  directory_exists "${prefix_path}/${_package}/active/lib" ||
     return 0 # no lib/ directory for activated package, no need to update ldconfig
 
   # TODO: Figure out if solaris and freebsd have an analog to this?
