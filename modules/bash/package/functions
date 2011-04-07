@@ -15,7 +15,7 @@ package_definition()
       value="$1" ; shift
     else
       if echo "$key" | grep '=' ; then
-        fail "${extension} : ${action} : package_definition() : Invalid key/value specifier '${key}', you should change the '=' to a ' '. Yes, I *am* being pedantic."
+        fail "${extension} : ${action} : package_definition() : Invalid key '${key}'\nChange the '=' to a ' '."
       else
         fail "${extension} : ${action} : package_definition() : Missing value for key '${key}'"
       fi
