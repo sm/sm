@@ -36,7 +36,14 @@ variable_is_nonempty package_version || \
 if variable_is_nonempty package_version ; then
   install_path="${install_base_path}/${package_version}"
 else
-  log "ERROR: package_version must be defined when using package module. \n(Hint: set version=x.y.z in the extension's config/defaults file.)"
+  case ${package_name} in
+    bdsm|extension)
+      true # ignore.
+      ;;
+    *)
+      log "ERROR: package_version must be defined when using package module. \n(Hint: set version=x.y.z in the extension's config/defaults file.)"
+      ;;
+  esac
 fi
 
 variable_is_nonempty package_base_url || \
