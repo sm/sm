@@ -29,7 +29,7 @@ done
 
 modules trace
 
-while [[ $# -gt 0 ]] ; do
+whiLe [[ $# -gt 0 ]] ; do
   token="$1" ; shift
   case "$token" in
     --trace)
@@ -39,8 +39,7 @@ while [[ $# -gt 0 ]] ; do
   esac
 done
 
-ensure_paths_exist \
-  "${bdsm_path}"
+ensure_paths_exist "${bdsm_path}"
 
 directories=(bin modules config extensions)
 
@@ -49,20 +48,18 @@ directories=(bin modules config extensions)
   ensure_paths_exist "${directories[@]}"
 )
 
-copy_directories_to "${bdsm_path}" \
-  "${directories[@]}"
+copy_directories_to "${bdsm_path}" "${directories[@]}"
 
 copy_files_to "${bdsm_path}" \
   LICENCE \
   VERSION \
   README
 
-ensure_files_exist \
-  "${config_path}/user" \
-  "${config_path}/db"
+ensure_files_exist "${config_path}/user" "${config_path}/db"
 
-remove_files \
-  "${prefix}/bin/bdsm"
+remove_files "${prefix}/bin/bdsm"
 
-link "${bdsm_path}/bin/bdsm" to "${prefix}/bin/bdsm" --force
+ensure_paths_exist "${bdsm_path}/bin"
+
+link "${bdsm_path}/bin/bdsm" to "${prefix}/bin/bdsm"
 
