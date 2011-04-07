@@ -364,8 +364,9 @@ package_ldconfig()
   # TODO: Figure out if solaris and freebsd have an analog to this?
   if running_as_root && os_is_linux ; then
     ensure_paths_exist "/etc/ld.so.profile.d"
-    printf "%s" "${prefix_path}/${_package}/active/lib" \
-      > "/etc/ld.so.profile.d/${_package}.conf"
+    printf "%s\n" \
+      "${prefix_path}/${_package}/active/lib" \
+        > "/etc/ld.so.profile.d/${_package}.conf"
     chmod 0644 "/etc/ld.so.profile.d/${_package}.conf"
     ldconfig
   fi
@@ -381,9 +382,9 @@ package_profile_d()
       "${prefix_path}/${_package}/active/bin" \
       "/etc/profile.d"
 
-    printf "%s" "[[ -d \"${prefix_path}/${_package}/active/bin\" ]] && PATH=\"\$PATH:${prefix_path}/${_package}/active/bin\"" \
+    printf "%s\n" \
+      "[ -d \"${prefix_path}/${_package}/active/bin\" ] && PATH=\"\$PATH:${prefix_path}/${_package}/active/bin\"" \
       > "/etc/profile.d/${_package}.sh"
-
     chmod 0644 "/etc/profile.d/${_package}.sh"
   fi
 }
