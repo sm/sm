@@ -319,7 +319,9 @@ package_clean_install_files()
 package_activate()
 {
   local _package="${1:-}" _version="${2:-}"
-  ensure_nonempty _package _version
+  ensure_nonempty _package
+  variable_is_nonempty _version ||
+  fail "${extension} ${action} package_activate()\n > Variable must be specified as the 2nd parameter!"
 
   package_deactivate "${_package}"
 
