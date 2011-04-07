@@ -360,7 +360,7 @@ package_activate_if_first()
 
 package_ldconfig()
 {
-  local _package="${1:-}" _path
+  local _package="${1:-}" _path _files
 
   ensure_nonempty _package
 
@@ -377,8 +377,10 @@ package_ldconfig()
       chmod 0644 "/etc/ld.so.profile.d/${_package}.conf"
       ldconfig
     elif os_is_darwin ; then # Cluster Fuck.
-      for _path in "${prefix_path}/${_package}/active/"* ; do
-        cp -Rf "${dir}" "${prefix_path}/"
+      _files=($(find "${prefix_path}/${_package}/active/" -mindepth 1 -maxdepth 1 -type d))
+
+      for _path in "${_files[@]}" ; do
+        cp -Rf "${_path}" "${prefix_path}/"
       done
     fi
   fi
