@@ -15,4 +15,3 @@ esac
 
 install_extensions "${extension_args[@]}"
 
-log "Installed extensions: ${extension_args[@]}"

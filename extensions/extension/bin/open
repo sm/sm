@@ -3,7 +3,13 @@
 [[ ${#extension_args[@]} -gt 0 ]] || \
   fail "At least one extension name must be specified."
 
-enter "$extensions_path/${extension_args[0]}/"
+enter "${extensions_development_path}/${extension_args[0]}/"
 
-# TODO: Adjust this for different platforms, this is rather OSX specific for now.
-open .
+if command_exists open ; then
+  open .
+elif command_exists xdg-open ; then
+  xdg-open .
+else
+  echo "$PWD"
+fi
+
