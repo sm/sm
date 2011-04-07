@@ -72,7 +72,7 @@ while [[ $# -gt 0 ]] ; do
 
     edit|open)
       extension="extension"
-      action="edit"
+      action="${token}"
       extension_args=("$@")
       parse_break=1
       ;;
