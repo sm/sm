@@ -361,7 +361,6 @@ package_ldconfig()
 
   # TODO: Figure out if solaris and freebsd have an analog to this?
   if running_as_root && os_is_linux ; then
-    [[ -d "${install_base_path}/${package_name}/lib" ]] ; then
     ensure_paths_exist "/etc/ld.so.conf.d"
     printf "%s" "${install_base_path}/${package_name}/active/lib" \
       > "/etc/ld.so.conf.d/${package_name}.conf"
