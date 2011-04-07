@@ -302,6 +302,7 @@ file_contains()
   local _file="${1}" _string="${2}"
   grep -q "${_string}" "${_file}" 2>/dev/null
 }
+symlink_exists() { [[ -L "$1" ]] ; }
 
 # Directory conditional functions
 directory_exists() { [[ -d "$1" ]] ; }
