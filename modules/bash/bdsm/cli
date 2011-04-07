@@ -38,6 +38,13 @@ while [[ $# -gt 0 ]] ; do
       parse_break=1
     ;;
 
+    activate|deactivate)
+      extension="extension"
+      action="package"
+      extension_args=("${token}" "$@")
+      parse_break=1
+      ;;
+
     --disable-hooks)
       hooks_flag=0
       ;;

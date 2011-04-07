@@ -1,26 +1,50 @@
 #!/usr/bin/env bash
 
-#
-#
-# TODO: put all of this into a module.
-#
-#
-#
-#
 [[ ${#extension_args[@]} -gt 0 ]] || \
   fail "At least one extension name must be specified."
 
-# bdsm extension package A,B,C
-for extension in "${extensions[@]}" ; do
+usage() {
+  printf "
+  Usage:
 
-  [[ -s "$extensions_path/$extension/VERSION" ]] || \
-    fail "The version must be specified in $extensions_path/$extension/VERSION"
+    $0 [options]
 
-  version="$(cat "$extensions_path/$extension/VERSION")"
+  options:
 
-  package_extension
+    --prefix   - specify prefix path
+    --src)     - specify source directory
+    --data)    - specify data directory
+    --user)    - specify user to install as
+    --version) - specify version to install
+    --license) - view license
+    --help)    - view this usage information
+
+"
+  return 0
+}
+
+modules package
+
+number_of_args=${#extension_args[@]}
+
+for ((index=0 ; index < $number_of_args ; index++)) ; do
+
+  token="${extension_args[$index]}"
+
+  case "$token" in
+    activate)
+      package_activate "${extension_args[$((++index))]}" "${extension_args[$((++index))]}"
+      ;;
+
+    deactivate)
+      package_deactivate "${extension_args[$((++index))]}"
+      ;;
+
+    --trace)
+      set -o xtrace
+      ;;
+  esac
 
 done
 
-exit 0
 
