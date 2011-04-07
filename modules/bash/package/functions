@@ -394,7 +394,7 @@ package_profile_d()
     printf "%s\n" \
       "[ -d \"${prefix_path}/${_package}/active/bin\" ] && PATH=\"\$PATH:${prefix_path}/${_package}/active/bin\"" \
       > "/etc/profile.d/${_package}.sh"
-    chmod 0644 "/etc/profile.d/${_package}.sh"
+    chmod 0755 "/etc/profile.d/${_package}.sh"
   fi
 }
 
