@@ -134,7 +134,7 @@ package_install()
     fi
   fi
 
-  package_activate_if_first
+  package_activate_if_first "${package_name}" "${package_version}"
 }
 
 package_patch()
