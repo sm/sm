@@ -15,9 +15,9 @@ package_definition()
       value="$1" ; shift
     else
       if echo "$key" | grep '=' ; then
-        fail "${extension} ${action} : package_definition() Invalid key '${key}'\nGuess: Most likely the '=' is supposed to be a ' '."
+        fail "${extension} ${action} : package_definition()\n > Invalid key '${key}'\n => Guess: Most likely the '=' is supposed to be a ' '."
       else
-        fail "${extension} ${action} : package_definition() Missing value for key '${key}'"
+        fail "${extension} ${action} : package_definition()\n > Value not specified for key '${key}'\n => They tend to come in pairs :)"
       fi
     fi
 
