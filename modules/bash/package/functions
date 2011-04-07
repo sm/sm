@@ -387,8 +387,8 @@ package_profile_d()
     if os_is_darwin ; then
       grep '/etc/profile.d/\*' /etc/profile > /dev/null 2>&1 ||
         printf "\n%s\n" \
-          "[ -d /etc/profile.d/ ] && for profile in /etc/profile.d/*.sh ; do [ -x \"$profile\" ] && . \"$profile\" ; done ; unset profile" \
-          > /etc/profile
+          "[ -d /etc/profile.d/ ] && for profile in /etc/profile.d/*.sh ; do [ -x \"\$profile\" ] && . \"\$profile\" ; done ; unset profile" \
+          >> /etc/profile
     fi
 
     printf "%s\n" \
