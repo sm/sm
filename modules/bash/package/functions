@@ -14,7 +14,11 @@ package_definition()
     if [[ -n "${1:-}" ]] ; then
       value="$1" ; shift
     else
-      fail "${extension} : ${action} : package_definition() : Missing value for key '${key}'"
+      if echo "$key" | grep '=' ; then
+        fail "${extension} : ${action} : package_definition() : Invalid key/value specifier '${key}', you should change the '=' to a ' '. Yes, I *am* being pedantic."
+      else
+        fail "${extension} : ${action} : package_definition() : Missing value for key '${key}'"
+      fi
     fi
 
     case "$key" in
