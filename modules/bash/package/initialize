@@ -18,7 +18,8 @@ true \
 
 if running_as_root ; then
   true \
-    "${data_path:="/var/db/${package_name}"}" \
+    "${data_path:="/var/db/${package_name}/${package_version}"}" \
+    "${data_base_path:="/var/db/${package_name}"}" \
     "${log_path:="/var/log/${package_name}"}" \
     "${package_user:="${package_name}"}"
 
