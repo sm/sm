@@ -382,6 +382,15 @@ package_profile_d()
       "${prefix_path}/${_package}/active/bin" \
       "/etc/profile.d"
 
+
+    ensure_files_exist /etc/profile
+
+    if os_is_darwin && ! awk '/\/etc\/profile.d\/\*/' /etc/profile ; then
+      printf "\n%s\n" \
+"[ -d /etc/profile.d/ ] && for profile in /etc/profile.d/*.sh ; do [ -x \"$profile\" ] && . \"$profile\" ; done ; unset profile" \
+        > /etc/profile
+    fi
+
     printf "%s\n" \
       "[ -d \"${prefix_path}/${_package}/active/bin\" ] && PATH=\"\$PATH:${prefix_path}/${_package}/active/bin\"" \
       > "/etc/profile.d/${_package}.sh"
