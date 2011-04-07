@@ -358,7 +358,7 @@ package_activate_if_first()
 
 package_ldconfig()
 {
-  local _package="${1:-}"
+  local _package="${1:-}" _path
 
   ensure_nonempty _package
 
@@ -366,30 +366,37 @@ package_ldconfig()
     return 0 # no lib/ directory for activated package, no need to update ldconfig
 
   # TODO: Figure out if solaris and freebsd have an analog to this?
-  if running_as_root && os_is_linux ; then
-    ensure_paths_exist "/etc/ld.so.profile.d"
-    printf "%s\n" \
-      "${prefix_path}/${_package}/active/lib" \
+  if running_as_root ; then
+    if os_is_linux ; then
+      ensure_paths_exist "/etc/ld.so.profile.d"
+      printf "%s\n" \
+        "${prefix_path}/${_package}/active/lib" \
         > "/etc/ld.so.profile.d/${_package}.conf"
-    chmod 0644 "/etc/ld.so.profile.d/${_package}.conf"
-    ldconfig
+      chmod 0644 "/etc/ld.so.profile.d/${_package}.conf"
+      ldconfig
+    elif os_is_darwin ; then # Cluster Fuck.
+      for _path in "${prefix_path}/${_package}/active/"* ; do
+        cp -Rf "${dir}" "${prefix_path}/"
+      done
+    fi
   fi
 }
 
 package_profile_d()
 {
   local _package="${1:-}"
+
   ensure_nonempty _package
 
-  if running_as_root ; then
-    ensure_paths_exist \
-      "${prefix_path}/${_package}/active/bin" \
-      "/etc/profile.d"
+  directory_exists "${prefix_path}/${_package}/active/bin" ||
+    return 0 # No bin/ dir, no need for it to be in the path.
 
-    ensure_files_exist /etc/profile
+  if running_as_root ; then
+    ensure_paths_exist "/etc/profile.d"
+    ensure_files_exist "/etc/profile"
 
     if os_is_darwin ; then
-      grep '/etc/profile.d/\*' /etc/profile > /dev/null 2>&1 ||
+      grep '/etc/profile.d/\*' /etc/profile >/dev/null 2>&1 ||
         printf "\n%s\n" \
           "if test -d /etc/profile.d/ ; then for profile in /etc/profile.d/*.sh ; do if test -x \"\$profile\" ; then . \"\$profile\" ; fi ; done ; unset profile ; fi " \
           >> /etc/profile

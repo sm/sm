@@ -38,12 +38,38 @@ while [[ $# -gt 0 ]] ; do
       parse_break=1
     ;;
 
-    activate|deactivate)
+    activate|enable)
       extension="extension"
       action="package"
-      extension_args=("${token}" "$@")
+      extension_args=("activate" "$@")
       parse_break=1
       ;;
+
+    deactivate|disable)
+      extension="extension"
+      action="package"
+      extension_args=("deactivate" "$@")
+      parse_break=1
+      ;;
+
+    list|ls)
+      extension="extension"
+      action="list"
+      extension_args=("$@")
+      parse_break=1
+      ;;
+
+    add|extend)
+      extension="extension"
+      action="install"
+      extension_args=("$@")
+      parse_break=1
+      ;;
+
+    ext|extension|extensions)
+      extension="extension"
+      ;;
+
 
     --disable-hooks)
       hooks_flag=0
@@ -90,15 +116,6 @@ while [[ $# -gt 0 ]] ; do
     --trace)
       trace_flag=1
       source "${modules_path}/bash/trace/initialize"
-      ;;
-
-    extend)
-      extension="extension"
-      action="install"
-      ;;
-
-    ext|extension|extensions)
-      extension="extension"
       ;;
 
     --) extension_args=("$@") # Stop processing arguments.
