@@ -25,7 +25,8 @@ if running_as_root ; then
 else
   true \
     "${log_path:="${prefix_path}/log"}" \
-    "${data_path:="${prefix_path}/db/${package_name}"}" \
+    "${data_base_path:="${prefix_path}/db/${package_name}"}" \
+    "${data_path:="${prefix_path}/db/${package_name}/${package_version}"}" \
     "${package_user:="$USER"}"
 fi
 
