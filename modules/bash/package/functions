@@ -377,7 +377,7 @@ package_conf_d()
 
   ensure_nonempty _package
 
-  ensure_path_exists "${prefix_path}/${_package}/active/bin"
+  ensure_paths_exist "${prefix_path}/${_package}/active/bin"
   # return 0 # No bin/ directory for activated package, no need to update PATH
 
   if running_as_root ; then
