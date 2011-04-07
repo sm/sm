@@ -356,7 +356,7 @@ package_ldconfig()
 {
   local _package="${1:-}"
 
-  ensure_set _package
+  ensure_nonempty _package
 
   directory_exists "${prefix_path}/${_package}/lib" ||
     return 0 # no lib/ directory for activated package, no need to update ldconfig
@@ -375,7 +375,7 @@ package_conf_d()
 {
   local _package="${1:-}"
 
-  ensure_set _package
+  ensure_nonempty _package
 
   ensure_path_exists "${prefix_path}/${_package}/active/bin"
   # return 0 # No bin/ directory for activated package, no need to update PATH
