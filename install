@@ -29,7 +29,7 @@ done
 
 modules trace
 
-whiLe [[ $# -gt 0 ]] ; do
+while [[ $# -gt 0 ]] ; do
   token="$1" ; shift
   case "$token" in
     --trace)
