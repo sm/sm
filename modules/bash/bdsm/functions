@@ -58,6 +58,8 @@ actions_for_extension() {
 
   (
   if [[ -n "${_extension}" ]] ; then
+    directory_exists "$extensions_path/${_extension}/bin" || return 0
+
     actions=($(
       find "$extensions_path/${_extension}/bin" -mindepth 1 -maxdepth 1 -type f
     ))
@@ -75,7 +77,8 @@ actions_for_extension() {
 
 version()
 {
-  log "\nbdsm ${VERSION:-"?.?.?"} http://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)\n"
+  bdsm_version=$(cat -v "$bdsm_path/VERSION")
+  log "\nbdsm ${bdsm_version:-"?.?.?"} http://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)\n"
 }
 
 usage()

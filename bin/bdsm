@@ -36,7 +36,7 @@ source "${modules_path}/bash/bdsm/cli"
 #
 if [[ -n ${extension} ]] ; then
   if [[ "${action}" = "version" ]] ; then
-    extension_version "${extension}" "${action}"
+    version
   elif [[ -n "${action}" ]] ; then
     extension_action "${extension}" "${action}"
   else

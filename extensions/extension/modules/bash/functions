@@ -36,7 +36,7 @@ md5_match()
 fetch_extensions_repository()
 {
   (
-  if [[ -d "$extensions_src_path/.git" ]] ; then
+  if directory_exists "$extensions_src_path/.git" ; then
     log "Updating $extension repository."
     enter "$extensions_src_path"
     git fetch ${remote:-origin} >/dev/null 2>&1
@@ -101,9 +101,8 @@ package_extension()
 
   extension_path="${extensions_path}/${extension}"
 
-  if ! version="$(cat "$extension_path/VERSION" 2>/dev/null)" ; then
+  version="$(cat "$extension_path/VERSION" 2>/dev/null)" ||
     fail "${extension_path}/VERSION file is missing. Halting packaging."
-  fi
 
   # TODO: add a sanity check to ensure that VERSION matches x.y.x
 

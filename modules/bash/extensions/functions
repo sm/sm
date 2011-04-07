@@ -29,6 +29,8 @@ extensions_in()
   (
   path="${1:-}"
 
+  directory_exists "${path}" || return 0
+
   version_files=($(
     find "${path}" -mindepth 2 -maxdepth 2 -name 'VERSION' -type f
   ))
