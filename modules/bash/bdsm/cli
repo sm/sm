@@ -141,6 +141,8 @@ while [[ $# -gt 0 ]] ; do
         fi
       fi
 
+      [[ ${parse_break:-0} -eq 1 ]] && break
+
       if [[ -z "$action" ]] ; then
         if [[ -x "$extensions_path/$extension/bin/$token" ]] ; then
           action="$token"
