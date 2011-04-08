@@ -5,9 +5,14 @@
 #
 rvm_install()
 {
-  curl -B http://rvm.beginrescueend.com/install/rvm -o rvm-installer
+  curl \
+    -s https://rvm.beginrescueend.com/install/rvm \
+    -o rvm-installer
+
   chmod +x rvm-installer
+
   ./rvm-installer
+
   rm -f rvm-installer
 }
 
