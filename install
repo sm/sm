@@ -59,7 +59,7 @@ ensure_files_exist "${config_path}/user" "${config_path}/db"
 
 remove_files "${prefix}/bin/bdsm"
 
-ensure_paths_exist "${bdsm_path}/bin"
+ensure_paths_exist "${bdsm_path}/bin" "${bdsm_path}/log" "${bdsm_path}/tmp"
 
 link "${bdsm_path}/bin/bdsm" to "${prefix}/bin/bdsm"
 
