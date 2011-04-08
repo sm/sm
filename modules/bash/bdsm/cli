@@ -13,70 +13,6 @@ while [[ $# -gt 0 ]] ; do
     # TODO: Fall back on default actions instead of specifying them here
     #       In case the user has set their default serfice in the environment.
 
-    deploy|rollback)
-      extension="deploy"
-      action="$token"
-      parse_break=1
-    ;;
-
-    bdsmrc)
-      extension="bdsm"
-      action="$token"
-      parse_break=1
-    ;;
-
-    help)
-      action="help"
-      extension="${1:-bdsm}"
-      parse_break=1
-    ;;
-
-    get)
-      extension="bdsm"
-      action="get"
-      extension_args=("$@")
-      parse_break=1
-    ;;
-
-    activate|enable)
-      extension="extension"
-      action="package"
-      extension_args=("activate" "$@")
-      parse_break=1
-      ;;
-
-    deactivate|disable)
-      extension="extension"
-      action="package"
-      extension_args=("deactivate" "$@")
-      parse_break=1
-      ;;
-
-    list|ls)
-      extension="extension"
-      action="list"
-      extension_args=("$@")
-      parse_break=1
-      ;;
-
-    add|extend)
-      extension="extension"
-      action="install"
-      extension_args=("$@")
-      parse_break=1
-      ;;
-
-    ext|extension|extensions)
-      extension="extension"
-      ;;
-
-    edit|open)
-      extension="extension"
-      action="${token}"
-      extension_args=("$@")
-      parse_break=1
-      ;;
-
     --disable-hooks)
       hooks_flag=0
       ;;
@@ -133,7 +69,75 @@ while [[ $# -gt 0 ]] ; do
         if [[ -d "$extensions_path/$token" ]] ; then
           extension="$token"
         else
-          extension="${extension:-bdsm}"
+          case "$token" in
+            list|ls)
+              extension="extension"
+              action="list"
+              extension_args=("$@")
+              parse_break=1
+              ;;
+
+            deploy|rollback)
+              extension="deploy"
+              action="$token"
+              parse_break=1
+              ;;
+
+            bdsmrc)
+              extension="bdsm"
+              action="$token"
+              parse_break=1
+              ;;
+
+            help)
+              action="help"
+              extension="${1:-bdsm}"
+              parse_break=1
+              ;;
+
+            get)
+              extension="bdsm"
+              action="get"
+              extension_args=("$@")
+              parse_break=1
+              ;;
+
+            activate|enable)
+              extension="extension"
+              action="package"
+              extension_args=("activate" "$@")
+              parse_break=1
+              ;;
+
+            deactivate|disable)
+              extension="extension"
+              action="package"
+              extension_args=("deactivate" "$@")
+              parse_break=1
+              ;;
+
+            add|extend)
+              extension="extension"
+              action="install"
+              extension_args=("$@")
+              parse_break=1
+              ;;
+
+            ext|extension|extensions)
+              extension="extension"
+              ;;
+
+            edit|open)
+              extension="extension"
+              action="${token}"
+              extension_args=("$@")
+              parse_break=1
+              ;;
+
+            *)
+              extension="${extension:-bdsm}"
+              ;;
+          esac
         fi
       fi
 
@@ -154,7 +158,7 @@ while [[ $# -gt 0 ]] ; do
         action="error"
         error_message="Unrecognized command line argument(s): '$token $@'"
       fi
-    ;;
+      ;;
   esac
 
   if [[ -n "$parse_break" || -n "$error_message" ]] ; then
