@@ -17,7 +17,7 @@ bdsm_path()
 
 bdsm_exports()
 {
-  export action archives_path bdsm_path branch config_path database database_name debug_flag environment error_message extension extension_action extension_args extension_bin_path extension_config_path extension_modules_path extension_path extension_templates_path extensions_path flags framework head_flag hooks_flag keep_releases modules_path old_releases parse_break paths prefix previous_path project project_path release_path remote repository result revision shared_path src_path templates_path timestamp tmp_path trace_flag user
+  export action archives_path bdsm_path branch config_path database database_name debug_flag environment error_message extension extension_action extension_args extension_bin_path extension_config_path extension_modules_path extension_path extension_templates_path extensions_path flags framework head_flag hooks_flag keep_releases modules_path old_releases parse_break paths prefix previous_path project project_path release_path remote repository result revision shared_path src_path templates_path timestamp tmp_path trace_flag user extension_log_path
   # TODO: Filter this list of exports down.
 }
 
@@ -308,6 +308,7 @@ extension_action()
   extension_templates_path="$extensions_path/$extension/templates"
   extension_modules_path="$extensions_path/$extension/modules"
   extension_bin_path="$extensions_path/$extension/bin"
+  extension_log_path="$log_path/$extension"
 
   paths=$(env | awk -F= -v ORS=' ' '/_path/{print $1}')
   flags=$(env | awk -F= -v ORS=' ' '/_flag/{print $1}')

@@ -10,6 +10,7 @@ true \
   "${templates_path:="${bdsm_path}/templates"}" \
   "${config_path:="${bdsm_path}/config"}" \
   "${src_path:="${bdsm_path}/src"}" \
+  "${log_path:="${bdsm_path}/log"}" \
   "${extensions_src_path:="${src_path}/extensions"}" \
   "${tmp_path:="${bdsm_path}/tmp"}" \
   "${bin_path:="${bdsm_path}/bin"}" \
