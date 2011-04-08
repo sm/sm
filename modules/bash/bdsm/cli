@@ -132,8 +132,6 @@ while [[ $# -gt 0 ]] ; do
       if [[ -z "$extension" ]] ; then
         if [[ -d "$extensions_path/$token" ]] ; then
           extension="$token"
-          extension_args=("$@")
-          parse_break=1
         else
           extension="${extension:-bdsm}"
         fi
@@ -142,6 +140,8 @@ while [[ $# -gt 0 ]] ; do
       if [[ -z "$action" ]] ; then
         if [[ -x "$extensions_path/$extension/bin/$token" ]] ; then
           action="$token"
+          extension_args=("$@")
+          parse_break=1
         fi
       elif [[ -d "/data/$token" ]] ; then
         project="$token"
