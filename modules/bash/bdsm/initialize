@@ -10,7 +10,6 @@ true \
   "${templates_path:="${bdsm_path}/templates"}" \
   "${config_path:="${bdsm_path}/config"}" \
   "${src_path:="${bdsm_path}/src"}" \
-  "${log_path:="${bdsm_path}/log"}" \
   "${extensions_src_path:="${src_path}/extensions"}" \
   "${tmp_path:="${bdsm_path}/tmp"}" \
   "${bin_path:="${bdsm_path}/bin"}" \
@@ -23,12 +22,13 @@ true \
   "${hooks_flag:=1}" \
   "${PAGER:=cat -v}" \
 
-bdsm_exports
 
 timestamp="$(date +%m.%d.%Y-%H:%M:%S)"
 
 # Modules that should be available to *all* bdsm extensions.
 modules trace logging variables filesystem extensions
+
+bdsm_exports
 
 bdsmrc # Load bdsmrc files.
 

@@ -21,7 +21,10 @@ true \
 true \
   "${vcs:=$(vcs "${shared_path}/${project}")}"
 
-export project environment project_path shared previous_path release_path stage_path
+log_path="$shared_path/log" # Override default BDSM log path.
+extension_log_path="${log_path}"
+
+export project environment project_path shared previous_path release_path stage_path log_path
 
 database_name="${database_name:-"${project}_${environment}"}"
 

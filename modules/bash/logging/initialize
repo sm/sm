@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-#
-# BDSM logging module initialization
-#
+if [[ $UID -eq 0 ]] ; then
+  "${log_path:="${bdsm_path}/log"}"
+else
+  "${log_path:="$HOME/log"}"
+fi
 
