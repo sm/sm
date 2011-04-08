@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 if [[ $UID -eq 0 ]] ; then
-  "${log_path:="${bdsm_path}/log"}"
+  true "${log_path:="${bdsm_path}/log"}"
 else
-  "${log_path:="$HOME/log"}"
+  true "${log_path:="$HOME/log"}"
 fi
 
