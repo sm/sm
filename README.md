@@ -1,6 +1,7 @@
 # About
 
-Bash Deployment & Server Manager (BDSM) is a scripting framework.
+Bash Development & Scripting Management Framework (BDSM) is a...
+scripting framework! (go figure)
 
 # Goal
 

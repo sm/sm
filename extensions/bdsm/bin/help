@@ -1,19 +1,17 @@
 #!/usr/bin/env bash
 
-description() {
-  log "Bash Deployment & System Management Framework - Core Extension"
-}
+# TODO: use the help module for this?
 
-actions() {
-  log "  bdsmrc  - Install bdsmrc template file into ~/.bdsmrc
+description "Bash Development & Scripting Management Framework - Core Extension"
+
+actions "  bdsmrc  - Install bdsmrc template file into ~/.bdsmrc
   help    - Display this help text."
-}
 
 usage() {
   log "
 Description
 
-  BDSM $(description)
+  BDSM $description
 
 Usage
 
@@ -21,7 +19,7 @@ Usage
 
 BDSM default actions
 
-$(actions)
+$actions
 
 Installed Extensions
 
