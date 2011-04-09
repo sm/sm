@@ -261,7 +261,13 @@ os_arch()
 os_arch_capable()
 {
   if os_is_darwin ; then
-
+    local _string
+    read -r _string < <(sysctl hw.cpu64bit_capable)
+    if [[ ${_string//* } -eq 1 ]] ; then
+      printf '%s' "x86_64"
+    else
+      os_arch_type # Either i386 or ppc
+    fi
   else
     os_arch_type
   fi
@@ -269,7 +275,7 @@ os_arch_capable()
 
 os_cpu_count()
 {
-  local _count=1
+  local _count=1 # Defaulting to 1.
 
   if os_is_darwin ; then
     read -r _count < <(sysctl hw.ncpu)
