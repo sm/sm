@@ -29,16 +29,19 @@ bdsm_set_trap()
 modules()
 {
   local _module _bdsm _extension _path _file
+  local _modules=("@")
 
-  for _module in "$@" ; do
+  [[ ${#_modules[@]} -gt 0 ]] ||
+    fail "${extension} ${action} ${FUNCNAME}()\n => No modules specified to load."
+
+  for _module in "${_modules[@]}" ; do
     _bdsm="${modules_path}/bash/${_module}"
     _extension="${extension_modules_path}/bash/${_module}"
 
     for _path in "${_bdsm}" "${_extension}" ; do
-      for _file in "functions" "initialize" ; do
-        if [[ -s "${_path}/${_file}" ]] ; then
+      for _file in "functions" "initialize" "cli" ; do
+        file_is_nonempty"${_path}/${_file}" &&
           source "${_path}/${_file}"
-        fi
       done
     done
   done
@@ -47,15 +50,15 @@ modules()
 load()
 {
   local _file
+  local _files=("$@")
 
-  for _file in "$@" ; do
+  for _file in "${_files[@]}" ; do
     source_files "${extension_modules_path:-"$modules_path"}/bash/${_file}"
   done
 }
 
 actions_for_extension() {
   local _extension="${1:-}"
-
   (
   if [[ -n "${_extension}" ]] ; then
     directory_exists "$extensions_path/${_extension}/bin" || return 0
@@ -77,29 +80,28 @@ actions_for_extension() {
 
 version()
 {
-  bdsm_version=$(cat -v "$bdsm_path/VERSION")
-  log "\nbdsm ${bdsm_version:-"?.?.?"} http://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)\n"
+  read -r bdsm_version "$bdsm_path/VERSION"
+  log "\nbdsm ${bdsm_version:-"?.?.?"} https://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)\n"
 }
 
 usage()
 {
   version
-
   extension_action "bdsm" "help"
 }
 
+# TODO: Extract fetch functions into it's own DSL module
 fetch()
 {
-  if fetch_command=$(which curl) ; then
-    fetch_command="$fetch_command -O -L --create-dirs -C - " # -s for silent
-  else
+  # TODO: allow either curl or wget, defaulting to curl...
+  command_exists curl ||
     fail "bdsm requires curl, which was not found in the PATH :(\nPlease install curl and try again."
-  fi
 
+  fetch_command="$fetch_command -O -L --create-dirs -C - " # -s for silent
   (
-  cd "$archives_path"
+  enter "$archives_path"
 
-  [[ -n "${1}" ]] || fail "BUG: $0 called without an argument :/"
+  [[ -n "${1:-}" ]] || fail "BUG: $0 called without an argument :/"
 
   archive=$(basename "$1")
   download=1
@@ -107,7 +109,7 @@ fetch()
   debug "Fetching $archive"
 
   # Check first if we have the correct archive
-  if [[ -e "$archive" && -e "$archive.md5" ]] ; then
+  if file_exists "$archive" && file_exists "$archive.md5" ; then
     debug "Found archive and its md5, testing correctness"
 
     if [[ $(md5sum --status -c "$archive.md5") -gt 0 ]] ; then
@@ -119,7 +121,7 @@ fetch()
       result=0
     fi
   else
-    debug "No archive or no MD5, downloading"
+    debug "No '${archive}' does not exist or does not match md5, downloading"
     download=1
   fi
 
@@ -166,6 +168,7 @@ md5_match()
 {
   local archive="$1"
 
+  # TODO: switch this to using system module's os_* DSL
   case "$(uname)" in
     Darwin|FreeBSD)
       archive_md5="$(/sbin/md5 -q "${archive}")"
@@ -191,15 +194,15 @@ install_release()
 
   fetch_md5
 
-  if [[ -s $archive ]] && ! md5_match ; then
+  if file_exists "${archive}" && ! md5_match ; then
     # Remove old installs, if they exist and have incorrect md5.
-    [[ -f "$archives_path/bdsm-${version}.tar.gz" ]] &&
+    file_exists "$archives_path/bdsm-${version}.tar.gz" &&
       rm -f "$archives_path/bdsm-${version}.tar.gz"
   fi
 
   curl -L "${releases_url}/bdsm-${version}.tar.gz" -o "$archive"
 
-  if ! md5_match "$archive" ; then
+  md5_match "$archive" ||
     fail "ERROR:
 
 Archive package downloaded does not match it's calculated md5 checksum ${md5}:
@@ -210,52 +213,50 @@ Retry the installation and/or check your networking setup.
 
 Halting installation.
 "
-  fi
 
   tar zxf "${archives_path}/bdsm-${version}.tar.gz" -C "$src_path/"
 
-  cd "$src_path/bdsm-${version}"
+  enter "$src_path/bdsm-${version}"
 }
 
 install_head()
 {
   local remote="origin"
 
-  if [[ -d "${src_path}/bdsm/.git" ]] ; then
-    builtin cd "${src_path}/bdsm/"
+  if directory_exists "${src_path}/bdsm/.git" ]] ; then
+
+    enter "${src_path}/bdsm/"
 
     if [[ -z "$(git branch | awk "/$branch$/")" ]] ; then
-      if ! git checkout -b "$branch" --track "$remote/$branch" 2>/dev/null ; then
+      git checkout -b "$branch" --track "$remote/$branch" 2>/dev/null ||
         fail "$remote $branch remote branch not found."
-      fi
+
     elif [[ -z "$(git branch | awk "/\* $branch$/{print \$2}")" ]] ; then
-      if ! git checkout $branch 2>/dev/null ; then
+
+      git checkout $branch 2>/dev/null ||
         fail "Unable to checkout $branch.\nCould not get head. Sucks to be you... or rather... doesn't suck :-p"
-      fi
     fi
 
     git pull --rebase origin $branch
+
   else
-    builtin cd "${src_path}"
+    enter "${src_path}"
 
     if ! git clone --depth 1 git://github.com/wayneeseguin/bdsm.git ; then
-      if !  git clone https://github.com/wayneeseguin/bdsm.git ; then
+      git clone https://github.com/wayneeseguin/bdsm.git ||
         fail "Unable to clone the BDSM repository, attempted both git:// and https://\nCould not get head, terribly sorry about the blue balls :("
-      fi
     fi
   fi
 
   log "Ahh... that's better...\nIt always feels so nice to get head.\nQuite a load this time eh?\nRemember to get head often!\n"
 
-  builtin cd "${src_path}/bdsm/"
+  enter "${src_path}/bdsm/"
 }
 
 # Source bdsmrc files, cascaded.
 bdsmrc()
 {
-  source_files \
-    source "/etc/bdsmrc" \
-    source "$HOME/.bdsmrc"
+  source_files "/etc/bdsmrc" "$HOME/.bdsmrc"
 }
 
 reload_extension()
@@ -267,9 +268,7 @@ reload_extension()
 
 reinit_extension()
 {
-  sourc\
-    e_files \
-    "${extension_modules_path}/bash/initialize"
+  source_files "${extension_modules_path}/bash/initialize"
 }
 
 extension_version()
@@ -277,13 +276,13 @@ extension_version()
   (
   extension="$1" ; shift
 
-  true \
-    ${extension_path:="$extensions_path/$extension"} \
+  true ${extension_path:="$extensions_path/$extension"}
 
-  if [[ -s "${extension_path}/VERSION" ]] ; then
-    log "${extension}-$(cat -v "${extension_path}/VERSION")"
+  if file_exists "${extension_path}/VERSION" ]] ; then
+    read -r extension_version < "${extension_path}/VERSION"
+    log "${extension}-${extension_version}"
   else
-    log "Unknown version for extension ${extension}"
+    log "${extension}-head"
   fi
   )
 }
@@ -292,16 +291,16 @@ extension_action()
 {
   (
   unset extension action
-  export extension="$1" ; shift
-  export action="$1" ; shift
+
+  export extension="${1:-}" ; shift
+  export action="${1:-}" ; shift
   export extension_args="${extension_args:-$@}"
 
-  if [[ -z "$extension" || -z "$action" ]] ; then
-    fail "WTF??? extension and action must be set."
-  fi
+  [[ -n "${extension}" ]] ||
+    fail "${FUNCNAME}()\n => 'extension' is not set! Something has gone terribly wrong."
 
-  file_exists "$extensions_path/$extension/bin/$action" ||
-    fail "Action ${action} missing for extension ${extension}"
+  [[ -n "${action}" ]] ||
+    fail "${extension} ${FUNCNAME}()\n => 'action' is not set! Something has gone terribly wrong."
 
   extension_path="$extensions_path/$extension"
   extension_config_path="$extensions_path/$extension/config"
@@ -313,14 +312,20 @@ extension_action()
   paths=$(env | awk -F= -v ORS=' ' '/_path/{print $1}')
   flags=$(env | awk -F= -v ORS=' ' '/_flag/{print $1}')
 
-  cd "$extensions_path/$extension" > /dev/null 2>&1
+  enter "${extension_path}" ||
+    fail "${extension} ${action} ${FUNCNAME}()\n => Could not enter the extension directory!\n    (${extension_path})"
 
   bdsm_exports
 
-  action_file="$extensions_path/$extension/bin/$action"
+  action_file="${extensino_path}/bin/${action}"
+
+  file_exists "${action_file}" ||
+    fail "${extension} ${action} ${FUNCNAME}()\n => Action binary/file ${action} missing for extension ${extension}\n    (${action_file})"
+
   action_file_type="$(file "$action_file")"
 
-  case "$action_file_type" in
+  case "${action_file_type}" in
+
     *sh[[:space:]]script*|*POSIX[[:space:]]shell*|*Bourne-Again*)
       action_type="bash"
       ;;
@@ -328,6 +333,7 @@ extension_action()
     *ASCII*)
       # Launch with helper functions, if possible.
       extension="${action_file//.}"
+
       case "${extension}" in
         bash|sh)
           action_type="bash"
@@ -349,7 +355,7 @@ extension_action()
       ;;
 
     *)
-      if [[ -x "${action_file}" ]] ; then
+      if file_is_executable "${action_file}" ; then
         action_type="binary"
       else
         action_type="noexec"
@@ -361,7 +367,7 @@ extension_action()
   case "${action_type}" in
     bash)
       (
-      modules bdsm
+      modules core
 
       source_files \
         "${extension_modules_path}/bash/functions" \
@@ -375,7 +381,7 @@ extension_action()
       #  "${action_file}"
       #  ;;
     dne|noexec)
-      fail "processing ${action} failed, does not exist or is not executable."
+      fail "${extension} ${action} ${FUNCNAME}()\n => Processing ${action} failed, file type is unknown, file does not exist or file is not executable."
       ;;
     binary|*)
       "${action_file}" "${extension_action}" "${extension_args[@]}"
