@@ -29,6 +29,8 @@ else
     "${package_user:="$USER"}"
 fi
 
+extension_patches_path="${extension_path}/patches"
+
 # Ensure that package_version is set at this point
 variable_is_nonempty package_version || \
   read_default version prefix package
