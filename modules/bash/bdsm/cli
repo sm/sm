@@ -127,6 +127,10 @@ while [[ $# -gt 0 ]] ; do
               extension="extension"
               ;;
 
+            mod|module|modules)
+              extension="module"
+              ;;
+
             edit|open)
               extension="extension"
               action="${token}"
