@@ -51,7 +51,7 @@ while [[ $# -gt 0 ]] ; do
       ;;
 
     -v|--version)
-      extension="bdsm"
+      extension="core"
       action="version"
       ;;
 
@@ -71,12 +71,13 @@ while [[ $# -gt 0 ]] ; do
         else
           case "$token" in
             list|ls)
-              extension="extension"
+              extension="ext"
               action="list"
               extension_args=("$@")
               parse_break=1
               ;;
 
+            # TODO: enable default actions for an extension...
             deploy|rollback)
               extension="deploy"
               action="$token"
@@ -84,62 +85,62 @@ while [[ $# -gt 0 ]] ; do
               ;;
 
             bdsmrc)
-              extension="bdsm"
+              extension="core"
               action="$token"
               parse_break=1
               ;;
 
             help)
               action="help"
-              extension="${1:-bdsm}"
+              extension="${1:-core}"
               parse_break=1
               ;;
 
             get)
-              extension="bdsm"
+              extension="core"
               action="get"
               extension_args=("$@")
               parse_break=1
               ;;
 
             activate|enable)
-              extension="extension"
+              extension="ext"
               action="package"
               extension_args=("activate" "$@")
               parse_break=1
               ;;
 
             deactivate|disable)
-              extension="extension"
+              extension="ext"
               action="package"
               extension_args=("deactivate" "$@")
               parse_break=1
               ;;
 
             add|extend)
-              extension="extension"
+              extension="ext"
               action="install"
               extension_args=("$@")
               parse_break=1
               ;;
 
             ext|extension|extensions)
-              extension="extension"
+              extension="ext"
               ;;
 
             mod|module|modules)
-              extension="module"
+              extension="mod"
               ;;
 
             edit|open)
-              extension="extension"
+              extension="ext"
               action="${token}"
               extension_args=("$@")
               parse_break=1
               ;;
 
             *)
-              extension="${extension:-bdsm}"
+              extension="${extension:-core}"
               ;;
           esac
         fi
@@ -148,7 +149,7 @@ while [[ $# -gt 0 ]] ; do
       [[ ${parse_break:-0} -eq 1 ]] && break
 
       if [[ -z "$action" ]] ; then
-        if [[ -x "$extensions_path/$extension/bin/$token" ]] ; then
+        if [[ -x "${extensions_path}/${extension}/bin/$token" ]] ; then
           action="$token"
           extension_args=("$@")
           parse_break=1
