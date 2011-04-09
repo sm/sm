@@ -105,7 +105,7 @@ package_install()
   if command_exists "${package_name}_patch" ; then
     "${package_name}_patch"
   else
-    log "Patching ${package_name} ${package_version}"
+    log "Applying any patches found for ${package_name} ${package_version}"
     package_patch
   fi
 
@@ -139,7 +139,17 @@ package_install()
 
 package_patch()
 {
-  true # noop for now
+  # TODO: Three level hierarchy based on patches/{OS}/{version},
+  #       root level as 'global' always installed.
+
+  patches=(
+    $(find "${extension_patches_path}" -mindepth 1 -maxdepth 1 -iname '*.patch' -type f)
+    $(find "${extension_patches_path}/$(os_type)" -mindepth 1 -maxdepth 1 -iname '*.patch' -type f)
+    $(find "${extension_patches_path}/$(os_type)/${package_version}" -mindepth 1 -maxdepth 1 -iname '*.patch' -type f)
+  )
+
+  for file in "${patches[@]}" ; do
+  done
 }
 
 package_uninstall()
@@ -264,7 +274,7 @@ package_build()
   if [[ -n ${make_command:-} ]] ; then
     command="${make_command}"
   else
-    command="make ${make_flags[@]:-}"
+    command="make ${make_flags[@]:-"-j$(os_cpu_count)""}"
   fi
 
   if ! ${command} > make.log 2>&1 ; then
