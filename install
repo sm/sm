@@ -41,19 +41,19 @@ done
 
 ensure_paths_exist "${bdsm_path}"
 
-directories=(bin modules config extensions)
+directories=(bin config extensions modules)
 
 (
   enter "${bdsm_path}"
   ensure_paths_exist "${directories[@]}"
 )
 
+# Clean old extension paths out.
+remove_paths "${extensions_path}/extension" "${extensions_path}/bdsm"
+
 copy_directories_to "${bdsm_path}" "${directories[@]}"
 
-copy_files_to "${bdsm_path}" \
-  LICENCE \
-  VERSION \
-  README
+copy_files_to "${bdsm_path}" LICENCE VERSION README
 
 ensure_files_exist "${config_path}/user" "${config_path}/db"
 
