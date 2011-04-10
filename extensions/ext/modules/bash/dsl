@@ -77,19 +77,17 @@ fetch_tarball()
 install_extensions()
 {
   local _extension
+  local _extensions=("$@")
 
-  for _extension in "$@" ; do
+  for _extension in "${_extensions[@]}" ; do
+    [[ "${_extension#\/}" = "ext" || -z "${_extension}" ]] && continue
 
-    [[ "${_extension#\/}" = "extension" || -z "${_extension}" ]] && continue
-
-    extension_src_path="${extensions_src_path}/${_extension}" \
+    extension_src_path="${extensions_src_path}/${_extension}"
 
     if [[ -s "${extension_src_path}/VERSION" && -x "${extension_src_path}/bin/help" ]] ; then
-      cp -Rf \
-        "${extension_src_path}" \
-        "$bdsm_path/extensions/"
+      copy_directories_to "${bdsm_path}/extensions" "${extension_src_path}"
     else
-      error "${extension_src_path}/${extension} is not a proper extension."
+      error "${extension_src_path}/${extension} is not a proper extension.\nIt is missing one or more of the VERSION or bin/help."
     fi
   done
 }
