@@ -1,23 +1,30 @@
 #!/usr/bin/env bash
 
-directories=( bin config extensions modules log tmp )
+set -x
+directories=( bin config modules log tmp )
+extensions=( core ext mod )
 
 files=( LICENCE VERSION README.md )
 
-# Create installation target paths.
 (
+  # Create installation target path
   ensure_paths_exist "${bdsm_path}"
   enter "${bdsm_path}"
+  # Remove target directories
   remove_paths "${directories[@]}"
-  ensure_paths_exist "${directories[@]}"
+  ensure_paths_exist "${directories[@]}" extensions
+  enter "${bdsm_path}/extensions"
+  # Remove core extension directories and removed extensions.
+  remove_paths "${extensions[@]}" extension bdsm
 ) || fail "Could not create installation target."
 
-# Clean old extension paths out.
+# Install extension directories
 (
-  enter "${extensions_path:-/tmp}"
-  remove_paths "extension" "bdsm"
+  enter extensions
+  copy_directories_to "${bdsm_path}/extensions" "${extensions[@]}"
 )
 
+# Install BDSM core directories
 copy_directories_to "${bdsm_path}" "${directories[@]}"
 
 copy_files_to "${bdsm_path}" ${files[@]}
