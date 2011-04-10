@@ -1,18 +1,17 @@
 #!/usr/bin/env bash
 
 # Ensure that default values are set.
-true \
-  "${prefix_path:="/usr/local"}" \
-  "${archive_format:=tar.gz}" \
-  "${package_name:=${extension}}"
+true "${prefix_path:="/usr/local"}"
 
 true \
   "${bin_path:="${prefix_path}/bin"}" \
-  "${source_path:="${prefix_path}/src"}"
+  "${source_path:="${prefix_path}/src"}" \
+  "${archive_format:=tar.gz}" \
+  "${package_name:=${extension}}"
 
 # Load the BDSM framework version.
-[[ -s "$bdsm_path/VERSION" ]] && \
-  VERSION="$(cat "$bdsm_path/VERSION")"
+file_is_nonempty "$bdsm_path/VERSION" &&
+  read -r bdsm_version < "$bdsm_path/VERSION"
 
 user="$USER"
 

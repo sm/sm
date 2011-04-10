@@ -14,7 +14,9 @@ source_files()
   for _file in "${_files[@]}" ; do
     _file=${_file/\~\//$HOME\/} # Expand ~/ to full value of $HOME
 
-    file_is_nonempty "${_file}" && source "${_file}"
+    if file_is_nonempty "${_file}" ; then
+      source "${_file}" || fail "Failed to source ${_file}."
+    fi
   done
 }
 
@@ -253,7 +255,7 @@ copy_directories_to()
     if directory_exists "${_directory}" ; then
       cp -Rf "${_directory}" "${_path}/"
     else
-       error "Cannot copy directory ${_directory} to ${_path} as the directory does not exist."
+       error "Cannot copy directory ${_directory} to ${_path} as the directory '${_directory}' does not exist."
     fi
 
   done
