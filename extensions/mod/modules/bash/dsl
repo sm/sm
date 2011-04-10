@@ -1,2 +1,44 @@
 #!/usr/bin/env bash
 
+# Print out a list of all installed modules.
+modules()
+{
+  local _module _modules
+  local _path="${bdsm_modules_path}/bash/${_module}"
+  _modules=($(find "${_path}" -mindepth 1 -maxdepth 1 -type d | sed -e 's#.*/##g' -e '/\..*/d'))
+  for _module in ${_modules[@]} ; do
+    printf "%s\n" "${_module}"
+  done
+}
+
+# Print out a list of all functions for the given module.
+module_functions()
+{
+  local _function _functions
+  local _module="${1:-}"
+  # [[ -n "${_module}" ]] || fail "... module not given"
+  local _path="${bdsm_modules_path}/bash/${_module}"
+  _functions=(
+  $(find "${_path}" -mindepth 1 -maxdepth 1 -name functions -type f -print0 | xargs -0 grep '^[a-z_]*()$')
+  )
+
+  for _function in "${_functions[@]}" ; do
+    _function="${_function##*modules\/bash\/}"
+    printf "%s\n" "${_function//*:}"
+  done
+}
+
+modules_list()
+{
+  local _module _modules _function _functions
+
+  _modules=($(modules))
+  for _module in "${_modules[@]}" ; do
+    printf "\n${_module}\n\n"
+    _functions=($(module_functions "$_module"))
+    for _function in "${_functions[@]}" ; do
+      printf "  ${_function}\n"
+    done
+  done
+}
+

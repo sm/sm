@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+directories=( bin config extensions modules log tmp )
+
+files=( LICENCE VERSION README.md )
+
+# Create installation target paths.
+(
+  ensure_paths_exist "${bdsm_path}"
+  enter "${bdsm_path}"
+  ensure_paths_exist "${directories[@]}"
+) || fail "Could not create installation target."
+
+# Clean old extension paths out.
+(
+  enter "${extensions_path:-/tmp}"
+  remove_paths "extension" "bdsm"
+)
+
+copy_directories_to "${bdsm_path}" "${directories[@]}"
+
+copy_files_to "${bdsm_path}" ${files[@]}
+
+ensure_files_exist "${config_path}/user" "${config_path}/db"
+
+link --force "${bdsm_path}/bin/bdsm" to "${prefix}/bin/bdsm"
+

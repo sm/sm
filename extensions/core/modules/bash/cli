@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+while [[ $# -gt 0 ]] ; do
+  token="$1" ; shift
+  case "$token" in
+    --trace)
+      export trace_flag=1
+      enable_trace
+      ;;
+  esac
+done
+

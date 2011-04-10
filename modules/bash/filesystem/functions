@@ -12,13 +12,13 @@ source_files()
   local _file
   local _files=("$@")
 
-  [[ ${#files[@]} -gt 0 ]] ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => No files given to source! "
+  [[ ${#_files[@]} -gt 0 ]] ||
+    fail "${extension:-core} ${action} ${FUNCNAME}()\n => No files given to source! "
 
-  for _file in "${files[@]}" ; do
+  for _file in "${_files[@]}" ; do
     _file=${_file/\~\//$HOME\/} # Expand ~/ to full value of $HOME
 
-    file_is_nonempty && source "${_file}"
+    file_is_nonempty "${_file}" && source "${_file}"
   done
 }
 
@@ -26,7 +26,7 @@ source_files()
 nonempty_files()
 {
   local _file
-  local _files=$("$@")
+  local _files=("$@")
 
   for _file in "${_files[@]}" ; do
     file_is_nonempty "${_file}" && printf "${_file}\n"
@@ -36,8 +36,9 @@ nonempty_files()
 ensure_paths_exist()
 {
   local _path
+  local _paths=("$@")
 
-  for _path in "$@" ; do
+  for _path in "${_paths[@]}" ; do
     directory_exists "${_path}" || mkdir -p "${_path}"
   done
 }
@@ -45,15 +46,16 @@ ensure_paths_exist()
 remove_files()
 {
   local _file
+  local _files=("$@")
 
-  for _file in "$@" ; do
+  for _file in "${_files[@]}" ; do
     if [[ -f "${_file}" || -L "${_file}" ]] ; then
       rm -f "${_file}"
     elif [[ -d "${_file}" ]] ; then
-      error "${extension} ${action} ${FUNCNAME}()\n => Cannot remove ${_file}, it is a directory! "
+      error "${extension:-core} ${action} ${FUNCNAME}()\n => Cannot remove ${_file}, it is a directory! "
 
     elif [[ -e "${_file}" ]] ; then
-      error "${extension} ${action} ${FUNCNAME}()\n => Unknown filesystem entity type located at ${_file}, cannot remove."
+      error "${extension:-core} ${action} ${FUNCNAME}()\n => Unknown filesystem entity type located at ${_file}, cannot remove."
     else
       true # already gone
     fi
@@ -68,13 +70,13 @@ remove_paths()
   for _path in "${_paths[@]}" ; do
 
     if [[ -f "${_path}" ]] ; then
-      error "${extension} ${action} ${FUNCNAME}()\n => Cannot remove the path '${_path}' as it is a file! "
+      error "${extension:-core} ${action} ${FUNCNAME}()\n => Cannot remove the path '${_path}' as it is a file! "
     elif [[ -L "${_path}" ]] ; then
       rm -f "${_path}"
     elif [[ -d "${_path}" ]] ; then
       rm -rf "${_path}"
     elif [[ -e "${_path}" ]] ; then
-      error "${extension} ${action} ${FUNCNAME}()\n => Unknown filesystem entity type at ${_path}, cannot remove."
+      error "${extension:-core} ${action} ${FUNCNAME}()\n => Unknown filesystem entity type at ${_path}, cannot remove."
     else
       true # already gone
     fi
@@ -88,7 +90,7 @@ ensure_files_exist()
   local _files=("$@")
 
   [[ ${#_files[@]} -gt 0 ]] ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => Cannot ensure files exist, no files were given."
+    fail "${extension:-core} ${action} ${FUNCNAME}()\n => Cannot ensure files exist, no files were given."
 
   for _file in "${_files[@]}" ; do
     [[ -e "${_file}" ]] || touch "${_file}"
@@ -102,10 +104,10 @@ ensure_files_are_executable()
   local _file="$1"
 
   [[ -d "${_file}" ]] &&
-    fail "${extension} ${action} ${FUNCNAME}()\n => Cannot make ${_file} executable, it is a directory."
+    fail "${extension:-core} ${action} ${FUNCNAME}()\n => Cannot make ${_file} executable, it is a directory."
 
   [[ -f "${_file}" ]] &&
-    fail "${extension} ${action} ${FUNCNAME}()\n => Cannot make ${_file} executable, the file does not exist."
+    fail "${extension:-core} ${action} ${FUNCNAME}()\n => Cannot make ${_file} executable, the file does not exist."
 
   chmod +x "${_file}"
 }
@@ -153,9 +155,9 @@ link()
 
   # TODO: What should we do if files already exist?
   if [[ -f "${_target}" ]] ; then
-    error "${extension} ${action} ${FUNCNAME}()\n => Cannot link ${_source} to ${_target} exists and is a file!"
+    error "${extension:-core} ${action} ${FUNCNAME}()\n => Cannot link ${_source} to ${_target} exists and is a file!"
   elif [[ -d "${_target}" ]] ; then
-    error "${extension} ${action} ${FUNCNAME}()\n => Cannot link ${_source} to ${_target} exists and is a directory"
+    error "${extension:-core} ${action} ${FUNCNAME}()\n => Cannot link ${_source} to ${_target} exists and is a directory"
   else
     ln -fs "${_source}" "${_target}"
   fi
@@ -234,8 +236,8 @@ copy_files_to()
 
   for _file in "${_files[@]}" ; do
 
-    if file_is_missing ; then
-      error "${extension} ${action} ${FUNCNAME}()\n => Cannot copy file ${_file} to ${_path} as the file does not exist."
+    if file_is_missing "${_file}" ; then
+      error "${extension:-core} ${action} ${FUNCNAME}()\n => Cannot copy file ${_file} to ${_path} as the file does not exist."
     else
       cp "${_file}" "${_path}/${_file}"
     fi
@@ -255,7 +257,8 @@ copy_directories_to()
     if directory_exists "${_directory}" ; then
       cp -Rf "${_directory}" "${_path}/"
     else
-      error "${extension} ${action} ${FUNCNAME}()\n => Cannot copy directory ${_directory} to ${_path} as the directory does not exist."
+      fail "${extension:-core} ${action} ${FUNCNAME}()\n => Cannot copy directory ${_directory} to ${_path} as the directory does not exist."
+      error "${extension:-core} ${action} ${FUNCNAME}()\n => Cannot copy directory ${_directory} to ${_path} as the directory does not exist."
     fi
 
   done
@@ -273,7 +276,7 @@ move_files_to()
     if file_exists "${_file}" ; then
       mv "${_file}" "${_path}/${_file}"
     else
-      error "${extension} ${action} ${FUNCNAME}()\n => Cannot move file ${_file} to ${_path} as the file does not exist."
+      error "${extension:-core} ${action} ${FUNCNAME}()\n => Cannot move file ${_file} to ${_path} as the file does not exist."
     fi
 
   done
@@ -288,7 +291,7 @@ chown_files()
     if file_exists "${_file}" ; then
       chown -R ${_idenity} "${_file}"
     else
-      error "${extension} ${action} ${FUNCNAME}()\n => Cannot chown file ${_file} to ${_idenity} as the file does not exist."
+      error "${extension:-core} ${action} ${FUNCNAME}()\n => Cannot chown file ${_file} to ${_idenity} as the file does not exist."
     fi
 
   done
@@ -304,7 +307,7 @@ chown_paths()
     if directory_exists "${_path}" ; then
       chown ${_idenity} "${_path}"
     else
-      error "${extension} ${action} ${FUNCNAME}()\n => Cannot chown path ${_path} to ${_idenity} as the directory does not exist."
+      error "${extension:-core} ${action} ${FUNCNAME}()\n => Cannot chown path ${_path} to ${_idenity} as the directory does not exist."
     fi
 
   done
@@ -320,7 +323,7 @@ chown_paths_recursively()
     if directory_exists "${_path}" ; then
       chown -R ${_idenity} "${_path}"
     else
-      error "${extension} ${action} ${FUNCNAME}()\n => Cannot recursively chown ${_path} to ${_idenity} as the directory does not exist."
+      error "${extension:-core} ${action} ${FUNCNAME}()\n => Cannot recursively chown ${_path} to ${_idenity} as the directory does not exist."
     fi
 
   done
@@ -335,7 +338,7 @@ chmod_files()
     if file_exists "${_file}" ; then
       chmod ${_permissions} "${_file}"
     else
-      error "${extension} ${action} ${FUNCNAME}()\n => Cannot chmod file ${_file} to ${_permissions} as the file does not exist."
+      error "${extension:-core} ${action} ${FUNCNAME}()\n => Cannot chmod file ${_file} to ${_permissions} as the file does not exist."
     fi
   done
 }
@@ -348,7 +351,7 @@ chmod_paths()
     if directory_exists "${_directory}" ; then
       chmod ${_permissions} "${_path}"
     else
-      error "${extension} ${action} ${FUNCNAME}()\n => Cannot chmod directory ${_path} to ${_permissions} as the directory does not exist."
+      error "${extension:-core} ${action} ${FUNCNAME}()\n => Cannot chmod directory ${_path} to ${_permissions} as the directory does not exist."
     fi
   done
 }
@@ -361,7 +364,7 @@ chmod_paths_recursively()
     if directory_exists "${_directory}" ; then
       chmod -R ${_permissions} "${_path}"
     else
-      error "${extension} ${action} ${FUNCNAME}()\n => Cannot chmod directory ${_path} to ${_permissions} as the directory does not exist."
+      error "${extension:-core} ${action} ${FUNCNAME}()\n => Cannot chmod directory ${_path} to ${_permissions} as the directory does not exist."
     fi
   done
 }
@@ -371,7 +374,7 @@ enter()
   local _path="$1"
 
   builtin cd "${_path}" ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => Could not enter directory ${_path}."
+    fail "${extension:-core} ${action} ${FUNCNAME}()\n => Could not enter directory ${_path}."
 }
 
 hash_file()
@@ -380,14 +383,14 @@ hash_file()
   local _key="${2:-}" ; shift
 
   [[ -f "${_file}" ]] ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => File path/name not given.\n => Usage: $0 <filename> <key> [value]"
+    fail "${extension:-core} ${action} ${FUNCNAME}()\n => File path/name not given.\n => Usage: $0 <filename> <key> [value]"
 
   ensure_paths_exist $(dirname $_file)
 
   ensure_files_exist "$_file"
 
   [[ -n "${_key}" ]] ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => Key not given.\n => Usage: $0 <filename> <key> [value]"
+    fail "${extension:-core} ${action} ${FUNCNAME}()\n => Key not given.\n => Usage: $0 <filename> <key> [value]"
 
   value="$*"
   case "$value" in
@@ -413,7 +416,7 @@ file_is_executable()
   local _file="${1:-}"
 
   [[ -n "${_file}" ]] ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => File path/name was not given!"
+    fail "${extension:-core} ${action} ${FUNCNAME}()\n => File path/name was not given!"
 
   [[ -x "${_file}" ]]
 }
@@ -423,7 +426,7 @@ file_exists()
   local _file="${1:-}"
 
   [[ -n "${_file}" ]] ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => File path/name was not given!"
+    fail "${extension:-core} ${action} ${FUNCNAME}()\n => File path/name was not given!"
 
   [[ -f "${_file}" ]]
 }
@@ -433,7 +436,7 @@ file_is_nonempty()
   local _file="${1:-}"
 
   [[ -n "${_file}" ]] ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => File path/name was not given!"
+    fail "${extension:-core} ${action} ${FUNCNAME}()\n => File path/name was not given!"
 
   [[ -s "${_file}" ]]
 }
@@ -443,7 +446,7 @@ file_is_empty()
   local _file="${1:-}"
 
   [[ -n "${_file}" ]] ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => File path/name was not given!"
+    fail "${extension:-core} ${action} ${FUNCNAME}()\n => File path/name was not given!"
 
   [[ -f "${_file}" && ! -s "${_file}" ]]
 }
@@ -453,7 +456,7 @@ file_is_missing()
   local _file="${1:-}"
 
   [[ -n "${_file}" ]] ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => File path/name was not given!"
+    fail "${extension:-core} ${action} ${FUNCNAME}()\n => File path/name was not given!"
 
   [[ ! -f "${_file}" ]]
 }
@@ -462,7 +465,7 @@ file_is_empty_or_missing() {
   local _file="${1:-}"
 
   [[ -n "${_file}" ]] ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => File path/name was not given!"
+    fail "${extension:-core} ${action} ${FUNCNAME}()\n => File path/name was not given!"
 
   [[ ! -f "${_file}" || ! -s "${_file}" ]] ;
 }
@@ -472,10 +475,10 @@ file_contains()
   local _file="${1:-}" _pattern="${2:-}"
 
   [[ -n "${_file}" ]] ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => File path/name was not given!"
+    fail "${extension:-core} ${action} ${FUNCNAME}()\n => File path/name was not given!"
 
   [[ -n "${_pattern}" ]] ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => String pattern for search was not given!"
+    fail "${extension:-core} ${action} ${FUNCNAME}()\n => String pattern for search was not given!"
 
   grep "${_pattern}" "${_file}" >/dev/null 2>&1
 }
@@ -485,7 +488,7 @@ symlink_exists()
   local _file="${1:-}"
 
   [[ -n "${_file}" ]] ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => File path/name was not given!"
+    fail "${extension:-core} ${action} ${FUNCNAME}()\n => File path/name was not given!"
 
   [[ -L "${_file}" ]]
 }
@@ -495,7 +498,7 @@ directory_exists()
 {
   local _directory="${1:-}"
   [[ -n "${_directory}" ]] ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => Directory name/path was not given!"
+    fail "${extension:-core} ${action} ${FUNCNAME}()\n => Directory name/path was not given!"
 
   [[ -d "$_directory" ]]
 }
@@ -505,10 +508,10 @@ directories_in()
   local _path="${1:-}"
 
   [[ -n "${path}" ]] ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => Directory name/path was not given!"
+    fail "${extension:-core} ${action} ${FUNCNAME}()\n => Directory name/path was not given!"
 
   [[ -d "${_path}" ]] ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => '${_path}' is not a directory!"
+    fail "${extension:-core} ${action} ${FUNCNAME}()\n => '${_path}' is not a directory!"
 
   find "${_path}" -mindepth 1 -maxdepth 1 -type d
 }
@@ -518,13 +521,13 @@ directories_in_matching()
   local _path="${1:-}" _pattern="${2:-}"
 
   [[ -n "${path}" ]] ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => Directory name/path was not given!"
+    fail "${extension:-core} ${action} ${FUNCNAME}()\n => Directory name/path was not given!"
 
   [[ -d "${_path}" ]] ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => '${_path}' is not a directory!"
+    fail "${extension:-core} ${action} ${FUNCNAME}()\n => '${_path}' is not a directory!"
 
   [[ -n "${_pattern}" ]] ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => '${_path}' is not a directory!"
+    fail "${extension:-core} ${action} ${FUNCNAME}()\n => '${_path}' is not a directory!"
 
   find "${_path}" -mindepth 1 -maxdepth 1 -type d
 }
@@ -534,10 +537,10 @@ directories_under()
   local _path="${1:-}"
 
   [[ -n "${path}" ]] ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => Directory name/path was not given!"
+    fail "${extension:-core} ${action} ${FUNCNAME}()\n => Directory name/path was not given!"
 
   [[ -d "${_path}" ]] ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => '${_path}' is not a directory!"
+    fail "${extension:-core} ${action} ${FUNCNAME}()\n => '${_path}' is not a directory!"
 
   find "${_path}" -mindepth 1 -type d
 }
@@ -547,13 +550,13 @@ directories_under_matching()
   local _path="${1:-}" _pattern="${2:-}"
 
   [[ -n "${path}" ]] ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => Directory name/path was not given!"
+    fail "${extension:-core} ${action} ${FUNCNAME}()\n => Directory name/path was not given!"
 
   [[ -d "${_path}" ]] ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => '${_path}' is not a directory!"
+    fail "${extension:-core} ${action} ${FUNCNAME}()\n => '${_path}' is not a directory!"
 
   [[ -n "${_pattern}" ]] ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => '${_path}' is not a directory!"
+    fail "${extension:-core} ${action} ${FUNCNAME}()\n => '${_path}' is not a directory!"
 
   find "${_path}" -mindepth 1 -iname "${_pattern}" -type d
 }
@@ -563,10 +566,10 @@ files_in()
   local _path="${1:-}"
 
   [[ -n "${path}" ]] ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => Directory name/path was not given!"
+    fail "${extension:-core} ${action} ${FUNCNAME}()\n => Directory name/path was not given!"
 
   [[ -d "${_path}" ]] ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => '${_path}' is not a directory!"
+    fail "${extension:-core} ${action} ${FUNCNAME}()\n => '${_path}' is not a directory!"
 
   find "${_path}" -mindepth 1 -maxdepth 1 -type f
 }
@@ -576,10 +579,10 @@ files_under()
   local _path="${1:-}"
 
   [[ -n "${path}" ]] ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => Directory name/path was not given!"
+    fail "${extension:-core} ${action} ${FUNCNAME}()\n => Directory name/path was not given!"
 
   [[ -d "${_path}" ]] ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => '${_path}' is not a directory!"
+    fail "${extension:-core} ${action} ${FUNCNAME}()\n => '${_path}' is not a directory!"
 
   find "${_path}" -mindepth 1 -type f
 }
@@ -589,13 +592,13 @@ files_under_matching()
   local _path="${1:-}" _pattern="${2:-}"
 
   [[ -n "${path}" ]] ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => Directory name/path was not given!"
+    fail "${extension:-core} ${action} ${FUNCNAME}()\n => Directory name/path was not given!"
 
   [[ -d "${_path}" ]] ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => '${_path}' is not a directory!"
+    fail "${extension:-core} ${action} ${FUNCNAME}()\n => '${_path}' is not a directory!"
 
   [[ -n "${_pattern}" ]] ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => '${_path}' is not a directory!"
+    fail "${extension:-core} ${action} ${FUNCNAME}()\n => '${_path}' is not a directory!"
 
   find "${_path}" -mindepth 1 -iname "${_pattern}" -type f
 }
