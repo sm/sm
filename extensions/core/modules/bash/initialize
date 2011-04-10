@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-modules package
-
 # Ensure that default values are set.
 true \
   "${prefix_path:="/usr/local"}" \

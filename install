@@ -25,7 +25,7 @@ mkdir -p log tmp
 
 # Load fundamental Module DSL's
 for module in logging trace filesystem core ; do
-  for file in dsl initialize  ; do
+  for file in dsl initialize ; do
     source "${PWD}/modules/bash/${module}/${file}"
   done
 done

@@ -15,9 +15,9 @@ package_definition()
       value="$1" ; shift
     else
       if echo "$key" | grep '=' ; then
-        fail "${extension} ${action} : package_definition()\n > Invalid key '${key}'\n => Guess: Most likely the '=' is supposed to be a ' '."
+        fail "Invalid key '${key}'\n => Guess: Most likely the '=' is supposed to be a ' '."
       else
-        fail "${extension} ${action} : package_definition()\n > Value not specified for key '${key}'\n => They tend to come in pairs :)"
+        fail "Value not specified for key '${key}'\n => They tend to come in pairs :)"
       fi
     fi
 
@@ -66,7 +66,7 @@ package_definition()
       #  eval "${key}=${value}"
       #  ;;
       *)
-        fail "Unknown key for package_definition() : '${key}' (value: ${value})"
+        fail "Unknown key '${key}' (value: ${value})"
       ;;
     esac
   done
@@ -75,10 +75,7 @@ package_definition()
 # TODO: much more error checking and conditional branching.
 package_install()
 {
-  ensure_nonempty \
-    "package_name" \
-    "package_version" \
-    "archive_format"
+  ensure_nonempty package_name package_version archive_format
 
   true "${package_dir:="${package_name}-${package_version}"}"
 
@@ -137,35 +134,16 @@ package_install()
   package_activate_if_first "${package_name}" "${package_version}"
 }
 
-package_patch()
-{
-  # TODO: Three level hierarchy based on patches/{OS}/{version},
-  #       root level as 'global' always installed.
-
-  patches=(
-    $(find "${extension_patches_path}" -mindepth 1 -maxdepth 1 -iname '*.patch' -type f)
-    $(find "${extension_patches_path}/$(os_type)" -mindepth 1 -maxdepth 1 -iname '*.patch' -type f)
-    $(find "${extension_patches_path}/$(os_type)/${package_version}" -mindepth 1 -maxdepth 1 -iname '*.patch' -type f)
-  )
-
-  for file in "${patches[@]}" ; do
-  done
-}
-
 package_uninstall()
 {
-  ensure_nonempty \
-    "package_name" \
-    "package_version" \
-    "archive_format"
+  ensure_nonempty package_name package_version archive_format
 
   true "${package_dir:="${package_name}-${package_version}"}"
 
-  if ! make_uninstall_package ; then
-    log "Uninstalled ${package_name} from ${prefix_path}."
-  else
+  make_uninstall_package ||
     fail "Failed to uninstall ${package_name} from ${prefix_path}."
-  fi
+
+  log "Uninstalled ${package_name} from ${prefix_path}."
 }
 
 package_fetch_md5()
@@ -174,10 +152,11 @@ package_fetch_md5()
 
   local download_url
 
-  true "${package_file:="${package_name}-${package_version}.${archive_format}"}"
-  true "${packge_md5_url:="${package_base_url}/${package_file}.md5"}"
+  true \
+    "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
+    "${packge_md5_url:="${package_base_url}/${package_file}.md5"}"
 
-  package_md5=$(hash_file "$extension_config_path/md5" "${package_file}")
+  package_md5=$( hash_file "$extension_config_path/md5" "${package_file}" )
 
   if [[ -z "${package_md5}" && -n "${package_md5_url}" ]] ; then
     curl -L "${packge_md5_url}" -o "${package_file}.md5" ||
@@ -194,9 +173,9 @@ file_matches_md5()
 
   [[ -s "${file}" ]] || return 1
 
-  if [[ "$MACHTYPE" = *linux* ]] ; then
+  if os_is_linux ; then
     command="md5sum"
-  elif [[ "$MACHTYPE" = *darwin* ]] ; then
+  elif os_is_darwin ; then
     command="/sbin/md5 -q"
   fi
 
@@ -209,23 +188,25 @@ package_fetch()
 {
   ensure_nonempty package_name package_version archive_format
 
-  true "${package_file:="${package_name}-${package_version}.${archive_format}"}"
-  true "${package_url:="${package_base_url}/${package_file}"}"
+  true \
+    "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
+    "${package_url:="${package_base_url}/${package_file}"}"
 
   package_fetch_md5
 
-  if ! file_matches_md5 "${package_file}" "${package_md5}" ; then
+  file_matches_md5 "${package_file}" "${package_md5}" ||
+  {
+    log "${package_file} does not match md5 ${package_md5}"
+
     remove_files "${package_file}"
 
-    if ! curl -L "${package_url}" -o "${package_file}" ; then
+    curl -L "${package_url}" -o "${package_file}" ||
       fail "Downloading ${package_name} from '${package_url}' to '${package_file}' failed "
-    fi
-  fi
+  }
 }
 
 package_extract()
 {
-  true "${package_file:="${package_name}-${package_version}.${archive_format}"}"
 
   case "${archive_format}" in
     tar.gz|tgz) # gzip
@@ -254,17 +235,19 @@ package_configure()
     command="${configure_command}"
   else
     export PREFIX="${install_base_path}/${package_version}"
+
     command="./configure ${configure_flags[@]:-"--prefix=${install_path:-$prefix_path}"}"
+
     if [[ ! -x ./configure ]] ; then
-      log "./configure not found, skipping configuration step." && return 0
+      log "./configure not found or not executable, skipping configuration step."
+      return 0
     fi
   fi
 
-  if ${command} > configure.log 2>&1; then
-    log "Configuration of ${package_name} ${package_version} successful."
-  else
+  ${command} > configure.log 2>&1 ||
     fail "Configuration of ${package_name} ${package_version} failed, seek help..."
-  fi
+
+  log "Configuration of ${package_name} ${package_version} successful."
 }
 
 package_build()
@@ -277,9 +260,8 @@ package_build()
     command="make ${make_flags[@]:-"-j$(os_cpu_count)""}"
   fi
 
-  if ! ${command} > make.log 2>&1 ; then
+  ${command} > make.log 2>&1 ||
     fail "Compilation if ${package_name} ${package_version} failed! "
-  fi
 }
 
 package_make_install()
@@ -292,11 +274,10 @@ package_make_install()
     command="make ${make_install_flags[@]:-install}"
   fi
 
-  if ${command} > make.install.log 2>&1  ; then
-    log "Installation of ${package_name} ${package_version} was successful! "
-  else
+  ${command} > make.install.log 2>&1 ||
     fail "make install of ${package_name} ${package_version} failed! "
-  fi
+
+  log "Installation of ${package_name} ${package_version} was successful! "
 }
 
 package_uninstall()
@@ -309,19 +290,18 @@ package_uninstall()
     command="make ${make_uninstall_flags[@]:-uninstall}"
   fi
 
-  if ! ${command} > make.uninstall.log 2>&1 ; then
+  ${command} > make.uninstall.log 2>&1 ||
     fail "make uninstall ${package_name} ${package_version} failed! "
-  fi
 }
 
 package_clean_install_files()
 {
   log "#cleaning install files for ${package} ${package_version}...\n"
+
   enter "${src_path}"
 
   local files=($(
-    find "$src_path/" -mindepth 1 -maxdepth 1 \
-      -iname "${package}*${package_version}*"
+  find "$src_path/" -mindepth 1 -maxdepth 1 -iname "${package}*${package_version}*"
   ))
 
   remove_files "${files[@]}"
@@ -330,9 +310,11 @@ package_clean_install_files()
 package_activate()
 {
   local _package="${1:-}" _version="${2:-}"
+
   ensure_nonempty _package
+
   variable_is_nonempty _version ||
-  fail "${extension} ${action} package_activate()\n > Variable must be specified as the 2nd parameter!"
+    fail "Variable must be specified as the 2nd parameter!"
 
   package_deactivate "${_package}"
 
@@ -340,7 +322,10 @@ package_activate()
     to "${prefix_path}/${_package}/active"
 
   package_ldconfig "${_package}"
+
   package_profile_d "${_package}"
+
+  # TODO: package_conf_d, detect if ext template file exists and put it in place.
 }
 
 package_deactivate()
@@ -382,17 +367,21 @@ package_ldconfig()
   if running_as_root ; then
     if os_is_linux ; then
       ensure_paths_exist "/etc/ld.so.profile.d"
-      printf "%s\n" \
-        "${prefix_path}/${_package}/active/lib" \
+
+      printf "%s\n" "${prefix_path}/${_package}/active/lib" \
         > "/etc/ld.so.profile.d/${_package}.conf"
-      chmod 0644 "/etc/ld.so.profile.d/${_package}.conf"
+
+      chmod_file 0644 "/etc/ld.so.profile.d/${_package}.conf"
+
       ldconfig
     elif os_is_darwin ; then # Cluster Fuck.
       _files=($(find "${prefix_path}/${_package}/active" -mindepth 1 -maxdepth 1 -type d))
 
-      for _path in "${_files[@]}" ; do
-        cp -Rf "${_path}" "${prefix_path}/"
-      done
+      copy_files_to "${prefix_path}" "${_files[@]}"
+
+      # for _path in "${_files[@]}" ; do
+      #   cp -Rf "${_path}" "${prefix_path}/"
+      # done
     fi
   fi
 }
@@ -407,20 +396,47 @@ package_profile_d()
     return 0 # No bin/ dir, no need for it to be in the path.
 
   if running_as_root ; then
+
     ensure_paths_exist "/etc/profile.d"
     ensure_files_exist "/etc/profile"
 
     if os_is_darwin ; then
-      grep '/etc/profile.d/\*' /etc/profile >/dev/null 2>&1 ||
-        printf "\n%s\n" \
-          "if test -d /etc/profile.d/ ; then for profile in /etc/profile.d/*.sh ; do if test -x \"\$profile\" ; then . \"\$profile\" ; fi ; done ; unset profile ; fi " \
+
+      if grep -v '/etc/profile.d/\*' /etc/profile >/dev/null 2>&1 ; then
+
+        echo 'if [ -d /etc/profile.d ]; then for profile in /etc/profile.d/*.sh ; do ' \
           >> /etc/profile
+
+        printf "%s\n" " [ -x \"$profile\" ] && . \"$profile\" ;\n  done ;\n unset profile ;\n fi" \
+          >> /etc/profile
+      fi
+
     fi
 
-    printf "%s\n" \
-      "if test -d \"${prefix_path}/${_package}/active/bin\" ; then PATH=\"\$PATH:${prefix_path}/${_package}/active/bin\" ; export PATH ; fi " \
+    printf "%s\n" "[ -d \"${prefix_path}/${_package}/active/bin\" ] && " \
       > "/etc/profile.d/${_package}.sh"
-    chmod 0755 "/etc/profile.d/${_package}.sh"
+
+    printf "%s" "PATH=\"\$PATH:${prefix_path}/${_package}/active/bin\" ; export PATH; " \
+      >> /etc/profile.d/${_package}.sh
+
+    chmod_file 0755 /etc/profile.d/${_package}.sh
   fi
+}
+
+package_patch()
+{
+  local _patches _patch
+  # TODO: Three level hierarchy based on patches/{OS}/{version},
+  #       root level as 'global' always installed.
+
+  _patches=(
+    $(find "${extension_patches_path}" -mindepth 1 -maxdepth 1 -iname '*.patch' -type f)
+    $(find "${extension_patches_path}/$(os_type)" -mindepth 1 -maxdepth 1 -iname '*.patch' -type f)
+    $(find "${extension_patches_path}/$(os_type)/${package_version}" -mindepth 1 -maxdepth 1 -iname '*.patch' -type f)
+  )
+
+  for _patch in "${_patches[@]}" ; do
+    true
+  done
 }
 

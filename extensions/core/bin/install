@@ -8,6 +8,7 @@ files=( LICENCE VERSION README.md )
 (
   ensure_paths_exist "${bdsm_path}"
   enter "${bdsm_path}"
+  remove_paths "${directories[@]}"
   ensure_paths_exist "${directories[@]}"
 ) || fail "Could not create installation target."
 

@@ -38,10 +38,10 @@ extension_action()
   export extension_args="${extension_args:-$@}"
 
   [[ -n "${extension}" ]] ||
-    fail "${FUNCNAME}()\n => 'extension' is not set! Something has gone terribly wrong."
+    fail "'extension' is not set! Something has gone terribly wrong."
 
   [[ -n "${action}" ]] ||
-    fail "${extension} ${FUNCNAME}()\n => 'action' is not set! Something has gone terribly wrong."
+    fail "'action' is not set! Something has gone terribly wrong."
 
   extension_path="$extensions_path/$extension"
   extension_config_path="$extensions_path/$extension/config"
@@ -54,14 +54,14 @@ extension_action()
   flags=$(env | awk -F= -v ORS=' ' '/_flag/{print $1}')
 
   enter "${extension_path}" ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => Could not enter the extension directory!\n    (${extension_path})"
+    fail "Could not enter the extension directory!\n    (${extension_path})"
 
   bdsm_exports
 
-  action_file="${extensino_path}/bin/${action}"
+  action_file="${extension_path}/bin/${action}"
 
   file_exists "${action_file}" ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => Action binary/file ${action} missing for extension ${extension}\n    (${action_file})"
+    fail "Action binary/file ${action} missing for extension ${extension}\n    (${action_file})"
 
   action_file_type="$(file "$action_file")"
 
@@ -122,7 +122,7 @@ extension_action()
       #  "${action_file}"
       #  ;;
     dne|noexec)
-      fail "${extension} ${action} ${FUNCNAME}()\n => Processing ${action} failed, file type is unknown, file does not exist or file is not executable."
+      fail "Processing ${action} failed, file type is unknown, file does not exist or file is not executable."
       ;;
     binary|*)
       "${action_file}" "${extension_action}" "${extension_args[@]}"

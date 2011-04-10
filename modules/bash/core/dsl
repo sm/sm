@@ -23,25 +23,28 @@ bdsm_exports()
 
 bdsm_set_trap()
 {
-  trap "[[ -e ${tmp_path}/$$ ]] && rm -rf '${tmp_path}/$$' >/dev/null 2>&1" 0 1 2 3 15
+  true # TODO: fix trap cleanup.
+  # trap "result=$? ; [[ -e ${tmp_path}/$$ ]] && rm -rf '${tmp_path}/$$; exit $result' >/dev/null 2>&1" 0 1 2 3 15
 }
 
 modules()
 {
   local _module _bdsm _extension _path _file
-  local _modules=("@")
+  local _modules=("$@")
 
   [[ ${#_modules[@]} -gt 0 ]] ||
     fail "${extension} ${action} ${FUNCNAME}()\n => No modules specified to load."
 
-  for _module in "${_modules[@]}" ; do
+  for _module in "${_modules[@]}"
+  do
     _bdsm="${modules_path}/bash/${_module}"
     _extension="${extension_modules_path}/bash/${_module}"
 
-    for _path in "${_bdsm}" "${_extension}" ; do
-      for _file in "dsl" "initialize" "cli" ; do
-        file_is_nonempty "${_path}/${_file}" &&
-          source "${_path}/${_file}"
+    for _path in "${_bdsm}" "${_extension}"
+    do
+      for _file in "dsl" "initialize" "cli"
+      do
+        [[ -s "${_path}/${_file}" ]] && source "${_path}/${_file}"
       done
     done
   done
@@ -80,7 +83,7 @@ actions_for_extension() {
 
 version()
 {
-  read -r bdsm_version "$bdsm_path/VERSION"
+  read -r bdsm_version < "$bdsm_path/VERSION"
   log "\nbdsm ${bdsm_version:-"?.?.?"} https://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)\n"
 }
 

@@ -7,7 +7,7 @@ true \
   ${remote:="origin"} \
   ${branch:="master"}
 
-modules logging environment extensions
+modules environment
 
 extensions_src_path="${src_path}/extensions"
 
