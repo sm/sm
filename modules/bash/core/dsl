@@ -29,22 +29,19 @@ bdsm_set_trap()
 
 modules()
 {
-  local _module _bdsm _extension _path _file
-  local _modules=("$@")
+  local _module _bdsm _extension _path _file _modules=("$@")
 
-  [[ ${#_modules[@]} -gt 0 ]] ||
-    fail "${extension} ${action} ${FUNCNAME}()\n => No modules specified to load."
+  [[ ${#_modules[@]} -gt 0 ]] || fail "No modules specified to load."
 
-  for _module in "${_modules[@]}"
-  do
+  for _module in "${_modules[@]}" ; do
     _bdsm="${modules_path}/bash/${_module}"
     _extension="${extension_modules_path}/bash/${_module}"
 
-    for _path in "${_bdsm}" "${_extension}"
-    do
-      for _file in "dsl" "initialize" "cli"
-      do
-        [[ -s "${_path}/${_file}" ]] && source "${_path}/${_file}"
+    for _path in "${_bdsm}" "${_extension}" ; do
+      for _file in dsl initialize cli ; do
+        if [[ -s "${_path}/${_file}" ]] ; then
+          source "${_path}/${_file}"
+        fi
       done
     done
   done
@@ -52,8 +49,7 @@ modules()
 
 load()
 {
-  local _file
-  local _files=("$@")
+  local _file _files=("$@")
 
   for _file in "${_files[@]}" ; do
     source_files "${extension_modules_path:-"$modules_path"}/bash/${_file}"

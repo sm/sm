@@ -13,54 +13,62 @@ while [[ $# -gt 0 ]] ; do
     # TODO: Fall back on default actions instead of specifying them here
     #       In case the user has set their default serfice in the environment.
 
-    --disable-hooks)
-      hooks_flag=0
-      ;;
+    -*)
+      case "$token" in
+        --disable-hooks)
+          hooks_flag=0
+          ;;
 
-    --project)
-      project="$1"
-      shift
-      ;;
+        --project)
+          project="$1"
+          shift
+          ;;
 
-    --environment)
-      environment="$1"
-      shift
-      ;;
+        --environment)
+          environment="$1"
+          shift
+          ;;
 
-    --repo|repository)
-      repository="$1"
-      shift
-      ;;
+        --repo|repository)
+          repository="$1"
+          shift
+          ;;
 
-    --revision)
-      revision="$1"
-      shift
-      ;;
+        --revision)
+          revision="$1"
+          shift
+          ;;
 
-    --user)
-      user="$1"
-      shift
-      ;;
+        --user)
+          user="$1"
+          shift
+          ;;
 
-    --head)
-      head_flag=1
-      ;;
+        --head)
+          head_flag=1
+          ;;
 
-    --debug)
-      debug_flag=1
-      ;;
+        --debug)
+          debug_flag=1
+          ;;
 
-    -v|--version)
-      extension="core"
-      action="version"
-      ;;
+        -v|--version)
+          extension="core"
+          action="version"
+          ;;
 
-    --trace)
-      trace_flag=1
-      source "${modules_path}/bash/trace/initialize"
-      ;;
+        --trace)
+          trace_flag=1
+          source "${modules_path}/bash/trace/initialize"
+          ;;
 
-    --) extension_args=("$@") # Stop processing arguments.
+        --) extension_args=("$@") # Stop processing arguments.
+          ;;
+        *)
+          error "Unknown flag ${token}"
+          exit 1
+          ;;
+      esac
       ;;
 
     *)
@@ -132,7 +140,7 @@ while [[ $# -gt 0 ]] ; do
               extension="mod"
               ;;
 
-            edit|open)
+            edit|open|install)
               extension="ext"
               action="${token}"
               extension_args=("$@")
@@ -140,7 +148,10 @@ while [[ $# -gt 0 ]] ; do
               ;;
 
             *)
-              extension="${extension:-core}"
+              if [[ -z "${extension}" ]] ; then
+                error "Extension ${token} not found"
+                exit 1
+              fi
               ;;
           esac
         fi

@@ -15,7 +15,10 @@ source_files()
     _file=${_file/\~\//$HOME\/} # Expand ~/ to full value of $HOME
 
     if file_is_nonempty "${_file}" ; then
-      source "${_file}" || fail "Failed to source ${_file}."
+      source "${_file}"
+      # TODO: figure out how to see if 'source' itself failed or simply
+      # returning nonzero code.
+      # || fail "Failed to source ${_file}."
     fi
   done
 }
