@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-#
-# BDSM project module DSL functions
-#
 vcs()
 {
   local _path="$1"

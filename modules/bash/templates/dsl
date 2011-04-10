@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 
-#
-# BDSM templates module DSL functions
-#
-
 template_exists()
 {
   local _template="${extension_templates_path}/${1}.template"

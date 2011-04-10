@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 
-#
-# BDSM filesystem module DSL functions
-#
-
 # Safely source files and notify the user if they do not exist.
 # Recommended to put in /etc/bash.bashrc or ~/.bashrc and be sure
 # it is sourced from ~/.bash_profile
@@ -493,7 +489,7 @@ symlink_exists()
   [[ -L "${_file}" ]]
 }
 
-# Directory conditional functions
+# Directory conditional dsl
 directory_exists()
 {
   local _directory="${1:-}"

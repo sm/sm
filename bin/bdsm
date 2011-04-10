@@ -24,8 +24,8 @@ true "${modules_path:="${bdsm_path}/modules"}"
 
 export initial_pwd="$PWD" # record this early on.
 
-# Load BDSM bash DSL functions and initialize for BDSM core itself manually.
-source "${modules_path}/bash/core/functions"
+# Load BDSM bash DSL and initialize for BDSM core itself manually.
+source "${modules_path}/bash/core/dsl"
 source "${modules_path}/bash/core/initialize"
 source "${modules_path}/bash/core/cli"
 

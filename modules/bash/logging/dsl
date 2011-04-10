@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-#
-# BDSM logging module DSL functions
-#
 log()
 {
   printf "$*\n"

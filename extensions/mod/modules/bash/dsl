@@ -11,18 +11,18 @@ modules()
   done
 }
 
-# Print out a list of all functions for the given module.
-module_functions()
+# Print out a list of all dsl for the given module.
+module_dsl()
 {
-  local _function _functions
+  local _function _dsl
   local _module="${1:-}"
   # [[ -n "${_module}" ]] || fail "... module not given"
   local _path="${bdsm_modules_path}/bash/${_module}"
-  _functions=(
-  $(find "${_path}" -mindepth 1 -maxdepth 1 -name functions -type f -print0 | xargs -0 grep '^[a-z_]*()$')
+  _dsl=(
+  $(find "${_path}" -mindepth 1 -maxdepth 1 -name dsl -type f -print0 | xargs -0 grep '^[a-z_]*()$')
   )
 
-  for _function in "${_functions[@]}" ; do
+  for _function in "${_dsl[@]}" ; do
     _function="${_function##*modules\/bash\/}"
     printf "%s\n" "${_function//*:}"
   done
@@ -30,13 +30,13 @@ module_functions()
 
 modules_list()
 {
-  local _module _modules _function _functions
+  local _module _modules _function _dsl
 
   _modules=($(modules))
   for _module in "${_modules[@]}" ; do
     printf "\n${_module}\n\n"
-    _functions=($(module_functions "$_module"))
-    for _function in "${_functions[@]}" ; do
+    _dsl=($(module_dsl "$_module"))
+    for _function in "${_dsl[@]}" ; do
       printf "  ${_function}\n"
     done
   done

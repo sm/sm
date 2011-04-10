@@ -39,7 +39,7 @@ modules()
     _extension="${extension_modules_path}/bash/${_module}"
 
     for _path in "${_bdsm}" "${_extension}" ; do
-      for _file in "functions" "initialize" "cli" ; do
+      for _file in "dsl" "initialize" "cli" ; do
         file_is_nonempty "${_path}/${_file}" &&
           source "${_path}/${_file}"
       done
@@ -90,7 +90,7 @@ usage()
   extension_action "bdsm" "help"
 }
 
-# TODO: Extract fetch functions into it's own DSL module
+# TODO: Extract fetch dsl into it's own DSL module
 fetch()
 {
   # TODO: allow either curl or wget, defaulting to curl...

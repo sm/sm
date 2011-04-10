@@ -18,19 +18,19 @@ fi
 
 true "${modules_path:="${bdsm_path}/modules"}"
 
-# Load BDSM bash DSL functions and initialize for BDSM core itself manually.
-source "./modules/bash/core/functions"
+# Load DSL and initialize BDSM core itself, manually.
+source "./modules/bash/core/dsl"
 
 mkdir -p log tmp
 
 # Load fundamental Module DSL's
 for module in logging trace filesystem core ; do
-  for file in functions initialize  ; do
+  for file in dsl initialize  ; do
     source "${PWD}/modules/bash/${module}/${file}"
   done
 done
 
-source_files "${PWD}/extensions/core/modules/bash/functions" \
+source_files "${PWD}/extensions/core/modules/bash/dsl" \
   "${PWD}/extensions/core/modules/bash/initialize" \
   "${PWD}/extensions/core/modules/bash/cli" \
   "${PWD}/extensions/core/bin/install"

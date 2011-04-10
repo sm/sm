@@ -3,7 +3,7 @@
 reload_extension()
 {
   source_files \
-    "${extension_modules_path}/bash/functions" \
+    "${extension_modules_path}/bash/dsl" \
     "${extension_modules_path}/bash/initialize"
 }
 
@@ -72,7 +72,7 @@ extension_action()
       ;;
 
     *ASCII*)
-      # Launch with helper functions, if possible.
+      # Launch with helper dsl, if possible.
       extension="${action_file//.}"
 
       case "${extension}" in
@@ -111,7 +111,7 @@ extension_action()
       modules core
 
       source_files \
-        "${extension_modules_path}/bash/functions" \
+        "${extension_modules_path}/bash/dsl" \
         "${extension_modules_path}/bash/initialize"
 
       source "${action_file}"

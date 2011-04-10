@@ -10,7 +10,7 @@ get_help()
 }
 
 #
-# TODO: There is a lot of redundency in the get_X() functions, reduce it.
+# TODO: There is a lot of redundency in the get_{X}(), reduce it.
 #
 
 get_latest()

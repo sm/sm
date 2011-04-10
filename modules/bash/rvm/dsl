@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-#
-# BDSM RVM DSL module functions
-#
 rvm_install()
 {
   curl \
