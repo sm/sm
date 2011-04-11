@@ -15,38 +15,7 @@ true \
   ${repository_url:="git://github.com/wayneeseguin/bdsm"} \
   ${releases_url:="http://bdsm.beginrescueend.com/releases"}
 
-# TODO: Abstract this functionality out into a modules/bash/parse_args hook
-number_of_args=${#extension_args[@]}
-for ((index=0 ; index < $number_of_args ; index++)) ; do
-
-  token="${extension_args[$index]}"
-
-  case "$token" in
-    head|master)
-      install_head
-      ;;
-
-    +([[:digit:]]).+([[:digit:]]).+([[:digit:]])) # x.y.z
-      version="${token}"
-      install_release
-      ;;
-
-    latest|release)
-      fetch_version
-      install_release
-      ;;
-
-    help|usage)
-      usage
-      exit 0
-      ;;
-
-    *)
-      usage
-      exit 1
-      ;;
-  esac
-done
+enter "${source_path}"
 
 ensure_files_are_executable "install"
 

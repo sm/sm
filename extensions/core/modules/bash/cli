@@ -1,12 +1,42 @@
 #!/usr/bin/env bash
 
-while [[ $# -gt 0 ]] ; do
-  token="$1" ; shift
+# TODO: Abstract this functionality out into a modules/bash/parse_args hook
+number_of_args=${#extension_args[@]}
+for ((index=0 ; index < $number_of_args ; index++)) ; do
+
+  token="${extension_args[$index]}"
+
   case "$token" in
+    head|master)
+      # TODO: Set env vars instead of calling the method.
+      install_head
+      ;;
+
+    +([[:digit:]]).+([[:digit:]]).+([[:digit:]])) # x.y.z
+      # TODO: Set env vars instead of calling the method.
+      version="${token}"
+      install_release
+      ;;
+
+    latest|release)
+      # TODO: Set env vars instead of calling the method.
+      fetch_version
+      install_release
+      ;;
+
     --trace)
       export trace_flag=1
       enable_trace
       ;;
+
+    help|usage)
+      usage
+      exit 0
+      ;;
+
+    *)
+      usage
+      exit 1
+      ;;
   esac
 done
-
