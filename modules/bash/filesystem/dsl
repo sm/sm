@@ -46,15 +46,16 @@ ensure_paths_exist()
 
 remove_files()
 {
-  local _file
-  local _files=("$@")
+  local _file _files=("$@")
+
+  [[ ${#_files[@]} -gt 0 ]] ||
+    fail "Cannot remove files as no files were specified."
 
   for _file in "${_files[@]}" ; do
     if [[ -f "${_file}" || -L "${_file}" ]] ; then
       rm -f "${_file}"
     elif [[ -d "${_file}" ]] ; then
-      error "Cannot remove ${_file}, it is a directory! "
-
+      error "Cannot remove the file ${_file} as it is a directory."
     elif [[ -e "${_file}" ]] ; then
       error "Unknown filesystem entity type located at ${_file}, cannot remove."
     else
@@ -71,7 +72,7 @@ remove_paths()
   for _path in "${_paths[@]}" ; do
 
     if [[ -f "${_path}" ]] ; then
-      error "Cannot remove the path '${_path}' as it is a file! "
+      error "Cannot remove the path '${_path}' as it is a file."
     elif [[ -L "${_path}" ]] ; then
       rm -f "${_path}"
     elif [[ -d "${_path}" ]] ; then
@@ -91,7 +92,7 @@ ensure_files_exist()
   local _files=("$@")
 
   [[ ${#_files[@]} -gt 0 ]] ||
-    fail "Cannot ensure files exist, no files were given."
+    fail "Cannot ensure files exist as no files were given."
 
   for _file in "${_files[@]}" ; do
     [[ -e "${_file}" ]] || touch "${_file}"
@@ -105,10 +106,10 @@ ensure_files_are_executable()
   local _file="$1"
 
   [[ -d "${_file}" ]] &&
-    fail "Cannot make ${_file} executable, it is a directory."
+    fail "Cannot make the file '${_file}' executable as it is a directory."
 
   [[ -f "${_file}" ]] &&
-    fail "Cannot make ${_file} executable, the file does not exist."
+    fail "Cannot make the file '${_file}' executable as the file does not exist."
 
   chmod +x "${_file}"
 }
