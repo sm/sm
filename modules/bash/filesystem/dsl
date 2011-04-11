@@ -5,11 +5,10 @@
 # it is sourced from ~/.bash_profile
 source_files()
 {
-  local _file
-  local _files=("$@")
+  local _file _files=("$@")
 
   [[ ${#_files[@]} -gt 0 ]] ||
-    fail "No files given to source! "
+    fail "Cannot source files as no files were given."
 
   for _file in "${_files[@]}" ; do
     _file=${_file/\~\//$HOME\/} # Expand ~/ to full value of $HOME
@@ -26,8 +25,10 @@ source_files()
 # safely source the first file found
 nonempty_files()
 {
-  local _file
-  local _files=("$@")
+  local _file _files=("$@")
+
+  [[ ${#_files[@]} ]] ||
+    fail "Cannot return nonempty files as no files were given."
 
   for _file in "${_files[@]}" ; do
     file_is_nonempty "${_file}" && printf "${_file}\n"
@@ -36,8 +37,10 @@ nonempty_files()
 
 ensure_paths_exist()
 {
-  local _path
-  local _paths=("$@")
+  local _path _paths=("$@")
+
+  [[ ${#_paths[@]} ]] ||
+    fail "Cannot ensure paths exist as no paths were given."
 
   for _path in "${_paths[@]}" ; do
     directory_exists "${_path}" || mkdir -p "${_path}"
@@ -49,7 +52,7 @@ remove_files()
   local _file _files=("$@")
 
   [[ ${#_files[@]} -gt 0 ]] ||
-    fail "Cannot remove files as no files were specified."
+    fail "Cannot remove files as no files were given."
 
   for _file in "${_files[@]}" ; do
     if [[ -f "${_file}" || -L "${_file}" ]] ; then
@@ -66,11 +69,12 @@ remove_files()
 
 remove_paths()
 {
-  local _path
-  local _paths=("$@")
+  local _path _paths=("$@")
+
+  [[ ${#_paths[@]} -gt 0 ]] ||
+    fail "Cannot remove paths as no paths were given."
 
   for _path in "${_paths[@]}" ; do
-
     if [[ -f "${_path}" ]] ; then
       error "Cannot remove the path '${_path}' as it is a file."
     elif [[ -L "${_path}" ]] ; then
@@ -82,14 +86,12 @@ remove_paths()
     else
       true # already gone
     fi
-
   done
 }
 
 ensure_files_exist()
 {
-  local _file
-  local _files=("$@")
+  local _file _files=("$@")
 
   [[ ${#_files[@]} -gt 0 ]] ||
     fail "Cannot ensure files exist as no files were given."
@@ -103,15 +105,20 @@ ensure_files_exist()
 #       make this into make_files_executable or some such
 ensure_files_are_executable()
 {
-  local _file="$1"
+  local _file _files=("$@")
 
-  [[ -d "${_file}" ]] &&
-    fail "Cannot make the file '${_file}' executable as it is a directory."
+  [[ ${#_files[@]} -gt 0 ]] ||
+    fail "Cannot ensure files are executable as no files were given."
 
-  [[ -f "${_file}" ]] &&
-    fail "Cannot make the file '${_file}' executable as the file does not exist."
+  for _file in "${_files[@]}" ; do
+    [[ -d "${_file}" ]] &&
+      fail "Cannot make the file '${_file}' executable as it is a directory."
 
-  chmod +x "${_file}"
+    [[ -f "${_file}" ]] ||
+      fail "Cannot make the file '${_file}' executable as the file does not exist."
+
+    chmod +x "${_file}"
+  done
 }
 
 #
@@ -278,7 +285,7 @@ move_files_to()
     fail "Path was not given as the first parameter."
 
   [[ -n "${#_files[@]}" ]] ||
-    fail "No paths given in order to chmod ${_permissions} them."
+    fail "No files given in order to chmod ${_permissions} them."
 
   ensure_paths_exist "${_path}"
 
