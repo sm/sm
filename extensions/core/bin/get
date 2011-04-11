@@ -15,7 +15,7 @@ true \
   ${repository_url:="git://github.com/wayneeseguin/bdsm"} \
   ${releases_url:="http://bdsm.beginrescueend.com/releases"}
 
-enter "${source_path}"
+enter "${source_path}/bdsm"
 
 ensure_files_are_executable "install"
 
