@@ -3,7 +3,7 @@
 directories=( bin config modules log tmp )
 extensions=( core ext mod )
 
-files=( LICENCE VERSION README.md )
+files=( LICENSE VERSION README.md )
 
 (
   # Create installation target path
