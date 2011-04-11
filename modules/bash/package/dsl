@@ -328,7 +328,7 @@ package_ldconfig()
       printf "%s\n" "${prefix_path}/${_package}/active/lib" \
         > "/etc/ld.so.profile.d/${_package}.conf"
 
-      chmod_file 0644 "/etc/ld.so.profile.d/${_package}.conf"
+      chmod_files 0644 "/etc/ld.so.profile.d/${_package}.conf"
 
       ldconfig
     elif os_is_darwin ; then # Cluster Fuck.
@@ -376,7 +376,7 @@ package_profile_d()
     printf "%s" "PATH=\"\$PATH:${prefix_path}/${_package}/active/bin\" ; export PATH; " \
       >> /etc/profile.d/${_package}.sh
 
-    chmod_file 0755 /etc/profile.d/${_package}.sh
+    chmod_files 0755 /etc/profile.d/${_package}.sh
   fi
 }
 
