@@ -1,77 +1,4 @@
-#!/usr/bin/env bash
-
-# Example Usage:
-#
-# package_definition \
-#   name "bash"
-#   version "4.2"
-#   url "ftp.gnu.org/gnu/bash/"
-#
-package_definition()
-{
-  while [[ $# -gt 0 ]] ; do
-    key="$1" ; shift
-    if [[ -n "${1:-}" ]] ; then
-      value="$1" ; shift
-    else
-      if echo "$key" | grep '=' ; then
-        fail "Invalid key '${key}'\n => Guess: Most likely the '=' is supposed to be a ' '."
-      else
-        fail "Value not specified for key '${key}'\n => They tend to come in pairs :)"
-      fi
-    fi
-
-    case "$key" in
-      name)
-        package_name="${value}"
-        ;;
-      version)
-        package_version="${value}"
-        ;;
-      file)
-        package_file="${value}"
-        ;;
-      dir)
-        package_dir="${value}"
-        ;;
-      url)
-        package_url="${value}"
-        ;;
-      base_url)
-        package_base_url="${value}"
-        ;;
-      patches_url)
-        package_patches_url="${value}"
-        ;;
-      md5_url)
-        package_md5_url="${value}"
-        ;;
-      bin_path)
-        bin_path="${value}"
-        ;;
-      prefix_path)
-        prefix_path="${value}"
-        ;;
-      source_path)
-        source_path="${value}"
-        ;;
-      target_path)
-        target_path="${value}"
-        ;;
-      archive_format)
-        archive_format="${value}"
-        ;;
-      # TODO: Simplify into
-      #(+([[[:alnum:]]|])_path|name|version|url|md5_url)
-      #  eval "${key}=${value}"
-      #  ;;
-      *)
-        fail "Unknown key '${key}' (value: ${value})"
-      ;;
-    esac
-  done
-}
-
+# TODO: much more error checking and conditional branching.
 package_install()
 {
   ensure_nonempty package_name package_version archive_format
@@ -132,6 +59,18 @@ package_install()
   package_activate_if_first "${package_name}" "${package_version}"
 }
 
+package_uninstall()
+{
+  ensure_nonempty package_name package_version archive_format
+
+  true "${package_dir:="${package_name}-${package_version}"}"
+
+  package_make_uninstall ||
+    fail "Failed to uninstall ${package_name} from ${prefix_path}."
+
+  log "Uninstalled ${package_name} from ${prefix_path}."
+}
+
 package_fetch_md5()
 {
   ensure_nonempty package_name package_version archive_format
@@ -150,6 +89,7 @@ package_fetch_md5()
 
     package_md5=$(cat "${package_file}.md5")
   fi
+
 }
 
 file_matches_md5()
@@ -179,7 +119,8 @@ package_fetch()
 
   package_fetch_md5
 
-  file_matches_md5 "${package_file}" "${package_md5}" || {
+  file_matches_md5 "${package_file}" "${package_md5}" ||
+  {
     log "${package_file} does not match md5 ${package_md5}"
 
     remove_files "${package_file}"
@@ -191,6 +132,7 @@ package_fetch()
 
 package_extract()
 {
+
   case "${archive_format}" in
     tar.gz|tgz) # gzip
       tar zxf "${package_file}"
@@ -234,14 +176,13 @@ package_configure()
 }
 
 package_build()
-{
-  # TODO: make this robust, -j4 for example.
+{ # TODO: make this robust, -j4 for example.
   local command
 
   if [[ -n ${make_command:-} ]] ; then
     command="${make_command}"
   else
-    command="make ${make_flags[@]:-"-j$(os_cpu_count)"}"
+    command="make ${make_flags[@]:-"-j$(os_cpu_count)""}"
   fi
 
   ${command} > make.log 2>&1 ||
@@ -249,7 +190,7 @@ package_build()
 }
 
 package_make_install()
-{
+{ # TODO: make this robust
   local command
 
   if [[ -n ${make_command:-} ]] ; then
@@ -262,6 +203,33 @@ package_make_install()
     fail "Failed to make install of ${package_name} ${package_version} failed! "
 
   log "Installation of ${package_name} ${package_version} was successful! "
+}
+
+package_uninstall()
+{ # TODO: make this robust
+  local command
+
+  if [[ -n ${make_uninstall_command:-} ]] ; then
+    command="${make_uninstall_command}"
+  else
+    command="make ${make_uninstall_flags[@]:-uninstall}"
+  fi
+
+  ${command} > make.uninstall.log 2>&1 ||
+    fail "make uninstall ${package_name} ${package_version} failed! "
+}
+
+package_clean_install_files()
+{
+  log "#cleaning install files for ${package} ${package_version}...\n"
+
+  enter "${src_path}"
+
+  local files=($(
+  find "$src_path/" -mindepth 1 -maxdepth 1 -iname "${package}*${package_version}*"
+  ))
+
+  remove_files "${files[@]}"
 }
 
 package_activate()
@@ -380,18 +348,6 @@ package_profile_d()
   fi
 }
 
-package_uninstall()
-{
-  ensure_nonempty package_name package_version archive_format
-
-  true "${package_dir:="${package_name}-${package_version}"}"
-
-  package_make_uninstall ||
-    fail "Failed to uninstall ${package_name} from ${prefix_path}."
-
-  log "Uninstalled ${package_name} from ${prefix_path}."
-}
-
 package_patch()
 {
   local _patches _patch
@@ -408,3 +364,5 @@ package_patch()
     true
   done
 }
+
+

@@ -251,16 +251,20 @@ copy_directories_to()
   local _path="${1}" _directory ; shift
   local _directories=("$@")
 
+  [[ -n "${_path}" ]] ||
+    fail "Path was not given as the first parameter."
+
+  [[ -n "${#_directories[@]}" ]] ||
+    fail "No directories were given in order to copy them into ${_path}."
+
   ensure_paths_exist "${_path}"
 
   for _directory in "${_directories[@]}" ; do
-
     if directory_exists "${_directory}" ; then
       cp -Rf "${_directory}" "${_path}/"
     else
        error "Cannot copy directory ${_directory} to ${_path} as the directory '${_directory}' does not exist."
     fi
-
   done
 }
 
@@ -269,69 +273,86 @@ move_files_to()
   local _path="$1" _file ; shift
   local _files=("$@")
 
+  [[ -n "${_path}" ]] ||
+    fail "Path was not given as the first parameter."
+
+  [[ -n "${#_files[@]}" ]] ||
+    fail "No paths given in order to chmod ${_permissions} them."
+
   ensure_paths_exist "${_path}"
 
   for _file in "${_files[@]}" ; do
-
     if file_exists "${_file}" ; then
       mv "${_file}" "${_path}/${_file}"
     else
       error "Cannot move file ${_file} to ${_path} as the file does not exist."
     fi
-
   done
 }
 
 chown_files()
 {
-  local _idenity="$1" _file; shift
+  local _identity="$1" _file; shift
+  local _files=("$@")
 
-  for _file in "${@}" ; do
+  [[ -n "${_identity}" ]] ||
+    fail "user[:group] not given as the first parameter."
 
+  [[ -n "${#_files[@]}" ]] ||
+    fail "No paths given to chmod ${_permissions}."
+
+  for _file in "${_files[@]}" ; do
     if file_exists "${_file}" ; then
-      chown -R ${_idenity} "${_file}"
+      chown -R ${_identity} "${_file}"
     else
-      error "Cannot chown file ${_file} to ${_idenity} as the file does not exist."
+      error "Cannot chown file ${_file} to ${_identity} as the file does not exist."
     fi
-
   done
 }
 
 chown_paths()
 {
-  local _idenity="$1" _path; shift
+  local _identity="$1" _path ; shift
   local _paths=("$@")
 
+  [[ -n "${_identity}" ]] ||
+    fail "user[:group] not given as the first parameter."
+
+  [[ -n "${#_paths[@]}" ]] ||
+    fail "No paths given to chmod ${_permissions}."
+
   for _path in "${_paths[@]}" ; do
-
     if directory_exists "${_path}" ; then
-      chown ${_idenity} "${_path}"
+      chown ${_identity} "${_path}"
     else
-      error "Cannot chown path ${_path} to ${_idenity} as the directory does not exist."
+      error "Cannot chown path ${_path} to ${_identity} as the directory does not exist."
     fi
-
   done
 }
 
 chown_paths_recursively()
 {
-  local _idenity="$1" _path; shift
+  local _identity="$1" _path ; shift
   local _paths=("$@")
 
+  [[ -n "${_identity}" ]] ||
+    fail "user[:group] not given as the first parameter!!"
+
+  [[ -n "${#_paths[@]}" ]] ||
+    fail "No paths given to chmod ${_permissions}."
+
   for _path in "${_paths[@]}" ; do
-
     if directory_exists "${_path}" ; then
-      chown -R ${_idenity} "${_path}"
+      chown -R ${_identity} "${_path}"
     else
-      error "Cannot recursively chown ${_path} to ${_idenity} as the directory does not exist."
+      error "Cannot recursively chown ${_path} to ${_identity} as the directory does not exist."
     fi
-
   done
 }
 
 chmod_files()
 {
-  local _permissions="$1" _file; shift
+  local _permissions="$1" _file ; shift
   local _files=("$@")
 
   for _file in "${_files[@]}" ; do
@@ -345,9 +366,16 @@ chmod_files()
 
 chmod_paths()
 {
-  local _permissions="$1" _path; shift
+  local _permissions="$1" _path ; shift
+  local _paths=("$@")
 
-  for _path in "${@}" ; do
+  [[ -n "${_permissions}" ]] ||
+    fail "Permissions not given as the first parameter!!"
+
+  [[ -n "${#_paths[@]}" ]] ||
+    fail "No paths given to chmod ${_permissions}."
+
+  for _path in "${_paths[@]}" ; do
     if directory_exists "${_directory}" ; then
       chmod ${_permissions} "${_path}"
     else
@@ -358,9 +386,16 @@ chmod_paths()
 
 chmod_paths_recursively()
 {
-  local _permissions="$1" _path; shift
+  local _permissions="${1:-}" _path ; shift
+  local _paths=("$@")
 
-  for _path in "${@}" ; do
+  [[ -n "${_permissions}" ]] ||
+    fail "Permissions not given as the first parameter!!"
+
+  [[ -n "${#_paths[@]}" ]] ||
+    fail "No paths given to chmod ${_permissions}."
+
+  for _path in "${_paths[@]}" ; do
     if directory_exists "${_directory}" ; then
       chmod -R ${_permissions} "${_path}"
     else

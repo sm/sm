@@ -185,3 +185,11 @@ extensions_in()
   printf "${extensions}"
 }
 
+display_extension_licence()
+{
+  local _extension="${1:-}"
+
+  [[ -n "${_extension}" ]] || fail "Extension not given."
+
+  cat -v "${extensions_path}/${_extension}/LICENSE"
+}

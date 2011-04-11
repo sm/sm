@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-set -x
 directories=( bin config modules log tmp )
 extensions=( core ext mod )
 

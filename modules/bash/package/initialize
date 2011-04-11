@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-modules \
-  filesystem system templates environment defaults
+modules filesystem system templates environment defaults
 
 # Ensure that default values are set.
 
@@ -48,21 +47,14 @@ else
   esac
 fi
 
-variable_is_nonempty package_base_url || \
-  read_default base_url prefix package
-
-variable_is_nonempty package_md5_url || \
-  read_default md5_url prefix package
-
-variable_is_nonempty init_scripts_path || \
-  init_scripts_path="$(init_scripts_path)"
-
-variable_is_nonempty archive_format || \
-  read_default archive_format
+variable_is_nonempty package_base_url  || read_default base_url prefix package
+variable_is_nonempty package_md5_url   || read_default md5_url prefix package
+variable_is_nonempty init_scripts_path || init_scripts_path="$(init_scripts_path)"
+variable_is_nonempty archive_format    || read_default archive_format
 
 true \
   "${archive_format:=tar.gz}" \
-  "${data_path:="${data_base_path}/${package_version}"}" \
+  "${data_path:="${data_base_path}/${package_version}"}"
 
 export LDFLAGS="${LDFLAGS:-} -L${prefix_path}/lib"
 
