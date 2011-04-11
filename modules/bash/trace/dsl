@@ -2,7 +2,7 @@
 
 set_ps4()
 {
-  export PS4="+> \${BASH_SOURCE##\${bdsm_path}\/} \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO} $ "
+  export PS4="=> \${BASH_SOURCE##\${bdsm_path}\/} \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO} $ "
 }
 
 enable_trace()
