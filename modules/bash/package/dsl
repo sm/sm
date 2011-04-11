@@ -401,13 +401,29 @@ package_patch()
   # TODO: Three level hierarchy based on patches/{OS}/{version},
   #       root level as 'global' always installed.
 
-  _patches=(
-    $(find "${extension_patches_path}" -mindepth 1 -maxdepth 1 -iname '*.patch' -type f)
-    $(find "${extension_patches_path}/$(os_type)" -mindepth 1 -maxdepth 1 -iname '*.patch' -type f)
-    $(find "${extension_patches_path}/$(os_type)/${package_version}" -mindepth 1 -maxdepth 1 -iname '*.patch' -type f)
-  )
+  # TODO: Test each dir for existence and skip if missing
+  _patches=($(find "${extension_patches_path}" -mindepth 1 -maxdepth 1 -iname '*.patch' -type f))
+  package_apply_patches "${_patches[@]}"
+
+  directory_exists "${extension_patches_path}/$(os_type)" || return 0
+
+  _patches=($(find "${extension_patches_path}/$(os_type)" -mindepth 1 -maxdepth 1 -iname '*.patch' -type f))
+  package_apply_patches "${_patches[@]}"
+
+  directory_exists "${extension_patches_path}/$(os_type)/${package_version}" || return 0
+  _patches=($(find "${extension_patches_path}/$(os_type)/${package_version}" -mindepth 1 -maxdepth 1 -iname '*.patch' -type f))
+  package_apply_patches "${_patches[@]}"
+}
+
+package_apply_patches()
+{
+  local _patch _patches=("$@")
+
+  [[ ${#_patches[@]} -gt 0 ]] ||
+    fail "Cannot apply patches as no patches were given."
 
   for _patch in "${_patches[@]}" ; do
+    # TODO: apply the patch...
     true
   done
 }
