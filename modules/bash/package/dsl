@@ -395,6 +395,9 @@ package_uninstall()
 package_patch()
 {
   local _patches _patch
+
+  directory_exists "${extension_patches_path}" || return 0
+
   # TODO: Three level hierarchy based on patches/{OS}/{version},
   #       root level as 'global' always installed.
 

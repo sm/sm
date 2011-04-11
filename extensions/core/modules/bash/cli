@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-# TODO: Abstract this functionality out into a modules/bash/parse_args hook
 number_of_args=${#extension_args[@]}
+
 for ((index=0 ; index < $number_of_args ; index++)) ; do
 
   token="${extension_args[$index]}"
