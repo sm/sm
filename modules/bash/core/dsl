@@ -23,7 +23,7 @@ bdsm_exports()
 
 bdsm_set_trap()
 {
-  true # TODO: fix trap cleanup.
+  trap backtrace ERR
   # trap "result=$? ; [[ -e ${tmp_path}/$$ ]] && rm -rf '${tmp_path}/$$; exit $result' >/dev/null 2>&1" 0 1 2 3 15
 }
 
