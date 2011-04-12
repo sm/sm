@@ -7,7 +7,7 @@ set_ps4()
 
 enable_trace()
 {
-  [[ ${trace_flag:-0} -eq 1 ]] || return
+  [[ ${trace_flag:-0} -eq 1 ]] || return 0
 
   export trace_flag
   set -o xtrace
@@ -15,9 +15,54 @@ enable_trace()
 
 enable_debug()
 {
-  [[ ${debug_flag:-0} -eq 1 ]] || return
+  [[ ${debug_flag:-0} -eq 1 ]] || return 0
 
   export debug_flag
   set -o verbose
+}
+
+enable_backtrace()
+{
+  trap 'backtrace ${lineno}' ERR
+}
+
+backtrace()
+{
+  echo "\n\$?: $?\n"
+
+  local _source _function _line
+
+  local _message="${1}" _status="${2:-0}" _string=""
+
+  [[ ${_status} -gt 0 ]] ||
+    return 0 # If the return status was success, do not print a backtrace
+
+  echo "\$*: $*"
+
+  _string+="On or around line ${BASH_LINENO[0]}"
+  _string+=" of ${BASH_SOURCE[0]}"
+  _string+=" in ${FUNCNAME[0]}()"
+
+  [[ -n "${_message}" ]] && _string+="  Message: ${_message}"
+
+  _string+="Exiting with status ${_status}"
+
+  printf "%s" "${_string}"
+
+  printf "  %6s %6s %-20s %-55s\n" "Trace" "Line" "Function" "File" 1>&2
+
+  for (( index = 0 ; index < (${#FUNCNAME[@]}) ; ++index )) ; do
+    # line="${LINENO} > "
+    _source="${BASH_SOURCE[${index}]}" # "##${bdsm_path}}"
+    _function="${FUNCNAME[${index}]:+${FUNCNAME[${index}]}()}"
+    _line=${BASH_LINENO[$(( index - 1 ))]}
+
+    printf "  %5d." "$((${#FUNCNAME[@]} - index ))" 1>&2
+    printf " %6s" "${_line}" 1>&2
+    printf " %-20s" "${_function}" 1>&2
+    printf " %-55s\n" "${_source} " 1>&2
+  done
+
+  exit "${_status}"
 }
 

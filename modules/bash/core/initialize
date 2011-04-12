@@ -32,5 +32,3 @@ bdsm_exports
 
 bdsmrc # Load bdsmrc files.
 
-bdsm_set_trap
-

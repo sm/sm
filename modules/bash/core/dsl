@@ -21,11 +21,6 @@ bdsm_exports()
   # TODO: Filter this list of exports down.
 }
 
-bdsm_set_trap()
-{
-  trap 'backtrace ${lineno}' ERR
-}
-
 modules()
 {
   local _module _bdsm _extension _path _file _modules=("$@")
@@ -251,3 +246,4 @@ bdsmrc()
 {
   source_files "/etc/bdsmrc" "$HOME/.bdsmrc"
 }
+

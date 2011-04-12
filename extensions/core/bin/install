@@ -2,33 +2,41 @@
 
 directories=( bin config modules log tmp )
 extensions=( core ext mod )
-
 files=( LICENSE VERSION README.md )
+configs=( user defaults )
+
+log "\nInstalling BDSM Framework into ${bdsm_path}\n"
 
 (
-  # Create installation target path
-  ensure_paths_exist "${bdsm_path}"
-  enter "${bdsm_path}"
-  # Remove target directories
-  remove_paths "${directories[@]}"
-  ensure_paths_exist "${directories[@]}" extensions
-  enter "${bdsm_path}/extensions"
-  # Remove core extension directories and removed extensions.
-  remove_paths "${extensions[@]}" extension bdsm
-) || fail "Could not create installation target."
+log "  Ensuring that bdsm_path '${bdsm_path}' exists"
+ensure_paths_exist "${bdsm_path}"
+enter "${bdsm_path}"
 
-# Install extension directories
+log "  Removing target directories"
+remove_paths "${directories[@]}"
+ensure_paths_exist "${directories[@]}" extensions
+enter "${bdsm_path}/extensions"
+
+log "  Removing core and old extensions, if they exist"
+remove_paths "${extensions[@]}" extension bdsm
+) || fail "Could not create installation target"
+
 (
-  enter extensions
-  copy_directories_to "${bdsm_path}/extensions" "${extensions[@]}"
+log "  Installing core extensions (${extensions[@]}) into ${bdsm_path}/extensions"
+enter extensions
+copy_directories_to "${bdsm_path}/extensions" "${extensions[@]}"
 )
 
-# Install BDSM core directories
+log "  Installing core directories (${directories[@]}) into ${bdsm_path}"
 copy_directories_to "${bdsm_path}" "${directories[@]}"
 
+log "  Installing core files (${files[@]}) into ${bdsm_path}"
 copy_files_to "${bdsm_path}" ${files[@]}
 
-ensure_files_exist "${config_path}/user" "${config_path}/db"
+log "  Ensuring that the configuration files (${configs[@]}) exist in ${config_path}"
+ensure_files_exist "${config_path}/user" "${config_path}/defaults"
 
+log "  Linking ${bdsm_path}/bin/bdsm to ${prefix}/bin/bdsm"
 link --force "${bdsm_path}/bin/bdsm" to "${prefix}/bin/bdsm"
 
+succeed "Installation of BDSM is complete"

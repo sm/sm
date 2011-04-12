@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 
-true "${bdsm_development_path:="$source_path/bdsm"}"
+_path="${bdsm_development_path:-"$source_path/bdsm"}/${extension_args[0]}"
 
-enter "${bdsm_development_path}/${extension_args[0]}/"
+# TODO: Allow --src flag to modify root behavior.
+running_as_root && _path="${bdsm_path}/extensions/${extension_args[0]}"
+
+enter "${_path}/"
 
 exec ${EDITOR:-vi} .
+
+exit 0 # For sanity.
