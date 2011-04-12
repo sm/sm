@@ -40,25 +40,21 @@ source "${modules_path}/bash/core/cli"
 #
 # Main Logic
 #
-if [[ -n ${extension} ]] ; then
-  if [[ "${action}" = "version" ]] ; then
+[[ -n ${extension} ]] || { extension_action "core" "help" ; exit 0 ; }
+
+[[ -n ${action} ]] || {
+  log "Usage: \n  bdsm ${extension} [action]\nActions:"
+  log "  $(actions_for_extension "${extension}")"
+  exit 0
+}
+
+case "${action}" in
+  version)
     extension_action "core" "version"
-  elif [[ -n "${action}" ]] ; then
+    ;;
+  *)
     extension_action "${extension}" "${action}"
-  else
-    log "Usage: \n  bdsm ${extension} [action]\nActions:\n  $(actions_for_extension "${extension}")"
-  fi
-else
-  usage
-fi
-result=$?
+    ;;
+esac
 
-if [[ ${verbose_flag:-0} -eq 1 ]]; then
-  if [[ ${result} -gt 0 ]] ; then
-    log "'$action $*' returned error ($result)\n\n"
-  else
-    log "'$action $*' returned success ($result)\n\n"
-  fi
-fi
-
-exit $result
+exit $?

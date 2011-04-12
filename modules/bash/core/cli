@@ -138,6 +138,9 @@ while [[ $# -gt 0 ]] ; do
 
             mod|module|modules)
               extension="mod"
+              action="${1:-list}"
+              extension_args=("$@")
+              parse_break=1
               ;;
 
             edit|open|install)
