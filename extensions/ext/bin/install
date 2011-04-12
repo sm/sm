@@ -3,6 +3,8 @@
 [[ ${#extension_args[@]} -gt 0 ]] ||
   fail "At least one extension name must be specified."
 
+log "Installing extensions ${extension_args[*]} to ${extensions_path}\n"
+
 case "${extension_version:-head}" in
   *([[:digit:]]).*([[:digit:]]).*([[:digit:]]))
     fetch_tarball
@@ -15,3 +17,4 @@ esac
 
 install_extensions "${extension_args[@]}"
 
+succeed "Installed extensions ${extension_args[*]}"

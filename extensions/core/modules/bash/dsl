@@ -1,17 +1,29 @@
 #!/usr/bin/env bash
 
+version()
+{
+  read -r bdsm_version < "$bdsm_path/VERSION"
+  log "\nbdsm ${bdsm_version:-"?.?.?"} https://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)\n"
+}
+
+usage()
+{
+  version
+  extension_action "bdsm" "help"
+}
+
 fetch_version()
 {
-  version=$(curl -B "${releases_url}/latest-version.txt" 2>/dev/null)
+  version=$(curl -s "${releases_url}/latest-version.txt" 2>/dev/null)
 }
 
 fetch_md5()
 {
-  md5=$(curl -B "${releases_url}/bdsm-${version}.tar.gz.md5" 2>/dev/null)
+  md5=$(curl -s "${releases_url}/bdsm-${version}.tar.gz.md5" 2>/dev/null)
 }
 
 md5_match()
-{
+{ # TODO: switch this to using system module's os_* DSL
   local archive="$1"
 
   case "$(uname)" in
@@ -33,66 +45,134 @@ md5_match()
   return $?
 }
 
+
+fetch()
+{ # TODO: Extract fetch dsl into it's own DSL module
+  # TODO: allow either curl or wget, defaulting to curl...
+  command_exists curl ||
+    fail "bdsm requires curl, which was not found in the PATH :(\nPlease install curl and try again."
+
+  fetch_command="$fetch_command -O -L --create-dirs -C - " # -s for silent
+  (
+  enter "$archives_path"
+
+  [[ -n "${1:-}" ]] || fail "BUG: $0 called without an argument :/"
+
+  archive=$(basename "$1")
+  download=1
+
+  debug "Fetching $archive"
+
+  # Check first if we have the correct archive
+  if file_exists "$archive" && file_exists "$archive.md5" ; then
+    debug "Found archive and its md5, testing correctness"
+
+    if [[ $(md5sum --status -c "$archive.md5") -gt 0 ]] ; then
+      debug "Archive is bad, downloading"
+      download=1
+    else
+      debug "Archive is good, not downloading"
+      download=0
+      result=0
+    fi
+  else
+    debug "No '${archive}' does not exist or does not match md5, downloading"
+    download=1
+  fi
+
+  if [[ $download -gt 0 ]] ; then
+    if ! eval $fetch_command "$1" ; then
+      retry=0
+      if [[ $result -eq 78 ]] ; then
+        error "The requested url does not exist: '$1'"
+      elif [[ $result -eq 18 ]] ; then
+        error "Only a part of the file was transferred. Removing and re-trying."
+        rm -f "$archive"
+        retry=1
+      elif [[ $result -eq 33 ]] ; then
+        debug "Remote server does not support 'range' command, removing '$archive'"
+        rm -f "$archive"
+        retry=1
+      else
+        error "There was an error, please check $log_path/*.error.log"
+      fi
+
+      if [[ $retry -eq 1 ]] ; then
+        if ! eval $fetch_command "$1" ; then
+          error "There was an error, please check $log_path/*.error.log"
+        fi
+      fi
+    fi
+  fi
+  )
+
+  return $0
+}
+
 install_release()
 {
-  archive="$source_path/bdsm-${version}.tar.gz"
+  archive="$archives_path/bdsm-${version}.tar.gz"
 
   fetch_md5
 
-  if [[ -s $archive ]] && ! md5_match ; then
+  if file_exists "${archive}" && ! md5_match ; then
     # Remove old installs, if they exist and have incorrect md5.
-    [[ -f "$source_path/bdsm-${version}.tar.gz" ]] &&
-      rm -f "$source_path/bdsm-${version}.tar.gz"
+    file_exists "$archives_path/bdsm-${version}.tar.gz" &&
+      rm -f "$archives_path/bdsm-${version}.tar.gz"
   fi
 
   curl -L "${releases_url}/bdsm-${version}.tar.gz" -o "$archive"
 
-  if ! md5_match "$archive" ; then
-    fail "ERROR:
-
+  md5_match "$archive" || fail "
 Archive package downloaded does not match it's calculated md5 checksum ${md5}:
 
-  $source_path/bdsm-${version}.tar.gz
+  $archives_path/bdsm-${version}.tar.gz
 
 Retry the installation and/or check your networking setup.
 
-Halting installation.
+Halting the installation.
 "
-  fi
 
-  tar xf "${source_path}/bdsm-${version}.tar.gz" -C "$source_path/"
+  tar zxf "${archives_path}/bdsm-${version}.tar.gz" -C "$src_path/"
 
-  enter "$source_path/bdsm-${version}"
+  enter "$src_path/bdsm-${version}"
+
+  ./install
 }
 
 install_head()
 {
   local remote="origin"
 
-  if [[ -d "${source_path}/bdsm/.git" ]] ; then
-    enter "${source_path}/bdsm/"
+  if directory_exists "${src_path}/bdsm/.git" ]] ; then
+
+    enter "${src_path}/bdsm/"
 
     if [[ -z "$(git branch | awk "/$branch$/")" ]] ; then
-      if ! git checkout -b "$branch" --track "$remote/$branch" 2>/dev/null ; then
+      git checkout -b "$branch" --track "$remote/$branch" 2>/dev/null ||
         fail "$remote $branch remote branch not found."
-      fi
+
     elif [[ -z "$(git branch | awk "/\* $branch$/{print \$2}")" ]] ; then
-      if ! git checkout $branch 2>/dev/null ; then
-        fail "Unable to checkout $branch."
-      fi
+
+      git checkout $branch 2>/dev/null ||
+        fail "Unable to checkout $branch.\nCould not get head. Sucks to be you... or rather... doesn't suck :-p"
     fi
 
     git pull --rebase origin $branch
+
   else
-    enter "${source_path}"
+    enter "${src_path}"
 
     if ! git clone --depth 1 git://github.com/wayneeseguin/bdsm.git ; then
-      if !  git clone https://github.com/wayneeseguin/bdsm.git ; then
-        fail "Unable to clone the bdsm repository, attempted both git:// and https://"
-      fi
+      git clone https://github.com/wayneeseguin/bdsm.git ||
+        fail "Unable to clone the BDSM repository, attempted both git:// and https://\nCould not get head, terribly sorry about the blue balls :("
     fi
   fi
 
-  enter "${source_path}/bdsm/"
+  log "Ahh... that's better...\nIt always feels so nice to get head.\nQuite a load this time eh?\nRemember to get head often!\n"
+
+  enter "${src_path}/bdsm/"
+
+  ./install
 }
 
