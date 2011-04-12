@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 
+usage()
+{
+  modules help
+  description "BDSM self-installer."
+  actions "  head   - Get the latest BDSM from the git repository master branch
+    latest - Download and install the latest BDSM release package"
+  show_help
+}
+
 version()
 {
   read -r bdsm_version < "$bdsm_path/VERSION"
@@ -137,6 +146,8 @@ Halting the installation.
 
   enter "$src_path/bdsm-${version}"
 
+  ensure_files_are_executable "install"
+
   ./install
 }
 
@@ -172,6 +183,8 @@ install_head()
   log "Ahh... that's better...\nIt always feels so nice to get head.\nQuite a load this time eh?\nRemember to get head often!\n"
 
   enter "${src_path}/bdsm/"
+
+  ensure_files_are_executable "install"
 
   ./install
 }

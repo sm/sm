@@ -9,6 +9,10 @@ true \
   "${archive_format:=tar.gz}" \
   "${package_name:=${extension}}"
 
+true \
+  ${repository_url:="git://github.com/wayneeseguin/bdsm"} \
+  ${releases_url:="http://bdsm.beginrescueend.com/releases"}
+
 # Load the BDSM framework version.
 file_is_nonempty "$bdsm_path/VERSION" &&
   read -r bdsm_version < "$bdsm_path/VERSION"

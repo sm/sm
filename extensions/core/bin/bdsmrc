@@ -1,11 +1,9 @@
 #!/usr/bin/env bash
 
-modules project
-
 file_is_nonempty "$extension_templates_path/bdsmrc" ||
   fail "${extension} ${action} ${FUNCNAME}()\n => The template file $extension_templates_path/bdsmrc is missing."
 
-if [[ -s "$HOME/.bdsmrc" ]] ; then
+if file_is_nonempty "$HOME/.bdsmrc" ; then
   true ${timestamp:=$(date +%m.%d.%Y-%H:%M:%S)}
 
   log "An existing $HOME/.bdsmrc file was found."
@@ -15,15 +13,15 @@ if [[ -s "$HOME/.bdsmrc" ]] ; then
   move_file "$HOME/.bdsmrc" to "$HOME/.bdsmrc.$timestamp"
 fi
 
+#
 # TODO: Move this into the project module and call as a function.
-#       bdsmrc_install
+#       bdsmrc_install, this does *not* belong here.
 #
 # TODO: Read project, repository_url and environment from defaults file.
 #       ~/.bdsm/project/config/defaults
 #
-
+modules project
 true ${repository_url:="git@github.com:username/repository.git"}
-
 \sed \
   -e "s#{{project}}#$project#g" \
   -e "s#{{repository_url}}#$repository_url#g" \

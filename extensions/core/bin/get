@@ -1,22 +1,4 @@
 #!/usr/bin/env bash
 
-# modules filesystem
+install_head
 
-usage()
-{
-  modules help
-  description "BDSM self-installer."
-  actions "  head   - Get the latest BDSM from the git repository master branch
-    latest - Download and install the latest BDSM release package"
-  show_help
-}
-
-true \
-  ${repository_url:="git://github.com/wayneeseguin/bdsm"} \
-  ${releases_url:="http://bdsm.beginrescueend.com/releases"}
-
-enter "${source_path}/bdsm"
-
-ensure_files_are_executable "install"
-
-./install
