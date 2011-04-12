@@ -28,6 +28,7 @@ succeed() {
 
 fail() {
   error "$*"
-  backtrace 69
+  backtrace
+  exit 1
 }
 

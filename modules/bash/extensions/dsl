@@ -31,7 +31,7 @@ extension_version()
 
 extension_action()
 {
-  (
+  {
   unset extension action
 
   export extension="${1:-}" ; shift
@@ -108,7 +108,7 @@ extension_action()
   # Now based on the determined action_type we launch the extension.
   case "${action_type}" in
     bash)
-      (
+      {
       modules core
 
       source_files \
@@ -116,7 +116,7 @@ extension_action()
         "${extension_modules_path}/bash/initialize"
 
       source "${action_file}"
-      )
+      } #  || result=$?
       ;;
     # ruby|python|lua|javascript)
       #   ADD "${modules_path}/${action_type}/" to the lib path so the script can require "bdsm"
@@ -129,7 +129,7 @@ extension_action()
       "${action_file}" "${extension_action}" "${extension_args[@]}"
       ;;
   esac
-  )
+  } # || result=$?
 }
 
 
