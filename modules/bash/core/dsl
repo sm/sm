@@ -23,8 +23,7 @@ bdsm_exports()
 
 bdsm_set_trap()
 {
-  trap backtrace ERR
-  # trap "result=$? ; [[ -e ${tmp_path}/$$ ]] && rm -rf '${tmp_path}/$$; exit $result' >/dev/null 2>&1" 0 1 2 3 15
+  trap 'backtrace ${lineno}' ERR
 }
 
 modules()
@@ -89,9 +88,8 @@ usage()
   extension_action "bdsm" "help"
 }
 
-# TODO: Extract fetch dsl into it's own DSL module
 fetch()
-{
+{ # TODO: Extract fetch dsl into it's own DSL module
   # TODO: allow either curl or wget, defaulting to curl...
   command_exists curl ||
     fail "bdsm requires curl, which was not found in the PATH :(\nPlease install curl and try again."
@@ -164,10 +162,9 @@ fetch_md5()
 }
 
 md5_match()
-{
+{ # TODO: switch this to using system module's os_* DSL
   local archive="$1"
 
-  # TODO: switch this to using system module's os_* DSL
   case "$(uname)" in
     Darwin|FreeBSD)
       archive_md5="$(/sbin/md5 -q "${archive}")"
@@ -201,16 +198,14 @@ install_release()
 
   curl -L "${releases_url}/bdsm-${version}.tar.gz" -o "$archive"
 
-  md5_match "$archive" ||
-    fail "ERROR:
-
+  md5_match "$archive" || fail "
 Archive package downloaded does not match it's calculated md5 checksum ${md5}:
 
   $archives_path/bdsm-${version}.tar.gz
 
 Retry the installation and/or check your networking setup.
 
-Halting installation.
+Halting the installation.
 "
 
   tar zxf "${archives_path}/bdsm-${version}.tar.gz" -C "$src_path/"
