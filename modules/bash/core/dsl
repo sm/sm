@@ -56,24 +56,23 @@ load()
 }
 
 actions_for_extension() {
-  local _extension="${1:-}"
-  (
-  if [[ -n "${_extension}" ]] ; then
-    directory_exists "$extensions_path/${_extension}/bin" || return 0
+  local _extension="${1:-}" _path="$extensions_path/${_extension}/bin"
 
-    actions=($(
-      find "$extensions_path/${_extension}/bin" -mindepth 1 -maxdepth 1 -type f
-    ))
+  [[ -n "${_extension}" ]] ||
+    fail "Cannot list actions for extension as no extension was given."
 
-    executables=()
-    for action in "${actions[@]}" ; do
-      [[ -x "${action}" ]] && \
-        executables[${#executables[@]}]="${action//*\/}"
-    done
-    executables="${executables[@]}"
-    printf "${executables}"
-  fi
-  )
+  directory_exists "${_path}" || return 0
+
+  local _files=($(find "${_path}" -mindepth 1 -maxdepth 1 -type f))
+  local _file _actions=()
+
+  for _file in "${_files[@]}" ; do
+    [[ -x "${_file}" ]] && _actions+=("${_file//*\/}")
+  done
+
+  _actions="${_actions[@]}" # Convert from array to string.
+
+  printf "${actions}"
 }
 
 version()
