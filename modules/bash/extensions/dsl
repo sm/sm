@@ -113,7 +113,8 @@ extension_action()
 
       source_files \
         "${extension_modules_path}/bash/dsl" \
-        "${extension_modules_path}/bash/initialize"
+        "${extension_modules_path}/bash/initialize" \
+        "${extension_modules_path}/bash/cli"
 
       source "${action_file}"
       } #  || result=$?
