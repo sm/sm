@@ -25,10 +25,12 @@ true \
 
 timestamp="$(date +%m.%d.%Y-%H:%M:%S)"
 
-# Modules that should be available to *all* bdsm extensions.
-modules trace logging variables filesystem extensions
+# Note that the trace, logging and core modules have already been loaded.
+# Note these moduels will be available to *all* extensions.
+modules variables environment filesystem extensions
 
+# Ensure variables desired to be exported to extensions actually are.
 bdsm_exports
 
-bdsmrc # Load bdsmrc files.
+bdsmrc # (re)load bdsmrc files.
 

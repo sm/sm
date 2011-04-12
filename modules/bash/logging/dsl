@@ -28,40 +28,6 @@ succeed() {
 
 fail() {
   error "$*"
-  #set -e
-  #false # => This should trigger the backtrace?
-  backtrace
-  #
-  exit 1
-}
-
-backtrace()
-{
-  local _source _function _line
-
-
-  local _lineno="${1}" _message="${2}" _status="${3:-1}"
-
-  if [[ -n "${_message}" ]] ; then
-    printf "%s" "Error on or around line ${_lineno}:\n\"${_message}\"\nExiting with status ${_status}"
-  else
-    printf "%s" "Error on or around line ${_lineno}:\nExiting with status ${_status}"
-  fi
-
-  printf "  %6s %6s %-20s %-55s\n" "Trace" "Line" "Function" "File" 1>&2
-
-  for (( index = 0 ; index < (${#FUNCNAME[@]}) ; ++index )) ; do
-    # line="${LINENO} > "
-    _source="${BASH_SOURCE[${index}]}" # "##${bdsm_path}}"
-    _function="${FUNCNAME[${index}]:+${FUNCNAME[${index}]}()}"
-    _line=${BASH_LINENO[$(( index - 1 ))]}
-
-    printf "  %5d." "$((${#FUNCNAME[@]} - index ))" 1>&2
-    printf " %6s" "${_line}" 1>&2
-    printf " %-20s" "${_function}" 1>&2
-    printf " %-55s\n" "${_source} " 1>&2
-  done
-
-  exit "${_status}"
+  backtrace 69
 }
 

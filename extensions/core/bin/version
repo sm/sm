@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+bdsm_version
+
+succeed "\nbdsm ${bdsm_version:-"?.?.?"} https://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)\n"
+

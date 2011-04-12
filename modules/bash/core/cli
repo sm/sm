@@ -104,9 +104,9 @@ while [[ $# -gt 0 ]] ; do
               parse_break=1
               ;;
 
-            get)
+            get|version)
               extension="core"
-              action="get"
+              action="${token}"
               extension_args=("$@")
               parse_break=1
               ;;

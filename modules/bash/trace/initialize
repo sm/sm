@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -o errtrace
+set -o errexit
 
 set_ps4
 

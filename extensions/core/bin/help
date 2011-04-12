@@ -1,35 +1,19 @@
 #!/usr/bin/env bash
 
-# TODO: use the help module for this?
+modules help
+
+extension="<extension>"
 
 description "Bash Development & Scripting Management Framework - Core Extension"
 
 actions "  bdsmrc  - Install bdsmrc template file into ~/.bdsmrc
-  help    - Display this help text."
+  get latest - Fetch and install the latest BDSM release
+  get head - Fetch and install the latest BDSM development version
+  version - Display the curently installed BDSM version
+  install <name> - Fetches and extends BDSM with the <name> extension
+  edit <name> - Opens extension <name> in the editor."
 
-usage() {
-  log "
-Description
-
-  BDSM $description
-
-Usage
-
-  bdsm <extension> <action> <<arguments>>
-
-BDSM default actions
-
-$actions
-
-Installed Extensions
-
-  $(installed_extensions)
-
-Available Extensions
-
-  $(available_extensions)
-
-Notes
+notes="
 
   See website for extension documentation.
 
@@ -51,21 +35,7 @@ Notes
 
   http://bdsm.beginrescueend.com/
   https://www.pivotaltracker.com/projects/26822
-
 "
-}
 
-modules extensions
+show_help "usage"
 
-command="usage" # Default
-
-while [[ $# -gt 0 ]] ; do
-  token="$1" ; shift
-  case "$token" in
-    description) command="description" ;;
-    actions)     command="actions"     ;;
-    *)           command="usage"       ;;
-  esac
-done
-
-$command

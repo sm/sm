@@ -2,30 +2,31 @@
 
 reload_extension()
 {
-  source_files \
-    "${extension_modules_path}/bash/dsl" \
-    "${extension_modules_path}/bash/initialize"
+  local _path="${extension_modules_path}/bash"
+
+  source_files "${_path}/dsl" "${_path}/initialize"
 }
 
 reinit_extension()
 {
-  source_files "${extension_modules_path}/bash/initialize"
+  local _path="${extension_modules_path}/bash"
+
+  source_files "${_path}/initialize"
 }
 
 extension_version()
 {
-  (
-  extension="$1" ; shift
+  local _extension="${1:-}" ; shift
 
-  true ${extension_path:="$extensions_path/$extension"}
+  variable_is_nonempty ||
+    fail "Can not retrieve extension version as no extension was given."
 
-  if file_exists "${extension_path}/VERSION" ]] ; then
+  true ${extension_path:="${extensions_path}/${_extension}"}
+
+  file_exists "${extension_path}/VERSION" &&
     read -r extension_version < "${extension_path}/VERSION"
-    log "${extension}-${extension_version}"
-  else
-    log "${extension}-head"
-  fi
-  )
+
+  log "${extension}-${extension_version:-head}"
 }
 
 extension_action()
@@ -134,9 +135,8 @@ extension_action()
 
 display_extension_license()
 {
-  if [[ -d "${extension_path:-}" ]] ; then
+  file_exists "${extension_path}/LICENSE" &&
     log "License:\n\n$(cat -v ${extension_path}/LICENSE)\n"
-  fi
 }
 
 installed_extensions()
@@ -171,10 +171,10 @@ extensions_in()
     extension_name="${extension_source_path//*\/}"
 
     case ${extension_name} in
-      bdsm|extension|[[=.=]]*)
+      (bdsm|extension|[[=.=]]*)
         true # Ignore for now.
         ;;
-      *)
+      (*)
         extensions[${#extensions[@]}]="${extension_name//*\//}"
         ;;
     esac
@@ -189,7 +189,8 @@ display_extension_licence()
 {
   local _extension="${1:-}"
 
-  [[ -n "${_extension}" ]] || fail "Extension not given."
+  variable_is_nonempty _extension ||
+    fail "Can not display extension license as an extension was not given."
 
   cat -v "${extensions_path}/${_extension}/LICENSE"
 }

@@ -1,23 +1,20 @@
 #!/usr/bin/env bash
 
-usage()
+bdsm_version()
 {
-  modules help
-  description "BDSM self-installer."
-  actions "  head   - Get the latest BDSM from the git repository master branch
-    latest - Download and install the latest BDSM release package"
-  show_help
-}
-
-version()
-{
-  read -r bdsm_version < "$bdsm_path/VERSION"
-  log "\nbdsm ${bdsm_version:-"?.?.?"} https://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)\n"
+  if file_is_nonempty "$bdsm_path/VERSION" ; then
+    read -r bdsm_version < "$bdsm_path/VERSION"
+  else
+    bdsm_version="?.?.?"
+  fi
 }
 
 usage()
 {
-  version
+  bdsm_version
+
+  log "\nbdsm ${bdsm_version} https://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)\n"
+
   extension_action "bdsm" "help"
 }
 

@@ -7,6 +7,11 @@ for ((index=0 ; index < $number_of_args ; index++)) ; do
   token="${extension_args[$index]}"
 
   case "$token" in
+    --trace)
+      export trace_flag=1
+      enable_trace
+      ;;
+
     head|master)
       # TODO: Set env vars instead of calling the method.
       install_head
@@ -22,11 +27,6 @@ for ((index=0 ; index < $number_of_args ; index++)) ; do
       # TODO: Set env vars instead of calling the method.
       fetch_version
       install_release
-      ;;
-
-    --trace)
-      export trace_flag=1
-      enable_trace
       ;;
 
     help|usage)

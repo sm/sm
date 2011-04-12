@@ -14,8 +14,7 @@ true \
   ${releases_url:="http://bdsm.beginrescueend.com/releases"}
 
 # Load the BDSM framework version.
-file_is_nonempty "$bdsm_path/VERSION" &&
-  read -r bdsm_version < "$bdsm_path/VERSION"
+bdsm_version
 
 user="$USER"
 

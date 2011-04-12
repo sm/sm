@@ -49,5 +49,10 @@ usage()
 
   [[ -n "${help_resources}" ]] && \
     log "\nResources\n${help_resources}"
+
+  [[ "${extension}" = "core" || "${extension}" = "<extension>" ]] && {
+    log "\nExtensions Installed\n\n  $(installed_extensions)"
+    log "\nExtensions Available\n\n  $(available_extensions)\n"
+  }
 }
 

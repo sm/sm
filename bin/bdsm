@@ -25,12 +25,14 @@ true "${modules_path:="${bdsm_path}/modules"}"
 export initial_pwd="$PWD" # record this early on.
 
 # Load BDSM bash DSL and initialize for BDSM core itself manually.
-source "${modules_path}/bash/trace/dsl" # Ensure backtrace is defined early.
-source "${modules_path}/bash/core/dsl"
-source "${modules_path}/bash/logging/dsl"
+# Ensure that backtrace and logging are defined first as everything depends on them.
+for script in dsl initialize ; do
+  for module in trace logging core ; do
+    source "${modules_path}/bash/${module}/${script}"
+  done
+done ; unset script module
 
-# Now initialize & process CLI arguments.
-source "${modules_path}/bash/core/initialize"
+# Now process CLI arguments.
 source "${modules_path}/bash/core/cli"
 
 [[ -n "$error_message" ]] && fail "$error_message"
@@ -40,7 +42,7 @@ source "${modules_path}/bash/core/cli"
 #
 if [[ -n ${extension} ]] ; then
   if [[ "${action}" = "version" ]] ; then
-    version
+    extension_action "core" "version"
   elif [[ -n "${action}" ]] ; then
     extension_action "${extension}" "${action}"
   else

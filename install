@@ -19,7 +19,7 @@ fi
 true "${modules_path:="${bdsm_path}/modules"}"
 
 # Load DSL and initialize BDSM core itself, manually.
-source "./modules/bash/core/dsl"
+source "${PWD}/modules/bash/core/dsl"
 
 mkdir -p log tmp
 

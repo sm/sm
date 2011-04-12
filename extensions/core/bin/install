@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+# NOTE: This action is *not* to be called directly but instead loaded from
+#       the './install' installer script.
+#       It is for this reason that this action file is not executable.
+#
+#       The CLI remaps 'bdsm install X' to 'bdsm ext install X'
+#
+
 directories=( bin config modules log tmp )
 extensions=( core ext mod )
 files=( LICENSE VERSION README.md )

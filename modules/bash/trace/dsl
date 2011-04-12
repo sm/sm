@@ -23,35 +23,29 @@ enable_debug()
 
 enable_backtrace()
 {
-  trap 'backtrace ${lineno}' ERR
+  trap 'backtrace 69 $? ${LINENO}' ERR
 }
 
 backtrace()
 {
-  echo "\n\$?: $?\n"
-
   local _source _function _line
 
-  local _message="${1}" _status="${2:-0}" _string=""
+  local _status="${1:-0}" _message="${1}"
 
-  [[ ${_status} -gt 0 ]] ||
+  if [[ ${_status} -gt 0 && ${_status} -ne 69 ]] ; then
     return 0 # If the return status was success, do not print a backtrace
+  fi
+  # printf "%s\n" "There has been an error..."
+  # printf "%s\n" " on or around line ${BASH_LINENO[0]}"
+  # printf "%s\n" " of ${BASH_SOURCE[0]}"
+  # printf "%s\n" " in ${FUNCNAME[0]}()"
+  # [[ -n "${_message}" ]] &&
+  #   printf "%s\n" "  with message: ${_message}"
+  # printf "%s\n" "  and exit status ${_status}"
+  # printf "%s\n" "${_string}"
+  # printf "  %6s %6s %-20s %-55s\n" "Trace" "Line" "Function" "File" 1>&2
 
-  echo "\$*: $*"
-
-  _string+="On or around line ${BASH_LINENO[0]}"
-  _string+=" of ${BASH_SOURCE[0]}"
-  _string+=" in ${FUNCNAME[0]}()"
-
-  [[ -n "${_message}" ]] && _string+="  Message: ${_message}"
-
-  _string+="Exiting with status ${_status}"
-
-  printf "%s" "${_string}"
-
-  printf "  %6s %6s %-20s %-55s\n" "Trace" "Line" "Function" "File" 1>&2
-
-  for (( index = 0 ; index < (${#FUNCNAME[@]}) ; ++index )) ; do
+  for (( index = 1 ; index < (${#FUNCNAME[@]}) ; ++index )) ; do
     # line="${LINENO} > "
     _source="${BASH_SOURCE[${index}]}" # "##${bdsm_path}}"
     _function="${FUNCNAME[${index}]:+${FUNCNAME[${index}]}()}"
