@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+modules help
+
 description "BDSM Extension manager."
 
 actions "  update repository - Update main BDSM Extension repository from remote (git).
@@ -13,5 +15,5 @@ actions "  update repository - Update main BDSM Extension repository from remote
 
 resources "http://bdsm.beginrescueend.com/${extension}/"
 
-show_help
+show_help usage
 

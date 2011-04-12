@@ -2,6 +2,3 @@
 
 modules defaults package
 
-read_default version prefix package
-read_default base_url prefix package
-
