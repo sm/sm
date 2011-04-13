@@ -95,6 +95,7 @@ while [[ $# -gt 0 ]] ; do
             bdsmrc)
               extension="core"
               action="$token"
+              extension_args=("${action}" "$@")
               parse_break=1
               ;;
 

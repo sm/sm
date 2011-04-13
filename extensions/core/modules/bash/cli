@@ -25,14 +25,5 @@ for ((index=0 ; index < $number_of_args ; index++)) ; do
     latest|release)
       extension_action="latest"
       ;;
-
-    bdsmrc|help|usage|version|edit)
-      true # allow action to run.
-      ;;
-
-    *)
-      usage
-      exit 1
-      ;;
   esac
 done
