@@ -268,10 +268,11 @@ package_activate()
 {
   local _package="${1:-}" _version="${2:-}"
 
-  ensure_nonempty _package
+  variable_is_nonempty _package ||
+    fail "Package name must be given as the 1st parameter."
 
   variable_is_nonempty _version ||
-    fail "Variable must be specified as the 2nd parameter!"
+    fail "Package version must be given as the 2nd parameter!"
 
   package_deactivate "${_package}"
 
@@ -291,13 +292,13 @@ package_deactivate()
 
   ensure_nonempty _package
 
-  symlink_exists "${prefix_path}/${_package}/active" &&
+  symlink_exists "${prefix_path}/${_package}/active" && \
     remove_files "${prefix_path}/${_package}/active"
 
-  file_exists "/etc/ld.so.profile.d/${_package}.conf" &&
+  file_exists "/etc/ld.so.profile.d/${_package}.conf" && \
     remove_files "/etc/ld.so.profile.d/${_package}.conf"
 
-  file_exists "/etc/profile.d/${_package}.sh" &&
+  file_exists "/etc/profile.d/${_package}.sh" && \
     remove_files "/etc/profile.d/${_package}.sh"
 }
 
@@ -450,7 +451,6 @@ package_usage() {
 
 package_cli()
 {
-
   number_of_args=${#extension_args[@]}
 
   for ((index=0 ; index < $number_of_args ; index++)) ; do
