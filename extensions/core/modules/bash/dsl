@@ -15,7 +15,7 @@ usage()
 
   log "\nbdsm ${bdsm_version} https://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)\n"
 
-  extension_action "bdsm" "help"
+  extension_action "core" "help"
 }
 
 fetch_version()

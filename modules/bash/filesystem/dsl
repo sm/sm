@@ -416,8 +416,7 @@ enter()
 {
   local _path="$1"
 
-  builtin cd "${_path}" ||
-    fail "Could not enter directory ${_path}."
+  builtin cd "${_path}" || fail "Could not enter directory ${_path}."
 }
 
 hash_file()
