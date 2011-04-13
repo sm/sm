@@ -137,8 +137,7 @@ extension_action()
 
 display_extension_license()
 {
-
-  local _extension="${1:-}"
+  local _extension="${1:-${extension}}"
 
   variable_is_nonempty _extension ||
     fail "Can not display extension license as an extension was not given."
