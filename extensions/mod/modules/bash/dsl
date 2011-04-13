@@ -3,9 +3,8 @@
 # Print out a list of all installed modules.
 modules_installed()
 {
-  local _module _modules
-  local _path="${bdsm_modules_path}/bash/${_module}"
-  _modules=($(find "${_path}" -mindepth 1 -maxdepth 1 -type d | sed -e 's#.*/##g' -e '/\..*/d'))
+  local _module
+  local _modules=($(find "${modules_path}" -mindepth 1 -maxdepth 1 -type d | sed -e 's#.*/##g' -e '/\..*/d'))
   for _module in ${_modules[@]} ; do
     printf "%s\n" "${_module}"
   done
@@ -14,8 +13,7 @@ modules_installed()
 # Print out a list of all dsl for the given module.
 module_dsl()
 {
-  local _function _dsl
-  local _module="${1:-}"
+  local _function _dsl _module="${1:-}"
   # [[ -n "${_module}" ]] || fail "... module not given"
   local _path="${bdsm_modules_path}/bash/${_module}"
   _dsl=(
