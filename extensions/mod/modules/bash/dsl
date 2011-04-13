@@ -4,7 +4,8 @@
 modules_installed()
 {
   local _module
-  local _modules=($(find "${modules_path}" -mindepth 1 -maxdepth 1 -type d | sed -e 's#.*/##g' -e '/\..*/d'))
+  local _module_type="${1:-"bash"}"
+  local _modules=($(find "${modules_path}/${_module_type}" -mindepth 1 -maxdepth 1 -type d | sed -e 's#.*/##g' -e '/\..*/d'))
   for _module in ${_modules[@]} ; do
     printf "%s\n" "${_module}"
   done
