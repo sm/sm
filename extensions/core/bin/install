@@ -29,7 +29,6 @@ log "  Removing core and old extensions, if they exist"
 remove_paths "${extensions[@]}" extension bdsm
 ) || fail "Could not create installation target"
 
-
 (
 log "  Ensuring auxillary directories (${aux[@]}) exist in ${bdsm_path}"
 ensure_paths_exist "${bdsm_path}/" "${aux[@]}"

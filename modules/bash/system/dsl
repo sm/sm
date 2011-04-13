@@ -280,7 +280,7 @@ os_cpu_count()
   elif os_is_linux ; then
     _count=0
     while read -r line ; do
-      case "$line" in (processor*) ((_count++)) ;; esac
+      case "$line" in (processor*) : ((++_count)) ;; esac
     done < /proc/cpuinfo
   fi
 
