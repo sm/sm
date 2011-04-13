@@ -109,6 +109,7 @@ extension_action()
   case "${action_type}" in
     bash)
       (
+      enable_backtrace
       modules core
 
       source_files \

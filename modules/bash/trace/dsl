@@ -26,6 +26,11 @@ enable_backtrace()
   trap backtrace ERR
 }
 
+disable_backtrace()
+{
+  trap - ERR
+}
+
 backtrace()
 {
   local _source _function _line _index

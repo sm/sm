@@ -53,6 +53,7 @@ case "${action}" in
     extension_action "core" "version"
     ;;
   *)
+    disable_backtrace
     extension_action "${extension}" "${action}"
     ;;
 esac
