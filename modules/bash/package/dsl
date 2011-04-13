@@ -471,7 +471,7 @@ package_cli()
         package_version="${extension_args[$((++index))]}"
         ;;
       --licence)
-        display_extension_licence
+        display_extension_license
         exit 0
         ;;
       --help)

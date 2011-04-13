@@ -137,8 +137,13 @@ extension_action()
 
 display_extension_license()
 {
-  file_exists "${extension_path}/LICENSE" &&
-    log "License:\n\n$(cat -v ${extension_path}/LICENSE)\n"
+
+  local _extension="${1:-}"
+
+  variable_is_nonempty _extension ||
+    fail "Can not display extension license as an extension was not given."
+
+  cat -v "${extensions_path}/${_extension}/LICENSE"
 }
 
 installed_extensions()
@@ -187,12 +192,3 @@ extensions_in()
   printf "${extensions}"
 }
 
-display_extension_licence()
-{
-  local _extension="${1:-}"
-
-  variable_is_nonempty _extension ||
-    fail "Can not display extension license as an extension was not given."
-
-  cat -v "${extensions_path}/${_extension}/LICENSE"
-}
