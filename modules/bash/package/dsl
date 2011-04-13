@@ -268,13 +268,10 @@ package_activate()
 {
   local _package="${1:-}" _version="${2:-}"
 
-  variable_is_nonempty _package ||
-    fail "Package name must be given as the 1st parameter."
+  ensure_nonempty _package _version
 
-  variable_is_nonempty _version ||
-    fail "Package version must be given as the 2nd parameter!"
-
-  package_deactivate "${_package}"
+  symlink_exists "${prefix_path}/${_package}/active" &&
+    package_deactivate "${_package}"
 
   link "${prefix_path}/${_package}/${_version}" \
     to "${prefix_path}/${_package}/active"
