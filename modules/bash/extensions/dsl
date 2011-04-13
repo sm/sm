@@ -33,7 +33,7 @@ extension_action()
 {
   (
   unset extension action
-
+  result=0
   export extension="${1:-}" ; shift
   export action="${1:-}" ; shift
   export extension_args="${extension_args:-$@}"
@@ -118,7 +118,7 @@ extension_action()
         "${extension_modules_path}/bash/cli"
 
       source "${action_file}"
-      ) #  || result=$?
+      ) || result=$?
       ;;
     # ruby|python|lua|javascript)
       #   ADD "${modules_path}/${action_type}/" to the lib path so the script can require "bdsm"
@@ -131,9 +131,9 @@ extension_action()
       "${action_file}" "${extension_action}" "${extension_args[@]}"
       ;;
   esac
-  ) # || result=$?
+  # exit $result
+  ) || result=$?
 }
-
 
 display_extension_license()
 {

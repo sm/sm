@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 file_is_nonempty "$extension_templates_path/bdsmrc" ||
-  fail "${extension} ${action} ${FUNCNAME}()\n => The template file $extension_templates_path/bdsmrc is missing."
+  fail "The template file $extension_templates_path/bdsmrc is missing."
 
 if file_is_nonempty "$HOME/.bdsmrc" ; then
   true ${timestamp:=$(date +%m.%d.%Y-%H:%M:%S)}
