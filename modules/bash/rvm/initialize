@@ -9,5 +9,5 @@ rvm_files=("$rvm_path/.rvm/scripts/rvm" "$HOME/.rvm/scripts/rvm" "/usr/local/scr
 # Attempt to load RVM
 files=( $(first $(nonempty_files "${rvm_files[@]}" ) ) )
 
-array_is_nonempty "files" && source_files "$@"
+array_is_nonempty "files" && source_files "${files[@]}"
 

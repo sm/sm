@@ -480,6 +480,9 @@ file_is_nonempty()
   [[ -n "${_file}" ]] ||
     fail "File path/name was not given!"
 
+  [[ -d "${_file}" ]] &&
+    fail "when checking whether the file '${_file}' was nonempty found instead it was a directory."
+
   [[ -s "${_file}" ]]
 }
 
