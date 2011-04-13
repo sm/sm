@@ -143,7 +143,7 @@ while [[ $# -gt 0 ]] ; do
               parse_break=1
               ;;
 
-            edit|open|install)
+            edit|open|install|update)
               extension="ext"
               action="${token}"
               extension_args=("$@")
