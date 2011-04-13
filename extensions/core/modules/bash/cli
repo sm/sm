@@ -13,25 +13,21 @@ for ((index=0 ; index < $number_of_args ; index++)) ; do
       ;;
 
     head|master)
-      # TODO: Set env vars instead of calling the method.
-      install_head
+      extension_action="head"
       ;;
 
     +([[:digit:]]).+([[:digit:]]).+([[:digit:]])) # x.y.z
       # TODO: Set env vars instead of calling the method.
       version="${token}"
-      install_release
+      extension_action="version"
       ;;
 
     latest|release)
-      # TODO: Set env vars instead of calling the method.
-      fetch_version
-      install_release
+      extension_action="latest"
       ;;
 
-    help|usage)
-      usage
-      exit 0
+    bdsmrc|help|usage|version|edit)
+      true # allow action to run.
       ;;
 
     *)

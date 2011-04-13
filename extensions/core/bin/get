@@ -1,4 +1,17 @@
 #!/usr/bin/env bash
 
-install_head
+case "$extension_action" in
+  head)
+    install_head
+    ;;
+
+  version) # x.y.z
+    install_release
+    ;;
+
+  latest)
+    fetch_version
+    install_release
+    ;;
+esac
 
