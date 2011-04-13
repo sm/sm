@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-#
-# BDSM RVM module initialization
-#
+modules array
+
 source_files "/etc/rvmrc" "$HOME/.rvmrc"
 
 rvm_files=("$rvm_path/.rvm/scripts/rvm" "$HOME/.rvm/scripts/rvm" "/usr/local/scripts/rvm")
+
 # Attempt to load RVM
 files=( $(first $(nonempty_files "${rvm_files[@]}" ) ) )
 
-[[ ${#files[@]} -gt 0 ]] && source_files "$@"
+array_is_nonempty "files" && source_files "$@"
 
