@@ -7,7 +7,8 @@
 #       The CLI remaps 'bdsm install X' to 'bdsm ext install X'
 #
 
-directories=( bin config modules log tmp src )
+directories=( bin config modules  )
+aux=( log tmp src )
 extensions=( core ext mod )
 files=( LICENSE VERSION README.md )
 configs=( user defaults )
@@ -28,8 +29,15 @@ log "  Removing core and old extensions, if they exist"
 remove_paths "${extensions[@]}" extension bdsm
 ) || fail "Could not create installation target"
 
+
+(
+log "  Ensuring auxillary directories (${aux[@]}) exist in ${bdsm_path}"
+ensure_paths_exist "${bdsm_path}/" "${aux[@]}"
+)
+
 (
 log "  Installing core extensions (${extensions[@]}) into ${bdsm_path}/extensions"
+ensure_paths_exist "${bdsm_path}/extensions"
 enter extensions
 copy_directories_to "${bdsm_path}/extensions" "${extensions[@]}"
 )
