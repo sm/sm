@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+
+array_is_nonempty()
+{
+  local _array_name="$1"
+
+  variable_is_nonempty _array_name ||
+    fail "Cannot push onto array as an array name was not given."
+
+  eval "[[ \${#${_array_name}[@]} -gt 0 ]]"
+}
+
+array_length()
+{
+  local _array_name="$1"
+
+  variable_is_nonempty _array_name ||
+    fail "Cannot push onto array as an array name was not given."
+
+  eval "printf \"%s\\n\"\"\${#${_array_name}[@]}\""
+}
+
+array_last_element()
+{
+  local _array_name="$1" _length
+
+  variable_is_nonempty _array_name ||
+    fail "Cannot push onto array as an array name was not given."
+
+  eval "_length=\${#${_array_name}[@]}"
+
+  eval "printf \"%s\\n\"\"\${${_array_name}[${_length}]}\""
+}
+
+array_first_element()
+{
+  local _array_name="$1" _length
+
+  variable_is_nonempty _array_name ||
+    fail "Cannot push onto array as an array name was not given."
+
+  eval "printf \"%s\\n\" \"\${${_array_name}[0]}\""
+}
+
+array_push()
+{
+  local _array_name="$1" ; shift
+
+  variable_is_nonempty _array_name ||
+    fail "Cannot push onto array as an array name was not given."
+
+  local _element _elements=("$@")
+
+  for _element in "${_elemenets[@]}" ; do
+    eval "${_array_name}+=(\${_element})}"
+  done
+}
+
+array_append()
+{
+  local _array_name="$1" ; shift
+
+  variable_is_nonempty _array_name ||
+    fail "Cannot push onto array as an array name was not given."
+
+  local _element _elements=("$@")
+
+  for _element in "${_elemenets[@]}" ; do
+    eval "${_array_name}+=(\${_element})}"
+  done
+}
+
+array_shift()
+{
+  local _array_name="$1" ; shift
+
+  variable_is_nonempty _array_name ||
+    fail "Cannot push onto array as an array name was not given."
+
+  fail "array_shift() has not yet been implemented for the array module."
+}
+
+array_unshift()
+{
+  local _array_name="$1" ; shift
+
+  variable_is_nonempty _array_name ||
+    fail "Cannot push onto array as an array name was not given."
+
+  fail "array_unshift() has not yet been implemented for the array module."
+}
+
+array_join()
+{
+  local _array_name="$1" ; shift
+  local _separator="${1:-' '}" ; shift
+
+  #variable_is_nonempty _array_name ||
+    #fail "Cannot join array as an array name was not given."
+
+  eval "for (( index=0 ; index < \${#${_array_name}[@]} ; index++ )) ; do [[ \${index} -gt 0 ]] && printf \"%s\"${_separator}\"\" ; printf \"%s\" \"\${${_array_name}[\${index}]}\" ; done"
+}
+
