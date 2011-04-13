@@ -404,7 +404,7 @@ chmod_paths_recursively()
     fail "No paths given to chmod ${_permissions}."
 
   for _path in "${_paths[@]}" ; do
-    if directory_exists "${_directory}" ; then
+    if directory_exists "${_path}" ; then
       chmod -R ${_permissions} "${_path}"
     else
       error "Cannot chmod directory ${_path} to ${_permissions} as the directory does not exist."
