@@ -6,11 +6,11 @@ rvm_install()
     -s https://rvm.beginrescueend.com/install/rvm \
     -o rvm-installer
 
-  chmod +x rvm-installer
+  ensure_files_are_executable "rvm-installer"
 
   ./rvm-installer
 
-  rm -f rvm-installer
+  remove_files "rvm-installer"
 }
 
 install_gem()
