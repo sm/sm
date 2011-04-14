@@ -643,8 +643,53 @@ files_under_matching()
     fail "'${_path}' is not a directory!"
 
   [[ -n "${_pattern}" ]] ||
-    fail "'${_path}' is not a directory!"
+    fail "Cannot find files as a filename or pattern was not given."
 
   find "${_path}" -mindepth 1 -iname "${_pattern}" -type f
+}
+
+#
+# Replace contents in a file with a given (sed) regex pattern.
+#
+# Example:
+# replace_content "^PREFIX =.*" with "${install_path}" in Makefile
+#
+replace_content()
+{
+  local _token _pattern _content _file
+
+  while [[ $# -gt 0 ]] ; do
+    _token="$1" ; shift
+
+    case "${_token}" in
+      (with)
+        _content="${1:-}" ; shift
+        ;;
+      (in)
+        _file="${1}" ; shift
+        ;;
+      (*)
+        if [[ -z "${_pattern}" ]] ; then
+          _pattern="${_token}"
+        else
+          fail "Unknown token '${_token}' passed as a parameter.'"
+        fi
+        ;;
+    esac
+  done
+
+  [[ -n "${_pattern:-}" ]] ||
+    fail "Cannot replace content as not even a pattern was given."
+
+  [[ -n "${_content:-}" ]] ||
+    fail "Cannot replace content as the replacement content was not given, specify by 'with \"replacement text\"'."
+
+  [[ -n "${_file:-}" ]] ||
+    fail "Can not file content as the filename was not given, specify by 'in \"/path/to/filename\"'"
+
+  [[ -f "${_file:-}" ]] ||
+    fail "Can not replace file content as the file does not exist."
+
+  sed -i -e "s#${_pattern}#${_content}#g" "${_file}"
 }
 
