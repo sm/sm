@@ -19,7 +19,7 @@ show_help()
     esac
   done
 
-  ${help_command}
+  ${_help_command}
 }
 
 description() { help_description="$*" ; }
