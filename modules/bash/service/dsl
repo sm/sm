@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+
+service_start()
+{
+  if command_exists "${extension}_start" ; then
+    "${extension}_start"
+  else
+    file_is_executable "${init_scripts_path}/${extension}" ||
+      fail "${init_scripts_path}/${extension} is missing or not executable."
+
+    "${init_scripts_path}/${extension}" start
+  fi
+}
+
+service_stop()
+{
+  if command_exists "${extension}_stop" ; then
+    "${extension}_stop"
+  else
+    file_is_executable "${init_scripts_path}/${extension}" ||
+      fail "${init_scripts_path}/${extension} is missing or not executable."
+
+    "${init_scripts_path}/${extension}" stop
+  fi
+}
+
+service_restart()
+{
+  if command_exists "${extension}_restart" ; then
+    "${extension}_restart"
+  else
+    file_is_executable "${init_scripts_path}/${extension}" ||
+      fail "${init_scripts_path}/${extension} is missing or not executable."
+
+    "${init_scripts_path}/${extension}" restart
+  fi
+}
+
+service_status()
+{
+  if command_exists "${extension}_status" ; then
+    "${extension}_status"
+  else
+    file_is_executable "${init_scripts_path}/${extension}" ||
+      fail "${init_scripts_path}/${extension} is missing or not executable."
+
+    "${init_scripts_path}/${extension}" status
+  fi
+}
+
+service_logtail()
+{
+  if command_exists "${extension}_logtail" ; then
+    "${extension}_logtail"
+  else
+    file_is_executable "${init_scripts_path}/${extension}" ||
+      fail "${init_scripts_path}/${extension} is missing or not executable."
+
+    "${init_scripts_path}/${extension}" logtail
+  fi
+}
+
+service_info()
+{
+  if command_exists "${extension}_info" ; then
+    "${extension}_info"
+  else
+    file_is_executable "${init_scripts_path}/${extension}" ||
+      fail "${init_scripts_path}/${extension} is missing or not executable."
+
+    "${init_scripts_path}/${extension}" info
+  fi
+}
+
+service_configcheck()
+{
+  if command_exists "${extension}_configcheck" ; then
+    "${extension}_configcheck"
+  else
+    file_is_executable "${init_scripts_path}/${extension}" ||
+      fail "${init_scripts_path}/${extension} is missing or not executable."
+
+    "${init_scripts_path}/${extension}" configcheck
+  fi
+}
+
