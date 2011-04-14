@@ -163,7 +163,7 @@ while [[ $# -gt 0 ]] ; do
 
       [[ ${parse_break:-0} -eq 1 ]] && break
 
-      if [[ -z "$action" ]] ; then
+      if [[ -z "${action:-}" ]] ; then
         if [[ -x "${extensions_path}/${extension}/bin/$token" ]] ; then
           action="$token"
           extension_args=("$@")
@@ -175,10 +175,6 @@ while [[ $# -gt 0 ]] ; do
       elif [[ -d "/home/$token" ]] ; then
         project="$token"
         project_path="/home/$token"
-      else
-        # determine sanity of project
-        action="error"
-        error_message="Unrecognized command line argument(s): '$token $@'"
       fi
       ;;
   esac
