@@ -192,9 +192,21 @@ delete_user()
   fi
 }
 
-running_as_root() { [[ $UID -eq 0 ]] ; }
+running_as_root()      { [[ $UID -eq 0 ]] ; }
 running_as_superuser() { [[ $UID -eq 0 ]] ; }
-running_as_user() { [[ $UID -ne 0 ]] ; }
+running_as_user()      { [[ $UID -ne 0 ]] ; }
+
+must_be_root()
+{
+  running_as_user &&
+    fail "bdsm $extension $action must be run as a root and NOT as a user ($USER)."
+}
+
+must_not_be_root()
+{
+  running_as_root &&
+    fail "bdsm $extension $action must be run as a (project) user and NOT as root."
+}
 
 run_as_user()
 {
