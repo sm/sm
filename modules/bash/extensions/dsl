@@ -112,6 +112,8 @@ extension_action()
       enable_backtrace
       modules core
 
+      [[ "${action}" = "help"]] && modules help
+
       source_files \
         "${extension_modules_path}/bash/dsl" \
         "${extension_modules_path}/bash/initialize" \
