@@ -2,21 +2,24 @@
 
 show_help()
 {
-  while [[ $# -gt 0 ]] ; do
-    token="$1" ; shift
+  local _help_command _token
 
-    case "$token" in
+  while [[ $# -gt 0 ]] ; do
+    _token="$1" ; shift
+    case "${_token}" in
       desc*|description)
-        description
+        _help_command="description"
         ;;
       actions)
-        actions
+        _help_command="actions"
         ;;
       help|usage|*)
-        usage
+        _help_command="usage"
         ;;
     esac
   done
+
+  ${help_command}
 }
 
 description() { help_description="$*" ; }
