@@ -192,6 +192,7 @@ delete_user()
   fi
 }
 
+# TODO: Move these to a user Module.
 running_as_root()      { [[ $UID -eq 0 ]] ; }
 running_as_superuser() { [[ $UID -eq 0 ]] ; }
 running_as_user()      { [[ $UID -ne 0 ]] ; }

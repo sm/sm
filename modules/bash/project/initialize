@@ -4,28 +4,13 @@
 # BDSM project module initialization
 #
 # When run as root, we must ensure that project and project_path are set.
-if [[ $UID -eq 0 ]] ; then
-  [[ -n "$project" ]] || fail "'project' must be set in bdsmrc"
-  [[ -n "$project_path" ]] || fail "'project_path' is not set."
+if [[ $UID -gt 0 ]] ; then
+  true \
+    "${project:="$USER"}" \
+    "${project_path:="$HOME"}"
 fi
 
-true \
-  "${project:="$USER"}" \
-  "${project_path:="$HOME"}"
-
-true \
-  "${shared_path:=${project_path}/shared}" \
-  "${release_path:=${project_path}/current}" \
-  "${environment:="production"}"
-
-true \
-  "${vcs:=$(vcs "${shared_path}/${project}")}"
-
-log_path="$shared_path/log" # Override default BDSM log path.
-extension_log_path="${log_path}"
+[[ -n "${project:-}" && -n "${project_path:-}" ]] && project_initialize
 
 export project environment project_path shared previous_path release_path stage_path log_path
 
-database_name="${database_name:-"${project}_${environment}"}"
-
-source_files ".${project}rc"

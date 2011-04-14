@@ -1,5 +1,27 @@
 #!/usr/bin/env bash
 
+project_initialize()
+{
+  if [[ -n "${project_path}" ]] ; then
+    true \
+      "${shared_path:=${project_path}/shared}" \
+      "${release_path:=${project_path}/current}" \
+      "${environment:="production"}"
+
+    true \
+      "${vcs:=$(vcs "${shared_path}/${project}")}"
+
+    log_path="$shared_path/log" # Override default BDSM log path.
+    extension_log_path="${log_path}"
+  fi
+
+  if [[ -n "${project}" ]] ; then
+    database_name="${database_name:-"${project}_${environment}"}"
+
+    source_files ".${project}rc"
+  fi
+}
+
 vcs()
 {
   local _path="$1"
