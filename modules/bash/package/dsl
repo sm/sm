@@ -470,6 +470,24 @@ package_cli()
       --version)
         package_version="${extension_args[$((++index))]}"
         ;;
+      --base_url)
+        package_base_url="${extension_args[$((++index))]}"
+        ;;
+      --file)
+        package_file="${extension_args[$((++index))]}"
+        ;;
+      --directory)
+        package_directory="${extension_args[$((++index))]}"
+        ;;
+      --archive_format)
+        archive_format="${extension_args[$((++index))]}"
+        ;;
+      --md5)
+        package_md5="${extension_args[$((++index))]}"
+        ;;
+      --md5)
+        package_md5="${extension_args[$((++index))]}"
+        ;;
       --licence)
         display_extension_license
         exit 0
