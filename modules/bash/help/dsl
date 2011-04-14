@@ -2,7 +2,7 @@
 
 show_help()
 {
-  local _help_command _token
+  local _help_command="usage" _token
 
   while [[ $# -gt 0 ]] ; do
     _token="$1" ; shift
@@ -13,13 +13,10 @@ show_help()
       actions)
         _help_command="actions"
         ;;
-      help|usage|*)
-        _help_command="usage"
-        ;;
     esac
   done
 
-  ${_help_command}
+  "${_help_command}"
 }
 
 description() { help_description="$*" ; }
