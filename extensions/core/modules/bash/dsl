@@ -20,7 +20,8 @@ usage()
 
 fetch_version()
 {
-  version=$(curl -s "${releases_url}/latest-version.txt" 2>/dev/null)
+  version=$(curl -s "${releases_url}/latest-version.txt" 2>/dev/null) ||
+    fail "Unable to fetch version from "
 }
 
 fetch_md5()
