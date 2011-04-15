@@ -181,12 +181,11 @@ move_file()
     token="$1" ; shift
     case "${token}" in
       to)
-        _target="${1}"
-        shift
+        _target="${1}" ; shift
         ;;
+
       from)
-        _source="${1}"
-        shift
+        _source="${1}" ; shift
         ;;
 
       *)
@@ -201,6 +200,12 @@ move_file()
         ;;
     esac
   done
+
+  [[ -n "${_source}" ]] ||
+    fail "Cannot move file as the source and target must be specified. "
+
+  [[ -n "${_target}" ]] ||
+    fail "Cannot move file as the source and target must be specified. "
 
   mv "${_source}" "${_target}"
 }
