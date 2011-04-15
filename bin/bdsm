@@ -4,8 +4,9 @@
 # See BDSM LICENSE file for Apache 2.0 license information.
 
 # Load System then User Configuration, if exists.
-[[ -s "/etc/bdsmrc" ]] && . /etc/bdsmrc
-[[ -s "$HOME/.bdsmrc" ]] && . "$HOME/.bdsmrc"
+for file in /etc/profile /etc/bdsmrc "$HOME/.bdsmrc" ; do
+  [[ -s "${file}" ]]  && . "${file}"
+done
 
 # In case bdsm is being called from within a hook for example, we unset these:
 unset extension action
