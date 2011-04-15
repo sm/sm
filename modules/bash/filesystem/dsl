@@ -190,9 +190,9 @@ move_file()
 
       *)
         if [[ -z "${_source}" ]] ; then
-          _source="$token" ; shift
+          _source="$token"
         elif [[ -z "${_target}" ]] ; then
-          _target="$token" ; shift
+          _target="$token"
           break # When we have a target we are done.
           # An alternative idea would be to allow an array of multiple targets
           # to symlink to...
