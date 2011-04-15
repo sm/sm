@@ -168,6 +168,7 @@ link()
   elif [[ -d "${_target}" ]] ; then
     error "Cannot link ${_source} to ${_target} exists and is a directory"
   else
+    ensure_paths_exist "${_target%\/*}"
     ln -fs "${_source}" "${_target}"
   fi
 }
