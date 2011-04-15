@@ -9,7 +9,7 @@ template_exists()
 
 install_template()
 {
-  local _name _target _source _mode
+  local _name _target _source _mode=0644 _owner=$USER
 
 
   while [[ $# -gt 0 ]] ; do
@@ -22,6 +22,10 @@ install_template()
 
       mode)
          _mode="$1" ; shift
+        ;;
+
+      owner)
+         _owner="$1" ; shift
         ;;
 
       from) # TODO: finish this part.
@@ -51,11 +55,13 @@ install_template()
         fail "${_target}/${_name} is a directory, cannot install template ${_name}"
       else
         cp -f "${_template}" "${_target}/${_name}"
-        [[ -n "${_mode:-}" ]] && chmod "${_mode:-}" "${_target}/${_name}"
+        [[ -n "${_mode:-}" ]] && chmod "${_mode}" "${_target}/${_name}"
+        [[ -n "${_owner:-}" ]] && chown "${_owner}" "${_target}/${_name}"
       fi
     else
       cp -f "${_template}" "${_target}"
-      [[ -n "${_mode:-}" ]] && chmod "${_mode:-}" "${_target}"
+      [[ -n "${_mode:-}" ]] && chmod "${_mode}" "${_target}"
+      [[ -n "${_owner:-}" ]] && chown "${_owner}" "${_target}"
     fi
   else
     fail "Template missing: #{_template}"
