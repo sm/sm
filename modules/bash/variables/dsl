@@ -29,5 +29,13 @@ ensure_nonempty()
   done
 }
 
-variable_is_nonempty() { eval "[[ -n \"\${${1}:-}\" ]]" ; }
+variable_is_nonempty()
+{
+  local _variable="${1:-}"
+
+  [[ -n "${_variable}"]] ||
+    fail "Cannot check if variable is nonempty, no variable was given."
+
+  eval "[[ -n \"\${${_variable}:-}\" ]]"
+}
 
