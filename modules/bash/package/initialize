@@ -56,8 +56,10 @@ true \
   "${archive_format:=tar.gz}" \
   "${data_path:="${data_base_path}/${package_version}"}"
 
+ensure_paths_exist "${prefix_path}/bin" "${prefix_path}/man" "${prefix_path}/lib"
 
 export LDFLAGS="${LDFLAGS:-} -L${prefix_path}/lib"
 
 export package_name prefix_path package_name package_version archive_format package_file package_url package_md5_url prefix_path bin_path source_path
+
 
