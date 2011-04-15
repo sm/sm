@@ -33,8 +33,10 @@ disable_backtrace()
 
 backtrace()
 {
+  set +o xtrace
+
   local _source _function _line _index
-  printf "  %6s %6s %-20s %-55s\n" "Trace" "Line" "Function" "File" 1>&2
+  printf "Error Backtrace:\n  %6s %6s %-20s %-55s\n" "Trace" "Line" "Function" "File" 1>&2
   for (( _index=1 ; _index < ${#FUNCNAME[@]} ; ++_index )) ; do
     _source="${BASH_SOURCE[${_index}]}"
     _function="${FUNCNAME[${_index}]:+${FUNCNAME[${_index}]}()}"
