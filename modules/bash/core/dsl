@@ -23,6 +23,7 @@ bdsm_exports()
 
 modules()
 {
+  disable_trace
   local _module _bdsm _extension _path _file _modules=("$@")
 
   [[ ${#_modules[@]} -gt 0 ]] || fail "No modules specified to load."
@@ -33,12 +34,11 @@ modules()
 
     for _path in "${_bdsm}" "${_extension}" ; do
       for _file in dsl initialize cli ; do
-        if [[ -s "${_path}/${_file}" ]] ; then
-          source "${_path}/${_file}"
-        fi
+        [[ -s "${_path}/${_file}" ]] && source "${_path}/${_file}"
       done
     done
   done
+  enable_trace
 }
 
 load()
