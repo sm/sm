@@ -13,12 +13,22 @@ enable_trace()
   set -o xtrace
 }
 
+disable_trace()
+{
+  set +o xtrace
+}
+
 enable_debug()
 {
   [[ ${debug_flag:-0} -eq 1 ]] || return 0
 
   export debug_flag
   set -o verbose
+}
+
+disable_debug()
+{
+  set +o verbose
 }
 
 enable_backtrace()
