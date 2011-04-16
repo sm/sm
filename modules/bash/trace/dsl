@@ -15,7 +15,7 @@ enable_trace()
 
 disable_trace()
 {
-  set +o xtrace
+  [[ ${trace_flag:-0} -lt 2 ]] && set +o xtrace
 }
 
 enable_debug()

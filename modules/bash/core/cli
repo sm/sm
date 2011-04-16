@@ -49,7 +49,8 @@ while [[ $# -gt 0 ]] ; do
           ;;
 
         --debug)
-          debug_flag=1
+          ((debug_flag++))
+          enable_debug
           ;;
 
         -v|--version)
@@ -58,14 +59,14 @@ while [[ $# -gt 0 ]] ; do
           ;;
 
         --trace)
-          trace_flag=1
-          source "${modules_path}/bash/trace/initialize"
+          ((trace_flag++))
+          enable_trace
           ;;
 
         --) extension_args=("$@") # Stop processing arguments.
           ;;
         *)
-          error "Unknown flag ${token}"
+          error "Unknown flag '${token}'"
           exit 1
           ;;
       esac
@@ -152,10 +153,10 @@ while [[ $# -gt 0 ]] ; do
               ;;
 
             *)
-              if [[ -z "${extension}" ]] ; then
-                error "Extension ${token} not found"
+              [[ -z "${extension}" ]] || {
+                error "Extension '${token}' not found"
                 exit 1
-              fi
+              }
               ;;
           esac
         fi
