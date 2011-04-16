@@ -2,17 +2,10 @@
 
 bdsm_path()
 {
-  if [[ $UID -eq 0 ]] ; then
-    true "${prefix:=/usr/local}"
-  else
-    true "${prefix:=$HOME}"
-  fi
+  [[ $UID -eq 0 ]] && { : "${prefix:=/usr/local}"; } ||{ : "${prefix:=$HOME}"; }
 
-  if [[ "$prefix" = "$HOME" ]] ; then
-    true "${bdsm_path:="${prefix}bdsm"}"
-  else
-    true "${bdsm_path:="${prefix}/bdsm"}"
-  fi
+  [[ "$prefix" = "$HOME" ]] && { : "${bdsm_path:="${prefix}bdsm"}"; } ||
+    { : "${bdsm_path:="${prefix}/bdsm"}"; }
 }
 
 bdsm_exports()
@@ -26,7 +19,7 @@ modules()
   disable_trace
   local _module _bdsm _extension _path _file _modules=("$@")
 
-  [[ ${#_modules[@]} -gt 0 ]] || fail "No modules specified to load."
+  (( ${#_modules[@]} > 0 )) || fail "No modules specified to load."
 
   for _module in "${_modules[@]}" ; do
     _bdsm="${modules_path}/bash/${_module}"
@@ -67,7 +60,7 @@ actions_for_extension() {
 
   _actions="${_actions[@]}" # Convert from array to string.
 
-  printf "${actions}"
+  printf "${_actions}"
 }
 
 # Source bdsmrc files, cascaded.
