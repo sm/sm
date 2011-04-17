@@ -7,8 +7,7 @@ source_files()
 {
   local _file _files=("$@")
 
-  [[ ${#_files[@]} -gt 0 ]] ||
-    fail "Cannot source files as no files were given."
+  (( ${#_files[@]} > 0 )) || fail "Cannot source files as no files were given."
 
   for _file in "${_files[@]}" ; do
     _file=${_file/\~\//$HOME\/} # Expand ~/ to full value of $HOME
@@ -27,8 +26,7 @@ nonempty_files()
 {
   local _file _files=("$@")
 
-  [[ ${#_files[@]} ]] ||
-    fail "Cannot return nonempty files as no files were given."
+  (( ${#_files[@]} > 0 )) || fail "Cannot return nonempty files as no files were given."
 
   for _file in "${_files[@]}" ; do
     file_is_nonempty "${_file}" && printf "${_file}\n"
@@ -39,8 +37,7 @@ ensure_paths_exist()
 {
   local _path _paths=("$@")
 
-  [[ ${#_paths[@]} ]] ||
-    fail "Cannot ensure paths exist as no paths were given."
+  (( ${#_paths[@]} > 0 )) || fail "Cannot ensure paths exist as no paths were given."
 
   for _path in "${_paths[@]}" ; do
     directory_exists "${_path}" || mkdir -p "${_path}"
@@ -51,8 +48,7 @@ remove_files()
 {
   local _file _files=("$@")
 
-  [[ ${#_files[@]} -gt 0 ]] ||
-    fail "Cannot remove files as no files were given."
+  (( ${#_files[@]} > 0 )) || fail "Cannot remove files as no files were given."
 
   for _file in "${_files[@]}" ; do
     if [[ -f "${_file}" || -L "${_file}" ]] ; then
@@ -71,8 +67,7 @@ remove_paths()
 {
   local _path _paths=("$@")
 
-  [[ ${#_paths[@]} -gt 0 ]] ||
-    fail "Cannot remove paths as no paths were given."
+  (( ${#_paths[@]} > 0 )) || fail "Cannot remove paths as no paths were given."
 
   for _path in "${_paths[@]}" ; do
     if [[ -f "${_path}" ]] ; then
@@ -93,8 +88,7 @@ ensure_files_exist()
 {
   local _file _files=("$@")
 
-  [[ ${#_files[@]} -gt 0 ]] ||
-    fail "Cannot ensure files exist as no files were given."
+  (( ${#_files[@]} > 0 )) || fail "Cannot ensure files exist as no files were given."
 
   for _file in "${_files[@]}" ; do
     [[ -e "${_file}" ]] || touch "${_file}"
@@ -107,8 +101,7 @@ ensure_files_are_executable()
 {
   local _file _files=("$@")
 
-  [[ ${#_files[@]} -gt 0 ]] ||
-    fail "Cannot ensure files are executable as no files were given."
+  (( ${#_files[@]} > 0 )) || fail "Cannot ensure files are executable as no files were given."
 
   for _file in "${_files[@]}" ; do
     [[ -d "${_file}" ]] &&
@@ -134,7 +127,7 @@ link()
 {
   local token _source _target _force_flag=0
 
-  while [[ $# -gt 0 ]] ; do
+  while (( $# > 0 )) ; do
     token="$1" ; shift
 
     case "${token}" in
@@ -158,9 +151,7 @@ link()
     esac
   done
 
-  if [[ ${_force_flag} -eq 1 ]] ; then
-    remove_files "${_target}"
-  fi
+  (( _force_flag == 1 )) && remove_files "${_target}"
 
   # TODO: What should we do if files already exist?
   if [[ -f "${_target}" ]] ; then
@@ -177,7 +168,7 @@ move_file()
 {
   local _source _target
 
-  while [[ $# -gt 0 ]] ; do
+  while (( $# > 0 )) ; do
     token="$1" ; shift
     case "${token}" in
       to)
@@ -201,11 +192,8 @@ move_file()
     esac
   done
 
-  [[ -n "${_source}" ]] ||
-    fail "Cannot move file as the source and target must be specified. "
-
-  [[ -n "${_target}" ]] ||
-    fail "Cannot move file as the source and target must be specified. "
+  [[ -n "${_source}" ]] || fail "Cannot move file as the source and target must be specified. "
+  [[ -n "${_target}" ]] || fail "Cannot move file as the source and target must be specified. "
 
   mv "${_source}" "${_target}"
 }
@@ -214,7 +202,7 @@ copy_file()
 {
   local _source _target
 
-  while [[ $# -gt 0 ]] ; do
+  while (( $# > 0 )) ; do
     token="$1" ; shift
     case "${token}" in
       to)
@@ -247,6 +235,9 @@ copy_files_to()
   local _path="$1" _file ; shift
   local _files=("$@")
 
+  [[ -n "${_path}" ]]     || fail "Path was not given as the first parameter."
+  (( ${#_files[@]} > 0 )) || fail "No files were given in order to copy them into ${_path}."
+
   ensure_paths_exist "${_path}"
 
   for _file in "${_files[@]}" ; do
@@ -265,11 +256,8 @@ copy_directories_to()
   local _path="${1}" _directory ; shift
   local _directories=("$@")
 
-  [[ -n "${_path}" ]] ||
-    fail "Path was not given as the first parameter."
-
-  [[ -n "${#_directories[@]}" ]] ||
-    fail "No directories were given in order to copy them into ${_path}."
+  [[ -n "${_path}" ]]           || fail "Path was not given as the first parameter."
+  (( ${#_directories[@]} > 0 )) || fail "No directories were given in order to copy them into ${_path}."
 
   ensure_paths_exist "${_path}"
 
@@ -287,11 +275,8 @@ move_files_to()
   local _path="$1" _file ; shift
   local _files=("$@")
 
-  [[ -n "${_path}" ]] ||
-    fail "Path was not given as the first parameter."
-
-  [[ -n "${#_files[@]}" ]] ||
-    fail "No files given in order to chmod ${_permissions} them."
+  [[ -n "${_path}" ]]     || fail "Path was not given as the first parameter."
+  (( ${#_files[@]} > 0 )) || fail "No files given in order to chmod ${_permissions} them."
 
   ensure_paths_exist "${_path}"
 
@@ -309,11 +294,8 @@ chown_files()
   local _identity="$1" _file; shift
   local _files=("$@")
 
-  [[ -n "${_identity}" ]] ||
-    fail "user[:group] not given as the first parameter."
-
-  [[ -n "${#_files[@]}" ]] ||
-    fail "No paths given to chmod ${_permissions}."
+  [[ -n "${_identity}" ]] || fail "user[:group] not given as the first parameter."
+  (( ${#_files[@]} > 0 )) || fail "No paths given to chmod ${_permissions}."
 
   for _file in "${_files[@]}" ; do
     if file_exists "${_file}" ; then
@@ -329,11 +311,8 @@ chown_paths()
   local _identity="$1" _path ; shift
   local _paths=("$@")
 
-  [[ -n "${_identity}" ]] ||
-    fail "user[:group] not given as the first parameter."
-
-  [[ -n "${#_paths[@]}" ]] ||
-    fail "No paths given to chmod ${_permissions}."
+  [[ -n "${_identity}" ]] || fail "user[:group] not given as the first parameter."
+  (( ${#_paths[@]} > 0 )) || fail "No paths given to chmod ${_permissions}."
 
   for _path in "${_paths[@]}" ; do
     if directory_exists "${_path}" ; then
@@ -349,11 +328,8 @@ chown_paths_recursively()
   local _identity="$1" _path ; shift
   local _paths=("$@")
 
-  [[ -n "${_identity}" ]] ||
-    fail "user[:group] not given as the first parameter!!"
-
-  [[ -n "${#_paths[@]}" ]] ||
-    fail "No paths given to chmod ${_permissions}."
+  [[ -n "${_identity}" ]] || fail "user[:group] not given as the first parameter!!"
+  (( ${#_paths[@]} > 0 )) || fail "No paths given to chmod ${_permissions}."
 
   for _path in "${_paths[@]}" ; do
     if directory_exists "${_path}" ; then
@@ -369,6 +345,9 @@ chmod_files()
   local _permissions="$1" _file ; shift
   local _files=("$@")
 
+  [[ -n "${_permissions}" ]] || fail "Permissions not given as the first parameter!!"
+  (( ${#_files[@]} > 0 ))    || fail "No files given to chmod ${_permissions}."
+
   for _file in "${_files[@]}" ; do
     if file_exists "${_file}" ; then
       chmod ${_permissions} "${_file}"
@@ -383,11 +362,8 @@ chmod_paths()
   local _permissions="$1" _path ; shift
   local _paths=("$@")
 
-  [[ -n "${_permissions}" ]] ||
-    fail "Permissions not given as the first parameter!!"
-
-  [[ -n "${#_paths[@]}" ]] ||
-    fail "No paths given to chmod ${_permissions}."
+  [[ -n "${_permissions}" ]] || fail "Permissions not given as the first parameter!!"
+  (( ${#_paths[@]} > 0 ))    || fail "No paths given to chmod ${_permissions}."
 
   for _path in "${_paths[@]}" ; do
     if directory_exists "${_directory}" ; then
@@ -403,11 +379,9 @@ chmod_paths_recursively()
   local _permissions="${1:-}" _path ; shift
   local _paths=("$@")
 
-  [[ -n "${_permissions}" ]] ||
-    fail "Permissions not given as the first parameter!!"
+  [[ -n "${_permissions}" ]] || fail "Permissions not given as the first parameter!!"
 
-  [[ -n "${#_paths[@]}" ]] ||
-    fail "No paths given to chmod ${_permissions}."
+  (( ${#_paths[@]} > 0 )) || fail "No paths given to chmod ${_permissions}."
 
   for _path in "${_paths[@]}" ; do
     if directory_exists "${_path}" ; then
@@ -463,8 +437,7 @@ file_is_executable()
 {
   local _file="${1:-}"
 
-  [[ -n "${_file}" ]] ||
-    fail "File path/name was not given!"
+  [[ -n "${_file}" ]] || fail "File path/name was not given!"
 
   [[ -x "${_file}" ]]
 }
@@ -473,8 +446,7 @@ file_exists()
 {
   local _file="${1:-}"
 
-  [[ -n "${_file}" ]] ||
-    fail "File path/name was not given!"
+  [[ -n "${_file}" ]] || fail "File path/name was not given!"
 
   [[ -f "${_file}" ]]
 }
@@ -483,8 +455,7 @@ file_is_nonempty()
 {
   local _file="${1:-}"
 
-  [[ -n "${_file}" ]] ||
-    fail "File path/name was not given!"
+  [[ -n "${_file}" ]] || fail "File path/name was not given!"
 
   [[ -d "${_file}" ]] &&
     fail "when checking whether the file '${_file}' was nonempty found instead it was a directory."
@@ -496,8 +467,7 @@ file_is_empty()
 {
   local _file="${1:-}"
 
-  [[ -n "${_file}" ]] ||
-    fail "File path/name was not given!"
+  [[ -n "${_file}" ]] || fail "File path/name was not given!"
 
   [[ -f "${_file}" && ! -s "${_file}" ]]
 }
@@ -506,8 +476,7 @@ file_is_missing()
 {
   local _file="${1:-}"
 
-  [[ -n "${_file}" ]] ||
-    fail "File path/name was not given!"
+  [[ -n "${_file}" ]] || fail "File path/name was not given!"
 
   [[ ! -f "${_file}" ]]
 }
@@ -515,21 +484,17 @@ file_is_missing()
 file_is_empty_or_missing() {
   local _file="${1:-}"
 
-  [[ -n "${_file}" ]] ||
-    fail "File path/name was not given!"
+  [[ -n "${_file}" ]] || fail "File path/name was not given!"
 
-  [[ ! -f "${_file}" || ! -s "${_file}" ]] ;
+  [[ ! -f "${_file}" || ! -s "${_file}" ]]
 }
 
 file_contains()
 {
   local _file="${1:-}" _pattern="${2:-}"
 
-  [[ -n "${_file}" ]] ||
-    fail "File path/name was not given!"
-
-  [[ -n "${_pattern}" ]] ||
-    fail "String pattern for search was not given!"
+  [[ -n "${_file}" ]]    || fail "File path/name was not given!"
+  [[ -n "${_pattern}" ]] || fail "String pattern for search was not given!"
 
   grep "${_pattern}" "${_file}" >/dev/null 2>&1
 }
@@ -538,8 +503,7 @@ symlink_exists()
 {
   local _file="${1:-}"
 
-  [[ -n "${_file}" ]] ||
-    fail "File path/name was not given!"
+  [[ -n "${_file}" ]] || fail "File path/name was not given!"
 
   [[ -L "${_file}" ]]
 }
@@ -548,8 +512,8 @@ symlink_exists()
 directory_exists()
 {
   local _directory="${1:-}"
-  [[ -n "${_directory}" ]] ||
-    fail "Directory name/path was not given!"
+
+  [[ -n "${_directory}" ]] || fail "Directory name/path was not given!"
 
   [[ -d "$_directory" ]]
 }
@@ -558,11 +522,8 @@ directories_in()
 {
   local _path="${1:-}"
 
-  [[ -n "${path}" ]] ||
-    fail "Directory name/path was not given!"
-
-  [[ -d "${_path}" ]] ||
-    fail "'${_path}' is not a directory!"
+  [[ -n "${path}" ]]  || fail "Directory name/path was not given!"
+  [[ -d "${_path}" ]] || fail "'${_path}' is not a directory!"
 
   find "${_path}" -mindepth 1 -maxdepth 1 -type d
 }
@@ -571,14 +532,9 @@ directories_in_matching()
 {
   local _path="${1:-}" _pattern="${2:-}"
 
-  [[ -n "${path}" ]] ||
-    fail "Directory name/path was not given!"
-
-  [[ -d "${_path}" ]] ||
-    fail "'${_path}' is not a directory!"
-
-  [[ -n "${_pattern}" ]] ||
-    fail "'${_path}' is not a directory!"
+  [[ -n "${path}" ]]     || fail "Directory name/path was not given!"
+  [[ -d "${_path}" ]]    || fail "'${_path}' is not a directory!"
+  [[ -n "${_pattern}" ]] || fail "'${_path}' is not a directory!"
 
   find "${_path}" -mindepth 1 -maxdepth 1 -type d
 }
@@ -587,11 +543,8 @@ directories_under()
 {
   local _path="${1:-}"
 
-  [[ -n "${path}" ]] ||
-    fail "Directory name/path was not given!"
-
-  [[ -d "${_path}" ]] ||
-    fail "'${_path}' is not a directory!"
+  [[ -n "${path}" ]]  || fail "Directory name/path was not given!"
+  [[ -d "${_path}" ]] || fail "'${_path}' is not a directory!"
 
   find "${_path}" -mindepth 1 -type d
 }
@@ -600,14 +553,9 @@ directories_under_matching()
 {
   local _path="${1:-}" _pattern="${2:-}"
 
-  [[ -n "${path}" ]] ||
-    fail "Directory name/path was not given!"
-
-  [[ -d "${_path}" ]] ||
-    fail "'${_path}' is not a directory!"
-
-  [[ -n "${_pattern}" ]] ||
-    fail "'${_path}' is not a directory!"
+  [[ -n "${path}" ]]     || fail "Directory name/path was not given!"
+  [[ -d "${_path}" ]]    || fail "'${_path}' is not a directory!"
+  [[ -n "${_pattern}" ]] || fail "'${_path}' is not a directory!"
 
   find "${_path}" -mindepth 1 -iname "${_pattern}" -type d
 }
@@ -616,11 +564,8 @@ files_in()
 {
   local _path="${1:-}"
 
-  [[ -n "${path}" ]] ||
-    fail "Directory name/path was not given!"
-
-  [[ -d "${_path}" ]] ||
-    fail "'${_path}' is not a directory!"
+  [[ -n "${path}" ]]  || fail "Directory name/path was not given!"
+  [[ -d "${_path}" ]] || fail "'${_path}' is not a directory!"
 
   find "${_path}" -mindepth 1 -maxdepth 1 -type f
 }
@@ -629,11 +574,8 @@ files_under()
 {
   local _path="${1:-}"
 
-  [[ -n "${path}" ]] ||
-    fail "Directory name/path was not given!"
-
-  [[ -d "${_path}" ]] ||
-    fail "'${_path}' is not a directory!"
+  [[ -n "${path}" ]]  || fail "Directory name/path was not given!"
+  [[ -d "${_path}" ]] || fail "'${_path}' is not a directory!"
 
   find "${_path}" -mindepth 1 -type f
 }
@@ -642,14 +584,9 @@ files_under_matching()
 {
   local _path="${1:-}" _pattern="${2:-}"
 
-  [[ -n "${path}" ]] ||
-    fail "Directory name/path was not given!"
-
-  [[ -d "${_path}" ]] ||
-    fail "'${_path}' is not a directory!"
-
-  [[ -n "${_pattern}" ]] ||
-    fail "Cannot find files as a filename or pattern was not given."
+  [[ -n "${path}" ]]     || fail "Directory name/path was not given!"
+  [[ -d "${_path}" ]]    || fail "'${_path}' is not a directory!"
+  [[ -n "${_pattern}" ]] || fail "Cannot find files as a filename or pattern was not given."
 
   find "${_path}" -mindepth 1 -iname "${_pattern}" -type f
 }
@@ -664,7 +601,7 @@ replace_content()
 {
   local _token _pattern _content _file
 
-  while [[ $# -gt 0 ]] ; do
+  while (( $# > 0 )) ; do
     _token="$1" ; shift
 
     case "${_token}" in

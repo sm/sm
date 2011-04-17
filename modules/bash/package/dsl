@@ -9,7 +9,7 @@
 #
 package_definition()
 {
-  while [[ $# -gt 0 ]] ; do
+  while (( $# > 0 )) ; do
     key="$1" ; shift
     if [[ -n "${1:-}" ]] ; then
       value="$1" ; shift
@@ -425,8 +425,7 @@ package_apply_patches()
 {
   local _patch _patches=("$@")
 
-  [[ ${#_patches[@]} -gt 0 ]] ||
-    fail "Cannot apply patches as no patches were given."
+  (( ${#_patches[@]} > 0 )) || fail "Cannot apply patches as no patches were given."
 
   for _patch in "${_patches[@]}" ; do
     # TODO: apply the patch...

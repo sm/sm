@@ -11,8 +11,7 @@ install_template()
 {
   local _name _target _source _mode=0644 _owner=$USER
 
-
-  while [[ $# -gt 0 ]] ; do
+  while (( $# > 0 )) ; do
     token="${1}" ; shift
 
     case "${token}" in

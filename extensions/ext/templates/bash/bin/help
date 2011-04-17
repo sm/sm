@@ -9,4 +9,4 @@ actions "install  - Install $extension .
   restart  - Restart ${extension}.
   status   - Display ${extension} status."
 
-show_help
+show_help usage

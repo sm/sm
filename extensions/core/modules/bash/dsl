@@ -74,7 +74,7 @@ fetch()
   if file_exists "$archive" && file_exists "$archive.md5" ; then
     debug "Found archive and its md5, testing correctness"
 
-    if [[ $(md5sum --status -c "$archive.md5") -gt 0 ]] ; then
+    if (( $(md5sum --status -c "$archive.md5") > 0 )) ; then
       debug "Archive is bad, downloading"
       download=1
     else
@@ -87,16 +87,17 @@ fetch()
     download=1
   fi
 
-  if [[ $download -gt 0 ]] ; then
+  if (( download > 0 )) ; then
+
     if ! eval $fetch_command "$1" ; then
       retry=0
-      if [[ $result -eq 78 ]] ; then
+      if (( result == 78 )) ; then
         error "The requested url does not exist: '$1'"
-      elif [[ $result -eq 18 ]] ; then
+      elif (( result == 18 )) ; then
         error "Only a part of the file was transferred. Removing and re-trying."
         rm -f "$archive"
         retry=1
-      elif [[ $result -eq 33 ]] ; then
+      elif (( result == 33 )) ; then
         debug "Remote server does not support 'range' command, removing '$archive'"
         rm -f "$archive"
         retry=1
@@ -104,11 +105,8 @@ fetch()
         error "There was an error, please check $log_path/*.error.log"
       fi
 
-      if [[ $retry -eq 1 ]] ; then
-        if ! eval $fetch_command "$1" ; then
-          error "There was an error, please check $log_path/*.error.log"
-        fi
-      fi
+      (( retry == 1 )) && eval $fetch_command "$1" ||
+        error "There was an error, please check $log_path/*.error.log"
     fi
   fi
   )

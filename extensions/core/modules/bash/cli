@@ -2,7 +2,7 @@
 
 number_of_args=${#extension_args[@]}
 
-for ((index=0 ; index < $number_of_args ; index++)) ; do
+for (( index=0 ; index < $number_of_args ; index++ )) ; do
 
   token="${extension_args[$index]}"
 

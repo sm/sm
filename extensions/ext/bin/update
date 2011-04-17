@@ -35,7 +35,7 @@ case "$extension_action" in
     extensions=($(installed_extensions))
 
     # TODO: Updates for released extensions instead of only from repository.
-    if [[ ${#extensions[@]} -gt 0 ]] ; then
+    if (( ${#extension_args[@]} > 0 )) ; then
       fetch_extensions_repository
 
       install_extensions "${extensions[@]}"
@@ -51,7 +51,6 @@ case "$extension_action" in
   ;;
 esac
 
-if [[ -n "${extension_action}" ]] ; then
+[[ -n "${extension_action}" ]] &&
   log "Updated extensions: ${extension_action} ${extensions[@]}"
-fi
 

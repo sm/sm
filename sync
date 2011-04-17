@@ -1,13 +1,15 @@
 #!/bin/bash
 
-source ./scripts/bash/bdsm
+source ./modules/bash/core/dsl
+source ./modules/bash/core/initialize
 
-hosts="$*"
+hosts="$@"
+
 [[ -n "$hosts" ]] || fail "hosts must be specified."
 
 set -o xtrace
 
-for host in ${hosts} ; do
+for host in "${hosts}" ; do
   echo "Syncing to $host"
 
   rsync -avgz --delete \

@@ -9,7 +9,7 @@ read_default()
   [[ -n "${key}" ]] || \
     fail "$extension $action read_default() no arguments passed! "
 
-  while [[ $# -gt 0 ]] ; do
+  while (( $# > 0 )) ; do
     token="$1" ; shift
     case "$token" in
       into|as)

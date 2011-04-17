@@ -1,62 +1,6 @@
 #!/usr/bin/env bash
 
-usage() {
-  printf "
-  Usage:
+package_cli
 
-    $0 [options]
-
-  options:
-
-    --prefix   - specify prefix path
-    --src)     - specify source directory
-    --data)    - specify data directory
-    --user)    - specify user to install as
-    --version) - specify version to install
-    --license) - view license
-    --help)    - view this usage information
-
-"
-  return 0
-}
-
-number_of_args=${#extension_args[@]}
-
-for ((index=0 ; index < $number_of_args ; index++)) ; do
-
-  token="${extension_args[$index]}"
-
-  case "$token" in
-    --prefix)
-      prefix_path="${extension_args[$((++index))]}"
-      ;;
-    --src)
-      src_path="${extension_args[$((++index))]}"
-      ;;
-    --data)
-      data_path="${extension_args[$((++index))]}"
-      ;;
-    --user)
-      package_user="${extension_args[$((++index))]}"
-      ;;
-    --version)
-      package_version="${extension_args[$((++index))]}"
-      ;;
-    --license)
-      display_extension_license
-      exit 0
-      ;;
-    --help)
-      usage
-      exit 0
-      ;;
-    --trace)
-      set -o xtrace
-      ;;
-    *)
-      true # Ignore?
-      ;;
-  esac
-
-done
+# service_cli
 

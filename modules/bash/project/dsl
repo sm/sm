@@ -3,12 +3,12 @@
 project_initialize()
 {
   if [[ -n "${project_path}" ]] ; then
-    true \
+    : \
       "${shared_path:=${project_path}/shared}" \
       "${release_path:=${project_path}/current}" \
       "${environment:="production"}"
 
-    true \
+    : \
       "${vcs:=$(vcs "${shared_path}/${project}")}"
 
     log_path="$shared_path/log" # Override default BDSM log path.
@@ -25,7 +25,7 @@ project_initialize()
 vcs()
 {
   local _path="$1"
-  (
+
   if [[ -d "${_path}/.git" ]] ; then
     vcs="git"
   elif [[ -d "${_path}/.svn" ]] ; then
@@ -38,6 +38,5 @@ vcs()
   else
     vcs="git" # default
   fi
-  )
 }
 

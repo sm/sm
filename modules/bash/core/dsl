@@ -2,7 +2,7 @@
 
 bdsm_path()
 {
-  [[ $UID -eq 0 ]] && { : "${prefix:=/usr/local}"; } ||{ : "${prefix:=$HOME}"; }
+  (( UID == 0 )) && { : "${prefix:=/usr/local}"; } ||{ : "${prefix:=$HOME}"; }
 
   [[ "$prefix" = "$HOME" ]] && { : "${bdsm_path:="${prefix}bdsm"}"; } ||
     { : "${bdsm_path:="${prefix}/bdsm"}"; }

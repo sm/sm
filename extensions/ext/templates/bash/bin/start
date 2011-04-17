@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
 
-is_executable "${init_scripts_path}/${extension}" || \
-  fail "${init_scripts_path}/${extension} is missing or not executable."
+service_start
 
-exec "${init_scripts_path}/${extension}" "${action}"

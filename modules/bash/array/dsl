@@ -7,7 +7,7 @@ array_is_nonempty()
   variable_is_nonempty _array_name ||
     fail "Cannot push onto array as an array name was not given."
 
-  eval "[[ \${#${_array_name}[@]} -gt 0 ]]"
+  eval "(( \${#${_array_name}[@]} > 0 ))"
 }
 
 array_length()
@@ -98,6 +98,6 @@ array_join()
   #variable_is_nonempty _array_name ||
     #fail "Cannot join array as an array name was not given."
 
-  eval "for (( index=0 ; index < \${#${_array_name}[@]} ; index++ )) ; do [[ \${index} -gt 0 ]] && printf \"%s\"${_separator}\"\" ; printf \"%s\" \"\${${_array_name}[\${index}]}\" ; done"
+  eval "for (( index=0 ; index < \${#${_array_name}[@]} ; index++ )) ; do (( index >  0 )) && printf \"%s\"${_separator}\"\" ; printf \"%s\" \"\${${_array_name}[\${index}]}\" ; done"
 }
 

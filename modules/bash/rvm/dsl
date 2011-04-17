@@ -2,9 +2,9 @@
 
 rvm_install()
 {
-  curl \
-    -s https://rvm.beginrescueend.com/install/rvm \
-    -o rvm-installer
+  local url="https://rvm.beginrescueend.com/install/rvm"
+
+  curl -s "$url" -o rvm-installer
 
   ensure_files_are_executable "rvm-installer"
 

@@ -4,11 +4,7 @@
 # BDSM project module initialization
 #
 # When run as root, we must ensure that project and project_path are set.
-if [[ $UID -gt 0 ]] ; then
-  true \
-    "${project:="$USER"}" \
-    "${project_path:="$HOME"}"
-fi
+(( UID > 0 )) && { : "${project:="$USER"}" "${project_path:="$HOME"}" ; }
 
 [[ -n "${project:-}" && -n "${project_path:-}" ]] && project_initialize
 

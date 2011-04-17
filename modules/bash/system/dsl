@@ -2,7 +2,7 @@
 
 init_scripts_path()
 {
-  if [[ $UID -eq 0 ]] ; then
+  if (( UID == 0 )) ; then
     case "$MACHTYPE" in
       *darwin*)
         # For now stick with say, /usr/local/bin
@@ -18,7 +18,6 @@ init_scripts_path()
         fi
         ;;
     esac
-
   else
     printf "$HOME/.init.d/"
   fi
@@ -31,7 +30,7 @@ ensure_user_exists()
 {
   local _token _group
   # parse arguments
-  while [[ $# -gt 0 ]] ; do
+  while (( $# > 0 )) ; do
     _token="$1" ; shift
 
     case "${_token}" in
@@ -57,7 +56,7 @@ ensure_user_exists()
     esac
   done
 
-  if [[ $UID -eq 0 ]] ; then
+  if (( UID == 0 )) ; then
     (
     case "$(uname)" in
       "OpenBSD")
@@ -121,7 +120,7 @@ delete_user()
 {
   local _token _group
   # parse arguments
-  while [[ $# -gt 0 ]] ; do
+  while (( $# > 0 )) ; do
     _token="$1" ; shift
 
     case "${_token}" in
@@ -147,7 +146,7 @@ delete_user()
     esac
   done
 
-  if [[ $UID -eq 0 ]] ; then
+  if (( UID == 0 )) ; then
     (
     case "$(uname)" in
       "OpenBSD")
@@ -193,9 +192,9 @@ delete_user()
 }
 
 # TODO: Move these to a user Module.
-running_as_root()      { [[ $UID -eq 0 ]] ; }
-running_as_superuser() { [[ $UID -eq 0 ]] ; }
-running_as_user()      { [[ $UID -ne 0 ]] ; }
+running_as_root()      { (( UID == 0 )) ; }
+running_as_superuser() { (( UID == 0 )) ; }
+running_as_user()      { (( UID != 0 )) ; }
 
 must_be_root()
 {
@@ -273,8 +272,8 @@ os_arch_capable()
   if os_is_darwin ; then
     local _string
     read -r _string < <(sysctl hw.cpu64bit_capable)
-    if [[ ${_string//* } -eq 1 ]] ; then
-      printf '%s' "x86_64"
+    if (( ${_string//* } == 1 )) ; then
+      printf "%s" "x86_64"
     else
       os_arch_type # Either i386 or ppc
     fi

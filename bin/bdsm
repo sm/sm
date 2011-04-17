@@ -15,11 +15,9 @@ unset extension action
 # this should be set to where BDSM is installed to in /etc/bdsmrc
 prefix="${prefix:-/usr/local}"
 
-if [[ "$prefix" = "$HOME" ]] ; then
-  true "${bdsm_path:="${prefix}bdsm"}"
-else
-  true "${bdsm_path:="${prefix}/bdsm"}"
-fi
+[[ "$prefix" = "$HOME" ]]\
+  && { : "${bdsm_path:="${prefix}bdsm"}" } \
+  || { : "${bdsm_path:="${prefix}/bdsm"}" }
 
 true "${modules_path:="${bdsm_path}/modules"}"
 
@@ -49,14 +47,6 @@ source "${modules_path}/bash/core/cli"
   exit 0
 }
 
-case "${action}" in
-  version)
-    extension_action "core" "version"
-    ;;
-  *)
-    disable_backtrace
-    extension_action "${extension}" "${action}"
-    ;;
-esac
+disable_backtrace
 
-exit $?
+extension_action "${extension}" "${action}"

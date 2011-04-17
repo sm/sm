@@ -37,5 +37,5 @@ notes="
   https://www.pivotaltracker.com/projects/26822
 "
 
-show_help "usage"
+show_help usage
 

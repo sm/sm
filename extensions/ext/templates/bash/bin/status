@@ -1,12 +1,4 @@
 #!/usr/bin/env bash
 
-ensure_set pid_file
+service_status
 
-log "${extension}-server:"
-
-if [[ -s "${pid_file}" ]] ; then
-  log "  status: running"
-  log "  pid: $(cat ${pid_file})"
-else
-  log "  status: not running"
-fi
