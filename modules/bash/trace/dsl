@@ -5,42 +5,43 @@ set_ps4()
   export PS4=" > \${BASH_SOURCE##\${bdsm_path}\/} \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO} $ "
 }
 
-enable_trace()
+trace()
 {
-  export trace_flag
-  (( trace_flag == 1 )) && set -o xtrace
+  local _option="${1:-on}"
+
+  if [[ "${_option}" = "on" ]] ;then
+    export trace_flag=1
+    set -o xtrace
+  else
+    set +o xtrace
+    export trace_flag=0
+  fi
 }
 
-disable_trace()
+enable_trace()  { trace on ; }
+disable_trace() { trace off ; }
+
+debug()
 {
-  (( trace_flag < 2 )) && set +o xtrace
+  local _option="${1:-on}"
+
+  if [[ "${_option}" = "on" ]] ;then
+    export debug_flag=1
+    set -o verbose
+  else
+    set +o verbose
+    export debug_flag=0
+  fi
 }
 
-enable_debug()
-{
-  export debug_flag
-  (( debug_flag == 1 )) || return 0
-  set -o verbose
-}
-
-disable_debug()
-{
-  set +o verbose
-}
-
-enable_backtrace()
-{
-  trap backtrace ERR
-}
-
-disable_backtrace()
-{
-  trap - ERR
-}
+enable_debug()      { debug on ; }
+disable_debug()     { debug off ; }
+enable_backtrace()  { trap backtrace ERR ; }
+disable_backtrace() { trap - ERR ; }
 
 backtrace()
 {
-  set +o xtrace
+  trace off
 
   local _source _function _line _index
   printf "Error Backtrace:\n  %6s %6s %-20s %-55s\n" "Trace" "Line" "Function" "File" 1>&2
@@ -53,5 +54,7 @@ backtrace()
       "$((${#FUNCNAME[@]} - _index ))" "${_line}" "${_function}" "${_source} " \
       1>&2
   done
+
+  trace on
 }
 
