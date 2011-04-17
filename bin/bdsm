@@ -16,8 +16,8 @@ unset extension action
 prefix="${prefix:-/usr/local}"
 
 [[ "$prefix" = "$HOME" ]]\
-  && { : "${bdsm_path:="${prefix}bdsm"}" } \
-  || { : "${bdsm_path:="${prefix}/bdsm"}" }
+  && { : "${bdsm_path:="${prefix}bdsm"}"; } \
+  || { : "${bdsm_path:="${prefix}/bdsm"}"; }
 
 true "${modules_path:="${bdsm_path}/modules"}"
 

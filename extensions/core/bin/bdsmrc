@@ -4,7 +4,7 @@ file_is_nonempty "$extension_templates_path/bdsmrc" ||
   fail "The template file $extension_templates_path/bdsmrc is missing."
 
 file_is_nonempty "$HOME/.bdsmrc" && {
-  { : ${timestamp:=$(date +%m.%d.%Y-%H:%M:%S)} }
+  { : ${timestamp:=$(date +%m.%d.%Y-%H:%M:%S)}; }
 
   log "An existing $HOME/.bdsmrc file was found."
   log "Reinaming it as ${HOME}/.bdsmrc.${timestamp} in order to preserve it."
@@ -22,7 +22,7 @@ file_is_nonempty "$HOME/.bdsmrc" && {
 #
 modules project
 
-{ : ${repository_url:="git@github.com:username/repository.git"} }
+{ : "${repository_url:="git@github.com:username/repository.git"}"; }
 
 command sed \
   -e "s#{{project}}#$project#g" \
