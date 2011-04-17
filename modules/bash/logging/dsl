@@ -2,23 +2,23 @@
 
 log()
 {
-  printf "%s\n" "$*"
+  printf "$*\n"
   return $?
 }
 
 error()
 {
-  printf "\n\nERROR: %s\n\n" "$*"
+  printf "\n\nERROR: $*\n\n"
 }
 
 warn()
 {
-  printf "\n\nWARNING: %s\n\n" "$*"
+  printf "\n\nWARNING: $*\n\n"
 }
 
 debug()
 {
-  (( debug_flag == 1 )) && printf "DEBUG: %s\n" "$*"
+  (( debug_flag == 1 )) && printf "DEBUG: $*\n"
 }
 
 succeed() {

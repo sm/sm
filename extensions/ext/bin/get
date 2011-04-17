@@ -72,7 +72,7 @@ get_version()
     ./install
   )
 
-  log "\nInstalled BDSM version:"
+  log "Installed BDSM version:"
   ( source $modules_path/bdsm ; bdsm --version )
 
   hook="after_update"
