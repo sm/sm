@@ -3,7 +3,7 @@
 
 first()
 {
-  printf "$1"
+  printf "%s" "$1"
 }
 
 match()

@@ -173,7 +173,7 @@ package_fetch()
 {
   ensure_nonempty package_name package_version archive_format
 
-  true \
+  : \
     "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
     "${package_url:="${package_base_url}/${package_file}"}"
 
@@ -221,10 +221,10 @@ package_configure()
 
     command="./configure ${configure_flags[@]:-"--prefix=${install_path:-$prefix_path}"}"
 
-    if [[ ! -x ./configure ]] ; then
+    [[ -x ./configure ]] || {
       log "./configure not found or not executable, skipping configuration step."
       return 0
-    fi
+    }
   fi
 
   ${command} > configure.log 2>&1 ||
@@ -417,7 +417,9 @@ package_patch()
   package_apply_patches "${_patches[@]}"
 
   directory_exists "${extension_patches_path}/$(os_type)/${package_version}" || return 0
+
   _patches=($(find "${extension_patches_path}/$(os_type)/${package_version}" -mindepth 1 -maxdepth 1 -iname '*.patch' -type f))
+
   package_apply_patches "${_patches[@]}"
 }
 
@@ -457,7 +459,7 @@ package_cli()
 {
   number_of_args=${#extension_args[@]}
 
-  for ((index=0 ; index < $number_of_args ; index++)) ; do
+  for (( index=0 ; index < $number_of_args ; index++ )) ; do
 
     token="${extension_args[$index]}"
 

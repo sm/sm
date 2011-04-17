@@ -192,8 +192,11 @@ move_file()
     esac
   done
 
-  [[ -n "${_source}" ]] || fail "Cannot move file as the source and target must be specified. "
-  [[ -n "${_target}" ]] || fail "Cannot move file as the source and target must be specified. "
+  [[ -n "${_source}" ]] ||
+    fail "Cannot move file as the source and target must be specified. "
+
+  [[ -n "${_target}" ]] ||
+    fail "Cannot move file as the source and target must be specified. "
 
   mv "${_source}" "${_target}"
 }
