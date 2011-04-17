@@ -10,11 +10,10 @@
 # this should be set to where BDSM is installed to in /etc/bdsmrc
 prefix="${prefix:-/usr/local}"
 
-[[ "$prefix" = "$HOME" ]] \
-  && { : "${bdsm_path:="${prefix}bdsm"}" } \
-  || { : "${bdsm_path:="${prefix}/bdsm"}" }
+[[ "$prefix" = "$HOME" ]] && { : "${bdsm_path:="${prefix}bdsm"}"; }\
+                          || { : "${bdsm_path:="${prefix}/bdsm"}"; }
 
-{ : "${modules_path:="${bdsm_path}/modules"}" }
+{ : "${modules_path:="${bdsm_path}/modules"}" ; }
 
 # Load DSL and initialize BDSM core itself, manually.
 source "${PWD}/modules/bash/core/dsl"
