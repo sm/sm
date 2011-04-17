@@ -15,7 +15,7 @@ unset extension action
 # this should be set to where BDSM is installed to in /etc/bdsmrc
 prefix="${prefix:-/usr/local}"
 
-[[ "$prefix" = "$HOME" ]]\
+[[ "$prefix" = "$HOME" ]] \
   && { : "${bdsm_path:="${prefix}bdsm"}"; } \
   || { : "${bdsm_path:="${prefix}/bdsm"}"; }
 
@@ -29,7 +29,8 @@ for script in dsl initialize ; do
   for module in trace logging core ; do
     source "${modules_path}/bash/${module}/${script}"
   done
-done ; unset script module
+done
+unset script module
 
 # Now process CLI arguments.
 source "${modules_path}/bash/core/cli"

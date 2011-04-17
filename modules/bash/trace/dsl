@@ -36,8 +36,9 @@ debug()
 
 enable_debug()      { debug on ; }
 disable_debug()     { debug off ; }
-enable_backtrace()  { trap backtrace ERR ; }
-disable_backtrace() { trap - ERR ; }
+
+enable_backtrace()  { trap backtrace ERR ; set -o errexit ; }
+disable_backtrace() { set +o errexit trap - ERR ; }
 
 backtrace()
 {

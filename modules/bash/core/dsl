@@ -16,7 +16,7 @@ bdsm_exports()
 
 modules()
 {
-  (( trace_flag < 2 )) && set +o xtrace
+  if (( trace_flag < 2 )) ; then set +o xtrace ; fi
 
   local _module _bdsm _extension _path _file _modules=("$@")
 
@@ -33,7 +33,7 @@ modules()
     done
   done
 
-  (( trace_flag == 1 )) && set -o xtrace
+  if (( trace_flag == 1 )) ; then set -o xtrace ; fi
 }
 
 load()
