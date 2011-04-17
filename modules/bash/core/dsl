@@ -16,7 +16,8 @@ bdsm_exports()
 
 modules()
 {
-  disable_trace
+  (( trace_flag < 2 )) && set +o xtrace
+
   local _module _bdsm _extension _path _file _modules=("$@")
 
   (( ${#_modules[@]} > 0 )) || fail "No modules specified to load."
@@ -31,7 +32,8 @@ modules()
       done
     done
   done
-  enable_trace
+
+  (( trace_flag == 1 )) && set -o xtrace
 }
 
 load()

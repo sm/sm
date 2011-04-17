@@ -7,9 +7,8 @@ set_ps4()
 
 enable_trace()
 {
-  (( trace_flag == 1 )) || return 0
   export trace_flag
-  set -o xtrace
+  (( trace_flag == 1 )) && set -o xtrace
 }
 
 disable_trace()
@@ -19,8 +18,8 @@ disable_trace()
 
 enable_debug()
 {
-  (( debug_flag == 1 )) || return 0
   export debug_flag
+  (( debug_flag == 1 )) || return 0
   set -o verbose
 }
 
