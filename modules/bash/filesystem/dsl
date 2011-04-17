@@ -268,7 +268,7 @@ copy_directories_to()
     if directory_exists "${_directory}" ; then
       cp -Rf "${_directory}" "${_path}/"
     else
-       error "Cannot copy directory ${_directory} to ${_path} as the directory '${_directory}' does not exist."
+      error "Cannot copy directory ${_directory} to ${_path} as the directory '${_directory}' does not exist (in '$PWD')."
     fi
   done
 }
