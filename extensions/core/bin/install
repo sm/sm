@@ -48,7 +48,7 @@ log "  Installing core files (${files[@]}) into ${install_path}"
 copy_files_to "${install_path}" ${files[@]}
 
 log "  Ensuring that the configuration files (${configs[@]}) exist in ${config_path}"
-ensure_files_exist "${config_path}/user" "${config_path}/defaults"
+ensure_files_exist "${bdsm_path}/cofig/user" "${bdsm_path}/config/defaults"
 
 log "  Linking ${install_path}/bin/bdsm to ${prefix_path}/bin/bdsm"
 link --force "${install_path}/bin/bdsm" to "${prefix_path}/bin/bdsm"
