@@ -426,6 +426,7 @@ hash_file()
   local _file="${1:-}" ; shift
   local _key="${1:-}" ; shift
 
+  # TODO: Debug why the error message is not showing up.
   [[ -f "${_file}" ]] ||
     fail "File path/name not given.\n => Usage: $0 <filename> <key> [value]"
 

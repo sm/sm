@@ -11,7 +11,7 @@ true \
 
 true \
   ${repository_url:="git://github.com/wayneeseguin/bdsm"} \
-  "${releases_url:=$(hash_file "$config_path/defaults" "releases_url")}"
+  "${releases_url:=$(hash_file "${config_path:="${bdsm_path}/config"}/defaults" "releases_url")}"
 
 # Load the BDSM framework version.
 bdsm_version
