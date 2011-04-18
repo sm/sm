@@ -18,8 +18,14 @@ trace()
   fi
 }
 
-enable_trace()  { trace on ; }
-disable_trace() { trace off ; }
+enable_trace()
+{
+  trace on
+}
+
+disable_trace()
+{ trace off
+}
 
 debug()
 {
@@ -34,11 +40,26 @@ debug()
   fi
 }
 
-enable_debug()      { debug on ; }
-disable_debug()     { debug off ; }
+enable_debug()
+{
+  debug on
+}
 
-enable_backtrace()  { trap backtrace ERR ; set -o errexit ; }
-disable_backtrace() { set +o errexit trap - ERR ; }
+disable_debug()
+{
+  debug off
+}
+
+enable_backtrace()
+{
+  trap backtrace ERR
+  set -o errexit
+}
+
+disable_backtrace()
+{
+  set +o errexit trap - ERR
+}
 
 backtrace()
 {
