@@ -1,8 +1,15 @@
 #!/usr/bin/env bash
 
-(( ${#extension_args[@]} > 0 )) ||
-  fail "An extension name must be specified."
-
-enter "${extensions_development_path}/${extension_args[0]}/"
-
-exec ${EDITOR:-vi} .
+if (( ${#extension_args[@]} > 0 ))
+then
+  if directory_exists "${extensions_development_path}/${extension_args[0]}"
+  then
+    enter "${extensions_development_path}/${extension_args[0]}"
+    exec ${EDITOR:-vi} .
+  else
+    error "Failed to edit '${extension_args[0]}' as it appears to not be installed. Installed extensions are,"
+    installed_extensions
+  fi
+else
+  error "An extension name must be specified."
+fi

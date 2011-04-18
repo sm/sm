@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
-(( ${#extension_args[@]} > 0 )) ||
-  fail "At least one extension name must be specified."
-
-package_cli
+if (( ${#extension_args[@]} > 0 ))
+then
+  package_cli
+else
+  error "At least one extension name must be specified."
+fi
 

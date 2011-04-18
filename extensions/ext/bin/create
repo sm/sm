@@ -1,30 +1,35 @@
 #!/usr/bin/env bash
 
-(( ${#extension_args[@]} > 0 )) ||
+if (( ${#extension_args[@]} > 0 ))
+then
+  target_path="${extensions_development_path:-"$initial_pwd"}"
+
+  for extension in ${extension_args[@]} ; do
+
+    if directory_exists "${target_path}/${extension}"
+    then
+      error "Extension '${extension}' already exists at ${target_path}/${extension}."
+    fi
+
+    if ! directory_exists "${extensions_path}/ext/templates/${language:-bash}"
+    then
+      fail "Extension template files for are missing from $target_path/ext/templates/${language:-bash}."
+    fi
+
+    (
+    enter "${extensions_path}/ext/templates/${language:-bash}"
+
+    copy_directories_to "${target_path}/${extension}/" \
+      bin modules templates config
+
+    copy_files_to "$target_path/$extension/" \
+      README.md VERSION CHANGELOG.md TODO.md
+    )
+
+    log "Extension created from template at ${target_path}/${extension}/"
+  done
+
+  succeed "Created extensions ${extension_args[@]}"
+else
   fail "At least one extension name must be specified."
-
-target_path="${extensions_development_path:-"$initial_pwd"}"
-
-for extension in ${extension_args[@]} ; do
-
-  [[ -d "${target_path}/${extension}" ]] &&
-    fail "Extension '${extension}' already exists at ${target_path}/${extension}."
-
-  [[ -d "${extensions_path}/ext/templates/${language:-bash}" ]] ||
-    fail "Extension template files for are missing from $target_path/ext/templates/${language:-bash}."
-
-  (
-  enter "${extensions_path}/ext/templates/${language:-bash}"
-
-  copy_directories_to "${target_path}/${extension}/" \
-    bin modules templates config
-
-  copy_files_to "$target_path/$extension/" \
-    README.md VERSION CHANGELOG.md TODO.md
-  )
-
-  log "Extension created from template at ${target_path}/${extension}/"
-
-done
-
-succeed "Created extensions ${extension_args[@]}"
+fi

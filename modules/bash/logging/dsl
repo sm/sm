@@ -3,31 +3,37 @@
 log()
 {
   printf "$*\n"
-  return $?
 }
 
-error()
+info()
 {
-  printf "\n\nERROR: $*\n\n"
+  log "INFO: $*"
 }
 
 warn()
 {
-  printf "\n\nWARNING: $*\n\n"
+  printf "WARNING: $*"
 }
 
 debug()
 {
-  (( debug_flag == 1 )) && printf "DEBUG: $*\n"
+  (( debug_flag == 1 )) && log "DEBUG: $*"
+}
+
+error()
+{
+  disable_backtrace
+  printf "ERROR: $*"
+  exit 1
 }
 
 succeed() {
-  log "\n$*\n"
+  log "$*"
   exit 0
 }
 
 fail() {
-  error "$*"
+  log "ERROR: $*"
   backtrace
   exit 1
 }

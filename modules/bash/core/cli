@@ -67,7 +67,6 @@ while (( $# > 0 )) ; do
           ;;
         *)
           error "Unknown flag '${token}'"
-          exit 1
           ;;
       esac
       ;;
@@ -153,10 +152,7 @@ while (( $# > 0 )) ; do
               ;;
 
             *)
-              [[ -z "${extension}" ]] || {
-                error "Extension '${token}' not found"
-                exit 1
-              }
+              [[ -z "${extension}" ]] || error "Extension '${token}' not found"
               ;;
           esac
         fi
