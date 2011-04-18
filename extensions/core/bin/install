@@ -7,7 +7,7 @@
 #       The CLI remaps 'bdsm install X' to 'bdsm ext install X'
 #
 
-directories=( bin config modules  )
+directories=( bin modules  )
 aux=( log tmp src )
 extensions=( core ext mod )
 files=( LICENSE VERSION README.md )

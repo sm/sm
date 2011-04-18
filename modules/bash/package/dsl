@@ -508,9 +508,6 @@ package_cli()
       --md5)
         package_md5="${extension_args[$((++index))]}"
         ;;
-      --md5)
-        package_md5="${extension_args[$((++index))]}"
-        ;;
       --licence)
         display_extension_license
         exit 0
