@@ -457,10 +457,12 @@ package_usage() {
 
 package_cli()
 {
+  local _ignored_args=()
+
   number_of_args=${#extension_args[@]}
 
-  for (( index=0 ; index < $number_of_args ; index++ )) ; do
-
+  for (( index=0 ; index < $number_of_args ; index++ ))
+  do
     token="${extension_args[$index]}"
 
     case "$token" in
@@ -491,6 +493,18 @@ package_cli()
       --archive_format)
         archive_format="${extension_args[$((++index))]}"
         ;;
+      --activate|activate)
+        # TODO: Throw error if parameter is not specified.
+        if (( ${#extension_args[@]} > 0 ))
+        then
+          package_activate "${extension}" "${extension_args[$((++index))]}"
+        else
+          error "Cannot activate ${extension}, no version was given."
+        fi
+        ;;
+      --deactivate|deactivate)
+        package_deactivate "${extension}"
+        ;;
       --md5)
         package_md5="${extension_args[$((++index))]}"
         ;;
@@ -509,9 +523,11 @@ package_cli()
         set -o xtrace
         ;;
       *)
-        true # Ignore?
+        _ignored_args+=("${token}")
         ;;
     esac
+
+    (( ${#_ignored_args[@]} > 0 )) && extension_args=( "${_ignored_args[@]}" )
 
   done
 }

@@ -13,11 +13,11 @@ unset extension action
 
 # The default prefix is /usr/local,
 # this should be set to where BDSM is installed to in /etc/bdsmrc
-prefix="${prefix:-/usr/local}"
+prefix_path="${prefix_path:-/usr/local}"
 
-[[ "$prefix" = "$HOME" ]] \
-  && { : "${bdsm_path:="${prefix}bdsm"}"; } \
-  || { : "${bdsm_path:="${prefix}/bdsm"}"; }
+[[ "$prefix_path" = "$HOME" ]] \
+  && { : "${bdsm_path:="${prefix_path}bdsm"}"; } \
+  || { : "${bdsm_path:="${prefix_path}/bdsm"}"; }
 
 true "${modules_path:="${bdsm_path}/modules"}"
 

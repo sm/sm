@@ -13,44 +13,44 @@ extensions=( core ext mod )
 files=( LICENSE VERSION README.md )
 configs=( user defaults )
 
-log "\nInstalling BDSM Framework into ${bdsm_path}\n"
+log "\nInstalling BDSM Framework into ${install_path}\n"
 
 (
-log "  Ensuring that bdsm_path '${bdsm_path}' exists"
-ensure_paths_exist "${bdsm_path}"
-enter "${bdsm_path}"
+log "  Ensuring that install_path '${install_path}' exists"
+ensure_paths_exist "${install_path}"
+enter "${install_path}"
 
 log "  Removing target directories"
 remove_paths "${directories[@]}"
 ensure_paths_exist "${directories[@]}" extensions
-enter "${bdsm_path}/extensions"
+enter "${install_path}/extensions"
 
 log "  Removing core and old extensions, if they exist"
 remove_paths "${extensions[@]}" extension bdsm
 ) || fail "Could not create installation target"
 
 (
-log "  Ensuring auxillary directories (${aux[@]}) exist in ${bdsm_path}"
-ensure_paths_exist "${bdsm_path}/" "${aux[@]}"
+log "  Ensuring auxillary directories (${aux[@]}) exist in ${install_path}"
+ensure_paths_exist "${install_path}/" "${aux[@]}"
 )
 
 (
-log "  Installing core extensions (${extensions[@]}) into ${bdsm_path}/extensions"
-ensure_paths_exist "${bdsm_path}/extensions"
+log "  Installing core extensions (${extensions[@]}) into ${install_path}/extensions"
+ensure_paths_exist "${install_path}/extensions"
 enter extensions
-copy_directories_to "${bdsm_path}/extensions" "${extensions[@]}"
+copy_directories_to "${install_path}/extensions" "${extensions[@]}"
 )
 
-log "  Installing core directories (${directories[@]}) into ${bdsm_path}"
-copy_directories_to "${bdsm_path}" "${directories[@]}"
+log "  Installing core directories (${directories[@]}) into ${install_path}"
+copy_directories_to "${install_path}" "${directories[@]}"
 
-log "  Installing core files (${files[@]}) into ${bdsm_path}"
-copy_files_to "${bdsm_path}" ${files[@]}
+log "  Installing core files (${files[@]}) into ${install_path}"
+copy_files_to "${install_path}" ${files[@]}
 
 log "  Ensuring that the configuration files (${configs[@]}) exist in ${config_path}"
 ensure_files_exist "${config_path}/user" "${config_path}/defaults"
 
-log "  Linking ${bdsm_path}/bin/bdsm to ${prefix}/bin/bdsm"
-link --force "${bdsm_path}/bin/bdsm" to "${prefix}/bin/bdsm"
+log "  Linking ${install_path}/bin/bdsm to ${prefix_path}/bin/bdsm"
+link --force "${install_path}/bin/bdsm" to "${prefix_path}/bin/bdsm"
 
 succeed "Installation of BDSM is complete"

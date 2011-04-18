@@ -3,48 +3,5 @@
 (( ${#extension_args[@]} > 0 )) ||
   fail "At least one extension name must be specified."
 
-usage() {
-  printf "
-  Usage:
-
-    $0 [options]
-
-  options:
-
-    --prefix   - specify prefix path
-    --src)     - specify source directory
-    --data)    - specify data directory
-    --user)    - specify user to install as
-    --version) - specify version to install
-    --license) - view license
-    --help)    - view this usage information
-
-"
-  return 0
-}
-
-modules package
-
-number_of_args=${#extension_args[@]}
-
-for ((index=0 ; index < $number_of_args ; index++)) ; do
-
-  token="${extension_args[$index]}"
-
-  case "$token" in
-    activate)
-      package_activate "${extension_args[$((++index))]}" "${extension_args[$((++index))]}"
-      ;;
-
-    deactivate)
-      package_deactivate "${extension_args[$((++index))]}"
-      ;;
-
-    --trace)
-      set -o xtrace
-      ;;
-  esac
-
-done
-
+package_cli
 
