@@ -8,7 +8,7 @@ then
     exec ${EDITOR:-vi} .
   else
     error "Failed to edit '${extension_args[0]}' as it appears to not be installed. Installed extensions are,"
-    installed_extensions
+    extensions_installed
   fi
 else
   error "An extension name must be specified."

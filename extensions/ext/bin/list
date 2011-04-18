@@ -19,7 +19,7 @@ Actions:
 
 list_installed()
 {
-  extensions=($(installed_extensions))
+  extensions=($(extensions_installed))
 
   log "${extensions[@]:-"# No extensions currently installed."}"
 }
@@ -28,7 +28,7 @@ list_available()
 {
   [[ -d "${extensions_src_path}" ]] || fetch_extensions_repository
 
-  extensions=($(available_extensions))
+  extensions=($(extensions_available))
 
     log "${extensions[@]:-"No extensions found. Run 'bdsm extensions clone' to make them available. ( ${src_path} )\n"}"
 }

@@ -8,6 +8,6 @@ then
   printf "${extensions_development_path}/${extension_args[0]}"
 else
   printf "." # Stay put!
-  error "Failed to edit '${extension_args[0]}' as it appears to not be installed. Installed extensions are,\n$(installed_extensions)"
+  error "Failed to edit '${extension_args[0]}' as it appears to not be installed. Installed extensions are,\n$(extensions_installed)"
 fi
 

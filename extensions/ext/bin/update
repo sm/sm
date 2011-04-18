@@ -32,7 +32,7 @@ case "$extension_action" in
   ;;
 
   all)
-    extensions=($(installed_extensions))
+    extensions=($(extensions_installed))
 
     # TODO: Updates for released extensions instead of only from repository.
     if (( ${#extension_args[@]} > 0 )) ; then

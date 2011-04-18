@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-reload_extension()
+extension_reload()
 {
   local _path="${extension_modules_path}/bash"
 
   source_files "${_path}/dsl" "${_path}/initialize"
 }
 
-reinit_extension()
+extension_reinitialize()
 {
   local _path="${extension_modules_path}/bash"
 
@@ -137,7 +137,7 @@ extension_action()
   ) || result=$?
 }
 
-display_extension_license()
+extension_license()
 {
   local _extension="${1:-${extension}}"
 
@@ -147,17 +147,17 @@ display_extension_license()
   cat -v "${extensions_path}/${_extension}/LICENSE"
 }
 
-installed_extensions()
+extensions_installed()
 {
   extensions_in "${extensions_path}"
 }
 
-available_extensions()
+extensions_available()
 {
   extensions_in "${extensions_src_path}"
 }
 
-development_extensions()
+extensions_in_development()
 {
   true "${extensions_development_path:="${extensions_src_path}"}"
 
@@ -191,5 +191,26 @@ extensions_in()
   extensions="${extensions[@]}"
 
   printf "${extensions}"
+}
+
+extension_actions()
+{
+  local _extension="${1:-}" _path="$extensions_path/${_extension}/bin"
+
+  [[ -n "${_extension}" ]] ||
+    fail "Cannot list actions for extension as no extension was given."
+
+  directory_exists "${_path}" || return 0
+
+  local _files=($(find "${_path}" -mindepth 1 -maxdepth 1 -type f))
+  local _file _actions=()
+
+  for _file in "${_files[@]}" ; do
+    [[ -x "${_file}" ]] && _actions+=("${_file//*\/}")
+  done
+
+  _actions="${_actions[@]}" # Convert from array to string.
+
+  printf "${_actions}"
 }
 

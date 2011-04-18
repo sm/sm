@@ -5,6 +5,9 @@
 
 # Load System then User Configuration, if exists.
 . /etc/profile ; unset prefix_path
+paths=(prefix_path $(env | awk -F= '/_path=/{print $1}' | sort))
+# TODO: unset all _path variables.
+unset "${paths[@]}"
 
 for file in /etc/profile /etc/bdsmrc "$HOME/.bdsmrc" ; do
   [[ -s "${file}" ]]  && . "${file}"
@@ -44,8 +47,9 @@ source "${modules_path}/bash/core/cli"
 [[ -n ${extension} ]] || { extension_action "core" "help" ; exit 0 ; }
 
 [[ -n ${action} ]] || {
+  modules extensions
   log "Usage: \n  bdsm ${extension} [action]\nActions:"
-  log "  $(actions_for_extension "${extension}")"
+  log "  $(extension_actions "${extension}")"
   exit 0
 }
 

@@ -14,6 +14,12 @@ bdsm_exports()
   # TODO: Filter this list of exports down.
 }
 
+# Source bdsmrc files, cascaded.
+bdsmrc()
+{
+  source_files "/etc/bdsmrc" "$HOME/.bdsmrc"
+}
+
 modules()
 {
   if (( trace_flag < 2 )) ; then set +o xtrace ; fi
@@ -43,31 +49,5 @@ load()
   for _file in "${_files[@]}" ; do
     source_files "${extension_modules_path:-"$modules_path"}/bash/${_file}"
   done
-}
-
-actions_for_extension() {
-  local _extension="${1:-}" _path="$extensions_path/${_extension}/bin"
-
-  [[ -n "${_extension}" ]] ||
-    fail "Cannot list actions for extension as no extension was given."
-
-  directory_exists "${_path}" || return 0
-
-  local _files=($(find "${_path}" -mindepth 1 -maxdepth 1 -type f))
-  local _file _actions=()
-
-  for _file in "${_files[@]}" ; do
-    [[ -x "${_file}" ]] && _actions+=("${_file//*\/}")
-  done
-
-  _actions="${_actions[@]}" # Convert from array to string.
-
-  printf "${_actions}"
-}
-
-# Source bdsmrc files, cascaded.
-bdsmrc()
-{
-  source_files "/etc/bdsmrc" "$HOME/.bdsmrc"
 }
 
