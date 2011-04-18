@@ -166,7 +166,7 @@ link()
 
 move_file()
 {
-  local _source _target
+  local _source _target _mode _owner
 
   while (( $# > 0 )) ; do
     token="$1" ; shift
@@ -177,6 +177,14 @@ move_file()
 
       from)
         _source="${1}" ; shift
+        ;;
+
+      mode)
+         _mode="${1}" ; shift
+        ;;
+
+      owner)
+         _owner="${1}" ; shift
         ;;
 
       *)
@@ -199,6 +207,9 @@ move_file()
     fail "Cannot move file as the source and target must be specified. "
 
   mv "${_source}" "${_target}"
+
+  [[ -n "${_mode:-}" ]] && chmod "${_mode}" "${_target}"
+  [[ -n "${_owner:-}" ]] && chown "${_owner}" "${_target}"
 }
 
 copy_file()
