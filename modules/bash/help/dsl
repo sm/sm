@@ -31,14 +31,14 @@ resources() { help_resources="$*" ; }
 
 usage()
 {
-  log "\nUsage\n\n    bdsm ${extension} <action> <<arguments>>\n"
+  log "\nUsage\n\n    bdsm ${extension} <action> <<arguments>>"
 
   [[ -n "${help_description}" ]] && \
     log "\nDescription\n    BDSM ${help_description}"
 
-  log "\nActions\n"
+  log "\nActions"
   [[ -n "${help_actions}" ]] && \
-    log "${help_actions}\n"
+    log "${help_actions}"
 
   [[ -n "${help_notes}" ]] && \
     log "\nNotes\n${help_notes}"
@@ -51,7 +51,7 @@ usage()
 
   [[ "${extension}" = "core" || "${extension}" = "<extension>" ]] && {
     log "\nExtensions Installed\n\n  $(installed_extensions)"
-    log "\nExtensions Available\n\n  $(available_extensions)\n"
+    log "\nExtensions Available\n\n  $(available_extensions)"
   }
 }
 
