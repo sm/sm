@@ -1,6 +1,6 @@
 # BDSM Framework
 
-The Bash Devops Scripting Management Framework is a... scripting framework with
+The Bash Delectable Scripting Management Framework is a... scripting framework with
 a devops focus (go figure)!
 
 # Goal
