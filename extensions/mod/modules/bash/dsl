@@ -17,11 +17,8 @@ module_dsl()
 {
   local _function _dsl _module="${1:-}"
   # [[ -n "${_module}" ]] || fail "... module not given"
-  local _path="${bdsm_modules_path}/bash/${_module}"
-  _dsl=(
-
-  _dsl=$(find "${_path}" -mindepth 1 -maxdepth 1 -name dsl -type f -print0 | xargs -0 grep '^[a-z_]*()$')
-  )
+  local _path="${modules_path}/bash/${_module}"
+  _dsl=($(find "${_path}" -mindepth 1 -maxdepth 1 -name dsl -type f -print0 | xargs -0 grep '^[a-z_]*()$'))
 
   for _function in "${_dsl[@]}" ; do
     _function="${_function##*modules\/bash\/}"
