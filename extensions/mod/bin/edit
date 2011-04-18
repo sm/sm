@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 
-(( ${#extension_args[@]} > 0 )) ||
-  fail "An extension name must be specified."
+_path="${core_development_path:="$source_path/bdsm"}/modules"
 
-enter "${extensions_development_path}/${extension_args[0]}/"
+# TODO: Allow --src flag to modify root behavior.
+running_as_root && _path="${bdsm_path}/modules"
+
+enter "${_path}"
 
 exec ${EDITOR:-vi} .
+
+exit 0 # For sanity.
