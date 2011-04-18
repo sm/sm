@@ -11,7 +11,7 @@ directories=( bin modules  )
 aux=( log tmp src )
 extensions=( core ext mod )
 files=( LICENSE VERSION README.md )
-configs=( user defaults )
+configs=( user ) # TODO move this to /etc/bdsm/ and/or $HOME/.bdsm/
 
 log "\nInstalling BDSM Framework into ${install_path}\n"
 
@@ -48,7 +48,7 @@ log "  Installing core files (${files[@]}) into ${install_path}"
 copy_files_to "${install_path}" ${files[@]}
 
 log "  Ensuring that the configuration files (${configs[@]}) exist in ${config_path}"
-ensure_files_exist "${install_path}/cofig/user" "${install_path}/config/defaults"
+ensure_files_exist "${install_path}/cofig/user"
 
 log "  Linking ${install_path}/bin/bdsm to ${prefix_path}/bin/bdsm"
 link --force "${install_path}/bin/bdsm" to "${prefix_path}/bin/bdsm"

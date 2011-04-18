@@ -8,7 +8,6 @@ true \
   "${modules_path:="${bdsm_path}/modules"}" \
   "${extensions_path:="${bdsm_path}/extensions"}" \
   "${templates_path:="${bdsm_path}/templates"}" \
-  "${config_path:="${bdsm_path}/config"}" \
   "${src_path:="${bdsm_path}/src"}" \
   "${extensions_src_path:="${src_path}/extensions"}" \
   "${tmp_path:="${bdsm_path}/tmp"}" \
@@ -22,6 +21,9 @@ true \
   "${hooks_flag:=1}" \
   "${PAGER:=cat -v}" \
 
+
+true \
+  "${config_path:="${extensions_path}/core/config"}"
 
 timestamp="$(date +%m.%d.%Y-%H:%M:%S)"
 

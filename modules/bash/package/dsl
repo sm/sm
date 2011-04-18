@@ -142,7 +142,7 @@ package_fetch_md5()
     "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
     "${packge_md5_url:="${package_base_url}/${package_file}.md5"}"
 
-  package_md5=$( hash_file "$extension_config_path/md5" "${package_file}" )
+  package_md5=$( hash_file "${extension_config_path}/md5" "${package_file}" )
 
   if [[ -z "${package_md5}" && -n "${package_md5_url}" ]] ; then
     curl -L "${packge_md5_url}" -o "${package_file}.md5" ||
