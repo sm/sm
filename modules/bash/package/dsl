@@ -365,8 +365,7 @@ package_profile_d()
 
     if os_is_darwin ; then
 
-      if grep -v '/etc/profile.d/' /etc/profile >/dev/null 2>&1 ; then
-
+      if ! awk '/\/etc\/profile\.d\//' /etc/profile ; then
         printf "%s" 'if [ -d /etc/profile.d ]; then for profile in /etc/profile.d/*.sh ; do ' \
           >> /etc/profile
 

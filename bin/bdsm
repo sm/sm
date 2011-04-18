@@ -4,6 +4,8 @@
 # See BDSM LICENSE file for Apache 2.0 license information.
 
 # Load System then User Configuration, if exists.
+. /etc/profile ; unset prefix_path
+
 for file in /etc/profile /etc/bdsmrc "$HOME/.bdsmrc" ; do
   [[ -s "${file}" ]]  && . "${file}"
 done
