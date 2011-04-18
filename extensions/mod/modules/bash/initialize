@@ -2,3 +2,5 @@
 
 true "${modules_path:="${bdsm_path}/modules"}"
 
+modules system
+
