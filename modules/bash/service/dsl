@@ -176,3 +176,18 @@ service_cli()
   done
 }
 
+services_list()
+{
+  error "Service listing has not yet been implemented."
+}
+
+services_installed()
+{
+  error "Installed services has not yet been implemented."
+}
+
+services_available()
+{
+  error "Installed services has not yet been implemented."
+}
+

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# Temlpates are useful for many things. Examples include but are not limited
+# to init scripts for services and default configuation files.
+

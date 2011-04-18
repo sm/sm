@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+NIY()
+{
+  fail "This feature has not yet been implemented."
+}
+
 extension_reload()
 {
   local _path="${extension_modules_path}/bash"

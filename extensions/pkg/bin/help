@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+description "${extension} BDSM extension."
+
+actions "  list     - List packages installed through BDSM extensions using the package module.
+  active     - List active packages versions.
+  activate   - Activate given package and version.
+  deactivate - Deactivate given package."
+
+show_help usage

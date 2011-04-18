@@ -144,6 +144,21 @@ while (( $# > 0 )) ; do
               parse_break=1
               ;;
 
+            srv|service|services)
+              extension="srv"
+              action="${1:-list}"
+              extension_args=("$@")
+              parse_break=1
+              ;;
+
+            pkg|package|packages)
+              extension="pkg"
+              action="${1:-list}"
+              extension_args=("$@")
+              parse_break=1
+              ;;
+
+
             edit|open|install|update|create)
               extension="ext"
               action="${token}"
