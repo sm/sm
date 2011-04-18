@@ -159,10 +159,6 @@ service_cli()
       --md5)
         service_md5="${extension_args[$((++index))]}"
         ;;
-      --licence)
-        display_extension_license
-        exit 0
-        ;;
       --help)
         service_usage
         exit 0
