@@ -16,10 +16,9 @@ else
   { : "${bdsm_path:="${prefix_path}/bdsm"}"; }
 fi
 
-{ : "${modules_path:="${bdsm_path}/modules"}" ; }
-
 export install_path="${bdsm_path}" # Path to install everything to
 export bdsm_path="$PWD"            # Path to load everything from
+export modules_path="${bdsm_path}/modules"
 
 # Load DSL and initialize BDSM core itself, manually.
 source "${PWD}/modules/bash/core/dsl"

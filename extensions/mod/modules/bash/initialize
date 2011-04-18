@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-true "${modules_path:="${bdsm_path}/modules"}"
+modules_path="${bdsm_path}/modules"
 
 modules system
 

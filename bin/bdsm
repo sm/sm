@@ -19,8 +19,7 @@ prefix_path="${prefix_path:-/usr/local}"
   && { : "${bdsm_path:="${prefix_path}bdsm"}"; } \
   || { : "${bdsm_path:="${prefix_path}/bdsm"}"; }
 
-true "${modules_path:="${bdsm_path}/modules"}"
-
+export modules_path="${bdsm_path}/modules"
 export initial_pwd="$PWD" # record this early on.
 
 # Load BDSM bash DSL and initialize for BDSM core itself manually.
@@ -35,7 +34,7 @@ unset script module
 # Now process CLI arguments.
 source "${modules_path}/bash/core/cli"
 
-[[ -n "$error_message" ]] && fail "$error_message"
+[[ -n "${error_message}" ]] && error "$error_message"
 
 #
 # Main Logic
@@ -49,5 +48,4 @@ source "${modules_path}/bash/core/cli"
 }
 
 disable_backtrace
-
 extension_action "${extension}" "${action}"
