@@ -2,5 +2,5 @@
 
 bdsm_version
 
-succeed "\nbdsm ${bdsm_version:-"?.?.?"} https://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)\n"
+succeed "\nBDSM Framework ${bdsm_version:-"?.?.?"} https://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)\n"
 

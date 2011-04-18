@@ -1,7 +1,7 @@
-# About
+# BDSM Framework
 
-Bash Development & Scripting Management Framework (BDSM) is a...
-scripting framework! (go figure)
+The Bash Devops Scripting Management Framework is a... scripting framework with
+a devops focus (go figure)!
 
 # Goal
 
