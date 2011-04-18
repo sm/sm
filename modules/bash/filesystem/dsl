@@ -86,11 +86,15 @@ remove_paths()
 
 ensure_files_exist()
 {
-  local _file _files=("$@")
+  local _file _files=("$@") _path
 
-  (( ${#_files[@]} > 0 )) || fail "Cannot ensure files exist as no files were given."
+  (( ${#_files[@]} > 0 )) ||
+    fail "Cannot ensure files exist as no files were given."
 
-  for _file in "${_files[@]}" ; do
+  for _file in "${_files[@]}"
+  do
+    _path="${_file%\/*}"
+    [[ -d "${_path}" ]] || mkdir -p "${_path}"
     [[ -e "${_file}" ]] || touch "${_file}"
   done
 }
@@ -99,7 +103,7 @@ ensure_files_exist()
 #       make this into make_files_executable or some such
 ensure_files_are_executable()
 {
-  local _file _files=("$@")
+  local _file _files=("$@") _path
 
   (( ${#_files[@]} > 0 )) || fail "Cannot ensure files are executable as no files were given."
 
@@ -109,6 +113,10 @@ ensure_files_are_executable()
 
     [[ -f "${_file}" ]] ||
       fail "Cannot make the file '${_file}' executable as the file does not exist."
+
+    _path="${_file%\/*}"
+    [[ -d "${_file}" ]] &&
+      fail "Cannot make the file '${_file} executable as '${_path}' does not even exist."
 
     chmod +x "${_file}"
   done
