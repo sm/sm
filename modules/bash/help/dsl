@@ -39,7 +39,6 @@ usage()
   log "\nActions\n"
   [[ -n "${help_actions}" ]] && \
     log "${help_actions}\n"
-  log "  help - Display this help text."
 
   [[ -n "${help_notes}" ]] && \
     log "\nNotes\n${help_notes}"
