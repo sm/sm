@@ -146,7 +146,7 @@ package_fetch_md5()
 
   if [[ -z "${package_md5}" && -n "${package_md5_url}" ]] ; then
     curl -L "${packge_md5_url}" -o "${package_file}.md5" ||
-      fail "Fetching md5 from '${package_md5_url}' failed."
+      error "Fetching md5 from '${package_md5_url}' failed."
 
     package_md5=$(cat "${package_file}.md5")
   fi
@@ -185,7 +185,7 @@ package_fetch()
     remove_files "${package_file}"
 
     curl -L "${package_url}" -o "${package_file}" ||
-      fail "Downloading ${package_name} from '${package_url}' to '${package_file}' failed "
+      error "Downloading ${package_name} from '${package_url}' to '${package_file}' failed "
   }
 }
 
@@ -205,7 +205,7 @@ package_extract()
       unzip "${package_file}" -C ${source_path}
       ;;
     *)
-      fail "Unknown archive format for ${package_file}"
+      error "Unknown archive format for ${package_file}"
       ;;
   esac
 }
@@ -228,7 +228,7 @@ package_configure()
   fi
 
   ${command} > configure.log 2>&1 ||
-    fail "Configuration of ${package_name} ${package_version} failed, seek help..."
+    error "Configuration of ${package_name} ${package_version} failed, seek help..."
 
   log "Configuration of ${package_name} ${package_version} successful."
 }
@@ -245,7 +245,7 @@ package_build()
   fi
 
   ${command} > make.log 2>&1 ||
-    fail "Compilation if ${package_name} ${package_version} failed! "
+    error "Compilation if ${package_name} ${package_version} failed! "
 }
 
 package_make_install()
@@ -259,7 +259,7 @@ package_make_install()
   fi
 
   ${command} > make.install.log 2>&1 ||
-    fail "Failed to make install of ${package_name} ${package_version} failed! "
+    error "Failed to make install of ${package_name} ${package_version} failed! "
 
   log "Installation of ${package_name} ${package_version} was successful! "
 }
@@ -323,9 +323,10 @@ package_ldconfig()
     return 0 # no lib/ directory for activated package, no need to update ldconfig
 
   # TODO: Figure out if solaris and freebsd have an analog to this?
-  if running_as_root ; then
-    if os_is_linux ; then
-
+  if running_as_root
+  then
+    if os_is_linux
+    then
       log "Updating ldconfig for ${_package}"
       ensure_paths_exist "/etc/ld.so.profile.d"
 
@@ -335,7 +336,8 @@ package_ldconfig()
       chmod_files 0644 "/etc/ld.so.profile.d/${_package}.conf"
 
       ldconfig
-    elif os_is_darwin ; then # Cluster Fuck.
+    elif os_is_darwin
+    then # Cluster Fuck.
       true
       # This should be handled by the profile.d?
       # _files=($(find "${prefix_path}/${_package}/active" -mindepth 1 -maxdepth 1 -type d))
@@ -353,8 +355,8 @@ package_profile_d()
   directory_exists "${prefix_path}/${_package}/active/bin" ||
     return 0 # No bin/ dir, no need for it to be in the path.
 
-  if running_as_root ; then
-
+  if running_as_root
+  then
     ensure_paths_exist "/etc/profile.d"
     ensure_files_exist "/etc/profile"
 
@@ -389,7 +391,7 @@ package_uninstall()
   true "${package_dir:="${package_name}-${package_version}"}"
 
   package_make_uninstall ||
-    fail "Failed to uninstall ${package_name} from ${prefix_path}."
+    error "Failed to uninstall ${package_name} from ${prefix_path}."
 
   log "Uninstalled ${package_name} from ${prefix_path}."
 }
