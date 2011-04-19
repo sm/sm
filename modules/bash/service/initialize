@@ -2,3 +2,5 @@
 
 modules filesystem system
 
+variable_is_nonempty init_scripts_path || init_scripts_path="$(init_scripts_path)"
+

@@ -49,10 +49,10 @@ fi
 
 variable_is_nonempty package_base_url  || read_default base_url prefix package
 variable_is_nonempty package_md5_url   || read_default md5_url prefix package
-variable_is_nonempty init_scripts_path || init_scripts_path="$(init_scripts_path)"
 variable_is_nonempty archive_format    || read_default archive_format
+variable_is_nonempty init_scripts_path || init_scripts_path="$(init_scripts_path)"
 
-true \
+: \
   "${archive_format:=tar.gz}" \
   "${data_path:="${data_base_path}/${package_version}"}"
 

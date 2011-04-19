@@ -5,8 +5,7 @@ init_scripts_path()
   if (( UID == 0 )) ; then
     case "$MACHTYPE" in
       *darwin*)
-        # For now stick with say, /usr/local/bin
-        printf "${prefix_path}/bin"
+        printf "/etc/init.d" # Service module will create and use this.
         ;;
       *linux-gnu*|*)
         if [[ -d "/etc/init.d" ]] ; then

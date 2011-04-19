@@ -191,3 +191,37 @@ services_available()
   error "Installed services has not yet been implemented."
 }
 
+service_init_d()
+{
+  local _service="${1:-}"
+
+  ensure_nonempty _service
+
+  directory_exists "${init_scripts_path}" ||
+    return 0 # No bin/ dir, no need for it to be in the path.
+
+  if running_as_root
+  then
+    ensure_paths_exist "/etc/conf.d" "${init_scripts_path}"
+
+    log "Installing init scripts for ${_service}"
+
+    # TODO: Install the service init script...
+
+    if template_exists "${_service}"
+    then
+      install_template "" to "${init_scripts_path}/${_service}" mode 0755
+    else
+      # Use core srv init.d template
+      install_template "${extensions_path}/srv/templates/init_d.template" to "${init_scripts_path}/${_service}" mode 0755
+    fi
+
+    printf "%s\n" "[ -d \"${prefix_path}/${_service}/active/bin\" ] && " \
+      > "/etc/profile.d/${_service}.sh"
+
+    printf "%s" "PATH=\"\$PATH:${prefix_path}/${_service}/active/bin\" ; export PATH; " \
+      >> /etc/profile.d/${_service}.sh
+
+    chmod_files 0755 /etc/profile.d/${_service}.sh
+  fi
+}

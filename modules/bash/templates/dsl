@@ -9,7 +9,7 @@ template_exists()
 
 install_template()
 {
-  local _name _target _source _mode=0644 _owner=$USER
+  local _template _name _target _source _mode=0644 _owner=$USER
 
   while (( $# > 0 )) ; do
     token="${1}" ; shift
@@ -44,7 +44,12 @@ install_template()
     esac
   done
 
-  local _template="${extension_templates_path}/${_name}.template"
+  if file_exists "${_name}"
+  then
+    _template="${_name}"
+  else
+    _template="${extension_templates_path}/${_name}.template"
+  fi
 
   ensure_paths_exist "$(dirname "${_target}")"
 
