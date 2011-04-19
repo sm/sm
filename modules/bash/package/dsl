@@ -336,13 +336,9 @@ package_ldconfig()
 
       ldconfig
     elif os_is_darwin ; then # Cluster Fuck.
-      _files=($(find "${prefix_path}/${_package}/active" -mindepth 1 -maxdepth 1 -type d))
-
-      copy_files_to "${prefix_path}" "${_files[@]}"
-
-      # for _path in "${_files[@]}" ; do
-      #   cp -Rf "${_path}" "${prefix_path}/"
-      # done
+      # This should be handled by the profile.d?
+      # _files=($(find "${prefix_path}/${_package}/active" -mindepth 1 -maxdepth 1 -type d))
+      # (( ${#_files[@]} > 0 )) && copy_files_to "${prefix_path}" "${_files[@]}"
     fi
   fi
 }
