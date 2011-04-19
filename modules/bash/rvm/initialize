@@ -4,10 +4,15 @@ modules array
 
 source_files "/etc/rvmrc" "$HOME/.rvmrc"
 
-rvm_files=("$rvm_path/scripts/rvm" "$HOME/.rvm/scripts/rvm" "/usr/local/rvm/scripts/rvm")
+rvm_files=(
+"$rvm_path/scripts/rvm"
+"$HOME/.rvm/scripts/rvm"
+"/usr/local/rvm/scripts/rvm"
+)
 
 # Attempt to load RVM
-files=( $(first $(nonempty_files "${rvm_files[@]}" ) ) )
+files=( $(nonempty_files "${rvm_files[@]}") )
 
-array_is_nonempty "files" && source_files "${files[@]}"
+array_is_nonempty "files" &&
+  source_files $(array_first_element files)
 

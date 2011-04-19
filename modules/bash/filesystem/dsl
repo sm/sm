@@ -26,7 +26,8 @@ nonempty_files()
 {
   local _file _files=("$@")
 
-  (( ${#_files[@]} > 0 )) || fail "Cannot return nonempty files as no files were given."
+  (( ${#_files[@]} > 0 )) ||
+    fail "Cannot return nonempty files as no files were given."
 
   for _file in "${_files[@]}" ; do
     file_is_nonempty "${_file}" && printf "${_file}\n"
