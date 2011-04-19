@@ -184,8 +184,8 @@ extensions_in()
     extension_name="${extension_source_path//*\/}"
 
     case ${extension_name} in
-      (bdsm|extension|[[=.=]]*)
-        true # Ignore for now.
+      (core|ext|mod|pkg|svc|[[=.=]]*)
+        true # Ignore core extensions, they are updated with BDSM itself.
         ;;
       (*)
         extensions[${#extensions[@]}]="${extension_name//*\//}"
