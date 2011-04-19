@@ -51,3 +51,15 @@ load()
   done
 }
 
+timestamp_set()
+{
+  timestamp=$(timestamp)
+}
+
+timestamp()
+{
+  local _format="${1:-"%m.%d.%Y-%H:%M:%S"}"
+
+  printf "%s" "$(date +${_format})"
+}
+

@@ -15,6 +15,6 @@ case "${extension_version:-head}" in
     ;;
 esac
 
-install_extensions "${extension_args[@]}"
+extensions_install "${extension_args[@]}"
 
 succeed "Installed extensions ${extension_args[*]}"

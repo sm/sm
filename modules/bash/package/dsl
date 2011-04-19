@@ -82,14 +82,16 @@ package_install()
 
   enter "${source_path}"
 
-  if command_exists "${package_name}_download" ; then
+  if command_exists "${package_name}_download"
+  then
     "${package_name}_download"
   else
     log "Downloading ${package_name} ${package_version}"
     package_fetch
   fi
 
-  if command_exists "${package_name}_extract" ; then
+  if command_exists "${package_name}_extract"
+  then
     "${package_name}_extract"
   else
     log "Extracting ${package_name} ${package_version}"
@@ -98,28 +100,32 @@ package_install()
 
   enter "${package_dir}"
 
-  if command_exists "${package_name}_patch" ; then
+  if command_exists "${package_name}_patch"
+  then
     "${package_name}_patch"
   else
     log "Applying any patches found for ${package_name} ${package_version}"
     package_patch
   fi
 
-  if command_exists "${package_name}_configure" ; then
+  if command_exists "${package_name}_configure"
+  then
     "${package_name}_configure"
   else
     log "Configuring ${package_name} ${package_version}"
     package_configure
   fi
 
-  if command_exists "${package_name}_build" ; then
+  if command_exists "${package_name}_build"
+  then
     "${package_name}_build"
   else
     log "Building ${package_name} ${package_version}"
     package_build
   fi
 
-  if command_exists "${package_name}_install" ; then
+  if command_exists "${package_name}_install"
+  then
     "${package_name}_install"
   else
     log "Installing ${package_name} ${package_version}"
@@ -128,6 +134,11 @@ package_install()
 
     log "Installed ${package_name} ${package_version}."
   fi
+
+  if command_exists "${package_name}_postinstall"
+  then
+    "${package_name}_postinstall"
+  else
 
   package_activate_if_first "${package_name}" "${package_version}"
 }
@@ -140,11 +151,11 @@ package_fetch_md5()
 
   true \
     "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
-    "${packge_md5_url:="${package_base_url}/${package_file}.md5"}"
+    "${packge_md5_url:="${package_base_url}/${package_file}.md5"}" \
+    "${package_md5:=$( hash_file "${extension_config_path}/md5" "${package_file}" )}"
 
-  package_md5=$( hash_file "${extension_config_path}/md5" "${package_file}" )
-
-  if [[ -z "${package_md5}" && -n "${package_md5_url}" ]] ; then
+  if [[ -z "${package_md5}" && -n "${package_md5_url}" ]]
+  then
     curl -L "${packge_md5_url}" -o "${package_file}.md5" ||
       error "Fetching md5 from '${package_md5_url}' failed."
 
@@ -158,13 +169,15 @@ file_matches_md5()
 
   [[ -s "${file}" ]] || return 1
 
-  if os_is_linux ; then
-    command="md5sum"
-  elif os_is_darwin ; then
-    command="/sbin/md5 -q"
+  if os_is_linux
+  then
+    _command="md5sum"
+  elif os_is_darwin
+  then
+    _command="/sbin/md5 -q"
   fi
 
-  file_md5="$($command "$file")"
+  file_md5="$($_command "$file")"
 
   [[ "${file_md5// *}" = "$md5" ]]
 }
@@ -212,14 +225,15 @@ package_extract()
 
 package_configure()
 {
-  local command
+  local _command
 
-  if [[ -n ${configure_command:-} ]] ; then
-    command="${configure_command}"
+  if [[ -n ${configure__command:-} ]]
+  then
+    _command="${configure__command}"
   else
     export PREFIX="${install_base_path}/${package_version}"
 
-    command="./configure ${configure_flags[@]:-"--prefix=${install_path:-$prefix_path}"}"
+    _command="./configure ${configure_flags[@]:-"--prefix=${install_path:-$prefix_path}"}"
 
     [[ -x ./configure ]] || {
       log "./configure not found or not executable, skipping configuration step."
@@ -227,7 +241,7 @@ package_configure()
     }
   fi
 
-  ${command} > configure.log 2>&1 ||
+  ${_command} > configure.log 2>&1 ||
     error "Configuration of ${package_name} ${package_version} failed, seek help..."
 
   log "Configuration of ${package_name} ${package_version} successful."
@@ -235,30 +249,31 @@ package_configure()
 
 package_build()
 {
-  # TODO: make this robust, -j4 for example.
-  local command
+  local _command
 
-  if [[ -n ${make_command:-} ]] ; then
-    command="${make_command}"
+  if [[ -n ${make__command:-} ]]
+  then
+    _command="${make__command}"
   else
-    command="make ${make_flags[@]:-"-j$(os_cpu_count)"}"
+    _command="make ${make_flags[@]:-"-j$(os_cpu_count)"}"
   fi
 
-  ${command} > make.log 2>&1 ||
+  ${_command} > make.log 2>&1 ||
     error "Compilation if ${package_name} ${package_version} failed! "
 }
 
 package_make_install()
 {
-  local command
+  local _command
 
-  if [[ -n ${make_command:-} ]] ; then
-    command="${make_command}"
+  if [[ -n ${make__command:-} ]]
+  then
+    _command="${make__command}"
   else
-    command="make ${make_install_flags[@]:-install}"
+    _command="make ${make_install_flags[@]:-install}"
   fi
 
-  ${command} > make.install.log 2>&1 ||
+  ${_command} > make.install.log 2>&1 ||
     error "Failed to make install of ${package_name} ${package_version} failed! "
 
   log "Installation of ${package_name} ${package_version} was successful! "
@@ -287,20 +302,25 @@ package_activate()
 
 package_deactivate()
 {
-  local _package="${1:-}"
+  local _package="${1:-}" _file _files
 
   ensure_nonempty _package
 
   log "Deactivating ${_package}"
 
-  symlink_exists "${prefix_path}/${_package}/active" && \
-    remove_files "${prefix_path}/${_package}/active"
+  _files=(
+    "${prefix_path}/${_package}/active"
+    "/etc/ld.so.profile.d/${_package}.conf"
+    "/etc/profile.d/${_package}.sh"
+  )
 
-  file_exists "/etc/ld.so.profile.d/${_package}.conf" && \
-    remove_files "/etc/ld.so.profile.d/${_package}.conf"
-
-  file_exists "/etc/profile.d/${_package}.sh" && \
-    remove_files "/etc/profile.d/${_package}.sh"
+  for _file in $"${_files[@]}"
+  do
+    if file_exists "${_file}"
+    then
+      remove_files "${_file}"
+    fi
+  done
 }
 
 package_activate_if_first()

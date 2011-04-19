@@ -298,10 +298,7 @@ os_cpu_count()
     read -r _count < <(sysctl hw.ncpu)
     _count="${_count//* }"
   elif os_is_linux ; then
-    _count=0
-    while read -r line ; do
-      case "$line" in (processor*) ((++_count)) ;; esac
-    done < /proc/cpuinfo
+    _count=$(awk '/^processor/{count++} END{print count}' /proc/cpuinfo 2>&1)
   fi
 
   printf '%d' ${_count}

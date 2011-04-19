@@ -5,6 +5,32 @@ NIY()
   fail "This feature has not yet been implemented."
 }
 
+extensions_install()
+{
+  local _extension
+  local _extensions=("$@")
+
+  for _extension in "${_extensions[@]}"
+  do
+    case "${_extension#\/}" in
+      ext|srv|pkg|core|mod) continue ;;
+    esac
+
+    [[ -z "${_extension}" ]] && continue
+
+    extension_src_path="${extensions_src_path}/${_extension}"
+
+    # TODO: Install extension dependencies?
+
+    if [[ -s "${extension_src_path}/VERSION" && -x "${extension_src_path}/bin/help" ]]
+    then
+      copy_directories_to "${bdsm_path}/extensions" "${extension_src_path}"
+    else
+      error "${extension_src_path}/${extension} is not a proper extension.\nIt is missing one or more of the VERSION or bin/help."
+    fi
+  done
+}
+
 extension_reload()
 {
   local _path="${extension_modules_path}/bash"

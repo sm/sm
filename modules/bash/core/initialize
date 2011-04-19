@@ -25,7 +25,7 @@ true \
 true \
   "${config_path:="${extensions_path}/core/config"}"
 
-timestamp="$(date +%m.%d.%Y-%H:%M:%S)"
+set_timestamp
 
 # Note that the trace, logging and core modules have already been loaded.
 # Note these moduels will be available to *all* extensions.

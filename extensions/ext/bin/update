@@ -24,7 +24,7 @@ extension_action=${extension_args[0]}
 case "$extension_action" in
   repository)
     fetch_extensions_repository
-    install_extensions "${extensions[@]}"
+    extensions_install "${extensions[@]}"
   ;;
 
   help|usage)
@@ -38,7 +38,7 @@ case "$extension_action" in
     if (( ${#extension_args[@]} > 0 )) ; then
       fetch_extensions_repository
 
-      install_extensions "${extensions[@]}"
+      extensions_install "${extensions[@]}"
     else
       log "No extensions to update."
     fi
@@ -47,7 +47,7 @@ case "$extension_action" in
   *)
     # TODO: Updates for released extensions instead of only from repository.
     fetch_extensions_repository
-    install_extensions "${extension_action}" "${extension_args[@]}"
+    extensions_install "${extension_action}" "${extension_args[@]}"
   ;;
 esac
 
