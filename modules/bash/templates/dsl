@@ -9,7 +9,7 @@ template_exists()
 
 install_template()
 {
-  local _name _target _source _mode=0644 _owner=$USER _executable_flag=0
+  local _name _target _source _mode=0644 _owner=$USER
 
   while (( $# > 0 )) ; do
     token="${1}" ; shift
@@ -30,9 +30,6 @@ install_template()
       from) # TODO: finish this part.
          _source="$1" ; shift
         ;;
-      executable)
-        _executable_flag=1
-        ;;
 
       *)
         if [[ -z "${_name}" ]] ; then
@@ -51,21 +48,22 @@ install_template()
 
   ensure_paths_exist "$(dirname "${_target}")"
 
-  if [[ -f "${_template}" ]] ; then
-    if [[ -d "${_target}" ]] ; then
-      if [[ -d "${_target}/${_name}" ]] ; then
+  if [[ -f "${_template}" ]]
+  then
+    if [[ -d "${_target}" ]]
+    then
+      if [[ -d "${_target}/${_name}" ]]
+      then
         fail "${_target}/${_name} is a directory, cannot install template ${_name}"
       else
         cp -f "${_template}" "${_target}/${_name}"
         [[ -n "${_mode:-}" ]]       && chmod "${_mode}" "${_target}/${_name}"
         [[ -n "${_owner:-}" ]]      && chown "${_owner}" "${_target}/${_name}"
-        (( _executable_flag == 1 )) && chmod +x "${_target}/${_name}"
       fi
     else
       cp -f "${_template}" "${_target}"
       [[ -n "${_mode:-}" ]]       && chmod "${_mode}" "${_target}"
       [[ -n "${_owner:-}" ]]      && chown "${_owner}" "${_target}"
-      (( _executable_flag == 1 )) && chmod +x "${_target}"
     fi
   else
     fail "Template missing: #{_template}"
