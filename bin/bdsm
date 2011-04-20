@@ -30,7 +30,7 @@ export initial_pwd="$PWD" # record this early on.
 # Load BDSM bash DSL and initialize for BDSM core itself manually.
 # Ensure that backtrace and logging are defined first as everything depends on them.
 for script in dsl initialize ; do
-  for module in trace logging core ; do
+  for module in core ; do
     source "${modules_path}/bash/${module}/${script}"
   done
 done

@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+#
+# Single Service functions.
+#
 service_start()
 {
   if command_exists "${extension}_start" ; then
@@ -172,26 +175,23 @@ service_cli()
     esac
 
     (( ${#_ignored_args[@]} > 0 )) && extension_args=( "${_ignored_args[@]}" )
-
   done
+
+  # Sanity checks, the following items should be set at this point.
+  variable_is_set prefix_path ||
+    fail "prefix_path has not been set."
+
+  directory_exists "$prefix_path" ||
+    fail "The directory ${prefix_path} is missing."
+
+  file_is_executable "${service_binary}" ||
+    fail "Could not find postmaster or postmaster is not executable."
+
+  # The path that is to be used for the script
+  PATH="${prefix_path}/bin:/bin:/usr/bin:/usr/local/bin:${PATH}"
 }
 
-services_list()
-{
-  error "Service listing has not yet been implemented."
-}
-
-services_installed()
-{
-  error "Installed services has not yet been implemented."
-}
-
-services_available()
-{
-  error "Installed services has not yet been implemented."
-}
-
-service_init_d()
+service_install_init_d()
 {
   local _service="${1:-}"
 
@@ -210,12 +210,14 @@ service_init_d()
 
     if template_exists "${_service}"
     then
-      install_template "" to "${init_scripts_path}/${_service}" mode 0755
+      install_template "..." to "${init_scripts_path}/${_service}" mode 0755
     else
       # Use core srv init.d template
-      install_template "${extensions_path}/srv/templates/init_d.template" to "${init_scripts_path}/${_service}" mode 0755
+      install_template "${extensions_path}/srv/templates/init_d.template" \
+        to "${init_scripts_path}/${_service}" mode 0755
     fi
 
+    # TODO: Replace this with install_template
     printf "%s\n" "[ -d \"${prefix_path}/${_service}/active/bin\" ] && " \
       > "/etc/profile.d/${_service}.sh"
 
@@ -225,3 +227,51 @@ service_init_d()
     chmod_files 0755 /etc/profile.d/${_service}.sh
   fi
 }
+
+service_pid()
+{
+  local _path="${run_path:="/var/run"}/${extension}"
+  ensure_paths_exist "${_path}"
+  read -r pid < "${_path}/${extension}.pid"
+
+  if os_is_linux
+  then # Sanity check.
+    directory_exists "/proc/${pid}" || pid=0 && rm -f "${_path}/${extension}.pid"
+  fi
+}
+
+service_load_conf_d()
+{
+  [[ -s "${confd_path}/${extension}.conf" ]] && "${confd_path}/${extension}.conf"
+}
+
+service_init_d()
+{ # Handle init.d functionality for the service extension.
+  enable_backtrace # Enable backtrace on script error.
+
+  service_load_conf_d # Load the configuration file.
+
+  service_pid
+
+  service_cli # Parse the script arguments and take action accordingly.
+}
+
+#
+# General Services functions.
+#
+
+services_list()
+{
+  error "Service listing has not yet been implemented."
+}
+
+services_installed()
+{
+  error "Installed services has not yet been implemented."
+}
+
+services_available()
+{
+  error "Installed services has not yet been implemented."
+}
+

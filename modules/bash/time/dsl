@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+timestamp_set()
+{
+  timestamp=$(timestamp)
+}
+
+timestamp()
+{
+  local _format="${1:-"%Y-%m-%dT%H:%M:%S"}"
+
+  printf "%s" "$(date +"${_format}")"
+}
+

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+[[ -n "$timestamp" ]] || timestamp_set
+

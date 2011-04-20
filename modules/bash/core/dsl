@@ -1,65 +1,8 @@
 #!/usr/bin/env bash
 
-bdsm_path()
-{
-  (( UID == 0 )) && { : "${prefix_path:=/usr/local}"; } ||{ : "${prefix_path:=$HOME}"; }
-
-  [[ "$prefix_path" = "$HOME" ]] && { : "${bdsm_path:="${prefix_path}bdsm"}"; } ||
-    { : "${bdsm_path:="${prefix_path}/bdsm"}"; }
-}
-
 bdsm_exports()
 {
   export action archives_path bdsm_path branch config_path database database_name debug_flag environment error_message extension extension_action extension_args extension_bin_path extension_config_path extension_modules_path extension_path extension_templates_path extensions_path flags framework head_flag hooks_flag keep_releases modules_path old_releases parse_break paths prefix_path previous_path project project_path release_path remote repository result revision shared_path src_path templates_path timestamp tmp_path trace_flag user extension_log_path
   # TODO: Filter this list of exports down.
-}
-
-# Source bdsmrc files, cascaded.
-bdsmrc()
-{
-  source_files "/etc/bdsmrc" "$HOME/.bdsmrc"
-}
-
-modules()
-{
-  if (( trace_flag < 2 )) ; then set +o xtrace ; fi
-
-  local _module _bdsm _extension _path _file _modules=("$@")
-
-  (( ${#_modules[@]} > 0 )) || fail "No modules specified to load."
-
-  for _module in "${_modules[@]}" ; do
-    _bdsm="${modules_path}/bash/${_module}"
-    _extension="${extension_modules_path}/bash/${_module}"
-
-    for _path in "${_bdsm}" "${_extension}" ; do
-      for _file in dsl initialize cli ; do
-        [[ -s "${_path}/${_file}" ]] && source "${_path}/${_file}"
-      done
-    done
-  done
-
-  if (( trace_flag == 1 )) ; then set -o xtrace ; fi
-}
-
-load()
-{
-  local _file _files=("$@")
-
-  for _file in "${_files[@]}" ; do
-    source_files "${extension_modules_path:-"$modules_path"}/bash/${_file}"
-  done
-}
-
-timestamp_set()
-{
-  timestamp=$(timestamp)
-}
-
-timestamp()
-{
-  local _format="${1:-"%m.%d.%Y-%H:%M:%S"}"
-
-  printf "%s" "$(date +${_format})"
 }
 

@@ -297,7 +297,7 @@ package_activate()
 
   package_profile_d "${_package}"
 
-  # TODO: package_conf_d, detect if ext template file exists and put it in place.
+  package_conf_d "${_package}"
 }
 
 package_deactivate()
@@ -402,6 +402,17 @@ package_profile_d()
 
     chmod_files 0755 /etc/profile.d/${_package}.sh
   fi
+}
+
+package_conf_d()
+{
+  # TODO: package_conf_d, detect if ext template file exists and put it in place.
+  install_template "conf.d.template" to "/etc/conf.d/${extension}.conf" \
+    mode 0644 owner "${package_user}:${package_user}"
+
+  seed_template \
+    confd_path "${confd_path}" \
+    extension "${extension}"
 }
 
 package_uninstall()

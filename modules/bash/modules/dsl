@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+modules()
+{
+  if (( trace_flag < 2 )) ; then set +o xtrace ; fi
+
+  local _module _bdsm _extension _path _file _modules=("$@")
+
+  (( ${#_modules[@]} > 0 )) || fail "No modules specified to load."
+
+  for _module in "${_modules[@]}"
+  do
+    _bdsm="${modules_path}/bash/${_module}"
+    _extension="${extension_modules_path}/bash/${_module}"
+
+    for _path in "${_bdsm}" "${_extension}"
+    do
+      for _file in dsl initialize
+      do
+        if [[ -s "${_path}/${_file}" ]]
+        then
+          source "${_path}/${_file}"
+        fi
+      done
+    done
+  done
+
+  if (( trace_flag == 1 )) ; then set -o xtrace ; fi
+}
+
+load()
+{
+  local _file _files=("$@")
+
+  for _file in "${_files[@]}" ; do
+    source_files "${extension_modules_path:-"$modules_path"}/bash/${_file}"
+  done
+}
+

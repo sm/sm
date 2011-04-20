@@ -1,0 +1,8 @@
+#!/bin/sh
+if [ -s "{{confd_path}}/{{extension}}.conf" ]
+then
+  prefix_path=$(. "{{confd_path}}/{{extension}}.conf" > /dev/null 2>&1 ; printf "$prefix_path")
+  [ -n "${prefix_path:-}" ] && PATH="$PATH:${prefix_path}/bin"
+  unset prefix_path
+fi
+

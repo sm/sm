@@ -2,37 +2,65 @@
 
 shopt -s extglob # Extended globs must always be on for BDSM.
 
-bdsm_path
+# load bdsmrc files, cascaded. Settings in these files trump.
+[[ -s "/etc/bdsmrc" ]] && . "/etc/bdsmrc"
+[[ -s "$HOME/.bdsmrc" ]] && . "$HOME/bdsmrc"
 
-true \
+if (( UID == 0 ))
+then # FHS
+  : \
+    "${prefix_path:="/usr/local"}"
+else # HOME
+  : \
+    "${prefix_path:=$HOME}" \
+fi
+
+if [[ "$prefix_path" = "$HOME" ]]
+then
+  : \
+    "${bdsm_path:="${prefix_path}/.bdsm"}"
+else
+  : \
+    "${bdsm_path:="${prefix_path}/bdsm"}"
+fi
+
+if (( UID == 0 ))
+then # FHS
+  :\
+    "${var_path:="/var"}" \
+    "${etc_path:="/etc"}"
+else
+  :\
+    "${var_path:="${bdsm_path}/var"}" \
+    "${etc_path:="${bdsm_path}/etc"}"
+fi
+
+: \
   "${modules_path:="${bdsm_path}/modules"}" \
   "${extensions_path:="${bdsm_path}/extensions"}" \
   "${templates_path:="${bdsm_path}/templates"}" \
   "${src_path:="${bdsm_path}/src"}" \
-  "${extensions_src_path:="${src_path}/extensions"}" \
   "${tmp_path:="${bdsm_path}/tmp"}" \
   "${bin_path:="${bdsm_path}/bin"}" \
   "${archives_path:="${bdsm_path}/archives"}" \
+  "${extensions_src_path:="${src_path}/extensions"}" \
   "${remote:="origin"}" \
   "${branch:="master"}" \
   "${language:="bash"}" \
   "${user:=$USER}" \
   "${keep_releases:=4}" \
   "${hooks_flag:=1}" \
-  "${PAGER:=cat -v}" \
-
-
-true \
+  "${PAGER:="cat -v"}" \
   "${config_path:="${extensions_path}/core/config"}"
 
-set_timestamp
 
-# Note that the trace, logging and core modules have already been loaded.
-# Note these moduels will be available to *all* extensions.
-modules variables environment filesystem extensions
+# Load module() function and then load core modules.
+source "${modules_path}/bash/modules/dsl"
+source "${modules_path}/bash/modules/initialize"
+modules \
+  trace logging time variables environment filesystem extensions
 
+load core/dsl
 # Ensure variables desired to be exported to extensions actually are.
 bdsm_exports
-
-bdsmrc # (re)load bdsmrc files.
 

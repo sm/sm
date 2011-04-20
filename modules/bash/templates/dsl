@@ -75,3 +75,21 @@ install_template()
   fi
 }
 
+seed_template()
+{
+  local _args="$@"
+
+  (( ${_args} > 0 ))  || fail "Arguments not specified, cannot seed template."
+  ((  (5 % 2) == 0 )) || fail "An even number of arguments must be given."
+
+  warn "Template Seeding (replacing defaults) has not yet been fully implemented."
+
+  for (( index=0 ; index < $(( ${#_args[@]} / 2 )) ; index++ ))
+  do
+    #seed_template_with \
+      #confd_path "${confd_path}" \
+      #extension "${extension}"
+  done
+
+}
+
