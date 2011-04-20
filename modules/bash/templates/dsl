@@ -77,19 +77,39 @@ install_template()
 
 seed_template()
 {
-  local _args="$@"
+  local _template="${1:-}"
 
-  (( ${_args} > 0 ))  || fail "Arguments not specified, cannot seed template."
+  if [[ -n "${_template}" ]]
+  then
+    fail "Can not seed template as no template was given."
+  else
+    shift
+  fi
+
+  local _args="$@" _strings=()
+
+  [[ -f "${_template}" ]] ||
+    fail "Can not seed template template file '${_template}' does not exist."
+
+  (( ${_args} > 0 ))  || fail "Arguments not specified, cannot seed template '${_template}'."
   ((  (5 % 2) == 0 )) || fail "An even number of arguments must be given."
 
   warn "Template Seeding (replacing defaults) has not yet been fully implemented."
 
-  for (( index=0 ; index < $(( ${#_args[@]} / 2 )) ; index++ ))
+  # Aggregate the replacement strings.
+  for (( index=0 ; index < ${#_args[@]} ; index++ ))
   do
-    #seed_template_with \
-      #confd_path "${confd_path}" \
-      #extension "${extension}"
+    _strings+=(" -e 's#${_args[${index}]}#${_args[$((++index))]}#g' ")
   done
 
+  # Filter the template with the replacments.
+  sed ${_strings[@]} ${_template} >> ${_template}.${timestamp}
+
+  if file_exists "${_template}.${timestamp}"
+  then
+    mv -f "${_template}.${timestamp}" "${_template}"
+  else
+    fail "Something went horribly wrong, the template intermediate file '${_template}.${timestamp}' does not exist."
+  fi
 }
 
