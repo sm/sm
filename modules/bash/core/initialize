@@ -4,7 +4,7 @@ shopt -s extglob # Extended globs must always be on for BDSM.
 
 # load bdsmrc files, cascaded. Settings in these files trump.
 [[ -s "/etc/bdsmrc" ]] && . "/etc/bdsmrc"
-[[ -s "$HOME/.bdsmrc" ]] && . "$HOME/bdsmrc"
+[[ -s "$HOME/.bdsmrc" ]] && . "$HOME/.bdsmrc"
 
 if (( UID == 0 ))
 then # FHS
@@ -12,7 +12,7 @@ then # FHS
     "${prefix_path:="/usr/local"}"
 else # HOME
   : \
-    "${prefix_path:=$HOME}" \
+    "${prefix_path:=$HOME}"
 fi
 
 if [[ "$prefix_path" = "$HOME" ]]
