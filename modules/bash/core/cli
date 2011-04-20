@@ -99,7 +99,7 @@ while (( $# > 0 )) ; do
               parse_break=1
               ;;
 
-            help)
+            --help|help)
               action="help"
               extension="${1:-core}"
               parse_break=1
