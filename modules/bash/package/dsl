@@ -138,7 +138,7 @@ package_install()
   if command_exists "${package_name}_postinstall"
   then
     "${package_name}_postinstall"
-  else
+  fi
 
   package_activate_if_first "${package_name}" "${package_version}"
 }
