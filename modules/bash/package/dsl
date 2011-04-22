@@ -588,8 +588,8 @@ package_must_be_active()
   [[ -n "${_name}" ]] ||
     fail "Can not ensure that package is active as no package name was given or name is empty."
 
-  package_is_active "node" ||
-    error "Install/activate the node package extension before installing npm."
+  package_is_active "${_name}" ||
+    error "Install/activate the node package extension before installing ${_name}."
 }
 
 packages_must_be_active()
