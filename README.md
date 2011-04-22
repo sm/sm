@@ -37,3 +37,20 @@ wayneeseguin@gmail.com
 http://github.com/wayneeseguin
 http://twitter.com/wayneeseguin
 
+# Contributing
+
+In the spirit of free software, everyone is encouraged to help improve this project.
+
+Here are some ways you can contribute:
+
+by using the latest development and release versions
+by reporting bugs in #beginrescueend on irc.freenode.net
+by suggesting new features in #beginrescueend on irc.freenode.net
+by writing or editing documentation
+by translating documentation to a new language
+by writing extensions
+by writing code (no patch is too small: fix typos, add comments, clean up inconsistent whitespace)
+by refactoring code
+by resolving issues
+by reviewing patches
+
