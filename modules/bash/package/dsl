@@ -218,7 +218,7 @@ package_extract()
         error "There was an error while extracting the archive '${package_file}'"
       ;;
     zip)
-      unzip "${package_file}" -d "${source_path}/${package_dir}" ||
+      unzip "${package_file}" -d "${source_path}" ||
         error "There was an error while extracting the archive '${package_file}'"
       ;;
     *)
