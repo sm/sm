@@ -7,4 +7,4 @@ for extension in "${extensions[@]}" ; do
   remove_paths "$extensions_path/$extension/"
 done
 
-succeed "Uninstalled extensions: ${extensions}"
+succeed "Removed extensions: ${extensions}"

@@ -162,7 +162,7 @@ while (( $# > 0 )) ; do
               ;;
 
 
-            edit|open|install|update|create)
+            edit|open|extend|update|create)
               extension="ext"
               action="${token}"
               extension_args=("$@")
