@@ -231,18 +231,15 @@ package_configure()
 {
   local _command
 
-  if [[ -n ${configure__command:-} ]]
+  if [[ -n ${configure_command:-} ]]
   then
-    _command="${configure__command}"
+    _command="${configure_command}"
   else
     export PREFIX="${install_base_path}/${package_version}"
 
     _command="./configure ${configure_flags[@]:-"--prefix=${install_path:-$prefix_path}"}"
 
-    [[ -x ./configure ]] || {
-      log "./configure not found or not executable, skipping configuration step."
-      return 0
-    }
+    file_is_executable "configure" || return 0
   fi
 
   ${_command} > configure.log 2>&1 ||
@@ -255,9 +252,9 @@ package_build()
 {
   local _command
 
-  if [[ -n ${make__command:-} ]]
+  if [[ -n ${make_command:-} ]]
   then
-    _command="${make__command}"
+    _command="${make_command}"
   else
     _command="make ${make_flags[@]:-"-j$(os_cpu_count)"}"
   fi
@@ -270,9 +267,9 @@ package_make_install()
 {
   local _command
 
-  if [[ -n ${make__command:-} ]]
+  if [[ -n ${make_command:-} ]]
   then
-    _command="${make__command}"
+    _command="${make_command}"
   else
     _command="make ${make_install_flags[@]:-install}"
   fi
@@ -291,6 +288,9 @@ package_activate()
 
   symlink_exists "${prefix_path}/${_package}/active" &&
     package_deactivate "${_package}"
+
+  directory_exists "" ||
+    log "Skipping activation of ${_package} ${_version} as '${install_path}' does not exist."
 
   log "Activating ${_package} ${_version}"
 
@@ -333,8 +333,13 @@ package_activate_if_first()
 
   ensure_nonempty _package _version
 
-  symlink_exists "${prefix_path}/${_package}/active" ||
-    package_activate "${_package}" "${_version}"
+  if directory_exists "${install_path}"
+  then
+    symlink_exists "${prefix_path}/${_package}/active" ||
+      package_activate "${_package}" "${_version}"
+  else
+    log "'${install_path}' not found, skipping activation."
+  fi
 }
 
 package_ldconfig()
@@ -410,19 +415,17 @@ package_profile_d()
 
 package_conf_d()
 {
-  # TODO: package_conf_d, detect if ext template file exists and put it in place.
-  if template_exists "conf.d.template"
-  then
-    install_template "conf.d.template" to "/etc/conf.d/${extension}.conf" \
-      mode 0644 owner "${package_user}:${package_user}"
-  fi
+  template_exists "conf.d.template" || return 0
 
-  if template_exists "/etc/conf.d/${extension}.conf"
-  then
-    seed_template "/etc/conf.d/${extension}.conf" \
-      confd_path "${confd_path}" \
-      extension "${extension}"
-  fi
+  install_template "conf.d.template" to "/etc/conf.d/${extension}.conf" \
+    mode 0644 owner "${package_user}:${package_user}"
+
+  template_exists "/etc/conf.d/${extension}.conf" ||
+    return 0
+
+  seed_template "/etc/conf.d/${extension}.conf" \
+    confd_path "${confd_path}" \
+    extension "${extension}"
 }
 
 package_uninstall()
@@ -565,5 +568,39 @@ package_cli()
 
     (( ${#_ignored_args[@]} > 0 )) && extension_args=( "${_ignored_args[@]}" )
 
+  done
+}
+
+package_is_active()
+{
+  local _name="${1:-}"
+  [[ -n "${_name}" ]] ||
+    fail "Can not query if a package is active as no package name was given or name is empty."
+
+  local _path="${prefix_path}/${_name}"
+
+  [[ -L "${_path}/active" ]] && [[ -d $(readlink "${_path}/active") ]]
+}
+
+package_must_be_active()
+{
+  local _name="${1:-}"
+  [[ -n "${_name}" ]] ||
+    fail "Can not ensure that package is active as no package name was given or name is empty."
+
+  package_is_active "node" ||
+    error "Install/activate the node package extension before installing npm."
+}
+
+packages_must_be_active()
+{
+  local _package _packages="$@"
+
+  (( "${#@}" > 0 )) ||
+    fail "Can not ensure that packages are active as no packages were given."
+
+  for _package in "${_packages[@]}"
+  do
+    package_must_be_active "${_package}"
   done
 }
