@@ -341,6 +341,38 @@ copy_directories_to()
   done
 }
 
+copy_directory()
+{
+  local _source _target
+
+  while (( $# > 0 )) ; do
+    token="$1" ; shift
+    case "${token}" in
+      to)
+        _target="${1}"
+        shift
+        ;;
+      from)
+        _source="${1}"
+        shift
+        ;;
+
+      *)
+        if [[ -z "${_source}" ]] ; then
+          _source="$token" ; shift
+        elif [[ -z "${_target}" ]] ; then
+          _target="$token" ; shift
+          break # When we have a target we are done.
+          # An alternative idea would be to allow an array of multiple targets
+          # to symlink to...
+        fi
+        ;;
+    esac
+  done
+
+  cp -Rf "${_source}" "${_target}"
+}
+
 move_files_to()
 {
   local _path="$1" _file ; shift

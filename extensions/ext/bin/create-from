@@ -21,6 +21,6 @@ then
   error "The target extension '${_target}' already exists, cannot create it from ${_source}."
 fi
 
-copy_directories_to "${extensions_development_path}/${_target}" \
-  "${extensions_development_path}/${_source}"
+copy_directory "${extensions_development_path}/${_source}" \
+  "${extensions_development_path}/${_target}"
 
