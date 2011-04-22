@@ -289,7 +289,7 @@ package_activate()
   symlink_exists "${prefix_path}/${_package}/active" &&
     package_deactivate "${_package}"
 
-  directory_exists "" ||
+  directory_exists "${prefix_path}/${_package}/${_version}" ||
     log "Skipping activation of ${_package} ${_version} as '${install_path}' does not exist."
 
   log "Activating ${_package} ${_version}"
