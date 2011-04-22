@@ -12,7 +12,7 @@ info()
 
 warn()
 {
-  printf "WARNING: $*"
+  log "WARNING: $*"
 }
 
 debug()
@@ -23,7 +23,7 @@ debug()
 error()
 {
   disable_backtrace
-  printf "ERROR: $*"
+  log "ERROR: $*"
   exit 1
 }
 

@@ -4,24 +4,23 @@
   error "An extension name must be specified."
 
 # Parse arguments
-while (( ${#extension_args} > 0 )) ; do
-  token="$1" ; shift
+for (( index = 0 ; index < ${#extension_args[@]} ; index++ ))
+do
+  token="${extension_args[${index}]}"
   case "${token}" in
     to)
-      _target="${1}"
-      shift
+      _target="${extension_args[$((++index))]}"
       ;;
     from)
-      _source="${1}"
-      shift
+      _source="${extension_args[$((++index))]}"
       ;;
-
     *)
       if [[ -z "${_source}" ]] ; then
-        _source="$token" ; shift
+        _source="$token"
       elif [[ -z "${_target}" ]] ; then
-        _target="$token" ; shift
-        break # When we have a target we are done.
+        _target="$token"
+      else
+        break
       fi
       ;;
   esac
