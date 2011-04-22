@@ -131,7 +131,7 @@ while (( $# > 0 )) ; do
 
             add|extend)
               extension="ext"
-              action="install"
+              action="extend"
               extension_args=("$@")
               parse_break=1
               ;;
@@ -162,7 +162,7 @@ while (( $# > 0 )) ; do
               ;;
 
 
-            edit|open|extend|update|create)
+            edit|open|update|create)
               extension="ext"
               action="${token}"
               extension_args=("$@")
