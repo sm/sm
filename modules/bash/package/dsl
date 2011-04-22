@@ -413,9 +413,12 @@ package_conf_d()
       mode 0644 owner "${package_user}:${package_user}"
   fi
 
-  seed_template \
-    confd_path "${confd_path}" \
-    extension "${extension}"
+  if template_exists "/etc/conf.d/${extension}.conf"
+  then
+    seed_template "/etc/conf.d/${extension}.conf" \
+      confd_path "${confd_path}" \
+      extension "${extension}"
+  fi
 }
 
 package_uninstall()
