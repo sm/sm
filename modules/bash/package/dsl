@@ -149,7 +149,7 @@ package_fetch_md5()
 
   local download_url
 
-  true \
+  : \
     "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
     "${packge_md5_url:="${package_base_url}/${package_file}.md5"}" \
     "${package_md5:=$( hash_file "${extension_config_path}/md5" "${package_file}" )}"
@@ -206,16 +206,20 @@ package_extract()
 {
   case "${archive_format}" in
     tar.gz|tgz) # gzip
-      tar zxf "${package_file}"
+      tar zxf "${package_file}" ||
+        error "There was an error while extracting the archive '${package_file}'"
       ;;
     xz) # LZMA
-      tar Jxf "${package_file}"
+      tar Jxf "${package_file}" ||
+        error "There was an error while extracting the archive '${package_file}'"
       ;;
     tar.bz2) # bzip
-      tar jxf "${package_file}"
+      tar jxf "${package_file}" ||
+        error "There was an error while extracting the archive '${package_file}'"
       ;;
     zip)
-      unzip "${package_file}" -C ${source_path}
+      unzip "${package_file}" -d "${source_path}/${package_dir}" ||
+        error "There was an error while extracting the archive '${package_file}'"
       ;;
     *)
       error "Unknown archive format for ${package_file}"
