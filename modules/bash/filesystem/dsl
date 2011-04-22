@@ -173,6 +173,54 @@ link()
   fi
 }
 
+move_directory()
+{
+  local _source _target _mode _owner
+
+  while (( $# > 0 )) ; do
+    token="$1" ; shift
+    case "${token}" in
+      to)
+        _target="${1}" ; shift
+        ;;
+
+      from)
+        _source="${1}" ; shift
+        ;;
+
+      mode)
+         _mode="${1}" ; shift
+        ;;
+
+      owner)
+         _owner="${1}" ; shift
+        ;;
+
+      *)
+        if [[ -z "${_source}" ]] ; then
+          _source="$token"
+        elif [[ -z "${_target}" ]] ; then
+          _target="$token"
+          break # When we have a target we are done.
+          # An alternative idea would be to allow an array of multiple targets
+          # to symlink to...
+        fi
+        ;;
+    esac
+  done
+
+  [[ -n "${_source}" ]] ||
+    fail "Cannot move file as the source and target must be specified. "
+
+  [[ -n "${_target}" ]] ||
+    fail "Cannot move file as the source and target must be specified. "
+
+  mv "${_source}" "${_target}"
+
+  [[ -n "${_mode:-}" ]] && chmod -R "${_mode}" "${_target}"
+  [[ -n "${_owner:-}" ]] && chown -R "${_owner}" "${_target}"
+}
+
 move_file()
 {
   local _source _target _mode _owner
