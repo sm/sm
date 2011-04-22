@@ -3,12 +3,12 @@
 (( ${#extension_args[@]} > 0 )) ||
   error "An extension name must be specified."
 
-_source=${#extension_args[0]}
+_source="${extension_args[0]}"
 
 variable_is_nonempty _source ||
   error "A source extension name must be specified."
 
-_target=${#extension_args[1]}
+_target="${extension_args[1]}"
 
 variable_is_nonempty _target ||
   error "A target extension name must be specified."
