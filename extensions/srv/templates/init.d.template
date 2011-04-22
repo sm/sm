@@ -20,7 +20,7 @@
 #
 # Initialize the BDSM framework for use in this script.
 #
-source {{modules_path}}/bash/core/initialize
+source "{{modules_path}}/bash/core/initialize"
 
 #
 # Set the service extension name

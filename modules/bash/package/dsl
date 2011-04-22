@@ -302,6 +302,11 @@ package_activate()
   package_profile_d "${_package}"
 
   package_conf_d "${_package}"
+
+  if module_loaded "service"
+  then
+    service_install_init_d
+  fi
 }
 
 package_deactivate()
@@ -417,13 +422,19 @@ package_conf_d()
 {
   template_exists "conf.d.template" || return 0
 
-  install_template "conf.d.template" to "/etc/conf.d/${extension}.conf" \
+  install_template "conf.d.template" \
+    to "/etc/conf.d/${extension}.conf" \
     mode 0644 owner "${package_user}:${package_user}"
 
   template_exists "/etc/conf.d/${extension}.conf" ||
     return 0
 
   seed_template "/etc/conf.d/${extension}.conf" \
+    prefix_path "${prefix_path}" \
+    init_scripts_path "${init_scripts_path}" \
+    conf_d_path "${conf_d_path}" \
+    modules_path "${modules_path}" \
+    data_path "${data_path}" \
     confd_path "${confd_path}" \
     extension "${extension}"
 }
