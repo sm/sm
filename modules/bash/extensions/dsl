@@ -276,7 +276,7 @@ extension_is_installed()
 
   local _extensions=(extensions_in "${extensions_path}")
 
-  case " ${_extensions} " in
+  case " ${_extensions[@]} " in
     (*[[:space:]]${_name}[[:space:]]*)
       return 0
       ;;
