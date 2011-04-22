@@ -3,12 +3,33 @@
 (( ${#extension_args[@]} > 0 )) ||
   error "An extension name must be specified."
 
-_source="${extension_args[0]}"
+# Parse arguments
+while (( ${#extension_args} > 0 )) ; do
+  token="$1" ; shift
+  case "${token}" in
+    to)
+      _target="${1}"
+      shift
+      ;;
+    from)
+      _source="${1}"
+      shift
+      ;;
 
+    *)
+      if [[ -z "${_source}" ]] ; then
+        _source="$token" ; shift
+      elif [[ -z "${_target}" ]] ; then
+        _target="$token" ; shift
+        break # When we have a target we are done.
+      fi
+      ;;
+  esac
+done
+
+# Sanity checks
 variable_is_nonempty _source ||
   error "A source extension name must be specified."
-
-_target="${extension_args[1]}"
 
 variable_is_nonempty _target ||
   error "A target extension name must be specified."
