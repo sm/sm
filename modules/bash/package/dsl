@@ -407,8 +407,11 @@ package_profile_d()
 package_conf_d()
 {
   # TODO: package_conf_d, detect if ext template file exists and put it in place.
-  install_template "conf.d.template" to "/etc/conf.d/${extension}.conf" \
-    mode 0644 owner "${package_user}:${package_user}"
+  if template_exists "conf.d.template"
+  then
+    install_template "conf.d.template" to "/etc/conf.d/${extension}.conf" \
+      mode 0644 owner "${package_user}:${package_user}"
+  fi
 
   seed_template \
     confd_path "${confd_path}" \

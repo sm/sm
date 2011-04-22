@@ -2,6 +2,15 @@
 
 command_exists()
 {
-  command -v "${1}" > /dev/null 2>&1
+  local _name="${1:-}"
+  [[ -n "${_name}" ]] || fail "No function name given."
+  command -v "${_name}" > /dev/null 2>&1
+}
+
+is_a_function()
+{
+  local _name="${1:-}"
+  [[ -n "${_name}" ]] || fail "No function name given."
+  declare -f "${_name}" >/dev/null 2>&1
 }
 

@@ -3,6 +3,9 @@
 #
 # parse CLI arguments
 #
+set +o nounset
+set +o noclobber
+
 while (( $# > 0 )) ; do
 
   token="$1" ; shift
@@ -49,7 +52,7 @@ while (( $# > 0 )) ; do
           ;;
 
         --debug)
-          ((debug_flag++))
+          (( debug_flag++ ))
           enable_debug
           ;;
 
@@ -59,7 +62,7 @@ while (( $# > 0 )) ; do
           ;;
 
         --trace)
-          ((trace_flag++))
+          (( ++trace_flag ))
           enable_trace
           ;;
 

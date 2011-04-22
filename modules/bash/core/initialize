@@ -57,10 +57,12 @@ fi
 # Load module() function and then load core modules.
 source "${modules_path}/bash/modules/dsl"
 source "${modules_path}/bash/modules/initialize"
+
 modules \
   trace logging time variables environment filesystem extensions
 
-load core/dsl
+module_load core/dsl
+
 # Ensure variables desired to be exported to extensions actually are.
 bdsm_exports
 

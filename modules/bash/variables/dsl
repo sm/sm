@@ -1,9 +1,17 @@
 #!/usr/bin/env bash
 
-
 first()
 {
-  printf "%s" "$1"
+  local _array=("$@")
+  (( ${#_array[@]} > 0 )) || fail "No arguments given."
+  printf "%s" "${_array[0]}"
+}
+
+last()
+{
+  local _array=("$@")
+  (( ${#_array[@]} > 0 )) || fail "No arguments given."
+  printf "%s" "${_array[$((${#_array[@]} - 1))]}"
 }
 
 match()
@@ -13,8 +21,8 @@ match()
   shopt -s extglob
 
   case "${_value}" in
-    ${_regex}) return 0 ;;
-    *)        return 1 ;;
+    (${_regex}) return 0 ;;
+    (*)         return 1 ;;
   esac
 }
 
@@ -22,10 +30,10 @@ ensure_nonempty()
 {
   local variable
 
-  for variable in "$@" ; do
-    if eval "[[ -z \"\${${variable}}\" ]]" ; then
+  for variable in "$@"
+  do
+    eval "[[ -n \"\${${variable}}\" ]]" ||
       fail "${extension} ${action} Required variable '$variable' is not set."
-    fi
   done
 }
 

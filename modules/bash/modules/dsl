@@ -28,7 +28,7 @@ modules()
   if (( trace_flag == 1 )) ; then set -o xtrace ; fi
 }
 
-load()
+module_load()
 {
   local _file _files=("$@")
 

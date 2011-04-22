@@ -4,10 +4,12 @@ read_default()
 {
   local key variable token value prefix
 
-  key="${1:-}" ; shift
+  key="${1:-}"
 
-  [[ -n "${key}" ]] || \
+  [[ -n "${key}" ]] ||
     fail "$extension $action read_default() no arguments passed! "
+
+  shift
 
   while (( $# > 0 )) ; do
     token="$1" ; shift

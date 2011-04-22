@@ -113,11 +113,22 @@ extension_action()
           #rb) action_type="ruby"   ;;
           ;;
         *)
-          if [[ -x "${action_file}" ]] ; then
-            action_type="binary"
-          else
-            action_type="not executable"
-          fi
+          read -r shebang < "${action_file}"
+
+          case "${shebang}" in
+            *ruby|*rbx|*jruby|*macruby)
+              binary="${shebang##*(#|!)}"
+              binary="${binary##* }"
+              action_type="ruby"
+              ;;
+            *)
+              if [[ -x "${action_file}" ]] ; then
+                action_type="binary"
+              else
+                action_type="not executable"
+              fi
+              ;;
+          esac
           ;;
       esac
       result=$?
@@ -153,7 +164,18 @@ extension_action()
       source "${action_file}"
       ) || result=$?
       ;;
-    # ruby|python|lua|javascript)
+
+    ruby)
+      requires=()
+      for script in dsl initialize
+      do
+        requires+=( "-r${modules_path}/ruby/core/${script}.rb" )
+      done
+
+      "${binary:-ruby}" -I"${modules_path}/ruby" -I"${extension_modules_path}/ruby" \
+        ${requires[@]} "${action_file}"
+      ;;
+    # python|lua|javascript)
       #   ADD "${modules_path}/${action_type}/" to the lib path so the script can require "bdsm"
       #  "${action_file}"
       #  ;;
