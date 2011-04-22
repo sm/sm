@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+(( ${#extension_args[@]} > 0 )) ||
+  error "An extension name must be specified."
+
+_source=${#extension_args[0]}
+
+variable_is_nonempty _source ||
+  error "A source extension name must be specified."
+
+_target=${#extension_args[1]}
+
+variable_is_nonempty _target ||
+  error "A target extension name must be specified."
+
+extension_is_installed "${_source}" ||
+  error "The extension '${_source}' was not found installed, cannot create a new extension from it."
+
+if extension_is_installed "${_target}"
+then
+  error "The target extension '${_target}' already exists, cannot create it from ${_source}."
+fi
+
+copy_directories_to "${extensions_development_path}/${_target}" \
+  "${extensions_development_path}/${_source}"
+
