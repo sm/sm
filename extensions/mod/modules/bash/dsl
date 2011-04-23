@@ -40,3 +40,16 @@ modules_list()
   done
 }
 
+modules_docgen()
+{
+  local _module _modules _function _dsl
+
+  _modules=($(modules_installed))
+  for _module in "${_modules[@]}" ; do
+    printf "\n${_module}\n\n"
+  awk <<AWK "${_module}"
+  skip comments...
+AWK
+  done
+}
+

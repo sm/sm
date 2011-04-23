@@ -294,10 +294,12 @@ os_cpu_count()
 {
   local _count=1 # Defaulting to 1.
 
-  if os_is_darwin ; then
+  if os_is_darwin
+  then
     read -r _count < <(sysctl hw.ncpu)
     _count="${_count//* }"
-  elif os_is_linux ; then
+  elif os_is_linux
+  then
     _count=$(awk '/^processor/{count++} END{print count}' /proc/cpuinfo 2>&1)
   fi
 
