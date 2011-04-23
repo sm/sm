@@ -7,13 +7,10 @@ variable_is_nonempty confd_path        || confd_path="$(confd_path)"
 
 : \
   "${prefix_path:="/usr/local/${extension}/active"}" \
-  "${data_path:="/var/db/${extension}/active/data"}" \
-  "${log_path:="/var/log/${extension}/active"}" \
+  "${service_data_path:="/var/db/${extension}/active/data"}" \
+  "${service_log_path:="/var/log/${extension}/active"}" \
   "${service_binary:="${prefix_path}/bin/${extension}"}" \
-  "${user:="${extension}"}"
-
-: \
-  ${service_config:="/etc/${extension}/${extension}.conf"} \
-  ${service_pid_file:="/var/run/${extension}/${extension}.pid"} \
-
+  "${service_user:="${extension}"}" \
+  "${service_config:="/etc/${extension}/${extension}.conf"}" \
+  "${service_pid_file:="/var/run/${extension}/${extension}.pid"}"
 
