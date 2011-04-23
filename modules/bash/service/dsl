@@ -1,11 +1,33 @@
 #!/usr/bin/env bash
 
 #
+# General Services functions.
+#
+services_list()
+{
+  error "Service listing has not yet been implemented."
+  services_installed
+}
+
+services_installed()
+{
+  # TODO: List installed extensions that are services.
+  error "Installed services has not yet been implemented."
+}
+
+services_available()
+{
+  # TODO: List available service extensions.
+  error "Installed services has not yet been implemented."
+}
+
+#
 # Single Service functions.
 #
 service_start()
 {
-  if command_exists "${extension}_start" ; then
+  if command_exists "${extension}_start"
+  then
     "${extension}_start"
   else
     file_is_executable "${init_scripts_path}/${extension}" ||
@@ -17,7 +39,8 @@ service_start()
 
 service_stop()
 {
-  if command_exists "${extension}_stop" ; then
+  if command_exists "${extension}_stop"
+  then
     "${extension}_stop"
   else
     file_is_executable "${init_scripts_path}/${extension}" ||
@@ -29,7 +52,8 @@ service_stop()
 
 service_restart()
 {
-  if command_exists "${extension}_restart" ; then
+  if command_exists "${extension}_restart"
+  then
     "${extension}_restart"
   else
     file_is_executable "${init_scripts_path}/${extension}" ||
@@ -41,7 +65,8 @@ service_restart()
 
 service_status()
 {
-  if command_exists "${extension}_status" ; then
+  if command_exists "${extension}_status"
+  then
     "${extension}_status"
   else
     file_is_executable "${init_scripts_path}/${extension}" ||
@@ -53,7 +78,8 @@ service_status()
 
 service_logtail()
 {
-  if command_exists "${extension}_logtail" ; then
+  if command_exists "${extension}_logtail"
+  then
     "${extension}_logtail"
   else
     file_is_executable "${init_scripts_path}/${extension}" ||
@@ -65,7 +91,8 @@ service_logtail()
 
 service_info()
 {
-  if command_exists "${extension}_info" ; then
+  if command_exists "${extension}_info"
+  then
     "${extension}_info"
   else
     file_is_executable "${init_scripts_path}/${extension}" ||
@@ -77,7 +104,8 @@ service_info()
 
 service_configcheck()
 {
-  if command_exists "${extension}_configcheck" ; then
+  if command_exists "${extension}_configcheck"
+  then
     "${extension}_configcheck"
   else
     file_is_executable "${init_scripts_path}/${extension}" ||
@@ -90,11 +118,11 @@ service_configcheck()
 service_usage() {
   # TODO: Update this for service specific items.
   printf "
-  Usage:
+Usage:
 
   $0 [options]
 
-  options:
+Options:
 
   --prefix   - specify prefix path
   --src)     - specify source directory
@@ -187,10 +215,38 @@ service_cli()
   file_is_executable "${service_binary}" ||
     fail "Could not find postmaster or postmaster is not executable."
 
-  # The path that is to be used for the script
-  PATH="${prefix_path}/bin:/bin:/usr/bin:/usr/local/bin:${PATH}"
+  service_init_path
 }
 
+service_pid()
+{
+  local _path="${run_path:="/var/run"}/${extension}"
+
+  ensure_paths_exist "${_path}"
+
+  read -r service_pid < "${_path}/${extension}.pid"
+
+  if os_is_linux
+  then # Sanity check.
+    if ! directory_exists "/proc/${pid}"
+    then
+      pid=0
+      rm -f "${_path}/${extension}.pid"
+    fi
+  fi
+}
+
+service_load_conf_d()
+{
+  if file_is_nonempty "${confd_path}/${extension}.conf"
+  then
+    source_files "${confd_path}/${extension}.conf"
+  fi
+}
+
+#
+# Service init functions.
+#
 service_install_init_d()
 {
   local _service="${1:-}"
@@ -221,28 +277,11 @@ service_install_init_d()
     printf "%s\n" "[ -d \"${prefix_path}/${_service}/active/bin\" ] && " \
       > "/etc/profile.d/${_service}.sh"
 
-    printf "%s" "PATH=\"\$PATH:${prefix_path}/${_service}/active/bin\" ; export PATH; " \
+    printf "%s\n" "PATH=\"\$PATH:${prefix_path}/${_service}/active/bin\" ; export PATH; " \
       >> /etc/profile.d/${_service}.sh
 
-    chmod_files 0755 /etc/profile.d/${_service}.sh
+    chmod_files 0755 "/etc/profile.d/${_service}.sh"
   fi
-}
-
-service_pid()
-{
-  local _path="${run_path:="/var/run"}/${extension}"
-  ensure_paths_exist "${_path}"
-  read -r pid < "${_path}/${extension}.pid"
-
-  if os_is_linux
-  then # Sanity check.
-    directory_exists "/proc/${pid}" || pid=0 && rm -f "${_path}/${extension}.pid"
-  fi
-}
-
-service_load_conf_d()
-{
-  [[ -s "${confd_path}/${extension}.conf" ]] && "${confd_path}/${extension}.conf"
 }
 
 service_init_d()
@@ -256,22 +295,84 @@ service_init_d()
   service_cli # Parse the script arguments and take action accordingly.
 }
 
-#
-# General Services functions.
-#
-
-services_list()
+service_init_path()
 {
-  error "Service listing has not yet been implemented."
+  PATH="${prefix_path}/bin:/bin:/usr/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin:${PATH}"
 }
 
-services_installed()
+service_init_start()
 {
-  error "Installed services has not yet been implemented."
+  log "Starting ${extension}..."
+
+  service_init_path
+
+  local _result
+
+  "${service_binary}" "${service_flags[@]}" "${service_config}"
+
+  _result=$?
+  (( _result != 0 )) || touch "$pidfile"
+  return ${_result}
 }
 
-services_available()
+service_init_stop()
 {
-  error "Installed services has not yet been implemented."
+  service_init_path
+
+  (( service_pid > 0 )) || error "Service pid has not been set or is zero."
+
+  log "Stopping ${extension}..."
+
+  kill -QUIT ${service_pid}
+
+  _result=$?
+  (( _result != 0 )) || rm -f "$pidfile"
+  return ${_result}
+}
+
+service_init_usage()
+{
+  log "Usage:\n\n  $0 {start|stop|restart|status}"
+}
+
+service_init_logtail()
+{
+  error "Service init logtail has not yet been implemented."
+}
+
+service_init_script()
+{
+  local _action="${1:-}"
+
+  service_load_conf_d
+
+  case "action" in
+    start)
+      service_init_start
+      ;;
+
+    stop)
+      service_init_stop
+      ;;
+
+    restart)
+      service_init_stop
+      service_init_start
+      ;;
+
+    status)
+      service_init_status
+      ;;
+
+    logtail)
+      service_init_logtail
+      ;;
+
+    *)
+      service_init_usage
+      ;;
+  esac
+
+  return $?
 }
 

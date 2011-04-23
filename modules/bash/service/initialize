@@ -12,3 +12,8 @@ variable_is_nonempty confd_path        || confd_path="$(confd_path)"
   "${service_binary:="${prefix_path}/bin/${extension}"}" \
   "${user:="${extension}"}"
 
+: \
+  ${service_config:="/etc/${extension}/${extension}.conf"} \
+  ${service_pid_file:="/var/run/${extension}/${extension}.pid"} \
+
+
