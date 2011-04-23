@@ -10,19 +10,24 @@ modules()
 
   for _module in "${_modules[@]}"
   do
-    _bdsm="${modules_path}/bash/${_module}"
-    _extension="${extension_modules_path}/bash/${_module}"
+    if module_is_loaded "${_module}"
+    then
+      continue # The module has already been loaded, continue to the next one.
+    else
+      _bdsm="${modules_path}/bash/${_module}"
+      _extension="${extension_modules_path}/bash/${_module}"
 
-    for _path in "${_bdsm}" "${_extension}"
-    do
-      for _file in dsl initialize
+      for _path in "${_bdsm}" "${_extension}"
       do
-        if [[ -s "${_path}/${_file}" ]]
-        then
-          source "${_path}/${_file}"
-        fi
+        for _file in dsl initialize
+        do
+          if [[ -s "${_path}/${_file}" ]]
+          then
+            source "${_path}/${_file}"
+          fi
+        done
       done
-    done
+    fi
   done
 
   if (( trace_flag == 1 )) ; then set -o xtrace ; fi
@@ -35,5 +40,22 @@ module_load()
   for _file in "${_files[@]}" ; do
     source_files "${extension_modules_path:-"$modules_path"}/bash/${_file}"
   done
+}
+
+module_is_loaded()
+{
+  local _name="${1:-}"
+
+  [[ -n "${_name}" ]] ||
+    fail "Cannot determine if a module is loaded as no module was given."
+
+  case " ${modules[@]} " in
+    (*[[:space:]]${_name}[[:space:]]*)
+      return 0
+      ;;
+    (*)
+      return 1
+      ;;
+  esac
 }
 
