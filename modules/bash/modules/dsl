@@ -27,6 +27,7 @@ modules()
           fi
         done
       done
+      modules+=("${_module}")
     fi
   done
 
