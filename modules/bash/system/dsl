@@ -32,16 +32,22 @@
 #
 init_scripts_path()
 {
-  if (( UID == 0 )) ; then
+  if (( UID == 0 ))
+  then
     case "$MACHTYPE" in
       *darwin*)
         printf "/etc/init.d" # Service module will create and use this.
         ;;
+
       *linux-gnu*|*)
-        if [[ -d "/etc/init.d" ]] ; then
+        if [[ -d "/etc/init.d" ]]
+        then
           printf "/etc/init.d"
-        elif [[ -d "/etc/rc.d" ]] ; then
+
+        elif [[ -d "/etc/rc.d" ]]
+        then
           printf "/etc/rc.d"
+
         else
           fail "Unknown init scripts directory (/etc/init.d or /etc/rc.d not found)."
         fi
@@ -137,7 +143,7 @@ os_is_linux()
 #
 # ## os_is_darwin
 #
-# Tests if the operating system the process is running on is Linux.
+# Tests if the operating system the process is running on is darwin.
 #
 # ### Input Parameters
 #
@@ -153,8 +159,8 @@ os_is_linux()
 #
 # ### Return Codes
 #
-# 0 if the operating system is linux
-# 1 if the operating system is not linux
+# 0 if the operating system is darwin
+# 1 if the operating system is not darwin
 #
 # ### Failure Scenarios
 #
@@ -162,8 +168,8 @@ os_is_linux()
 #
 # ### Usage Examples
 #
-#     root@archlinux# os_is_linux
-#     root@archlinux# echo $?
+#     user@OSX# os_is_darwin
+#     user@OSX# echo $?
 #     0
 #
 os_is_darwin()
@@ -179,7 +185,7 @@ os_is_darwin()
 #
 # ## os_is_bsd
 #
-# Tests if the operating system the process is running on is Linux.
+# Tests if the operating system the process is running on is bsd.
 #
 # ### Input Parameters
 #
@@ -195,8 +201,8 @@ os_is_darwin()
 #
 # ### Return Codes
 #
-# 0 if the operating system is linux
-# 1 if the operating system is not linux
+# 0 if the operating system is bsd
+# 1 if the operating system is not bsd
 #
 # ### Failure Scenarios
 #
@@ -204,20 +210,25 @@ os_is_darwin()
 #
 # ### Usage Examples
 #
-#     root@archlinux# os_is_linux
-#     root@archlinux# echo $?
+#     root@bsd# os_is_bsd
+#     root@bsd# echo $?
 #     0
 #
 
 os_is_bsd()
 {
-  [[ "$MACHTYPE" = *bsd* ]]
+  if [[ "$MACHTYPE" = *bsd* ]]
+  then
+    return 0
+  else
+    return 1
+  fi
 }
 
 #
 # ## os_is_solaris
 #
-# Tests if the operating system the process is running on is Linux.
+# Tests if the operating system the process is running on is solaris.
 #
 # ### Input Parameters
 #
@@ -242,20 +253,24 @@ os_is_bsd()
 #
 # ### Usage Examples
 #
-#     root@archlinux# os_is_linux
-#     root@archlinux# echo $?
+#     root@linux# os_is_linux
+#     root@linux# echo $?
 #     0
 #
-
 os_is_solaris()
 {
-  [[ "$MACHTYPE" = *solaris* ]]
+  if [[ "$MACHTYPE" = *solaris* ]]
+  then
+    return 0
+  else
+    return 1
+  fi
 }
 
 #
 # ## os_is_aix
 #
-# Tests if the operating system the process is running on is Linux.
+# Tests if the operating system the process is running on is aix.
 #
 # ### Input Parameters
 #
@@ -271,8 +286,8 @@ os_is_solaris()
 #
 # ### Return Codes
 #
-# 0 if the operating system is linux
-# 1 if the operating system is not linux
+# 0 if the operating system is aix
+# 1 if the operating system is not aix
 #
 # ### Failure Scenarios
 #
@@ -280,20 +295,24 @@ os_is_solaris()
 #
 # ### Usage Examples
 #
-#     root@archlinux# os_is_linux
-#     root@archlinux# echo $?
+#     root@aix# os_is_aix
+#     root@aix# echo $?
 #     0
 #
-
 os_is_aix()
 {
-  [[ "$MACHTYPE" = *aix* ]]
+  if [[ "$MACHTYPE" = *aix* ]]
+  then
+    return 0
+  else
+    return 1
+  fi
 }
 
 #
 # ## os_type
 #
-# Tests if the operating system the process is running on is Linux.
+# Prints out the operating system category / type.
 #
 # ### Input Parameters
 #
@@ -301,7 +320,7 @@ os_is_aix()
 #
 # ### Stream Outputs
 #
-# None.
+# Prints the OS category/type to the calling environments STDOUT.
 #
 # ### Environmental effects
 #
@@ -309,8 +328,7 @@ os_is_aix()
 #
 # ### Return Codes
 #
-# 0 if the operating system is linux
-# 1 if the operating system is not linux
+# 0 for success
 #
 # ### Failure Scenarios
 #
@@ -318,9 +336,11 @@ os_is_aix()
 #
 # ### Usage Examples
 #
-#     root@archlinux# os_is_linux
-#     root@archlinux# echo $?
-#     0
+#     root@archlinux# os_type
+#     linux
+#
+#     user@osx# os_type
+#     darwin
 #
 os_type()
 {
@@ -340,13 +360,16 @@ os_type()
     (*aix*)
       printf "%s" "aix"
       ;;
+    (*)
+      printf "%s" "$MACHTYPE"
+      ;;
   esac
 }
 
 #
 # ## os_arch_type
 #
-# Tests if the operating system the process is running on is Linux.
+# Prints out the OS Arch type.
 #
 # ### Input Parameters
 #
@@ -354,7 +377,8 @@ os_type()
 #
 # ### Stream Outputs
 #
-# None.
+# Prints out the architecture type string of the system that is running the
+# current process.
 #
 # ### Environmental effects
 #
@@ -362,8 +386,7 @@ os_type()
 #
 # ### Return Codes
 #
-# 0 if the operating system is linux
-# 1 if the operating system is not linux
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -371,9 +394,8 @@ os_type()
 #
 # ### Usage Examples
 #
-#     root@archlinux# os_is_linux
-#     root@archlinux# echo $?
-#     0
+#     user$ os_arch_type
+#     x86_64
 #
 os_arch_type()
 {
@@ -393,7 +415,7 @@ os_arch_type()
 #
 # ## os_arch
 #
-# Tests if the operating system the process is running on is Linux.
+# Prints out the full OS machine type string.
 #
 # ### Input Parameters
 #
@@ -401,7 +423,7 @@ os_arch_type()
 #
 # ### Stream Outputs
 #
-# None.
+# Print the OS machine type string to STDOUT of the calling environment.
 #
 # ### Environmental effects
 #
@@ -409,8 +431,7 @@ os_arch_type()
 #
 # ### Return Codes
 #
-# 0 if the operating system is linux
-# 1 if the operating system is not linux
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -418,9 +439,8 @@ os_arch_type()
 #
 # ### Usage Examples
 #
-#     root@archlinux# os_is_linux
-#     root@archlinux# echo $?
-#     0
+#     user@OSX# os_arch
+#     i386-apple-darwin10.7.0
 #
 os_arch()
 {
@@ -455,16 +475,17 @@ os_arch()
 #
 # ### Usage Examples
 #
-#     root@archlinux# os_is_linux
-#     root@archlinux# echo $?
-#     0
+#     user@OSX$ os_arch_capable
+#     x86_64
 #
 os_arch_capable()
 {
-  if os_is_darwin ; then
+  if os_is_darwin
+  then
     local _string
     read -r _string < <(sysctl hw.cpu64bit_capable)
-    if (( ${_string//* } == 1 )) ; then
+    if (( ${_string//* } == 1 ))
+    then
       printf "%s" "x86_64"
     else
       os_arch_type # Either i386 or ppc
