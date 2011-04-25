@@ -1,28 +1,133 @@
 #!/usr/bin/env bash
 
+#
+# ## rvm_install
+#
+# Install the latest release version of RVM.
+#
+# ### Input Parameters
+#
+# First parameter is an optional version number of RVM to install.
+#
+# ### Stream Outputs
+#
+# Output from rvm-installer will be printed to the enclosing environment's
+# STDOUT as well as curl output.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# No failure conditions currently.
+#
+# ### Usage Examples
+#
+#     user$ rvm_install
+#
 rvm_install()
 {
+  local _version=${1:-latest} _result=0
   local url="https://rvm.beginrescueend.com/install/rvm"
-
-  curl -s "$url" -o rvm-installer
-
-  ensure_files_are_executable "rvm-installer"
-
-  ./rvm-installer
-
-  remove_files "rvm-installer"
+  (
+    set -o errexit
+    curl -s "$url" -o rvm-installer
+    ensure_files_are_executable "rvm-installer"
+    ./rvm-installer --version ${_version}
+    remove_files "rvm-installer"
+  ) || _result=$?
+  return $_result
 }
 
+#
+# ## install_gem
+#
+# installs the named gem(s) with --no-rdoc --no-ri flags
+#
+# ### Input Parameters
+#
+# One or more gem names
+#
+# ### Stream Outputs
+#
+# The output of the gem install command will be printed to the calling
+# environments streams.
+#
+# ### Environmental effects
+#
+# Ruby gem(s) will be installed on the system, potentially enabling new commands.
+#
+# ### Return Codes
+#
+# 0 if gem install was successful
+# 1 if gem install was not successful
+#
+# ### Failure Scenarios
+#
+# Fails if ...
+#
+# ### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 install_gem()
 {
-  gem install --no-rdoc --no-ri -q "$*"
+  if gem install --no-rdoc --no-ri -q "$*"
+  then
+    return 0
+  else
+    return 1
+  fi
 }
 
+#
+# ## install_gems
+#
+# Installs listed gems using the install_gem function.
+#
+# ### Input Parameters
+#
+# One or more rubygems names
+#
+# ### Stream Outputs
+#
+# Output from underlying gem install will be printed to the calling environments
+# streams.
+#
+# ### Environmental effects
+#
+# One or more new commands may become available.
+#
+# ### Return Codes
+#
+# 0 if all gem installs were successful
+# n where n is the number of unsuccessful gem installs otherwise.
+#
+# ### Failure Scenarios
+#
+# Fails if no gems were given to install.
+#
+# ### Usage Examples
+#
+#     user$ install_gems rake rack
+#
 install_gems() {
-  local _gem
+  local _gem _gems=("$@") _result=0
 
-  for _gem in "$*" ; do
-    gem install ${_gem} --no-rdoc --no-ri
+  (( ${#_gems[@]} > 0 )) ||
+    fail "Cannot install gems as no gem names were given!"
+
+  for _gem in "${_gems[@]}"
+  do
+    install_gem ${_gem} || { true (( _result++ )) ; }
   done
+
+  return $_result
 }
 
