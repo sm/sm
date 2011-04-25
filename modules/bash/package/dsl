@@ -303,7 +303,7 @@ package_activate()
 
   package_conf_d "${_package}"
 
-  if module_loaded "service"
+  if module_is_loaded "service"
   then
     service_install_init_d
   fi
