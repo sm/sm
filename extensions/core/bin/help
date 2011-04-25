@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-modules help
-
 extension="<extension>"
 
 description "Bash Development & Scripting Management Framework - Core Extension"

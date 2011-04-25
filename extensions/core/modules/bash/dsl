@@ -9,15 +9,6 @@ bdsm_version()
   fi
 }
 
-usage()
-{
-  bdsm_version
-
-  log "\nbdsm ${bdsm_version} https://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)\n"
-
-  extension_action "core" "help"
-}
-
 fetch_version()
 {
   version=$(curl -s "${releases_url}/latest-version.txt" 2>/dev/null) ||

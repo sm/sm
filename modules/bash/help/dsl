@@ -32,7 +32,7 @@
 #
 show_help()
 {
-  local _help_command="usage" _token
+  local _help_command _token
 
   while (( $# > 0 )) ; do
     _token="$1" ; shift
@@ -43,10 +43,13 @@ show_help()
       actions)
         _help_command="actions"
         ;;
+      usage)
+        _help_command="usage"
+        ;;
     esac
   done
 
-  "${_help_command}"
+  "${_help_command:-usage}"
 }
 
 #
@@ -255,27 +258,32 @@ resources() {
 #
 usage()
 {
+  bdsm_version
+
+  log "\nbdsm ${bdsm_version} https://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)"
+
   log "\nUsage\n\n    bdsm ${extension} <action> <<arguments>>"
 
-  [[ -n "${help_description}" ]] && \
+  [[ -z "${help_description}" ]] ||
     log "\nDescription\n    BDSM ${help_description}"
 
   log "\nActions"
-  [[ -n "${help_actions}" ]] && \
+  [[ -z "${help_actions}" ]] ||
     log "${help_actions}"
 
-  [[ -n "${help_notes}" ]] && \
+  [[ -z "${help_notes}" ]] ||
     log "\nNotes\n${help_notes}"
 
-  [[ -n "${help_dependencies}" ]] && \
+  [[ -z "${help_dependencies}" ]] ||
     log "\nDependencies\n${help_dependencies}"
 
-  [[ -n "${help_resources}" ]] && \
+  [[ -z "${help_resources}" ]] ||
     log "\nResources\n${help_resources}"
 
-  [[ "${extension}" = "core" || "${extension}" = "<extension>" ]] && {
+  if [[ "${extension}" = "core" || "${extension}" = "<extension>" ]]
+  then
     log "\nExtensions Installed\n\n  $(extensions_installed)"
     log "\nExtensions Available\n\n  $(extensions_available)"
-  }
+  fi
 }
 

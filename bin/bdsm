@@ -44,14 +44,19 @@ source "${modules_path}/bash/core/cli"
 #
 # Main Logic
 #
-[[ -n ${extension} ]] || { extension_action "core" "help" ; exit 0 ; }
+if [[ -z ${extension} ]]
+then
+  extension_action "core" "help"
+  exit 1
+fi
 
-[[ -n ${action} ]] || {
+if [[ -z ${action} ]]
+then
   modules extensions
   log "Usage: \n  bdsm ${extension} [action]\nActions:"
   log "  $(extension_actions "${extension}")"
   exit 0
-}
+fi
 
 disable_backtrace
 extension_action "${extension}" "${action}"

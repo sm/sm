@@ -294,7 +294,7 @@ enable_backtrace()
   then
     trap "backtrace '${_message}'" ERR
   else
-    trap backtrace ERR
+    trap "backtrace 'A command has returned an unhandled error code (nonzero return value).'" ERR
   fi
   set -o errexit
 }
@@ -412,7 +412,7 @@ disable_backtrace()
 backtrace()
 {
   set +o xtrace
-  local _message="${1:-"A command has returned an unhandled error code (nonzero return value)."}"
+  local _message="${1:-}"
 
   if [[ -n "${_message}" ]]
   then

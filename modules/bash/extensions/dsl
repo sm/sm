@@ -163,6 +163,7 @@ extension_action()
 
       source "${action_file}"
       ) || result=$?
+      return $result
       ;;
 
     ruby)
@@ -188,6 +189,8 @@ extension_action()
   esac
   # exit $result
   ) || result=$?
+
+  return $result
 }
 
 extension_license()
