@@ -30,12 +30,15 @@ modules_list()
 {
   local _module _modules _function _dsl
 
-  _modules=($(modules_installed))
-  for _module in "${_modules[@]}" ; do
-    printf "\n${_module}\n\n"
-    _dsl=($(module_dsl "$_module"))
-    for _function in "${_dsl[@]}" ; do
-      printf "  ${_function}\n"
+  for language in bash ruby
+  do
+    _modules=($(modules_installed ${language}))
+    for _module in "${_modules[@]}" ; do
+      printf "\n${_module}\n\n"
+      _dsl=($(module_dsl "$_module"))
+      for _function in "${_dsl[@]}" ; do
+        printf "  ${_function}\n"
+      done
     done
   done
 }
