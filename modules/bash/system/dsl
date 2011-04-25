@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# ### init_scripts_path
+# ### init_scripts_path()
 #
 # Returns the system init scripts path (eg. /etc/init.d /etc/rc.d)
 #
@@ -59,7 +59,7 @@ init_scripts_path()
 }
 
 #
-# ### confd_path
+# ### confd_path()
 #
 # Return the system conf.d path.
 #
@@ -99,7 +99,7 @@ confd_path()
 }
 
 #
-# ### os_is_linux
+# ### os_is_linux()
 #
 # Tests if the operating system the process is running on is Linux.
 #
@@ -141,7 +141,7 @@ os_is_linux()
 }
 
 #
-# ### os_is_darwin
+# ### os_is_darwin()
 #
 # Tests if the operating system the process is running on is darwin.
 #
@@ -183,7 +183,7 @@ os_is_darwin()
 }
 
 #
-# ### os_is_bsd
+# ### os_is_bsd()
 #
 # Tests if the operating system the process is running on is bsd.
 #
@@ -226,7 +226,7 @@ os_is_bsd()
 }
 
 #
-# ### os_is_solaris
+# ### os_is_solaris()
 #
 # Tests if the operating system the process is running on is solaris.
 #
@@ -268,7 +268,7 @@ os_is_solaris()
 }
 
 #
-# ### os_is_aix
+# ### os_is_aix()
 #
 # Tests if the operating system the process is running on is aix.
 #
@@ -310,7 +310,7 @@ os_is_aix()
 }
 
 #
-# ### os_type
+# ### os_type()
 #
 # Prints out the operating system category / type.
 #
@@ -367,7 +367,7 @@ os_type()
 }
 
 #
-# ### os_arch_type
+# ### os_arch_type()
 #
 # Prints out the OS Arch type.
 #
@@ -413,7 +413,7 @@ os_arch_type()
 }
 
 #
-# ### os_arch
+# ### os_arch()
 #
 # Prints out the full OS machine type string.
 #
@@ -448,7 +448,7 @@ os_arch()
 }
 
 #
-# ### os_arch_capable
+# ### os_arch_capable()
 #
 # Tests if the operating system the process is running on is Linux.
 #
@@ -496,7 +496,7 @@ os_arch_capable()
 }
 
 #
-# ### os_cpu_count
+# ### os_cpu_count()
 #
 # Print the number of cpu cores on the current system to STDOUT
 #

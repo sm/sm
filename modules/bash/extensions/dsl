@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# ### extension_action
+# ### extension_action()
 #
 # Load the environment for a given extension action and then call it.
 # This is the main function for BDSM.
@@ -173,7 +173,7 @@ extension_action()
   return $result
 }
 #
-# ### extensions_install
+# ### extensions_install()
 #
 # Installs the given extensions.
 #
@@ -232,7 +232,7 @@ extensions_install()
 }
 
 #
-# ### extension_reload
+# ### extension_reload()
 #
 # Reloads (re-sources) the current extension's DSL and initialization files.
 #
@@ -269,7 +269,7 @@ extension_reload()
 }
 
 #
-# ### extension_reinitialize
+# ### extension_reinitialize()
 #
 # Reinitializes the current extension.
 #
@@ -306,7 +306,7 @@ extension_reinitialize()
 }
 
 #
-# ### extension_version
+# ### extension_version()
 #
 # Outputs the named extension's version
 #
@@ -355,7 +355,7 @@ extension_version()
 }
 
 #
-# ### extension_licence
+# ### extension_licence()
 #
 # Emits the extension's license file, if it exists.
 #
@@ -412,7 +412,7 @@ extension_license()
 }
 
 #
-# ### extensions_installed
+# ### extensions_installed()
 #
 # Lists the extensions installed on the currently running process's system.
 #
@@ -454,7 +454,7 @@ extensions_installed()
 }
 
 #
-# ### extensions_available
+# ### extensions_available()
 #
 # Lists the extensions available to install on the currently running process's
 # system.
@@ -497,7 +497,7 @@ extensions_available()
 }
 
 #
-# ### extensions_in_development
+# ### extensions_in_development()
 #
 # Lists the extensions available in the development repository, if set.
 #
@@ -541,7 +541,7 @@ extensions_in_development()
 }
 
 #
-# ### extensions_in
+# ### extensions_in()
 #
 # Lists the extensions in a given directory.
 #
@@ -612,7 +612,7 @@ extensions_in()
 }
 
 #
-# ### extension_actions
+# ### extension_actions()
 #
 # Lists actions exposed by the named extension.
 #
@@ -675,7 +675,7 @@ extension_actions()
 }
 
 #
-# ### extension_is_installed
+# ### extension_is_installed()
 #
 # Tests if a given extension is installed.
 #

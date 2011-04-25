@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# ### show_help
+# ### show_help()
 #
 # Display help for the current extension based on settings declared in the help
 # action.
@@ -53,7 +53,7 @@ show_help()
 }
 
 #
-# ### description
+# ### description()
 #
 # Set the string that will be printed when the actions help section is output.
 #
@@ -89,7 +89,7 @@ description()
 }
 
 #
-# ### actions
+# ### actions()
 #
 # Set the string that will be printed when the actions help section is output.
 #
@@ -124,7 +124,7 @@ actions()
 }
 
 #
-# ### notes
+# ### notes()
 #
 # Define the notes help section content.
 #
@@ -159,7 +159,7 @@ notes()
 }
 
 #
-# ### dependencies
+# ### dependencies()
 #
 # Specify content for the dependencies section of the help command.
 #
@@ -194,7 +194,7 @@ dependencies()
 }
 
 #
-# ### resources
+# ### resources()
 #
 # Specify content for the resources section of the help command.
 #
@@ -228,7 +228,7 @@ resources() {
 }
 
 #
-# ### usage
+# ### usage()
 #
 # Display the usage help output of the command. This displays all help sections.
 #

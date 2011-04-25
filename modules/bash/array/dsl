@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# ### array_is_nonempty
+# ### array_is_nonempty()
 #
 # Checks to see if an array with the name given as the first parameter is nonempty.
 #
@@ -45,7 +45,7 @@ array_is_nonempty()
 }
 
 #
-# ### array_length
+# ### array_length()
 #
 # Return the length of the given array.
 #
@@ -83,7 +83,7 @@ array_length()
 }
 
 #
-# ### array_last_element
+# ### array_last_element()
 #
 # Print the last element of the given array.
 #
@@ -123,7 +123,7 @@ array_last_element()
 }
 
 #
-# ### array_first_element
+# ### array_first_element()
 #
 # Print the first element of the given array.
 #
@@ -161,7 +161,7 @@ array_first_element()
 }
 
 #
-# ### array_push
+# ### array_push()
 #
 # Appends one or more elements to the array with the given name.
 #
@@ -211,7 +211,7 @@ array_push()
 }
 
 #
-# ### array_append
+# ### array_append()
 #
 # Return the length of the given array.
 #
@@ -260,7 +260,7 @@ array_append()
 }
 
 #
-# ### array_length
+# ### array_length()
 #
 # Return the length of the given array.
 #
@@ -289,7 +289,7 @@ array_shift()
 }
 
 #
-# ### array_unshift
+# ### array_unshift()
 #
 #   Prepends one or more elements to the array whose name is given, in the order
 #   given.
@@ -341,7 +341,7 @@ array_unshift()
 }
 
 #
-# ### array_join
+# ### array_join()
 #
 # Joins the named array into a string separated by either a space or a given string.
 #

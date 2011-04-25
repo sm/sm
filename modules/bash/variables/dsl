@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# ### first
+# ### first()
 #
 # Returns the first parameter.
 #
@@ -45,7 +45,7 @@ first()
 }
 
 #
-# ### last
+# ### last()
 #
 # Returns the last parameter.
 #
@@ -89,7 +89,7 @@ last()
 }
 
 #
-# ### match
+# ### match()
 #
 # Tests to see if a value matches a given regex (shell extended glob pattern).
 #
@@ -148,7 +148,7 @@ match()
 }
 
 #
-# ### variables_must_be_nonempty
+# ### variables_must_be_nonempty()
 #
 # Halts the program with a fail message if any of the named variables are empty
 # or undefined.
@@ -208,7 +208,7 @@ variables_must_be_nonempty()
 }
 
 #
-# ### variable_is_nonempty
+# ### variable_is_nonempty()
 #
 # Test to see if a variable is empty.
 #

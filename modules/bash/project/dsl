@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# ### project_initialize
+# ### project_initialize()
 #
 # Initializes paths and environment for the logical concept of a 'project'.
 #
@@ -55,7 +55,7 @@ project_initialize()
 }
 
 #
-# ### vcs
+# ### vcs()
 #
 # Detect and set the vcs, if any, for the current project.
 #

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# ### template_exists
+# ### template_exists()
 #
 # Checks if a named template file exists in the extension_templates_path
 #
@@ -38,7 +38,7 @@ template_exists()
 }
 
 #
-# ### install_template
+# ### install_template()
 #
 # Installs a named template to a given location.
 #
@@ -139,7 +139,7 @@ install_template()
 }
 
 #
-# ### seed_template
+# ### seed_template()
 #
 # Seed a template file replacing all given keys with given values.
 #

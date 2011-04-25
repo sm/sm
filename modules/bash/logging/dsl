@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# ### log
+# ### log()
 #
 # Log arguments to the calling environments STDOUT.
 #
@@ -40,7 +40,7 @@ log()
 }
 
 #
-# ### info
+# ### info()
 #
 # Log arguments to the calling environments STDOUT preceeded by 'INFO: .
 #
@@ -76,7 +76,7 @@ info()
 }
 
 #
-# ### warn
+# ### warn()
 #
 # Log arguments to the calling environments STDOUT preceeded by 'WARNING: .
 #
@@ -112,7 +112,7 @@ warn()
 }
 
 #
-# ### debug
+# ### debug()
 #
 # Log arguments to the calling environments STDOUT preceeded by 'DEBUG: .
 #
@@ -148,7 +148,7 @@ debug()
 }
 
 #
-# ### error
+# ### error()
 #
 # Log arguments to the calling environments STDERR preceeded by 'ERROR: '.
 # Exits with status code 1.
@@ -188,7 +188,7 @@ error()
 }
 
 #
-# ### succeed
+# ### succeed()
 #
 # Log arguments to the calling environments STDOUT. Exits with status code 0.
 #
@@ -225,7 +225,7 @@ succeed() {
 }
 
 #
-# ### fail
+# ### fail()
 #
 # Log arguments to the calling environments STDERR preceeded by 'ERROR: '.
 # Exits with status code 1.

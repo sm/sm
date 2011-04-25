@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# ### rvm_install
+# ### rvm_install()
 #
 # Install the latest release version of RVM.
 #
@@ -45,7 +45,7 @@ rvm_install()
 }
 
 #
-# ### install_gem
+# ### install_gem()
 #
 # installs the named gem(s) with --no-rdoc --no-ri flags
 #
@@ -87,7 +87,7 @@ install_gem()
 }
 
 #
-# ### install_gems
+# ### install_gems()
 #
 # Installs listed gems using the install_gem function.
 #

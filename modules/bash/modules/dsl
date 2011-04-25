@@ -62,7 +62,7 @@ modules()
 }
 
 #
-# ### module_load
+# ### module_load()
 #
 # Function Description
 #
@@ -107,7 +107,7 @@ module_load()
 }
 
 #
-# ### module_is_loaded
+# ### module_is_loaded()
 #
 # Checks to see whether or not the named module has been loaded or not.
 #
@@ -155,7 +155,7 @@ module_is_loaded()
 }
 
 #
-# ### modules_loaded
+# ### modules_loaded()
 #
 # Outputs a list of all modules that have been loaded.
 #
@@ -199,7 +199,7 @@ modules_installed()
 }
 
 #
-# ### module_dsl
+# ### module_dsl()
 #
 # Print out a list of all dsl for the given module.
 #
@@ -247,7 +247,7 @@ module_dsl()
 }
 
 #
-# ### modules_list
+# ### modules_list()
 #
 # Lists dsl for all modules.
 #
@@ -308,7 +308,7 @@ modules_list()
 }
 
 #
-# ### modules_docs
+# ### modules_docs()
 #
 # Output the module DSL documentation for a given module name.
 #
@@ -340,7 +340,7 @@ modules_list()
 #
 #     Reads default values from an extension's config/defaults file.
 #
-#     ### Input Parameters
+#     ##### Input Parameters
 #
 #     First parameter is the defaults file key to read (key=value).
 #     Second parameter is the variable name to store the retrieved value in.
@@ -349,24 +349,24 @@ modules_list()
 #       prefix <name>
 #       <variable> # If no specifier.
 #
-#     ### Stream Outputs
+#     ##### Stream Outputs
 #
 #     None.
 #
-#     ### Environmental effects
+#     ##### Environmental effects
 #
 #     A variable will be set to the value, if the value is nonempty. If no variable
 #     name is specified the variable will be assigned the same name as the key.
 #
-#     ### Return Codes
+#     ##### Return Codes
 #
 #     0 for success.
 #
-#     ### Failure Scenarios
+#     ##### Failure Scenarios
 #
 #     Fails if no arguments are passed in, at least need to specify a key.
 #
-#     ### Usage Examples
+#     ##### Usage Examples
 #
 #         user$ read_default "version" prefix "package" # extension is nginx for example
 #         user$ echo $package_version
@@ -385,7 +385,7 @@ module_docs()
 }
 
 #
-# ### modules_docgen
+# ### modules_docgen()
 #
 # Lists dsl for all modules.
 #

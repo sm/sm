@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# ### timestamp_set
+# ### timestamp_set()
 #
 # Sets the variable named 'timestamp' to the current timestamp.
 #
@@ -43,7 +43,7 @@ timestamp_set()
 }
 
 #
-# ### timestamp
+# ### timestamp()
 #
 # Prints out the current timestamp.
 #

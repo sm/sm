@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# ### user_create_if_missing
+# ### user_create_if_missing()
 #
 # Create a system user if it does not exist on the system.
 #
@@ -121,7 +121,7 @@ user_create_if_missing()
 }
 
 #
-# ### user_delete
+# ### user_delete()
 #
 # Deletes the named system user.
 #
@@ -225,7 +225,7 @@ user_delete()
 }
 
 #
-# ### user_is_root
+# ### user_is_root()
 #
 # Tests if the user the current process is running as is root.
 #
@@ -271,7 +271,7 @@ user_is_root()
 }
 
 #
-# ### user_is_not_root
+# ### user_is_not_root()
 #
 # Tests if the user the current process is running as is not root.
 #
@@ -317,7 +317,7 @@ user_is_not_root()
 }
 
 #
-# ### user_must_be_root
+# ### user_must_be_root()
 #
 # Halts the calling program with a failure message if the user is not root.
 #
@@ -353,7 +353,7 @@ user_must_be_root()
 }
 
 #
-# ### user_must_not_be_root
+# ### user_must_not_be_root()
 #
 # Halts the calling program with a failure message if the user is not root.
 #
@@ -389,7 +389,7 @@ user_must_not_be_root()
 }
 
 #
-# ### user_run_as
+# ### user_run_as()
 #
 # Runs a command as a given user.
 #
@@ -430,7 +430,7 @@ user_run_as()
 }
 
 #
-# ### user_run_as_login
+# ### user_run_as_login()
 #
 # Runs a command as a given user, in that users login shell.
 #

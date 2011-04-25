@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# ### bdsm_exports
+# ### bdsm_exports()
 #
 # Exports bdsm framework relevant environment variables for extension action
 # processes.
@@ -32,7 +32,7 @@ bdsm_exports()
 }
 
 #
-# ### NIY
+# ### NIY()
 #
 # Prints a failure message and backtrace to the screen letting the caller know
 # that the requested feature has not yet been implemented.

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# ### command_exists
+# ### command_exists()
 #
 # Checks to see whether a command exists within the current environment and PATH
 #
@@ -46,7 +46,7 @@ command_exists()
 }
 
 #
-# ### is_a_function
+# ### is_a_function()
 #
 # Checks to see whether a named function exists within the current environment
 #
