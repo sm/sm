@@ -1,16 +1,79 @@
 #!/usr/bin/env bash
 
+#
+# ## set_ps4
+#
+# Set the environmental PS4 variable for informative tracing.
+#
+# ### Input Parameterss
+#
+# None.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user$ echo "'$PS4'"
+#     '+ '
+#     user$ set_ps4
+#     user$ echo "'$PS4'"
+#     ' > ${BASH_SOURCE##${bdsm_path}\/} ${FUNCNAME[0]:+${FUNCNAME[0]}()} ${LINENO} $ '
+#
 set_ps4()
 {
   PS4=" > \${BASH_SOURCE##\${bdsm_path}\/} \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO} $ "
   export PS4
 }
 
+#
+# ## trace
+#
+# Toggle tracing functionality on or off. If 'on' is triggered then every line
+# of code execution after the function returns will be displayed in the format
+# specified by the PS4 environment variable (see set_ps4).
+#
+# ### Input Parameterss
+#
+# First parameter is either empty, 'on' or 'off'
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user$ trace on
+#     user$ echo "hi"
+#     >   1 $ echo hi
+#     user$ trace off
+#     >  trace() 1 $ local _option=off
+#     >  trace() 3 $ [[ off = \o\n ]]
+#     >  trace() 8 $ set +o xtrace
+#
 trace()
 {
   local _option="${1:-on}"
 
-  if [[ "${_option}" = "on" ]] ;then
+  if [[ "${_option}" = "on" ]]
+  then
     export trace_flag=1
     set -o xtrace
   else
@@ -19,16 +82,98 @@ trace()
   fi
 }
 
+#
+# ## enable_trace
+#
+# Turns tracing on.
+#
+# ### Input Parameterss
+#
+# None.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user$ enable_trace
+#
 enable_trace()
 {
   trace on
 }
 
+#
+# ## disable_trace
+#
+# Turns tracing off.
+#
+# ### Input Parameterss
+#
+# None.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# No current failure scenarios.
+#
+# ### Usage Examples
+#
+#     user$ disable_trace
+#
 disable_trace()
 {
   trace off
 }
 
+#
+# ## debug
+#
+# Toggle verbose debugging functionality on or off. If 'on' is triggered then
+# every line of code execution after the function returns will be displayed.
+#
+# ### Input Parameterss
+#
+# First parameter is either empty, 'on' or 'off'
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user$ debug on
+#     user$ echo "hi"
+#     >   1 $ echo hi
+#     user$ debug off
+#     >  debug() 1 $ local _option=off
+#     >  debug() 3 $ [[ off = \o\n ]]
+#     >  debug() 8 $ set +o xdebug
+#
 debug()
 {
   local _option="${1:-on}"
@@ -42,33 +187,240 @@ debug()
   fi
 }
 
+#
+# ## enable_debug
+#
+# Enables verbose debugging output.
+#
+# ### Input Parameterss
+#
+# None.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user$ enable_debug
 enable_debug()
 {
   debug on
 }
 
+#
+# ## disable_debug
+#
+# Disables verbose debugging output.
+#
+# ### Input Parameterss
+#
+# None.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user$ disable_debug
+#
 disable_debug()
 {
   debug off
 }
 
+#
+# ## enable_backtrace
+#
+# Enables backtrace and program exit whenever a command returns a nonzero value
+# that is not handled.
+#
+# ### Input Parameterss
+#
+# First parameter is optional. If it is passed it is a message that will be
+# outputed when a command trigger the program to error exit.
+#
+# ### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# No failure conditions currently.
+#
+# ### Usage Examples
+#
+#     user$ cat ./test
+#     #!/usr/bin/env bash
+#     source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
+#     modules trace # Load the trace module.
+#     enable_backtrace
+#     echo "Error exit with backtrace is now off."
+#     false # Does not cause exiting with backtrace printing.
+#
+#     user$ $PWD/test
+#     Error exit with backtrace is on.
+#     ERROR: A command has returned an unhandled error code (nonzero return value).
+#     Error Backtrace:
+#        Trace   Line Function             File
+#           1.      7 main()               /Users/wayneeseguin/test
+#
 enable_backtrace()
 {
-  trap backtrace ERR
+  local _message="${1:-}"
+
+  if [[ -n "${_message}" ]]
+  then
+    trap "backtrace '${_message}'" ERR
+  else
+    trap backtrace ERR
+  fi
   set -o errexit
 }
+
+#
+# ## function_name
+#
+# Function Description
+#
+# ### Input Parameterss
+#
+# None.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# No failure conditions currently.
+#
+# ### Usage Examples
+#
+#     user$ cat ./test
+#     #!/usr/bin/env bash
+#     source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
+#     modules trace # Load the trace module.
+#     disable_backtrace
+#     echo "Error exit with backtrace is now off."
+#     false # Does not cause exiting with backtrace printing.
+#
+#     user$ ./test
+#     Error exit with backtrace is now off.
 
 disable_backtrace()
 {
   set +o errexit trap - ERR
 }
 
+#
+# ## backtrace
+#
+# Display a backtrace of the current call stack to the point that backtrace was
+# called from. Currently trace is turned on as well so that execution after
+# calling backtrace is traced.
+#
+# ### Input Parameterss
+#
+# None.
+#
+# ### Stream Outputs
+#
+# The call stack up to the current point of execution is printed to STDOUT of
+# the calling environment.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user$ cat ./test
+#     #!/usr/bin/env bash
+#     source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
+#     modules trace # Load the trace module.
+#
+#     functiona()
+#     {
+#       echo "function a"
+#       functionb
+#       echo "function a"
+#     }
+#
+#     functionb()
+#     {
+#       echo "function b"
+#       functionc
+#       echo "function b"
+#     }
+#
+#     functionc()
+#     {
+#       echo "function c"
+#       backtrace
+#       echo "function c"
+#     }
+#
+#     functiona
+#
+#     user$ $PWD/test
+#     function a
+#     function b
+#     function c
+#     Error Backtrace:
+#        Trace   Line Function             File
+#           4.     25 functionc()          /Users/wayneeseguin/test
+#           3.     18 functionb()          /Users/wayneeseguin/test
+#           2.     11 functiona()          /Users/wayneeseguin/test
+#           1.     29 main()               /Users/wayneeseguin/test
+#      > /Users/wayneeseguin/test functionc() 26 $ echo 'function c'
+#     function c
+#      > /Users/wayneeseguin/test functionb() 19 $ echo 'function b'
+#     function b
+#      > /Users/wayneeseguin/test functiona() 12 $ echo 'function a'
+#     function a
+#
 backtrace()
 {
-  trace off
+  set +o xtrace
+  local _message="${1:-"A command has returned an unhandled error code (nonzero return value)."}"
+
+  if [[ -n "${_message}" ]]
+  then
+    printf "ERROR: %s\n" "${_message}"
+  fi
 
   local _source _function _line _index
-  printf "Error Backtrace:\n  %6s %6s %-20s %-55s\n" "Trace" "Line" "Function" "File" 1>&2
+  printf "Backtrace:\n  %6s %6s %-20s %-55s\n" "Trace" "Line" "Function" "File" 1>&2
   for (( _index=1 ; _index < ${#FUNCNAME[@]} ; ++_index )) ; do
     _source="${BASH_SOURCE[${_index}]}"
     _function="${FUNCNAME[${_index}]:+${FUNCNAME[${_index}]}()}"
@@ -78,7 +430,6 @@ backtrace()
       "$((${#FUNCNAME[@]} - _index ))" "${_line}" "${_function}" "${_source} " \
       1>&2
   done
-
-  trace on
+  set -o xtrace
 }
 
