@@ -1,5 +1,32 @@
 #!/usr/bin/env bash
 
+#
+# ## modules()
+#
+# Loads named BDSM modules into the calling environment.
+#
+# ### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ### Stream Outputs
+#
+# None, unless loading the module causes output to a stream.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# Fails if no module names were given as parameters.
+#
+# ### Usage Examples
+#
+#     user$ modules array system
+#     user$ modules_loaded
+#     logging trace filesystem array system
+#
 modules()
 {
   if (( trace_flag < 2 )) ; then set +o xtrace ; fi
@@ -34,15 +61,82 @@ modules()
   if (( trace_flag == 1 )) ; then set -o xtrace ; fi
 }
 
+#
+# ## module_load
+#
+# Function Description
+#
+# ### Input Parameterss
+#
+# Positional Parameter listing and descriptions.
+#
+# ### Stream Outputs
+#
+# None, unless loading the module causes output to a stream.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# Fails if no extension module files names have been given.
+#
+# ### Usage Examples
+#
+#     user$ ls ${extension_modules_path}/bash/
+#     cli dsl initialize zebra
+#
+#     user$ cat ${extension_modules_path}/bash/zebra
+#     #!/usr/bin/env bash
+#     echo "Zebra!!! "
+#
+#     user$ module_load zebra # This will load zebra into the current context
+#     Zebra!!!
+#
 module_load()
 {
   local _file _files=("$@")
 
-  for _file in "${_files[@]}" ; do
+  (( ${#_files[@]} > 0 )) || fail "No modules specified to load."
+
+  for _file in "${_files[@]}"
+  do
     source_files "${extension_modules_path:-"$modules_path"}/bash/${_file}"
   done
 }
 
+#
+# ## module_is_loaded
+#
+# Checks to see whether or not the named module has been loaded or not.
+#
+# ### Input Parameterss
+#
+# First parameter is a module name.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 if the module has already been loaded
+# 1 if the module has not already been loaded
+#
+# ### Failure Scenarios
+#
+# Fails if no module name was given as the first parameter.
+#
+# ### Usage Examples
+#
+#     user$ module_is_loaded package
+#     user$ echo $?
+#     1
+#     user$ modules package
+#     user$ module_is_loaded package
+#     0
+#
 module_is_loaded()
 {
   local _name="${1:-}"
@@ -60,3 +154,34 @@ module_is_loaded()
   esac
 }
 
+#
+# ## modules_loaded
+#
+# Outputs a list of all modules that have been loaded.
+#
+# ### Input Parameterss
+#
+# Positional Parameter listing and descriptions.
+#
+# ### Stream Outputs
+#
+# Prints a space separated list of all loaded modules to the STDOUT stream of
+# the calling environment.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# No failure scenarios.
+#
+# ### Usage Examples
+#
+#     user$ modules_loaded
+#     logging trace filesystem
+#
+modules_loaded()
+{
+  printf "${modules[@]}\n"
+}
