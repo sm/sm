@@ -11,6 +11,25 @@ do
   name=${file##*\/}
   name=${name%.haml}
   mkdir -p content/modules/bash/${name}
-  cp $file content/modules/bash/${name}.haml
+  cat > content/modules/bash/${name}.haml <<HEADER
+.breadcrumbs
+  %a{ :href => "/" }
+    Documentation
+  &nbsp;>&nbsp;
+  %a{ :href => "/modules/" }
+    Modules
+  &nbsp;>&nbsp;
+  %a{ :href => "/modules/bash/" }
+    Bash
+  &nbsp;>&nbsp;
+  %a{ :href => "/modules/bash/${file}/" }
+    ${file}
+  %hr
+
+%h1
+   Module ${file}
+
+HEADER
+  cat $file >> content/modules/bash/${name}.haml
 done
 
