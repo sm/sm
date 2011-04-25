@@ -185,3 +185,277 @@ modules_loaded()
 {
   printf "${modules[@]}\n"
 }
+
+# Print out a list of all installed modules.
+modules_installed()
+{
+  local _module
+  local _module_type="${1:-"bash"}"
+  local _modules=($(find "${modules_path}/${_module_type}" -mindepth 1 -maxdepth 1 -type d | sed -e 's#.*/##g' -e '/\..*/d'))
+
+  for _module in ${_modules[@]} ; do
+    printf "%s\n" "${_module}"
+  done
+}
+
+#
+# ## module_dsl
+#
+# Print out a list of all dsl for the given module.
+#
+# ### Input Parameters
+#
+# First parameter is the module name to print out the dsl for.
+#
+# ### Stream Outputs
+#
+# The named module's DSL function listing will is printed to the calling
+# environments STDOUT.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# Fails if no module name was given.
+#
+# ### Usage Examples
+#
+#     user$ module_dsl defaults
+#     read_default()
+#
+module_dsl()
+{
+  local _function _dsl _module="${1:-}"
+
+  [[ -n "${_module}" ]] || fail "... module not given"
+
+  local _path="${modules_path}/bash/${_module}"
+
+  _dsl=($(find "${_path}" -mindepth 1 -maxdepth 1 -name dsl -type f -print0 | xargs -0 grep '^[a-z_]*()$' 2>/dev/null || true))
+
+  for _function in "${_dsl[@]}"
+  do
+    _function="${_function##*modules\/bash\/}"
+    printf "%s\n" "${_function//*:}"
+  done
+}
+
+#
+# ## modules_list
+#
+# Lists dsl for all modules.
+#
+# ### Input Parameters
+#
+# First parameter is the module name to print out the dsl for.
+#
+# ### Stream Outputs
+#
+# DSL function listing for each module is printed to the STDOUT of the calling
+# environment.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user$ modules_list
+#     array
+#
+#       array_is_nonempty()
+#       array_length()
+#       array_last_element()
+#       array_first_element()
+#       array_push()
+#       array_append()
+#       array_shift()
+#       array_unshift()
+#       array_join()
+#     ... longish output ...
+#
+modules_list()
+{
+  local _module _modules _function _dsl
+
+  for language in bash ruby
+  do
+    _modules=($(modules_installed ${language}))
+    for _module in "${_modules[@]}"
+    do
+      printf "\n%s\n\n" "${_module}"
+      _dsl=($(module_dsl "${_module}"))
+      for _function in "${_dsl[@]}"
+      do
+        printf "%s\n" "  ${_function}"
+      done
+    done
+  done
+}
+
+#
+# ## modules_docs
+#
+# Output the module DSL documentation for a given module name.
+#
+# ### Input Parameters
+#
+# First parameter is the module name to print out the dsl documentation for.
+#
+# ### Stream Outputs
+#
+# DSL documentation for every function of the named module.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# Fails if no module name is given.
+#
+# ### Usage Examples
+#
+#     user$ module_docs defaults
+#
+#     # read_default
+#
+#     Reads default values from an extension's config/defaults file.
+#
+#     ## Input Parameters
+#
+#     First parameter is the defaults file key to read (key=value).
+#     Second parameter is the variable name to store the retrieved value in.
+#     Remaining parameters are parsed out as token, value and prefix
+#       into|as <variable name>
+#       prefix <name>
+#       <variable> # If no specifier.
+#
+#     ## Stream Outputs
+#
+#     None.
+#
+#     ## Environmental effects
+#
+#     A variable will be set to the value, if the value is nonempty. If no variable
+#     name is specified the variable will be assigned the same name as the key.
+#
+#     ## Return Codes
+#
+#     0 for success.
+#
+#     ## Failure Scenarios
+#
+#     Fails if no arguments are passed in, at least need to specify a key.
+#
+#     ## Usage Examples
+#
+#         user$ read_default "version" prefix "package" # extension is nginx for example
+#         user$ echo $package_version
+#         1.0.0
+#
+module_docs()
+{
+  local _function _dsl _module="${1:-}"
+
+  [[ -n "${_module}" ]] ||
+    fail "Cannot glean documentation for a module as no module name was given"
+
+  local _path="${modules_path}/bash/${_module}"
+
+  awk '/^#/{print }' "${_path}/dsl" | sed -e "1d" -e "s/^# //g" -e "s/^#\s*//"
+}
+
+#
+# ## modules_docgen
+#
+# Lists dsl for all modules.
+#
+# ### Input Parameters
+#
+# First parameter is the module name to print out the dsl for.
+#
+# ### Stream Outputs
+#
+# DSL function listing for each module is printed to the STDOUT of the calling
+# environment.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user$ modules_list
+#     array
+#
+#       array_is_nonempty()
+#       array_length()
+#       array_last_element()
+#       array_first_element()
+#       array_push()
+#       array_append()
+#       array_shift()
+#       array_unshift()
+#       array_join()
+#     ... longish output ...
+#
+modules_docgen()
+{
+  local _module _modules _function _dsl
+  local _prefix="/tmp/docs/modules/"
+
+  _modules=($(modules_installed))
+  for _module in "${_modules[@]}"
+  do
+    ensure_paths_exist "${_prefix}/${_module}"
+
+    _base="${_prefix}/${_module}/${_module}"
+
+    module_docs "${_module}" > "${_base}.md"
+
+    if command_exists redcarpet
+    then
+      redcarpet "${_base}.md" > "${_base}.html"
+    else
+      log "Skipping html conversion as the 'redcarpet' command was not found (gem install redcarpet for this feature)"
+    fi
+
+    if command_exists html2haml
+    then
+      html2haml "${_base}.html" > "${_base}.haml"
+    else
+      log "Skipping haml conversion as the 'html2haml' command was not found (gem install haml for this feature)"
+    fi
+  done
+
+  # perl Markdown.pl --html4tags foo.text
+  printf "%s\n" "Modules documentation has been generated in ${_prefix}."
+}
+

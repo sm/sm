@@ -292,9 +292,9 @@ enable_backtrace()
 
   if [[ -n "${_message}" ]]
   then
-    trap "backtrace '${_message}'" ERR
+    trap "backtrace \"${_message}\"" ERR
   else
-    trap "backtrace 'A command has returned an unhandled error code (nonzero return value).'" ERR
+    trap "backtrace \"A command has returned an unhandled error code (nonzero return value).\"" ERR
   fi
   set -o errexit
 }
@@ -416,7 +416,7 @@ backtrace()
 
   if [[ -n "${_message}" ]]
   then
-    printf "ERROR: %s\n" "${_message}"
+    printf "ERROR: ${_message}\n"
   fi
 
   local _source _function _line _index
