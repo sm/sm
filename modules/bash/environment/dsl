@@ -1,16 +1,96 @@
 #!/usr/bin/env bash
 
+#
+# ## command_exists
+#
+# Checks to see whether a command exists within the current environment and PATH
+#
+# ### Input Parameterss
+#
+# First parameter is a command name.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# none.
+#
+# ### return codes
+#
+# 0 if the command was found in the current environment
+# 1 if the command was not found in the current environment
+#
+# ### failure scenarios
+#
+# Fails if no command name was given.
+#
+# ### usage examples
+#
+#     user$ command_exists adsf
+#     user$ echo $?
+#     1
+#
+#     user$ command_exists ls
+#     user$ echo $?
+#     0
+#
 command_exists()
 {
   local _name="${1:-}"
+
   [[ -n "${_name}" ]] || fail "No function name given."
+
   command -v "${_name}" > /dev/null 2>&1
 }
 
+#
+# ## is_a_function
+#
+# Checks to see whether a named function exists within the current environment
+#
+# ### Input Parameterss
+#
+# First parameter is a command name.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# none.
+#
+# ### return codes
+#
+# 0 if the function exists
+# 1 if the function does not exist
+#
+# ### failure scenarios
+#
+# Fails if no function name was given.
+#
+# ### usage examples
+#
+#     user$ is_a_function rvm
+#     user$ echo $?
+#     0
+#
+#     user$ is_a_function asdf
+#     user$ echo $?
+#     1
+#
+#     user$ is_a_function ls
+#     user$ echo $?
+#     1
+#
 is_a_function()
 {
   local _name="${1:-}"
+
   [[ -n "${_name}" ]] || fail "No function name given."
+
   declare -f "${_name}" >/dev/null 2>&1
 }
 
