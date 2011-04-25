@@ -53,13 +53,28 @@ module_docs()
 modules_docgen()
 {
   local _module _modules _function _dsl
+  local _prefix="/tmp/docs/modules/"
 
   _modules=($(modules_installed))
   for _module in "${_modules[@]}" ; do
-    ensure_paths_exist "/tmp/docs/modules/${_module}"
-    module_docs "${_module}" > "/tmp/docs/modules/${_module}/${_module}.md"
+    ensure_paths_exist "${_prefix}/${_module}"
+
+    _base="${_prefix}/${_module}/${_module}"
+
+    module_docs "${_module}" > "${_base}.md"
+
+    if command_exists redcarpet
+    then
+      redcarpet "${_base}.md" > "${_base}.html"
+    fi
+
+    if command_exists html2haml
+    then
+      html2haml "${_base}.html" > "${_base}.haml"
+    fi
   done
 
-  printf "%s\n" "Modules documentation has been generated as Markdown files in /tmp/docs/modules/"
+  # perl Markdown.pl --html4tags foo.text
+  printf "%s\n" "Modules documentation has been generated in ${_prefix}"
 }
 
