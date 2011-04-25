@@ -5,7 +5,7 @@
 #
 # Checks to see whether a command exists within the current environment and PATH
 #
-# ### Input Parameterss
+# ### Input Parameters
 #
 # First parameter is a command name.
 #
@@ -50,7 +50,7 @@ command_exists()
 #
 # Checks to see whether a named function exists within the current environment
 #
-# ### Input Parameterss
+# ### Input Parameters
 #
 # First parameter is a command name.
 #

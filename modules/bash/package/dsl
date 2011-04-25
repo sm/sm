@@ -74,7 +74,7 @@ package_definition()
 
 package_install()
 {
-  ensure_nonempty package_name package_version archive_format
+  variables_must_be_nonempty package_name package_version archive_format
 
   true "${package_dir:="${package_name}-${package_version}"}"
 
@@ -145,7 +145,7 @@ package_install()
 
 package_fetch_md5()
 {
-  ensure_nonempty package_name package_version archive_format
+  variables_must_be_nonempty package_name package_version archive_format
 
   local download_url
 
@@ -184,7 +184,7 @@ file_matches_md5()
 
 package_fetch()
 {
-  ensure_nonempty package_name package_version archive_format
+  variables_must_be_nonempty package_name package_version archive_format
 
   : \
     "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
@@ -284,7 +284,7 @@ package_activate()
 {
   local _package="${1:-}" _version="${2:-}"
 
-  ensure_nonempty _package _version
+  variables_must_be_nonempty _package _version
 
   symlink_exists "${prefix_path}/${_package}/active" &&
     package_deactivate "${_package}"
@@ -313,7 +313,7 @@ package_deactivate()
 {
   local _package="${1:-}" _file _files
 
-  ensure_nonempty _package
+  variables_must_be_nonempty _package
 
   log "Deactivating ${_package}"
 
@@ -336,7 +336,7 @@ package_activate_if_first()
 {
   local _package="${1:-}" _version="${2:-}"
 
-  ensure_nonempty _package _version
+  variables_must_be_nonempty _package _version
 
   if directory_exists "${install_path}"
   then
@@ -351,7 +351,7 @@ package_ldconfig()
 {
   local _package="${1:-}" _path _files
 
-  ensure_nonempty _package
+  variables_must_be_nonempty _package
 
   directory_exists "${prefix_path}/${_package}/active/lib" ||
     return 0 # no lib/ directory for activated package, no need to update ldconfig
@@ -384,7 +384,7 @@ package_profile_d()
 {
   local _package="${1:-}"
 
-  ensure_nonempty _package
+  variables_must_be_nonempty _package
 
   directory_exists "${prefix_path}/${_package}/active/bin" ||
     return 0 # No bin/ dir, no need for it to be in the path.
@@ -441,7 +441,7 @@ package_conf_d()
 
 package_uninstall()
 {
-  ensure_nonempty package_name package_version archive_format
+  variables_must_be_nonempty package_name package_version archive_format
 
   true "${package_dir:="${package_name}-${package_version}"}"
 

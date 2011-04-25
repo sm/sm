@@ -5,7 +5,7 @@
 #
 # Set the environmental PS4 variable for informative tracing.
 #
-# ### Input Parameterss
+# ### Input Parameters
 #
 # None.
 #
@@ -42,7 +42,7 @@ set_ps4()
 # of code execution after the function returns will be displayed in the format
 # specified by the PS4 environment variable (see set_ps4).
 #
-# ### Input Parameterss
+# ### Input Parameters
 #
 # First parameter is either empty, 'on' or 'off'
 #
@@ -87,7 +87,7 @@ trace()
 #
 # Turns tracing on.
 #
-# ### Input Parameterss
+# ### Input Parameters
 #
 # None.
 #
@@ -117,7 +117,7 @@ enable_trace()
 #
 # Turns tracing off.
 #
-# ### Input Parameterss
+# ### Input Parameters
 #
 # None.
 #
@@ -148,7 +148,7 @@ disable_trace()
 # Toggle verbose debugging functionality on or off. If 'on' is triggered then
 # every line of code execution after the function returns will be displayed.
 #
-# ### Input Parameterss
+# ### Input Parameters
 #
 # First parameter is either empty, 'on' or 'off'
 #
@@ -192,7 +192,7 @@ debug()
 #
 # Enables verbose debugging output.
 #
-# ### Input Parameterss
+# ### Input Parameters
 #
 # None.
 #
@@ -221,7 +221,7 @@ enable_debug()
 #
 # Disables verbose debugging output.
 #
-# ### Input Parameterss
+# ### Input Parameters
 #
 # None.
 #
@@ -252,7 +252,7 @@ disable_debug()
 # Enables backtrace and program exit whenever a command returns a nonzero value
 # that is not handled.
 #
-# ### Input Parameterss
+# ### Input Parameters
 #
 # First parameter is optional. If it is passed it is a message that will be
 # outputed when a command trigger the program to error exit.
@@ -304,7 +304,7 @@ enable_backtrace()
 #
 # Function Description
 #
-# ### Input Parameterss
+# ### Input Parameters
 #
 # None.
 #
@@ -345,7 +345,7 @@ disable_backtrace()
 # called from. Currently trace is turned on as well so that execution after
 # calling backtrace is traced.
 #
-# ### Input Parameterss
+# ### Input Parameters
 #
 # None.
 #

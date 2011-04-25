@@ -6,7 +6,7 @@
 # Display help for the current extension based on settings declared in the help
 # action.
 #
-# ### Input Parameterss
+# ### Input Parameters
 #
 # First parameter is the help section to display, default is all sections 'usage'.
 #
@@ -54,7 +54,7 @@ show_help()
 #
 # Set the string that will be printed when the actions help section is output.
 #
-# ### Input Parameterss
+# ### Input Parameters
 #
 # First parameter is a string containing a description of the extension.
 #
@@ -90,7 +90,7 @@ description()
 #
 # Set the string that will be printed when the actions help section is output.
 #
-# ### Input Parameterss
+# ### Input Parameters
 #
 # First parameter is a string of the action descriptions.
 #
@@ -125,7 +125,7 @@ actions()
 #
 # Define the notes help section content.
 #
-# ### Input Parameterss
+# ### Input Parameters
 #
 # First parameter is a string containing any notes for the notes section of the
 # current extension's help output.
@@ -160,7 +160,7 @@ notes()
 #
 # Specify content for the dependencies section of the help command.
 #
-# ### Input Parameterss
+# ### Input Parameters
 #
 # First parameter is a string containing any dependencies for the dependencies
 # section of the current extension's help output.
@@ -195,7 +195,7 @@ dependencies()
 #
 # Specify content for the resources section of the help command.
 #
-# ### Input Parameterss
+# ### Input Parameters
 #
 # First parameter is a string containing any resources for the resources
 # section of the current extension's help output.
@@ -229,7 +229,7 @@ resources() {
 #
 # Display the usage help output of the command. This displays all help sections.
 #
-# ### Input Parameterss
+# ### Input Parameters
 #
 # None.
 #

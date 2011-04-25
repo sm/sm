@@ -5,7 +5,7 @@
 #
 # Function Description
 #
-# ### Input Parameterss
+# ### Input Parameters
 #
 # Positional Parameter listing and descriptions.
 #
@@ -39,7 +39,7 @@ template_exists()
 #
 # Function Description
 #
-# ### Input Parameterss
+# ### Input Parameters
 #
 # Positional Parameter listing and descriptions.
 #
@@ -134,7 +134,7 @@ install_template()
 #
 # Function Description
 #
-# ### Input Parameterss
+# ### Input Parameters
 #
 # Positional Parameter listing and descriptions.
 #

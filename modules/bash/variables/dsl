@@ -1,22 +1,143 @@
 #!/usr/bin/env bash
 
+#
+# ## first
+#
+# Returns the first parameter.
+#
+# ### Input Parameters
+#
+# One or more parameters.
+#
+# ### Stream Outputs
+#
+# Prints the first positional parameter to STDOUT of the calling environment.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# Fails if no parameters are passed.
+#
+# ### Usage Examples
+#
+#     user$ first one two three
+#     one
+#
+#     user$ array=($(ls $HOME))
+#     user$ first ${array[@]}
+#     Desktop
+#
 first()
 {
   local _array=("$@")
-  (( ${#_array[@]} > 0 )) || fail "No arguments given."
+
+  (( ${#_array[@]} > 0 )) ||
+    fail "No parameters given, cannot return the first one."
+
   printf "%s" "${_array[0]}"
 }
 
+#
+# ## last
+#
+# Returns the last parameter.
+#
+# ### Input Parameters
+#
+# One or more parameters.
+#
+# ### Stream Outputs
+#
+# Prints the last positional parameter to STDOUT of the calling environment.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# Fails if no parameters are passed.
+#
+# ### Usage Examples
+#
+#     user$ last one two three
+#     one
+#
+#     user$ array=($(ls $HOME))
+#     user$ last ${array[@]}
+#     tmp
+#
 last()
 {
   local _array=("$@")
-  (( ${#_array[@]} > 0 )) || fail "No arguments given."
+
+  (( ${#_array[@]} > 0 )) ||
+    fail "No parameters given, cannot return the last one."
+
   printf "%s" "${_array[$((${#_array[@]} - 1))]}"
 }
 
+#
+# ## match
+#
+# Tests to see if a value matches a given regex (shell extended glob pattern).
+#
+# ### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 if the value matches the regex (shell extended glob pattern)
+# 1 if the value does not match the regex (shell extended glob pattern)
+#
+# ### Failure Scenarios
+#
+# Fails if no value is given
+# Fails if no regex is given
+#
+# ### Usage Examples
+#
+#     user$ match "The quick brown fox jumped over the lazy dog." "*fox*"
+#     user$ echo $?
+#     0
+#
+#     user$ match "The quick brown fox jumped over the lazy dog." "*smurf*"
+#     user$ echo $?
+#     1
+#
 match()
 {
-  local _value="$1" _regex="$2"
+  local _value="$1"
+
+  [[ -n "${_value}" ]] ||
+    fail "A value and regex must be specified in order to match."
+
+  shift
+
+  local _regex="$1"
+
+  [[ -n "${_value}" ]] ||
+    fail "A regex must be specified in order to match ${_value} against it."
 
   shopt -s extglob
 
@@ -26,17 +147,102 @@ match()
   esac
 }
 
-ensure_nonempty()
+#
+# ## variables_must_be_nonempty
+#
+# Halts the program with a fail message if any of the named variables are empty
+# or undefined.
+#
+# ### Input Parameters
+#
+# One or more parameters specifying the names of variables.
+#
+# ### Stream Outputs
+#
+# None if all are
+#
+# ### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# Fails if no varaible names were given.
+# Fails if any of the named variables are empty.
+#
+# ### Usage Examples
+#
+#     user$ cat test
+#     #!/usr/bin/env bash
+#     source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
+#     modules trace variables # Load the trace module.
+#     unset HOME
+#     variables_must_be_nonempty HOME
+#
+#     user$ $PWD/test
+#     ERROR: Required variable 'HOME' is not set.
+#     ERROR: A command has returned an unhandled error code (nonzero return value).
+#     Backtrace:
+#        Trace   Line Function             File
+#           3.     37 fail()               /usr/local/bdsm/modules/bash/logging/dsl
+#           2.    192 variables_must_be_nonempty() /usr/local/bdsm/modules/bash/variables/dsl
+#           1.      6 main()               /Users/wayneeseguin/test
+#      > modules/bash/logging/dsl fail() 38 $ exit 1
+#
+variables_must_be_nonempty()
 {
-  local variable
+  local _variable _variables=("$@")
 
-  for variable in "$@"
+  (( ${#_variables[@]} > 0 )) ||
+    fail "Cannot ensure variables are nonempty as no variables were given."
+
+  for _variable in "${_variables}"
   do
-    eval "[[ -n \"\${${variable}}\" ]]" ||
-      fail "${extension} ${action} Required variable '$variable' is not set."
+    eval "[[ -n \"\${${_variable}}\" ]]" ||
+      fail "Required variable '$_variable' is not set."
   done
 }
 
+#
+# ## variable_is_nonempty
+#
+# Test to see if a variable is empty.
+#
+# ### Input Parameters
+#
+# First parameter is a string containing a variable name.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# Fails if no variable name was given as the first argument.
+#
+# ### Usage Examples
+#
+#     user$ variable_is_nonempty asdf
+#     user$ echo $?
+#     1
+#
+#     user$ asdf="w00t! "
+#     user$ variable_is_nonempty asdf
+#     user$ echo $?
+#     0
+#
 variable_is_nonempty()
 {
   local _variable="${1:-}"

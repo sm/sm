@@ -5,7 +5,7 @@
 #
 # Checks to see if an array with the name given as the first parameter is nonempty.
 #
-# ### Input Parameterss
+# ### Input Parameters
 #
 # The first parameter is the name of the array variable.
 #
@@ -49,7 +49,7 @@ array_is_nonempty()
 #
 # Return the length of the given array.
 #
-# ### Input Parameterss
+# ### Input Parameters
 #
 # First parameter is the name of the array variable.
 #
@@ -87,7 +87,7 @@ array_length()
 #
 # Print the last element of the given array.
 #
-# ### Input Parameterss
+# ### Input Parameters
 #
 # First parameter is the name of the array variable.
 #
@@ -127,7 +127,7 @@ array_last_element()
 #
 # Print the first element of the given array.
 #
-# ### Input Parameterss
+# ### Input Parameters
 #
 # First parameter is the name of the array variable.
 #
@@ -165,7 +165,7 @@ array_first_element()
 #
 # Appends one or more elements to the array with the given name.
 #
-# ### Input Parameterss
+# ### Input Parameters
 #
 #   The first parameter is the name of the array variable.
 #   Remaining parameters are the elements to be appended to the array.
@@ -215,7 +215,7 @@ array_push()
 #
 # Return the length of the given array.
 #
-# ### Input Parameterss
+# ### Input Parameters
 #
 # The first parameter is the name of the array variable.
 # Remaining parameters are the elements to append to the end of the array.
@@ -264,7 +264,7 @@ array_append()
 #
 # Return the length of the given array.
 #
-# ### Input Parameterss
+# ### Input Parameters
 #
 #   The first parameter is the name of the array variable.
 #
@@ -345,7 +345,7 @@ array_unshift()
 #
 # Joins the named array into a string separated by either a space or a given string.
 #
-# ### Input Parameterss
+# ### Input Parameters
 #
 # The first parameter is the name of the array variable.
 # The second parameter is the separator between elements in the string, this is optional and defaults to a space.

@@ -5,7 +5,7 @@
 #
 # Reads default values from an extension's config/defaults file.
 #
-# ### Input Parameterss
+# ### Input Parameters
 #
 # First parameter is the defaults file key to read (key=value).
 # Second parameter is the variable name to store the retrieved value in.
