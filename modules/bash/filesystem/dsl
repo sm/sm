@@ -29,8 +29,12 @@ nonempty_files()
   (( ${#_files[@]} > 0 )) ||
     fail "Cannot return nonempty files as no files were given."
 
-  for _file in "${_files[@]}" ; do
-    file_is_nonempty "${_file}" && printf "${_file}\n"
+  for _file in "${_files[@]}"
+  do
+    if file_is_nonempty "${_file}"
+    then
+      printf "${_file}\n"
+    fi
   done
 }
 
@@ -40,7 +44,8 @@ ensure_paths_exist()
 
   (( ${#_paths[@]} > 0 )) || fail "Cannot ensure paths exist as no paths were given."
 
-  for _path in "${_paths[@]}" ; do
+  for _path in "${_paths[@]}"
+  do
     directory_exists "${_path}" || mkdir -p "${_path}"
   done
 }
@@ -106,17 +111,18 @@ ensure_files_are_executable()
 {
   local _file _files=("$@") _path
 
-  (( ${#_files[@]} > 0 )) || fail "Cannot ensure files are executable as no files were given."
+  (( ${#_files[@]} > 0 )) ||
+    fail "Cannot ensure files are executable as no files were given."
 
   for _file in "${_files[@]}" ; do
-    [[ -d "${_file}" ]] &&
+    [[ ! -d "${_file}" ]] ||
       fail "Cannot make the file '${_file}' executable as it is a directory."
 
     [[ -f "${_file}" ]] ||
       fail "Cannot make the file '${_file}' executable as the file does not exist."
 
     _path="${_file%\/*}"
-    [[ -d "${_file}" ]] &&
+    [[ ! -d "${_file}" ]] ||
       fail "Cannot make the file '${_file} executable as '${_path}' does not even exist."
 
     chmod +x "${_file}"
@@ -160,7 +166,7 @@ link()
     esac
   done
 
-  (( _force_flag == 1 )) && remove_files "${_target}"
+  (( _force_flag != 1 )) || remove_files "${_target}"
 
   # TODO: What should we do if files already exist?
   if [[ -f "${_target}" ]] ; then
@@ -217,8 +223,8 @@ move_directory()
 
   mv "${_source}" "${_target}"
 
-  [[ -n "${_mode:-}" ]] && chmod -R "${_mode}" "${_target}"
-  [[ -n "${_owner:-}" ]] && chown -R "${_owner}" "${_target}"
+  [[ -z "${_mode:-}" ]]  || chmod -R "${_mode}" "${_target}"
+  [[ -z "${_owner:-}" ]] || chown -R "${_owner}" "${_target}"
 }
 
 move_file()
@@ -265,8 +271,8 @@ move_file()
 
   mv "${_source}" "${_target}"
 
-  [[ -n "${_mode:-}" ]] && chmod "${_mode}" "${_target}"
-  [[ -n "${_owner:-}" ]] && chown "${_owner}" "${_target}"
+  [[ -z "${_mode:-}" ]]  || chmod "${_mode}" "${_target}"
+  [[ -z "${_owner:-}" ]] || chown "${_owner}" "${_target}"
 }
 
 copy_file()
@@ -561,7 +567,7 @@ file_is_nonempty()
 
   [[ -n "${_file}" ]] || fail "File path/name was not given!"
 
-  [[ -d "${_file}" ]] &&
+  [[ ! -d "${_file}" ]] ||
     fail "when checking whether the file '${_file}' was nonempty found instead it was a directory."
 
   [[ -s "${_file}" ]]
@@ -573,7 +579,12 @@ file_is_empty()
 
   [[ -n "${_file}" ]] || fail "File path/name was not given!"
 
-  [[ -f "${_file}" && ! -s "${_file}" ]]
+  if [[ -f "${_file}" && ! -s "${_file}" ]]
+  then
+    return 0
+  else
+    return 1
+  fi
 }
 
 file_is_missing()
@@ -582,7 +593,12 @@ file_is_missing()
 
   [[ -n "${_file}" ]] || fail "File path/name was not given!"
 
-  [[ ! -f "${_file}" ]]
+  if [[ ! -f "${_file}" ]]
+  then
+    return 0
+  else
+    return 1
+  fi
 }
 
 file_is_empty_or_missing() {
@@ -590,7 +606,12 @@ file_is_empty_or_missing() {
 
   [[ -n "${_file}" ]] || fail "File path/name was not given!"
 
-  [[ ! -f "${_file}" || ! -s "${_file}" ]]
+  if [[ ! -f "${_file}" || ! -s "${_file}" ]]
+  then
+    return 0
+  else
+    return 1
+  fi
 }
 
 file_contains()
@@ -600,7 +621,12 @@ file_contains()
   [[ -n "${_file}" ]]    || fail "File path/name was not given!"
   [[ -n "${_pattern}" ]] || fail "String pattern for search was not given!"
 
-  grep "${_pattern}" "${_file}" >/dev/null 2>&1
+  if grep "${_pattern}" "${_file}" >/dev/null 2>&1
+  then
+    return 0
+  else
+    return 1
+  fi
 }
 
 symlink_exists()
@@ -609,7 +635,12 @@ symlink_exists()
 
   [[ -n "${_file}" ]] || fail "File path/name was not given!"
 
-  [[ -L "${_file}" ]]
+  if [[ -L "${_file}" ]]
+  then
+    return 0
+  else
+    return 1
+  fi
 }
 
 # Directory conditional dsl
@@ -619,7 +650,12 @@ directory_exists()
 
   [[ -n "${_directory}" ]] || fail "Directory name/path was not given!"
 
-  [[ -d "$_directory" ]]
+  if [[ -d "$_directory" ]]
+  then
+    return 0
+  else
+    return 1
+  fi
 }
 
 directories_in()
@@ -629,7 +665,12 @@ directories_in()
   [[ -n "${path}" ]]  || fail "Directory name/path was not given!"
   [[ -d "${_path}" ]] || fail "'${_path}' is not a directory!"
 
-  find "${_path}" -mindepth 1 -maxdepth 1 -type d
+  if find "${_path}" -mindepth 1 -maxdepth 1 -type d
+  then
+    return 0
+  else
+    return 1
+  fi
 }
 
 directories_in_matching()
@@ -640,7 +681,12 @@ directories_in_matching()
   [[ -d "${_path}" ]]    || fail "'${_path}' is not a directory!"
   [[ -n "${_pattern}" ]] || fail "'${_path}' is not a directory!"
 
-  find "${_path}" -mindepth 1 -maxdepth 1 -type d
+  if find "${_path}" -mindepth 1 -maxdepth 1 -type d
+  then
+    return 0
+  else
+    return 1
+  fi
 }
 
 directories_under()
@@ -650,7 +696,12 @@ directories_under()
   [[ -n "${path}" ]]  || fail "Directory name/path was not given!"
   [[ -d "${_path}" ]] || fail "'${_path}' is not a directory!"
 
-  find "${_path}" -mindepth 1 -type d
+  if find "${_path}" -mindepth 1 -type d
+  then
+    return 0
+  else
+    return 1
+  fi
 }
 
 directories_under_matching()
@@ -661,7 +712,12 @@ directories_under_matching()
   [[ -d "${_path}" ]]    || fail "'${_path}' is not a directory!"
   [[ -n "${_pattern}" ]] || fail "'${_path}' is not a directory!"
 
-  find "${_path}" -mindepth 1 -iname "${_pattern}" -type d
+  if find "${_path}" -mindepth 1 -iname "${_pattern}" -type d
+  then
+    return 0
+  else
+    return 1
+  fi
 }
 
 files_in()
@@ -671,7 +727,12 @@ files_in()
   [[ -n "${path}" ]]  || fail "Directory name/path was not given!"
   [[ -d "${_path}" ]] || fail "'${_path}' is not a directory!"
 
-  find "${_path}" -mindepth 1 -maxdepth 1 -type f
+  if find "${_path}" -mindepth 1 -maxdepth 1 -type f
+  then
+    return 0
+  else
+    return 1
+  fi
 }
 
 files_under()
@@ -681,7 +742,12 @@ files_under()
   [[ -n "${path}" ]]  || fail "Directory name/path was not given!"
   [[ -d "${_path}" ]] || fail "'${_path}' is not a directory!"
 
-  find "${_path}" -mindepth 1 -type f
+  if find "${_path}" -mindepth 1 -type f
+  then
+    return 0
+  else
+    return 1
+  fi
 }
 
 files_under_matching()
@@ -692,7 +758,12 @@ files_under_matching()
   [[ -d "${_path}" ]]    || fail "'${_path}' is not a directory!"
   [[ -n "${_pattern}" ]] || fail "Cannot find files as a filename or pattern was not given."
 
-  find "${_path}" -mindepth 1 -iname "${_pattern}" -type f
+  if find "${_path}" -mindepth 1 -iname "${_pattern}" -type f
+  then
+    return 0
+  else
+    return 1
+  fi
 }
 
 #
@@ -737,6 +808,11 @@ replace_content()
   [[ -f "${_file:-}" ]] ||
     fail "Can not replace file content as the file does not exist."
 
-  sed -i -e "s#${_pattern}#${_content}#g" "${_file}"
+  if sed -i -e "s#${_pattern}#${_content}#g" "${_file}"
+  then
+    return 0
+  else
+    return 1
+  fi
 }
 
