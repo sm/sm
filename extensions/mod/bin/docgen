@@ -22,12 +22,12 @@ do
   %a{ :href => "/modules/bash/" }
     Bash
   &nbsp;>&nbsp;
-  %a{ :href => "/modules/bash/${file}/" }
-    ${file}
+  %a{ :href => "/modules/bash/${name}/" }
+    ${name}
   %hr
 
 %h1
-   Module ${file}
+  Module ${name}
 
 HEADER
   cat $file >> content/modules/bash/${name}.haml
