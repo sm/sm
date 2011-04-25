@@ -1,26 +1,26 @@
 #!/usr/bin/env bash
 
 #
-# ## function_name
+# ## template_exists
 #
-# Function Description
+# Checks if a named template file exists in the extension_templates_path
 #
 # ### Input Parameters
 #
-# Positional Parameter listing and descriptions.
+# First parameter must be the name of a template file, eg. a string.
 #
 # ### Stream Outputs
 #
-# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+# None.
 #
 # ### Return Codes
 #
-# 0 if ...
-# 1 if ...
+# 0 if the named template file exists and is nonempty.
+# 1 if the named template file does not exist or is empty.
 #
 # ### Failure Scenarios
 #
-# Fails if ...
+# Fails if no template name is given.
 #
 # ### Usage Examples
 #
@@ -31,36 +31,45 @@ template_exists()
 {
   local _template="${extension_templates_path}/${1}.template"
 
+  [[ -n "${_template}" ]] ||
+    fail "Cannot check if a template exists as no template name was given."
+
   [[ -s "${_template}" ]]
 }
 
 #
-# ## function_name
+# ## install_template
 #
-# Function Description
+# Installs a named template to a given location.
 #
 # ### Input Parameters
 #
-# Positional Parameter listing and descriptions.
+# The first parameter should be the template name.
+# Remaining parameters specify the target, mode and owner:
+#   owner "<<user>>[:<<group>>]"
+#   mode 0755
+#   to "/path/to/new/file"
 #
 # ### Stream Outputs
 #
-# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+# None.
 #
 # ### Return Codes
 #
-# 0 if ...
-# 1 if ...
+# 0 if successful
+# 1 otherwise
 #
 # ### Failure Scenarios
 #
-# Fails if ...
+# Fails if no template name was given.
+# Fails if the template name given is a directory.
 #
 # ### Usage Examples
 #
-#     user$ {{ setup the scenario }}
-#     user$ function_name {{ parameters }}
-#     user$ {{ demonstrate the results}}
+#     user$ install_template "nginx.conf" \
+#           to "${nginx_path}/nginx.conf" \
+#           mode 0644 owner "${nginx_user}"
+#
 install_template()
 {
   local _template _name _target _source _mode=0644 _owner=$USER
@@ -130,32 +139,44 @@ install_template()
 }
 
 #
-# ## function_name
+# ## seed_template
 #
-# Function Description
+# Seed a template file replacing all given keys with given values.
 #
 # ### Input Parameters
 #
-# Positional Parameter listing and descriptions.
+# First parameter must be the template filename to seed.
+# Remaining parameters must come in pairs, the first of each pair specifies
+# the key to search and replace in the template file and the second is the
+# value to replace {{$key}} with.
 #
 # ### Stream Outputs
 #
-# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+# None.
 #
 # ### Return Codes
 #
-# 0 if ...
-# 1 if ...
+# 0 for success
 #
 # ### Failure Scenarios
 #
-# Fails if ...
+# Fails if no template filename is given.
+# Fails if the template given does not exist.
+# Fails if no key/value pairs are given.
+# Fails if for every key there is no associated value.
+# Fails if the intermediate template file does not exist...
 #
 # ### Usage Examples
 #
-#     user$ {{ setup the scenario }}
-#     user$ function_name {{ parameters }}
-#     user$ {{ demonstrate the results}}
+#    user$ seed_template "/etc/conf.d/${extension}.conf" \
+#      prefix_path "${prefix_path}" \
+#      init_scripts_path "${init_scripts_path}" \
+#      conf_d_path "${conf_d_path}" \
+#      modules_path "${modules_path}" \
+#      data_path "${data_path}" \
+#      confd_path "${confd_path}" \
+#      extension "${extension}"
+#
 seed_template()
 {
   local _template="${1:-}"
@@ -172,8 +193,8 @@ seed_template()
   [[ -f "${_template}" ]] ||
     fail "Can not seed template template file '${_template}' does not exist."
 
-  (( ${_args} > 0 ))  || fail "Arguments not specified, cannot seed template '${_template}'."
-  ((  (5 % 2) == 0 )) || fail "An even number of arguments must be given."
+  (( ${#_args[@]} > 0 ))  || fail "No replacement keys specified, cannot seed template '${_template}'."
+  ((  (${#_args[@]} % 2) == 0 )) || fail "Every replacement key must have a replacement value."
 
   warn "Template Seeding (replacing defaults) has not yet been fully implemented."
 
