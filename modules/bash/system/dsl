@@ -1,5 +1,35 @@
 #!/usr/bin/env bash
 
+#
+# ## init_scripts_path
+#
+# Returns the system init scripts path (eg. /etc/init.d /etc/rc.d)
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# The system init scripts path is printed to the calling environments STDOUT.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# Fails the OS is not of a (yet) recognized type.
+#
+# ### Usage Examples
+#
+#     user@archlinux$ init_scripts_path
+#     /etc/rc.d
+#
 init_scripts_path()
 {
   if (( UID == 0 )) ; then
@@ -22,218 +52,276 @@ init_scripts_path()
   fi
 }
 
+#
+# ## confd_path
+#
+# Return the system conf.d path.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# Prints the conf.d path for the current system and user.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     root# confd_path
+#     /etc/conf.d
+#
 confd_path()
 {
-  if (( UID == 0 )) ; then
+  if (( UID == 0 ))
+  then
     printf "/etc/conf.d"
   else
     printf "$HOME/.conf.d"
   fi
 }
 
-# Example:
 #
-#   ensure_user_exists "nginx" group "nginx"
-ensure_user_exists()
+# ## os_is_linux
+#
+# Tests if the operating system the process is running on is Linux.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 if the operating system is linux
+# 1 if the operating system is not linux
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     root@archlinux# os_is_linux
+#     root@archlinux# echo $?
+#     0
+#
+os_is_linux()
 {
-  local _token _group
-  # parse arguments
-  while (( $# > 0 )) ; do
-    _token="$1" ; shift
-
-    case "${_token}" in
-      group)
-        _group="${1}" ; shift
-        ;;
-      with)
-        continue # Syntatic sugar, ignore, next!
-        ;;
-      from)
-        _source="${1}" ; shift
-        ;;
-      --force)
-        _force_flag=1
-        ;;
-
-      *)
-        if [[ -z "${_group}" ]] ; then
-          _group="${_token}"
-          break
-        fi
-        ;;
-    esac
-  done
-
-  if (( UID == 0 )) ; then
-    (
-    case "$(uname)" in
-      "OpenBSD")
-        groupadd "$package_user"
-        useradd -g "$package_user" "$package_user" -s /bin/bash
-        usermod -s /bin/bash "$package_user"
-        ;;
-
-      "FreeBSD")
-        pw groupadd -q "$package_user"
-        ;;
-
-      "Linux")
-        # groupadd nginx
-        # useradd -G nginx -M nginx
-        if [[ -f "/etc/SuSE-release" ]] ; then
-          groupadd "$package_user"
-        else
-          groupadd -f "$package_user"
-        fi
-
-        useradd -g "${package_user}" "${package_user}"
-        usermod -d "${data_path%\/*}" "${package_user}"
-        usermod -s /bin/bash "${package_user}"
-      ;;
-
-      "Darwin")
-        current_max_gid=$(dscl . -list /Groups gid | awk '{print $2}' | sort -g -r | head -1)
-        next_gid=$((current_max_gid+1))
-
-        current_max_uid=$(dscl . -list /Users UniqueID | awk '{print $2}' | sort -g -r | head -1)
-        next_uid=$((current_max_uid+1))
-
-        if ! dscl . -list /Users | grep -q "^${package_user}$" ; then
-          dscl . -create "/Groups/$package_user"
-          dscl . -create "/Groups/$package_user" gid "$next_gid"
-          dscl . -create "/Users/${package_user}"
-          dscl . -create "/Users/${package_user}" PrimaryGroupID "$gid" # UserShell /bin/bash
-          dscl . -create "/Users/${package_user}" uid "$next_uid"
-          dscl . -create "/Users/${package_user}" realname "Postgresql User"
-          dscl . -create "/Users/${package_user}" home "${data_path%\/*}"
-          dscl . -create "/Users/${package_user}" shell "/bin/bash"
-          dscl . -create "/Users/${package_user}" gid "$gid"
-          dscl . -create "/Users/${package_user}" passwd "*"
-        fi
-      ;;
-
-      "SunOS")
-        groupadd "$package_user"
-        useradd -g "$package_user" -s /bin/bash -d "${data_path}" "$package_user"
-        usermod -s /bin/bash "$package_user"
-        ;;
-    esac
-    ) || true # Ignore failures with this for now...
+  if [[ "$MACHTYPE" = *linux* ]]
+  then
+    return 0
   else
-    fail "Users and groups may be manipulated only by the super user (root) via su or sudo."
+    return 1
   fi
 }
 
-delete_user()
+#
+# ## os_is_darwin
+#
+# Tests if the operating system the process is running on is Linux.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 if the operating system is linux
+# 1 if the operating system is not linux
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     root@archlinux# os_is_linux
+#     root@archlinux# echo $?
+#     0
+#
+os_is_darwin()
 {
-  local _token _group
-  # parse arguments
-  while (( $# > 0 )) ; do
-    _token="$1" ; shift
-
-    case "${_token}" in
-      group)
-        _group="${1}" ; shift
-        ;;
-      with)
-        continue # Syntatic sugar, ignore, next!
-        ;;
-      from)
-        _source="${1}" ; shift
-        ;;
-      --force)
-        _force_flag=1
-        ;;
-
-      *)
-        if [[ -z "${_group}" ]] ; then
-          _group="${_token}"
-          break
-        fi
-        ;;
-    esac
-  done
-
-  if (( UID == 0 )) ; then
-    (
-    case "$(uname)" in
-      "OpenBSD")
-        groupdel "$package_user"
-        userdel -g "$package_user" "$package_user"
-        ;;
-
-      "FreeBSD")
-        pw groupdel -q "$package_user"
-        ;;
-
-      "Linux")
-        userdel "${package_user}"
-      ;;
-
-      "Darwin")
-        gid="501" #only gids > 500 show up in user preferences
-
-        #Find an open gid
-        while true; do
-          name=$(dscl . search /groups PrimaryGroupID $gid | cut -f1 -s)
-          if [ -z "$name" ] ; then
-            break
-          fi
-          gid=$[$gid +1]
-        done
-
-        #Create the group
-        dscl . -delete "/Users/${package_user}" PrimaryGroupID "$gid" # UserShell /bin/bash
-        dscl . -delete "/Groups/$package_user"
-        dscl . -delete "/Groups/$package_user" gid "$gid"
-      ;;
-
-      "SunOS")
-        groupdel "$package_user"
-        userdel "$package_user"
-        ;;
-    esac
-    ) || true # Ignore failures with this for now...
+  if [[ "$MACHTYPE" = *darwin* ]]
+  then
+    return 0
   else
-    fail "Users and groups may be manipulated only by the super user (root) via su or sudo."
+    return 1
   fi
 }
 
-# TODO: Move these to a user Module.
-running_as_root()      { (( UID == 0 )) ; }
-running_as_superuser() { (( UID == 0 )) ; }
-running_as_user()      { (( UID != 0 )) ; }
+#
+# ## os_is_bsd
+#
+# Tests if the operating system the process is running on is Linux.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 if the operating system is linux
+# 1 if the operating system is not linux
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     root@archlinux# os_is_linux
+#     root@archlinux# echo $?
+#     0
+#
 
-must_be_root()
+os_is_bsd()
 {
-  running_as_user &&
-    fail "bdsm $extension $action must be run as a root and NOT as a user ($USER)."
+  [[ "$MACHTYPE" = *bsd* ]]
 }
 
-must_not_be_root()
+#
+# ## os_is_solaris
+#
+# Tests if the operating system the process is running on is Linux.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 if the operating system is linux
+# 1 if the operating system is not linux
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     root@archlinux# os_is_linux
+#     root@archlinux# echo $?
+#     0
+#
+
+os_is_solaris()
 {
-  running_as_root &&
-    fail "bdsm $extension $action must be run as a (project) user and NOT as root."
+  [[ "$MACHTYPE" = *solaris* ]]
 }
 
-run_as_user()
+#
+# ## os_is_aix
+#
+# Tests if the operating system the process is running on is Linux.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 if the operating system is linux
+# 1 if the operating system is not linux
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     root@archlinux# os_is_linux
+#     root@archlinux# echo $?
+#     0
+#
+
+os_is_aix()
 {
-  local _user="$1" ; shift
-  su "${_user}" -c "$*"
+  [[ "$MACHTYPE" = *aix* ]]
 }
 
-run_as_login_user()
-{
-  local _user="$1" ; shift
-  su - "${_user}" -c "$*"
-}
-
-os_is_linux()   { [[ "$MACHTYPE" = *linux* ]]   ; }
-os_is_darwin()  { [[ "$MACHTYPE" = *darwin* ]]  ; }
-os_is_bsd()     { [[ "$MACHTYPE" = *bsd* ]]     ; }
-os_is_solaris() { [[ "$MACHTYPE" = *solaris* ]] ; }
-os_is_aix()     { [[ "$MACHTYPE" = *aix* ]]     ; }
-
+#
+# ## os_type
+#
+# Tests if the operating system the process is running on is Linux.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 if the operating system is linux
+# 1 if the operating system is not linux
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     root@archlinux# os_is_linux
+#     root@archlinux# echo $?
+#     0
+#
 os_type()
 {
   case "$MACHTYPE" in
@@ -255,6 +343,38 @@ os_type()
   esac
 }
 
+#
+# ## os_arch_type
+#
+# Tests if the operating system the process is running on is Linux.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 if the operating system is linux
+# 1 if the operating system is not linux
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     root@archlinux# os_is_linux
+#     root@archlinux# echo $?
+#     0
+#
 os_arch_type()
 {
   case "${MACHTYPE//-*}" in
@@ -270,11 +390,75 @@ os_arch_type()
   esac
 }
 
+#
+# ## os_arch
+#
+# Tests if the operating system the process is running on is Linux.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 if the operating system is linux
+# 1 if the operating system is not linux
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     root@archlinux# os_is_linux
+#     root@archlinux# echo $?
+#     0
+#
 os_arch()
 {
   printf '%s' "${MACHTYPE//-*}"
 }
 
+#
+# ## os_arch_capable
+#
+# Tests if the operating system the process is running on is Linux.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 if the operating system is linux
+# 1 if the operating system is not linux
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     root@archlinux# os_is_linux
+#     root@archlinux# echo $?
+#     0
+#
 os_arch_capable()
 {
   if os_is_darwin ; then
@@ -290,6 +474,36 @@ os_arch_capable()
   fi
 }
 
+#
+# ## os_cpu_count
+#
+# Print the number of cpu cores on the current system to STDOUT
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# An integer representing the number of CPU cores or 1 if unknown.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user$ os_cpu_count
+#     24
+#
 os_cpu_count()
 {
   local _count=1 # Defaulting to 1.

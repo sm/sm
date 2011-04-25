@@ -1,0 +1,471 @@
+#!/usr/bin/env bash
+
+#
+# ## user_create_if_missing
+#
+# Create a system user if it does not exist on the system.
+#
+# ### Input Parameters
+#
+# The first parameter should be the user name, then optionally
+#   [with] group {{groupname}}
+#
+# ### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# Fails if no username is given.
+#
+# ### Usage Examples
+#
+#     user$ user_create_if_missing "nginx" with group "nginx"
+#
+user_create_if_missing()
+{
+  local _token _group
+  # parse arguments
+  while (( $# > 0 )) ; do
+    _token="$1" ; shift
+
+    case "${_token}" in
+      group)
+        _group="${1}" ; shift
+        ;;
+      with)
+        continue # Syntatic sugar, ignore, next!
+        ;;
+      from)
+        _source="${1}" ; shift
+        ;;
+      --force)
+        _force_flag=1
+        ;;
+
+      *)
+        if [[ -z "${_group}" ]] ; then
+          _group="${_token}"
+          break
+        fi
+        ;;
+    esac
+  done
+
+  if (( UID == 0 )) ; then
+    (
+    case "$(uname)" in
+      "OpenBSD")
+        groupadd "$package_user"
+        useradd -g "$package_user" "$package_user" -s /bin/bash
+        usermod -s /bin/bash "$package_user"
+        ;;
+
+      "FreeBSD")
+        pw groupadd -q "$package_user"
+        ;;
+
+      "Linux")
+        # groupadd nginx
+        # useradd -G nginx -M nginx
+        if [[ -f "/etc/SuSE-release" ]] ; then
+          groupadd "$package_user"
+        else
+          groupadd -f "$package_user"
+        fi
+
+        useradd -g "${package_user}" "${package_user}"
+        usermod -d "${data_path%\/*}" "${package_user}"
+        usermod -s /bin/bash "${package_user}"
+      ;;
+
+      "Darwin")
+        current_max_gid=$(dscl . -list /Groups gid | awk '{print $2}' | sort -g -r | head -1)
+        next_gid=$((current_max_gid+1))
+
+        current_max_uid=$(dscl . -list /Users UniqueID | awk '{print $2}' | sort -g -r | head -1)
+        next_uid=$((current_max_uid+1))
+
+        if ! dscl . -list /Users | grep -q "^${package_user}$" ; then
+          dscl . -create "/Groups/$package_user"
+          dscl . -create "/Groups/$package_user" gid "$next_gid"
+          dscl . -create "/Users/${package_user}"
+          dscl . -create "/Users/${package_user}" PrimaryGroupID "$gid" # UserShell /bin/bash
+          dscl . -create "/Users/${package_user}" uid "$next_uid"
+          dscl . -create "/Users/${package_user}" realname "Postgresql User"
+          dscl . -create "/Users/${package_user}" home "${data_path%\/*}"
+          dscl . -create "/Users/${package_user}" shell "/bin/bash"
+          dscl . -create "/Users/${package_user}" gid "$gid"
+          dscl . -create "/Users/${package_user}" passwd "*"
+        fi
+      ;;
+
+      "SunOS")
+        groupadd "$package_user"
+        useradd -g "$package_user" -s /bin/bash -d "${data_path}" "$package_user"
+        usermod -s /bin/bash "$package_user"
+        ;;
+    esac
+    ) || true # Ignore failures with this for now...
+  else
+    fail "Users and groups may be manipulated only by the super user (root) via su or sudo."
+  fi
+}
+
+#
+# ## user_delete
+#
+# Deletes the named system user.
+#
+# ### Input Parameters
+#
+# The first parameter is the system user to delete.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# The given user will no longer exist on the system.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# Fails if the user name was not specified.
+#
+# ### Usage Examples
+#
+#     user$ user_delete "nginx"
+#
+user_delete()
+{
+  local _token _group
+  # parse arguments
+  while (( $# > 0 )) ; do
+    _token="$1" ; shift
+
+    case "${_token}" in
+      group)
+        _group="${1}" ; shift
+        ;;
+      with)
+        continue # Syntatic sugar, ignore, next!
+        ;;
+      from)
+        _source="${1}" ; shift
+        ;;
+      --force)
+        _force_flag=1
+        ;;
+
+      *)
+        if [[ -z "${_group}" ]] ; then
+          _group="${_token}"
+          break
+        fi
+        ;;
+    esac
+  done
+
+  if (( UID == 0 )) ; then
+    (
+    case "$(uname)" in
+      "OpenBSD")
+        groupdel "$package_user"
+        userdel -g "$package_user" "$package_user"
+        ;;
+
+      "FreeBSD")
+        pw groupdel -q "$package_user"
+        ;;
+
+      "Linux")
+        userdel "${package_user}"
+      ;;
+
+      "Darwin")
+        gid="501" #only gids > 500 show up in user preferences
+
+        #Find an open gid
+        while true; do
+          name=$(dscl . search /groups PrimaryGroupID $gid | cut -f1 -s)
+          if [ -z "$name" ] ; then
+            break
+          fi
+          gid=$[$gid +1]
+        done
+
+        #Create the group
+        dscl . -delete "/Users/${package_user}" PrimaryGroupID "$gid" # UserShell /bin/bash
+        dscl . -delete "/Groups/$package_user"
+        dscl . -delete "/Groups/$package_user" gid "$gid"
+      ;;
+
+      "SunOS")
+        groupdel "$package_user"
+        userdel "$package_user"
+        ;;
+    esac
+    ) || true # Ignore failures with this for now...
+  else
+    fail "Users and groups may be manipulated only by the super user (root) via su or sudo."
+  fi
+}
+
+#
+# ## user_is_root
+#
+# Tests if the user the current process is running as is root.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 if user is root (UID 0).
+# 1 if user is not root (UID 0).
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user$ user_is_root
+#     user$ echo $?
+#     1
+#
+#     root# user_is_root
+#     root# echo $?
+#     0
+#
+user_is_root()
+{
+  if (( UID == 0 ))
+  then
+    return 0
+  else
+    return 1
+  fi
+}
+
+#
+# ## user_is_not_root
+#
+# Tests if the user the current process is running as is not root.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 if user is not root (eg UID is nonzero)
+# 1 if user is root (UID 0)
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently
+#
+# ### Usage Examples
+#
+#     user$ user_is_not_root
+#     user$ echo $?
+#     0
+#
+#     root# user_is_not_root
+#     root# echo $?
+#     1
+#
+user_is_not_root()
+{
+  if (( UID != 0 ))
+  then
+    return 0
+  else
+    return 1
+  fi
+}
+
+#
+# ## user_must_be_root
+#
+# Halts the calling program with a failure message if the user is not root.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# A failure message is output to STDERR if the failure condition is met.
+#
+# ### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ### Return Codes
+#
+# 0 if the user is root
+#
+# ### Failure Scenarios
+#
+# Fails if the program user running is not root.
+#
+# ### Usage Examples
+#
+#     user$ user_must_be_root
+#     ERROR: bdsm test test must be run as root and NOT as a user(user)
+#
+user_must_be_root()
+{
+  user_is_running_as_root ||
+    fail "bdsm $extension $action must be run as a root and NOT as a user ($USER)."
+}
+
+#
+# ## user_must_not_be_root
+#
+# Halts the calling program with a failure message if the user is not root.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# A failure message is output to STDERR if the failure condition is met.
+#
+# ### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ### Return Codes
+#
+# 0 if the user is root
+#
+# ### Failure Scenarios
+#
+# Fails if the program user running is root.
+#
+# ### Usage Examples
+#
+#     user$ user_must_not_be_root
+#     ERROR: bdsm test test must be run as a (project) user and NOT as a root.
+#
+user_must_not_be_root()
+{
+  user_is_not_root ||
+    fail "bdsm $extension $action must be run as a (project) user and NOT as root."
+}
+
+#
+# ## user_run_as
+#
+# Runs a command as a given user.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# Any stream outputs of the command being run.
+#
+# ### Environmental effects
+#
+# Any environmental effects of the command being run.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# Fails if no user was specified.
+#
+# ### Usage Examples
+#
+#     root# user_run_as "user" pwd
+#     /home/user
+#
+user_run_as()
+{
+  local _user="$1"
+
+  [[ -n "${_user:-}" ]] ||
+    fail "Cannot run as user as no user or commands were given."
+  shift
+
+  su "${_user}" -c "$*"
+}
+
+#
+# ## user_run_as_login
+#
+# Runs a command as a given user, in that users login shell.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# Any stream outputs of the command being run.
+#
+# ### Environmental effects
+#
+# Any environmental effects of the command being run.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# Fails if no user was specified.
+#
+# ### Usage Examples
+#
+#     root# user_run_as_login "deploy" bdsm unicorn restart
+#     << unicorn restart output >>
+#
+user_run_as_login()
+{
+  local _user="$1"
+
+  [[ -n "${_user:-}" ]] ||
+    fail "Cannot run as login user as no user or commands were given."
+  shift
+
+  su - "${_user}" -c "$*"
+}
