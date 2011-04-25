@@ -1,10 +1,87 @@
 #!/usr/bin/env bash
 
+#
+# ## timestamp_set
+#
+# Sets the variable named 'timestamp' to the current timestamp.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# Sets the variable named 'timestamp' to the current timestamp.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user$ cat ./test
+#     #!/usr/bin/env bash
+#     source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
+#     modules trace time # Load the trace module.
+#
+#     timestamp_set
+#     echo $timestamp
+#
+#     user$ $PWD/test
+#     2011-04-24T22:28:16
 timestamp_set()
 {
   timestamp=$(timestamp)
 }
 
+#
+# ## timestamp
+#
+# Prints out the current timestamp.
+#
+# ### Input Parameters
+#
+# None required. The first parameter may optionally specify the format to output
+# the time string in. See 'man 1 date' for formatting options.
+#
+# ### Stream Outputs
+#
+# Prints the current timestamp as a formatted datetime string to the STDOUT of
+# the calling environment.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure conditions currently.
+#
+# ### Usage Examples
+#
+#     user$ cat ./test
+#     #!/usr/bin/env bash
+#     source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
+#     modules trace time # Load the trace module.
+#
+#     timestamp
+#     echo
+#
+#     user$ $PWD/test
+#     2011-04-24T22:31:54
+#
 timestamp()
 {
   local _format="${1:-"%Y-%m-%dT%H:%M:%S"}"
