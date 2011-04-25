@@ -1,32 +1,32 @@
 #!/usr/bin/env bash
 
 #
-# ## command_exists
+# ### command_exists
 #
 # Checks to see whether a command exists within the current environment and PATH
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # First parameter is a command name.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # None.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # none.
 #
-# ### return codes
+# ##### return codes
 #
 # 0 if the command was found in the current environment
 # 1 if the command was not found in the current environment
 #
-# ### failure scenarios
+# ##### failure scenarios
 #
 # Fails if no command name was given.
 #
-# ### usage examples
+# ##### usage examples
 #
 #     user$ command_exists adsf
 #     user$ echo $?
@@ -46,32 +46,32 @@ command_exists()
 }
 
 #
-# ## is_a_function
+# ### is_a_function
 #
 # Checks to see whether a named function exists within the current environment
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # First parameter is a command name.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # None.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # none.
 #
-# ### return codes
+# ##### return codes
 #
 # 0 if the function exists
 # 1 if the function does not exist
 #
-# ### failure scenarios
+# ##### failure scenarios
 #
 # Fails if no function name was given.
 #
-# ### usage examples
+# ##### usage examples
 #
 #     user$ is_a_function rvm
 #     user$ echo $?

@@ -1,31 +1,31 @@
 #!/usr/bin/env bash
 
 #
-# ## timestamp_set
+# ### timestamp_set
 #
 # Sets the variable named 'timestamp' to the current timestamp.
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # None.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # None.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # Sets the variable named 'timestamp' to the current timestamp.
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # 0 for success
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # No failure scenarios currently.
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #     user$ cat ./test
 #     #!/usr/bin/env bash
@@ -43,33 +43,33 @@ timestamp_set()
 }
 
 #
-# ## timestamp
+# ### timestamp
 #
 # Prints out the current timestamp.
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # None required. The first parameter may optionally specify the format to output
 # the time string in. See 'man 1 date' for formatting options.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # Prints the current timestamp as a formatted datetime string to the STDOUT of
 # the calling environment.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # None.
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # 0 for success.
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # No failure conditions currently.
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #     user$ cat ./test
 #     #!/usr/bin/env bash

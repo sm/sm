@@ -1,35 +1,35 @@
 #!/usr/bin/env bash
 
 #
-# ## extension_action
+# ### extension_action
 #
 # Load the environment for a given extension action and then call it.
 # This is the main function for BDSM.
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # One or more extension names.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # None.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # The current extension's initialize file will be resourced into the current
 # environment.
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # 0 for success
 # 1 for failure
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # Fails if no extension was given.
 # Fails if no action was given.
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #     $ cat $HOME/test
 #     #!/usr/bin/env bash
@@ -173,32 +173,32 @@ extension_action()
   return $result
 }
 #
-# ## extensions_install
+# ### extensions_install
 #
 # Installs the given extensions.
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # One or more extension names.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # None.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # The named extensions will be installed to the filesystem in the BDSM
 # extensions directory.
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # 0 for success
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # Fails if no extensions are passed in to install.
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #     user$ extensions_install libevent tmux
 #
@@ -232,32 +232,32 @@ extensions_install()
 }
 
 #
-# ## extension_reload
+# ### extension_reload
 #
 # Reloads (re-sources) the current extension's DSL and initialization files.
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # None.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # None.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # The current extension's DSL and initialization files are re-sourced into the
 # calling environment.
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # 0 for success
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # No current failure scenarios.
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #     user$ extension_reload
 #
@@ -269,32 +269,32 @@ extension_reload()
 }
 
 #
-# ## extension_reinitialize
+# ### extension_reinitialize
 #
 # Reinitializes the current extension.
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # None.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # None.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # The current extension's initialize file will be resourced into the current
 # environment.
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # 0 for success
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # No failure scenarios currently.
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #     user$ extension_reinitialize
 #
@@ -306,31 +306,31 @@ extension_reinitialize()
 }
 
 #
-# ## extension_version
+# ### extension_version
 #
 # Outputs the named extension's version
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # First parameter must be the name of an extension.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # The extension-version string for the named extension.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # None.
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # 0 for success
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # Fails if the extension name is not given.
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #     user$ extension_reinitialize
 #
@@ -355,31 +355,31 @@ extension_version()
 }
 
 #
-# ## extension_licence
+# ### extension_licence
 #
 # Emits the extension's license file, if it exists.
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # First parameter may optionally be an extension name.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # If the extension has a LICENSE file then it wil be printed to STDOUT.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # None.
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # 0 for success.
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # No failure scenarios currently exist.
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #     $ cat $HOME/test
 #     !/usr/bin/env bash
@@ -412,32 +412,32 @@ extension_license()
 }
 
 #
-# ## extensions_installed
+# ### extensions_installed
 #
 # Lists the extensions installed on the currently running process's system.
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # None.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # The names of the currently installed non-core extensions are printed to the
 # calling environment's STDOUT.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # None.
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # 0 for success.
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # No failure scenarios currently.
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #     $ cat $HOME/test
 #     #!/usr/bin/env bash
@@ -454,33 +454,33 @@ extensions_installed()
 }
 
 #
-# ## extensions_available
+# ### extensions_available
 #
 # Lists the extensions available to install on the currently running process's
 # system.
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # None.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # The names of the available to install non-core extensions are printed to the
 # calling environment's STDOUT.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # None.
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # 0 for success.
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # No failure scenarios currently.
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #      $ cat $HOME/test
 #      #!/usr/bin/env bash
@@ -497,32 +497,32 @@ extensions_available()
 }
 
 #
-# ## extensions_in_development
+# ### extensions_in_development
 #
 # Lists the extensions available in the development repository, if set.
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # None.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # The names of the available to install non-core development repository
 # extensions are printed to the calling environment's STDOUT, if defined.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # None.
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # 0 for success.
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # No failure scenarios currently.
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #      $ cat $HOME/test
 #      #!/usr/bin/env bash
@@ -541,33 +541,33 @@ extensions_in_development()
 }
 
 #
-# ## extensions_in
+# ### extensions_in
 #
 # Lists the extensions in a given directory.
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # First parameter is a full path a BDSM extensions directory.
 #   (example: /usr/local/bdsm/extensions)
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # The names of the extensions in the given directory are printed to the
 # calling environment's STDOUT.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # None.
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # 0 for success.
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # No failure scenarios currently.
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #     $ cat $HOME/test
 #     #!/usr/bin/env bash
@@ -612,32 +612,32 @@ extensions_in()
 }
 
 #
-# ## extension_actions
+# ### extension_actions
 #
 # Lists actions exposed by the named extension.
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # First parameter is the name of the extension to list actions for.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # The names of the extensions in the given directory are printed to the
 # calling environment's STDOUT.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # None.
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # 0 for success.
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # Fails if no extension name is given.
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #      $ cat $HOME/test
 #      #!/usr/bin/env bash
@@ -675,32 +675,32 @@ extension_actions()
 }
 
 #
-# ## extension_is_installed
+# ### extension_is_installed
 #
 # Tests if a given extension is installed.
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # First parameter is an extension name.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # None.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # None.
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # 0 if the extension is installed.
 # 1 if the extension is not installed.
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # Fails if no extension name is given.
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #     $ cat $HOME/test
 #     #!/usr/bin/env bash

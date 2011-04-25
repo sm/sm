@@ -1,28 +1,28 @@
 #!/usr/bin/env bash
 
 #
-# ## bdsm_exports
+# ### bdsm_exports
 #
 # Exports bdsm framework relevant environment variables for extension action
 # processes.
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # None.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # None.
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # 0 for success.
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # No failure scenarios currently.
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #     user$ bdsm_exports
 #
@@ -32,33 +32,33 @@ bdsm_exports()
 }
 
 #
-# ## NIY
+# ### NIY
 #
 # Prints a failure message and backtrace to the screen letting the caller know
 # that the requested feature has not yet been implemented.
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # None.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # Prints "This feature has not yet been implemented." to STDERR of the calling
 # environment.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # None.
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # None, only exit is through failure.
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # Fails always.
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #     user$ cat $HOME/test
 #     #!/usr/bin/env bash

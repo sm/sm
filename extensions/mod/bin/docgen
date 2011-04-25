@@ -2,3 +2,15 @@
 
 modules_docgen
 
+exit 0
+
+# Copy the generated files into the proper site content dir.
+files=($(find /tmp/docs/modules -mindepth 1 -iname '*.haml'))
+for file in ${files[@]}
+do
+  name=${file##*\/}
+  name=${name%.haml}
+  mkdir -p content/modules/bash/${name}
+  cp $file content/modules/bash/${name}.haml
+done
+

@@ -1,31 +1,31 @@
 #!/usr/bin/env bash
 
 #
-# ## first
+# ### first
 #
 # Returns the first parameter.
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # One or more parameters.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # Prints the first positional parameter to STDOUT of the calling environment.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # None.
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # 0 for success
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # Fails if no parameters are passed.
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #     user$ first one two three
 #     one
@@ -45,31 +45,31 @@ first()
 }
 
 #
-# ## last
+# ### last
 #
 # Returns the last parameter.
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # One or more parameters.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # Prints the last positional parameter to STDOUT of the calling environment.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # None.
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # 0 for success
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # Fails if no parameters are passed.
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #     user$ last one two three
 #     one
@@ -89,33 +89,33 @@ last()
 }
 
 #
-# ## match
+# ### match
 #
 # Tests to see if a value matches a given regex (shell extended glob pattern).
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # Positional Parameter listing and descriptions.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # None.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # None.
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # 0 if the value matches the regex (shell extended glob pattern)
 # 1 if the value does not match the regex (shell extended glob pattern)
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # Fails if no value is given
 # Fails if no regex is given
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #     user$ match "The quick brown fox jumped over the lazy dog." "*fox*"
 #     user$ echo $?
@@ -148,33 +148,33 @@ match()
 }
 
 #
-# ## variables_must_be_nonempty
+# ### variables_must_be_nonempty
 #
 # Halts the program with a fail message if any of the named variables are empty
 # or undefined.
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # One or more parameters specifying the names of variables.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # None if all are
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # What, if any, environmental side effects this function causes. 'None.' for none.
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # 0 for success
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # Fails if no varaible names were given.
 # Fails if any of the named variables are empty.
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #     user$ cat test
 #     #!/usr/bin/env bash
@@ -208,31 +208,31 @@ variables_must_be_nonempty()
 }
 
 #
-# ## variable_is_nonempty
+# ### variable_is_nonempty
 #
 # Test to see if a variable is empty.
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # First parameter is a string containing a variable name.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # None.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # None.
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # 0 for success.
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # Fails if no variable name was given as the first argument.
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #     user$ variable_is_nonempty asdf
 #     user$ echo $?

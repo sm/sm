@@ -1,31 +1,31 @@
 #!/usr/bin/env bash
 
 #
-# ## init_scripts_path
+# ### init_scripts_path
 #
 # Returns the system init scripts path (eg. /etc/init.d /etc/rc.d)
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # None.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # The system init scripts path is printed to the calling environments STDOUT.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # None.
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # 0 for success.
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # Fails the OS is not of a (yet) recognized type.
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #     user@archlinux$ init_scripts_path
 #     /etc/rc.d
@@ -59,31 +59,31 @@ init_scripts_path()
 }
 
 #
-# ## confd_path
+# ### confd_path
 #
 # Return the system conf.d path.
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # None.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # Prints the conf.d path for the current system and user.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # None.
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # 0 for success
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # No failure scenarios currently.
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #     root# confd_path
 #     /etc/conf.d
@@ -99,32 +99,32 @@ confd_path()
 }
 
 #
-# ## os_is_linux
+# ### os_is_linux
 #
 # Tests if the operating system the process is running on is Linux.
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # None.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # None.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # None.
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # 0 if the operating system is linux
 # 1 if the operating system is not linux
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # No failure scenarios currently.
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #     root@archlinux# os_is_linux
 #     root@archlinux# echo $?
@@ -141,32 +141,32 @@ os_is_linux()
 }
 
 #
-# ## os_is_darwin
+# ### os_is_darwin
 #
 # Tests if the operating system the process is running on is darwin.
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # None.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # None.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # None.
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # 0 if the operating system is darwin
 # 1 if the operating system is not darwin
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # No failure scenarios currently.
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #     user@OSX# os_is_darwin
 #     user@OSX# echo $?
@@ -183,32 +183,32 @@ os_is_darwin()
 }
 
 #
-# ## os_is_bsd
+# ### os_is_bsd
 #
 # Tests if the operating system the process is running on is bsd.
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # None.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # None.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # None.
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # 0 if the operating system is bsd
 # 1 if the operating system is not bsd
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # No failure scenarios currently.
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #     root@bsd# os_is_bsd
 #     root@bsd# echo $?
@@ -226,32 +226,32 @@ os_is_bsd()
 }
 
 #
-# ## os_is_solaris
+# ### os_is_solaris
 #
 # Tests if the operating system the process is running on is solaris.
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # None.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # None.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # None.
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # 0 if the operating system is linux
 # 1 if the operating system is not linux
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # No failure scenarios currently.
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #     root@linux# os_is_linux
 #     root@linux# echo $?
@@ -268,32 +268,32 @@ os_is_solaris()
 }
 
 #
-# ## os_is_aix
+# ### os_is_aix
 #
 # Tests if the operating system the process is running on is aix.
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # None.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # None.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # None.
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # 0 if the operating system is aix
 # 1 if the operating system is not aix
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # No failure scenarios currently.
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #     root@aix# os_is_aix
 #     root@aix# echo $?
@@ -310,31 +310,31 @@ os_is_aix()
 }
 
 #
-# ## os_type
+# ### os_type
 #
 # Prints out the operating system category / type.
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # None.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # Prints the OS category/type to the calling environments STDOUT.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # None.
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # 0 for success
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # No failure scenarios currently.
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #     root@archlinux# os_type
 #     linux
@@ -367,32 +367,32 @@ os_type()
 }
 
 #
-# ## os_arch_type
+# ### os_arch_type
 #
 # Prints out the OS Arch type.
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # None.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # Prints out the architecture type string of the system that is running the
 # current process.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # None.
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # 0 for success.
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # No failure scenarios currently.
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #     user$ os_arch_type
 #     x86_64
@@ -413,31 +413,31 @@ os_arch_type()
 }
 
 #
-# ## os_arch
+# ### os_arch
 #
 # Prints out the full OS machine type string.
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # None.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # Print the OS machine type string to STDOUT of the calling environment.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # None.
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # 0 for success.
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # No failure scenarios currently.
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #     user@OSX# os_arch
 #     i386-apple-darwin10.7.0
@@ -448,32 +448,32 @@ os_arch()
 }
 
 #
-# ## os_arch_capable
+# ### os_arch_capable
 #
 # Tests if the operating system the process is running on is Linux.
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # None.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # None.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # None.
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # 0 if the operating system is linux
 # 1 if the operating system is not linux
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # No failure scenarios currently.
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #     user@OSX$ os_arch_capable
 #     x86_64
@@ -496,31 +496,31 @@ os_arch_capable()
 }
 
 #
-# ## os_cpu_count
+# ### os_cpu_count
 #
 # Print the number of cpu cores on the current system to STDOUT
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # None.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # An integer representing the number of CPU cores or 1 if unknown.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # None.
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # 0 for success
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # No failure scenarios currently.
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #     user$ os_cpu_count
 #     24

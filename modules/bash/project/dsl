@@ -1,32 +1,32 @@
 #!/usr/bin/env bash
 
 #
-# ## project_initialize
+# ### project_initialize
 #
 # Initializes paths and environment for the logical concept of a 'project'.
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # None.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # None.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # Environmental variable settings, such as {shared,release}_path, environment,
 # etc...
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # 0 for success
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # No failure scenarios currently.
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #     user$ project_initialize
 #     user$ echo $environment
@@ -55,32 +55,32 @@ project_initialize()
 }
 
 #
-# ## vcs
+# ### vcs
 #
 # Detect and set the vcs, if any, for the current project.
 #
-# ### Input Parameters
+# ##### Input Parameters
 #
 # First parameter must be the path to a repository for determining the VCS.
 #
-# ### Stream Outputs
+# ##### Stream Outputs
 #
 # None.
 #
-# ### Environmental effects
+# ##### Environmental effects
 #
 # The environment variable 'vcs' will be set to the VCS detected, or 'git' by
 # default.
 #
-# ### Return Codes
+# ##### Return Codes
 #
 # 0 for success
 #
-# ### Failure Scenarios
+# ##### Failure Scenarios
 #
 # Fails if no repository path is given.
 #
-# ### Usage Examples
+# ##### Usage Examples
 #
 #     user$ vcs /home/appuser/shared/appuser
 #     user$ echo $vcs
