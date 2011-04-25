@@ -48,14 +48,18 @@ read_default()
 
   shift
 
-  while (( $# > 0 )) ; do
-    token="$1" ; shift
+  while (( $# > 0 ))
+  do
+    token="$1"
+    shift
     case "$token" in
       into|as)
-        variable="$1" ; shift
+        variable="$1"
+        shift
         ;;
       prefix)
-        prefix="$1" ; shift
+        prefix="$1"
+        shift
         ;;
       *)
         variable="$token"
@@ -64,8 +68,10 @@ read_default()
     esac
   done
 
-  if [[ -z "${variable:-}" ]] ; then
-    if [[ -n "${prefix:-}" ]] ; then
+  if [[ -z "${variable:-}" ]]
+  then
+    if [[ -n "${prefix:-}" ]]
+    then
       true "${variable:="${prefix:-}_$key"}"
     else
       true "${variable:="$key"}"

@@ -317,9 +317,10 @@ copy_files_to()
 
   ensure_paths_exist "${_path}"
 
-  for _file in "${_files[@]}" ; do
-
-    if file_is_missing "${_file}" ; then
+  for _file in "${_files[@]}"
+  do
+    if file_is_missing "${_file}"
+    then
       error "Cannot copy file ${_file} to ${_path} as the file does not exist."
     else
       cp "${_file}" "${_path}/${_file}"
@@ -338,8 +339,10 @@ copy_directories_to()
 
   ensure_paths_exist "${_path}"
 
-  for _directory in "${_directories[@]}" ; do
-    if directory_exists "${_directory}" ; then
+  for _directory in "${_directories[@]}"
+  do
+    if directory_exists "${_directory}"
+    then
       cp -Rf "${_directory}" "${_path}/"
     else
       error "Cannot copy directory ${_directory} to ${_path} as the directory '${_directory}' does not exist (in '$PWD')."

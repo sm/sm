@@ -1,68 +1,48 @@
 #!/usr/bin/env bash
 
-NIY()
-{
-  fail "This feature has not yet been implemented."
-}
-
-extensions_install()
-{
-  local _extension
-  local _extensions=("$@")
-
-  for _extension in "${_extensions[@]}"
-  do
-    case "${_extension#\/}" in
-      ext|srv|pkg|core|mod) continue ;;
-    esac
-
-    [[ -z "${_extension}" ]] && continue
-
-    extension_src_path="${extensions_src_path}/${_extension}"
-
-    # TODO: Install extension dependencies?
-
-    if [[ -s "${extension_src_path}/VERSION" && -x "${extension_src_path}/bin/help" ]]
-    then
-      copy_directories_to "${bdsm_path}/extensions" "${extension_src_path}"
-    else
-      error "${extension_src_path}/${extension} is not a proper extension.\nIt is missing one or more of the VERSION or bin/help."
-    fi
-  done
-}
-
-extension_reload()
-{
-  local _path="${extension_modules_path}/bash"
-
-  source_files "${_path}/dsl" "${_path}/initialize"
-}
-
-extension_reinitialize()
-{
-  local _path="${extension_modules_path}/bash"
-
-  source_files "${_path}/initialize"
-}
-
-extension_version()
-{
-  local _extension="${1:-}" ; shift
-
-  variable_is_nonempty ||
-    fail "Can not retrieve extension version as no extension was given."
-
-  true ${extension_path:="${extensions_path}/${_extension}"}
-
-  file_exists "${extension_path}/VERSION" &&
-    read -r extension_version < "${extension_path}/VERSION"
-
-  log "${extension}-${extension_version:-head}"
-}
-
+#
+# ## extension_action
+#
+# Load the environment for a given extension action and then call it.
+# This is the main function for BDSM.
+#
+# ### Input Parameters
+#
+# One or more extension names.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# The current extension's initialize file will be resourced into the current
+# environment.
+#
+# ### Return Codes
+#
+# 0 for success
+# 1 for failure
+#
+# ### Failure Scenarios
+#
+# Fails if no extension was given.
+# Fails if no action was given.
+#
+# ### Usage Examples
+#
+#     $ cat $HOME/test
+#     #!/usr/bin/env bash
+#     source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
+#     modules extensions
+#     extension_action ext list
+#
+#     $  $HOME/test
+#     bash fossil git libevent nginx p7zip postgresql rails redis srv tig tmux zeromq zlib
+#
+#
 extension_action()
 {
-  (
   unset extension action
   result=0
   export extension="${1:-}" ; shift
@@ -74,7 +54,7 @@ extension_action()
 
   [[ -n "${action}" ]] ||
     fail "'action' is not set! Something has gone terribly wrong."
-
+  (
   extension_path="$extensions_path/$extension"
   extension_config_path="$extensions_path/$extension/config"
   extension_templates_path="$extensions_path/$extension/templates"
@@ -192,7 +172,235 @@ extension_action()
 
   return $result
 }
+#
+# ## extensions_install
+#
+# Installs the given extensions.
+#
+# ### Input Parameters
+#
+# One or more extension names.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# The named extensions will be installed to the filesystem in the BDSM
+# extensions directory.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# Fails if no extensions are passed in to install.
+#
+# ### Usage Examples
+#
+#     user$ extensions_install libevent tmux
+#
+extensions_install()
+{
+  local _extension
+  local _extensions=("$@")
 
+  (( ${#_extensions[@]} > 0 )) ||
+    fail "Cannot install extensions as no extensions were given to install."
+
+  for _extension in "${_extensions[@]}"
+  do
+    case "${_extension#\/}" in
+      ext|srv|pkg|core|mod) continue ;;
+    esac
+
+    [[ -n "${_extension}" ]] || continue
+
+    extension_src_path="${extensions_src_path}/${_extension}"
+
+    # TODO: Install extension dependencies?
+
+    if [[ -s "${extension_src_path}/VERSION" && -x "${extension_src_path}/bin/help" ]]
+    then
+      copy_directories_to "${bdsm_path}/extensions" "${extension_src_path}"
+    else
+      error "${extension_src_path}/${extension} is not a proper extension.\nIt is missing one or more of the VERSION or bin/help."
+    fi
+  done
+}
+
+#
+# ## extension_reload
+#
+# Reloads (re-sources) the current extension's DSL and initialization files.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# The current extension's DSL and initialization files are re-sourced into the
+# calling environment.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# No current failure scenarios.
+#
+# ### Usage Examples
+#
+#     user$ extension_reload
+#
+extension_reload()
+{
+  local _path="${extension_modules_path}/bash"
+
+  source_files "${_path}/dsl" "${_path}/initialize"
+}
+
+#
+# ## extension_reinitialize
+#
+# Reinitializes the current extension.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# The current extension's initialize file will be resourced into the current
+# environment.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user$ extension_reinitialize
+#
+extension_reinitialize()
+{
+  local _path="${extension_modules_path}/bash"
+
+  source_files "${_path}/initialize"
+}
+
+#
+# ## extension_version
+#
+# Outputs the named extension's version
+#
+# ### Input Parameters
+#
+# First parameter must be the name of an extension.
+#
+# ### Stream Outputs
+#
+# The extension-version string for the named extension.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# Fails if the extension name is not given.
+#
+# ### Usage Examples
+#
+#     user$ extension_reinitialize
+#
+extension_version()
+{
+  local _extension="${1:-}"
+
+  variable_is_nonempty ||
+    fail "Can not retrieve extension version as no extension was given."
+
+  shift
+  true ${extension_path:="${extensions_path}/${_extension}"}
+
+  if file_exists "${extension_path}/VERSION"
+  then
+    read -r extension_version < "${extension_path}/VERSION"
+  else
+    extension_version="head"
+  fi
+
+  log "${extension}-${extension_version}"
+}
+
+#
+# ## extension_licence
+#
+# Emits the extension's license file, if it exists.
+#
+# ### Input Parameters
+#
+# First parameter may optionally be an extension name.
+#
+# ### Stream Outputs
+#
+# If the extension has a LICENSE file then it wil be printed to STDOUT.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently exist.
+#
+# ### Usage Examples
+#
+#     $ cat $HOME/test
+#     !/usr/bin/env bash
+#     source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
+#     modules extensions
+#     extension_license postgresql
+#
+#     $ $HOME/test
+#     Copyright (c) 2009-2011 Wayne E. Seguin
+#
+#     Licensed under the Apache License, Version 2.0 (the \"License\");
+#     you may not use this file except in compliance with the License.
+#     You may obtain a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0
+#
+#     Unless required by applicable law or agreed to in writing, software
+#     distributed under the License is distributed on an \"AS IS\" BASIS,
+#     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#     See the License for the specific language governing permissions and
+#     limitations under the License.
 extension_license()
 {
   local _extension="${1:-${extension}}"
@@ -203,16 +411,128 @@ extension_license()
   cat -v "${extensions_path}/${_extension}/LICENSE"
 }
 
+#
+# ## extensions_installed
+#
+# Lists the extensions installed on the currently running process's system.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# The names of the currently installed non-core extensions are printed to the
+# calling environment's STDOUT.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     $ cat $HOME/test
+#     #!/usr/bin/env bash
+#     source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
+#     modules extensions
+#     extensions_installed
+#
+#     $ $HOME/test
+#     bash fossil git libevent nginx p7zip postgresql rails redis tig tmux zeromq zlib
+#
 extensions_installed()
 {
   extensions_in "${extensions_path}"
 }
 
+#
+# ## extensions_available
+#
+# Lists the extensions available to install on the currently running process's
+# system.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# The names of the available to install non-core extensions are printed to the
+# calling environment's STDOUT.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#      $ cat $HOME/test
+#      #!/usr/bin/env bash
+#      source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
+#      modules extensions
+#      extensions_available
+
+#      $  $HOME/test
+#      ack androidsdk apache bash bcrypt cacti cmake ctags curl deploy erlang fossil freetype ghc ghostscript git god iconv imagemagick jpeg keepalived lcms libevent libpng libwmf libxml2 libxslt logrotate lua memcached mercurial mongodb monit mysql nginx node npm openpkg openssl p7zip passenger pcre perl postgresql r rails rainbows readline redis riak rsync rvm screen sphinx sqlite3 subversion system thin tiff tig tmux unicorn unrar zeromq zlib zsh
+#
 extensions_available()
 {
   extensions_in "${extensions_src_path}"
 }
 
+#
+# ## extensions_in_development
+#
+# Lists the extensions available in the development repository, if set.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# The names of the available to install non-core development repository
+# extensions are printed to the calling environment's STDOUT, if defined.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#      $ cat $HOME/test
+#      #!/usr/bin/env bash
+#      source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
+#      modules extensions
+#      extensions_in_development
+
+#      $  $HOME/test
+#      ack androidsdk apache bash bcrypt cacti cmake ctags curl deploy erlang fossil freetype ghc ghostscript git god iconv imagemagick jpeg keepalived lcms libevent libpng libwmf libxml2 libxslt logrotate lua memcached mercurial mongodb monit mysql nginx node npm openpkg openssl p7zip passenger pcre perl postgresql r rails rainbows readline redis riak rsync rvm screen sphinx sqlite3 subversion system thin tiff tig tmux unicorn unrar zeromq zlib zsh
+#
 extensions_in_development()
 {
   true "${extensions_development_path:="${extensions_src_path}"}"
@@ -220,24 +540,66 @@ extensions_in_development()
   list_extensions_in "${extensions_development_path}"
 }
 
+#
+# ## extensions_in
+#
+# Lists the extensions in a given directory.
+#
+# ### Input Parameters
+#
+# First parameter is a full path a BDSM extensions directory.
+#   (example: /usr/local/bdsm/extensions)
+#
+# ### Stream Outputs
+#
+# The names of the extensions in the given directory are printed to the
+# calling environment's STDOUT.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     $ cat $HOME/test
+#     #!/usr/bin/env bash
+#     source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
+#     modules extensions
+#     extensions_in /usr/local/bdsm/extensions
+#
+#     $  $HOME/test
+#     bash fossil git libevent nginx p7zip postgresql rails redis tig tmux zeromq zlib
+#
+#
 extensions_in()
 {
   local _path="${1:-}"
 
-  directory_exists "${_path}" || return 0
+  directory_exists "${_path}" ||
+    fail "Cannot list extensions in '${_path}' as the directory does not exist."
 
   _files=($(find "${_path}" -mindepth 2 -maxdepth 2 -name 'VERSION' -type f))
 
   extensions=()
 
-  for _file in "${_files[@]}" ; do
+  for _file in "${_files[@]}"
+  do
     extension_source_path="${_file/%\/VERSION}"
     extension_name="${extension_source_path//*\/}"
 
     case ${extension_name} in
-      (core|ext|mod|pkg|svc|[[=.=]]*)
+      (core|ext|mod|pkg|srv|svc|[[=.=]]*)
         true # Ignore core extensions, they are updated with BDSM itself.
         ;;
+
       (*)
         extensions[${#extensions[@]}]="${extension_name//*\//}"
         ;;
@@ -249,20 +611,62 @@ extensions_in()
   printf "${extensions}"
 }
 
+#
+# ## extension_actions
+#
+# Lists actions exposed by the named extension.
+#
+# ### Input Parameters
+#
+# First parameter is the name of the extension to list actions for.
+#
+# ### Stream Outputs
+#
+# The names of the extensions in the given directory are printed to the
+# calling environment's STDOUT.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# Fails if no extension name is given.
+#
+# ### Usage Examples
+#
+#      $ cat $HOME/test
+#      #!/usr/bin/env bash
+#      source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
+#      modules extensions
+#      extension_actions "postgresql"
+#
+#      $ $HOME/test
+#      backup configure help initialize install restart start status stop uninstall upgrade
+#
+#
+#
 extension_actions()
 {
-  local _extension="${1:-}" _path="$extensions_path/${_extension}/bin"
+  local _extension="${1:-}"
 
   [[ -n "${_extension}" ]] ||
     fail "Cannot list actions for extension as no extension was given."
+
+  local _path="$extensions_path/${_extension}/bin"
 
   directory_exists "${_path}" || return 0
 
   local _files=($(find "${_path}" -mindepth 1 -maxdepth 1 -type f))
   local _file _actions=()
 
-  for _file in "${_files[@]}" ; do
-    [[ -x "${_file}" ]] && _actions+=("${_file//*\/}")
+  for _file in "${_files[@]}"
+  do
+    [[ ! -x "${_file}" ]] || _actions+=("${_file//*\/}")
   done
 
   _actions="${_actions[@]}" # Convert from array to string.
@@ -270,6 +674,55 @@ extension_actions()
   printf "${_actions}"
 }
 
+#
+# ## extension_is_installed
+#
+# Tests if a given extension is installed.
+#
+# ### Input Parameters
+#
+# First parameter is an extension name.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 if the extension is installed.
+# 1 if the extension is not installed.
+#
+# ### Failure Scenarios
+#
+# Fails if no extension name is given.
+#
+# ### Usage Examples
+#
+#     $ cat $HOME/test
+#     #!/usr/bin/env bash
+#     source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
+#     modules extensions
+#     extensions_installed
+#     echo
+#     for extension in postgresql asdf
+#     do
+#       if extension_is_installed "${extension}"
+#       then
+#         echo "${extension} is installed! "
+#       else
+#         echo "${extension} is NOT installed! "
+#       fi
+#     done
+#
+#     $  $HOME/test
+#     bash fossil git libevent mysql nginx node npm p7zip postgresql rails redis tig tmux zeromq zlib
+#     postgresql is installed!
+#     asdf is NOT installed!
+#
 extension_is_installed()
 {
   local _name="${1:-}"
