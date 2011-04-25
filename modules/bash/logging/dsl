@@ -1,37 +1,262 @@
 #!/usr/bin/env bash
 
+#
+# ## log
+#
+# Log arguments to the calling environments STDOUT.
+#
+# ### Input Parameters
+#
+# Strings to be logged.
+#
+# ### Stream Outputs
+#
+# Prints arguments passed in to the calling environments STDOUT with a newline
+# character appended.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# Fails if no arguments are given.
+#
+# ### Usage Examples
+#
+#     user$ log "Hello there! "
+#     Hello there!
+#
 log()
 {
+  [[ -n "$*" ]] ||
+    fail "Cannot log arguments as none were given."
+
   printf "$*\n"
 }
 
+#
+# ## info
+#
+# Log arguments to the calling environments STDOUT preceeded by 'INFO: .
+#
+# ### Input Parameters
+#
+# Strings to be logged.
+#
+# ### Stream Outputs
+#
+# Prints arguments passed in to the calling environments STDOUT with a newline
+# character appended and 'INFO: ' prepended.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# Fails if no arguments are given.
+#
+# ### Usage Examples
+#
+#     user$ info "Hello there! "
+#     INFO: Hello there!
+#
 info()
 {
   log "INFO: $*"
 }
 
+#
+# ## warn
+#
+# Log arguments to the calling environments STDOUT preceeded by 'WARNING: .
+#
+# ### Input Parameters
+#
+# Strings to be logged.
+#
+# ### Stream Outputs
+#
+# Prints arguments passed in to the calling environments STDOUT with a newline
+# character appended and 'WARNING: ' prepended.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# Fails if no arguments are given.
+#
+# ### Usage Examples
+#
+#     user$ info "Hello there! "
+#     INFO: Hello there!
+#
 warn()
 {
   log "WARNING: $*"
 }
 
+#
+# ## debug
+#
+# Log arguments to the calling environments STDOUT preceeded by 'DEBUG: .
+#
+# ### Input Parameters
+#
+# Strings to be logged.
+#
+# ### Stream Outputs
+#
+# Prints arguments passed in to the calling environments STDOUT with a newline
+# character appended and 'DEBUG: ' prepended.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# Fails if no arguments are given.
+#
+# ### Usage Examples
+#
+#     user$ debug "Hello there! "
+#     DEBUG: Hello there!
+#
 debug()
 {
-  (( debug_flag == 1 )) && log "DEBUG: $*"
+  (( debug_flag == 0 )) || log "DEBUG: $*"
 }
 
+#
+# ## error
+#
+# Log arguments to the calling environments STDERR preceeded by 'ERROR: '.
+# Exits with status code 1.
+#
+# ### Input Parameters
+#
+# Strings to be logged.
+#
+# ### Stream Outputs
+#
+# Prints arguments passed in to the calling environments STDOUT with a newline
+# character appended and 'ERROR: ' prepended.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 1 for failure.
+#
+# ### Failure Scenarios
+#
+# Fails if no arguments are given.
+#
+# ### Usage Examples
+#
+#     user$ error "Hello there! "
+#     ERROR: Hello there!
+#     *poof* shell closed...
+#
 error()
 {
   disable_backtrace
-  log "ERROR: $*"
+  log "ERROR: $*" >&2
   exit 1
 }
 
+#
+# ## succeed
+#
+# Log arguments to the calling environments STDOUT. Exits with status code 0.
+#
+# ### Input Parameters
+#
+# Strings to be logged.
+#
+# ### Stream Outputs
+#
+# Prints arguments passed in to the calling environments STDOUT with a newline
+# character appended.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# Fails if no arguments are given.
+#
+# ### Usage Examples
+#
+#     user$ succeed "Hello there! "
+#     Hello there!
+#     *poof* shell closed...
+#
 succeed() {
   log "$*"
   exit 0
 }
 
+#
+# ## fail
+#
+# Log arguments to the calling environments STDERR preceeded by 'ERROR: '.
+# Exits with status code 1.
+#
+# ### Input Parameters
+#
+# Strings to be logged.
+#
+# ### Stream Outputs
+#
+# Prints arguments passed in to the calling environments STDOUT with a newline
+# character appended and 'ERROR: ' prepended.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 1 for failure.
+#
+# ### Failure Scenarios
+#
+# Fails if no arguments are given.
+#
+# ### Usage Examples
+#
+#     user$ error "Hello there! "
+#     ERROR: Hello there!
+#     *poof* shell closed...
+#
 fail() {
   log "ERROR: $*"
   backtrace
