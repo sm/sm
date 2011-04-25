@@ -1,8 +1,33 @@
 #!/usr/bin/env bash
 
+#
+# ## bdsm_exports
+#
+# Exports bdsm framework relevant environment variables for extension action
+# processes.
+#
+# ### Input Parameterss
+#
+# None.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user$ bdsm_exports
+#
 bdsm_exports()
-{
+{ # TODO: Filter this list of exports down.
   export action archives_path bdsm_path branch config_path database database_name debug_flag environment error_message extension extension_action extension_args extension_bin_path extension_config_path extension_modules_path extension_path extension_templates_path extensions_path flags framework head_flag hooks_flag keep_releases modules_path old_releases parse_break paths prefix_path previous_path project project_path release_path remote repository result revision shared_path src_path templates_path timestamp tmp_path trace_flag user extension_log_path
-  # TODO: Filter this list of exports down.
 }
 
