@@ -842,7 +842,26 @@ service_install_init_d()
         to "${init_scripts_path}/${_service}" mode 0755
     fi
 
-    # TODO: Replace this with install_template
+    if (( UID == 0 ))
+    then # Add service to system startup
+      if command_exists rc-update
+      then
+        rc-update add ${service} default
+      elif command_exists chkconfig
+      then
+        chkconfig ${service} on
+      #elif command_exists svc
+      #then
+      #  svc ${service} on # TODO: daemontools start on boot
+      else # Fall back on rc.local to start redis at system startup.
+        if ! file_contains "/etc/rc.local" "${service} start"
+        then
+          echo "${init_scripts_path}/${service} start" >> /etc/rc.local
+        fi
+      fi
+    fi
+
+    # TODO: Replace this with install_template + seed_template
     printf "%s\n" "[ -d \"${prefix_path}/${_service}/active/bin\" ] && " \
       > "/etc/profile.d/${_service}.sh"
 
