@@ -67,7 +67,7 @@ then
       cat >> /etc/profile <<Profile
   if [ -n ${BASH_VERSION:-} ]
   then
-    [[ -s \"${install_path}/completion/bdsm.bash\" ]] && . \"${install_path}/completion/bdsm.bash\""
+    [[ -s \"${install_path}/completion/bdsm\" ]] && . \"${install_path}/completion/bdsm.bash\""
   fi
 Profile
     fi
