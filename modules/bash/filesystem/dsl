@@ -290,7 +290,13 @@ copy_file()
         _source="${1}"
         shift
         ;;
+      mode)
+         _mode="${1}" ; shift
+        ;;
 
+      owner)
+         _owner="${1}" ; shift
+        ;;
       *)
         if [[ -z "${_source}" ]] ; then
           _source="$token" ; shift
@@ -305,6 +311,10 @@ copy_file()
   done
 
   cp "${_source}" "${_target}"
+
+  [[ -z "${_mode:-}" ]]  || chmod "${_mode}" "${_target}"
+  [[ -z "${_owner:-}" ]] || chown "${_owner}" "${_target}"
+
 }
 
 copy_files_to()
