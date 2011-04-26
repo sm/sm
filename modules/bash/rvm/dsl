@@ -125,7 +125,7 @@ install_gems() {
 
   for _gem in "${_gems[@]}"
   do
-    install_gem ${_gem} || { true (( _result++ )) ; }
+    install_gem ${_gem} || (( _result++ ))
   done
 
   return $_result

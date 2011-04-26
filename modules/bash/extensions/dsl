@@ -43,7 +43,6 @@
 #
 extension_action()
 {
-  disable_backtrace
   unset extension action
   result=0
   export extension="${1:-}" ; shift

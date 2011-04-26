@@ -240,17 +240,17 @@ service_setup()
 #
 service_start()
 {
-  [[ -n "${extension}" ]] ||
-    fail "Extension must be set in order to start the associated service."
+  [[ -n "${service}" ]] ||
+    fail "Service must be set in order to start the associated service."
 
-  if command_exists "${extension}_start"
+  if command_exists "${service}_start"
   then
-    "${extension}_start"
+    "${service}_start"
   else
-    file_is_executable "${init_scripts_path}/${extension}" ||
-      fail "${init_scripts_path}/${extension} is missing or not executable."
+    file_is_executable "${init_scripts_path}/${service}" ||
+      fail "${init_scripts_path}/${service} is missing or not executable."
 
-    "${init_scripts_path}/${extension}" start
+    "${init_scripts_path}/${service}" start
   fi
 }
 
@@ -277,25 +277,25 @@ service_start()
 #
 # ##### Failure Scenarios
 #
-# Fails if extension was not set.
+# Fails if service was not set.
 # Fails if the init script is missing or not executable.
 #
 # ##### Usage Examples
 #
-#     user$ extension=redis
+#     user$ service=redis
 #     user$ service_stop
 #     ...
 #
 service_stop()
 {
-  if command_exists "${extension}_stop"
+  if command_exists "${service}_stop"
   then
-    "${extension}_stop"
+    "${service}_stop"
   else
-    file_is_executable "${init_scripts_path}/${extension}" ||
-      fail "${init_scripts_path}/${extension} is missing or not executable."
+    file_is_executable "${init_scripts_path}/${service}" ||
+      fail "${init_scripts_path}/${service} is missing or not executable."
 
-    "${init_scripts_path}/${extension}" stop
+    "${init_scripts_path}/${service}" stop
   fi
 }
 
@@ -322,25 +322,25 @@ service_stop()
 #
 # ##### Failure Scenarios
 #
-# Fails if extension was not set.
+# Fails if service was not set.
 # Fails if the init script is missing or not executable.
 #
 # ##### Usage Examples
 #
-#     user$ extension=redis
+#     user$ service=redis
 #     user$ service_restart
 #     ...
 #
 service_restart()
 {
-  if command_exists "${extension}_restart"
+  if command_exists "${service}_restart"
   then
-    "${extension}_restart"
+    "${service}_restart"
   else
-    file_is_executable "${init_scripts_path}/${extension}" ||
-      fail "${init_scripts_path}/${extension} is missing or not executable."
+    file_is_executable "${init_scripts_path}/${service}" ||
+      fail "${init_scripts_path}/${service} is missing or not executable."
 
-    "${init_scripts_path}/${extension}" restart
+    "${init_scripts_path}/${service}" restart
   fi
 }
 
@@ -367,25 +367,25 @@ service_restart()
 #
 # ##### Failure Scenarios
 #
-# Fails if extension was not set.
+# Fails if service was not set.
 # Fails if the init script is missing or not executable.
 #
 # ##### Usage Examples
 #
-#     user$ extension=redis
+#     user$ service=redis
 #     user$ service_status
 #     ...
 #
 service_status()
 {
-  if command_exists "${extension}_status"
+  if command_exists "${service}_status"
   then
-    "${extension}_status"
+    "${service}_status"
   else
-    file_is_executable "${init_scripts_path}/${extension}" ||
-      fail "${init_scripts_path}/${extension} is missing or not executable."
+    file_is_executable "${init_scripts_path}/${service}" ||
+      fail "${init_scripts_path}/${service} is missing or not executable."
 
-    "${init_scripts_path}/${extension}" status
+    "${init_scripts_path}/${service}" status
   fi
 }
 
@@ -412,25 +412,25 @@ service_status()
 #
 # ##### Failure Scenarios
 #
-# Fails if extension was not set.
+# Fails if service was not set.
 # Fails if the init script is missing or not executable.
 #
 # ##### Usage Examples
 #
-#     user$ extension=redis
+#     user$ service=redis
 #     user$ service_logtail
 #     ...
 #
 service_logtail()
 {
-  if command_exists "${extension}_logtail"
+  if command_exists "${service}_logtail"
   then
-    "${extension}_logtail"
+    "${service}_logtail"
   else
-    file_is_executable "${init_scripts_path}/${extension}" ||
-      fail "${init_scripts_path}/${extension} is missing or not executable."
+    file_is_executable "${init_scripts_path}/${service}" ||
+      fail "${init_scripts_path}/${service} is missing or not executable."
 
-    "${init_scripts_path}/${extension}" logtail
+    "${init_scripts_path}/${service}" logtail
   fi
 }
 
@@ -457,25 +457,25 @@ service_logtail()
 #
 # ##### Failure Scenarios
 #
-# Fails if extension was not set.
+# Fails if service was not set.
 # Fails if the init script is missing or not executable.
 #
 # ##### Usage Examples
 #
-#     user$ extension=redis
+#     user$ service=redis
 #     user$ service_info
 #     ...
 #
 service_info()
 {
-  if command_exists "${extension}_info"
+  if command_exists "${service}_info"
   then
-    "${extension}_info"
+    "${service}_info"
   else
-    file_is_executable "${init_scripts_path}/${extension}" ||
-      fail "${init_scripts_path}/${extension} is missing or not executable."
+    file_is_executable "${init_scripts_path}/${service}" ||
+      fail "${init_scripts_path}/${service} is missing or not executable."
 
-    "${init_scripts_path}/${extension}" info
+    "${init_scripts_path}/${service}" info
   fi
 }
 
@@ -502,25 +502,25 @@ service_info()
 #
 # ##### Failure Scenarios
 #
-# Fails if extension was not set.
+# Fails if service was not set.
 # Fails if the init script is missing or not executable.
 #
 # ##### Usage Examples
 #
-#     user$ extension=redis
+#     user$ service=redis
 #     user$ service_configcheck
 #     ...
 #
 service_configcheck()
 {
-  if command_exists "${extension}_configcheck"
+  if command_exists "${service}_configcheck"
   then
-    "${extension}_configcheck"
+    "${service}_configcheck"
   else
-    file_is_executable "${init_scripts_path}/${extension}" ||
-      fail "${init_scripts_path}/${extension} is missing or not executable."
+    file_is_executable "${init_scripts_path}/${service}" ||
+      fail "${init_scripts_path}/${service} is missing or not executable."
 
-    "${init_scripts_path}/${extension}" configcheck
+    "${init_scripts_path}/${service}" configcheck
   fi
 }
 
@@ -547,12 +547,12 @@ service_configcheck()
 #
 # ##### Failure Scenarios
 #
-# Fails if extension was not set.
+# Fails if service was not set.
 # Fails if the init script is missing or not executable.
 #
 # ##### Usage Examples
 #
-#     user$ extension=redis
+#     user$ service=redis
 #     user$ service_usage
 #     ...
 #
@@ -600,12 +600,12 @@ Options:
 #
 # ##### Failure Scenarios
 #
-# Fails if extension was not set.
+# Fails if service was not set.
 # Fails if the init script is missing or not executable.
 #
 # ##### Usage Examples
 #
-#     user$ extension=redis
+#     user$ service=redis
 #     user$ service_cli
 #     ...
 #
@@ -652,13 +652,13 @@ service_cli()
         # TODO: Throw error if parameter is not specified.
         if (( ${#extension_args[@]} > 0 ))
         then
-          service_activate "${extension}" "${extension_args[$((++index))]}"
+          service_activate "${service}" "${extension_args[$((++index))]}"
         else
-          error "Cannot activate ${extension}, no version was given."
+          error "Cannot activate ${service}, no version was given."
         fi
         ;;
       --deactivate|deactivate)
-        service_deactivate "${extension}"
+        service_deactivate "${service}"
         ;;
       --md5)
         service_md5="${extension_args[$((++index))]}"
@@ -681,15 +681,8 @@ service_cli()
     fi
   done
 
-  # Sanity checks, the following items should be set at this point.
-  #variable_is_set prefix_path ||
-  #  fail "prefix_path has not been set."
-
-  #directory_exists "$prefix_path" ||
-  #  fail "The directory ${prefix_path} is missing."
-
-  #file_is_executable "${service_binary}" ||
-  #  fail "Could not find postmaster or postmaster is not executable."
+  file_is_executable "${service_binary}" ||
+    fail "Could not find ${service_binary} or ${service_binary} is not executable."
 
   service_init_path
 }
@@ -723,27 +716,27 @@ service_cli()
 #
 # ##### Usage Examples
 #
-#     root# extension=redis
+#     root# service=redis
 #     root# service_pid
 #     root# echo $service_pid
 #     0
 #
 service_pid()
 {
-  local _path="${run_path:="/var/run"}/${extension}"
+  local _path="${run_path:="/var/run"}/${service}"
   local _pid=0
 
   ensure_paths_exist "${_path}"
 
-  if file_is_nonempty "${_path}/${extension}.pid"
+  if file_is_nonempty "${_path}/${service}.pid"
   then
-    read -r _pid < "${_path}/${extension}.pid"
+    read -r _pid < "${_path}/${service}.pid"
     if os_is_linux
     then # Sanity check.
       if ! directory_exists "/proc/${pid}"
       then
         _pid=0
-        rm -f "${_path}/${extension}.pid"
+        rm -f "${_path}/${service}.pid"
       fi
     fi
   fi
@@ -756,7 +749,7 @@ service_pid()
 #
 # ### service_load_conf_d()
 #
-# Load the /etc/conf.d/{extension}.conf configuration file into the calling
+# Load the /etc/conf.d/{service}.conf configuration file into the calling
 # environment.
 #
 # ##### Input Parameters
@@ -781,12 +774,12 @@ service_pid()
 #
 # ##### Usage Examples
 #
-#     user$ extension=redis
+#     user$ service=redis
 #     user$ service_load_conf_d
 #
 service_load_conf_d()
 {
-  source_files "${confd_path}/${extension}.conf"
+  source_files "${confd_path}/${service}.conf"
 }
 
 #
@@ -848,24 +841,7 @@ service_install_init_d()
         to "${init_scripts_path}/${_service}" mode 0755
     fi
 
-    if (( UID == 0 ))
-    then # Add service to system startup
-      if command_exists rc-update
-      then
-        rc-update add ${service} default
-      elif command_exists chkconfig
-      then
-        chkconfig ${service} on
-      #elif command_exists svc
-      #then
-      #  svc ${service} on # TODO: daemontools start on boot
-      else # Fall back on rc.local to start redis at system startup.
-        if ! file_contains "/etc/rc.local" "${service} start"
-        then
-          echo "${init_scripts_path}/${service} start" >> /etc/rc.local
-        fi
-      fi
-    fi
+    service_activate
 
     # TODO: Replace this with install_template + seed_template
     printf "%s\n" "[ -d \"${prefix_path}/${_service}/active/bin\" ] && " \
@@ -943,7 +919,7 @@ service_init_path()
 #
 service_init_start()
 {
-  log "Starting ${extension}..."
+  log "Starting ${service}..."
 
   service_init_path
 
@@ -993,7 +969,7 @@ service_init_stop()
 
   (( service_pid > 0 )) || error "Service pid has not been set or is zero."
 
-  log "Stopping ${extension}..."
+  log "Stopping ${service}..."
 
   kill -QUIT ${service_pid}
 
@@ -1122,7 +1098,7 @@ service_conf_d()
     modules_path "${modules_path}" \
     data_path "${data_path}" \
     confd_path "${confd_path}" \
-    extension "${extension}" \
+    extension "${service}" \
     service "${service}"
 }
 
@@ -1223,7 +1199,7 @@ service_init_action()
 #
 # ##### Usage Examples
 #
-#     user$ extension=redis
+#     user$ service=redis
 #     user$ service_init_d
 #
 service_init_d()
@@ -1237,4 +1213,130 @@ service_init_d()
   service_cli # Parse the script arguments and take action accordingly.
 
   service_init_action "${service_action}"
+}
+
+#
+# ### service_deactivate()
+#
+# Deactivates the named service or
+#
+# ##### Input Parameters
+#
+# None.
+#
+# ##### Stream Outputs
+#
+# Logging updates to inform the user what is happening.
+#
+# ##### Environmental effects
+#
+# Changes the current or named service's init script to be nonexecutable.
+#
+# ##### Return Codes
+#
+# 0 for success
+#
+# ##### Failure Scenarios
+#
+# No failure conditions currently.
+#
+# ##### Usage Examples
+#
+#     user$ service=redis
+#     user$ service_deactivate
+#
+service_deactivate()
+{
+  local _service="${1:-"${service}"}"
+
+  [[ -n "${_service}" ]] ||
+    fail "service must be set or passed in in order to deactivate a service."
+
+  if file_exists "${init_scripts_path}/${_service}"
+  then
+    chmod_files 0644 "${init_scripts_path}/${_service}"
+
+    if user_is_root
+    then # Add service to system startup
+      if command_exists rc-update
+      then
+        rc-update add ${service} default
+      elif command_exists chkconfig
+      then
+        chkconfig ${service} on
+      #elif command_exists svc
+      #then
+      #  svc ${service} on # TODO: daemontools start on boot
+      else # Fall back on rc.local to start redis at system startup.
+        if ! file_contains "/etc/rc.local" "${service} start"
+        then
+          echo "${init_scripts_path}/${service} start" >> /etc/rc.local
+        fi
+      fi
+    fi
+  fi
+  # TDOO: hook into system's paths.
+}
+
+#
+# ### service_activate()
+#
+# Activates the named service or
+#
+# ##### Input Parameters
+#
+# None.
+#
+# ##### Stream Outputs
+#
+# Logging updates to inform the user what is happening.
+#
+# ##### Environmental effects
+#
+# Changes the current or named service's init script to be nonexecutable.
+#
+# ##### Return Codes
+#
+# 0 for success
+#
+# ##### Failure Scenarios
+#
+# No failure conditions currently.
+#
+# ##### Usage Examples
+#
+#     user$ service=redis
+#     user$ service_deactivate
+#
+service_activate()
+{
+  local _service="${1:-"${service}"}"
+
+  [[ -n "${_service}" ]] ||
+    fail "service must be set or passed in in order to deactivate a service."
+
+  if file_exists "${init_scripts_path}/${service}"
+  then
+    chmod_files 0755 "${init_scripts_path}/${service}"
+
+    if user_is_root
+    then # Add service to system startup
+      if command_exists rc-update
+      then
+        rc-update remove ${service} default
+      elif command_exists chkconfig
+      then
+        chkconfig ${service} off
+      #elif command_exists svc
+      #then
+      #  svc ${service} off
+      #  TODO: daemontools remove start on boot
+      else # Fall back on rc.local to start redis at system startup.
+        if ! file_contains "/etc/rc.local" "${service} start"
+        then
+          sed -i -e "d#${init_scripts_path}/${service} start#" /etc/rc.local
+        fi
+      fi
+    fi
+  fi
 }
