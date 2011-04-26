@@ -682,14 +682,14 @@ service_cli()
   done
 
   # Sanity checks, the following items should be set at this point.
-  variable_is_set prefix_path ||
-    fail "prefix_path has not been set."
+  #variable_is_set prefix_path ||
+  #  fail "prefix_path has not been set."
 
-  directory_exists "$prefix_path" ||
-    fail "The directory ${prefix_path} is missing."
+  #directory_exists "$prefix_path" ||
+  #  fail "The directory ${prefix_path} is missing."
 
-  file_is_executable "${service_binary}" ||
-    fail "Could not find postmaster or postmaster is not executable."
+  #file_is_executable "${service_binary}" ||
+  #  fail "Could not find postmaster or postmaster is not executable."
 
   service_init_path
 }
