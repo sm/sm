@@ -7,7 +7,7 @@
 #       The CLI remaps 'bdsm install X' to 'bdsm ext install X'
 #
 
-directories=( bin modules  )
+directories=( bin modules completion )
 aux=( log tmp src )
 extensions=( core ext mod pkg srv )
 files=( LICENSE VERSION README.md )
@@ -31,6 +31,7 @@ remove_paths "${extensions[@]}" extension bdsm
 
 (
 log "  Ensuring auxillary directories (${aux[@]}) exist in ${install_path}"
+enter "${install_path}"
 ensure_paths_exist "${install_path}/" "${aux[@]}"
 )
 
@@ -52,5 +53,24 @@ ensure_files_exist "${install_path}/cofig/user"
 
 log "  Linking ${install_path}/bin/bdsm to ${prefix_path}/bin/bdsm"
 link --force "${install_path}/bin/bdsm" to "${prefix_path}/bin/bdsm"
+
+if user_is_root
+then
+  log "  Setting up bdsm shell completion."
+  if directory_exists "/etc/bash_completion.d/"
+  then
+    copy_files_to "/etc/bash_completion.d/" "${install_path}/completion/bdsm.bash"
+  else
+    if grep -v 'completion/bdsm.bash' /etc/profile >/dev/null 2>&1
+    then
+      cat >> /etc/profile <<Profile
+  if [ -n ${BASH_VERSION:-} ]
+  then
+    [[ -s \"${install_path}/completion/bdsm.bash\" ]] && . \"${install_path}/completion/bdsm.bash\""
+  fi
+Profile
+    fi
+  fi
+fi
 
 succeed "Installation of BDSM is complete"
