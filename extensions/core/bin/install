@@ -60,7 +60,7 @@ then
   ensure_paths_exist "/etc/profile.d/"
 
   copy_file from "${install_path}/completion/bdsm.bash" \
-    to "/etc/profile.d/bdsm-completion" \
+    to "/etc/profile.d/bdsm-completion.sh" \
     mode 0755 \
     owner "root:root"
 fi
