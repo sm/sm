@@ -59,7 +59,8 @@ then
   log "  Setting up bdsm shell completion."
   if directory_exists "/etc/bash_completion.d/"
   then
-    copy_files_to "/etc/bash_completion.d/" "${install_path}/completion/bdsm.bash"
+    copy_file from "${install_path}/completion/bdsm.bash" \
+      to "/etc/bash_completion.d/bdsm.bash"
   else
     if grep -v 'completion/bdsm.bash' /etc/profile >/dev/null 2>&1
     then
