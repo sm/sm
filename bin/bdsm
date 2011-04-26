@@ -60,3 +60,4 @@ fi
 
 disable_backtrace
 extension_action "${extension}" "${action}"
+
