@@ -751,7 +751,8 @@ service_install_init_d()
 
     if template_exists "${_service}"
     then
-      install_template "..." to "${init_scripts_path}/${_service}" mode 0755
+      install_template "${_service}" to "${init_scripts_path}/${_service}" \
+        mode 0755
     else
       # Use core srv init.d template
       install_template "${extensions_path}/srv/templates/init_d.template" \
