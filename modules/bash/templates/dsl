@@ -110,14 +110,18 @@ install_template()
   if file_exists "${_name}"
   then
     _template="${_name}"
+  elif file_exists "${extension_templates_path}/${_name}"
+  then
+    _template="${extension_templates_path}/${_name}"
   else
     _template="${extension_templates_path}/${_name}.template"
   fi
 
   ensure_paths_exist "$(dirname "${_target}")"
 
-  if [[ -f "${_template}" ]]
-  then
+  [[ -f "${_template}" ]] ||
+    fail "Cannot install template as the template file '${_template}' is missing.'"
+
     if [[ -d "${_target}" ]]
     then
       if [[ -d "${_target}/${_name}" ]]
@@ -133,9 +137,6 @@ install_template()
       [[ -n "${_mode:-}" ]]       && chmod "${_mode}" "${_target}"
       [[ -n "${_owner:-}" ]]      && chown "${_owner}" "${_target}"
     fi
-  else
-    fail "Template missing: #{_template}"
-  fi
 }
 
 #
