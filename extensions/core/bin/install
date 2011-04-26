@@ -13,7 +13,7 @@ extensions=( core ext mod pkg srv )
 files=( LICENSE VERSION README.md )
 configs=( user ) # TODO move this to /etc/bdsm/ and/or $HOME/.bdsm/
 
-log "\nInstalling BDSM Framework into ${install_path}\n"
+log "Installing BDSM Framework into ${install_path}\n"
 
 (
 log "  Ensuring that install_path '${install_path}' exists"
