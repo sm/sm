@@ -195,7 +195,13 @@ services_available()
 #
 service_setup()
 {
-  user_create_if_missing "${service}" with group "${service}"
+  log "#creating paths for ${service} ${package_version}..."
+
+  ensure_paths_exist "${service_paths[@]}" "${install_path}"
+
+  user_create_if_missing "${service_user}" with group "${service_user}"
+
+  chown_paths_recursively "${service_user}:${service_user}" "${service_paths[@]}"
 
   service_install_init_d "${service}"
 }
