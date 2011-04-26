@@ -305,7 +305,7 @@ package_activate()
 
   if module_is_loaded "service"
   then
-    service_install_init_d
+    service_install_init_d "${_package}"
   fi
 }
 
