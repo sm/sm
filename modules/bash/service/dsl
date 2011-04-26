@@ -37,6 +37,43 @@
 #     Available service listing has not yet been implemented.
 #     This feature has not yet been implemented.
 #
+#
+# # General Services functions.
+#
+#
+# ### services_list()
+#
+# List installed services. These are extensions that have loaded the service
+# module.
+#
+# ##### Input Parameters
+#
+# None.
+#
+# ##### Stream Outputs
+#
+# A list of available services to install are printed to STDOUT of
+# the calling environment.
+#
+# ##### Environmental effects
+#
+# None.
+#
+# ##### Return Codes
+#
+# 0 for success
+#
+# ##### Failure Scenarios
+#
+# NIY
+# No failure conditions currently.
+#
+# ##### Usage Examples
+#
+#     user$ services_avilable
+#     Available service listing has not yet been implemented.
+#     This feature has not yet been implemented.
+#
 services_avilable()
 {
   log "Available service listing has not yet been implemented."
@@ -124,6 +161,45 @@ services_available()
 #
 # # Single Service functions.
 #
+#
+# ### service_setup()
+#
+# Service setup and configuration.
+#
+# ##### Input Parameters
+#
+# None.
+#
+# ##### Stream Outputs
+#
+# None.
+#
+# ##### Environmental effects
+#
+# Creates a system service user with the same name as the service.
+# Sets up the service init_d file from template, if it exists.
+#
+# ##### Return Codes
+#
+# 0 for success
+#
+# ##### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ##### Usage Examples
+#
+#     user$ service=redis
+#     user$ service_setup
+#     ...
+#
+service_setup()
+{
+  user_create_if_missing "${service}" with group "${service}"
+
+  service_install_init_d "${service}"
+}
+
 #
 # ### service_start()
 #

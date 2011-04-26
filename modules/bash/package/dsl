@@ -141,6 +141,11 @@ package_install()
   fi
 
   package_activate_if_first "${package_name}" "${package_version}"
+
+  if module_is_loaded "service"
+  then
+    service_setup
+  fi
 }
 
 package_fetch_md5()
@@ -297,6 +302,12 @@ package_activate()
   link "${prefix_path}/${_package}/${_version}" \
     to "${prefix_path}/${_package}/active"
 
+  package_setup "${_package}"
+}
+
+package_setup()
+{
+  local _package="${1:-}"
   package_ldconfig "${_package}"
 
   package_profile_d "${_package}"
@@ -305,7 +316,7 @@ package_activate()
 
   if module_is_loaded "service"
   then
-    service_install_init_d "${_package}"
+    service_setup "${_package}"
   fi
 }
 
