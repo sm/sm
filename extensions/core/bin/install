@@ -57,23 +57,12 @@ link --force "${install_path}/bin/bdsm" to "${prefix_path}/bin/bdsm"
 if user_is_root
 then
   log "  Setting up bdsm shell completion."
-  if directory_exists "/etc/bash_completion.d/"
-  then
-    copy_file from "${install_path}/completion/bdsm.bash" \
-      to "/etc/bash_completion.d/bdsm" \
-      mode 0644 \
-      owner "root:root"
-  else
-    if grep -v 'completion/bdsm.bash' /etc/profile >/dev/null 2>&1
-    then
-      cat >> /etc/profile <<Profile
-  if [ -n ${BASH_VERSION:-} ]
-  then
-    [[ -s \"${install_path}/completion/bdsm.bash\" ]] && . \"${install_path}/completion/bdsm.bash\""
-  fi
-Profile
-    fi
-  fi
+  ensure_paths_exist "/etc/profile.d/"
+
+  copy_file from "${install_path}/completion/bdsm.bash" \
+    to "/etc/profile.d/bdsm-completion" \
+    mode 0755 \
+    owner "root:root"
 fi
 
 succeed "Installation of BDSM is complete"
