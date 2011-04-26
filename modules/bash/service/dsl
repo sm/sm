@@ -593,7 +593,10 @@ service_cli()
         ;;
     esac
 
-    (( ${#_ignored_args[@]} > 0 )) && extension_args=( "${_ignored_args[@]}" )
+    if (( ${#_ignored_args[@]} > 0 ))
+    then
+      extension_args=( "${_ignored_args[@]}" )
+    fi
   done
 
   # Sanity checks, the following items should be set at this point.
@@ -646,21 +649,25 @@ service_cli()
 service_pid()
 {
   local _path="${run_path:="/var/run"}/${extension}"
-  local _pid
+  local _pid=0
 
   ensure_paths_exist "${_path}"
 
-  read -r _pid < "${_path}/${extension}.pid"
-
-  if os_is_linux
-  then # Sanity check.
-    if ! directory_exists "/proc/${pid}"
-    then
-      _pid=0
-      rm -f "${_path}/${extension}.pid"
+  if file_is_nonempty "${_path}/${extension}.pid"
+  then
+    read -r _pid < "${_path}/${extension}.pid"
+    if os_is_linux
+    then # Sanity check.
+      if ! directory_exists "/proc/${pid}"
+      then
+        _pid=0
+        rm -f "${_path}/${extension}.pid"
+      fi
     fi
   fi
+
   service_pid=${_pid}
+
   return 0
 }
 
@@ -999,32 +1006,37 @@ service_init_action()
 
   service_load_conf_d
 
-  case "action" in
-    start)
-      service_init_start
-      ;;
+  if command_exists "${service}_${action}"
+  then
+    "${service}_${action}"
+  else
+    case "action" in
+      start)
+        service_init_start
+        ;;
 
-    stop)
-      service_init_stop
-      ;;
+      stop)
+        service_init_stop
+        ;;
 
-    restart)
-      service_init_stop
-      service_init_start
-      ;;
+      restart)
+        service_init_stop
+        service_init_start
+        ;;
 
-    status)
-      service_init_status
-      ;;
+      status)
+        service_init_status
+        ;;
 
-    logtail)
-      service_init_logtail
-      ;;
+      logtail)
+        service_init_logtail
+        ;;
 
-    *)
-      service_init_usage
-      ;;
-  esac
+      *)
+        service_init_usage
+        ;;
+    esac
+  fi
 
   return $?
 }

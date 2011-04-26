@@ -6,6 +6,7 @@ variable_is_nonempty init_scripts_path || init_scripts_path="$(init_scripts_path
 variable_is_nonempty confd_path        || confd_path="$(confd_path)"
 
 : \
+  "${service:="${extension}}"
   "${prefix_path:="/usr/local/${extension}/active"}" \
   "${service_data_path:="/var/db/${extension}/active/data"}" \
   "${service_log_path:="/var/log/${extension}/active"}" \
