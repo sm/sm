@@ -741,7 +741,7 @@ service_install_init_d()
   directory_exists "${init_scripts_path}" ||
     return 0 # No bin/ dir, no need for it to be in the path.
 
-  if running_as_root
+  if user_is_root
   then
     ensure_paths_exist "/etc/conf.d" "${init_scripts_path}"
 

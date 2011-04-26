@@ -348,7 +348,7 @@ user_is_not_root()
 #
 user_must_be_root()
 {
-  user_is_running_as_root ||
+  user_is_root ||
     fail "bdsm $extension $action must be run as a root and NOT as a user ($USER)."
 }
 

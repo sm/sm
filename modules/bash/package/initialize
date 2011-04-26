@@ -15,7 +15,7 @@ true \
   "${source_path:="${prefix_path}/src"}" \
   "${install_base_path:="${prefix_path}/${package_name}"}"
 
-if running_as_root ; then
+if user_is_root ; then
   true \
     "${data_base_path:="/var/db/${package_name}"}" \
     "${log_path:="/var/log/${package_name}"}" \
