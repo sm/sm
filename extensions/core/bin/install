@@ -64,4 +64,4 @@ then
     mode 0755 owner "root"
 fi
 
-succeed "Installation of BDSM is complete"
+succeed "\nInstallation of BDSM is complete\n"
