@@ -61,8 +61,7 @@ then
 
   copy_file from "${install_path}/completion/bdsm.bash" \
     to "/etc/profile.d/bdsm-completion.sh" \
-    mode 0755 \
-    owner "root:root"
+    mode 0755 owner "root"
 fi
 
 succeed "Installation of BDSM is complete"
