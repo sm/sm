@@ -357,7 +357,7 @@ package_ldconfig()
     return 0 # no lib/ directory for activated package, no need to update ldconfig
 
   # TODO: Figure out if solaris and freebsd have an analog to this?
-  if running_as_root
+  if user_is_root
   then
     if os_is_linux
     then
@@ -389,7 +389,7 @@ package_profile_d()
   directory_exists "${prefix_path}/${_package}/active/bin" ||
     return 0 # No bin/ dir, no need for it to be in the path.
 
-  if running_as_root
+  if user_is_root
   then
     ensure_paths_exist "/etc/profile.d"
     ensure_files_exist "/etc/profile"

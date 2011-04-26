@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-modules extensions filesystem system templates environment defaults
+modules extensions filesystem system users templates environment defaults
 
 # Ensure that default values are set.
 
