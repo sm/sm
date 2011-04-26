@@ -172,7 +172,6 @@ install_template()
 #    user$ seed_template "/etc/conf.d/${extension}.conf" \
 #      prefix_path "${prefix_path}" \
 #      init_scripts_path "${init_scripts_path}" \
-#      conf_d_path "${conf_d_path}" \
 #      modules_path "${modules_path}" \
 #      data_path "${data_path}" \
 #      confd_path "${confd_path}" \

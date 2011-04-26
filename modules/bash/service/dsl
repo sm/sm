@@ -1010,7 +1010,7 @@ service_init_stop()
 #
 service_init_usage()
 {
-  log "Usage:\n\n  $0 {start|stop|restart|status}"
+  log "Usage:\n\n  $0 {start|stop|restart|status|info|logtail}"
 }
 
 #
@@ -1045,6 +1045,60 @@ service_init_usage()
 service_init_logtail()
 {
   error "Service init logtail has not yet been implemented."
+}
+
+#
+# ### service_conf_d()
+#
+# Installs the conf.d template for the service, if it exists.
+#
+# ##### Input Parameters
+#
+# None.
+#
+# ##### Stream Outputs
+#
+# Logging updates to inform the user what is happening.
+#
+# ##### Environmental effects
+#
+# Once completed a conf.d file should be in place.
+# For example /etc/conf.d/redis.conf for the redis service.
+#
+# ##### Return Codes
+#
+# 0 for success
+#
+# ##### Failure Scenarios
+#
+# No failure conditions currently.
+#
+# ##### Usage Examples
+#
+#     user$ service=redis
+#     user$ service_conf_d
+#
+service_conf_d()
+{
+  # TODO: Install a default conf.d template if extension does not define one.
+  template_exists "conf.d" || return 0
+
+  install_template "conf.d.template" \
+    to "/etc/conf.d/${service}.conf" \
+    mode 0644 \
+    owner "${service_user}:${service_user}"
+
+  template_exists "/etc/conf.d/${service}.conf" ||
+    return 0
+
+  seed_template "/etc/conf.d/${service}.conf" \
+    prefix_path "${prefix_path}" \
+    init_scripts_path "${init_scripts_path}" \
+    modules_path "${modules_path}" \
+    data_path "${data_path}" \
+    confd_path "${confd_path}" \
+    extension "${extension}" \
+    service "${service}"
 }
 
 #
@@ -1159,4 +1213,3 @@ service_init_d()
 
   service_init_action "${service_action}"
 }
-
