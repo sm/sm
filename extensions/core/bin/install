@@ -60,14 +60,14 @@ then
   if directory_exists "/etc/bash_completion.d/"
   then
     copy_file from "${install_path}/completion/bdsm.bash" \
-      to "/etc/bash_completion.d/bdsm.bash"
+      to "/etc/bash_completion.d/bdsm"
   else
     if grep -v 'completion/bdsm.bash' /etc/profile >/dev/null 2>&1
     then
       cat >> /etc/profile <<Profile
   if [ -n ${BASH_VERSION:-} ]
   then
-    [[ -s \"${install_path}/completion/bdsm\" ]] && . \"${install_path}/completion/bdsm.bash\""
+    [[ -s \"${install_path}/completion/bdsm.bash\" ]] && . \"${install_path}/completion/bdsm.bash\""
   fi
 Profile
     fi
