@@ -253,3 +253,57 @@ variable_is_nonempty()
   eval "[[ -n \"\${${_variable}:-}\" ]]"
 }
 
+#
+# ### variables_are_nonempty()
+#
+# Test to see if any of a given list of variables are empty.
+#
+# ##### Input Parameters
+#
+# First parameter is a string containing a variable name.
+#
+# ##### Stream Outputs
+#
+# None.
+#
+# ##### Environmental effects
+#
+# None.
+#
+# ##### Return Codes
+#
+# 0 if all variables given are nonempty.
+# 1 if any variable given is nonempty.
+#
+# ##### Failure Scenarios
+#
+# Fails if no variable names were given as arguments.
+#
+# ##### Usage Examples
+#
+#     user$ variables_are_nonempty BASH_VERSION asdf
+#     user$ echo $?
+#     1
+#
+#     user$ asdf="w00t! "
+#     user$ variables_are_nonempty BASH_VERSION asdf
+#     user$ echo $?
+#     0
+#
+variables_are_nonempty()
+{
+  local _variable _variables=("$@")
+
+  (( "${#_variables[@]}" > 0 )) ||
+    fail "Cannot check if variables are nonempty as no variables were given."
+
+  for _variable in "${_variables}"
+  do
+    if eval "[[ -z \"\${${_variable}:-}\" ]]"
+    then
+      return 1
+    fi
+  done
+  return 0
+}
+
