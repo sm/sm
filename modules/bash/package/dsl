@@ -488,6 +488,8 @@ package_build()
   then
     _command="${make_command}"
   else
+    # Adjust for gcc 4.6 strictness.
+    export CFLAGS="${CFLAGS} -Wunused-but-set-variable"
     _command="make ${make_flags[@]:-"-j$(os_cpu_count)"}"
   fi
 
