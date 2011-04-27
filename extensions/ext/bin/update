@@ -22,9 +22,8 @@ Usage:
 extension_action=${extension_args[0]}
 
 case "$extension_action" in
-  repository)
+  repo|repository)
     fetch_extensions_repository
-    extensions_install "${extensions[@]}"
   ;;
 
   help|usage)

@@ -1,8 +1,34 @@
 #!/usr/bin/env bash
 
-# Safely source files and notify the user if they do not exist.
-# Recommended to put in /etc/bash.bashrc or ~/.bashrc and be sure
-# it is sourced from ~/.bash_profile
+#
+# ## source_files
+#
+# Safely source files only if they exists and are nonempty.
+#
+# ##### Input Parameters
+#
+# One or more files.
+#
+# ##### Stream Outputs
+#
+# None.
+#
+# ##### Environmental effects
+#
+# Nonempty files given will be sourced into the calling environment.
+#
+# ##### Return Codes
+#
+# 0 for success
+#
+# ##### Failure Scenarios
+#
+# Fails if no files are given to sources.
+#
+# ##### Usage Examples
+#
+#     user$ source_files "$HOME/.dotfiles/scripts/functions"
+#
 source_files()
 {
   local _file _files=("$@")
@@ -21,7 +47,7 @@ source_files()
   done
 }
 
-# safely source the first file found
+
 nonempty_files()
 {
   local _file _files=("$@")
