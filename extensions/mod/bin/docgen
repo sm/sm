@@ -2,34 +2,3 @@
 
 modules_docgen
 
-exit 0
-
-# Copy the generated files into the proper site content dir.
-files=($(find /tmp/docs/modules -mindepth 1 -iname '*.haml'))
-for file in ${files[@]}
-do
-  name=${file##*\/}
-  name=${name%.haml}
-  mkdir -p content/modules/bash/${name}
-  cat > content/modules/bash/${name}.haml <<HEADER
-.breadcrumbs
-  %a{ :href => "/" }
-    Documentation
-  &nbsp;>&nbsp;
-  %a{ :href => "/modules/" }
-    Modules
-  &nbsp;>&nbsp;
-  %a{ :href => "/modules/bash/" }
-    Bash
-  &nbsp;>&nbsp;
-  %a{ :href => "/modules/bash/${name}/" }
-    ${name}
-  %hr
-
-%h1
-  Module ${name}
-
-HEADER
-  cat $file >> content/modules/bash/${name}.haml
-done
-
