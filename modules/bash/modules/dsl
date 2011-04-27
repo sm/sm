@@ -429,7 +429,7 @@ module_docs()
 modules_docgen()
 {
   local _module _modules _function _dsl
-  local _prefix="/tmp/docs/modules/"
+  local _prefix="/tmp/docs/modules"
   local _path="${site_development_path}"
 
   directory_exists "${site_development_path}" ||
@@ -472,11 +472,13 @@ modules_docgen()
   files=($(find "${_prefix}" -mindepth 1 -iname '*.haml'))
   for file in "${files[@]}"
   do
+    (
     name=${file##*\/}
     name=${name%.haml}
 
     ensure_paths_exist "${site_development_path}/content/modules/bash/${name}"
 
+    log "Building ${name} dsl from generated docs."
     cat > "${site_development_path}/content/modules/bash/${name}/dsl.haml" <<HEADER
 .breadcrumbs
   %a{ :href => "/" }
@@ -500,6 +502,10 @@ modules_docgen()
 
 HEADER
     cat $file >> "${site_development_path}/content/modules/bash/${name}/dsl.haml"
+    )&
   done
+
+  wait
+  log "Module documentation has been generated from the source code path ${core_development_path} into the site development path ${site_development_path}"
 }
 
