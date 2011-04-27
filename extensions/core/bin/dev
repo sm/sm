@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-case "$extension_action" in
+extension_action="${extension_actions[0]}"
+
+case "${extension_action}" in
   setup)
     bdsm_development_setup
     ;;
