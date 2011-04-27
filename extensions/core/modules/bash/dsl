@@ -15,11 +15,6 @@ fetch_version()
     fail "Unable to fetch version from "
 }
 
-fetch_md5()
-{
-  md5=$(curl -s "${releases_url}/bdsm-${version}.tar.gz.md5" 2>/dev/null)
-}
-
 md5_match()
 { # TODO: switch this to using system module's os_* DSL
   local archive="$1"
@@ -109,17 +104,20 @@ install_release()
 {
   archive="$archives_path/bdsm-${version}.tar.gz"
 
-  fetch_md5
+  md5=$(curl -s "${releases_url}/bdsm-${version}.tar.gz.md5" 2>/dev/null)
 
-  if file_exists "${archive}" && ! md5_match ; then
+  if file_exists "${archive}" && ! md5_match
+  then
     # Remove old installs, if they exist and have incorrect md5.
     file_exists "$archives_path/bdsm-${version}.tar.gz" &&
       rm -f "$archives_path/bdsm-${version}.tar.gz"
   fi
 
+  ensure_paths_exist "${archives_path}"
+
   curl -L "${releases_url}/bdsm-${version}.tar.gz" -o "$archive"
 
-  md5_match "$archive" || fail "
+  file_matches_md5 "${archive}" "${md5}" || fail "
 Archive package downloaded does not match it's calculated md5 checksum ${md5}:
 
   $archives_path/bdsm-${version}.tar.gz
