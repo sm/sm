@@ -37,13 +37,18 @@ p()
 
   if [[ -n "${pattern1}" ]]
   then
-    _path=$( find "$projects_path" -iname "${pattern1}*" -mindepth 1 -maxdepth 2 -type d | head -1)
+    _path=$(
+    find "$projects_path" -mindepth 1 -maxdepth 2 -iname "${pattern1}*" -type d | head -1
+    )
 
     cd "$_path"
 
     if [[ -n "${pattern2}" ]]
     then
-      _path=$( find "$_path" -iname "${pattern2}*" -mindepth 1 -maxdepth 1 -type d | head -1);
+      _path=$(
+      find "$_path" -mindepth 1 -maxdepth 1 -iname "${pattern2}*" -type d | head -1
+      )
+
       cd "$_path"
     fi
   else

@@ -1,12 +1,18 @@
 #!/usr/bin/env bash
 
-#
-# BDSM project module initialization
-#
-# When run as root, we must ensure that project and project_path are set.
-(( UID > 0 )) && { : "${project:="$USER"}" "${project_path:="$HOME"}" ; }
+# TODO: Read project and project_path from defaults file first.
+if user_is_not_root
+then
+  true "${project:="$USER"}" "${project_path:="$HOME"}"
+else
+  # TODO: When run as root, we must ensure that project and project_path are set.
+  true
+fi
 
-[[ -n "${project:-}" && -n "${project_path:-}" ]] && project_initialize
+if variables_are_nonempty project project_path
+then
+  project_initialize
+fi
 
 export project environment project_path shared previous_path release_path stage_path log_path
 
