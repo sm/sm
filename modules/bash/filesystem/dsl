@@ -47,7 +47,38 @@ source_files()
   done
 }
 
-
+#
+# ## nonempty_files
+#
+# Outputs a subset of the named files that are nonempty.
+#
+# ##### Input Parameters
+#
+# One or more files.
+#
+# ##### Stream Outputs
+#
+# Each nonempty filename parameter will be printed to STDOUT of the calling
+# environment.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 nonempty_files()
 {
   local _file _files=("$@")
@@ -64,6 +95,37 @@ nonempty_files()
   done
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 ensure_paths_exist()
 {
   local _path _paths=("$@")
@@ -76,6 +138,37 @@ ensure_paths_exist()
   done
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 remove_files()
 {
   local _file _files=("$@")
@@ -95,6 +188,37 @@ remove_files()
   done
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 remove_paths()
 {
   local _path _paths=("$@")
@@ -116,6 +240,37 @@ remove_paths()
   done
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 ensure_files_exist()
 {
   local _file _files=("$@") _path
@@ -131,6 +286,37 @@ ensure_files_exist()
   done
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 # TODO: change this to be a  fail function if one is not
 #       make this into make_files_executable or some such
 ensure_files_are_executable()
@@ -155,6 +341,37 @@ ensure_files_are_executable()
   done
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 #
 # Link files
 #
@@ -205,6 +422,37 @@ link()
   fi
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 move_directory()
 {
   local _source _target _mode _owner
@@ -253,6 +501,37 @@ move_directory()
   [[ -z "${_owner:-}" ]] || chown -R "${_owner}" "${_target}"
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 move_file()
 {
   local _source _target _mode _owner
@@ -301,6 +580,37 @@ move_file()
   [[ -z "${_owner:-}" ]] || chown "${_owner}" "${_target}"
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 copy_file()
 {
   local _source _target
@@ -343,6 +653,37 @@ copy_file()
 
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 copy_files_to()
 {
   local _path="$1" _file ; shift
@@ -365,6 +706,37 @@ copy_files_to()
   done
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 copy_directories_to()
 {
   local _path="${1}" _directory ; shift
@@ -386,6 +758,37 @@ copy_directories_to()
   done
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 copy_directory()
 {
   local _source _target
@@ -418,6 +821,37 @@ copy_directory()
   cp -Rf "${_source}" "${_target}"
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 move_files_to()
 {
   local _path="$1" _file ; shift
@@ -437,6 +871,37 @@ move_files_to()
   done
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 chown_files()
 {
   local _identity="$1" _file; shift
@@ -454,6 +919,37 @@ chown_files()
   done
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 chown_paths()
 {
   local _identity="$1" _path ; shift
@@ -471,6 +967,37 @@ chown_paths()
   done
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 chown_paths_recursively()
 {
   local _identity="$1" _path ; shift
@@ -488,6 +1015,37 @@ chown_paths_recursively()
   done
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 chmod_files()
 {
   local _permissions="$1" _file ; shift
@@ -505,6 +1063,37 @@ chmod_files()
   done
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 chmod_paths()
 {
   local _permissions="$1" _path ; shift
@@ -522,6 +1111,37 @@ chmod_paths()
   done
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 chmod_paths_recursively()
 {
   local _permissions="${1:-}" _path ; shift
@@ -540,6 +1160,37 @@ chmod_paths_recursively()
   done
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 enter()
 {
   local _path="$1"
@@ -547,6 +1198,37 @@ enter()
   builtin cd "${_path}" || fail "Could not enter directory ${_path}."
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 hash_file()
 {
   local _file="${1:-}" ; shift
@@ -582,6 +1264,37 @@ hash_file()
   esac
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 file_is_executable()
 {
   local _file="${1:-}"
@@ -591,6 +1304,37 @@ file_is_executable()
   [[ -x "${_file}" ]]
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 file_exists()
 {
   local _file="${1:-}"
@@ -600,6 +1344,37 @@ file_exists()
   [[ -f "${_file}" ]]
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 file_is_nonempty()
 {
   local _file="${1:-}"
@@ -612,6 +1387,37 @@ file_is_nonempty()
   [[ -s "${_file}" ]]
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 file_is_empty()
 {
   local _file="${1:-}"
@@ -626,6 +1432,37 @@ file_is_empty()
   fi
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 file_is_missing()
 {
   local _file="${1:-}"
@@ -640,6 +1477,37 @@ file_is_missing()
   fi
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 file_is_empty_or_missing() {
   local _file="${1:-}"
 
@@ -653,6 +1521,37 @@ file_is_empty_or_missing() {
   fi
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 file_contains()
 {
   local _file="${1:-}" _pattern="${2:-}"
@@ -668,6 +1567,37 @@ file_contains()
   fi
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 symlink_exists()
 {
   local _file="${1:-}"
@@ -682,6 +1612,37 @@ symlink_exists()
   fi
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 # Directory conditional dsl
 directory_exists()
 {
@@ -697,6 +1658,37 @@ directory_exists()
   fi
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 directories_in()
 {
   local _path="${1:-}"
@@ -759,6 +1751,37 @@ directories_under_matching()
   fi
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 files_in()
 {
   local _path="${1:-}"
@@ -774,6 +1797,37 @@ files_in()
   fi
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 files_under()
 {
   local _path="${1:-}"
@@ -789,6 +1843,37 @@ files_under()
   fi
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 files_under_matching()
 {
   local _path="${1:-}" _pattern="${2:-}"
@@ -805,6 +1890,37 @@ files_under_matching()
   fi
 }
 
+#
+# ## function_name
+#
+# Function Description
+#
+# ##### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ##### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ##### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ##### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ##### Failure Scenarios
+#
+# Fails if ...
+#
+# ##### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
 #
 # Replace contents in a file with a given (sed) regex pattern.
 #

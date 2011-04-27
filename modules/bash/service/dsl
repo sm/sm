@@ -1089,8 +1089,7 @@ service_conf_d()
     mode 0644 \
     owner "${service_user}:${service_user}"
 
-  template_exists "/etc/conf.d/${service}.conf" ||
-    return 0
+  template_exists "/etc/conf.d/${service}.conf" || return 0
 
   seed_template "/etc/conf.d/${service}.conf" \
     prefix_path "${prefix_path}" \
