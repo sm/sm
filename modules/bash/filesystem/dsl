@@ -829,3 +829,69 @@ replace_content()
   fi
 }
 
+#
+# ## file_matches_md5
+#
+# Fetches the package's md5 sum from the md5_url, if given.
+#
+# ##### Input Parameters
+#
+# None.
+#
+# ##### Stream Outputs
+#
+# none.
+#
+# ##### Environmental effects
+#
+# None.
+#
+# ##### Return Codes
+#
+# 0 if the file matches the md5sum
+# 1 if the file does not match the md5sum
+# 1 if the file is empty or missing
+#
+# ##### Failure Scenarios
+#
+# Fails if no file name/path was given.
+# Fails if no md5 string was given.
+#
+# ##### Usage Examples
+#
+# Example Usage:
+#
+# user$ file_matches_md5
+#
+# ##### Notes
+#
+file_matches_md5()
+{
+  local _file="$1" _md5="$2" _file_md5
+
+  [[ -n "${_file}" ]] ||
+    fail "Cannot determine if file matches md5 as no file was given."
+  [[ -n "${_md5}" ]]  ||
+    fail "Cannot determine if file matches md5 as no md5 was given."
+
+  [[ -s "${_file}" ]] || return 1
+
+  if os_is_linux
+  then
+    _command="md5sum"
+  elif os_is_darwin
+  then
+    _command="/sbin/md5 -q"
+  else
+    _command="md5" # ... ?
+  fi
+
+  _file_md5="$($_command "$_file")"
+
+  if [[ "${_file_md5// *}" = "$_md5" ]]
+  then
+    return 0
+  else
+    return 1
+  fi
+}
