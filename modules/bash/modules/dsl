@@ -379,7 +379,7 @@ module_docs()
   [[ -n "${_module}" ]] ||
     fail "Cannot glean documentation for a module as no module name was given"
 
-  local _path="${modules_path}/bash/${_module}"
+  local _path="${core_development_path}/modules/bash/${_module}"
 
   awk '/^#/{print }' "${_path}/dsl" | sed -e "1d" -e "s/^# //g" -e "s/^#\s*//"
 }
