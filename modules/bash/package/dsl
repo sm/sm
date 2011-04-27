@@ -138,7 +138,6 @@ package_install()
   then
     "${package_name}_patch"
   else
-    log "Applying any patches found for ${package_name} ${package_version}"
     package_patch
   fi
 
@@ -484,6 +483,11 @@ package_patch()
 
   # TODO: Test each dir for existence and skip if missing
   _patches=($(find "${extension_patches_path}" -mindepth 1 -maxdepth 1 -iname '*.patch' -type f))
+
+  (( ${#_patches[@]} > 0 )) || return 0
+
+  log "Applying patches for ${package_name} ${package_version}"
+
   package_apply_patches "${_patches[@]}"
 
   directory_exists "${extension_patches_path}/$(os_type)" || return 0
