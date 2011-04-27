@@ -430,6 +430,10 @@ modules_docgen()
 {
   local _module _modules _function _dsl
   local _prefix="/tmp/docs/modules/"
+  local _path="${site_development_path}"
+
+  directory_exists "${site_development_path}" ||
+    fail "Set site_development_path in ~/.bdsmrc in order to run docgen."
 
   _modules=($(modules_installed))
   for _module in "${_modules[@]}"
@@ -459,13 +463,15 @@ modules_docgen()
   log "Modules documentation has been generated in ${_prefix}."
 
   # Copy the generated files into the proper site content dir.
-  files=($(find /tmp/docs/modules -mindepth 1 -iname '*.haml'))
-  for file in ${files[@]}
+  files=($(find "${_prefix}" -mindepth 1 -iname '*.haml'))
+  for file in "${files[@]}"
   do
     name=${file##*\/}
     name=${name%.haml}
-    mkdir -p content/modules/bash/${name}
-    cat > content/modules/bash/${name}/dsl.haml <<HEADER
+
+    ensure_paths_exist "${site_development_path}/content/modules/bash/${name}"
+
+    cat > "${site_development_path}/content/modules/bash/${name}/dsl.haml" <<HEADER
 .breadcrumbs
   %a{ :href => "/" }
     Documentation
@@ -487,7 +493,7 @@ modules_docgen()
   Module ${name}
 
 HEADER
-    cat $file >> content/modules/bash/${name}/dsl.haml
+    cat $file >> "${site_development_path}/content/modules/bash/${name}/dsl.haml"
   done
 }
 
