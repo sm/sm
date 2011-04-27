@@ -1,5 +1,65 @@
 #!/usr/bin/env bash
 
+bdsm_development_setup()
+{
+  if file_contains "$HOME/.bash_profile" "projects_path="
+  then
+    log "projects_path is set in $HOME/.bash_profile."
+  else
+    echo 'export projects_path="$HOME/projects"' >> "$HOME/.bash_profile"
+    log "projects_path is now set in $HOME/.bash_profile."
+  fi
+
+  if file_contains "$HOME/.bash_profile" "modules/bash/project/interactive"
+  then
+    log "BDSM project functions are setup in $HOME/.bash_profile."
+  else
+    log "BDSM project functions are now setup in $HOME/.bash_profile."
+    echo '[[ -s "/usr/local/bdsm/modules/bash/project/interactive" ]] && source "/usr/local/bdsm/modules/bash/project/interactive"' >> "$HOME/.bash_profile"
+  fi
+
+  # Load the .bash_profile changes into your current running shell.
+  source_files "$HOME/.bash_profile"
+
+  if file_contains "$HOME/.bdsmrc" "core_development_path"
+  then
+    log "core_development_path is set in .bdsmrc"
+  else
+    echo "export core_development_path=\"${projects_path}/bdsm/core\"" \
+      >> "$HOME/.bdsmrc"
+    log "core_development_path is now set in .bdsmrc"
+  fi
+
+  if file_contains "$HOME/.bdsmrc" "site_development_path"
+  then
+    echo "export site_development_path=\"${projects_path}/bdsm/site\""
+    >> "$HOME/.bdsmrc"
+  fi
+
+  if file_contains "$HOME/.bdsmrc" "extensions_development_path"
+  then
+    echo "export extensions_development_path=\"${projects_path}/bdsm/extensions\""
+    >> "$HOME/.bdsmrc"
+  fi
+
+  ensure_paths_exist "${projects_path}/bdsm"
+
+  enter "${projects_path}/bdsm"
+
+  log "Cloning core into $PWD/core/"
+  git clone https://github.com/wayneeseguin/bdsm core
+
+  log "Cloning site into $PWD/core/"
+  git clone https://github.com/wayneeseguin/bdsm-site site
+
+  log "Cloning extensions into $PWD/core/"
+  git clone https://github.com/wayneeseguin/bdsm-extensions extensions
+}
+
+bdsm_development_update()
+{
+}
+
 bdsm_version()
 {
   if file_is_nonempty "$bdsm_path/VERSION" ; then
