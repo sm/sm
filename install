@@ -1,38 +1,61 @@
 #!/usr/bin/env bash
+#
+# Bash Delectable Scripting Management (BDSM) Framework
+#
+# Copyright (c) 2009-2011 Wayne E. Seguin
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-# Load System Configuration, if it exists.
-[[ -s "/etc/bdsmrc" ]] && . /etc/bdsmrc
-
-# Load User Configuration, if it exists.
-[[ -s "$HOME/.bdsmrc" ]] && . "$HOME/.bdsmrc"
+# Load System BDSM Configuration, if it exists.
+for file in /etc/bdsmrc "$HOME/.bdsmrc"
+do
+  if [[ -s "/etc/bdsmrc" ]]
+  then
+    source "${file}" || true # Continue if it fails.
+  fi
+done
 
 # The default prefix is /usr/local,
 # this should be set to where BDSM is installed to in /etc/bdsmrc
 prefix_path="${prefix_path:-/usr/local}"
 
-if [[ "$prefix_path" = "$HOME" ]] ; then
+if [[ "$prefix_path" = "$HOME" ]]
+then
   { : "${bdsm_path:="${prefix_path}bdsm"}"; }
 else
   { : "${bdsm_path:="${prefix_path}/bdsm"}"; }
 fi
 
-export install_path="${bdsm_path}" # Path to install everything to
-export bdsm_path="$PWD"            # Path to load everything from
-export modules_path="${bdsm_path}/modules"
+install_path="${bdsm_path}"         # Path to install everything to
+bdsm_path="$PWD"                    # Path to load everything from
+modules_path="${bdsm_path}/modules"
+
+export bdsm_path install_path modules_path
 
 # Load DSL and initialize BDSM core itself, manually.
 source "${PWD}/modules/bash/core/dsl"
 
-mkdir -p log tmp
-
 # Load fundamental Module DSL's
-for module in logging trace filesystem core ; do
-  for file in dsl initialize ; do
+for module in logging trace filesystem core
+do
+  for file in dsl initialize
+  do
     source "${PWD}/modules/bash/${module}/${file}"
   done
 done
 
-source_files "${PWD}/extensions/core/modules/bash/dsl" \
+source_files \
+  "${PWD}/extensions/core/modules/bash/dsl" \
   "${PWD}/extensions/core/modules/bash/initialize" \
   "${PWD}/extensions/core/modules/bash/cli" \
   "${PWD}/extensions/core/bin/install"

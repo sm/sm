@@ -1,4 +1,4 @@
-# BDSM Core Roadmap
+# Bash Delectable Scripting Management (BDSM) Framework Roadmap
 
 Features Roadmap
 ====================
