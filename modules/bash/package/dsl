@@ -1,11 +1,45 @@
 #!/usr/bin/env bash
-
+#
+# ## package_definition
+#
+# Enables module developers to easily set package variables in name, value pairs.
+#
+# ##### Input Parameters
+#
+# Parameters must come in pairs, variable name first (without the 'package'
+# prefix), value second.
+#
+# ##### Stream Outputs
+#
+# None.
+#
+# ##### Environmental effects
+#
+# For each name/value pair, a variable package_${name} is created with the given
+# value.
+#
+# ##### Return Codes
+#
+# 0 for success.
+#
+# ##### Failure Scenarios
+#
+# Fails if extension developer accidentailly separates key/value with an = :)
+# Fails if a key is given without a matching value.
+#
+# ##### Usage Examples
+#
 # Example Usage:
 #
-# package_definition \
-#   name "bash"
-#   version "4.2"
-#   url "ftp.gnu.org/gnu/bash/"
+# user$ package_definition \
+#         name "bash" \
+#         version "4.2" \
+#         url "ftp.gnu.org/gnu/bash/"
+#
+# ##### Notes
+#
+# For readability it is recommended to split the line into "key value" lines by
+# ending the line with a singele backslash '\' character with no space afterwards.
 #
 package_definition()
 {
