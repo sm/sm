@@ -58,6 +58,7 @@ bdsm_development_setup()
 
 bdsm_development_update()
 {
+  NIY
 }
 
 bdsm_version()
