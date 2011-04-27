@@ -4,6 +4,8 @@ bdsm_development_setup()
 {
   local _component
 
+  true "${projects_path:-"$HOME/projects"}"
+
   if file_contains "$HOME/.bash_profile" "projects_path="
   then
     log "projects_path is set in $HOME/.bash_profile."
@@ -19,9 +21,6 @@ bdsm_development_setup()
     log "BDSM project functions are now setup in $HOME/.bash_profile."
     echo '[[ -s "/usr/local/bdsm/modules/bash/project/interactive" ]] && source "/usr/local/bdsm/modules/bash/project/interactive"' >> "$HOME/.bash_profile"
   fi
-
-  # Load the .bash_profile changes into your current running shell.
-  source_files "$HOME/.bash_profile"
 
   ensure_paths_exist "${projects_path}/bdsm"
 
