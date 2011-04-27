@@ -438,14 +438,17 @@ modules_docgen()
   _modules=($(modules_installed))
   for _module in "${_modules[@]}"
   do
+    (
     ensure_paths_exist "${_prefix}/${_module}"
 
     _base="${_prefix}/${_module}/${_module}"
 
+    log "Generating ${_base}.md"
     module_docs "${_module}" > "${_base}.md"
 
     if command_exists redcarpet
     then
+      log "Generating ${_base}.html"
       redcarpet "${_base}.md" > "${_base}.html"
     else
       log "Skipping html conversion as the 'redcarpet' command was not found (gem install redcarpet for this feature)"
@@ -453,11 +456,14 @@ modules_docgen()
 
     if command_exists html2haml
     then
+      log "Generating ${_base}.html"
       html2haml "${_base}.html" > "${_base}.haml"
     else
       log "Skipping haml conversion as the 'html2haml' command was not found (gem install haml for this feature)"
     fi
+    )&
   done
+  wait
 
   # perl Markdown.pl --html4tags foo.text
   log "Modules documentation has been generated in ${_prefix}."
