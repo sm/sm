@@ -16,10 +16,12 @@ Features Roadmap
   * Interface for browsing published extensions.
 
 ## Package (pkg) extension and module
-* Package activatoin and deactivation
+* Package activation and deactivation
+  $ bdsm pkg {activate/deactivate} {package}
 
 ## Service (srv) extension and module
 * Overridable start/stop/restart/status actions ala package_install
 * init scripts
-* enable/disable autostart on boot
+* activate/deactivate -- autostart on boot
+  $ bdsm srv {activate/deactivate} {service}
 
