@@ -2,9 +2,6 @@
 
 _path="${core_development_path:="$source_path/bdsm"}"
 
-# TODO: Allow --src flag to modify root behavior.
-user_is_not_root || _path="${bdsm_path}/"
-
 enter "${_path}"
 
 exec ${EDITOR:-vi} .

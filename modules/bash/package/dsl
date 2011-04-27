@@ -324,14 +324,20 @@ package_fetch()
 
   package_fetch_md5
 
-  file_matches_md5 "${package_file}" "${package_md5}" || {
-    log "${package_file} does not match md5 ${package_md5}"
+  if variable_is_nonempty package_md5
+  then
+    file_matches_md5 "${package_file}" "${package_md5}" || {
+      log "${package_file} does not match md5 ${package_md5}, removing and downloading."
 
-    remove_files "${package_file}"
+      remove_files "${package_file}"
 
+      curl -L "${package_url}" -o "${package_file}" ||
+        error "Downloading ${package_name} from '${package_url}' to '${package_file}' failed "
+    }
+  else
     curl -L "${package_url}" -o "${package_file}" ||
       error "Downloading ${package_name} from '${package_url}' to '${package_file}' failed "
-  }
+  fi
 }
 
 #
