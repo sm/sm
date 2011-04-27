@@ -2,6 +2,8 @@
 
 bdsm_development_setup()
 {
+  local _component
+
   if file_contains "$HOME/.bash_profile" "projects_path="
   then
     log "projects_path is set in $HOME/.bash_profile."
@@ -21,39 +23,29 @@ bdsm_development_setup()
   # Load the .bash_profile changes into your current running shell.
   source_files "$HOME/.bash_profile"
 
-  if file_contains "$HOME/.bdsmrc" "core_development_path"
-  then
-    log "core_development_path is set in .bdsmrc"
-  else
-    echo "export core_development_path=\"${projects_path}/bdsm/core\"" \
-      >> "$HOME/.bdsmrc"
-    log "core_development_path is now set in .bdsmrc"
-  fi
-
-  if file_contains "$HOME/.bdsmrc" "site_development_path"
-  then
-    echo "export site_development_path=\"${projects_path}/bdsm/site\""
-    >> "$HOME/.bdsmrc"
-  fi
-
-  if file_contains "$HOME/.bdsmrc" "extensions_development_path"
-  then
-    echo "export extensions_development_path=\"${projects_path}/bdsm/extensions\""
-    >> "$HOME/.bdsmrc"
-  fi
-
   ensure_paths_exist "${projects_path}/bdsm"
 
   enter "${projects_path}/bdsm"
 
-  log "Cloning core into $PWD/core/"
-  git clone https://github.com/wayneeseguin/bdsm core
+  for _component in core extensions site
+  do
+    if file_contains "$HOME/.bdsmrc" "${_component}_development_path"
+    then
+      log "${_component}_development_path is set in .bdsmrc"
+    else
+      echo "export ${_component}_development_path=\"${projects_path}/bdsm/${_component}\"" \
+        >> "$HOME/.bdsmrc"
+      log "${_component}_development_path is now set in .bdsmrc"
+    fi
 
-  log "Cloning site into $PWD/core/"
-  git clone https://github.com/wayneeseguin/bdsm-site site
-
-  log "Cloning extensions into $PWD/core/"
-  git clone https://github.com/wayneeseguin/bdsm-extensions extensions
+    if directory_exists "${_component}"
+    then
+      log "BDSM Core repository already exists at $PWD/${_component}/"
+    else
+      log "Cloning BDSM Core repository into $PWD/${_component}/"
+      git clone https://github.com/wayneeseguin/bdsm ${_component}
+    fi
+  done
 }
 
 bdsm_development_update()
