@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+case "$extension_action" in
+  setup)
+    bdsm_development_setup
+    ;;
+  update)
+    bdsm_development_update
+    ;;
+esac
+
