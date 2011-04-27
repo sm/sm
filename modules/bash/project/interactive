@@ -3,8 +3,7 @@
 # In order to use the bdsm interactive project functions,
 # source this file in your profiles, such as ~/.bash_profile, for example:
 #
-#  [[ -s "/usr/local/bdsm/modules/project/interactive" ]] &&
-#    "/usr/local/bdsm/modules/project/interactive"
+#   [[ -s "/usr/local/bdsm/modules/bash/project/interactive" ]] && source "/usr/local/bdsm/modules/bash/project/interactive"
 #
 true "${projects_path:="$HOME/projects"}" ; export projects_path
 
