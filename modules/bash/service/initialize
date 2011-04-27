@@ -28,7 +28,6 @@ service_paths=(
   "${service_bin_path}"
   "${service_config_path}"
   "${service_pid_path}"
-  "${service_db_path}"
   "${service_lock_path}"
   "${service_log_path}"
 )
