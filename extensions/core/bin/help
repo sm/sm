@@ -4,12 +4,15 @@ extension="<extension>"
 
 description "Bash Development & Scripting Management Framework - Core Extension"
 
-actions "  bdsmrc  - Install bdsmrc template file into ~/.bdsmrc
-  get latest - Fetch and install the latest BDSM release
-  get head - Fetch and install the latest BDSM development version
-  version - Display the curently installed BDSM version
-  install <name> - Fetches and extends BDSM with the <name> extension
-  edit <name> - Opens extension <name> in the editor."
+actions "
+  bdsmrc        - Install bdsmrc template file into ~/.bdsmrc or /etc/bdsmrc
+  get latest    - Fetch and install the latest BDSM release
+  get head      - Fetch and install the latest BDSM development version
+  version       - Display the curently installed BDSM version
+  extend <name> - Fetches and extends BDSM with the <name> extension
+  create <name> - Creates extension <name> in the extensions development dir,
+                  or extensions path if development path is not set in bdsmrc.
+  edit <name>   - Opens extension <name> in the editor."
 
 notes="
 
