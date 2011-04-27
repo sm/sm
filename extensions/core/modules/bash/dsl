@@ -4,7 +4,7 @@ bdsm_development_setup()
 {
   local _component
 
-  true "${projects_path:-"$HOME/projects"}"
+  true "${projects_path:="$HOME/projects"}"
 
   if file_contains "$HOME/.bash_profile" "projects_path="
   then
