@@ -13,11 +13,11 @@ variable_is_nonempty confd_path        || confd_path="$(confd_path)"
   "${service_bin_path:="${install_path}/bin"}" \
   "${service_pid_path:="/var/run/${service}"}" \
   "${service_config_path:="/etc/${service}"}" \
-  "${service_db_path:="/var/db/${service}/active"}" \
-  "${service_data_path:="/var/db/${service}/active/data"}" \
+  "${service_db_path:="/var/db/${service}"}" \
+  "${service_data_path:="/var/db/${service}/${package_version}/data"}" \
   "${service_log_path:="/var/log/${service}"}" \
   "${service_lock_path:="/var/lock/${service}"}" \
-  "${service_src_path:="${source_path}/${package}-${version}"}" \
+  "${service_src_path:="${source_path}/${service}-${package_version}"}" \
   "${service_config_file:="${service_config_path}/${service}.conf"}" \
   "${service_log_file:="${service_log_path}/${service}.log"}" \
   "${service_pid_file:="${service_pid_path}/${service}.pid"}" \
@@ -27,6 +27,7 @@ service_paths=(
   "${service_bin_path}"
   "${service_config_path}"
   "${service_pid_path}"
+  "${service_data_path}"
   "${service_lock_path}"
   "${service_log_path}"
 )

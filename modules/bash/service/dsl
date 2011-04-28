@@ -201,6 +201,8 @@ service_setup()
 
   user_create_if_missing "${service_user}" with group "${service_user}"
 
+  service_activate "${service}" "${package_version}"
+
   chown_paths_recursively "${service_user}:${service_user}" "${service_paths[@]}"
 
   service_install_init_d "${service}"
@@ -1310,10 +1312,24 @@ service_deactivate()
 #
 service_activate()
 {
-  local _service="${1:-"${service}"}"
+  local _service="${1:-"${service}"}" _version="${2:-${package_version}}"
 
   [[ -n "${_service}" ]] ||
     fail "service must be set or passed in in order to deactivate a service."
+
+  variables_must_be_nonempty _service _version
+
+  symlink_exists "${service_db_path}/${_service}/active" &&
+    package_deactivate "${_service}"
+
+  directory_exists "${service_db_path}/${_service}/${_version}" ||
+    log "Skipping activation of ${_service} ${_version} as '${install_path}' does not exist."
+
+  log "Activating service ${_service} version ${_version}"
+
+  link --force "${service_db_path}/${_service}/${_version}" \
+    to "${service_db_path}/${_service}/active"
+
 
   if file_exists "${init_scripts_path}/${service}"
   then
