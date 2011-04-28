@@ -250,7 +250,7 @@ service_start()
     file_is_executable "${init_scripts_path}/${service}" ||
       fail "${init_scripts_path}/${service} is missing or not executable."
 
-    "${init_scripts_path}/${service}" start
+    service_init_start
   fi
 }
 
@@ -295,7 +295,7 @@ service_stop()
     file_is_executable "${init_scripts_path}/${service}" ||
       fail "${init_scripts_path}/${service} is missing or not executable."
 
-    "${init_scripts_path}/${service}" stop
+    service_init_stop
   fi
 }
 
@@ -340,7 +340,8 @@ service_restart()
     file_is_executable "${init_scripts_path}/${service}" ||
       fail "${init_scripts_path}/${service} is missing or not executable."
 
-    "${init_scripts_path}/${service}" restart
+    service_init_stop
+    service_init_start
   fi
 }
 
