@@ -63,22 +63,21 @@ source_files()
 #
 # ##### Environmental effects
 #
-# What, if any, environmental side effects this function causes. 'None.' for none.
+# None.
 #
 # ##### Return Codes
 #
-# 0 if ...
-# 1 if ...
+# 0 for success
 #
 # ##### Failure Scenarios
 #
-# Fails if ...
+# Fails if no file names are given as arguments.
 #
 # ##### Usage Examples
 #
-#     user$ {{ setup the scenario }}
-#     user$ function_name {{ parameters }}
-#     user$ {{ demonstrate the results}}
+#     user$ nonempty_files a $HOME/.bdmsrc c
+#     /Users/wayneeseguin/.bdsmrc
+#
 nonempty_files()
 {
   local _file _files=("$@")
@@ -96,41 +95,45 @@ nonempty_files()
 }
 
 #
-# ## function_name
+# ## ensure_paths_exist
 #
-# Function Description
+# Iterates over the list of given paths, creates the directory if it
+# does not exist.
 #
 # ##### Input Parameters
 #
-# Positional Parameter listing and descriptions.
+# A list of paths to create if missing.
 #
 # ##### Stream Outputs
 #
-# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+# None.
 #
 # ##### Environmental effects
 #
-# What, if any, environmental side effects this function causes. 'None.' for none.
+# Paths that were given but do not exist will be created.
 #
 # ##### Return Codes
 #
-# 0 if ...
-# 1 if ...
+# 0 for success
 #
 # ##### Failure Scenarios
 #
-# Fails if ...
+# Fails if no paths were given to.
 #
 # ##### Usage Examples
 #
-#     user$ {{ setup the scenario }}
-#     user$ function_name {{ parameters }}
-#     user$ {{ demonstrate the results}}
+#     user$ ls -a
+#     . ..
+#     user$ ensure_paths_exist a b c
+#     user$ ls -a
+#     . .. a b c
+#
 ensure_paths_exist()
 {
   local _path _paths=("$@")
 
-  (( ${#_paths[@]} > 0 )) || fail "Cannot ensure paths exist as no paths were given."
+  (( ${#_paths[@]} > 0 )) ||
+    fail "Cannot ensure paths exist as no paths were given."
 
   for _path in "${_paths[@]}"
   do
@@ -139,41 +142,48 @@ ensure_paths_exist()
 }
 
 #
-# ## function_name
+# ## remove_files
 #
-# Function Description
+# Removes the given files, if they exist.
 #
 # ##### Input Parameters
 #
-# Positional Parameter listing and descriptions.
+# One or more file names/paths.
 #
 # ##### Stream Outputs
 #
-# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+# None.
 #
 # ##### Environmental effects
 #
-# What, if any, environmental side effects this function causes. 'None.' for none.
+# The named files will no longer exist on the system, if they existed to begin
+# with.
 #
 # ##### Return Codes
 #
-# 0 if ...
-# 1 if ...
+# 0 for success
 #
 # ##### Failure Scenarios
 #
-# Fails if ...
+# Fails if no files were named.
+# Fails if a named file is a directory.
+# Fails if a named file exists but is not a file.
 #
 # ##### Usage Examples
 #
-#     user$ {{ setup the scenario }}
-#     user$ function_name {{ parameters }}
-#     user$ {{ demonstrate the results}}
+#     user$ touch a b c
+#     user$ ls -a
+#     . .. a b c
+#     user$ remove_files a b c
+#     user$ ls
+#     . ..
+#
 remove_files()
 {
   local _file _files=("$@")
 
-  (( ${#_files[@]} > 0 )) || fail "Cannot remove files as no files were given."
+  (( ${#_files[@]} > 0 )) ||
+    fail "Cannot remove files as no files were given."
 
   for _file in "${_files[@]}" ; do
     if [[ -f "${_file}" || -L "${_file}" ]] ; then
@@ -189,7 +199,7 @@ remove_files()
 }
 
 #
-# ## function_name
+# ## remove_paths
 #
 # Function Description
 #
