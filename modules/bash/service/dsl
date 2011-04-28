@@ -201,8 +201,6 @@ service_setup()
 
   user_create_if_missing "${service_user}" with group "${service_user}"
 
-  service_activate "${service}" "${package_version}"
-
   chown_paths_recursively "${service_user}:${service_user}" "${service_paths[@]}"
 
   service_install_init_d "${service}"
@@ -815,7 +813,7 @@ service_load_conf_d()
 #
 service_install_init_d()
 {
-  local _service="${1:-}"
+  local _service="${1:-}" _version="${2:-${package_version}}"
 
   variables_must_be_nonempty _service
 
@@ -840,7 +838,7 @@ service_install_init_d()
         to "${init_scripts_path}/${_service}" mode 0755
     fi
 
-    service_activate
+    service_activate "${service}" "${package_version}"
 
     # TODO: Replace this with install_template + seed_template
     printf "%s\n" "[ -d \"${prefix_path}/${_service}/active/bin\" ] && " \
