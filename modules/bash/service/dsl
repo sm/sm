@@ -1382,7 +1382,7 @@ service_activate()
   log "Activating service ${_service} version ${_version}"
 
   link --force "${service_db_path}/${_version}" \
-    to "${service_db_path}/${_service}/active"
+    to "${service_db_path}/active"
 
 
   if file_exists "${init_scripts_path}/${service}"
