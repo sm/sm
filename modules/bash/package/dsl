@@ -499,8 +499,12 @@ package_build()
     _command="make ${make_flags[@]:-"-j$(os_cpu_count)"}"
   fi
 
-  eval "${_command}" > make.log 2>&1 ||
+  if eval "${_command}" > make.log 2>&1
+  then
+    return 0
+  else
     error "Compilation if ${package_name} ${package_version} failed! "
+  fi
 }
 
 #
@@ -540,17 +544,19 @@ package_make_install()
 {
   local _command
 
-  if [[ -n ${make_command:-} ]]
+  if [[ -n ${make_install_command:-} ]]
   then
-    _command="${make_command}"
+    _command="${make_install_command}"
   else
     _command="make ${make_install_flags[@]:-install}"
   fi
 
-  ${_command} > make.install.log 2>&1 ||
+  if ${_command} > make.install.log 2>&1
+  then
+    return 0
+  else
     error "Failed to make install of ${package_name} ${package_version} failed! "
-
-  log "Installation of ${package_name} ${package_version} was successful! "
+  fi
 }
 
 #
