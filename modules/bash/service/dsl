@@ -199,7 +199,8 @@ service_setup()
 
   ensure_paths_exist "${service_paths[@]}" "${install_path}"
 
-  user_create_if_missing "${service_user}" with group "${service_user}"
+  user_create_if_missing "${service_user}" \
+    with group "${service_user}" 2>/dev/null
 
   chown_paths_recursively "${service_user}:${service_user}" "${service_paths[@]}"
 
