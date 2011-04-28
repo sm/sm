@@ -21,14 +21,12 @@ variable_is_nonempty confd_path        || confd_path="$(confd_path)"
   "${service_config_file:="${service_config_path}/${service}.conf"}" \
   "${service_log_file:="${service_log_path}/${service}.log"}" \
   "${service_pid_file:="${service_pid_path}/${service}.pid"}" \
-  "${service_db_file:="${service_db_path}/dump.rdb"}" \
   "${service_lock_file:="${service_lock_path}/${service}.lock"}"
 
 service_paths=(
   "${service_bin_path}"
   "${service_config_path}"
   "${service_pid_path}"
-  "${service_db_path}"
   "${service_lock_path}"
   "${service_log_path}"
 )

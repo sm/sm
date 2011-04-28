@@ -433,36 +433,37 @@ link()
 }
 
 #
-# ## function_name
+# ## move_directory
 #
-# Function Description
+# Moves a directory from one location to another.
+# (This is also used to rename a directory.)
 #
 # ##### Input Parameters
 #
-# Positional Parameter listing and descriptions.
+# The first parameter is the source directory name
+# The second parameter is the target directory name
 #
 # ##### Stream Outputs
 #
-# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+# None.
 #
 # ##### Environmental effects
 #
-# What, if any, environmental side effects this function causes. 'None.' for none.
+# If successful, a directory is renamed (moved).
 #
 # ##### Return Codes
 #
-# 0 if ...
-# 1 if ...
+# 0 for success.
 #
 # ##### Failure Scenarios
 #
-# Fails if ...
+# Fails if the source directory is not specified.
+# Fails if the target directory is not specified.
 #
 # ##### Usage Examples
 #
-#     user$ {{ setup the scenario }}
-#     user$ function_name {{ parameters }}
-#     user$ {{ demonstrate the results}}
+#     user$ move_directory "freetds-0.91rc"* to "freetds-0.91"
+#
 move_directory()
 {
   local _source _target _mode _owner

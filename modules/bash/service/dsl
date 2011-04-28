@@ -681,9 +681,6 @@ service_cli()
     fi
   done
 
-  file_is_executable "${service_binary}" ||
-    fail "Could not find ${service_binary} or ${service_binary} is not executable."
-
   service_init_path
 }
 
@@ -1206,6 +1203,10 @@ service_init_d()
   enable_backtrace # Enable backtrace on script error.
 
   service_load_conf_d # Load the configuration file.
+
+  # Sanity checks go here.
+  file_is_executable "${service_binary}" ||
+    fail "Could not find ${service_binary} or ${service_binary} is not executable."
 
   service_pid
 

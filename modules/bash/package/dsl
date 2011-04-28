@@ -324,14 +324,20 @@ package_fetch()
 
   package_fetch_md5
 
-  file_matches_md5 "${package_file}" "${package_md5}" || {
-    log "${package_file} does not match md5 ${package_md5}"
+  if variable_is_nonempty package_md5
+  then
+    file_matches_md5 "${package_file}" "${package_md5}" || {
+      log "${package_file} does not match md5 ${package_md5}, removing and downloading."
 
-    remove_files "${package_file}"
+      remove_files "${package_file}"
 
+      curl -L "${package_url}" -o "${package_file}" ||
+        error "Downloading ${package_name} from '${package_url}' to '${package_file}' failed "
+    }
+  else
     curl -L "${package_url}" -o "${package_file}" ||
       error "Downloading ${package_name} from '${package_url}' to '${package_file}' failed "
-  }
+  fi
 }
 
 #
@@ -436,6 +442,13 @@ package_configure()
   else
     export PREFIX="${install_base_path}/${package_version}"
 
+    if variable_is_nonempty CFLAGS
+    then # Adjust for gcc 4.6 strictness.
+      export CFLAGS="-Wunused-but-set-variable ${CFLAGS}"
+    else
+      export CFLAGS="-Wunused-but-set-variable"
+    fi
+
     _command="./configure ${configure_flags[@]:-"--prefix=${install_path:-$prefix_path}"}"
 
     file_is_executable "configure" || return 0
@@ -488,8 +501,6 @@ package_build()
   then
     _command="${make_command}"
   else
-    # Adjust for gcc 4.6 strictness.
-    export CFLAGS="${CFLAGS} -Wunused-but-set-variable"
     _command="make ${make_flags[@]:-"-j$(os_cpu_count)"}"
   fi
 
