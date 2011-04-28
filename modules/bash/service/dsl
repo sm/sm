@@ -386,7 +386,7 @@ service_status()
     file_is_executable "${init_scripts_path}/${service}" ||
       fail "${init_scripts_path}/${service} is missing or not executable."
 
-    "${init_scripts_path}/${service}" status
+    service_init_status
   fi
 }
 
@@ -977,6 +977,52 @@ service_init_stop()
 
   return ${_result}
 }
+#
+# ### service_init_status()
+#
+# This is the generalized service init status function.
+#
+# ##### Input Parameters
+#
+# None.
+#
+# ##### Stream Outputs
+#
+# Logging telling the end user what is happening.
+#
+# ##### Environmental effects
+#
+# None.
+#
+# ##### Return Codes
+#
+# 0 for success
+#
+# ##### Failure Scenarios
+#
+# No failure conditions currently.
+#
+# ##### Usage Examples
+#
+#     user$ service_init_status
+#
+service_init_status()
+{
+  log "statusing ${service}..."
+
+  service_init_path
+
+  local _result
+
+  "${service_binary}" "${service_flags[@]}" "${service_config}"
+
+  _result=$?
+
+  (( _result != 0 )) || touch "$pidfile"
+
+  return ${_result}
+}
+
 
 #
 # ### service_init_usage()
