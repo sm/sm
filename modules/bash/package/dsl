@@ -442,13 +442,6 @@ package_configure()
   else
     export PREFIX="${install_base_path}/${package_version}"
 
-    if variable_is_nonempty CFLAGS
-    then # Adjust for gcc 4.6 strictness.
-      export CFLAGS="-Wunused-but-set-variable ${CFLAGS}"
-    else
-      export CFLAGS="-Wunused-but-set-variable"
-    fi
-
     _command="./configure ${configure_flags[@]:-"--prefix=${install_path:-$prefix_path}"}"
 
     file_is_executable "configure" || return 0
