@@ -495,7 +495,7 @@ package_build()
     _command="${make_command}"
   else
     # Adjust for gcc 4.6 strictness.
-    if variable_is_nonempty
+    if variable_is_nonempty CFLAGS
     then
       export CFLAGS="-Wunused-but-set-variable ${CFLAGS}"
     else
