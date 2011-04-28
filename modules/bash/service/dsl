@@ -963,17 +963,21 @@ service_init_start()
 #
 service_init_stop()
 {
+  local _result=0
+
   service_init_path
 
-  (( service_pid > 0 )) || error "Service pid has not been set or is zero."
+  (( service_pid > 0 )) ||
+    error "Service pid has not been set or is zero."
 
   log "Stopping ${service}..."
 
-  kill -QUIT ${service_pid}
+  kill -QUIT "${service_pid}" || _result=$?
 
-  _result=$?
-
-  (( _result != 0 )) || rm -f "$pidfile"
+  if (( _result > 0 ))
+  then
+    rm -f "$pidfile"
+  fi
 
   return ${_result}
 }
