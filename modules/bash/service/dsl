@@ -921,18 +921,16 @@ service_init_start()
 
   service_init_path
 
-  local _result
+  local _result=0
 
   if array_is_nonempty service_flags
   then
-    "${service_binary}" "${service_flags[@]}" "${service_config_file}"
+    "${service_binary}" "${service_flags[@]}" "${service_config_file}" || result=$?
   else
-    "${service_binary}" "${service_config_file}"
+    "${service_binary}" "${service_config_file}" || result=$?
   fi
 
-  _result=$?
-
-  (( _result != 0 )) || touch "$pidfile"
+  (( _result > 0 )) || touch "$service_pid_file"
 
   return ${_result}
 }
@@ -981,7 +979,7 @@ service_init_stop()
 
   if (( _result > 0 ))
   then
-    rm -f "$pidfile"
+    rm -f "$service_pid_file"
   fi
 
   return ${_result}
@@ -1027,7 +1025,7 @@ service_init_status()
 
   _result=$?
 
-  (( _result != 0 )) || touch "$pidfile"
+  (( _result != 0 )) || touch "$service_pid_file"
 
   return ${_result}
 }
