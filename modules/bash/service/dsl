@@ -923,7 +923,12 @@ service_init_start()
 
   local _result
 
-  "${service_binary}" "${service_flags[@]}" "${service_config}"
+  if array_is_nonempty service_flags
+  then
+    "${service_binary}" "${service_flags[@]}" "${service_config_file}"
+  else
+    "${service_binary}" "${service_config_file}"
+  fi
 
   _result=$?
 
@@ -1018,7 +1023,7 @@ service_init_status()
 
   local _result
 
-  "${service_binary}" "${service_flags[@]}" "${service_config}"
+  "${service_binary}" "${service_flags[@]}" "${service_config_file}"
 
   _result=$?
 
