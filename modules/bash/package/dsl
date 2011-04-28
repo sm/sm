@@ -220,9 +220,9 @@ package_install()
     "${package_name}_postinstall"
   fi
 
-  package_setup
-
   package_activate_if_first "${package_name}" "${package_version}"
+
+  package_setup
 
   if module_is_loaded "service"
   then
@@ -642,7 +642,7 @@ package_activate()
 #
 package_setup()
 {
-  local _package="${1:-}"
+  local _package="${1:-${package_name}}"
 
   package_ldconfig "${_package}"
 
@@ -795,7 +795,7 @@ package_activate_if_first()
 #
 package_ldconfig()
 {
-  local _package="${1:-}" _path _files
+  local _package="${1:-${package_name}}" _path _files
 
   variables_must_be_nonempty _package
 
@@ -861,7 +861,7 @@ package_ldconfig()
 #
 package_profile_d()
 {
-  local _package="${1:-}"
+  local _package="${1:-${package_name}}"
 
   variables_must_be_nonempty _package
 
@@ -1245,7 +1245,7 @@ package_cli()
 #
 package_is_active()
 {
-  local _name="${1:-}"
+  local _name="${1:-${package_name}}"
   [[ -n "${_name}" ]] ||
     fail "Can not query if a package is active as no package name was given or name is empty."
 
