@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-modules system
+modules system array
 
 variable_is_nonempty init_scripts_path || init_scripts_path="$(init_scripts_path)"
 variable_is_nonempty confd_path        || confd_path="$(confd_path)"
@@ -38,3 +38,4 @@ then
 else
   service_pid=0
 fi
+
