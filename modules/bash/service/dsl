@@ -1317,15 +1317,15 @@ service_activate()
 
   variables_must_be_nonempty _service _version
 
-  symlink_exists "${service_db_path}/${_service}/active" &&
+  symlink_exists "${service_db_path}/active" &&
     package_deactivate "${_service}"
 
-  directory_exists "${service_db_path}/${_service}/${_version}" ||
+  directory_exists "${service_db_path}/${_version}" ||
     log "Skipping activation of ${_service} ${_version} as '${install_path}' does not exist."
 
   log "Activating service ${_service} version ${_version}"
 
-  link --force "${service_db_path}/${_service}/${_version}" \
+  link --force "${service_db_path}/${_version}" \
     to "${service_db_path}/${_service}/active"
 
 
