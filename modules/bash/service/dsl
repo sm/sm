@@ -977,7 +977,7 @@ service_init_stop()
 
   kill -QUIT "${service_pid}" || _result=$?
 
-  if (( _result > 0 ))
+  if (( _result == 0 ))
   then
     rm -f "$service_pid_file"
   fi
