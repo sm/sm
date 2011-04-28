@@ -7,7 +7,7 @@ variable_is_nonempty confd_path        || confd_path="$(confd_path)"
 
 : \
   "${service:="${extension}"}" \
-  "${service_user:="${service}"}" \
+  "${service_user:="${package_user:-"${service}"}"}" \
   "${prefix_path:="/usr/local/${service}/active"}" \
   "${service_binary:="${prefix_path}/bin/${service}"}" \
   "${service_bin_path:="${install_path}/bin"}" \
