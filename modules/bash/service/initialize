@@ -34,7 +34,7 @@ service_paths=(
 
 if file_is_nonempty "${service_pid_file}"
 then
-  read -r service_pid "${service_pid_file}"
+  read -r service_pid < "${service_pid_file}"
 else
   service_pid=0
 fi
