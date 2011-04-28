@@ -808,12 +808,12 @@ package_ldconfig()
     if os_is_linux
     then
       log "Updating ldconfig for ${_package}"
-      ensure_paths_exist "/etc/ld.so.profile.d"
+      ensure_paths_exist "/etc/ld.so.conf.d"
 
       printf "%s\n" "${prefix_path}/${_package}/active/lib" \
-        > "/etc/ld.so.profile.d/${_package}.conf"
+        > "/etc/ld.so.conf.d/${_package}.conf"
 
-      chmod_files 0644 "/etc/ld.so.profile.d/${_package}.conf"
+      chmod_files 0644 "/etc/ld.so.conf.d/${_package}.conf"
 
       ldconfig
     elif os_is_darwin
