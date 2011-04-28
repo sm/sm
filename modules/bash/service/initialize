@@ -1,4 +1,4 @@
-#!/usr/local/bin bash
+#!/usr/bin/env bash
 
 modules system
 
@@ -32,3 +32,9 @@ service_paths=(
   "${service_log_path}"
 )
 
+if file_is_nonempty "${service_pid_file}"
+then
+  read -r service_pid "${service_pid_file}"
+else
+  service_pid=0
+fi
