@@ -43,18 +43,26 @@
 #
 extension_action()
 {
+  local result=0
+
   unset extension action
-  result=0
-  export extension="${1:-}" ; shift
-  export action="${1:-}" ; shift
-  export extension_args="${extension_args:-$@}"
+
+  export extension="${1:-}"
 
   [[ -n "${extension}" ]] ||
     fail "'extension' is not set! Something has gone terribly wrong."
 
+  shift
+
+  export action="${1:-}"
+
   [[ -n "${action}" ]] ||
     fail "'action' is not set! Something has gone terribly wrong."
-  (
+
+  shift
+
+  export extension_args="${extension_args:-$@}"
+
   extension_path="$extensions_path/$extension"
   extension_config_path="$extensions_path/$extension/config"
   extension_templates_path="$extensions_path/$extension/templates"
@@ -125,7 +133,7 @@ extension_action()
         action_type="noexec"
       fi
       ;;
-  esac
+  esac || result=$?
 
   # Now based on the determined action_type we launch the extension.
   case "${action_type}" in
@@ -166,9 +174,7 @@ extension_action()
     binary|*)
       "${action_file}" "${extension_action}" "${extension_args[@]}"
       ;;
-  esac
-  # exit $result
-  ) || result=$?
+  esac || result=$?
 
   return $result
 }
