@@ -499,7 +499,7 @@ package_build()
     _command="make ${make_flags[@]:-"-j$(os_cpu_count)"}"
   fi
 
-  ${_command} > make.log 2>&1 ||
+  eval "${_command}" > make.log 2>&1 ||
     error "Compilation if ${package_name} ${package_version} failed! "
 }
 
