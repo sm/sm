@@ -6,19 +6,21 @@ bdsm_development_setup()
 
   true "${projects_path:="$HOME/projects"}"
 
+  log "\nBDSM Development Environment Setup\n"
+
   if file_contains "$HOME/.bash_profile" "projects_path="
   then
-    log "projects_path is set in $HOME/.bash_profile."
+    log "* projects_path is already set in $HOME/.bash_profile."
   else
     echo 'export projects_path="$HOME/projects"' >> "$HOME/.bash_profile"
-    log "projects_path is now set in $HOME/.bash_profile."
+    log "* Setting projects_path in $HOME/.bash_profile."
   fi
 
   if file_contains "$HOME/.bash_profile" "modules/bash/project/interactive"
   then
-    log "BDSM project functions are setup in $HOME/.bash_profile."
+    log "* project functions are setup in $HOME/.bash_profile."
   else
-    log "BDSM project functions are now setup in $HOME/.bash_profile."
+    log "* project functions are now setup in $HOME/.bash_profile."
     echo '[[ -s "/usr/local/bdsm/modules/bash/project/interactive" ]] && source "/usr/local/bdsm/modules/bash/project/interactive"' >> "$HOME/.bash_profile"
   fi
 
@@ -29,20 +31,21 @@ bdsm_development_setup()
 
   for _component in core extensions site
   do
+    "Setting up ${_component} component"
     if file_contains "$HOME/.bdsmrc" "${_component}_development_path"
     then
-      log "${_component}_development_path is set in .bdsmrc"
+      log "${_component}_development_path is already set in .bdsmrc"
     else
       echo "export ${_component}_development_path=\"${projects_path}/bdsm/${_component}\"" \
         >> "$HOME/.bdsmrc"
-      log "${_component}_development_path is now set in .bdsmrc"
+      log "Setting ${_component}_development_path in .bdsmrc"
     fi
 
     if directory_exists "${_component}"
     then
-      log "BDSM Core repository already exists at $PWD/${_component}/"
+      log "* Core repository already exists at $PWD/${_component}/"
     else
-      log "Cloning BDSM Core repository into $PWD/${_component}/"
+      log "* Cloning Core repository into $PWD/${_component}/"
       git clone https://github.com/wayneeseguin/bdsm ${_component}
     fi
   done
