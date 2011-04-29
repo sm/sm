@@ -31,7 +31,7 @@ bdsm_development_setup()
 
   for _component in core extensions site
   do
-    "Setting up ${_component} component"
+    log "Setting up ${_component} component"
     if file_contains "$HOME/.bdsmrc" "${_component}_development_path"
     then
       log "${_component}_development_path is already set in .bdsmrc"
