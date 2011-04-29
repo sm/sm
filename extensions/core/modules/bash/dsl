@@ -8,7 +8,7 @@ bdsm_development_setup()
 
   true "${projects_path:="$HOME/projects"}"
 
-  log "\nBDSM Development Environment Setup"
+  log "\nBDSM development environment setup"
 
   log "\n=> configuration\n${_separator// /=}"
 
@@ -68,7 +68,7 @@ bdsm_development_setup()
     fi
   done
 
-  printf "\n"
+  log "\nBDSM development environment setup has completed."
 }
 
 bdsm_development_update()
