@@ -2,13 +2,15 @@
 
 bdsm_development_setup()
 {
-  local _component
+  local _component _separator
+
+  printf -v _separator '%*s' "${_columns:-${COLUMNS:-80}}"
 
   true "${projects_path:="$HOME/projects"}"
 
-  log "\nBDSM Development Environment Setup\n"
+  log "\nBDSM Development Environment Setup"
 
-  log "\nConfiguration"
+  log "\n=> configuration\n${_separator// /=}"
 
   if file_contains "$HOME/.bash_profile" "projects_path="
   then
@@ -33,7 +35,7 @@ bdsm_development_setup()
 
   for _component in core extensions site
   do
-    log "\n${_component} component setup"
+    log "\n=> ${_component}\n${_separator// /=}"
     if file_contains "$HOME/.bdsmrc" "${_component}_development_path"
     then
       log "  * ${_component}_development_path is already set in .bdsmrc"
@@ -45,12 +47,14 @@ bdsm_development_setup()
 
     if directory_exists "${_component}"
     then
-      log "  * Core repository already exists at $PWD/${_component}/"
+      log "  * Repository already exists at $PWD/${_component}/"
     else
       log "  * Cloning Core repository into $PWD/${_component}/"
       git clone https://github.com/wayneeseguin/bdsm ${_component}
     fi
   done
+
+  printf "\n"
 }
 
 bdsm_development_update()
