@@ -449,17 +449,15 @@ backtrace()
   done
 
   case "${EDITOR:-}" in
-    (*vim*|*emacs*)
-      _format=" %-$((${#_largest} + 2))s $ %${#EDITOR}s +%-$((${#_digits}))s %-$((${#_longest} + 2))s %s\n"
-      printf "${_format}" "function()" ' ' "#" "source file"  1>&2
+    (mvim*|mate*)
+      #_format=" %-$((${#_largest} + 2))s %-$((${#EDITOR} + ${#_digits} + 19 + ${#_longest}))s\n"
+      _format="%-$((${#_largest} + 2))s %-s\n"
+      printf "${_format}" "function()" "Source"  1>&2
       ;;
-    (mate*)
-      _format=" %-$((${#_largest} + 2))s $ %${#EDITOR}s -l %-$((${#_digits}))s %-$((${#_longest} + 2))s %s\n"
+    (vi*|gvim*|emacs*|*)
+      _format="%-$((${#_largest} + 2))s $ %${#EDITOR}s +%-$((${#_digits}))s %-$((${#_longest} + 2))s %s\n"
       printf "${_format}" "function()" ' ' "#" "source file"  1>&2
-      ;;
-    (*)
-      _format=" %-$((${#_largest} + 2))s %-$((${#_longest} + 2))s %s\n"
-      printf "${_format}" "Function()" "Source File"  1>&2
+
       ;;
   esac
 
@@ -472,11 +470,11 @@ backtrace()
     _line=${BASH_LINENO[$(( _index - 1 ))]}
 
     case "${EDITOR:-}" in
-      (*vim*|*emacs*|mate*)
-        printf "${_format}" "${_function}" "${EDITOR}" "${_line}" "${_source} " 1>&2
+      (mvim*|mate*)
+        printf "${_format}" "${_function}" "${EDITOR// *}://open?url=file://${_source}&line=${_line}" 1>&2
         ;;
-      (*)
-        printf "${_format}" "${_function}" "${_line}" "${_source} " 1>&2
+      (vi*|gvim*|emacs*|*)
+        printf "${_format}" "${_function}" "${EDITOR}" "${_line}" "${_source} " 1>&2
         ;;
     esac
   done
