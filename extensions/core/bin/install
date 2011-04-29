@@ -88,7 +88,6 @@ export PATH
 if [ -n "\${BASH_VERSION:-}" -o -n "\${ZSH_VERSION:-}" ] ; then builtin hash -r ;  fi
 Code
   fi
-  set +x
 fi
 
 succeed "\nInstallation of BDSM is complete\n"

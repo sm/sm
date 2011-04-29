@@ -23,6 +23,7 @@ bdsm_development_setup()
   fi
 
   ensure_paths_exist "${projects_path}/bdsm"
+  ensure_files_exist "${HOME}/.bdsmrc"
 
   enter "${projects_path}/bdsm"
 
