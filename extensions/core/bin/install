@@ -66,7 +66,6 @@ fi
 
 if user_is_root
 then
-  set -x
   if os_is_darwin
   then
     if ! file_contains /etc/profile '/etc/profile.d/'
