@@ -4,16 +4,31 @@ modules help
 
 description "BDSM Extension manager."
 
-actions "  update repository - Update main BDSM Extension repository from remote (git).
-  install        - install named extension
-  create         - create a new extension from the default template in the current directory.
-  list available - List extensions available in the main repository.
-  list installed - List all installed extensions.
-  update X       - update extension X
-  update all     - update all installed extensions
-"
+action "update repository" \
+  "Update main BDSM Extension repository from remote (git)."
 
-resources "http://bdsm.beginrescueend.com/${extension}/"
+action "install" \
+  "install named extension"
+
+action "create" \
+  "create a new extension from the default template in the current directory."
+
+action "list available" \
+  "List extensions available in the main repository."
+
+action "list" \
+  "List all installed extensions."
+
+action "list installed" \
+  "List all installed extensions."
+
+action "update {name {...}}" \
+  "update extension(s) {name {...}}"
+
+action "update all" \
+  "update all installed extensions"
+
+resource "http://bdsm.beginrescueend.com/${extension}/"
 
 show_help usage
 

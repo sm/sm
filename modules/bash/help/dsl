@@ -120,7 +120,51 @@ description()
 actions()
 {
   [[ -n "$*" ]] || fail "No help actions were given."
+  warn "help actions() is depreciated, use action() instead for each action."
   help_actions="$*"
+}
+
+#
+# ### action()
+#
+# Adds an action definition for help output.
+#
+# ##### Input Parameters
+#
+# First parameter is the name of the extension action
+# Second parameter is the description of the extension action
+#
+# ##### Stream Outputs
+#
+# None.
+#
+# ##### Environmental effects
+#
+# The action description will be stored for use on help output.
+#
+# ##### Return Codes
+#
+# 0 for success.
+#
+# ##### Failure Scenarios
+#
+# Fails if an action name is not given.
+# Fails if a description is not provided.
+#
+# ##### Usage Examples
+#
+#     user$ action "install"  "Installs the extension..."
+#
+action()
+{
+  local _name="${1:-}"
+  local _description="${2:-}"
+
+  [[ -n "${_name}" && -n "${_description}" ]] ||
+    fail "An action and a description must be provided:\naction {name} {description}"
+
+  help_names+=( "${_name}" )
+  help_descriptions+=( "${_description}" )
 }
 
 #
@@ -194,9 +238,9 @@ dependencies()
 }
 
 #
-# ### resources()
+# ### resource()
 #
-# Specify content for the resources section of the help command.
+# Add a resource for the Resources section of the help command.
 #
 # ##### Input Parameters
 #
@@ -221,11 +265,168 @@ dependencies()
 #
 # ##### Usage Examples
 #
-#     user$ resources "website: ..."
+#     user$ resource "website: ..."
 #
-resources() {
-  help_resources="$*"
+resource()
+{
+  help_resources+=("$*")
 }
+
+#
+# ### help_actions()
+#
+# Outputs the help actions in a formatted manner.
+# Outputs a message if there are no actions.
+#
+# ##### Input Parameters
+#
+# None.
+#
+# ##### Stream Outputs
+#
+# Prints a formatted listing of the actions and their descriptions to the
+# calling environments STDOUT.
+#
+# ##### Environmental effects
+#
+# None.
+#
+# ##### Return Codes
+#
+# 0 for success
+#
+# ##### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ##### Usage Examples
+#
+#     user$ cat $HOME/test
+#     #!/usr/bin/env bash
+#     source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
+#     modules help
+#
+#     action "help" "Displays the help output for the ${extension} extension"
+#     action "install" "Installs Z redis package"
+#     action "uninstall" "Uninstalls Z redis package"
+#
+#     help_actions
+#
+#     user$ "$HOME/test"
+#     help      - Displays the help output for the redis extension
+#     install   - Installs Z redis package
+#     uninstall - Uninstalls Z redis package
+#
+help_actions()
+{
+  local _largest _index
+
+  if (( ${#help_names[@]} > 0 ))
+  then
+    _largest=$( array_largest help_names ) # Use the array DSL to grab largest
+    _largest=$(( ${#_largest} + 1 ))
+
+    for (( _index=0 ; _index < ${#help_names[@]} ; _index++ ))
+    do
+      printf "%-${_largest}s - %s\n" \
+        "${help_names[${_index}]}" "${help_descriptions[${_index}]}"
+    done
+  else
+    log "# No help definitions exist for ${extension} actions ."
+  fi
+}
+
+#
+# ### help_notes()
+#
+# Outputs the help notes in a formatted manner.
+# Outputs a message if there are no notes.
+#
+# ##### Input Parameters
+#
+# None.
+#
+# ##### Stream Outputs
+#
+# Prints a formatted listing of the notes to the calling environments STDOUT.
+#
+# ##### Environmental effects
+#
+# None.
+#
+# ##### Return Codes
+#
+# 0 for success
+#
+# ##### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ##### Usage Examples
+#
+#     user$ cat $HOME/test
+#     #!/usr/bin/env bash
+#     source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
+#     modules help
+#
+#     note "Don't forget the milk! "
+#     note "... and cookies... mmm...."
+#
+#     help_notes
+#
+#     user$ "$HOME/test"
+#     * Don't forget the milk!
+#     * ... and cookies... mmm....
+#
+help_notes()
+{
+  local _index
+
+  if (( ${#help_names[@]} > 0 ))
+  then
+    for (( _index=0 ; _index < ${#help_notes[@]} ; _index++ ))
+    do
+      printf " * %s\n" "${help_notes[${_index}]}"
+    done
+  else
+    log "# No help notes exist for ${extension} actions ."
+  fi
+}
+
+#
+# ### help_section()
+#
+# Displays a help section header.
+#
+# ##### Input Parameters
+#
+# None.
+#
+# ##### Stream Outputs
+#
+# Prints the given string as a help section header.
+#
+# ##### Environmental effects
+#
+# None.
+#
+# ##### Return Codes
+#
+# 0 for success
+#
+# ##### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ##### Usage Examples
+#
+#     user$ help_section Usage
+#
+help_section()
+{
+  log "\n$*\n"
+}
+
 
 #
 # ### usage()
@@ -262,28 +463,31 @@ usage()
 
   log "\nbdsm ${bdsm_version} https://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)"
 
-  log "\nUsage\n\n    bdsm ${extension} <action> <<arguments>>"
+  help_section Usage
+  log "  bdsm ${extension} {action} [arguments...]"
 
-  [[ -z "${help_description}" ]] ||
-    log "\nDescription\n    BDSM ${help_description}"
+  help_section Description
+  help_description
 
-  log "\nActions"
-  [[ -z "${help_actions}" ]] ||
-    log "${help_actions}"
+  help_section Actions
+  help_actions
 
-  [[ -z "${help_notes}" ]] ||
-    log "\nNotes\n${help_notes}"
+  help_section Notes
+  help_notes
 
-  [[ -z "${help_dependencies}" ]] ||
-    log "\nDependencies\n${help_dependencies}"
+  secthelp_ion Dependencies
+  help_dependencies
 
-  [[ -z "${help_resources}" ]] ||
-    log "\nResources\n${help_resources}"
+  help_section Resources
+  help_resources
 
-  if [[ "${extension}" = "core" || "${extension}" = "<extension>" ]]
-  then
-    log "\nExtensions Installed\n\n  $(extensions_installed)"
-    log "\nExtensions Available\n\n  $(extensions_available)"
-  fi
+  case "${extension}" in
+    core|<extension>)
+      section "Installed Extensions"
+      extensions_installed
+
+      section "Available Extensions"
+      extensions_available
+      ;;
+  esac
 }
-

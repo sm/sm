@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
-(( ${#extension_args[@]} > 0 )) || fail "An extension name must be specified."
+if (( ${#extension_args[@]} == 0 ))
+then
+  fail "An extension name must be specified."
+fi
 
 printf "${extensions_development_path}/${extension_args[0]}/"

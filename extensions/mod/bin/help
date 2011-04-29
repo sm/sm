@@ -4,14 +4,23 @@ modules help
 
 description "BDSM Extension manager."
 
-actions "  update repository - Update main BDSM Extension repository from remote (git).
-  install        - install named extension
-  create         - create a new extension from the default template in the current directory.
-  list available - List extensions available in the main repository.
-  list installed - List all installed extensions.
-  update X       - update extension X
-  update all     - update all installed extensions
-"
+action "create {name}" \
+  "Create a named module. Use --language {name} to specify the language."
+
+action "list" \
+  "List all modules installed in the system."
+
+action "docgen" \
+  "Generate module documentation from the system installed BDSM instance into content/modules/."
+
+action "src" \
+  "Prints out the modules source directory."
+
+action "open" \
+  "Opens the modules directory in the filesystem browser."
+
+action "dsl" \
+  "Prints out a summary listing of dsl functions by module."
 
 resources "http://bdsm.beginrescueend.com/${extension}/"
 

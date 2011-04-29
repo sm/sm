@@ -1,2 +1,7 @@
 #!/usr/bin/env bash
 
+modules array
+
+declare -a help_names
+declare -a help_descriptions
+

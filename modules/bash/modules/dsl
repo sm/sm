@@ -231,9 +231,12 @@ modules_installed()
 #
 module_dsl()
 {
-  local _function _dsl _module="${1:-}"
+  local _function _dsl _modules="${@:-}"
 
-  [[ -n "${_module}" ]] || fail "... module not given"
+  if (( ${#_modules[@]} == 0 ))
+  then
+    fail "Cannot print the DSL for module(s) as no module names were given."
+  fi
 
   local _path="${modules_path}/bash/${_module}"
 
