@@ -2,7 +2,7 @@
 
 bdsm_development_setup()
 {
-  local _component _separator
+  local _component _separator _string
 
   printf -v _separator '%*s' "${_columns:-${COLUMNS:-80}}"
 
@@ -50,7 +50,21 @@ bdsm_development_setup()
       log "  * Repository already exists at $PWD/${_component}/"
     else
       log "  * Cloning Core repository into $PWD/${_component}/"
-      git clone https://github.com/wayneeseguin/bdsm ${_component}
+      case ${_component} in
+        core)
+          _url="https://github.com/wayneeseguin/bdsm"
+          ;;
+        *)
+          _url="https://github.com/wayneeseguin/bdsm-${_component}"
+          ;;
+      esac
+
+      if git clone ${_url} ${_component}
+      then
+        log "  * ${_component} repository successfully cloned into $PWD/${_component}/"
+      else
+        error "There was an error cloning ${_component} repository from ${_url} into ${PWD}/${_component}"
+      fi
     fi
   done
 
