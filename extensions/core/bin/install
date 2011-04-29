@@ -85,7 +85,7 @@ then
 PATH="\$(printf "\$PATH" | awk -v RS=: -v ORS=: '!(\$0 in a){a[\$0];print}')"
 PATH="\${PATH/%:/}" # Strip trailing : if it exists
 export PATH
-if [ -n \${BASH_VERSION:-} -o \${ZSH_VERSION} ] ; then builtin hash -r ;  fi
+if [ -n "\${BASH_VERSION:-}" -o "\${ZSH_VERSION:-}" ] ; then builtin hash -r ;  fi
 Code
   fi
   set +x
