@@ -8,19 +8,21 @@ bdsm_development_setup()
 
   log "\nBDSM Development Environment Setup\n"
 
+  log "\nConfiguration"
+
   if file_contains "$HOME/.bash_profile" "projects_path="
   then
-    log "* projects_path is already set in $HOME/.bash_profile."
+    log "  * projects_path is already set in $HOME/.bash_profile."
   else
     echo 'export projects_path="$HOME/projects"' >> "$HOME/.bash_profile"
-    log "* Setting projects_path in $HOME/.bash_profile."
+    log "  * Setting projects_path in $HOME/.bash_profile."
   fi
 
   if file_contains "$HOME/.bash_profile" "modules/bash/project/interactive"
   then
-    log "* project functions are setup in $HOME/.bash_profile."
+    log "  * project functions are setup in $HOME/.bash_profile."
   else
-    log "* project functions are now setup in $HOME/.bash_profile."
+    log "  * project functions are now setup in $HOME/.bash_profile."
     echo '[[ -s "/usr/local/bdsm/modules/bash/project/interactive" ]] && source "/usr/local/bdsm/modules/bash/project/interactive"' >> "$HOME/.bash_profile"
   fi
 
@@ -31,10 +33,10 @@ bdsm_development_setup()
 
   for _component in core extensions site
   do
-    log "Setting up ${_component} component"
+    log "\n${_component} component setup"
     if file_contains "$HOME/.bdsmrc" "${_component}_development_path"
     then
-      log "${_component}_development_path is already set in .bdsmrc"
+      log "  * ${_component}_development_path is already set in .bdsmrc"
     else
       echo "export ${_component}_development_path=\"${projects_path}/bdsm/${_component}\"" \
         >> "$HOME/.bdsmrc"
@@ -43,9 +45,9 @@ bdsm_development_setup()
 
     if directory_exists "${_component}"
     then
-      log "* Core repository already exists at $PWD/${_component}/"
+      log "  * Core repository already exists at $PWD/${_component}/"
     else
-      log "* Cloning Core repository into $PWD/${_component}/"
+      log "  * Cloning Core repository into $PWD/${_component}/"
       git clone https://github.com/wayneeseguin/bdsm ${_component}
     fi
   done
@@ -58,7 +60,8 @@ bdsm_development_update()
 
 bdsm_version()
 {
-  if file_is_nonempty "$bdsm_path/VERSION" ; then
+  if file_is_nonempty "$bdsm_path/VERSION"
+  then
     read -r bdsm_version < "$bdsm_path/VERSION"
   else
     bdsm_version="?.?.?"
