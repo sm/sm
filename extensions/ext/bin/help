@@ -28,7 +28,7 @@ action "update {name {...}}" \
 action "update all" \
   "update all installed extensions"
 
-resource "http://bdsm.beginrescueend.com/${extension}/"
+resource "http://bdsm.beginrescueend.com/extensions/"
 
 show_help usage
 

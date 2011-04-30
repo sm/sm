@@ -482,7 +482,7 @@ modules_docgen()
     ensure_paths_exist "${site_development_path}/content/modules/bash/${name}"
 
     log "Building ${name} dsl from generated docs."
-    cat > "${site_development_path}/content/modules/bash/${name}/dsl.haml" <<HEADER
+    cat > "${site_development_path}/content/modules/bash/${name}/dsl.haml" <<Header
 .breadcrumbs
   %a{ :href => "/" }
     Documentation
@@ -503,12 +503,13 @@ modules_docgen()
 %h1
   Module ${name}
 
-HEADER
+Header
     cat $file >> "${site_development_path}/content/modules/bash/${name}/dsl.haml"
     )&
   done
 
   wait
+
   log "Module documentation has been generated from the source code path ${core_development_path} into the site development path ${site_development_path}"
 }
 

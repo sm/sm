@@ -32,9 +32,10 @@ notes="
    - curl
    - rsync
 
-  http://bdsm.beginrescueend.com/
-  https://www.pivotaltracker.com/projects/26822
 "
+
+resource "http://bdsm.beginrescueend.com/"
+resource "https://www.pivotaltracker.com/projects/26822"
 
 show_help usage
 

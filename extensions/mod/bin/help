@@ -22,7 +22,7 @@ action "open" \
 action "dsl" \
   "Prints out a summary listing of dsl functions by module."
 
-resources "http://bdsm.beginrescueend.com/${extension}/"
+resource "http://bdsm.beginrescueend.com/modules/"
 
 show_help usage
 
