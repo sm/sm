@@ -5,3 +5,4 @@ extensions_repository_url=git://github.com/wayneeseguin/bdsm-extensions
 service_url=https://bdsm.beginrescueend.com/services
 bdsm_repo_url=git://github.com/wayneeseguin/bdsm
 service_repo_url=git://github.com/wayneeseguin/bdsm-services
+website_url=https://bdsm.beginrescueend.com/

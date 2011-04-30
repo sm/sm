@@ -138,6 +138,9 @@ do
 
             ext|extension|extensions)
               extension="ext"
+              action="${1:-help}"
+              extension_args=("$@")
+              parse_break=1
               ;;
 
             mod|module|modules)
@@ -161,7 +164,6 @@ do
               parse_break=1
               ;;
 
-
             edit|open|update|create)
               extension="ext"
               action="${token}"
@@ -170,7 +172,8 @@ do
               ;;
 
             *)
-              [[ -z "${extension}" ]] || error "Extension '${token}' not found"
+              [[ -z "${extension}" ]] ||
+                error "Extension '${token}' not found"
               ;;
           esac
         fi
