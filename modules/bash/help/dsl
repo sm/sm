@@ -83,9 +83,53 @@ show_help()
 #
 description()
 {
-  [[ -n "$*" ]] || fail "No help description was given."
+  [[ -n "$*" ]] || fail "Cannot add description to help as no help description was given."
 
-  help_description="$*"
+  help_descriptions+=("$*")
+}
+
+#
+# ### help_description()
+#
+# Outputs the collected help description.
+#
+# ##### Input Parameters
+#
+# None.
+#
+# ##### Stream Outputs
+#
+# Prints the help description output.
+#
+# ##### Environmental effects
+#
+# None.
+#
+# ##### Return Codes
+#
+# 0 for success.
+#
+# ##### Failure Scenarios
+#
+# None.
+#
+# ##### Usage Examples
+#
+#     user$ description "This extension handles X Y and Z."
+#
+help_description()
+{
+  local _description
+
+  if (( ${#help_descriptions[@]} > 0 ))
+  then
+    help_section "Description"
+
+    for _description in "${help_descriptions[@]}"
+    do
+      printf "  %s\n" "${_description}"
+    done
+  fi
 }
 
 #
@@ -163,8 +207,8 @@ action()
   [[ -n "${_name}" && -n "${_description}" ]] ||
     fail "An action and a description must be provided:\naction {name} {description}"
 
-  help_names+=( "${_name}" )
-  help_descriptions+=( "${_description}" )
+  help_action_names+=( "${_name}" )
+  help_action_descriptions+=( "${_description}" )
 }
 
 #
@@ -321,18 +365,20 @@ help_actions()
 {
   local _largest _index
 
-  if (( ${#help_names[@]} > 0 ))
+  if (( ${#help_action_names[@]} > 0 ))
   then
-    _largest=$( array_largest help_names ) # Use the array DSL to grab largest
+    _largest=$( array_largest help_action_names ) # Use the array DSL to grab largest
     _largest=$(( ${#_largest} + 1 ))
 
-    for (( _index=0 ; _index < ${#help_names[@]} ; _index++ ))
+    help_section "Actions"
+
+    for (( _index=0 ; _index < ${#help_action_names[@]} ; _index++ ))
     do
-      printf "%-${_largest}s - %s\n" \
-        "${help_names[${_index}]}" "${help_descriptions[${_index}]}"
+      printf "  %-$((_largest + 2))s - %s\n" \
+        "${help_action_names[${_index}]}" "${help_action_descriptions[${_index}]}"
     done
   else
-    log "# No help definitions exist for ${extension} actions ."
+    log "# No help has been defined for ${extension} actions ."
   fi
 }
 
@@ -382,14 +428,100 @@ help_notes()
 {
   local _index
 
-  if (( ${#help_names[@]} > 0 ))
+  if (( ${#help_notes[@]} > 0 ))
   then
+    help_section "Notes"
+
     for (( _index=0 ; _index < ${#help_notes[@]} ; _index++ ))
     do
-      printf " * %s\n" "${help_notes[${_index}]}"
+      printf "  * %s\n" "${help_notes[${_index}]}"
     done
-  else
-    log "# No help notes exist for ${extension} actions ."
+  fi
+}
+
+#
+# ### help_dependencies()
+#
+# Outputs the help dependencies in a formatted manner.
+#
+# ##### Input Parameters
+#
+# None.
+#
+# ##### Stream Outputs
+#
+# Prints a formatted listing of the current extensions defined dependencies to
+# the calling environments STDOUT.
+#
+# ##### Environmental effects
+#
+# None.
+#
+# ##### Return Codes
+#
+# 0 for success
+#
+# ##### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ##### Usage Examples
+help_dependencies()
+{
+  local _index
+
+  if (( ${#help_dependencies[@]} > 0 ))
+  then
+    help_section "Dependencies"
+
+    for (( _index=0 ; _index < ${#help_dependencies[@]} ; _index++ ))
+    do
+      printf " * %s\n" "${help_dependencies[${_index}]}"
+    done
+  fi
+}
+
+#
+# ### help_resources()
+#
+# Outputs the help notes in a formatted manner.
+# Outputs a message if there are no notes.
+#
+# ##### Input Parameters
+#
+# None.
+#
+# ##### Stream Outputs
+#
+# Prints a formatted listing of the defined resources to the calling
+# environments STDOUT.
+#
+# ##### Environmental effects
+#
+# None.
+#
+# ##### Return Codes
+#
+# 0 for success
+#
+# ##### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ##### Usage Examples
+#
+help_resources()
+{
+  local _index
+
+  if (( ${#help_resources[@]} > 0 ))
+  then
+    help_section "Resources"
+
+    for (( _index=0 ; _index < ${#help_resources[@]} ; _index++ ))
+    do
+      printf " * %s\n" "${help_resources[${_index}]}"
+    done
   fi
 }
 
@@ -427,6 +559,41 @@ help_section()
   log "\n$*\n"
 }
 
+#
+# ### help_usage()
+#
+# Display the CLI signature.
+#
+# ##### Input Parameters
+#
+# None.
+#
+# ##### Stream Outputs
+#
+# Prints the CLI command signature.
+#
+# ##### Environmental effects
+#
+# None.
+#
+# ##### Return Codes
+#
+# 0 for success
+#
+# ##### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ##### Usage Examples
+#
+#     user$ help_usage
+#     bdsm core {action} [arguments...]
+#
+help_usage()
+{
+  help_section "Usage"
+  log "  bdsm ${extension} {action} [arguments...]"
+}
 
 #
 # ### usage()
@@ -463,31 +630,25 @@ usage()
 
   log "\nbdsm ${bdsm_version} https://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)"
 
-  help_section Usage
-  log "  bdsm ${extension} {action} [arguments...]"
-
-  help_section Description
-  help_description
-
-  help_section Actions
-  help_actions
-
-  help_section Notes
-  help_notes
-
-  secthelp_ion Dependencies
-  help_dependencies
-
-  help_section Resources
-  help_resources
+  sections=(usage description actions notes dependencies resources)
+  for section in "${sections[@]}"
+  do
+    "help_${section}"
+  done
 
   case "${extension}" in
-    core|<extension>)
-      section "Installed Extensions"
+    ext|extension|extend)
+      help_section "Installed Extensions"
+      printf "  "
       extensions_installed
+      echo
 
-      section "Available Extensions"
+      help_section "Available Extensions"
+      printf "  "
       extensions_available
+      echo
       ;;
   esac
+  echo
 }
+

@@ -76,16 +76,6 @@ bdsm_development_update()
   NIY
 }
 
-bdsm_version()
-{
-  if file_is_nonempty "$bdsm_path/VERSION"
-  then
-    read -r bdsm_version < "$bdsm_path/VERSION"
-  else
-    bdsm_version="?.?.?"
-  fi
-}
-
 fetch_version()
 {
   version=$(curl -s "${releases_url}/latest-version.txt" 2>/dev/null) ||
