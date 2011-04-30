@@ -1,7 +1,7 @@
-# Bash Delectable Scripting Management (BDSM) Framework
+# Bash Delectable Scripting Modules (BDSM) Framework
 
-The Bash Delectable Scripting Management Framework is a... scripting framework with
-a devops focus (go figure)!
+The BDSM Framework is a... scripting management framework, with modules
+(go figure)!
 
 # Goal
 

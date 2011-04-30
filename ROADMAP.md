@@ -1,4 +1,4 @@
-# Bash Delectable Scripting Management (BDSM) Framework Roadmap
+# Bash Delectable Scripting Modules (BDSM) Framework Roadmap
 
 Features Roadmap
 ====================
