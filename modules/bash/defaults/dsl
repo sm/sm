@@ -39,14 +39,16 @@
 #
 read_default()
 {
-  local key variable token value prefix
+  local key variable token value prefix _file _files _temp
 
   key="${1:-}"
 
-  [[ -n "${key}" ]] ||
+  if [[ -z "${key}" ]]
+  then
     fail "$extension $action read_default() no arguments passed! "
-
-  shift
+  else
+    shift
+  fi
 
   while (( $# > 0 ))
   do
@@ -78,7 +80,24 @@ read_default()
     fi
   fi
 
-  value="$(hash_file "${extension_config_path}/defaults" "${key}")"
+  _files=(
+    "/etc/bdsm/${extension}/defaults"
+    "$HOME/.bdsm/${extension}/defaults"
+    "${extension_config_path}/defaults"
+  )
+
+  for _file in "${_files[@]}"
+  do
+    if file_is_nonempty "${_file}"
+    then
+      _temp="$(hash_file "${_file}" "${key}")"
+
+      if [[ -n "${_temp}" ]]
+      then
+        value="${_temp}"
+      fi
+    fi
+  done
 
   eval "${variable}=\"${value}\""
 }
