@@ -1288,7 +1288,7 @@ hash_file()
     shift
   fi
 
-  local _path=$(dirnmae "${_file}")
+  local _path=$(dirname "${_file}")
   if [[ -d "${_path}" ]]
   then
     ensure_files_exist "$_file"
