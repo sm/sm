@@ -212,14 +212,14 @@ action()
 }
 
 #
-# ### notes()
+# ### note()
 #
-# Define the notes help section content.
+# Adds a note definition for help Notes section.
 #
 # ##### Input Parameters
 #
-# First parameter is a string containing any notes for the notes section of the
-# current extension's help output.
+# First parameter is a string containing any note for the notes section of
+# the current extension's help output.
 #
 # ##### Stream Outputs
 #
@@ -239,11 +239,11 @@ action()
 #
 # ##### Usage Examples
 #
-#     user$ notes "Help for this extension can be found in #beginrescueend on irc.freenode.net"
+#     user$ note "Help for this extension can be found in #beginrescueend on irc.freenode.net"
 #
-notes()
+note()
 {
-  help_notes="$*"
+  help_notes+=("$*")
 }
 
 #

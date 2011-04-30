@@ -6,9 +6,10 @@
 set +o nounset
 set +o noclobber
 
-while (( $# > 0 )) ; do
-
-  token="$1" ; shift
+while (( $# > 0 ))
+do
+  token="$1"
+  shift
 
   case "$token" in
     # TODO: extension detection "did you mean"
@@ -81,23 +82,16 @@ while (( $# > 0 )) ; do
       ;;
 
     *)
-      #if $modules_path/match "$token" $extensions ; then
       if [[ -z "$extension" ]] ; then
         if [[ -d "$extensions_path/$token" ]] ; then
           extension="$token"
+          continue
         else
           case "$token" in
             list|ls)
               extension="ext"
               action="list"
               extension_args=("$@")
-              parse_break=1
-              ;;
-
-            # TODO: enable default actions for an extension...
-            deploy|rollback)
-              extension="deploy"
-              action="$token"
               parse_break=1
               ;;
 
@@ -184,23 +178,34 @@ while (( $# > 0 )) ; do
 
       (( parse_break == 1 )) && break
 
-      if [[ -z "${action:-}" ]] ; then
-        if [[ -x "${extensions_path}/${extension}/bin/$token" ]] ; then
+      if [[ -z "${action:-}" ]]
+      then
+        if [[ -x "${extensions_path}/${extension}/bin/$token" ]]
+        then
           action="$token"
           extension_args=("$@")
           parse_break=1
         fi
-      elif [[ -d "/data/$token" ]] ; then
+      elif [[ -d "/data/$token" ]]
+      then
         project="$token"
         project_path="/data/$token"
-      elif [[ -d "/home/$token" ]] ; then
+      elif [[ -d "/home/$token" ]]
+      then
         project="$token"
         project_path="/home/$token"
       fi
       ;;
   esac
 
-  if [[ -n "$parse_break" || -n "$error_message" ]] ; then
+  if [[ -z "${action:-}" &&
+    -x "${extensions_path}/${extension}/bin/${extension}" ]]
+  then # A default action has the same name as the extension.
+    action="${extension}"
+  fi
+
+  if [[ -n "$parse_break" || -n "$error_message" ]]
+  then
     unset parse_break
     break
   fi
