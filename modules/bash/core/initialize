@@ -59,7 +59,7 @@ source "${modules_path}/bash/modules/dsl"
 source "${modules_path}/bash/modules/initialize"
 
 modules \
-  trace logging time variables environment filesystem users extensions
+  array trace logging time variables environment filesystem users extensions
 
 module_load core/dsl
 

@@ -64,4 +64,30 @@ then
     mode 0755 owner "root"
 fi
 
+if user_is_root
+then
+  if os_is_darwin
+  then
+    if ! file_contains /etc/profile '/etc/profile.d/'
+    then
+      printf "%s" 'if [ -d /etc/profile.d ]; then for profile in /etc/profile.d/*.sh ; do ' \
+        >> /etc/profile
+
+      printf "%s\n" " [ -x \"\$profile\" ] && . \"\$profile\" ; done ; unset profile ; fi" \
+        >> /etc/profile
+    fi
+  fi
+
+  if ! file_contains /etc/profile 'awk -v RS=: -v ORS=:'
+  then
+    cat >> /etc/profile <<Code
+# BDSM path cleanse
+PATH="\$(printf "\$PATH" | awk -v RS=: -v ORS=: '!(\$0 in a){a[\$0];print}')"
+PATH="\${PATH/%:/}" # Strip trailing : if it exists
+export PATH
+if [ -n "\${BASH_VERSION:-}" -o -n "\${ZSH_VERSION:-}" ] ; then builtin hash -r ;  fi
+Code
+  fi
+fi
+
 succeed "\nInstallation of BDSM is complete\n"

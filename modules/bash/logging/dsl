@@ -42,7 +42,7 @@ log()
 #
 # ### info()
 #
-# Log arguments to the calling environments STDOUT preceeded by 'INFO: .
+# Log arguments to the calling environments STDOUT preceeded by 'INFO .
 #
 # ##### Input Parameters
 #
@@ -51,7 +51,7 @@ log()
 # ##### Stream Outputs
 #
 # Prints arguments passed in to the calling environments STDOUT with a newline
-# character appended and 'INFO: ' prepended.
+# character appended and 'INFO ' prepended.
 #
 # ##### Environmental effects
 #
@@ -68,17 +68,17 @@ log()
 # ##### Usage Examples
 #
 #     user$ info "Hello there! "
-#     INFO: Hello there!
+#     INFO Hello there!
 #
 info()
 {
-  log "INFO: $*"
+  log "INFO\n$*"
 }
 
 #
 # ### warn()
 #
-# Log arguments to the calling environments STDOUT preceeded by 'WARNING: .
+# Log arguments to the calling environments STDOUT preceeded by 'WARNING .
 #
 # ##### Input Parameters
 #
@@ -87,7 +87,7 @@ info()
 # ##### Stream Outputs
 #
 # Prints arguments passed in to the calling environments STDOUT with a newline
-# character appended and 'WARNING: ' prepended.
+# character appended and 'WARNING ' prepended.
 #
 # ##### Environmental effects
 #
@@ -104,11 +104,11 @@ info()
 # ##### Usage Examples
 #
 #     user$ info "Hello there! "
-#     INFO: Hello there!
+#     INFO Hello there!
 #
 warn()
 {
-  log "WARNING: $*"
+  log "WARNING\n$*"
 }
 
 #
@@ -144,13 +144,13 @@ warn()
 #
 debug()
 {
-  (( debug_flag == 0 )) || log "DEBUG: $*"
+  (( debug_flag == 0 )) || log "DEBUG\n$*"
 }
 
 #
 # ### error()
 #
-# Log arguments to the calling environments STDERR preceeded by 'ERROR: '.
+# Log arguments to the calling environments STDERR preceeded by 'ERROR '.
 # Exits with status code 1.
 #
 # ##### Input Parameters
@@ -160,7 +160,7 @@ debug()
 # ##### Stream Outputs
 #
 # Prints arguments passed in to the calling environments STDOUT with a newline
-# character appended and 'ERROR: ' prepended.
+# character appended and 'ERROR ' prepended.
 #
 # ##### Environmental effects
 #
@@ -177,13 +177,14 @@ debug()
 # ##### Usage Examples
 #
 #     user$ error "Hello there! "
-#     ERROR: Hello there!
+#     ERROR Hello there!
 #     *poof* shell closed...
 #
 error()
 {
+  set +o xtrace
+  log "\nERROR\n\n$*\n" >&2
   disable_backtrace
-  log "ERROR: $*" >&2
   exit 1
 }
 
@@ -220,6 +221,7 @@ error()
 #     *poof* shell closed...
 #
 succeed() {
+  set +o xtrace
   log "$*"
   exit 0
 }
@@ -227,7 +229,7 @@ succeed() {
 #
 # ### fail()
 #
-# Log arguments to the calling environments STDERR preceeded by 'ERROR: '.
+# Log arguments to the calling environments STDERR preceeded by 'ERROR '.
 # Exits with status code 1.
 #
 # ##### Input Parameters
@@ -237,7 +239,7 @@ succeed() {
 # ##### Stream Outputs
 #
 # Prints arguments passed in to the calling environments STDOUT with a newline
-# character appended and 'ERROR: ' prepended.
+# character appended and 'ERROR ' prepended.
 #
 # ##### Environmental effects
 #
@@ -254,12 +256,13 @@ succeed() {
 # ##### Usage Examples
 #
 #     user$ error "Hello there! "
-#     ERROR: Hello there!
+#     ERROR Hello there!
 #     *poof* shell closed...
 #
-fail() {
-  log "ERROR: $*"
-  backtrace
+fail()
+{
+  trace_flag=0
+  backtrace "$*"
   exit 1
 }
 

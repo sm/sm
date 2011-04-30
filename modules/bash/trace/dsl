@@ -283,8 +283,8 @@ disable_debug()
 #     Error exit with backtrace is on.
 #     ERROR: A command has returned an unhandled error code (nonzero return value).
 #     Error Backtrace:
-#        Trace   Line Function             File
-#           1.      7 main()               /Users/wayneeseguin/test
+#        Trace   Function           Line  File
+#           1.   main()                7  /Users/wayneeseguin/test
 #
 enable_backtrace()
 {
@@ -335,7 +335,8 @@ enable_backtrace()
 
 disable_backtrace()
 {
-  set +o errexit trap - ERR
+  set +o errexit
+  trap - ERR
 }
 
 #
@@ -412,24 +413,76 @@ disable_backtrace()
 backtrace()
 {
   set +o xtrace
+  local _separator _columns=$(tput cols)
+  printf -v _separator '%*s' "${_columns:-${COLUMNS:-80}}"
   local _message="${1:-}"
 
   if [[ -n "${_message}" ]]
   then
-    printf "ERROR: ${_message}\n"
+    printf "\n${_message}\n\n"
   fi
 
-  local _source _function _line _index
-  printf "Backtrace:\n  %6s %6s %-20s %-55s\n" "Trace" "Line" "Function" "File" 1>&2
-  for (( _index=1 ; _index < ${#FUNCNAME[@]} ; ++_index )) ; do
+  local _source _function _line _index _largest _format _digits _longest
+
+  for (( _index=0 ; _index < ${#FUNCNAME[@]} ; _index++ ))
+  do
+    if (( ${#FUNCNAME[${_index}]} > ${#_largest} ))
+    then
+      _largest=${FUNCNAME[${_index}]}
+    fi
+  done
+
+  for (( _index=0 ; _index < ${#BASH_SOURCE[@]} ; _index++ ))
+  do
+    if (( ${#BASH_SOURCE[${_index}]} > ${#_longest} ))
+    then
+      _longest=${BASH_SOURCE[${_index}]}
+    fi
+  done
+
+  for (( _index=0 ; _index < ${#BASH_LINENO[@]} ; _index++ ))
+  do
+    if (( ${#BASH_LINENO[${_index}]} > ${#_digits} ))
+    then
+      _digits=${BASH_LINENO[${_index}]}
+    fi
+  done
+
+  case "${EDITOR:-}" in
+    (mvim*|mate*)
+      #_format=" %-$((${#_largest} + 2))s %-$((${#EDITOR} + ${#_digits} + 19 + ${#_longest}))s\n"
+      _format="%-$((${#_largest} + 2))s %-s\n"
+      printf "${_format}" "function()" "Source"  1>&2
+      ;;
+    (vi*|gvim*|emacs*|*)
+      _format="%-$((${#_largest} + 2))s $ %${#EDITOR}s +%-$((${#_digits}))s %-$((${#_longest} + 2))s %s\n"
+      printf "${_format}" "function()" ' ' "#" "source file"  1>&2
+
+      ;;
+  esac
+
+  printf "${_separator// /=}\n" 1>&2
+
+  for (( _index=1 ; _index < ${#FUNCNAME[@]} ; ++_index ))
+  do
     _source="${BASH_SOURCE[${_index}]}"
     _function="${FUNCNAME[${_index}]:+${FUNCNAME[${_index}]}()}"
     _line=${BASH_LINENO[$(( _index - 1 ))]}
 
-    printf "  %5d. %6s %-20s %-55s\n" \
-      "$((${#FUNCNAME[@]} - _index ))" "${_line}" "${_function}" "${_source} " \
-      1>&2
+    case "${EDITOR:-}" in
+      (mvim*|mate*)
+        printf "${_format}" "${_function}" "${EDITOR// *}://open?url=file://${_source}&line=${_line}" 1>&2
+        ;;
+      (vi*|gvim*|emacs*|*)
+        printf "${_format}" "${_function}" "${EDITOR}" "${_line}" "${_source} " 1>&2
+        ;;
+    esac
   done
-  set -o xtrace
+  printf "${_separator// /=}\n" 1>&2
+
+  if (( trace_flag > 0 ))
+  then
+    enable_trace
+  fi
 }
 

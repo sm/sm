@@ -2,17 +2,15 @@
 
 extension="<extension>"
 
-description "Bash Development & Scripting Management Framework - Core Extension"
+description "Bash Delectable Scripting Manager (BDSM) Framework - Core Extension"
 
-actions "
-  bdsmrc        - Install bdsmrc template file into ~/.bdsmrc or /etc/bdsmrc
-  get latest    - Fetch and install the latest BDSM release
-  get head      - Fetch and install the latest BDSM development version
-  version       - Display the curently installed BDSM version
-  extend <name> - Fetches and extends BDSM with the <name> extension
-  create <name> - Creates extension <name> in the extensions development dir,
-                  or extensions path if development path is not set in bdsmrc.
-  edit <name>   - Opens extension <name> in the editor."
+action "bdsmrc" "Install bdsmrc template file into ~/.bdsmrc or /etc/bdsmrc"
+action "get latest" "Fetch and install the latest BDSM release"
+action "get head" "Fetch and install the latest BDSM development version"
+action "version" "Display the curently installed BDSM version"
+action "extend {name}" "Fetches and extends BDSM with the {name} extension"
+action "create {name}" "Creates extension {name} in the extensions development dir, or extensions path if development path is not set in bdsmrc."
+action "edit {name}" "Opens extension {name} in the editor."
 
 notes="
 

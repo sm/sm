@@ -2,8 +2,10 @@
 
 _path="${core_development_path:="$source_path/bdsm"}/modules"
 
-# TODO: Allow --src flag to modify root behavior.
-user_is_not_root || _path="${bdsm_path}/modules"
+if user_is_root
+then # TODO: Allow --src flag to modify root behavior.
+  _path="${bdsm_path}/modules"
+fi
 
 enter "${_path}"
 

@@ -44,6 +44,17 @@ array_is_nonempty()
   eval "(( \${#${_array_name}[@]} > 0 ))"
 }
 
+array_is_empty()
+{
+  local _array_name="$1"
+
+  variable_is_nonempty _array_name ||
+    fail "Cannot push onto array as an array name was not given."
+
+  eval "(( \${#${_array_name}[@]} == 0 ))"
+}
+
+
 #
 # ### array_length()
 #
@@ -274,18 +285,38 @@ array_append()
 #
 # ##### Usage Examples
 #
-#     $ the_array=(1 2 3 4 5)
-#     $ array_length the_array
-#     5
+#     user$ cat $HOME/test
+#     #!/usr/bin/env bash
+#     source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
+#     modules array
+#
+#     my_array=(1 2 3 4)
+#     echo ${my_array[@]}
+#     array_shift my_array
+#     echo ${my_array[@]}
+#
+#     user$ $HOME/test
+#     1 2 3 4
+#     1
+#     2 3 4
 #
 array_shift()
 {
-  local _array_name="$1" ; shift
+  local _array_name="$1" new_array=() index
 
   variable_is_nonempty _array_name ||
     fail "Cannot push onto array as an array name was not given."
 
-  fail "array_shift() has not yet been implemented for the array module."
+  shift
+
+  eval "
+  for (( index=0; index < \${${_array_name}[@]}; index++ ))
+  do
+    new_array[\${index}]=\${${_array_name}[\${index}]}
+  done
+
+  ${_array_name}=(\"\${new_array[@]}\")
+"
 }
 
 #
@@ -384,5 +415,55 @@ array_join()
   local _separator="${1:-' '}"
 
   eval "for (( index=0 ; index < \${#${_array_name}[@]} ; index++ )) ; do (( index >  0 )) && printf \"%s\"${_separator}\"\" ; printf \"%s\" \"\${${_array_name}[\${index}]}\" ; done"
+}
+
+#
+# ### array_largest()
+#
+# Outputs the largest element of the array, in the sense of longest string.
+#
+# ##### Input Parameters
+#
+# The first element is an array variable name.
+#
+# ##### Stream Outputs
+#
+# Prints the largest elements of the named array to the STDOUT
+# stream of the calling environment.
+#
+# ##### Return Codes
+#
+# 0 denoting success
+#
+# ##### Failure Scenarios
+#
+# Fails if the array name, the first parameter, is not given.
+#
+# ##### Usage Examples
+#
+#     $ the_array=(1 2 3 4 5)
+#     $ array_join the_array
+#     1 2 3 4 5
+#
+#     $ array_join the_array '.'
+#     1.2.3.4.5
+#
+array_largest()
+{
+  local _array_name="${1:-}" _index _largest=""
+
+  variable_is_nonempty _array_name ||
+    fail "Cannot find largest element of an array as an array name was not given."
+
+  eval "
+    for (( _index=0 ; _index < \${#${_array_name}[@]} ; _index++ ))
+    do
+      if (( \${#${_array_name}[\${_index}]} > \${#_largest} ))
+      then
+        _largest=\${${_array_name}}[\${_index}]}
+      fi
+    done
+  "
+  printf "%s" "${_largest}"
 }
 

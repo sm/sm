@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-module_dsl
+module_dsl "${extension_args[@]}"
 

@@ -1533,42 +1533,61 @@ file_is_empty_or_missing() {
 }
 
 #
-# ## function_name
+# ## file_contains()
 #
-# Function Description
+# Checks if a named file contains a given string/unix regexp pattern.
 #
 # ##### Input Parameters
 #
-# Positional Parameter listing and descriptions.
+# First parameter is the file name/path.
+# Second parameter is the pattern to match.
 #
 # ##### Stream Outputs
 #
-# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+# None.
 #
 # ##### Environmental effects
 #
-# What, if any, environmental side effects this function causes. 'None.' for none.
+# None.
 #
 # ##### Return Codes
 #
-# 0 if ...
-# 1 if ...
+# 0 if the given file contains the given pattern.
+# 1 if the given file does not contain the given pattern.
 #
 # ##### Failure Scenarios
 #
-# Fails if ...
+# Fails if the file path/name was not given
+# Fails if the pattern is not given.
+# Fails if the file path/name given either does not exist or is not a file.
 #
 # ##### Usage Examples
 #
-#     user$ {{ setup the scenario }}
-#     user$ function_name {{ parameters }}
-#     user$ {{ demonstrate the results}}
+#     user$ cat "$HOME/test"
+#     #!/usr/bin/env bash
+#     source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
+#
+#     modules filesystem
+#
+#     if file_contains "$HOME/.bdsmrc" ".*w00t.*"
+#     then
+#       echo "w00t! "
+#     else
+#       echo "no w00t :("
+#     fi
+#
+#     user$ "$HOME/test"
+#     no w00t :(
+#
 file_contains()
 {
   local _file="${1:-}" _pattern="${2:-}"
 
   [[ -n "${_file}" ]]    || fail "File path/name was not given!"
   [[ -n "${_pattern}" ]] || fail "String pattern for search was not given!"
+
+  [[ -f "${_file}" ]] ||
+    fail "First parameter must be a file, '${_file}' does not appear to be a file."
 
   if grep "${_pattern}" "${_file}" >/dev/null 2>&1
   then

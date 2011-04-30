@@ -1,13 +1,17 @@
 #!/usr/bin/env bash
 
-(( ${#extension_args[@]} > 0 )) ||
+if (( ${#extension_args[@]} == 0 ))
+then
   fail "At least one extension name must be specified."
+fi
 
 enter "${extensions_development_path}/${extension_args[0]}/"
 
-if command_exists open ; then
+if command_exists open
+then
   open .
-elif command_exists xdg-open ; then
+elif command_exists xdg-open
+then
   xdg-open .
 else
   echo "$PWD"
