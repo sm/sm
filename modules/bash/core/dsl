@@ -120,3 +120,39 @@ NIY()
   fail "This feature has not yet been implemented."
 }
 
+# Allow for method_missing when a command is not found during lookup.
+if (( ${BASH_VERSINFO[0]} > 3 ))
+then
+  command_not_found()
+  {
+    echo "bash: $1: command not found ($*)" >&2
+    return 127
+  }
+
+  command_not_found_handle()
+  {
+    if [[ -n "${MC_SID}" || ! -t 1 ]]
+    then # do not run when inside Midnight Commander or within a Pipe
+      command_not_found "$@"
+    fi
+
+    if [[ $MACHTYPE = *linux* ]]
+    then # do not run when within a subshell, Linux version.
+      local cmd state remainder
+      local -i pid ppid pgrp session tty_nr tpgid
+      read pid cmd state ppid pgrp session tty_nr tpgid remainder < /proc/self/stat
+      if (( $$ == ${tpgid} ))
+      then
+        command_not_found "$@"
+      fi
+    fi
+
+    if command -v method_missing
+    then # Pass to method_missing.
+      method_missing "$@"
+    else # Default behavior.
+      command_not_found "$@"
+    fi
+  }
+fi
+
