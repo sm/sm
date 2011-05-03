@@ -37,6 +37,16 @@
 #     user$ echo $package_version
 #     1.0.0
 #
+# ##### Notes
+#
+# read_default respects a tiered default file scheme,
+#
+#   "/etc/bdsm/${extension}/defaults"
+#   "$HOME/.bdsm/${extension}/defaults"
+#   "${extension_config_path}/defaults"
+#
+#
+#
 read_default()
 {
   local key variable token value prefix _file _files _temp
