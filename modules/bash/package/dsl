@@ -1336,3 +1336,57 @@ packages_must_be_active()
     package_must_be_active "${_package}"
   done
 }
+
+#
+# ## package_docs
+#
+# Opens package documentation website either in the web browser (if able) or via
+# curl through PAGER (defaulting to less).
+#
+# ##### Input Parameters
+#
+# None.
+#
+# ##### Stream Outputs
+#
+# None if can open web browser or website docs in PAGER otherwise.
+#
+# ##### Environmental effects
+#
+# Web browser will open with documentation url if able.
+#
+# ##### Return Codes
+#
+# 0 for success.
+#
+# ##### Failure Scenarios
+#
+# Error if package_docs_url has not been set.
+#
+# ##### Usage Examples
+#
+# Example Usage:
+#
+# user$ package_docs
+#
+# ##### Notes
+#
+package_docs()
+{
+  # TODO: move this logic into a core dsl function.
+  if os_is_linux
+  then
+    if command_exists xdg-open
+    then
+      xdg-open $package_docs_url
+    else
+      curl -L $package_docs_url | ${PAGER:-less}
+    fi
+  elif os_is_darwin
+  then
+    open $package_docs_url
+  else
+    curl -L $package_docs_url | ${PAGER:-less}
+  fi
+}
+
