@@ -2,27 +2,39 @@
 
 shopt -s extglob # Extended globs must always be on for BDSM.
 
-# load bdsmrc files, cascaded. Settings in these files trump.
-[[ -s "/etc/bdsmrc" ]] && . "/etc/bdsmrc"
-[[ -s "$HOME/.bdsmrc" ]] && . "$HOME/.bdsmrc"
+# load bdsmrc files, cascaded. Settings in these files trump all.
+for file in /etc/bdsmrc "$HOME/.bdsmrc"
+do
+  if [[ -s "${file}" ]]
+  then
+    . "${file}"
+  fi
+done
 
-if (( UID == 0 ))
-then # FHS
-  : \
-    "${prefix_path:="/usr/local"}"
-else # HOME
-  : \
-    "${prefix_path:=$HOME}"
-fi
-
-if [[ "$prefix_path" = "$HOME" ]]
+if [[ -z "${prefix_path:-}" ]]
 then
-  : \
-    "${bdsm_path:="${prefix_path}/.bdsm"}"
-else
-  : \
-    "${bdsm_path:="${prefix_path}/bdsm"}"
+  if (( UID == 0 ))
+  then # FHS
+    prefix_path="/usr/local"
+  else # HOME
+    prefix_path="$HOME"
+  fi
 fi
+
+if [[ -z "${bdsm_path:-}" ]]
+then
+  if [[ "$prefix_path" = "$HOME" ]]
+  then
+    bdsm_path="${prefix_path}.bdsm"
+  else
+    bdsm_path="${prefix_path}/bdsm"
+  fi
+fi
+
+modules_path="${bdsm_path}/modules"
+
+export prefix_path bdsm_path modules_path initial_pwd
+
 
 if (( UID == 0 ))
 then # FHS
@@ -58,9 +70,14 @@ source "${modules_path}/bash/modules/dsl"
 source "${modules_path}/bash/modules/initialize"
 
 modules \
-  array trace logging time variables environment filesystem users extensions
+  array trace logging time variables environment filesystem system users extensions
 
 module_load core/dsl
+
+if os_is_solaris
+then # custom compilations + g*
+  export PATH="/usr/local/bin:/usr/sfw/bin:$PATH"
+fi
 
 # Ensure variables desired to be exported to extensions actually are.
 bdsm_exports

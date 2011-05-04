@@ -21,6 +21,11 @@
 . /etc/profile
 unset prefix_path bdsm_path
 
+if [[ $MACHTYPE = *solaris* ]]
+then
+  export PATH="/usr/local/bin:/usr/sfw/bin:$PATH"
+fi
+
 # Clean environment of all *_path variables.
 paths=(prefix_path $(env | awk -F= '/_path=/{print $1}' | sort))
 unset "${paths[@]}"
