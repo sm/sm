@@ -23,7 +23,7 @@ unset prefix_path bdsm_path
 
 if [[ $MACHTYPE = *solaris* ]]
 then
-  export PATH="/usr/local/bin:/usr/sfw/bin:$PATH"
+  export PATH="/usr/local/bin:/usr/sfw/bin:/usr/sbin:/usr/bin:/opt/local/bin"
 fi
 
 # Clean environment of all *_path variables.
