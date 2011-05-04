@@ -23,6 +23,10 @@ unset prefix_path bdsm_path
 
 if [[ $MACHTYPE = *solaris* ]]
 then
+  for tool in awk sed seq env sort head tail
+  do # This is ... sickening.
+    alias ${tool}="g${tool}"
+  done
   export PATH="/usr/local/bin:/usr/sfw/bin:/usr/sbin:/usr/bin:/opt/local/bin"
 fi
 
