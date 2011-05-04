@@ -1387,8 +1387,10 @@ package_docs()
   then
     xdg-open $package_docs_url
   elif command_exists lynx
+  then
     lynx $package_docs_url
   elif command_exists links
+  then
     links $package_docs_url
   else
     curl -s -L $package_docs_url -o /tmp/${package_name}-${package_version}.docs
