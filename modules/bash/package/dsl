@@ -1383,13 +1383,15 @@ package_docs()
     then
       xdg-open $package_docs_url
     else
-      curl -L $package_docs_url | ${PAGER:-less}
+      curl -s -L $package_docs_url -O /tmp/${package_name}-${package_version}.docs
+      ${PAGER:-less} /tmp/${package_name}-${package_version}.docs
     fi
   elif os_is_darwin
   then
     open $package_docs_url
   else
-    curl -L $package_docs_url | ${PAGER:-less}
+    curl -s -L $package_docs_url -O /tmp/${package_name}-${package_version}.docs
+    ${PAGER:-less} /tmp/${package_name}-${package_version}.docs
   fi
 }
 
