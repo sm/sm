@@ -18,46 +18,55 @@
 #
 
 # Load System then User Configuration, if exists.
-. /etc/profile ; unset prefix_path
+. /etc/profile
+unset prefix_path bdsm_path
+
+# Clean environment of all *_path variables.
 paths=(prefix_path $(env | awk -F= '/_path=/{print $1}' | sort))
-# TODO: unset all _path variables.
 unset "${paths[@]}"
 
-for file in /etc/profile /etc/bdsmrc "$HOME/.bdsmrc" ; do
-  [[ -s "${file}" ]]  && . "${file}"
+for file in /etc/bdsmrc "$HOME/.bdsmrc"
+do
+  if [[ -s "${file}" ]]
+  then
+    . "${file}"
+  fi
 done
 
 # In case bdsm is being called from within a hook for example, we unset these:
 unset extension action
 
+initial_pwd="$PWD" # record this early on.
+
 # The default prefix is /usr/local,
 # this should be set to where BDSM is installed to in /etc/bdsmrc
 prefix_path="${prefix_path:-/usr/local}"
 
-[[ "$prefix_path" = "$HOME" ]] \
-  && { : "${bdsm_path:="${prefix_path}bdsm"}"; } \
-  || { : "${bdsm_path:="${prefix_path}/bdsm"}"; }
+if [[ -z "${bdsm_path:-}" ]]
+then
+  if [[ "$prefix_path" = "$HOME" ]]
+  then
+    bdsm_path="${prefix_path}.bdsm"
+  else
+    bdsm_path="${prefix_path}/bdsm"
+  fi
+fi
+modules_path="${bdsm_path}/modules"
 
-export modules_path="${bdsm_path}/modules"
-export initial_pwd="$PWD" # record this early on.
+export prefix_path bdsm_path modules_path initial_pwd
 
 # Load BDSM bash DSL and initialize for BDSM core itself manually.
 # Ensure that backtrace and logging are defined first as everything depends on them.
-for script in dsl initialize ; do
-  for module in core ; do
-    source "${modules_path}/bash/${module}/${script}"
-  done
-done
-unset script module
+# Then load the main BDSM CLI
+. "${modules_path}/bash/core/dsl"
+. "${modules_path}/bash/core/initialize"
+. "${modules_path}/bash/core/cli"
 
-# Now process CLI arguments.
-source "${modules_path}/bash/core/cli"
+if [[ -n "${error_message}" ]]
+then
+  error "$error_message"
+fi
 
-[[ -n "${error_message}" ]] && error "$error_message"
-
-#
-# Main Logic
-#
 if [[ -z ${extension} ]]
 then
   extension_action "core" "help"
@@ -67,8 +76,7 @@ fi
 if [[ -z ${action} ]]
 then
   modules extensions
-  log "Usage: \n  bdsm ${extension} [action]\nActions:"
-  log "  $(extension_actions "${extension}")"
+  log "Usage: \n  bdsm ${extension} [action]\nActions:\n   $(extension_actions "${extension}")"
   exit 0
 fi
 
