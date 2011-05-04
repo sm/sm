@@ -20,10 +20,9 @@
 source "{{modules_path}}/bash/core/initialize"
 
 # Set the service extension name
-export extension="{{extension}}"
+export service="{{service}}"
 
-# Load the service module.
-modules service
+modules service # Load the service module.
 
 service_init_d
 
