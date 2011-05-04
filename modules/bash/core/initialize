@@ -76,10 +76,6 @@ module_load core/dsl
 
 if os_is_solaris
 then # custom compilations + g*
-  for tool in awk sed seq env sort head tail
-  do # This is ... sickening.
-    eval "${tool}(){ g${tool} "\$*" ; }"
-  done
   export PATH="/usr/local/bin:/usr/sfw/bin:/usr/sbin:/usr/bin:/opt/local/bin"
 fi
 
