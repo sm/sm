@@ -1377,31 +1377,22 @@ packages_must_be_active()
 package_docs()
 {
   # TODO: move this logic into a core dsl function.
-  if os_is_linux
-  then
-    if command_exists xdg-open
-    then
-      xdg-open $package_docs_url
-    else
-      curl -s -L $package_docs_url -o /tmp/${package_name}-${package_version}.docs
-      if [[ -z "${PAGER:-}" ]]
-      then
-        less /tmp/${package_name}-${package_version}.docs
-      else
-        ${PAGER} /tmp/${package_name}-${package_version}.docs
-      fi
-    fi
-  elif os_is_darwin
+  if os_is_darwin
   then
     open $package_docs_url
+    return 0
+  fi
+
+  if command_exists xdg-open
+  then
+    xdg-open $package_docs_url
+  elif command_exists lynx
+    lynx $package_docs_url
+  elif command_exists links
+    links $package_docs_url
   else
     curl -s -L $package_docs_url -o /tmp/${package_name}-${package_version}.docs
-    if [[ -z "${PAGER:-}" ]]
-    then
-      less /tmp/${package_name}-${package_version}.docs
-    else
-      ${PAGER} /tmp/${package_name}-${package_version}.docs
-    fi
+    less /tmp/${package_name}-${package_version}.docs
   fi
 }
 
