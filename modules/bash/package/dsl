@@ -74,6 +74,9 @@ package_definition()
       base_url)
         package_base_url="${value}"
         ;;
+      docs_url)
+        package_docs_url="${value}"
+        ;;
       patches_url)
         package_patches_url="${value}"
         ;;
