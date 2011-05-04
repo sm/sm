@@ -25,7 +25,7 @@ if [[ -z "${bdsm_path:-}" ]]
 then
   if [[ "$prefix_path" = "$HOME" ]]
   then
-    bdsm_path="${prefix_path}.bdsm"
+    bdsm_path="${prefix_path}/.bdsm"
   else
     bdsm_path="${prefix_path}/bdsm"
   fi
@@ -47,7 +47,7 @@ else
     "${etc_path:="${bdsm_path}/etc"}"
 fi
 
-: \
+true \
   "${modules_path:="${bdsm_path}/modules"}" \
   "${extensions_path:="${bdsm_path}/extensions"}" \
   "${templates_path:="${bdsm_path}/templates"}" \
@@ -69,14 +69,14 @@ fi
 source "${modules_path}/bash/modules/dsl"
 source "${modules_path}/bash/modules/initialize"
 
-modules \
-  array trace logging time variables environment filesystem system users extensions
+modules array trace logging time variables environment filesystem system users \
+  extensions
 
 module_load core/dsl
 
 if os_is_solaris
 then # custom compilations + g*
-  export PATH="/usr/local/bin:/usr/sfw/bin:/usr/sbin:/usr/bin:/opt/local/bin"
+  export PATH="/usr/local/bin:/opt/local/bin:/usr/sfw/bin:/usr/sbin:/usr/bin"
 fi
 
 # Ensure variables desired to be exported to extensions actually are.

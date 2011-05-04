@@ -1,16 +1,14 @@
 #!/usr/bin/env bash
 
-# Ensure that default values are set.
-true "${prefix_path:="/usr/local"}"
-
+# Ensure that default values are set, prefix_path should be set at this point so
+# this is also a failsafe.
 true \
+  "${prefix_path:="/usr/local"}" \
   "${bin_path:="${prefix_path}/bin"}" \
   "${source_path:="${prefix_path}/src"}" \
   "${archive_format:=tar.gz}" \
-  "${package_name:=${extension}}"
-
-true \
-  ${repository_url:="git://github.com/wayneeseguin/bdsm"} \
+  "${package_name:=${extension}}" \
+  "${repository_url:="git://github.com/wayneeseguin/bdsm"}" \
   "${releases_url:=$(hash_file "${bdsm_path}/extensions/core/config/defaults" "releases_url")}"
 
 # Load the BDSM framework version.

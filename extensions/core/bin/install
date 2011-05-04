@@ -90,4 +90,19 @@ Code
   fi
 fi
 
+if user_is_root
+then
+  ensure_files_exist "/etc/bdsmrc"
+  if ! file_contains "/etc/bdsmrc" "bdsm_path="
+  then
+    printf "%s" "export bdsm_path=\"${bdsm_path}\"\n" >> "/etc/bdsmrc"
+  fi
+else
+  ensure_files_exist "$HOME/.bdsmrc"
+  if ! file_contains "$HOME/.bdsmrc" "bdsm_path="
+  then
+    printf "%s" "export bdsm_path=\"${bdsm_path}\"\n" >> "$HOME/.bdsmrc"
+  fi
+fi
+
 succeed "\nInstallation of BDSM is complete\n"
