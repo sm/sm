@@ -38,9 +38,19 @@ export prefix_path bdsm_path modules_path initial_pwd
 
 if (( UID == 0 ))
 then # FHS
-  true "${var_path:="/var"}" "${etc_path:="/etc"}"
+  true \
+    "${var_path:="/var"}" \
+    "${etc_path:="/etc"}" \
+    "${profile_path:="/etc/profile"}" \
+    "${profile_d_path:="/etc/profile.d"}"
+
 else
-  true "${var_path:="${bdsm_path}/var"}" "${etc_path:="${bdsm_path}/etc"}"
+  true \
+    "${var_path:="${bdsm_path}/var"}" \
+    "${etc_path:="$HOME/.etc"}" \
+    "${profile_path:="$HOME/.profile"}" \
+    "${profile_d_path:="$HOME/.profile.d"}"
+
 fi
 
 true \

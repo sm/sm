@@ -361,7 +361,8 @@ Code
     fi
   fi
 
-  if ! file_contains "${profile_d_path}/bdsm.sh" "${packages_path}/active/bin"
+  if ! file_exists "${profile_d_path}/bdsm.sh" ||
+     ! file_contains "${profile_d_path}/bdsm.sh" "${packages_path}/active/bin"
   then
     printf "PATH=\"${packages_path}/active/bin:${PATH}\"\n" \
       > "${profile_d_path}/bdsm.sh"
