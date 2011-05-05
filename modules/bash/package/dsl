@@ -597,18 +597,25 @@ package_make_install()
 #
 package_activate()
 {
+  # TODO: Switch package activation to
   local _package="${1:-}" _version="${2:-}"
 
   variables_must_be_nonempty _package _version
 
-  symlink_exists "${prefix_path}/${_package}/active" &&
+  if symlink_exists "${prefix_path}/${_package}/active"
+  then
     package_deactivate "${_package}"
+  fi
 
-  directory_exists "${prefix_path}/${_package}/${_version}" ||
+  if ! directory_exists "${prefix_path}/${_package}/${_version}"
+  then
     log "Skipping activation of ${_package} ${_version} as '${install_path}' does not exist."
+  fi
 
   log "Activating ${_package} ${_version}"
 
+  # TODO: activation proces here should iterate over inner files =>
+  # ${bdsm_path}/active/
   link "${prefix_path}/${_package}/${_version}" \
     to "${prefix_path}/${_package}/active"
 
@@ -874,8 +881,10 @@ package_profile_d()
 
   variables_must_be_nonempty _package
 
-  directory_exists "${prefix_path}/${_package}/active/bin" ||
+  if ! directory_exists "${prefix_path}/${_package}/active/bin"
+  then
     return 0 # No bin/ dir, no need for it to be in the path.
+  fi
 
   if user_is_root
   then
@@ -933,8 +942,10 @@ package_uninstall()
 
   true "${package_dir:="${package_name}-${package_version}"}"
 
-  package_make_uninstall ||
+  if ! package_make_uninstall
+  then
     error "Failed to uninstall ${package_name} from ${prefix_path}."
+  fi
 
   log "Uninstalled ${package_name} from ${prefix_path}."
 }
@@ -990,7 +1001,10 @@ package_patch()
 
   package_apply_patches "${_patches[@]}"
 
-  directory_exists "${extension_patches_path}/$(os_type)" || return 0
+  if ! directory_exists "${extension_patches_path}/$(os_type)"
+  then
+    return 0
+  fi
 
   _patches=($(find "${extension_patches_path}/$(os_type)" -mindepth 1 -maxdepth 1 -iname '*.patch' -type f))
   package_apply_patches "${_patches[@]}"

@@ -185,7 +185,8 @@ remove_files()
   (( ${#_files[@]} > 0 )) ||
     fail "Cannot remove files as no files were given."
 
-  for _file in "${_files[@]}" ; do
+  for _file in "${_files[@]}"
+  do
     if [[ -f "${_file}" || -L "${_file}" ]] ; then
       rm -f "${_file}"
     elif [[ -d "${_file}" ]] ; then

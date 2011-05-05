@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-for (( index=0 ; index < ${#extension_args[@]}; index++ )) ; do
-
+for (( index=0 ; index < ${#extension_args[@]} ; index++ ))
+do
   token="${extension_args[$index]}"
 
   case "$token" in

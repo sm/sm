@@ -109,14 +109,19 @@ md5_match()
 fetch()
 { # TODO: Extract fetch dsl into it's own DSL module
   # TODO: allow either curl or wget, defaulting to curl...
-  command_exists curl ||
+  if ! command_exists curl
+  then
     fail "bdsm requires curl, which was not found in the PATH :(\nPlease install curl and try again."
+  fi
 
   fetch_command="$fetch_command -O -L --create-dirs -C - " # -s for silent
   (
   enter "$archives_path"
 
-  [[ -n "${1:-}" ]] || fail "BUG: $0 called without an argument :/"
+  if [[ -z "${1:-}" ]]
+  then
+    fail "BUG: $0 called without an argument :/"
+  fi
 
   archive=$(basename "$1")
   download=1
@@ -124,10 +129,12 @@ fetch()
   debug "Fetching $archive"
 
   # Check first if we have the correct archive
-  if file_exists "$archive" && file_exists "$archive.md5" ; then
+  if file_exists "$archive" && file_exists "$archive.md5"
+  then
     debug "Found archive and its md5, testing correctness"
 
-    if (( $(md5sum --status -c "$archive.md5") > 0 )) ; then
+    if (( $(md5sum --status -c "$archive.md5") > 0 ))
+    then
       debug "Archive is bad, downloading"
       download=1
     else
@@ -140,17 +147,21 @@ fetch()
     download=1
   fi
 
-  if (( download > 0 )) ; then
-
-    if ! eval $fetch_command "$1" ; then
+  if (( download > 0 ))
+  then
+    if ! eval $fetch_command "$1"
+    then
       retry=0
-      if (( result == 78 )) ; then
+      if (( result == 78 ))
+      then
         error "The requested url does not exist: '$1'"
-      elif (( result == 18 )) ; then
+      elif (( result == 18 ))
+      then
         error "Only a part of the file was transferred. Removing and re-trying."
         rm -f "$archive"
         retry=1
-      elif (( result == 33 )) ; then
+      elif (( result == 33 ))
+      then
         debug "Remote server does not support 'range' command, removing '$archive'"
         rm -f "$archive"
         retry=1
@@ -158,8 +169,13 @@ fetch()
         error "There was an error, please check $log_path/*.error.log"
       fi
 
-      (( retry == 1 )) && eval $fetch_command "$1" ||
-        error "There was an error, please check $log_path/*.error.log"
+      if (( retry == 1 ))
+      then
+        if ! eval $fetch_command "$1"
+        then
+          error "There was an error, please check $log_path/*.error.log"
+        fi
+      fi
     fi
   fi
   )
@@ -184,7 +200,9 @@ install_release()
 
   curl -L "${releases_url}/bdsm-${version}.tar.gz" -o "$archive"
 
-  file_matches_md5 "${archive}" "${md5}" || fail "
+  if ! file_matches_md5 "${archive}" "${md5}"
+  then
+      fail "
 Archive package downloaded does not match it's calculated md5 checksum ${md5}:
 
   $archives_path/bdsm-${version}.tar.gz
@@ -193,6 +211,7 @@ Retry the installation and/or check your networking setup.
 
 Halting the installation.
 "
+  fi
 
   tar zxf "${archives_path}/bdsm-${version}.tar.gz" -C "$src_path/"
 
@@ -207,28 +226,32 @@ install_head()
 {
   local remote="origin"
 
-  if directory_exists "${src_path}/bdsm/.git" ]] ; then
-
+  if directory_exists "${src_path}/bdsm/.git" ]]
+  then
     enter "${src_path}/bdsm/"
 
-    if [[ -z "$(git branch | awk "/$branch$/")" ]] ; then
-      git checkout -b "$branch" --track "$remote/$branch" 2>/dev/null ||
+    if [[ -z "$(git branch | awk "/$branch$/")" ]]
+    then
+      if ! git checkout -b "$branch" --track "$remote/$branch" 2>/dev/null
+      then
         fail "$remote $branch remote branch not found."
-
-    elif [[ -z "$(git branch | awk "/\* $branch$/{print \$2}")" ]] ; then
-
+      fi
+    elif [[ -z "$(git branch | awk "/\* $branch$/{print \$2}")" ]]
+    then
       git checkout $branch 2>/dev/null ||
         fail "Unable to checkout $branch.\nCould not get head. Sucks to be you... or rather... doesn't suck :-p"
     fi
 
     git pull --rebase origin $branch
-
   else
     enter "${src_path}"
 
-    if ! git clone --depth 1 git://github.com/wayneeseguin/bdsm.git ; then
-      git clone https://github.com/wayneeseguin/bdsm.git ||
+    if ! git clone --depth 1 git://github.com/wayneeseguin/bdsm.git
+    then
+      if ! git clone https://github.com/wayneeseguin/bdsm.git
+      then
         fail "Unable to clone the BDSM repository, attempted both git:// and https://\nCould not get head, terribly sorry about the blue balls :("
+      fi
     fi
   fi
 
@@ -239,5 +262,122 @@ install_head()
   ensure_files_are_executable "install"
 
   ./install
+}
+
+prepare_for_installation()
+{
+  (
+  log "  Ensuring that install_path '${install_path}' exists"
+  ensure_paths_exist "${install_path}"
+  enter "${install_path}"
+
+  log "  Removing target directories"
+  remove_paths "${directories[@]}"
+  ensure_paths_exist "${directories[@]}" extensions
+  enter "${install_path}/extensions"
+
+  log "  Removing core and old extensions, if they exist"
+  remove_paths "${extensions[@]}" extension bdsm
+  ) || fail "Could not create installation target"
+}
+
+create_auxillary_paths()
+{
+  (
+  log "  Ensuring auxillary directories (${aux[@]}) exist in ${install_path}"
+  enter "${install_path}"
+  ensure_paths_exist "${install_path}/" "${aux[@]}"
+  )
+}
+
+install_core_extensions()
+{
+  (
+  log "  Installing core extensions (${extensions[@]}) into ${install_path}/extensions"
+  ensure_paths_exist "${install_path}/extensions"
+  enter extensions
+  copy_directories_to "${install_path}/extensions" "${extensions[@]}"
+  )
+}
+
+install_core()
+{
+  log "  Installing core directories (${directories[@]}) into ${install_path}"
+  copy_directories_to "${install_path}" "${directories[@]}"
+
+  log "  Installing core files (${files[@]}) into ${install_path}"
+  copy_files_to "${install_path}" ${files[@]}
+}
+
+install_configuration_files()
+{
+  log "  Ensuring that the configuration files (${configs[@]}) exist in ${config_path}"
+  ensure_files_exist "${install_path}/cofig/user"
+}
+
+symlink_bdsm()
+{
+  log "  Linking ${install_path}/bin/bdsm to ${prefix_path}/bin/bdsm"
+  link --force "${install_path}/bin/bdsm" to "${prefix_path}/bin/bdsm"
+}
+
+setup_shell_completion()
+{
+  if user_is_root
+  then
+    log "  Setting up bdsm shell completion."
+    ensure_paths_exist "/etc/profile.d/"
+
+    copy_file from "${install_path}/completion/bdsm.bash" \
+      to "/etc/profile.d/bdsm-completion.sh" \
+      mode 0755 owner "root"
+  fi
+}
+
+setup_profile_d()
+{
+  if user_is_root
+  then
+    if os_is_darwin
+    then
+      if ! file_contains /etc/profile '/etc/profile.d/'
+      then
+        printf "%s" 'if [ -d /etc/profile.d ]; then for profile in /etc/profile.d/*.sh ; do ' \
+          >> /etc/profile
+
+        printf "%s\n" " [ -x \"\$profile\" ] && . \"\$profile\" ; done ; unset profile ; fi" \
+          >> /etc/profile
+      fi
+    fi
+
+    if ! file_contains /etc/profile 'awk -v RS=: -v ORS=:'
+    then
+      cat >> /etc/profile <<Code
+# BDSM path cleanse
+PATH="\$(printf "\$PATH" | awk -v RS=: -v ORS=: '!(\$0 in a){a[\$0];print}')"
+PATH="\${PATH/%:/}" # Strip trailing : if it exists
+export PATH
+if [ -n "\${BASH_VERSION:-}" -o -n "\${ZSH_VERSION:-}" ] ; then builtin hash -r ;  fi
+Code
+    fi
+  fi
+}
+
+setup_bdsmrc()
+{
+  if user_is_root
+  then
+    ensure_files_exist "/etc/bdsmrc"
+    if ! file_contains "/etc/bdsmrc" "bdsm_path="
+    then
+      printf "%s\n" "export bdsm_path=\"${bdsm_path}\"" >> "/etc/bdsmrc"
+    fi
+  else
+    ensure_files_exist "$HOME/.bdsmrc"
+    if ! file_contains "$HOME/.bdsmrc" "bdsm_path="
+    then
+      printf "%s\n" "export bdsm_path=\"${bdsm_path}\"" >> "$HOME/.bdsmrc"
+    fi
+  fi
 }
 

@@ -15,94 +15,22 @@ configs=( user ) # TODO move this to /etc/bdsm/ and/or $HOME/.bdsm/
 
 log "Installing BDSM Framework into ${install_path}\n"
 
-(
-log "  Ensuring that install_path '${install_path}' exists"
-ensure_paths_exist "${install_path}"
-enter "${install_path}"
+prepare_for_installation
 
-log "  Removing target directories"
-remove_paths "${directories[@]}"
-ensure_paths_exist "${directories[@]}" extensions
-enter "${install_path}/extensions"
+create_auxillary_paths
 
-log "  Removing core and old extensions, if they exist"
-remove_paths "${extensions[@]}" extension bdsm
-) || fail "Could not create installation target"
+install_core
 
-(
-log "  Ensuring auxillary directories (${aux[@]}) exist in ${install_path}"
-enter "${install_path}"
-ensure_paths_exist "${install_path}/" "${aux[@]}"
-)
+install_core_extensions
 
-(
-log "  Installing core extensions (${extensions[@]}) into ${install_path}/extensions"
-ensure_paths_exist "${install_path}/extensions"
-enter extensions
-copy_directories_to "${install_path}/extensions" "${extensions[@]}"
-)
+install_configuration_files
 
-log "  Installing core directories (${directories[@]}) into ${install_path}"
-copy_directories_to "${install_path}" "${directories[@]}"
+symlink_bdsm
 
-log "  Installing core files (${files[@]}) into ${install_path}"
-copy_files_to "${install_path}" ${files[@]}
+setup_shell_completion
 
-log "  Ensuring that the configuration files (${configs[@]}) exist in ${config_path}"
-ensure_files_exist "${install_path}/cofig/user"
+setup_profile_d
 
-log "  Linking ${install_path}/bin/bdsm to ${prefix_path}/bin/bdsm"
-link --force "${install_path}/bin/bdsm" to "${prefix_path}/bin/bdsm"
-
-if user_is_root
-then
-  log "  Setting up bdsm shell completion."
-  ensure_paths_exist "/etc/profile.d/"
-
-  copy_file from "${install_path}/completion/bdsm.bash" \
-    to "/etc/profile.d/bdsm-completion.sh" \
-    mode 0755 owner "root"
-fi
-
-if user_is_root
-then
-  if os_is_darwin
-  then
-    if ! file_contains /etc/profile '/etc/profile.d/'
-    then
-      printf "%s" 'if [ -d /etc/profile.d ]; then for profile in /etc/profile.d/*.sh ; do ' \
-        >> /etc/profile
-
-      printf "%s\n" " [ -x \"\$profile\" ] && . \"\$profile\" ; done ; unset profile ; fi" \
-        >> /etc/profile
-    fi
-  fi
-
-  if ! file_contains /etc/profile 'awk -v RS=: -v ORS=:'
-  then
-    cat >> /etc/profile <<Code
-# BDSM path cleanse
-PATH="\$(printf "\$PATH" | awk -v RS=: -v ORS=: '!(\$0 in a){a[\$0];print}')"
-PATH="\${PATH/%:/}" # Strip trailing : if it exists
-export PATH
-if [ -n "\${BASH_VERSION:-}" -o -n "\${ZSH_VERSION:-}" ] ; then builtin hash -r ;  fi
-Code
-  fi
-fi
-
-if user_is_root
-then
-  ensure_files_exist "/etc/bdsmrc"
-  if ! file_contains "/etc/bdsmrc" "bdsm_path="
-  then
-    printf "%s\n" "export bdsm_path=\"${bdsm_path}\"" >> "/etc/bdsmrc"
-  fi
-else
-  ensure_files_exist "$HOME/.bdsmrc"
-  if ! file_contains "$HOME/.bdsmrc" "bdsm_path="
-  then
-    printf "%s\n" "export bdsm_path=\"${bdsm_path}\"" >> "$HOME/.bdsmrc"
-  fi
-fi
+setup_bdsmrc
 
 succeed "\nInstallation of BDSM is complete\n"
