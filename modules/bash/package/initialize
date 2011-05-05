@@ -15,7 +15,7 @@ true "${package_name:=${extension}}"
 true \
   "${source_path:="${bdsm_path}/src"}" \
   "${install_base_path:="${packages_path}/${package_name}"}" \
-  "${active_path:="${packages_path}/active"}" \
+  "${active_path:="${packages_path}/active"}"
 
 if user_is_root
 then
@@ -23,14 +23,14 @@ then
     "${data_base_path:="/var/db/${package_name}"}" \
     "${log_path:="/var/log/${package_name}"}" \
     "${package_user:="${package_name}"}" \
-    "${profile_path:=/etc/profile}"
+    "${profile_path:=/etc/profile}" \
     "${profile_d_path:=/etc/profile.d}"
 else
   true \
     "${log_path:="${packages_path}/log"}" \
     "${data_base_path:="${packages_path}/db/${package_name}"}" \
     "${package_user:="$USER"}" \
-    "${profile_path:="$HOME/.profile"}"
+    "${profile_path:="$HOME/.profile"}" \
     "${profile_d_path:="$HOME/.profile.d"}"
 fi
 
