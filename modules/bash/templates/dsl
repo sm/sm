@@ -29,12 +29,19 @@
 #     user$ {{ demonstrate the results}}
 template_exists()
 {
+  if [[ -z "${1:-}" ]]
+  then
+    fail "Cannot check if a template exists as no template name was given."
+  fi
+
   local _template="${extension_templates_path}/${1}.template"
 
-  [[ -n "${_template}" ]] ||
-    fail "Cannot check if a template exists as no template name was given."
-
-  [[ -s "${_template}" ]]
+  if [[ -s "${_template}" ]]
+  then
+    return 0
+  else
+    return 1
+  fi
 }
 
 #

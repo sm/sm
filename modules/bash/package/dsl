@@ -83,11 +83,14 @@ package_definition()
       md5_url)
         package_md5_url="${value}"
         ;;
+      active_path)
+        active_path="${value}"
+        ;;
       bin_path)
         bin_path="${value}"
         ;;
-      prefix_path)
-        prefix_path="${value}"
+      packages_path)
+        packages_path="${value}"
         ;;
       source_path)
         source_path="${value}"
@@ -447,7 +450,7 @@ package_configure()
   else
     export PREFIX="${install_base_path}/${package_version}"
 
-    _command="./configure ${configure_flags[@]:-"--prefix=${install_path:-$prefix_path}"}"
+    _command="./configure ${configure_flags[@]:-"--prefix=${install_path:-$packages_path}"}"
 
     file_is_executable "configure" || return 0
   fi
@@ -602,22 +605,37 @@ package_activate()
 
   variables_must_be_nonempty _package _version
 
-  if symlink_exists "${prefix_path}/${_package}/active"
+  local _package_path="${packages_path}/${_package}/${_version}"
+
+  if symlink_exists "${packages_path}/${_package}/active"
   then
     package_deactivate "${_package}"
   fi
 
-  if ! directory_exists "${prefix_path}/${_package}/${_version}"
+  if directory_exists "${_package_path}"
   then
-    log "Skipping activation of ${_package} ${_version} as '${install_path}' does not exist."
+    log "Activating ${_package} ${_version}"
+
+    (
+    enter "${_package_path}"
+    directories=($(find . -type d))
+    for directory in "${directories[@]}"
+    do
+      mkdir -p "${active_path}/${directory#.\/}"
+    done
+
+    files=($(find . -type f))
+    for file in "${files[@]}"
+    do
+      copy_file "${_package_path}/${file#.\/}" to "${active_path}/${file#.\/}"
+    done
+    )
+
+    link "${packages_path}/${_package}/${_version}" \
+      to "${packages_path}/${_package}/active"
+  else
+    log "Skipping activation of ${_package} ${_version} as '${_package_path}' does not exist."
   fi
-
-  log "Activating ${_package} ${_version}"
-
-  # TODO: activation proces here should iterate over inner files =>
-  # ${bdsm_path}/active/
-  link "${prefix_path}/${_package}/${_version}" \
-    to "${prefix_path}/${_package}/active"
 
   package_setup "${_package}"
 }
@@ -711,10 +729,21 @@ package_deactivate()
 
   log "Deactivating ${_package}"
 
+  (
+  enter "${_package_path}"
+  directories=($(find . -type d))
+
+  files=($(find . -type f))
+  for file in "${files[@]}"
+  do
+    remove_files "${active_path}/${file#.\/}"
+  done
+  )
+
   _files=(
-    "${prefix_path}/${_package}/active"
-    "/etc/ld.so.profile.d/${_package}.conf"
-    "/etc/profile.d/${_package}.sh"
+  "/etc/ld.so.profile.d/${_package}.conf"
+  "/etc/profile.d/${_package}.sh"
+  "${packages_path}/${_package}/active"
   )
 
   for _file in $"${_files[@]}"
@@ -724,6 +753,7 @@ package_deactivate()
       remove_files "${_file}"
     fi
   done
+  log "${_package} deactivated"
 }
 
 #
@@ -769,7 +799,7 @@ package_activate_if_first()
 
   if directory_exists "${install_path}"
   then
-    symlink_exists "${prefix_path}/${_package}/active" ||
+    symlink_exists "${packages_path}/${_package}/active" ||
       package_activate "${_package}" "${_version}"
   else
     log "'${install_path}' not found, skipping activation."
@@ -815,7 +845,7 @@ package_ldconfig()
 
   variables_must_be_nonempty _package
 
-  directory_exists "${prefix_path}/${_package}/active/lib" ||
+  directory_exists "${packages_path}/${_package}/active/lib" ||
     return 0 # no lib/ directory for activated package, no need to update ldconfig
 
   # TODO: Figure out if solaris and freebsd have an analog to this?
@@ -826,7 +856,7 @@ package_ldconfig()
       log "Updating ldconfig for ${_package}"
       ensure_paths_exist "/etc/ld.so.conf.d"
 
-      printf "%s\n" "${prefix_path}/${_package}/active/lib" \
+      printf "%s\n" "${packages_path}/${_package}/active/lib" \
         > "/etc/ld.so.conf.d/${_package}.conf"
 
       chmod_files 0644 "/etc/ld.so.conf.d/${_package}.conf"
@@ -836,8 +866,8 @@ package_ldconfig()
     then # Cluster Fuck.
       true
       # This should be handled by the profile.d?
-      # _files=($(find "${prefix_path}/${_package}/active" -mindepth 1 -maxdepth 1 -type d))
-      # (( ${#_files[@]} > 0 )) && copy_files_to "${prefix_path}" "${_files[@]}"
+      # _files=($(find "${packages_path}/${_package}/active" -mindepth 1 -maxdepth 1 -type d))
+      # (( ${#_files[@]} > 0 )) && copy_files_to "${packages_path}" "${_files[@]}"
     fi
   fi
 }
@@ -881,25 +911,14 @@ package_profile_d()
 
   variables_must_be_nonempty _package
 
-  if ! directory_exists "${prefix_path}/${_package}/active/bin"
+  if template_exists "profile.d.template"
   then
-    return 0 # No bin/ dir, no need for it to be in the path.
-  fi
-
-  if user_is_root
-  then
-    ensure_paths_exist "/etc/profile.d"
-    ensure_files_exist "/etc/profile"
-
     log "Updating shell profile for ${_package}"
 
-    printf "%s\n" "[ -d \"${prefix_path}/${_package}/active/bin\" ] && " \
-      > "/etc/profile.d/${_package}.sh"
+    ensure_paths_exist "${profile_d_path}"
+    ensure_files_exist "${profile_path}"
 
-    printf "%s" "PATH=\"\$PATH:${prefix_path}/${_package}/active/bin\" ; export PATH; " \
-      >> /etc/profile.d/${_package}.sh
-
-    chmod_files 0755 /etc/profile.d/${_package}.sh
+    install_template "profile.d" to "${profile_d_path}/${_package}.sh" mode 0755
   fi
 }
 
@@ -944,10 +963,10 @@ package_uninstall()
 
   if ! package_make_uninstall
   then
-    error "Failed to uninstall ${package_name} from ${prefix_path}."
+    error "Failed to uninstall ${package_name} from ${packages_path}."
   fi
 
-  log "Uninstalled ${package_name} from ${prefix_path}."
+  log "Uninstalled ${package_name} from ${packages_path}."
 }
 
 #
@@ -1159,7 +1178,7 @@ package_cli()
 
     case "$token" in
       --prefix)
-        prefix_path="${extension_args[$((++index))]}"
+        packages_path="${extension_args[$((++index))]}"
         ;;
       --src)
         src_path="${extension_args[$((++index))]}"
@@ -1260,7 +1279,7 @@ package_is_active()
   [[ -n "${_name}" ]] ||
     fail "Can not query if a package is active as no package name was given or name is empty."
 
-  local _path="${prefix_path}/${_name}"
+  local _path="${packages_path}/${_name}"
 
   [[ -L "${_path}/active" ]] && [[ -d $(readlink "${_path}/active") ]]
 }

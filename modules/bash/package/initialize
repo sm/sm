@@ -4,28 +4,34 @@ modules extensions filesystem system users templates environment defaults
 
 # Ensure that default values are set.
 
+fhs_dirs=(bin etc include lib libexec sbin share man)
+
 # Our default bdsm installation location is to /usr/local
-true "${prefix_path:="/usr/local"}"
+true "${packages_path:="${bdsm_path}/pkg"}"
 
 # Default name for the package is the extension name.
 true "${package_name:=${extension}}"
 
 true \
-  "${bin_path:="${prefix_path}/bin"}" \
-  "${source_path:="${prefix_path}/src"}" \
-  "${install_base_path:="${prefix_path}/${package_name}"}"
+  "${source_path:="${bdsm_path}/src"}" \
+  "${install_base_path:="${packages_path}/${package_name}"}"
+  "${active_path:="${packages_path}/active"}" \
 
-if user_is_root ; then
+if user_is_root
+then
   true \
     "${data_base_path:="/var/db/${package_name}"}" \
     "${log_path:="/var/log/${package_name}"}" \
-    "${package_user:="${package_name}"}"
-
+    "${package_user:="${package_name}"}" \
+    "${profile_path:=/etc/profile}"
+    "${profile_d_path:=/etc/profile.d}"
 else
   true \
-    "${log_path:="${prefix_path}/log"}" \
-    "${data_base_path:="${prefix_path}/db/${package_name}"}" \
-    "${package_user:="$USER"}"
+    "${log_path:="${packages_path}/log"}" \
+    "${data_base_path:="${packages_path}/db/${package_name}"}" \
+    "${package_user:="$USER"}" \
+    "${profile_path:="$HOME/.profile"}"
+    "${profile_d_path:="$HOME/.profile.d"}"
 fi
 
 extension_patches_path="${extension_path}/patches"
@@ -52,14 +58,17 @@ variable_is_nonempty package_md5_url   || read_default md5_url prefix package
 variable_is_nonempty archive_format    || read_default archive_format
 variable_is_nonempty init_scripts_path || init_scripts_path="$(init_scripts_path)"
 
-: \
-  "${archive_format:=tar.gz}" \
-  "${data_path:="${data_base_path}/${package_version}"}"
+true "${archive_format:=tar.gz}" "${data_path:="${data_base_path}/${package_version}"}"
 
-ensure_paths_exist "${prefix_path}/bin" "${prefix_path}/man" "${prefix_path}/lib"
+ensure_paths_exist "${active_path}"
 
-export LDFLAGS="${LDFLAGS:-} -L${prefix_path}/lib"
+(
+enter "${active_path}"
+ensure_paths_exist ${fhs_dirs}
+)
 
-export package_name prefix_path package_name package_version archive_format package_file package_url package_md5_url prefix_path bin_path source_path
+export LDFLAGS="${LDFLAGS:-} -L${active_path}/lib"
+
+export package_name packages_path package_name package_version archive_format package_file package_url package_md5_url packages_path bin_path source_path
 
 
