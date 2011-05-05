@@ -355,11 +355,17 @@ setup_profile_d()
       cat >> /etc/profile <<Code
 # BDSM path cleanse
 PATH="\$(printf "\$PATH" | awk -v RS=: -v ORS=: '!(\$0 in a){a[\$0];print}')"
-PATH="\${PATH/%:/}" # Strip trailing : if it exists
-export PATH
+PATH="\${PATH/%:/}" # Strip trailing : if it exists ; export PATH
 if [ -n "\${BASH_VERSION:-}" -o -n "\${ZSH_VERSION:-}" ] ; then builtin hash -r ;  fi
 Code
     fi
+  fi
+
+  if ! file_contains "${profile_d_path}/bdsm.sh" "${packages_path}/active/bin"
+  then
+    printf "PATH=\"${packages_path}/active/bin:${PATH}\"\n" \
+      > "${profile_d_path}/bdsm.sh"
+    chmod_files 0644 "${profile_d_path}/bdsm.sh"
   fi
 }
 
