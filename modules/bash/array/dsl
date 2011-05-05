@@ -420,7 +420,7 @@ array_join()
 #
 # ### array_largest()
 #
-# Outputs the largest element of the array, in the sense of longest string.
+# Outputs the first string in the array with the largest length.
 #
 # ##### Input Parameters
 #
@@ -441,12 +441,9 @@ array_join()
 #
 # ##### Usage Examples
 #
-#     $ the_array=(1 2 3 4 5)
-#     $ array_join the_array
-#     1 2 3 4 5
-#
-#     $ array_join the_array '.'
-#     1.2.3.4.5
+#     $ the_array=(billie bob joe)
+#     $ array_largest the_array
+#     billie
 #
 array_largest()
 {
@@ -460,7 +457,7 @@ array_largest()
     do
       if (( \${#${_array_name}[\${_index}]} > \${#_largest} ))
       then
-        _largest=\${${_array_name}}[\${_index}]}
+        _largest=\${${_array_name}[\${_index}]}
       fi
     done
   "

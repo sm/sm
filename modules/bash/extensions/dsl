@@ -49,19 +49,27 @@ extension_action()
 
   export extension="${1:-}"
 
-  [[ -n "${extension}" ]] ||
+  if [[ -z "${extension}" ]]
+  then
     fail "'extension' is not set! Something has gone terribly wrong."
+  fi
 
   shift
 
   export action="${1:-}"
 
-  [[ -n "${action}" ]] ||
+  if [[ -z "${action}" ]]
+  then
     fail "'action' is not set! Something has gone terribly wrong."
+  fi
 
   shift
 
-  export extension_args="${extension_args:-$@}"
+  if (( ${#extension_args[@]} == 0 ))
+  then
+    extension_args="$@"
+  fi
+  export extension_args
 
   extension_path="$extensions_path/$extension"
   extension_config_path="$extensions_path/$extension/config"
@@ -140,16 +148,19 @@ extension_action()
     bash)
       (
       enable_backtrace
-      modules core
-
-      [[ "${action}" = "help" ]] && modules help
+      if [[ "${action}" = "help" ]]
+      then # Load the help module also.
+        modules core help
+      else
+        modules core
+      fi
 
       source_files \
         "${extension_modules_path}/bash/dsl" \
         "${extension_modules_path}/bash/initialize" \
         "${extension_modules_path}/bash/cli"
 
-      source "${action_file}"
+      . "${action_file}"
       ) || result=$?
       return $result
       ;;

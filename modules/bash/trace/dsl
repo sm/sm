@@ -469,6 +469,12 @@ backtrace()
     _function="${FUNCNAME[${_index}]:+${FUNCNAME[${_index}]}()}"
     _line=${BASH_LINENO[$(( _index - 1 ))]}
 
+    case "$_function" in
+      fail\(\)|error\(\)|command_not_found_handle\(\)|command_not_found\(\))
+        continue
+        ;;
+    esac
+
     case "${EDITOR:-}" in
       (mvim*|mate*)
         printf "${_format}" "${_function}" "${EDITOR// *}://open?url=file://${_source}&line=${_line}" 1>&2
