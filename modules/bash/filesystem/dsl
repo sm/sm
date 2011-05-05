@@ -1747,7 +1747,7 @@ file_contains()
     fail "String pattern for search was not given!"
   fi
 
-  if [[ -f "${_file}" ]]
+  if [[ ! -f "${_file}" ]]
   then
     fail "First parameter must be a file, '${_file}' does not appear to be a file."
   fi
@@ -2106,13 +2106,14 @@ files_under()
 }
 
 #
-# ## function_name
+# ## files_in_path_matching
 #
-# Function Description
+# Find all files in given path matching a given name glob pattern.
 #
 # ##### Input Parameters
 #
-# Positional Parameter listing and descriptions.
+# First parameter is the path to search in
+# Second parameter is the pattern to match in
 #
 # ##### Stream Outputs
 #
@@ -2133,21 +2134,25 @@ files_under()
 #
 # ##### Usage Examples
 #
-#     user$ {{ setup the scenario }}
-#     user$ function_name {{ parameters }}
-#     user$ {{ demonstrate the results}}
-files_under_matching()
+#     user$ files_in_path_matching ...
+#
+files_in_path_matching()
 {
-  local _path="${1:-}" _pattern="${2:-}"
+  local _path="${1:-}"
 
   if [[ -z "${path}" ]]
   then
     fail "Directory name/path was not given!"
+  else
+    shift
   fi
 
+  _pattern="${1:-}"
   if [[ ! -d "${_path}" ]]
   then
     fail "'${_path}' is not a directory!"
+  else
+    shift
   fi
 
   if [[ -z "${_pattern}" ]]
