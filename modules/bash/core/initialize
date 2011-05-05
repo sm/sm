@@ -31,7 +31,7 @@ then
   fi
 fi
 
-modules_path="${bdsm_path}/modules"
+true ${modules_path:="${bdsm_path}/modules"}
 
 export prefix_path bdsm_path modules_path initial_pwd
 

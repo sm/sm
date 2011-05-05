@@ -792,7 +792,7 @@ copy_directories_to()
 
   local _directories=("$@")
 
-  if (( ${#_directories[@]} > 0 ))
+  if (( ${#_directories[@]} == 0 ))
   then
     fail "No directories were given in order to copy them into ${_path}."
   fi

@@ -29,11 +29,17 @@
 #
 modules()
 {
-  if (( trace_flag < 2 )) ; then set +o xtrace ; fi
+  if (( trace_flag < 2 ))
+  then
+    set +o xtrace
+  fi
 
   local _module _bdsm _extension _path _file _modules=("$@")
 
-  (( ${#_modules[@]} > 0 )) || fail "No modules specified to load."
+  if (( ${#_modules[@]} == 0 ))
+  then
+    fail "No modules specified to load."
+  fi
 
   for _module in "${_modules[@]}"
   do
@@ -58,7 +64,10 @@ modules()
     fi
   done
 
-  if (( trace_flag == 1 )) ; then set -o xtrace ; fi
+  if (( trace_flag > 0 ))
+  then
+    set -o xtrace
+  fi
 }
 
 #
@@ -98,7 +107,10 @@ module_load()
 {
   local _file _files=("$@")
 
-  (( ${#_files[@]} > 0 )) || fail "No modules specified to load."
+  if (( ${#_files[@]} == 0 ))
+  then
+    fail "Cannot load a module as no module was given."
+  fi
 
   for _file in "${_files[@]}"
   do
