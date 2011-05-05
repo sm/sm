@@ -364,9 +364,9 @@ Code
   if ! file_exists "${profile_d_path}/bdsm.sh" ||
      ! file_contains "${profile_d_path}/bdsm.sh" "${packages_path}/active/bin"
   then
-    printf "PATH=\"${packages_path}/active/bin:\${PATH}\"\n" \
+    printf "PATH=\"${install_path}/pkg/active/bin:\${PATH}\"\n" \
       > "${profile_d_path}/bdsm.sh"
-    chmod_files 0644 "${profile_d_path}/bdsm.sh"
+    chmod_files 0755 "${profile_d_path}/bdsm.sh"
   fi
 }
 

@@ -43,14 +43,12 @@ then # FHS
     "${etc_path:="/etc"}" \
     "${profile_path:="/etc/profile"}" \
     "${profile_d_path:="/etc/profile.d"}"
-
 else
   true \
     "${var_path:="${bdsm_path}/var"}" \
     "${etc_path:="$HOME/.etc"}" \
     "${profile_path:="$HOME/.profile"}" \
     "${profile_d_path:="$HOME/.profile.d"}"
-
 fi
 
 true \
@@ -69,7 +67,9 @@ true \
   "${keep_releases:=4}" \
   "${hooks_flag:=1}" \
   "${PAGER:="cat -v"}" \
-  "${config_path:="${extensions_path}/core/config"}"
+  "${config_path:="${extensions_path}/core/config"}" \
+  "${packages_path:="${bdsm_path}/pkg"}" \
+  "${active_path:="${packages_path}/active"}"
 
 # Load module() function and then load core modules.
 source "${modules_path}/bash/modules/dsl"

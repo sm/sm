@@ -6,16 +6,12 @@ modules extensions filesystem system users templates environment defaults
 
 fhs_dirs=(bin etc include lib libexec sbin share man)
 
-# Our default bdsm installation location is to /usr/local
-true "${packages_path:="${bdsm_path}/pkg"}"
-
 # Default name for the package is the extension name.
 true "${package_name:=${extension}}"
 
 true \
   "${source_path:="${bdsm_path}/src"}" \
-  "${install_base_path:="${packages_path}/${package_name}"}" \
-  "${active_path:="${packages_path}/active"}"
+  "${install_base_path:="${packages_path}/${package_name}"}"
 
 if user_is_root
 then
