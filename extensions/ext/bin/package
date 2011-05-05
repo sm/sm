@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-if (( ${#extension_args[@]} > 0 ))
+if (( ${#extension_args[@]} == 0 ))
 then
-  package_cli
-else
   error "At least one extension name must be specified."
 fi
+
+package_cli
 

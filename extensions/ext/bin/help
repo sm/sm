@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-modules help
-
 description "BDSM Extension manager."
 
 action "update repository" \

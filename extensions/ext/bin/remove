@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 
-(( ${#extension_args[@]} > 0 )) ||
+if (( ${#extension_args[@]} == 0 ))
+then
   fail "At least one extension name must be specified."
+fi
 
-for extension in "${extensions[@]}" ; do
+for extension in "${extensions[@]}"
+do
   remove_paths "$extensions_path/$extension/"
 done
 
