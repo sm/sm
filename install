@@ -60,6 +60,7 @@ done
 source_files \
   "${PWD}/extensions/core/modules/bash/dsl" \
   "${PWD}/extensions/core/modules/bash/initialize" \
-  "${PWD}/extensions/core/modules/bash/cli" \
-  "${PWD}/extensions/core/bin/install"
+  "${PWD}/extensions/core/modules/bash/cli"
+
+source "${PWD}/extensions/core/bin/install"
 

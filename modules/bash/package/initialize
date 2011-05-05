@@ -6,32 +6,24 @@ modules extensions filesystem system users templates environment defaults
 
 fhs_dirs=(bin etc include lib libexec sbin share man)
 
-# Our default bdsm installation location is to /usr/local
-true "${packages_path:="${bdsm_path}/pkg"}"
-
 # Default name for the package is the extension name.
 true "${package_name:=${extension}}"
 
 true \
   "${source_path:="${bdsm_path}/src"}" \
-  "${install_base_path:="${packages_path}/${package_name}"}" \
-  "${active_path:="${packages_path}/active"}"
+  "${install_base_path:="${packages_path}/${package_name}"}"
 
 if user_is_root
 then
   true \
     "${data_base_path:="/var/db/${package_name}"}" \
     "${log_path:="/var/log/${package_name}"}" \
-    "${package_user:="${package_name}"}" \
-    "${profile_path:=/etc/profile}" \
-    "${profile_d_path:=/etc/profile.d}"
+    "${package_user:="${package_name}"}"
 else
   true \
     "${log_path:="${packages_path}/log"}" \
     "${data_base_path:="${packages_path}/db/${package_name}"}" \
-    "${package_user:="$USER"}" \
-    "${profile_path:="$HOME/.profile"}" \
-    "${profile_d_path:="$HOME/.profile.d"}"
+    "${package_user:="$USER"}"
 fi
 
 extension_patches_path="${extension_path}/patches"
