@@ -338,19 +338,28 @@ ensure_files_are_executable()
   #       make this into make_files_executable or some such
   local _file _files=("$@") _path
 
-  (( ${#_files[@]} > 0 )) ||
+  if (( ${#_files[@]} == 0 ))
+  then
     fail "Cannot ensure files are executable as no files were given."
+  fi
 
-  for _file in "${_files[@]}" ; do
-    [[ ! -d "${_file}" ]] ||
+  for _file in "${_files[@]}"
+  do
+    if [[ -d "${_file}" ]]
+    then
       fail "Cannot make the file '${_file}' executable as it is a directory."
+    fi
 
-    [[ -f "${_file}" ]] ||
+    if [[ ! -f "${_file}" ]]
+    then
       fail "Cannot make the file '${_file}' executable as the file does not exist."
+    fi
 
     _path="${_file%\/*}"
-    [[ -n "${_path}" && ! -d "${_file}" ]] ||
+    if ! [[ -n "${_path}" && ! -d "${_file}" ]]
+    then
       fail "Cannot make the file '${_file} executable as '${_path}' does not even exist."
+    fi
 
     chmod +x "${_file}"
   done
@@ -647,10 +656,13 @@ copy_file()
          _owner="${1}" ; shift
         ;;
       *)
-        if [[ -z "${_source}" ]] ; then
-          _source="$token" ; shift
-        elif [[ -z "${_target}" ]] ; then
-          _target="$token" ; shift
+        if [[ -z "${_source:-}" ]]
+        then
+          _source="$token"
+          shift
+        elif [[ -z "${_target:-}" ]]
+        then
+          _target="$token"
           break # When we have a target we are done.
           # An alternative idea would be to allow an array of multiple targets
           # to symlink to...
@@ -661,8 +673,15 @@ copy_file()
 
   cp "${_source}" "${_target}"
 
-  [[ -z "${_mode:-}" ]]  || chmod "${_mode}" "${_target}"
-  [[ -z "${_owner:-}" ]] || chown "${_owner}" "${_target}"
+  if [[ -n "${_mode:-}" ]]
+  then
+    chmod "${_mode}" "${_target}"
+  fi
+
+  if [[ -n "${_owner:-}" ]]
+  then
+    chown "${_owner}" "${_target}"
+  fi
 
 }
 
@@ -699,11 +718,21 @@ copy_file()
 #
 copy_files_to()
 {
-  local _path="$1" _file ; shift
+  local _path="${1:-}" _file
+
+  if [[ -z "${_path}" ]]
+  then
+    fail "Path was not given as the first parameter."
+  else
+    shift
+  fi
+
   local _files=("$@")
 
-  [[ -n "${_path}" ]]     || fail "Path was not given as the first parameter."
-  (( ${#_files[@]} > 0 )) || fail "No files were given in order to copy them into ${_path}."
+  if (( ${#_files[@]} == 0 ))
+  then
+    fail "No files were given in order to copy them into ${_path}."
+  fi
 
   ensure_paths_exist "${_path}"
 
@@ -752,11 +781,21 @@ copy_files_to()
 #
 copy_directories_to()
 {
-  local _path="${1}" _directory ; shift
+  local _path="${1:-}" _directory
+
+  if [[ -z "${_path}" ]]
+  then
+    fail "Path was not given as the first parameter."
+  else
+    shift
+  fi
+
   local _directories=("$@")
 
-  [[ -n "${_path}" ]]           || fail "Path was not given as the first parameter."
-  (( ${#_directories[@]} > 0 )) || fail "No directories were given in order to copy them into ${_path}."
+  if (( ${#_directories[@]} > 0 ))
+  then
+    fail "No directories were given in order to copy them into ${_path}."
+  fi
 
   ensure_paths_exist "${_path}"
 
@@ -821,9 +860,10 @@ copy_directory()
 
       *)
         if [[ -z "${_source}" ]] ; then
-          _source="$token" ; shift
+          _source="$token"
+          shift
         elif [[ -z "${_target}" ]] ; then
-          _target="$token" ; shift
+          _target="$token"
           break # When we have a target we are done.
           # An alternative idea would be to allow an array of multiple targets
           # to symlink to...
@@ -868,16 +908,28 @@ copy_directory()
 #
 move_files_to()
 {
-  local _path="$1" _file ; shift
+  local _path="${1:-}" _file
+
+  if [[ -n "${_path}" ]]
+  then
+    fail "Path was not given as the first parameter."
+  else
+    shift
+  fi
+
   local _files=("$@")
 
-  [[ -n "${_path}" ]]     || fail "Path was not given as the first parameter."
-  (( ${#_files[@]} > 0 )) || fail "No files given in order to chmod ${_permissions} them."
+  if (( ${#_files[@]} > 0 ))
+  then
+    fail "No files given in order to chmod ${_permissions} them."
+  fi
 
   ensure_paths_exist "${_path}"
 
-  for _file in "${_files[@]}" ; do
-    if file_exists "${_file}" ; then
+  for _file in "${_files[@]}"
+  do
+    if file_exists "${_file}"
+    then
       mv "${_file}" "${_path}/${_file}"
     else
       error "Cannot move file ${_file} to ${_path} as the file does not exist."
@@ -918,17 +970,21 @@ move_files_to()
 #
 chown_files()
 {
-  local _identity="$1" _file
+  local _identity="${1:-}" _file
 
-  [[ -n "${_identity}" ]] ||
+  if [[ -z "${_identity}" ]]
+  then
     fail "user[:group] not given as the first parameter."
+  else
+    shift
+  fi
 
-  shift
   local _files=("$@")
 
-
-  (( ${#_files[@]} > 0 )) ||
+  if (( ${#_files[@]} == 0 ))
+  then
     fail "No paths given to chmod ${_permissions}."
+  fi
 
   for _file in "${_files[@]}"
   do
@@ -974,13 +1030,16 @@ chown_files()
 #
 chown_paths()
 {
-  local _identity="$1" _path ; shift
-  local _paths=("$@")
+  local _identity="${1:-}" _path
 
   if [[ -z "${_identity}" ]]
   then
     fail "user[:group] not given as the first parameter."
+  else
+    shift
   fi
+
+  local _paths=("$@")
 
   if (( ${#_paths[@]} == 0 ))
   then
@@ -1031,21 +1090,26 @@ chown_paths()
 #
 chown_paths_recursively()
 {
-  local _identity="$1" _path ; shift
-  local _paths=("$@")
+  local _identity="${1:-}" _path
 
   if [[ -z "${_identity}" ]]
   then
     fail "user[:group] not given as the first parameter!!"
+  else
+    shift
   fi
+
+  local _paths=("$@")
 
   if (( ${#_paths[@]} == 0 ))
   then
     fail "No paths given to chmod ${_permissions}."
   fi
 
-  for _path in "${_paths[@]}" ; do
-    if directory_exists "${_path}" ; then
+  for _path in "${_paths[@]}"
+  do
+    if directory_exists "${_path}"
+    then
       chown -R ${_identity} "${_path}"
     else
       error "Cannot recursively chown ${_path} to ${_identity} as the directory does not exist."
@@ -1086,13 +1150,16 @@ chown_paths_recursively()
 #
 chmod_files()
 {
-  local _permissions="$1" _file ; shift
-  local _files=("$@")
+  local _permissions="${1:-}" _file
 
   if [[ -z "${_permissions}" ]]
   then
     fail "Permissions not given as the first parameter!!"
+  else
+    shift
   fi
+
+  local _files=("$@")
 
   if (( ${#_files[@]} == 0 ))
   then
@@ -1147,8 +1214,10 @@ chmod_paths()
   if [[ -z "${_permissions}" ]]
   then
     fail "Cannot chmod_paths as the permissions were not given as the first parameter!!"
+  else
+    shift
   fi
-  shift
+
   local _paths=("$@")
 
   if (( ${#_paths[@]} == 0 ))
