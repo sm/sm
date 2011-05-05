@@ -206,6 +206,47 @@ service_setup()
 
   service_install_init_d "${service}"
 }
+#
+# # Single Service functions.
+#
+#
+# ### service_uninstall()
+#
+# Service uninstall and configuration.
+#
+# ##### Input Parameters
+#
+# None.
+#
+# ##### Stream Outputs
+#
+# None.
+#
+# ##### Environmental effects
+#
+# Creates a system service user with the same name as the service.
+# Sets up the service init_d file from template, if it exists.
+#
+# ##### Return Codes
+#
+# 0 for success
+#
+# ##### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ##### Usage Examples
+#
+#     user$ service=redis
+#     user$ service_uninstall
+#     ...
+#
+service_uninstall()
+{
+  log "TODO: service_uninstall is NIY"
+  # 1. Remove init scripts
+  # 2. Unload OS service hooks
+}
 
 #
 # ### service_start()

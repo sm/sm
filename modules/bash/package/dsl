@@ -959,14 +959,21 @@ package_uninstall()
 {
   variables_must_be_nonempty package_name package_version archive_format
 
-  true "${package_dir:="${package_name}-${package_version}"}"
+  local _package_path="${packages_path}/${package_name}/${package_version}"
 
-  if ! package_make_uninstall
-  then
-    error "Failed to uninstall ${package_name} from ${packages_path}."
+  if package_is_active "${package_name}" "${package_version}"
+  then # Deactivate the package if active.
+     package_deactivate "${package_name}"
   fi
 
-  log "Uninstalled ${package_name} from ${packages_path}."
+  remove_paths "${_package_path}"
+
+  if module_is_loaded service
+  then # Remove any service reminants.
+     service_uninstall
+  fi
+
+  log "${package_name} ${package_version} has been uninstalled."
 }
 
 #
@@ -1276,12 +1283,19 @@ package_cli()
 package_is_active()
 {
   local _name="${1:-${package_name}}"
-  [[ -n "${_name}" ]] ||
+  if [[ -z "${_name}" ]]
+  then
     fail "Can not query if a package is active as no package name was given or name is empty."
+  fi
 
   local _path="${packages_path}/${_name}"
 
-  [[ -L "${_path}/active" ]] && [[ -d $(readlink "${_path}/active") ]]
+  if [[ -L "${_path}/active" && -d $(readlink "${_path}/active") ]]
+  then
+    return 0
+  else
+    return 1
+  fi
 }
 
 #
@@ -1320,11 +1334,17 @@ package_is_active()
 package_must_be_active()
 {
   local _name="${1:-}"
-  [[ -n "${_name}" ]] ||
+  if [[ -z "${_name}" ]]
+  then
     fail "Can not ensure that package is active as no package name was given or name is empty."
+  fi
 
-  package_is_active "${_name}" ||
+  if package_is_active "${_name}"
+  then
+    return 0
+  else
     error "Install/activate the node package extension before installing ${_name}."
+  fi
 }
 
 #
