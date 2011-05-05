@@ -38,13 +38,9 @@ export prefix_path bdsm_path modules_path initial_pwd
 
 if (( UID == 0 ))
 then # FHS
-  :\
-    "${var_path:="/var"}" \
-    "${etc_path:="/etc"}"
+  true "${var_path:="/var"}" "${etc_path:="/etc"}"
 else
-  :\
-    "${var_path:="${bdsm_path}/var"}" \
-    "${etc_path:="${bdsm_path}/etc"}"
+  true "${var_path:="${bdsm_path}/var"}" "${etc_path:="${bdsm_path}/etc"}"
 fi
 
 true \

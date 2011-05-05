@@ -976,11 +976,20 @@ chown_paths()
   local _identity="$1" _path ; shift
   local _paths=("$@")
 
-  [[ -n "${_identity}" ]] || fail "user[:group] not given as the first parameter."
-  (( ${#_paths[@]} > 0 )) || fail "No paths given to chmod ${_permissions}."
+  if [[ -z "${_identity}" ]]
+  then
+    fail "user[:group] not given as the first parameter."
+  fi
 
-  for _path in "${_paths[@]}" ; do
-    if directory_exists "${_path}" ; then
+  if (( ${#_paths[@]} == 0 ))
+  then
+    fail "No paths given to chmod ${_permissions}."
+  fi
+
+  for _path in "${_paths[@]}"
+  do
+    if directory_exists "${_path}"
+    then
       chown ${_identity} "${_path}"
     else
       error "Cannot chown path ${_path} to ${_identity} as the directory does not exist."
@@ -1024,8 +1033,15 @@ chown_paths_recursively()
   local _identity="$1" _path ; shift
   local _paths=("$@")
 
-  [[ -n "${_identity}" ]] || fail "user[:group] not given as the first parameter!!"
-  (( ${#_paths[@]} > 0 )) || fail "No paths given to chmod ${_permissions}."
+  if [[ -z "${_identity}" ]]
+  then
+    fail "user[:group] not given as the first parameter!!"
+  fi
+
+  if (( ${#_paths[@]} == 0 ))
+  then
+    fail "No paths given to chmod ${_permissions}."
+  fi
 
   for _path in "${_paths[@]}" ; do
     if directory_exists "${_path}" ; then
@@ -1072,11 +1088,20 @@ chmod_files()
   local _permissions="$1" _file ; shift
   local _files=("$@")
 
-  [[ -n "${_permissions}" ]] || fail "Permissions not given as the first parameter!!"
-  (( ${#_files[@]} > 0 ))    || fail "No files given to chmod ${_permissions}."
+  if [[ -z "${_permissions}" ]]
+  then
+    fail "Permissions not given as the first parameter!!"
+  fi
 
-  for _file in "${_files[@]}" ; do
-    if file_exists "${_file}" ; then
+  if (( ${#_files[@]} == 0 ))
+  then
+    fail "No files given to chmod ${_permissions}."
+  fi
+
+  for _file in "${_files[@]}"
+  do
+    if file_exists "${_file}"
+    then
       chmod ${_permissions} "${_file}"
     else
       error "Cannot chmod file ${_file} to ${_permissions} as the file does not exist."
@@ -1117,14 +1142,23 @@ chmod_files()
 #
 chmod_paths()
 {
-  local _permissions="$1" _path ; shift
+  local _permissions="$1" _path
+  if [[ -z "${_permissions}" ]]
+  then
+    fail "Cannot chmod_paths as the permissions were not given as the first parameter!!"
+  fi
+  shift
   local _paths=("$@")
 
-  [[ -n "${_permissions}" ]] || fail "Permissions not given as the first parameter!!"
-  (( ${#_paths[@]} > 0 ))    || fail "No paths given to chmod ${_permissions}."
+  if (( ${#_paths[@]} == 0 ))
+  then
+    fail "Cannot chmod_paths as no paths were given in order to change permissions to ${_permissions}."
+  fi
 
-  for _path in "${_paths[@]}" ; do
-    if directory_exists "${_directory}" ; then
+  for _path in "${_paths[@]}"
+  do
+    if directory_exists "${_directory}"
+    then
       chmod ${_permissions} "${_path}"
     else
       error "Cannot chmod directory ${_path} to ${_permissions} as the directory does not exist."
@@ -1165,15 +1199,23 @@ chmod_paths()
 #
 chmod_paths_recursively()
 {
-  local _permissions="${1:-}" _path ; shift
+  local _permissions="${1:-}" _path
+  if [[ -z "${_permissions}" ]]
+  then
+    fail "Permissions not given as the first parameter!!"
+  fi
+  shift
   local _paths=("$@")
 
-  [[ -n "${_permissions}" ]] || fail "Permissions not given as the first parameter!!"
+  if (( ${#_paths[@]} == 0 ))
+  then
+    fail "No paths given to chmod ${_permissions}."
+  fi
 
-  (( ${#_paths[@]} > 0 )) || fail "No paths given to chmod ${_permissions}."
-
-  for _path in "${_paths[@]}" ; do
-    if directory_exists "${_path}" ; then
+  for _path in "${_paths[@]}"
+  do
+    if directory_exists "${_path}"
+    then
       chmod -R ${_permissions} "${_path}"
     else
       error "Cannot chmod directory ${_path} to ${_permissions} as the directory does not exist."
@@ -1624,7 +1666,8 @@ file_is_missing()
 #     user$ echo $?
 #     0
 #
-file_is_empty_or_missing() {
+file_is_empty_or_missing()
+{
   local _file="${1:-}"
 
   if [[ -z "${_file}" ]]
@@ -1689,13 +1732,25 @@ file_is_empty_or_missing() {
 #
 file_contains()
 {
-  local _file="${1:-}" _pattern="${2:-}"
+  local _file="${1:-}"
 
-  [[ -n "${_file}" ]]    || fail "File path/name was not given!"
-  [[ -n "${_pattern}" ]] || fail "String pattern for search was not given!"
+  if [[ -z "${_file}" ]]
+  then
+    fail "File path/name was not given!"
+  else
+    shift
+  fi
 
-  [[ -f "${_file}" ]] ||
+  local _pattern="${1:-}"
+  if [[ -z "${_pattern}" ]]
+  then
+    fail "String pattern for search was not given!"
+  fi
+
+  if [[ -f "${_file}" ]]
+  then
     fail "First parameter must be a file, '${_file}' does not appear to be a file."
+  fi
 
   if grep "${_pattern}" "${_file}" >/dev/null 2>&1
   then
@@ -1846,8 +1901,15 @@ directories_in()
 {
   local _path="${1:-}"
 
-  [[ -n "${path}" ]]  || fail "Directory name/path was not given!"
-  [[ -d "${_path}" ]] || fail "'${_path}' is not a directory!"
+  if [[ -z "${path}" ]]
+  then
+    fail "Directory name/path was not given!"
+  fi
+
+  if [[ ! -d "${_path}" ]]
+  then
+    fail "'${_path}' is not a directory!"
+  fi
 
   if find "${_path}" -mindepth 1 -maxdepth 1 -type d
   then
@@ -1861,9 +1923,20 @@ directories_in_matching()
 {
   local _path="${1:-}" _pattern="${2:-}"
 
-  [[ -n "${path}" ]]     || fail "Directory name/path was not given!"
-  [[ -d "${_path}" ]]    || fail "'${_path}' is not a directory!"
-  [[ -n "${_pattern}" ]] || fail "'${_path}' is not a directory!"
+  if [[ -z "${path}" ]]
+  then
+    fail "Directory name/path was not given!"
+  fi
+
+  if [[ ! -d "${_path}" ]]
+  then
+    fail "'${_path}' is not a directory!"
+  fi
+
+  if [[ -z "${_pattern}" ]]
+  then
+    fail "'${_path}' is not a directory!"
+  fi
 
   if find "${_path}" -mindepth 1 -maxdepth 1 -type d
   then
@@ -1877,8 +1950,15 @@ directories_under()
 {
   local _path="${1:-}"
 
-  [[ -n "${path}" ]]  || fail "Directory name/path was not given!"
-  [[ -d "${_path}" ]] || fail "'${_path}' is not a directory!"
+  if [[ -z "${path}" ]]
+  then
+    fail "Directory name/path was not given!"
+  fi
+
+  if [[ ! -d "${_path}" ]]
+  then
+    fail "'${_path}' is not a directory!"
+  fi
 
   if find "${_path}" -mindepth 1 -type d
   then
@@ -1890,11 +1970,26 @@ directories_under()
 
 directories_under_matching()
 {
-  local _path="${1:-}" _pattern="${2:-}"
+  local _path="${1:-}"
 
-  [[ -n "${path}" ]]     || fail "Directory name/path was not given!"
-  [[ -d "${_path}" ]]    || fail "'${_path}' is not a directory!"
-  [[ -n "${_pattern}" ]] || fail "'${_path}' is not a directory!"
+  if [[ -z "${path}" ]]
+  then
+    fail "Directory name/path was not given!"
+  else
+    shift
+  fi
+
+  local _pattern="${1:-}"
+
+  if [[ ! -d "${_path}" ]]
+  then
+    fail "'${_path}' is not a directory!"
+  fi
+
+  if [[ -z "${_pattern}" ]]
+  then
+    fail "'${_path}' is not a directory!"
+  fi
 
   if find "${_path}" -mindepth 1 -iname "${_pattern}" -type d
   then
@@ -1939,8 +2034,15 @@ files_in()
 {
   local _path="${1:-}"
 
-  [[ -n "${path}" ]]  || fail "Directory name/path was not given!"
-  [[ -d "${_path}" ]] || fail "'${_path}' is not a directory!"
+  if [[ -z "${path}" ]]
+  then
+    fail "Directory name/path was not given!"
+  fi
+
+  if [[ ! -d "${_path}" ]]
+  then
+    fail "'${_path}' is not a directory!"
+  fi
 
   if find "${_path}" -mindepth 1 -maxdepth 1 -type f
   then
@@ -1985,8 +2087,15 @@ files_under()
 {
   local _path="${1:-}"
 
-  [[ -n "${path}" ]]  || fail "Directory name/path was not given!"
-  [[ -d "${_path}" ]] || fail "'${_path}' is not a directory!"
+  if [[ -n "${path}" ]]
+  then
+    fail "Directory name/path was not given!"
+  fi
+
+  if [[ -d "${_path}" ]]
+  then
+    fail "'${_path}' is not a directory!"
+  fi
 
   if find "${_path}" -mindepth 1 -type f
   then
@@ -2031,9 +2140,20 @@ files_under_matching()
 {
   local _path="${1:-}" _pattern="${2:-}"
 
-  [[ -n "${path}" ]]     || fail "Directory name/path was not given!"
-  [[ -d "${_path}" ]]    || fail "'${_path}' is not a directory!"
-  [[ -n "${_pattern}" ]] || fail "Cannot find files as a filename or pattern was not given."
+  if [[ -z "${path}" ]]
+  then
+    fail "Directory name/path was not given!"
+  fi
+
+  if [[ ! -d "${_path}" ]]
+  then
+    fail "'${_path}' is not a directory!"
+  fi
+
+  if [[ -z "${_pattern}" ]]
+  then
+    fail "Cannot find files as a filename or pattern was not given."
+  fi
 
   if find "${_path}" -mindepth 1 -iname "${_pattern}" -type f
   then
@@ -2044,58 +2164,66 @@ files_under_matching()
 }
 
 #
-# ## function_name
+# ## replace_content
 #
-# Function Description
+# Replaces a given (sed compatable) pattern with given replacement text in a
+# file.
 #
 # ##### Input Parameters
 #
-# Positional Parameter listing and descriptions.
+# First parameter is the pattern
+# [optional 'with']
+# Second parameter is the replacement content
+# [optional 'in']
+# Third parameter is the file name/path
 #
 # ##### Stream Outputs
 #
-# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+# None.
 #
 # ##### Environmental effects
 #
-# What, if any, environmental side effects this function causes. 'None.' for none.
+# The pattern will be matched against the file name/path content and the
+# replacement text will be put in place.
 #
 # ##### Return Codes
 #
-# 0 if ...
-# 1 if ...
+# 0 for success
 #
 # ##### Failure Scenarios
 #
-# Fails if ...
+# Fails if no pattern was given
+# Fails if replacement content was not given
+# Fails if filename was not given
+# Fails if the file does not exist
 #
 # ##### Usage Examples
 #
-#     user$ {{ setup the scenario }}
-#     user$ function_name {{ parameters }}
-#     user$ {{ demonstrate the results}}
+# # Replace contents in a file with a given (sed) regex pattern.
 #
-# Replace contents in a file with a given (sed) regex pattern.
-#
-# Example:
-# replace_content "^PREFIX =.*" with "${install_path}" in Makefile
+#     replace_content "^PREFIX =.*" with "${install_path}" in Makefile
 #
 replace_content()
 {
   local _token _pattern _content _file
 
-  while (( $# > 0 )) ; do
-    _token="$1" ; shift
+  while (( $# > 0 ))
+  do
+    _token="$1"
+    shift
 
     case "${_token}" in
       (with)
-        _content="${1:-}" ; shift
+        _content="${1:-}"
+        shift
         ;;
       (in)
-        _file="${1}" ; shift
+        _file="${1}"
+        shift
         ;;
       (*)
-        if [[ -z "${_pattern}" ]] ; then
+        if [[ -z "${_pattern}" ]]
+        then
           _pattern="${_token}"
         else
           fail "Unknown token '${_token}' passed as a parameter.'"
@@ -2104,17 +2232,25 @@ replace_content()
     esac
   done
 
-  [[ -n "${_pattern:-}" ]] ||
+  if [[ -z "${_pattern:-}" ]]
+  then
     fail "Cannot replace content as not even a pattern was given."
+  fi
 
-  [[ -n "${_content:-}" ]] ||
+  if [[ -z "${_content:-}" ]]
+  then
     fail "Cannot replace content as the replacement content was not given, specify by 'with \"replacement text\"'."
+  fi
 
-  [[ -n "${_file:-}" ]] ||
+  if [[ -z "${_file:-}" ]]
+  then
     fail "Can not file content as the filename was not given, specify by 'in \"/path/to/filename\"'"
+  fi
 
-  [[ -f "${_file:-}" ]] ||
+  if [[ ! -f "${_file:-}" ]]
+  then
     fail "Can not replace file content as the file does not exist."
+  fi
 
   if sed -i -e "s#${_pattern}#${_content}#g" "${_file}"
   then
@@ -2127,7 +2263,7 @@ replace_content()
 #
 # ## file_matches_md5
 #
-# Fetches the package's md5 sum from the md5_url, if given.
+# Checks to see if the given file matches the given md5 sum.
 #
 # ##### Input Parameters
 #
@@ -2164,12 +2300,20 @@ file_matches_md5()
 {
   local _file="$1" _md5="$2" _file_md5
 
-  [[ -n "${_file}" ]] ||
+  if [[ -z "${_file}" ]]
+  then
     fail "Cannot determine if file matches md5 as no file was given."
-  [[ -n "${_md5}" ]]  ||
-    fail "Cannot determine if file matches md5 as no md5 was given."
+  fi
 
-  [[ -s "${_file}" ]] || return 1
+  if [[ -z "${_md5}" ]]
+  then
+    fail "Cannot determine if file matches md5 as no md5 was given."
+  fi
+
+  if [[ ! -s "${_file}" ]]
+  then
+    return 1
+  fi
 
   if os_is_linux
   then
@@ -2190,3 +2334,4 @@ file_matches_md5()
     return 1
   fi
 }
+
