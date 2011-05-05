@@ -853,14 +853,15 @@ package_ldconfig()
   then
     if os_is_linux
     then
-      log "Updating ldconfig for ${_package}"
       ensure_paths_exist "/etc/ld.so.conf.d"
 
-      printf "%s\n" "${packages_path}/${_package}/active/lib" \
-        > "/etc/ld.so.conf.d/${_package}.conf"
+      if ! file_exists "/etc/ld.so.conf.d/bdsm.conf"
+      then
+        printf "%s\n" "${active_path}/lib" > "/etc/ld.so.conf.d/bdsm.conf"
+        chmod_files 0644 "/etc/ld.so.conf.d/bdsm.conf"
+      fi
 
-      chmod_files 0644 "/etc/ld.so.conf.d/${_package}.conf"
-
+      log "Updating ldconfig for ${_package}"
       ldconfig
     elif os_is_darwin
     then # Cluster Fuck.
@@ -1013,7 +1014,10 @@ package_patch()
 {
   local _patches _patch
 
-  directory_exists "${extension_patches_path}" || return 0
+  if ! directory_exists "${extension_patches_path}"
+  then
+    return 0
+  fi
 
   # TODO: Three level hierarchy based on patches/{OS}/{version},
   #       root level as 'global' always installed.
@@ -1021,7 +1025,10 @@ package_patch()
   # TODO: Test each dir for existence and skip if missing
   _patches=($(find "${extension_patches_path}" -mindepth 1 -maxdepth 1 -iname '*.patch' -type f))
 
-  (( ${#_patches[@]} > 0 )) || return 0
+  if (( ${#_patches[@]} == 0 ))
+  then
+    return 0
+  fi
 
   log "Applying patches for ${package_name} ${package_version}"
 
@@ -1035,7 +1042,10 @@ package_patch()
   _patches=($(find "${extension_patches_path}/$(os_type)" -mindepth 1 -maxdepth 1 -iname '*.patch' -type f))
   package_apply_patches "${_patches[@]}"
 
-  directory_exists "${extension_patches_path}/$(os_type)/${package_version}" || return 0
+  if ! directory_exists "${extension_patches_path}/$(os_type)/${package_version}"
+  then
+    return 0
+  fi
 
   _patches=($(find "${extension_patches_path}/$(os_type)/${package_version}" -mindepth 1 -maxdepth 1 -iname '*.patch' -type f))
 
@@ -1079,11 +1089,14 @@ package_apply_patches()
 {
   local _patch _patches=("$@")
 
-  (( ${#_patches[@]} > 0 )) || fail "Cannot apply patches as no patches were given."
+  if (( ${#_patches[@]} == 0 ))
+  then
+    fail "Cannot apply patches as no patches were given."
+  fi
 
-  for _patch in "${_patches[@]}" ; do
-    # TODO: apply the patch...
-    true
+  for _patch in "${_patches[@]}"
+  do
+    log "TODO: patch application is NIY"
   done
 }
 
@@ -1242,7 +1255,10 @@ package_cli()
         ;;
     esac
 
-    (( ${#_ignored_args[@]} > 0 )) && extension_args=( "${_ignored_args[@]}" )
+    if (( ${#_ignored_args[@]} > 0 ))
+    then
+      extension_args=( "${_ignored_args[@]}" )
+    fi
 
   done
 }
@@ -1334,6 +1350,7 @@ package_is_active()
 package_must_be_active()
 {
   local _name="${1:-}"
+
   if [[ -z "${_name}" ]]
   then
     fail "Can not ensure that package is active as no package name was given or name is empty."
@@ -1384,8 +1401,10 @@ packages_must_be_active()
 {
   local _package _packages="$@"
 
-  (( "${#@}" > 0 )) ||
+  if (( "${#@}" == 0 ))
+  then
     fail "Can not ensure that packages are active as no packages were given."
+  fi
 
   for _package in "${_packages[@]}"
   do
@@ -1433,21 +1452,81 @@ package_docs()
   if os_is_darwin
   then
     open $package_docs_url
-    return 0
-  fi
 
-  if command_exists xdg-open
+  elif command_exists xdg-open
   then
     xdg-open $package_docs_url
+
   elif command_exists lynx
   then
     lynx $package_docs_url
+
   elif command_exists links
   then
     links $package_docs_url
+
   else
     curl -s -L $package_docs_url -o /tmp/${package_name}-${package_version}.docs
-    less /tmp/${package_name}-${package_version}.docs
+    ${EDITOR:-/bin/less} /tmp/${package_name}-${package_version}.docs
+  fi
+}
+
+#
+# ## package_website
+#
+# Opens package documentation website either in the web browser (if able) or via
+# curl through PAGER (defaulting to less).
+#
+# ##### Input Parameters
+#
+# None.
+#
+# ##### Stream Outputs
+#
+# None if can open web browser or website website in PAGER otherwise.
+#
+# ##### Environmental effects
+#
+# Web browser will open with documentation url if able.
+#
+# ##### Return Codes
+#
+# 0 for success.
+#
+# ##### Failure Scenarios
+#
+# Error if package_website_url has not been set.
+#
+# ##### Usage Examples
+#
+# Example Usage:
+#
+# user$ package_website
+#
+# ##### Notes
+#
+package_website()
+{
+  # TODO: move this logic into a core dsl function.
+  if os_is_darwin
+  then
+    open $package_website_url
+
+  elif command_exists xdg-open
+  then
+    xdg-open $package_website_url
+
+  elif command_exists lynx
+  then
+    lynx $package_website_url
+
+  elif command_exists links
+  then
+    links $package_website_url
+
+  else
+    curl -s -L $package_website_url -o /tmp/${package_name}-${package_version}.website
+    ${EDITOR:-/bin/less} /tmp/${package_name}-${package_version}.website
   fi
 }
 
