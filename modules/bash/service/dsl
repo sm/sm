@@ -1345,8 +1345,10 @@ service_deactivate()
 {
   local _service="${1:-"${service}"}"
 
-  [[ -n "${_service}" ]] ||
+  if [[ -z "${_service}" ]]
+  then
     fail "service must be set or passed in in order to deactivate a service."
+  fi
 
   if file_exists "${init_scripts_path}/${_service}"
   then
@@ -1357,9 +1359,11 @@ service_deactivate()
       if command_exists rc-update
       then
         rc-update add ${service} default
+
       elif command_exists chkconfig
       then
         chkconfig ${service} on
+
       #elif command_exists svc
       #then
       #  svc ${service} on # TODO: daemontools start on boot
@@ -1408,22 +1412,26 @@ service_activate()
 {
   local _service="${1:-"${service}"}" _version="${2:-${package_version}}"
 
-  [[ -n "${_service}" ]] ||
+  if [[ -z "${_service}" ]]
+  then
     fail "service must be set or passed in in order to deactivate a service."
+  fi
 
   variables_must_be_nonempty _service _version
 
-  symlink_exists "${service_db_path}/active" &&
-    package_deactivate "${_service}"
+  if symlink_exists "${service_db_path}/active"
+  then
+    service_deactivate "${_service}"
+  fi
 
-  directory_exists "${service_db_path}/${_version}" ||
+  if ! directory_exists "${service_db_path}/${_version}"
+  then
     log "Skipping activation of ${_service} ${_version} as '${install_path}' does not exist."
+  fi
 
   log "Activating service ${_service} version ${_version}"
 
-  link --force "${service_db_path}/${_version}" \
-    to "${service_db_path}/active"
-
+  link --force "${service_db_path}/${_version}" to "${service_db_path}/active"
 
   if file_exists "${init_scripts_path}/${service}"
   then
@@ -1434,13 +1442,16 @@ service_activate()
       if command_exists rc-update
       then
         rc-update remove ${service} default
+
       elif command_exists chkconfig
       then
         chkconfig ${service} off
+
       #elif command_exists svc
       #then
       #  svc ${service} off
       #  TODO: daemontools remove start on boot
+
       else # Fall back on rc.local to start redis at system startup.
         if ! file_contains "/etc/rc.local" "${service} start"
         then
