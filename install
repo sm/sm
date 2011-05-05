@@ -19,7 +19,7 @@
 # Load System BDSM Configuration, if it exists.
 for file in /etc/bdsmrc "$HOME/.bdsmrc"
 do
-  if [[ -s "/etc/bdsmrc" ]]
+  if [[ -s "${file}" ]]
   then
     source "${file}" || true # Continue if it fails.
   fi
@@ -29,11 +29,14 @@ done
 # this should be set to where BDSM is installed to in /etc/bdsmrc
 prefix_path="${prefix_path:-/usr/local}"
 
-if [[ "$prefix_path" = "$HOME" ]]
+if [[ -z "${bdsm_path}" ]]
 then
-  { : "${bdsm_path:="${prefix_path}bdsm"}"; }
-else
-  { : "${bdsm_path:="${prefix_path}/bdsm"}"; }
+  if [[ "$prefix_path" = "$HOME" ]]
+  then
+    bdsm_path="${prefix_path}/.bdsm"
+  else
+    bdsm_path="${prefix_path}/bdsm"
+  fi
 fi
 
 install_path="${bdsm_path}"         # Path to install everything to
