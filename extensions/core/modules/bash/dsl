@@ -353,13 +353,13 @@ setup_profile_d()
 
     if ! file_contains "$HOME/.bashrc" "$HOME/.profile"
     then
-      log "if test -s \"$HOME/.profile\" ; then . \"$HOME/.profile\" ; fi"
+      log "if test -s \"$HOME/.profile\" ; then . \"$HOME/.profile\" ; fi"\
         to /etc/profile
     fi
 
     if ! file_contains "$HOME/.bash_profile" "$HOME/.bashrc"
     then
-      log "if test -s \"$HOME/.bashrc\" ; then . \"$HOME/.bashrc\" ; fi"
+      log "if test -s \"$HOME/.bashrc\" ; then . \"$HOME/.bashrc\" ; fi"\
         to /etc/profile
     fi
 
