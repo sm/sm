@@ -2515,7 +2515,7 @@ extract_archive()
 
   local _path="${1:-}"
 
-  case "${archive}" in
+  case "${_archive}" in
     *.tar.gz|*.tgz) # gzip
       if ! tar zxf "${archive}"
       then
