@@ -336,36 +336,26 @@ setup_shell_completion()
 
 setup_profile_d()
 {
+  ensure_paths_exist "${profile_d_path}"
+
   if user_is_root
   then
     if os_is_darwin
     then
-      if ! file_contains /etc/profile '/etc/profile.d/'
+      if ! file_contains /etc/profile "${profile_d_path}"
       then
-        printf "%s" 'if [ -d /etc/profile.d ]; then for profile in /etc/profile.d/*.sh ; do ' \
-          >> /etc/profile
-
-        printf "%s\n" " [ -x \"\$profile\" ] && . \"\$profile\" ; done ; unset profile ; fi" \
-          >> /etc/profile
+        log "if test -d '${profile_d_path}' ; then for profile in \"${profile_d_path}\"/*.sh ; do if test -x \"\$profile\" ; then . \"\$profile\" ; fi ; done ; unset profile ; fi" \
+          to /etc/profile
       fi
-    fi
-
-    if ! file_contains /etc/profile 'awk -v RS=: -v ORS=:'
-    then
-      cat >> /etc/profile <<Code
-# BDSM path cleanse
-PATH="\$(printf "\$PATH" | awk -v RS=: -v ORS=: '!(\$0 in a){a[\$0];print}')"
-PATH="\${PATH/%:/}" # Strip trailing : if it exists ; export PATH
-if [ -n "\${BASH_VERSION:-}" -o -n "\${ZSH_VERSION:-}" ] ; then builtin hash -r ;  fi
-Code
     fi
   fi
 
   if ! file_exists "${profile_d_path}/bdsm.sh" ||
      ! file_contains "${profile_d_path}/bdsm.sh" "${packages_path}/active/bin"
   then
-    printf "PATH=\"${install_path}/pkg/active/bin:\${PATH}\"\n" \
-      > "${profile_d_path}/bdsm.sh"
+    log "PATH=\"${install_path}/pkg/active/bin:\${PATH}\"\n" \
+      to "${profile_d_path}/bdsm.sh"
+
     chmod_files 0755 "${profile_d_path}/bdsm.sh"
   fi
 }
