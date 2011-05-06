@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 # ## package_error
 #
 # Presents the user with a package related error message including the tail
@@ -30,7 +31,7 @@
 #
 #     user$ package_error "Hello there! " configure.log 5
 #     ERROR Hello there!
-#     
+#
 #
 #     Tail of configure.log:
 #			checking for inflate in -lz... no
@@ -495,10 +496,12 @@ package_configure()
     file_is_executable "configure" || return 0
   fi
 
-  ${_command} > configure.log 2>&1 ||
+  if ${_command} > configure.log 2>&1
+  then
+    log "Configuration of ${package_name} ${package_version} successful."
+  else
     package_error "Configuration of ${package_name} ${package_version} failed" "configure.log"
-
-  log "Configuration of ${package_name} ${package_version} successful."
+  fi
 }
 
 #
