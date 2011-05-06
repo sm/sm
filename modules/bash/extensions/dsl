@@ -798,11 +798,11 @@ extension_install()
     fail "Cannot install an extension as no extension name was given."
   fi
 
-  extension_fetch "${extension_uri:-"${extensions_repository_url}"}"
+  extension_fetch "${extension_uri:="${extensions_repository_url}"}"
 
   if extension_is_valid "${extension_src_path}/${_extension}"
   then
-    copy_directories_to "${bdsm_path}/extensions" "${extension_src_path}"
+    copy_directories_to "${bdsm_path}/extensions" "${extension_src_path}/${_extension}"
 
     log "${extension_uri}" > "${bdsm_path}/extensions/${_extension}/.uri"
 
