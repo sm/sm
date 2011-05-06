@@ -1007,8 +1007,6 @@ move_files()
   if [[ -z "${_target}" ]]
   then
     fail "Cannot move files as no target path was given (eg. move_files ... to {path})."
-  else
-    shift
   fi
 
   if (( ${#_files[@]} == 0 ))
