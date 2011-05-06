@@ -261,7 +261,7 @@ extension_cli()
 
     case "$token" in
       --url)
-        extensions_url="${extension_args[$((++index))]}"
+        extension_url="${extension_args[$((++index))]}"
         ;;
       --version)
         extension_version="${extension_args[$((++index))]}"

@@ -58,6 +58,7 @@ true \
   "${src_path:="${bdsm_path}/src"}" \
   "${tmp_path:="${bdsm_path}/tmp"}" \
   "${bin_path:="${bdsm_path}/bin"}" \
+  "${repos_path:="${bdsm_path}/repos"}" \
   "${archives_path:="${bdsm_path}/archives"}" \
   "${extensions_src_path:="${src_path}/extensions"}" \
   "${remote:="origin"}" \

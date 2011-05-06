@@ -191,65 +191,6 @@ extension_action()
 }
 
 #
-# ### extensions_install()
-#
-# Installs the given extensions.
-#
-# ##### Input Parameters
-#
-# One or more extension names.
-#
-# ##### Stream Outputs
-#
-# None.
-#
-# ##### Environmental effects
-#
-# The named extensions will be installed to the filesystem in the BDSM
-# extensions directory.
-#
-# ##### Return Codes
-#
-# 0 for success
-#
-# ##### Failure Scenarios
-#
-# Fails if no extensions are passed in to install.
-#
-# ##### Usage Examples
-#
-#     user$ extensions_install libevent tmux
-#
-extensions_install()
-{
-  local _extension
-  local _extensions=("$@")
-
-  (( ${#_extensions[@]} > 0 )) ||
-    fail "Cannot install extensions as no extensions were given to install."
-
-  for _extension in "${_extensions[@]}"
-  do
-    case "${_extension#\/}" in
-      ext|srv|pkg|core|mod) continue ;;
-    esac
-
-    [[ -n "${_extension}" ]] || continue
-
-    extension_src_path="${extensions_src_path}/${_extension}"
-
-    # TODO: Install extension dependencies?
-
-    if [[ -s "${extension_src_path}/VERSION" && -x "${extension_src_path}/bin/help" ]]
-    then
-      copy_directories_to "${bdsm_path}/extensions" "${extension_src_path}"
-    else
-      error "${extension_src_path}/${extension} is not a proper extension.\nIt is missing one or more of the VERSION or bin/help."
-    fi
-  done
-}
-
-#
 # ### extension_reload()
 #
 # Reloads (re-sources) the current extension's DSL and initialization files.
@@ -758,5 +699,210 @@ extension_is_installed()
       return 1
       ;;
   esac
+}
+
+
+#
+# ### extensions_install()
+#
+# Installs the given extensions.
+#
+# ##### Input Parameters
+#
+# One or more extension names.
+#
+# ##### Stream Outputs
+#
+# None.
+#
+# ##### Environmental effects
+#
+# The named extensions will be installed to the filesystem in the BDSM
+# extensions directory.
+#
+# ##### Return Codes
+#
+# 0 for success
+#
+# ##### Failure Scenarios
+#
+# Fails if no extensions are passed in to install.
+#
+# ##### Usage Examples
+#
+#     user$ extensions_install libevent tmux
+#
+extensions_install()
+{
+  local _extension
+  local _extensions=("$@")
+
+  if (( ${#_extensions[@]} == 0 ))
+  then
+    fail "Cannot install extensions as no extensions were given to install."
+  fi
+
+  for _extension in "${_extensions[@]}"
+  do
+    case "${_extension#\/}" in
+      ext|srv|pkg|core|mod)
+        continue # Skip core extensions.
+        ;;
+    esac
+
+    if [[ -z "${_extension}" ]]
+    then # Skip any empty extensions / 'artifact'.
+      continue
+    else
+      extension_install "${_extension}"
+    fi
+  done
+}
+
+#
+# ### extension_install()
+#
+# Installs the given extension.
+#
+# ##### Input Parameters
+#
+# First parameter is the name of the extension to install
+#
+# ##### Stream Outputs
+#
+# None.
+#
+# ##### Environmental effects
+#
+# The named extension will be installed to the filesystem in the BDSM
+# extension directory.
+#
+# ##### Return Codes
+#
+# 0 for success
+#
+# ##### Failure Scenarios
+#
+# Fails if no extension are passed in to install.
+#
+# ##### Usage Examples
+#
+#     user$ extension_install redis
+#
+extension_install()
+{
+  local _extension="${1:-}"
+
+  if [[ -z "${_extension}" ]]
+  then
+    fail "Cannot install an extension as no extension name was given."
+  fi
+
+  true "${extensions_url:="${extensions_repository_url:-}"}"
+
+  # TODO: source path
+  if [[ -n "${extension_url}" ]]
+  then
+    extension_fetch "${extension_url}"
+    extension_source="${extension_url}"
+  else # Extension comes from the default repository.
+    # TODO: Merge this with the above, use the default url as the base.
+    extension_src_path="${extensions_src_path}/${_extension}"
+    extension_source="${extensions_src_path}"
+  fi
+
+  # TODO: Install extension dependencies?
+  if extension_is_valid "${extension_src_path}"
+  then
+    copy_directories_to "${bdsm_path}/extensions" "${extension_src_path}"
+    # TODO: Now record the source of the extension.
+    log "${extension_url:-"${extensions_src_path}"}" > "${bdsm_path}/extensions/${_extension}"
+  else
+    warn "${extension_src_path} is not a proper extension.\nIt is missing VERSION and/or bin/help. Skipping installation of ${_extension}."
+  fi
+}
+
+extension_fetch()
+{
+  local _url="${1:-$extension_url}"
+  local _identifier="${_url//\//_}" # Convert '/' to an invalid url component '_'
+  local repo_path="${repos_path}/${_identifier}"
+
+  if [[ -z "${_url}" ]]
+  then
+    fail "Cannot fetch an extension from a url as no url was given"
+  fi
+
+   # TODO: scm fetch vs tarball fetch
+  scm_fetch "${_url}"
+
+  scm_update "${_url}"
+
+  extension_src_path="${repo_path}"
+}
+
+extension_is_valid()
+{
+  local _path="${1:-}"
+
+  if [[ -z "${_path}" ]]
+  then
+    fail "Cannot determine if an extension is valid as the path to the extension was not given."
+  fi
+
+  # TODO: Add all extension requirement checks here.
+  if [[ -s "${_path}/VERSION" && -x "${_path}/bin/help" ]]
+  then
+    return 0
+  else
+    return 1
+  fi
+}
+
+extension_package()
+{
+  local _name="${1:-}"
+
+  if [[ -z "${_name}" ]]
+  then
+    fail "Cannot package an extension as no extension name was given."
+  fi
+
+  local _path="${extensions_development_path:-"$extensions_src_path"}"
+
+  enter "${_path}"
+
+  if extension_is_valid "${_path}/${_name}"
+  then
+    local _version="$(cat "${_name}/VERSION")"
+    log "Packaging extension ${_name}"
+    log "${_name}-${_version}:"
+
+    for archiver in "gzip" "bzip2 -z" "xz -z"
+    do
+      if command_exists ${archiver// *}
+      then
+        if tar cf "${_name}-${_version}.tar" "${_name}/"
+        then
+          ${archiver} -f -9 "${_name}-${_version}.tar"
+        else
+          error "There was an error ($?) while trying to create a tar of the '${_name}' directory while packaging."
+        fi
+      fi
+
+      ensure_paths_exist "${_path}/pkg"
+      for file in "${_name}-${_version}".tar.*
+      do
+        log "  - ${file}"
+        file_md5 "${file}" > "${file}.md5"
+        log "  - ${file}.md5"
+        move_files --force "${file}" "${file}.md5" to "${_path}/pkg"
+      done
+    done
+
+    log "Packaging complete (packages are located in '${_path}/pkg' )"
+  else
+    error "Cannot package extension '${_name}' as the extension is not valid."
+  fi
 }
 

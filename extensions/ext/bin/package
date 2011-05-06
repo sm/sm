@@ -2,8 +2,11 @@
 
 if (( ${#extension_args[@]} == 0 ))
 then
-  error "At least one extension name must be specified."
+  error "At least one extension name must be specified for packaging."
 fi
 
-package_cli
+for extension in "${extension_args[@]}"
+do
+  extension_package "${extension}"
+done
 
