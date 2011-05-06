@@ -36,6 +36,8 @@ service_paths=(
 
 service_actions=( start stop restart )
 
+export service_paths service_actions
+
 if file_is_nonempty "${service_pid_file}"
 then
   read -r service_pid < "${service_pid_file}"
