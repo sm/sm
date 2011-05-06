@@ -27,7 +27,12 @@ done
 
 # The default prefix is /usr/local,
 # this should be set to where BDSM is installed to in /etc/bdsmrc
-prefix_path="${prefix_path:-/usr/local}"
+if (( UID == 0 ))
+then
+  true "${prefix_path:=/usr/local}"
+else
+  true "${prefix_path:="$HOME"}"
+fi
 
 if [[ -z "${bdsm_path}" ]]
 then
