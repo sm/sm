@@ -369,6 +369,12 @@ setup_profile_d()
         to "$HOME/.profile"
     fi
 
+    if ! file_contains "$HOME/.profile" "$HOME/bin"
+    then
+      log "if test -d '${HOME}/bin' ; then PATH=\"${PATH}:$HOME/bin\"; export PATH ; fi" \
+        to "$HOME/.profile"
+    fi
+
   fi
 
   if ! file_exists "${profile_d_path}/bdsm.sh" ||
