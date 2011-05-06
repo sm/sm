@@ -350,6 +350,13 @@ setup_profile_d()
     fi
   else
     ensure_files_exist "$HOME/.profile"
+
+    if ! file_contains "$HOME/.bashrc" "$HOME/.profile"
+    then
+      log "if test -s \"$HOME/.profile\" ; then . \"$HOME/.profile\" ; fi"
+        to /etc/profile
+    fi
+
     if ! file_contains "$HOME/.profile" "${profile_d_path}"
     then
       log "if test -d '${profile_d_path}' ; then for profile in \"${profile_d_path}\"/*.sh ; do if test -x \"\$profile\" ; then . \"\$profile\" ; fi ; done ; unset profile ; fi" \
