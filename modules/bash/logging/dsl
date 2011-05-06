@@ -32,11 +32,23 @@
 #     Hello there!
 #
 log()
-{
-  [[ -n "$*" ]] ||
+{ # TODO: Refactor the function below to parse arguments properly.
+  if [[ -n "$1" ]]
+  then
+    if [[ "${2:-}" = "to" ]]
+    then
+      if [[ -n "${3:-}" ]]
+      then
+        printf "$1\n" > "${3}"
+      else
+        fail "Cannot log arguments to a file as no file name/path was given."
+      fi
+    else
+      printf "$1\n"
+    fi
+  else
     fail "Cannot log arguments as none were given."
-
-  printf "$*\n"
+  fi
 }
 
 #
@@ -144,7 +156,10 @@ warn()
 #
 debug()
 {
-  (( debug_flag == 0 )) || log "DEBUG\n$*"
+  if (( ${debug_flag:=0} == 0 ))
+  then
+    log "DEBUG\n$*"
+  fi
 }
 
 #

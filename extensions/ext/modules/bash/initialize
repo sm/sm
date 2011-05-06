@@ -6,7 +6,7 @@ true \
   ${remote:="origin"} \
   ${branch:="master"}
 
-modules environment
+modules environment vcs
 
 extensions_src_path="${src_path}/extensions"
 

@@ -798,19 +798,18 @@ extension_install()
     fail "Cannot install an extension as no extension name was given."
   fi
 
-  true "${extension_uri:="${extensions_repository_url:-}"}"
+  extension_fetch "${extension_uri:-"${extensions_repository_url}"}"
 
-  #################################
-  extension_fetch "${extension_uri}"
-  #################################
-
-
-  # TODO: Install extension dependencies?
-  if extension_is_valid "${extension_src_path}"
+  if extension_is_valid "${extension_src_path}/${_extension}"
   then
     copy_directories_to "${bdsm_path}/extensions" "${extension_src_path}"
-    # TODO: Now record the source of the extension.
-    log "${extension_uri:-"${extensions_src_path}"}" > "${bdsm_path}/extensions/${_extension}/.uri"
+
+    log "${extension_uri}" > "${bdsm_path}/extensions/${_extension}/.uri"
+
+    #
+    # TODO: Process extension dependencies...
+    #
+
   else
     error "${extension_src_path} is not a proper extension.
    The named extension is missing VERSION and/or bin/help files.
