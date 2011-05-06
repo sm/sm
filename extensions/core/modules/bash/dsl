@@ -353,7 +353,7 @@ setup_profile_d()
     if ! file_contains "$HOME/.profile" "${profile_d_path}"
     then
       log "if test -d '${profile_d_path}' ; then for profile in \"${profile_d_path}\"/*.sh ; do if test -x \"\$profile\" ; then . \"\$profile\" ; fi ; done ; unset profile ; fi" \
-        to /etc/profile
+        to "$HOME/.profile"
     fi
 
   fi
