@@ -1,4 +1,64 @@
 #!/usr/bin/env bash
+# ## package_error
+#
+# Presents the user with a package related error message including the tail
+# of an optional log file.
+#
+# ##### Input Parameters
+#
+# String to be logged, an optional log file containing more details and
+# an optional number of lines of the file to show (defaults to 25)
+#
+# ##### Stream Outputs
+#
+# Prints arguments passed in to the calling environments STDOUT with a newline
+# character appended and 'ERROR ' prepended.
+#
+# ##### Environmental effects
+#
+# None.
+#
+# ##### Return Codes
+#
+# 1 for failure.
+#
+# ##### Failure Scenarios
+#
+# Fails if no arguments are given.
+#
+# ##### Usage Examples
+#
+#     user$ package_error "Hello there! " configure.log 5
+#     ERROR Hello there!
+#     
+#
+#     Tail of configure.log:
+#			checking for inflate in -lz... no
+#			configure: error: zlib library not found
+#			If you have zlib already installed, see config.log for details on the
+#			failure.  It is possible the compiler isn't looking in the proper directory.
+#			Use --without-zlib to disable zlib support.
+#
+#     *poof* shell closed...
+#
+package_error()
+{
+  local _message=$1
+  if [[ -z "${_message}" ]]
+  then
+    fail "Cannot print a package error as no message was provided."
+  fi
+  local _log=$2
+
+  if [[ -n ${_log} ]] && file_exists ${_log}
+  then # Append tail of error log to the error message.
+    local _num_lines=${3:-25} # Default the number of lines to 25
+    _message="${_message}\n\nTail of ${_log}:\n$( tail -n ${_num_lines} ${_log} )"
+  fi
+
+  error "${_message}"
+}
+
 #
 # ## package_definition
 #
@@ -436,7 +496,7 @@ package_configure()
   fi
 
   ${_command} > configure.log 2>&1 ||
-    error "Configuration of ${package_name} ${package_version} failed, seek help..."
+    package_error "Configuration of ${package_name} ${package_version} failed" "configure.log"
 
   log "Configuration of ${package_name} ${package_version} successful."
 }
@@ -489,7 +549,7 @@ package_build()
   then
     return 0
   else
-    error "Compilation if ${package_name} ${package_version} failed! "
+    package_error "Compilation of ${package_name} ${package_version} failed! " "make.log"
   fi
 }
 
@@ -541,7 +601,7 @@ package_make_install()
   then
     return 0
   else
-    error "Failed to make install of ${package_name} ${package_version} failed! "
+    package_error "Installation of ${package_name} ${package_version} failed! " "make.install.log"
   fi
 }
 
