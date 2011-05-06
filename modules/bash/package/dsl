@@ -516,7 +516,7 @@ package_configure()
   fi
 
   ${_command} > configure.log 2>&1 ||
-    package_error "Configuration of ${package_name} ${package_version} failed" "configiure.log"
+    package_error "Configuration of ${package_name} ${package_version} failed" "configure.log"
 
   log "Configuration of ${package_name} ${package_version} successful."
 }
