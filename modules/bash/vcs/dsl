@@ -1,2 +1,97 @@
 #!/usr/bin/env bash
 
+scm_fetch()
+{
+  local _url="${1:-${extension_url:-}}"
+
+  if [[ -z "${_url}" ]]
+  then
+    fail "Cannot fetch an extension from a url as no url was given"
+  fi
+
+  local _identifier="${_url//\//_}" # Convert '/' to an invalid url component '_'
+  local repo_path="${repos_path}/${_identifier}"
+
+  ensure_paths_exist "${repos_path}"
+
+  case "${_url}" in
+    *git*)
+      if directory_exists "${repo_path}/.git"
+      then
+        true # already fetched!
+      else
+        if directory_exists "${repo_path}"
+        then
+          remove_paths "${repo_path}"
+        fi
+
+        if ! git clone --depth 1 ${_url} "${repo_path}"
+        then
+          error "There was an error while cloning the repository from the url '${_url}'"
+        fi
+      fi
+      ;;
+    *svn*)
+      NIY
+      ;;
+    *hg*)
+      NIY
+      ;;
+    *fossil*)
+      NIY
+      ;;
+    *)
+      ;;
+  esac
+}
+
+scm_update()
+{
+  local _url="${1:-${extension_url:-}}"
+
+  if [[ -z "${_url}" ]]
+  then
+    fail "Cannot fetch an extension from a url as no url was given"
+  fi
+
+  local _identifier="${_url//\//_}" # Convert '/' to an invalid url component '_'
+  local repo_path="${repos_path}/${_identifier}"
+
+  case "${_url}" in
+    *git*)
+      # TODO: Use git cli instead of awking it :)
+      if [[ -z "$(git branch | awk "/${branch:=master}$/")" ]]
+      then
+        if ! git checkout -b "$branch" --track "$remote/$branch" 2>/dev/null
+        then
+          error "$remote $branch remote branch not found. Halting."
+        fi
+
+      elif [[ -z "$(git branch | awk "/\* $branch$/{print \$2}")" ]]
+      then
+        if ! git checkout $branch 2>/dev/null
+        then
+          error "Unable to checkout $branch.\nCould not get head. Halting."
+        fi
+      fi
+
+      if ! git pull --rebase origin $branch
+      then
+        error "Git pull failed. Halting."
+      fi
+      ;;
+    *svn*)
+      NIY "Subversion scm_update"
+      ;;
+    *hg*)
+      NIY "hg scm_update"
+      ;;
+    *fossil*)
+      NIY "fossil scm_update"
+      ;;
+    *)
+      error "Unknownn SCM for url '${_url}'"
+      ;;
+  esac
+}
+

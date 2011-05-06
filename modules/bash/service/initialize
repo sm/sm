@@ -5,6 +5,8 @@ modules system array
 variable_is_nonempty init_scripts_path || init_scripts_path="$(init_scripts_path)"
 variable_is_nonempty confd_path        || confd_path="$(confd_path)"
 
+declare -a service_flags service_actions service_paths
+
 : \
   "${service:="${extension}"}" \
   "${service_user:="${package_user:-"${service}"}"}" \
@@ -31,6 +33,8 @@ service_paths=(
   "${service_lock_path}"
   "${service_log_path}"
 )
+
+service_actions=( start stop restart )
 
 if file_is_nonempty "${service_pid_file}"
 then

@@ -199,6 +199,7 @@ service_setup()
 
   ensure_paths_exist "${service_paths[@]}" "${install_path}"
 
+  # TODO: create an 'user_exists' function and use it here.
   user_create_if_missing "${service_user}" \
     with group "${service_user}" 2>/dev/null
 
@@ -206,6 +207,7 @@ service_setup()
 
   service_install_init_d "${service}"
 }
+
 #
 # # Single Service functions.
 #
@@ -246,6 +248,7 @@ service_uninstall()
   log "TODO: service_uninstall is NIY"
   # 1. Remove init scripts
   # 2. Unload OS service hooks
+  # 3. Deactivate database path.
 }
 
 #
@@ -282,17 +285,21 @@ service_uninstall()
 #
 service_start()
 {
-  [[ -n "${service}" ]] ||
-    fail "Service must be set in order to start the associated service."
+  if [[ -z "${service}" ]]
+  then
+    fail "In order to start a service the 'service' variable must be set."
+  fi
 
   if command_exists "${service}_start"
   then
     "${service}_start"
   else
-    file_is_executable "${init_scripts_path}/${service}" ||
+    if file_is_executable "${init_scripts_path}/${service}"
+    then
+      service_init_start
+    else
       fail "${init_scripts_path}/${service} is missing or not executable."
-
-    service_init_start
+    fi
   fi
 }
 
@@ -338,6 +345,53 @@ service_stop()
       fail "${init_scripts_path}/${service} is missing or not executable."
 
     service_init_stop
+  fi
+}
+
+#
+# ### service_reload()
+#
+# reloads the given service using init scripts.
+#
+# ##### Input Parameters
+#
+# None.
+#
+# ##### Stream Outputs
+#
+# Whatever stream output comes from the called init script.
+#
+# ##### Environmental effects
+#
+# None.
+#
+# ##### Return Codes
+#
+# 0 for success
+#
+# ##### Failure Scenarios
+#
+# Fails if service was not set.
+# Fails if the init script is missing or not executable.
+#
+# ##### Usage Examples
+#
+#     user$ service=redis
+#     user$ service_reload
+#     ...
+#
+service_reload()
+{
+  if command_exists "${service}_reload"
+  then
+    "${service}_reload"
+  else
+    if file_is_executable "${init_scripts_path}/${service}"
+    then
+      service_init_reload
+    else
+      fail "${init_scripts_path}/${service} is missing or not executable."
+    fi
   fi
 }
 
@@ -972,7 +1026,10 @@ service_init_start()
     "${service_binary}" "${service_config_file}" || result=$?
   fi
 
-  (( _result > 0 )) || touch "$service_pid_file"
+  if (( _result == 0 ))
+  then
+    touch "$service_pid_file"
+  fi
 
   return ${_result}
 }
@@ -1026,6 +1083,7 @@ service_init_stop()
 
   return ${_result}
 }
+
 #
 # ### service_init_status()
 #
@@ -1072,6 +1130,57 @@ service_init_status()
   return ${_result}
 }
 
+#
+# ### service_init_reload()
+#
+# This is the generalized service init reload function.
+#
+# ##### Input Parameters
+#
+# None.
+#
+# ##### Stream Outputs
+#
+# Logging telling the end user what is happening.
+#
+# ##### Environmental effects
+#
+# None.
+#
+# ##### Return Codes
+#
+# 0 for success
+#
+# ##### Failure Scenarios
+#
+# No failure conditions currently.
+#
+# ##### Usage Examples
+#
+#     user$ service_init_reload
+#
+service_init_reload()
+{
+  log "reloading ${service}..."
+
+  service_init_path
+
+  local _result=0
+
+  if array_is_nonempty service_flags
+  then
+    "${service_binary}" reload "${service_flags[@]}" "${service_config_file}" || result=$?
+  else
+    "${service_binary}" reload "${service_config_file}" || result=$?
+  fi
+
+  if (( _result == 0 ))
+  then
+    touch "$service_pid_file"
+  fi
+
+  return ${_result}
+}
 
 #
 # ### service_init_usage()
@@ -1175,23 +1284,23 @@ service_init_logtail()
 service_conf_d()
 {
   # TODO: Install a default conf.d template if extension does not define one.
-  template_exists "conf.d" || return 0
+  if template_exists "conf.d"
+  then
+    install_template "conf.d.template" to "/etc/conf.d/${service}.conf" \
+      mode 0644 owner "${service_user}:${service_user}"
 
-  install_template "conf.d.template" \
-    to "/etc/conf.d/${service}.conf" \
-    mode 0644 \
-    owner "${service_user}:${service_user}"
-
-  template_exists "/etc/conf.d/${service}.conf" || return 0
-
-  seed_template "/etc/conf.d/${service}.conf" \
-    prefix_path "${prefix_path}" \
-    init_scripts_path "${init_scripts_path}" \
-    modules_path "${modules_path}" \
-    data_path "${data_path}" \
-    confd_path "${confd_path}" \
-    extension "${service}" \
-    service "${service}"
+    if template_exists "/etc/conf.d/${service}.conf"
+    then
+      seed_template "/etc/conf.d/${service}.conf" \
+        prefix_path "${prefix_path}" \
+        init_scripts_path "${init_scripts_path}" \
+        modules_path "${modules_path}" \
+        data_path "${data_path}" \
+        confd_path "${confd_path}" \
+        extension "${service}" \
+        service "${service}"
+    fi
+  fi
 }
 
 #
@@ -1221,7 +1330,7 @@ service_conf_d()
 #
 # ##### Usage Examples
 #
-#     user$ service_init_start
+#     user$ service_init_action start
 #
 service_init_action()
 {
@@ -1233,32 +1342,12 @@ service_init_action()
   then
     "${service}_${action}"
   else
-    case "action" in
-      start)
-        service_init_start
-        ;;
-
-      stop)
-        service_init_stop
-        ;;
-
-      restart)
-        service_init_stop
-        service_init_start
-        ;;
-
-      status)
-        service_init_status
-        ;;
-
-      logtail)
-        service_init_logtail
-        ;;
-
-      *)
-        service_init_usage
-        ;;
-    esac
+    if [[ "${service_actions[*]}" = *[[:space:]]${action}[[:space:]]* ]]
+    then
+      service_init_${action}
+    else
+      service_init_usage
+    fi
   fi
 
   return $?
@@ -1301,14 +1390,16 @@ service_init_d()
   service_load_conf_d # Load the configuration file.
 
   # Sanity checks go here.
-  file_is_executable "${service_binary}" ||
+  if file_is_executable "${service_binary}"
+  then
+    service_pid
+
+    service_cli # Parse the script arguments and take action accordingly.
+
+    service_init_action "${service_action}"
+  else
     fail "Could not find ${service_binary} or ${service_binary} is not executable."
-
-  service_pid
-
-  service_cli # Parse the script arguments and take action accordingly.
-
-  service_init_action "${service_action}"
+  fi
 }
 
 #
@@ -1347,7 +1438,7 @@ service_deactivate()
 
   if [[ -z "${_service}" ]]
   then
-    fail "service must be set or passed in in order to deactivate a service."
+    fail "a service name must be set or passed in in order to deactivate a service."
   fi
 
   if file_exists "${init_scripts_path}/${_service}"
@@ -1410,12 +1501,14 @@ service_deactivate()
 #
 service_activate()
 {
-  local _service="${1:-"${service}"}" _version="${2:-${package_version}}"
+  local _service="${1:-"${service}"}"
 
   if [[ -z "${_service}" ]]
   then
-    fail "service must be set or passed in in order to deactivate a service."
+    fail "the service name must be set or passed in in order to activate a service."
   fi
+
+  local _version="${2:-${package_version}}"
 
   variables_must_be_nonempty _service _version
 
@@ -1461,3 +1554,4 @@ service_activate()
     fi
   fi
 }
+
