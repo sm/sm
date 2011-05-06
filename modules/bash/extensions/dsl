@@ -816,7 +816,7 @@ extension_install()
   then
     copy_directories_to "${bdsm_path}/extensions" "${extension_src_path}"
     # TODO: Now record the source of the extension.
-    log "${extension_url:-"${extensions_src_path}"}" > "${bdsm_path}/extensions/${_extension}"
+    log "${extension_url:-"${extensions_src_path}"}" > "${bdsm_path}/extensions/${_extension}/.uri"
   else
     warn "${extension_src_path} is not a proper extension.\nIt is missing VERSION and/or bin/help. Skipping installation of ${_extension}."
   fi
