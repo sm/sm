@@ -549,7 +549,7 @@ package_build()
   then
     return 0
   else
-    package_error "Compilation if ${package_name} ${package_version} failed! " "make.log"
+    package_error "Compilation of ${package_name} ${package_version} failed! " "make.log"
   fi
 }
 
@@ -601,7 +601,7 @@ package_make_install()
   then
     return 0
   else
-    package_error "Failed to make install of ${package_name} ${package_version} failed! " "make.install.log"
+    package_error "Installation of ${package_name} ${package_version} failed! " "make.install.log"
   fi
 }
 
