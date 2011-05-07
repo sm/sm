@@ -368,3 +368,71 @@ logrotate()
   rm "${file}.$$.log"
 }
 
+# ### log_streams()
+#
+# Log streams to three files:
+#   - standard out
+#   - standard in
+#   - combined (what the user typically sees)
+#
+# ##### Usage Examples
+#
+#     root# log_streams "make install" prefix make
+#     cat make.out.log
+#     root#
+#     ...
+#
+# Alternatively,
+#
+#     root# log_streams "make install" \
+#           out /path/to/out.log \
+#           err /path/to/err.log \
+#           mix /path/to/mix.log # both out & err as they occurred.
+#     root# cat /path/to/mix.log
+#     ...
+#
+log_streams()
+{
+  local _command="${1:-}" _prefix _err _out _mix
+
+  # TODO: allow specification of path, name prefix
+
+  while (( $# > 0 ))
+  do
+    _token="${1}"
+    shift
+    case "${token}" in
+      prefix)
+        _prefix="${1}."
+        ;;
+      err)
+        _stderr="${1}"
+        shift
+        ;;
+      out)
+        _stdout="${1}"
+        shift
+        ;;
+      mix)
+        _stdmix="${1}"
+        shift
+        ;;
+      *)
+        _command="${1}"
+        shift
+        ;;
+    esac
+  done
+
+  : \
+    "${_stdout="${2:-stdout.log}"}" \
+    "${_stderr="${3:-stderr.log}"}" \
+    "${_stdmix="${4:-stdmix.log}"}"
+
+  {
+    {
+      ${_command} 2>&1 1>&3 | tee "${_stderr}"
+    } 3>&1 1>&2 | tee "${_stdout}"
+  } > "${_stdmix}" 2>&1
+}
+
