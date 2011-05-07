@@ -734,6 +734,8 @@ copy_files_to()
     fail "No files were given in order to copy them into ${_path}."
   fi
 
+  log "copy_files_to is depreciated, please use copy_files with the 'to' specifier instead"
+
   ensure_paths_exist "${_path}"
 
   for _file in "${_files[@]}"
@@ -745,6 +747,93 @@ copy_files_to()
       cp "${_file}" "${_path}/${_file}"
     fi
 
+  done
+}
+
+#
+# ## copy_files
+#
+# Copys a given list of files into the named path.
+#
+# ##### Input Parameters
+#
+# The first parameter is the path to copy the files into.
+# Remaining parameters are the file name/path list.
+#
+# ##### Stream Outputs
+#
+# None.
+#
+# ##### Environmental effects
+#
+# If successful, all named files are copied into the target path.
+#
+# ##### Return Codes
+#
+# 0 for success.
+#
+# ##### Failure Scenarios
+#
+# Fails if no target path is given.
+# Fails if no files are given.
+#
+# ##### Usage Examples
+#
+#     user$ copy_files "$HOME/backup" "$HOME/.bashrc" "$HOME/.bash_profile"
+#
+copy_files()
+{
+  local _source _target _file _force_flag=0 _files=()
+
+  while (( $# > 0 ))
+  do
+    token="$1"
+    shift
+
+    case "${token}" in
+      to)
+        _target="${1}"
+        shift
+        ;;
+      from)
+        _source="${1}"
+        shift
+        ;;
+      --force)
+        _force_flag=1
+        ;;
+
+      *)
+        _files+=( "${token}" )
+        ;;
+    esac
+  done
+
+  if [[ -z "${_target}" ]]
+  then
+    fail "Cannot copy files as no target path was given (eg. copy_files ... to {path})."
+  fi
+
+  if (( ${#_files[@]} == 0 ))
+  then
+    fail "Cannot copy files as no files were given to copy."
+  fi
+
+  ensure_paths_exist "${_target}"
+
+  for _file in "${_files[@]}"
+  do
+    if file_is_missing "${_file}"
+    then
+      error "Cannot copy file ${_file} to ${_target} as the file does not exist."
+    else
+      if (( _force_flag == 1 ))
+      then
+        cp -f "${_file}" "${_target}/${_file//*\/}"
+      else
+        cp "${_file}" "${_target}/${_file//*\/}"
+      fi
+    fi
   done
 }
 
