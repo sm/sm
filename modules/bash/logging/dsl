@@ -281,3 +281,91 @@ fail()
   exit 1
 }
 
+
+#
+# ### verbose()
+#
+# Log arguments to the calling environments STDERR preceeded by 'ERROR '.
+# Exits with status code 1.
+#
+# ##### Input Parameters
+#
+# Strings to be logged.
+#
+# ##### Stream Outputs
+#
+# Prints arguments passed in to the calling environments STDOUT with a newline
+# character appended and 'ERROR ' prepended.
+#
+# ##### Environmental effects
+#
+# None.
+#
+# ##### Return Codes
+#
+# 1 for verboseure.
+#
+# ##### verboseure Scenarios
+#
+# verboses if no arguments are given.
+#
+# ##### Usage Examples
+#
+#     user$ verbose "w00t! "
+#     user$ verbose_flag=1
+#     user$ verbose "w00t! "
+#     w00t!
+#
+verbose()
+{
+  if (( ${verbose_flag:=0} == 1 ))
+  then
+    log "$*"
+  fi
+}
+
+# ### logrotate()
+#
+# Strategically rotate a logfile minimizing data loss.
+#
+# This function uses a copy, tail and truncate strategy.
+#
+# ##### Usage Examples
+#
+#     root# logrotate /var/log/my_logfile.log
+#
+logrotate()
+{
+  local _file="${1:-}"
+  if [[ -z "${_file}" ]]
+  then
+    fail "Cannot rotate a log file as no log file was given."
+  fi
+
+  set_timestamp
+
+  verbose "Tailing the file in a background process into a tail logfile."
+  ( tail -n 0 -f "${_file}" > ${file}.$$.log )&
+
+  local _tail_pid=$!
+
+  verbose "Copying the file's contentes into a new timestamped file."
+  cp "${_file}" "${_file}.${timestamp}"
+
+  verbose "Truncating the file."
+  cp /dev/null ${_file}
+
+  verbose "Signaling the tail background process to stop."
+  kill -QUIT ${_tail_pid}
+
+  verbose "Appending the tail log to the new timestamped logfile."
+  cat "${file}.$$.log" >> "${file}.${timestamp}"
+
+  verbose "Compressing the timestamped file (gzip)"
+  gzip -f -9 "${file}.${timestamp}"
+
+  verbose "Removing temporary logfilek"
+  # 6. Remove the temporary log file.
+  rm "${file}.$$.log"
+}
+
