@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+# ### shell_is_interactive()
+#
+# Test if the current shell is an interactive shell.
+#
+# Usage Examples:
+#
+#     if shell_is_interactive
+#     then
+#       ${PAGER} somefile
+#     else
+#       cat -v somefile
+#     fi
+#
+shell_is_interactive()
+{
+  if [[ -t 0 ]]
+  then
+    return 0
+  else
+    return 1
+  fi
+}
