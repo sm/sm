@@ -358,14 +358,13 @@ logrotate()
   verbose "Signaling the tail background process to stop."
   kill -QUIT ${_tail_pid}
 
-  verbose "Appending the tail log to the new timestamped logfile."
+  verbose "Appending the tail logfile to the new timestamped logfile."
   cat "${file}.$$.log" >> "${file}.${timestamp}"
 
   verbose "Compressing the timestamped file (gzip)"
   gzip -f -9 "${file}.${timestamp}"
 
-  verbose "Removing temporary logfilek"
-  # 6. Remove the temporary log file.
+  verbose "Removing the tail logfile"
   rm "${file}.$$.log"
 }
 

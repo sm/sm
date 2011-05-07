@@ -1,5 +1,19 @@
 #!/usr/bin/env bash
 
+# ### lockfile_lock()
+#
+# If the current process is the first to write to the lockfile then the process
+# continues processing past the line calling lockfile_lock "{file path/name}"
+#
+# Otherwise lockfile_lock causes the process to exit with a message and status
+# code 0.
+#
+# If the lock is obtained then lockfile_lock ensures that
+#
+# Usage Examples:
+#
+# lockfile_lock /var/run/my_script.pid
+#
 lockfile_lock()
 {
   local _lockfile="${1:-}"
@@ -16,6 +30,7 @@ lockfile_lock()
 
   if [[ "${_pid}" == "$$" ]]
   then
+    on_exit "rm -f ${_lockfile}"
     # Ensure the lockfile is released on exit while preserving existing EXIT traps.
     trap "rm -f ${_lockfile};$(trap | awk '/EXIT/' | sed -e "s#' EXIT##" -e "s#.*'##")" EXIT
     return 0 # The lock has been obtained! Proceed with nefarious things!
@@ -24,3 +39,31 @@ lockfile_lock()
   fi
 }
 
+on_exit()
+{
+  local _commands="$*"
+  local _on_exit_code="$(trap | awk '/EXIT/' | sed -e "s#' EXIT##" -e "s#.*'##")"
+
+  if [[ "${_on_exit_code}" != *on_exit* ]]
+  then
+    trap "on_exit_commands;${_on_exit_code}" EXIT
+  fi
+
+  on_exit_commands+=( "${_commands}" )
+}
+
+on_exit_commands()
+{
+  local _result="$?" # Preserve actual exit code.
+
+  local _command
+  for _command in "${on_exit_commands[@]}"
+  do
+    if ! eval "${_command}"
+    then
+      log "On Exit Command Failed: ${_command}"
+    fi
+  done
+
+  return "${_result}"
+}
