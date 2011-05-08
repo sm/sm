@@ -486,7 +486,10 @@ link()
     esac
   done
 
-  (( _force_flag != 1 )) || remove_files "${_target}"
+  if (( _force_flag == 1 ))
+  then
+    remove "${_target}"
+  fi
 
   # TODO: What should we do if files already exist?
   if [[ -f "${_target}" ]] ; then
