@@ -911,7 +911,7 @@ package_ldconfig()
       true
       # This should be handled by the profile.d?
       # _files=($(find "${packages_path}/${_package}/active" -mindepth 1 -maxdepth 1 -type d))
-      # (( ${#_files[@]} > 0 )) && copy_files_to "${packages_path}" "${_files[@]}"
+      # (( ${#_files[@]} > 0 )) && copy_files to "${packages_path}" "${_files[@]}"
     fi
   fi
 }

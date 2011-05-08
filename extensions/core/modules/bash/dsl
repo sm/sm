@@ -309,7 +309,7 @@ install_core()
   copy_directories_to "${install_path}" "${directories[@]}"
 
   log "  Installing core files (${files[@]}) into ${install_path}"
-  copy_files_to "${install_path}" ${files[@]}
+  copy_files to "${install_path}" ${files[@]}
 }
 
 install_configuration_files()
