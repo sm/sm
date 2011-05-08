@@ -200,6 +200,64 @@ remove_files()
 }
 
 #
+# ## remove
+#
+# Removes the given entries, if they exist.
+#
+# ##### Input Parameters
+#
+# One or more file, directory or symlink names/paths.
+#
+# ##### Stream Outputs
+#
+# None.
+#
+# ##### Environmental effects
+#
+# The named files will no longer exist on the system, if they existed to begin
+# with.
+#
+# ##### Return Codes
+#
+# 0 for success
+#
+# ##### Failure Scenarios
+#
+# Fails if no files were named.
+#
+# ##### Usage Examples
+#
+#     user$ touch a
+#     user$ mkdir b
+#     user$ ln -s b c
+#     user$ ls -a
+#     . .. a b c
+#     user$ remove a b c
+#     user$ ls
+#     . ..
+#
+remove_files()
+{
+  local _file _files=("$@")
+
+  if (( ${#_files[@]} == 0 ))
+  then
+    fail "Cannot remove files as no files were given."
+  fi
+
+  for _file in "${_files[@]}"
+  do
+    if [[ -f "${_file}" || -L "${_file}" || -d "${_file}" ]] ; then
+      rm -rf "${_file}"
+
+    elif [[ -e "${_file}" ]] ; then
+      error "Unhandled filesystem entity type located at ${_file}, cannot remove. (File, link and directory types are handled)"
+
+    fi
+  done
+}
+
+#
 # ## remove_paths
 #
 # Function Description
