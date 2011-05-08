@@ -236,7 +236,7 @@ remove_files()
 #     user$ ls
 #     . ..
 #
-remove_files()
+remove()
 {
   local _file _files=("$@")
 
