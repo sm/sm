@@ -72,6 +72,11 @@ true \
   "${packages_path:="${bdsm_path}/pkg"}" \
   "${active_path:="${packages_path}/active"}"
 
+if directory_exists "${active_path}/bin"
+then
+  export PATH="${active_path}/bin:${PATH}"
+fi
+
 # Load module() function and then load core modules.
 source "${modules_path}/bash/modules/dsl"
 source "${modules_path}/bash/modules/initialize"
@@ -88,4 +93,5 @@ fi
 
 # Ensure variables desired to be exported to extensions actually are.
 bdsm_exports
+
 
