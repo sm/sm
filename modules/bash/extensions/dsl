@@ -804,7 +804,7 @@ extension_install()
   then
     copy_directories_to "${bdsm_path}/extensions" "${extension_src_path}/${_extension}"
 
-    log "${extension_uri}" > "${bdsm_path}/extensions/${_extension}/.uri"
+    log "${extension_uri}" to "${bdsm_path}/extensions/${_extension}/.uri"
 
     #
     # TODO: Process extension dependencies...
@@ -889,7 +889,7 @@ extension_package()
       for file in "${_name}-${_version}".tar.*
       do
         log "  - ${file}"
-        file_md5 "${file}" > "${file}.md5"
+        log "$( file_md5 "${file}" )" to "${file}.md5"
         log "  - ${file}.md5"
         move_files --force "${file}" "${file}.md5" to "${_path}/pkg"
       done

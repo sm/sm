@@ -18,5 +18,5 @@ user="$USER"
 
 export prefix_path bin_path source_path
 
-modules system
+modules system time
 

@@ -949,11 +949,11 @@ service_install_init_d()
     service_activate "${service}" "${package_version}"
 
     # TODO: Replace this with install_template + seed_template
-    printf "%s\n" "[ -d \"${prefix_path}/${_service}/active/bin\" ] && " \
-      > "/etc/profile.d/${_service}.sh"
+    log "%s\n" "[ -d \"${prefix_path}/${_service}/active/bin\" ] && " \
+      to "/etc/profile.d/${_service}.sh"
 
-    printf "%s\n" "PATH=\"\$PATH:${prefix_path}/${_service}/active/bin\" ; export PATH; " \
-      >> /etc/profile.d/${_service}.sh
+    log "%s\n" "PATH=\"\$PATH:${prefix_path}/${_service}/active/bin\" ; export PATH; " \
+      append to "/etc/profile.d/${_service}.sh"
 
     chmod_files 0755 "/etc/profile.d/${_service}.sh"
   fi
@@ -1510,7 +1510,8 @@ service_deactivate()
       else # Fall back on rc.local to start redis at system startup.
         if ! file_contains "/etc/rc.local" "${service} start"
         then
-          echo "${init_scripts_path}/${service} start" >> /etc/rc.local
+          log "${init_scripts_path}/${service} start" \
+            append to /etc/rc.local
         fi
       fi
     fi

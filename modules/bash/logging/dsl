@@ -41,7 +41,7 @@ log()
     shift
 
     case "${_token}" in
-      (--append)
+      (append|--append)
         _append_flag=1
         ;;
       (to)

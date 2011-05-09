@@ -16,7 +16,9 @@ bdsm_development_setup()
   then
     log "  * projects_path is already set in $HOME/.bash_profile."
   else
-    echo 'export projects_path="$HOME/projects"' >> "$HOME/.bash_profile"
+    log 'export projects_path="$HOME/projects"' \
+      append to "$HOME/.bash_profile"
+
     log "  * Setting projects_path in $HOME/.bash_profile."
   fi
 
@@ -25,7 +27,9 @@ bdsm_development_setup()
     log "  * project functions are setup in $HOME/.bash_profile."
   else
     log "  * project functions are now setup in $HOME/.bash_profile."
-    echo '[[ -s "/usr/local/bdsm/modules/bash/project/interactive" ]] && source "/usr/local/bdsm/modules/bash/project/interactive"' >> "$HOME/.bash_profile"
+
+    log '[[ -s "/usr/local/bdsm/modules/bash/project/interactive" ]] && source "/usr/local/bdsm/modules/bash/project/interactive"'  \
+      append to "$HOME/.bash_profile"
   fi
 
   ensure_paths_exist "${projects_path}/bdsm"
@@ -40,8 +44,8 @@ bdsm_development_setup()
     then
       log "  * ${_component}_development_path is already set in .bdsmrc"
     else
-      echo "export ${_component}_development_path=\"${projects_path}/bdsm/${_component}\"" \
-        >> "$HOME/.bdsmrc"
+      log "export ${_component}_development_path=\"${projects_path}/bdsm/${_component}\"" \
+        append to "$HOME/.bdsmrc"
       log "Setting ${_component}_development_path in .bdsmrc"
     fi
 
@@ -362,19 +366,19 @@ setup_profile_d()
     if ! file_contains "$HOME/.bashrc" "$HOME/.profile"
     then
       log "if test -s \"$HOME/.profile\" ; then . \"$HOME/.profile\" ; fi"\
-        to "$HOME/.bashrc"
+        append to "$HOME/.bashrc"
     fi
 
     if ! file_contains "$HOME/.bash_profile" "$HOME/.bashrc"
     then
       log "if test -s \"$HOME/.bashrc\" ; then . \"$HOME/.bashrc\" ; fi"\
-        to "$HOME/.bash_profile"
+        append to "$HOME/.bash_profile"
     fi
 
     if ! file_contains "$HOME/.profile" "${profile_d_path}"
     then
       log "if test -d '${profile_d_path}' ; then for profile in \"${profile_d_path}\"/*.sh ; do if test -x \"\$profile\" ; then . \"\$profile\" ; fi ; done ; unset profile ; fi" \
-        to "$HOME/.profile"
+        append to "$HOME/.profile"
     fi
   fi
 
@@ -382,7 +386,7 @@ setup_profile_d()
      ! file_contains "${profile_d_path}/bdsm.sh" "${packages_path}/active/bin"
   then
     log "PATH=\"${install_path}/pkg/active/bin:\${PATH}\"\n" \
-      to "${profile_d_path}/bdsm.sh"
+      append to "${profile_d_path}/bdsm.sh"
 
     chmod_files 0755 "${profile_d_path}/bdsm.sh"
   fi
@@ -419,13 +423,15 @@ setup_bdsmrc()
     ensure_files_exist "/etc/bdsmrc"
     if ! file_contains "/etc/bdsmrc" "bdsm_path="
     then
-      printf "%s\n" "export bdsm_path=\"${bdsm_path}\"" >> "/etc/bdsmrc"
+      log "export bdsm_path=\"${bdsm_path}\"" \
+        append to "/etc/bdsmrc"
     fi
   else
     ensure_files_exist "$HOME/.bdsmrc"
     if ! file_contains "$HOME/.bdsmrc" "bdsm_path="
     then
-      printf "%s\n" "export bdsm_path=\"${bdsm_path}\"" >> "$HOME/.bdsmrc"
+      log "export bdsm_path=\"${bdsm_path}\"" \
+        append to "$HOME/.bdsmrc"
     fi
   fi
 }
