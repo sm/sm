@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
-(( UID == 0 )) \
-  && { : "${log_path:="${bdsm_path}/log"}"; } \
-  || { : "${log_path:="$HOME/log"}" ; }
+if (( UID == 0 ))
+then
+  "${log_path:="${bdsm_path}/log"}"
+else
+  "${log_path:="$HOME/log"}"
+fi
 

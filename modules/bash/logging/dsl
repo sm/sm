@@ -32,22 +32,43 @@
 #     Hello there!
 #
 log()
-{ # TODO: Refactor the function below to parse arguments properly.
-  if [[ -n "$1" ]]
+{
+  local _token _file _message _append_flag=0
+
+  while (( $# > 0 ))
+  do
+    _token="$1"
+    shift
+
+    case "${_token}" in
+      (--append)
+        _append_flag=1
+        ;;
+      (to)
+        _file="${1}"
+        shift
+        ;;
+      (*)
+        _message="${_token}"
+        ;;
+    esac
+  done
+
+  if [[ -z "${_message:-}" ]]
   then
-    if [[ "${2:-}" = "to" ]]
+    fail "Cannot log a message as no message was given."
+  fi
+
+  if [[ -n "${_file}" ]]
+  then
+    if (( _append_flag == 0 ))
     then
-      if [[ -n "${3:-}" ]]
-      then
-        printf "$1\n" > "${3}"
-      else
-        fail "Cannot log arguments to a file as no file name/path was given."
-      fi
+      printf "${_message}\n" >> "${_file}"
     else
-      printf "$1\n"
+      printf "${_message}\n" > "${_file}"
     fi
   else
-    fail "Cannot log arguments as none were given."
+      printf "${_message}\n"
   fi
 }
 
