@@ -340,10 +340,12 @@ service_stop()
   then
     "${service}_stop"
   else
-    file_is_executable "${init_scripts_path}/${service}" ||
+    if file_is_executable "${init_scripts_path}/${service}"
+    then
+      service_init_stop
+    else
       fail "${init_scripts_path}/${service} is missing or not executable."
-
-    service_init_stop
+    fi
   fi
 }
 
@@ -432,11 +434,13 @@ service_restart()
   then
     "${service}_restart"
   else
-    file_is_executable "${init_scripts_path}/${service}" ||
+    if file_is_executable "${init_scripts_path}/${service}"
+    then
+      service_init_stop
+      service_init_start
+    else
       fail "${init_scripts_path}/${service} is missing or not executable."
-
-    service_init_stop
-    service_init_start
+    fi
   fi
 }
 
@@ -478,10 +482,12 @@ service_status()
   then
     "${service}_status"
   else
-    file_is_executable "${init_scripts_path}/${service}" ||
+    if file_is_executable "${init_scripts_path}/${service}"
+    then
+      service_init_status
+    else
       fail "${init_scripts_path}/${service} is missing or not executable."
-
-    service_init_status
+    fi
   fi
 }
 
@@ -523,10 +529,13 @@ service_logtail()
   then
     "${service}_logtail"
   else
-    file_is_executable "${init_scripts_path}/${service}" ||
+    if file_is_executable "${init_scripts_path}/${service}"
+    then
+      service_init_logtail
+    else
       fail "${init_scripts_path}/${service} is missing or not executable."
+    fi
 
-    "${init_scripts_path}/${service}" logtail
   fi
 }
 
@@ -568,10 +577,13 @@ service_info()
   then
     "${service}_info"
   else
-    file_is_executable "${init_scripts_path}/${service}" ||
+    if file_is_executable "${init_scripts_path}/${service}"
+    then
+      service_init_info
+    else
       fail "${init_scripts_path}/${service} is missing or not executable."
+    fi
 
-    "${init_scripts_path}/${service}" info
   fi
 }
 
@@ -1016,21 +1028,20 @@ service_init_start()
 
   service_init_path
 
-  local _result=0
+  local _result=0 _command=("${service_binary}")
 
   if array_is_nonempty service_flags
   then
-    "${service_binary}" "${service_flags[@]}" "${service_config_file}" || result=$?
-  else
-    "${service_binary}" "${service_config_file}" || result=$?
+    _command=("${service_flags[@]}")
   fi
+  _command+=("${service_config_file}" )
 
-  if (( _result == 0 ))
+  if user_run_as "${service_user}" "${_command[*]}"
   then
     touch "$service_pid_file"
+  else
+    return $?
   fi
-
-  return ${_result}
 }
 
 #
@@ -1064,23 +1075,21 @@ service_init_start()
 #
 service_init_stop()
 {
-  local _result=0
-
   service_init_path
 
-  (( service_pid > 0 )) ||
+  if (( service_pid == 0 ))
+  then
     error "Service pid has not been set or is zero."
+  fi
 
   log "Stopping ${service}..."
 
-  kill -QUIT "${service_pid}" || _result=$?
-
-  if (( _result == 0 ))
+  if kill -QUIT "${service_pid}"
   then
     rm -f "$service_pid_file"
+  else
+    return $?
   fi
-
-  return ${_result}
 }
 
 #
@@ -1118,15 +1127,20 @@ service_init_status()
 
   service_init_path
 
-  local _result
+  local _command=("${service_binary}")
 
-  "${service_binary}" "${service_flags[@]}" "${service_config_file}"
+  if array_is_nonempty service_flags
+  then
+    _command=("${service_flags[@]}")
+  fi
+  _command+=("${service_config_file}" )
 
-  _result=$?
-
-  (( _result != 0 )) || touch "$service_pid_file"
-
-  return ${_result}
+  if user_run_as "${service_user}" "${_command[*]}"
+  then
+    return 0
+  else
+    touch "$service_pid_file"
+  fi
 }
 
 #
@@ -1164,21 +1178,21 @@ service_init_reload()
 
   service_init_path
 
-  local _result=0
+  local _command=( "${service_binary}" )
 
   if array_is_nonempty service_flags
   then
-    "${service_binary}" reload "${service_flags[@]}" "${service_config_file}" || result=$?
-  else
-    "${service_binary}" reload "${service_config_file}" || result=$?
+    _command=("${service_flags[@]}")
   fi
+  _command+=("${service_config_file}" )
 
-  if (( _result == 0 ))
+
+  if user_run_as "${service_user}" "${_command[*]}"
   then
     touch "$service_pid_file"
+  else
+    return $?
   fi
-
-  return ${_result}
 }
 
 #
@@ -1246,7 +1260,43 @@ service_init_usage()
 #
 service_init_logtail()
 {
-  error "Service init logtail has not yet been implemented."
+  # TODO: Adjust this to allow for parameter passing.
+
+  exec tail -n 10 "${service_log_file}"
+}
+
+#
+# ### service_init_info()
+#
+# This is the generalized service init info function.
+#
+# ##### Input Parameters
+#
+# None.
+#
+# ##### Stream Outputs
+#
+# Outputs information about the service (version, etc...).
+#
+# ##### Environmental effects
+#
+# None.
+#
+# ##### Return Codes
+#
+# 0 for success
+#
+# ##### Failure Scenarios
+#
+# No failure conditions currently.
+#
+# ##### Usage Examples
+#
+#     user$ service_init_info
+#
+service_init_info()
+{
+  NIY "service_init_info has not yet been implemented for the service module."
 }
 
 #
