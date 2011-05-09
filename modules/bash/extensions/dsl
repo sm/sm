@@ -742,6 +742,10 @@ extensions_install()
     fail "Cannot install extensions as no extensions were given to install."
   fi
 
+  # We need to ensure that the extensions directory already exists before calling
+  # install in parallel.
+  extension_fetch "${extension_uri:="${extensions_repository_url}"}"
+
   for _extension in "${_extensions[@]}"
   do
     case "${_extension#\/}" in
