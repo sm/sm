@@ -754,9 +754,10 @@ extensions_install()
     then # Skip any empty extensions / 'artifact'.
       continue
     else
-      extension_install "${_extension}"
+      ( extension_install "${_extension}" )&
     fi
   done
+  wait
 }
 
 #
