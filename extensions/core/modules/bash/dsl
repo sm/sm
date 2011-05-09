@@ -291,7 +291,7 @@ prepare_for_installation()
 create_auxillary_paths()
 {
   (
-  log "  Ensuring auxillary directories (${aux[@]}) exist in ${install_path}"
+  log "  Ensuring auxillary directories (${aux[*]}) exist in ${install_path}"
   enter "${install_path}"
   ensure_paths_exist "${install_path}/" "${aux[@]}"
   )
@@ -300,7 +300,7 @@ create_auxillary_paths()
 install_core_extensions()
 {
   (
-  log "  Installing core extensions (${extensions[@]}) into ${install_path}/extensions"
+  log "  Installing core extensions (${extensions[*]}) into ${install_path}/extensions"
   ensure_paths_exist "${install_path}/extensions"
   enter extensions
   copy_directories_to "${install_path}/extensions" "${extensions[@]}"
@@ -309,16 +309,16 @@ install_core_extensions()
 
 install_core()
 {
-  log "  Installing core directories (${directories[@]}) into ${install_path}"
+  log "  Installing core directories (${directories[*]}) into ${install_path}"
   copy_directories_to "${install_path}" "${directories[@]}"
 
-  log "  Installing core files (${files[@]}) into ${install_path}"
+  log "  Installing core files (${files[*]}) into ${install_path}"
   copy_files to "${install_path}" ${files[@]}
 }
 
 install_configuration_files()
 {
-  log "  Ensuring that the configuration files (${configs[@]}) exist in ${config_path}"
+  log "  Ensuring that the configuration files (${configs[*]}) exist in ${config_path}"
   ensure_files_exist "${install_path}/cofig/user"
 }
 
