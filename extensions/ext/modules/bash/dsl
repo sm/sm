@@ -284,11 +284,11 @@ extension_cli()
         _ignored_args+=("${token}")
         ;;
     esac
-
-    if (( ${#_ignored_args[@]} > 0 ))
-    then
-      extension_args=( "${_ignored_args[@]}" )
-    fi
   done
+
+  if (( ${#_ignored_args[@]} > 0 ))
+  then
+    extension_args=( "${_ignored_args[@]}" )
+  fi
 }
 

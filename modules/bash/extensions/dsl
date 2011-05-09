@@ -803,10 +803,9 @@ extension_install()
     fail "Cannot install an extension as no extension name was given."
   fi
 
-  extension_fetch "${extension_uri:="${extensions_repository_url}"}"
-
   if extension_is_valid "${extension_src_path}/${_extension}"
   then
+    log " - ${_extension}"
     copy_directories_to "${bdsm_path}/extensions" "${extension_src_path}/${_extension}"
 
     log "${extension_uri}" to "${bdsm_path}/extensions/${_extension}/.uri"
@@ -814,12 +813,25 @@ extension_install()
     #
     # TODO: Process extension dependencies...
     #
-
   else
     error "${extension_src_path} is not a proper extension.
    The named extension is missing VERSION and/or bin/help files.
    Halting installation."
   fi
+}
+
+extension_fetch_and_install()
+{
+  local _extension="${1:-}"
+
+  if [[ -z "${_extension}" ]]
+  then
+    fail "Cannot fetch and install an extension as no extension name was given."
+  fi
+
+  extension_fetch "${extension_uri:="${extensions_repository_url}"}"
+
+  extension_install "${_extension}"
 }
 
 extension_fetch()
