@@ -1032,7 +1032,7 @@ service_init_start()
 
   if array_is_nonempty service_flags
   then
-    _command=("${service_flags[@]}")
+    _command+=("${service_flags[@]}")
   fi
   _command+=("${service_config_file}" )
 
@@ -1131,7 +1131,7 @@ service_init_status()
 
   if array_is_nonempty service_flags
   then
-    _command=("${service_flags[@]}")
+    _command+=("${service_flags[@]}")
   fi
   _command+=("${service_config_file}" )
 
@@ -1182,7 +1182,7 @@ service_init_reload()
 
   if array_is_nonempty service_flags
   then
-    _command=("${service_flags[@]}")
+    _command+=("${service_flags[@]}")
   fi
   _command+=("${service_config_file}" )
 
