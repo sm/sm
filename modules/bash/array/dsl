@@ -340,7 +340,7 @@ array_append()
 #
 # ### Stream Outputs
 #
-#   Prints the length of the named array to the STDOUT stream of the
+#   Prints the first element of the named array to the STDOUT stream of the
 #   calling environment.
 #
 # ### Usage Examples
@@ -379,7 +379,7 @@ array_shift()
     "
     printf "%s" "${first_element}"
   else
-    fail "Cannot push onto array as an array name was not given."
+    fail "Cannot shift from array as an array name was not given."
   fi
 }
 
@@ -454,7 +454,7 @@ array_unshift()
 #
 # ### Stream Outputs
 #
-# Prints the elements of the named array, separted by either the 2nd parameter
+# Prints the elements of the named array, separated by either the 2nd parameter
 # if given or else a space character, to the STDOUT stream of the calling
 # environment.
 #
