@@ -59,7 +59,19 @@ enter "${active_path}"
 ensure_paths_exist ${fhs_dirs}
 )
 
-export LDFLAGS="${LDFLAGS:-} -L${active_path}/lib"
+if [[ -n "${LDFLAGS}" ]]
+then
+  export LDFLAGS="${LDFLAGS} -L${active_path}/lib"
+else
+  export LDFLAGS="-L${active_path}/lib"
+fi
+
+if [[ -n "${CFLAGS}" ]]
+then
+  export CFLAGS="${CFLAGS} -I${active_path}/include"
+else
+  export CFLAGS="-I${active_path}/include"
+fi
 
 export package_name packages_path package_name package_version archive_format package_file package_url package_md5_url packages_path bin_path source_path
 
