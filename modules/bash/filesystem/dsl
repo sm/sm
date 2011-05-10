@@ -2386,21 +2386,21 @@ directories_in()
 {
   local _path="${1:-}"
 
-  if [[ -z "${path}" ]]
+  if [[ -n "${path}" ]]
   then
-    fail "Directory name/path was not given!"
-  fi
-
-  if [[ ! -d "${_path}" ]]
-  then
-    fail "'${_path}' is not a directory!"
-  fi
-
-  if find "${_path}" -mindepth 1 -maxdepth 1 -type d
-  then
-    return 0
+    if [[ -d "${_path}" ]]
+    then
+      if find "${_path}" -mindepth 1 -maxdepth 1 -type d
+      then
+        return 0
+      else
+        return 1
+      fi
+    else
+      fail "'${_path}' is not a directory!"
+    fi
   else
-    return 1
+    fail "Directory name/path was not given!"
   fi
 }
 
@@ -2408,26 +2408,26 @@ directories_in_matching()
 {
   local _path="${1:-}" _pattern="${2:-}"
 
-  if [[ -z "${path}" ]]
+  if [[ -n "${path}" ]]
   then
-    fail "Directory name/path was not given!"
-  fi
-
-  if [[ ! -d "${_path}" ]]
-  then
-    fail "'${_path}' is not a directory!"
-  fi
-
-  if [[ -z "${_pattern}" ]]
-  then
-    fail "'${_path}' is not a directory!"
-  fi
-
-  if find "${_path}" -mindepth 1 -maxdepth 1 -type d
-  then
-    return 0
+    if [[ -d "${_path}" ]]
+    then
+      if [[ -n "${_pattern}" ]]
+      then
+        if find "${_path}" -mindepth 1 -maxdepth 1 -type d
+        then
+          return 0
+        else
+          return 1
+        fi
+      else
+        fail "'${_path}' is not a directory!"
+      fi
+    else
+      fail "'${_path}' is not a directory!"
+    fi
   else
-    return 1
+    fail "Directory name/path was not given!"
   fi
 }
 
@@ -2435,21 +2435,21 @@ directories_under()
 {
   local _path="${1:-}"
 
-  if [[ -z "${path}" ]]
+  if [[ -n "${path}" ]]
   then
-    fail "Directory name/path was not given!"
-  fi
-
-  if [[ ! -d "${_path}" ]]
-  then
-    fail "'${_path}' is not a directory!"
-  fi
-
-  if find "${_path}" -mindepth 1 -type d
-  then
-    return 0
+    if [[ -d "${_path}" ]]
+    then
+      if find "${_path}" -mindepth 1 -type d
+      then
+        return 0
+      else
+        return 1
+      fi
+    else
+      fail "'${_path}' is not a directory!"
+    fi
   else
-    return 1
+    fail "Directory name/path was not given!"
   fi
 }
 
@@ -2457,30 +2457,28 @@ directories_under_matching()
 {
   local _path="${1:-}"
 
-  if [[ -z "${path}" ]]
+  if [[ -n "${path}" ]]
   then
-    fail "Directory name/path was not given!"
-  else
     shift
-  fi
-
-  local _pattern="${1:-}"
-
-  if [[ ! -d "${_path}" ]]
-  then
-    fail "'${_path}' is not a directory!"
-  fi
-
-  if [[ -z "${_pattern}" ]]
-  then
-    fail "'${_path}' is not a directory!"
-  fi
-
-  if find "${_path}" -mindepth 1 -iname "${_pattern}" -type d
-  then
-    return 0
+    local _pattern="${1:-}"
+    if [[ -d "${_path}" ]]
+    then
+      if [[ -n "${_pattern}" ]]
+      then
+        if find "${_path}" -mindepth 1 -iname "${_pattern}" -type d
+        then
+          return 0
+        else
+          return 1
+        fi
+      else
+        fail "'${_path}' is not a directory!"
+      fi
+    else
+      fail "'${_path}' is not a directory!"
+    fi
   else
-    return 1
+    fail "Directory name/path was not given!"
   fi
 }
 
@@ -2519,21 +2517,21 @@ files_in()
 {
   local _path="${1:-}"
 
-  if [[ -z "${path}" ]]
+  if [[ -n "${path}" ]]
   then
-    fail "Directory name/path was not given!"
-  fi
-
-  if [[ ! -d "${_path}" ]]
-  then
-    fail "'${_path}' is not a directory!"
-  fi
-
-  if find "${_path}" -mindepth 1 -maxdepth 1 -type f
-  then
-    return 0
+    if [[ -d "${_path}" ]]
+    then
+      if find "${_path}" -mindepth 1 -maxdepth 1 -type f
+      then
+        return 0
+      else
+        return 1
+      fi
+    else
+      fail "'${_path}' is not a directory!"
+    fi
   else
-    return 1
+    fail "Directory name/path was not given!"
   fi
 }
 
@@ -2574,19 +2572,19 @@ files_under()
 
   if [[ -n "${path}" ]]
   then
-    fail "Directory name/path was not given!"
-  fi
-
-  if [[ -d "${_path}" ]]
-  then
-    fail "'${_path}' is not a directory!"
-  fi
-
-  if find "${_path}" -mindepth 1 -type f
-  then
-    return 0
+    if [[ -d "${_path}" ]]
+    then
+      if find "${_path}" -mindepth 1 -type f
+      then
+        return 0
+      else
+        return 1
+      fi
+    else
+      fail "'${_path}' is not a directory!"
+    fi
   else
-    return 1
+    fail "Directory name/path was not given!"
   fi
 }
 
@@ -2625,31 +2623,29 @@ files_in_path_matching()
 {
   local _path="${1:-}"
 
-  if [[ -z "${path}" ]]
+  if [[ -n "${path}" ]]
   then
+    shift
+    _pattern="${1:-}"
+    if [[ -d "${_path}" ]]
+    then
+      shift
+      if [[ -n "${_pattern}" ]]
+      then
+        if find "${_path}" -mindepth 1 -iname "${_pattern}" -type f
+        then
+          return 0
+        else
+          return 1
+        fi
+      else
+        fail "Cannot find files as a filename or pattern was not given."
+      fi
+    else
+      fail "'${_path}' is not a directory!"
+    fi
+  else
     fail "Directory name/path was not given!"
-  else
-    shift
-  fi
-
-  _pattern="${1:-}"
-  if [[ ! -d "${_path}" ]]
-  then
-    fail "'${_path}' is not a directory!"
-  else
-    shift
-  fi
-
-  if [[ -z "${_pattern}" ]]
-  then
-    fail "Cannot find files as a filename or pattern was not given."
-  fi
-
-  if find "${_path}" -mindepth 1 -iname "${_pattern}" -type f
-  then
-    return 0
-  else
-    return 1
   fi
 }
 
@@ -2695,7 +2691,7 @@ files_in_path_matching()
 #
 replace_content()
 {
-  local _token _pattern _content _file
+  local _token _pattern _content _file _message
 
   while (( $# > 0 ))
   do
@@ -2722,31 +2718,39 @@ replace_content()
     esac
   done
 
-  if [[ -z "${_pattern:-}" ]]
+  if [[ -n "${_pattern:-}" ]]
   then
-    fail "Cannot replace content as not even a pattern was given."
-  fi
-
-  if [[ -z "${_content:-}" ]]
-  then
-    fail "Cannot replace content as the replacement content was not given, specify by 'with \"replacement text\"'."
-  fi
-
-  if [[ -z "${_file:-}" ]]
-  then
-    fail "Can not file content as the filename was not given, specify by 'in \"/path/to/filename\"'"
-  fi
-
-  if [[ ! -f "${_file:-}" ]]
-  then
-    fail "Can not replace file content as the file does not exist."
-  fi
-
-  if sed -i -e "s#${_pattern}#${_content}#g" "${_file}"
-  then
-    return 0
+    if [[ -n "${_content:-}" ]]
+    then
+      if [[ -n "${_file:-}" ]]
+      then
+        if [[ -f "${_file:-}" ]]
+        then
+          if sed -i -e "s#${_pattern}#${_content}#g" "${_file}"
+          then
+            return 0
+          else
+            return 1
+          fi
+        else
+          fail "Can not replace file content as the file does not exist."
+        fi
+      else
+        _message=(
+        "Can not file content as the filename was not given,"
+        " specify by 'in \"/path/to/filename\"'"
+        )
+        fail "${_message[*]}"
+      fi
+    else
+      _message=(
+      "Cannot replace content as the replacement content was not given, "
+      "specify by 'with \"replacement text\"'."
+      )
+      fail "${_message[*]}"
+    fi
   else
-    return 1
+    fail "Cannot replace content as not even a pattern was given."
   fi
 }
 
@@ -2790,28 +2794,28 @@ file_matches_md5()
 {
   local _file="$1" _md5="$2" _file_md5
 
-  if [[ -z "${_file}" ]]
+  if [[ -n "${_file}" ]]
   then
-    fail "Cannot determine if file matches md5 as no file was given."
-  fi
+    if [[ -n "${_md5}" ]]
+    then
+      if [[ -s "${_file}" ]]
+      then
+        _file_md5="$(file_md5 "${_file}")"
 
-  if [[ -z "${_md5}" ]]
-  then
-    fail "Cannot determine if file matches md5 as no md5 was given."
-  fi
-
-  if [[ ! -s "${_file}" ]]
-  then
-    return 1
-  fi
-
-  _file_md5="$(file_md5 "${_file}")"
-
-  if [[ "${_file_md5// *}" = "$_md5" ]]
-  then
-    return 0
+        if [[ "${_file_md5// *}" = "$_md5" ]]
+        then
+          return 0
+        else
+          return 1
+        fi
+      else
+        return 1
+      fi
+    else
+      fail "Cannot determine if file matches md5 as no md5 was given."
+    fi
   else
-    return 1
+    fail "Cannot determine if file matches md5 as no file was given."
   fi
 }
 
@@ -2819,80 +2823,81 @@ extract_archive()
 {
   local _archive="${1:-}"
 
-  if [[ -z "${_archive}" ]]
+  if [[ -n "${_archive}" ]]
   then
-    fail "Cannot extract an archive to a target location as no archive was given."
-  else
     shift
+    local _path="${1:-}"
+
+    case "${_archive}" in
+      *.tar.gz|*.tgz) # gzip
+        if ! tar zxf "${_archive}"
+        then
+          error "There was an error while extracting the archive '${_archive}'"
+        fi
+        ;;
+      *tar.xz) # LZMA
+        # TODO: if 'xz' command exists, use that, otherwise use tar J
+        if ! tar Jxf "${_archive}"
+        then
+          error "There was an error while extracting the archive '${_archive}'"
+        fi
+        ;;
+      *.tar.bz2) # bzip
+        if ! tar jxf "${_archive}"
+        then
+          error "There was an error while extracting the archive '${_archive}'"
+        fi
+        ;;
+      *.zip)
+        if ! unzip "${_archive}" -d "${_path:-}"
+        then
+          error "There was an error while extracting the archive '${_archive}'"
+        fi
+        ;;
+      *)
+        error "Unknown archive format for ${_archive}"
+        ;;
+    esac
+  else
+    fail "Cannot extract an archive to target location as no archive was given."
   fi
 
-  local _path="${1:-}"
-
-  case "${_archive}" in
-    *.tar.gz|*.tgz) # gzip
-      if ! tar zxf "${_archive}"
-      then
-        error "There was an error while extracting the archive '${_archive}'"
-      fi
-      ;;
-    *tar.xz) # LZMA
-      # TODO: if 'xz' command exists, use that, otherwise use tar J
-      if ! tar Jxf "${_archive}"
-      then
-        error "There was an error while extracting the archive '${_archive}'"
-      fi
-      ;;
-    *.tar.bz2) # bzip
-      if ! tar jxf "${_archive}"
-      then
-        error "There was an error while extracting the archive '${_archive}'"
-      fi
-      ;;
-    *.zip)
-      if ! unzip "${_archive}" -d "${_path:-}"
-      then
-        error "There was an error while extracting the archive '${_archive}'"
-      fi
-      ;;
-    *)
-      error "Unknown archive format for ${_archive}"
-      ;;
-  esac
 }
 
 file_md5()
 {
   local _file="${1:-}" _command _md5
 
-  if [[ -z "${_file}" ]]
+  if [[ -n "${_file}" ]]
   then
-    fail "Cannot calculate md5 of a file as no file name/path was given."
-  fi
-
-  if os_is_darwin
-  then
-    _command="/sbin/md5 -q"
-
-  else
-    if command_exists "md5sum"
+    if os_is_darwin
     then
-      _command="md5sum"
-
-    elif command_exists md5
-    then
-      _command="md5"
+      _command="/sbin/md5 -q"
 
     else
-      error "Could not find a suitable md5 command in the path."
+      if command_exists "md5sum"
+      then
+        _command="md5sum"
+
+      elif command_exists md5
+      then
+        _command="md5"
+
+      else
+        error "Could not find a suitable md5 command in the path."
+      fi
     fi
-  fi
 
-  if _md5="$(${_command} "$_file" 2>/dev/null)"
-  then
-    printf "${_md5// *}"
+    if _md5="$(${_command} "$_file" 2>/dev/null)"
+    then
+      printf "${_md5// *}"
 
-  else # Should this be error ?
-    warn "There was an unknown error computing the md5"
-    return 1
+    else # Should this be error ?
+      warn "There was an unknown error computing the md5"
+      return 1
+    fi
+  else
+    fail "Cannot calculate md5 of a file as no file name/path was given."
   fi
 }
+
