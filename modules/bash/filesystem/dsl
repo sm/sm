@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
 #
+# # Filesystem Module
+#
+
+#
 # ## source_files
 #
 # Safely source files only if they exists and are nonempty.
@@ -849,7 +853,8 @@ copy_files_to()
 #
 # ### Usage Examples
 #
-#     user$ copy_files "$HOME/backup" "$HOME/.bashrc" "$HOME/.bash_profile"
+#     user$ copy_files "$HOME/.bashrc" "$HOME/.bash_profile" \
+#             to "$HOME/backup"
 #
 copy_files()
 {
