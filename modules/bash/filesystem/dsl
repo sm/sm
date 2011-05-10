@@ -961,6 +961,89 @@ copy_directories_to()
 }
 
 #
+# ## copy_directories to
+#
+# Copys a given list of directories into the named path.
+#
+# ##### Input Parameters
+#
+# The first parameter is the path to copy the directorys into.
+# Remaining parameters are the directory name/path list.
+#
+# ##### Stream Outputs
+#
+# None.
+#
+# ##### Environmental effects
+#
+# If successful, all named directories are copied into the target path.
+#
+# ##### Return Codes
+#
+# 0 for success.
+#
+# ##### Failure Scenarios
+#
+# Fails if no target path is given.
+# Fails if no directories are given.
+#
+# ##### Usage Examples
+#
+#     user$ copy_directories to "$HOME/backup/" "$HOME/bin" "$HOME/projects"
+#
+copy_directories_to()
+{
+  local _source _target _directory _force_flag=0 _directories=()
+
+  while (( $# > 0 ))
+  do
+    token="$1"
+    shift
+
+    case "${token}" in
+      to)
+        _target="${1}"
+        shift
+        ;;
+      from)
+        _source="${1}"
+        shift
+        ;;
+      --force)
+        _force_flag=1
+        ;;
+
+      *)
+        _directories+=( "${token}" )
+        ;;
+    esac
+  done
+
+  if [[ -z "${_target}" ]]
+  then
+    fail "Cannot copy directories as no target path was given (eg. copy_directories ... to {path})."
+  fi
+
+  if (( ${#_directories[@]} == 0 ))
+  then
+    fail "Cannot copy directories as no directories were given to copy."
+  fi
+
+  ensure_paths_exist "${_target}"
+
+  for _directory in "${_directories[@]}"
+  do
+    if directory_exists "${_directory}"
+    then
+      cp -Rf "${_directory}" "${_target}/"
+    else
+      error "Cannot copy directory ${_directory} to ${_target} as the directory '${_directory}' does not exist (in '$PWD')."
+    fi
+  done
+}
+
+
+#
 # ## copy_directory
 #
 # Copys a directory from one location to another.
