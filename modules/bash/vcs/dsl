@@ -62,20 +62,20 @@ scm_update()
       # TODO: Use git cli instead of awking it :)
       if [[ -z "$(git branch | awk "/${branch:=master}$/")" ]]
       then
-        if ! git checkout -b "$branch" --track "$remote/$branch" 2>/dev/null
+        if ! $(enter "${repo_path}"; git checkout -b "$branch" --track "$remote/$branch" 2>/dev/null)
         then
           error "$remote $branch remote branch not found. Halting."
         fi
 
       elif [[ -z "$(git branch | awk "/\* $branch$/{print \$2}")" ]]
       then
-        if ! git checkout $branch 2>/dev/null
+        if ! $(enter "${repo_path}"; git checkout $branch 2>/dev/null)
         then
           error "Unable to checkout $branch.\nCould not get head. Halting."
         fi
       fi
 
-      if ! git pull --rebase origin $branch
+      if ! $(enter "${repo_path}"; git pull --rebase origin $branch)
       then
         error "Git pull failed. Halting."
       fi
