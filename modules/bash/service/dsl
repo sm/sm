@@ -1577,27 +1577,38 @@ service_activate()
   then
     chmod_files 0755 "${init_scripts_path}/${service}"
 
-    if user_is_root
-    then # Add service to system startup
-      if command_exists rc-update
+    if os_is_linux
+      if user_is_root
+      then # Add service to system startup
+        if command_exists rc-update
+        then
+          rc-update remove ${service} default
+
+        elif command_exists chkconfig
+        then
+          chkconfig ${service} off
+
+        #elif command_exists svc
+        #then
+        #  svc ${service} off
+        #  TODO: daemontools remove start on boot
+
+        else # Fall back on rc.local to start redis at system startup.
+          if ! file_contains "/etc/rc.local" "${service} start"
+          then
+            sed -i -e "d#${init_scripts_path}/${service} start#" /etc/rc.local
+          fi
+        fi
+      elif os_is_darwin
       then
-        rc-update remove ${service} default
-
-      elif command_exists chkconfig
-      then
-        chkconfig ${service} off
-
-      #elif command_exists svc
-      #then
-      #  svc ${service} off
-      #  TODO: daemontools remove start on boot
-
-      else # Fall back on rc.local to start redis at system startup.
+        true # TODO: launchctl
+      else # ::shrug::
         if ! file_contains "/etc/rc.local" "${service} start"
         then
           sed -i -e "d#${init_scripts_path}/${service} start#" /etc/rc.local
         fi
       fi
+    else
     fi
   fi
 }

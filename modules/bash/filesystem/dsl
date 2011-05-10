@@ -1558,11 +1558,11 @@ chmod_files()
 chmod_paths()
 {
   local _permissions="$1" _path
-  if [[ -z "${_permissions}" ]]
+  if [[ -n "${_permissions}" ]]
   then
-    fail "Cannot chmod_paths as the permissions were not given as the first parameter!!"
-  else
     shift
+  else
+    fail "Cannot chmod_paths as the permissions were not given as the first parameter!!"
   fi
 
   local _paths=("$@")
@@ -1574,7 +1574,7 @@ chmod_paths()
 
   for _path in "${_paths[@]}"
   do
-    if directory_exists "${_directory}"
+    if directory_exists "${_path}"
     then
       chmod ${_permissions} "${_path}"
     else
