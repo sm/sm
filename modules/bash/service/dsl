@@ -1034,7 +1034,6 @@ service_init_start()
   then
     _command+=("${service_flags[@]}")
   fi
-  _command+=("${service_config_file}" )
 
   if user_run_as "${service_user}" "${_command[*]}"
   then
