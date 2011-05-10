@@ -60,7 +60,7 @@ ensure_paths_exist ${fhs_dirs}
 )
 
 LDFLAGS="-L${active_path}/lib ${LDFLAGS:-}"
-CFLAGS="-I${active_path}/include ${CFLAGS} "
+CFLAGS="-I${active_path}/include ${CFLAGS:-} "
 
 export package_name packages_path package_name package_version archive_format package_file package_url package_md5_url packages_path bin_path source_path LDFLAGS CFLAGS
 
