@@ -303,14 +303,14 @@ install_core_extensions()
   log "  Installing core extensions (${extensions[*]}) into ${install_path}/extensions"
   ensure_paths_exist "${install_path}/extensions"
   enter extensions
-  copy_directories_to "${install_path}/extensions" "${extensions[@]}"
+  copy_directories to "${install_path}/extensions" "${extensions[@]}"
   )
 }
 
 install_core()
 {
   log "  Installing core directories (${directories[*]}) into ${install_path}"
-  copy_directories_to "${install_path}" "${directories[@]}"
+  copy_directories to "${install_path}" "${directories[@]}"
 
   log "  Installing core files (${files[*]}) into ${install_path}"
   copy_files to "${install_path}" ${files[@]}

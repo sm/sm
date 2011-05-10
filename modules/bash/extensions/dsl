@@ -806,7 +806,7 @@ extension_install()
   if extension_is_valid "${extension_src_path}/${_extension}"
   then
     log " - ${_extension}"
-    copy_directories_to "${bdsm_path}/extensions" "${extension_src_path}/${_extension}"
+    copy_directories to "${bdsm_path}/extensions" "${extension_src_path}/${_extension}"
 
     log "${extension_uri}" to "${bdsm_path}/extensions/${_extension}/.uri"
 

@@ -991,7 +991,7 @@ copy_directories_to()
 #
 #     user$ copy_directories to "$HOME/backup/" "$HOME/bin" "$HOME/projects"
 #
-copy_directories_to()
+copy_directories()
 {
   local _source _target _directory _force_flag=0 _directories=()
 
