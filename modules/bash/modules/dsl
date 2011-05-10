@@ -443,6 +443,9 @@ module_docs()
 #
 modules_docgen()
 {
+  # TODO: Replace with,
+  # for file in modules/bash/*/dsl ; do name=${file%%\/dsl};(shocco $file > html/${name//*\/}.html)& done
+
   local _module _modules _function _dsl
   local _prefix="/tmp/docs/modules"
   local _path="${site_development_path}"
