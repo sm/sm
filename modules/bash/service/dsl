@@ -1600,7 +1600,7 @@ service_activate()
           fi
         fi
       fi
-    elif os_is_darwin
+    else if os_is_darwin
     then
       true # TODO: launchctl
     else # ::shrug::
