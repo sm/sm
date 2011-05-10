@@ -2087,7 +2087,7 @@ file_is_empty_or_missing()
 {
   local _file="${1:-}"
 
-  if [[ -z "${_file}" ]]
+  if [[ -n "${_file}" ]]
   then
     if [[ ! -f "${_file}" || ! -s "${_file}" ]]
     then
@@ -2151,11 +2151,11 @@ file_contains()
 {
   local _file="${1:-}"
 
-  if [[ -z "${_file}" ]]
+  if [[ -n "${_file}" ]]
   then
-    fail "File path/name was not given!"
-  else
     shift
+  else
+    fail "File path/name was not given!"
   fi
 
   local _pattern="${1:-}"
