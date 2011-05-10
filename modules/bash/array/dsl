@@ -165,7 +165,7 @@ array_last_element()
   then
     eval "_length=\${#${_array_name}[@]}"
 
-    eval "printf \"%s\\n\"\"\${${_array_name}[${_length}]}\""
+    eval "printf \"%s\\n\" \"\${${_array_name}[${_length}]}\""
   else
     fail "Cannot push onto array as an array name was not given."
   fi
