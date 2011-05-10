@@ -5,27 +5,27 @@
 #
 # Safely source files only if they exists and are nonempty.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # One or more files.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # Nonempty files given will be sourced into the calling environment.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no files are given to sources.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ source_files "$HOME/.dotfiles/scripts/functions"
 #
@@ -52,28 +52,28 @@ source_files()
 #
 # Outputs a subset of the named files that are nonempty.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # One or more files.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # Each nonempty filename parameter will be printed to STDOUT of the calling
 # environment.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no file names are given as arguments.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ nonempty_files a $HOME/.bdmsrc c
 #     /Users/wayneeseguin/.bdsmrc
@@ -100,27 +100,27 @@ nonempty_files()
 # Iterates over the list of given paths, creates the directory if it
 # does not exist.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # A list of paths to create if missing.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # Paths that were given but do not exist will be created.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no paths were given to.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ ls -a
 #     . ..
@@ -146,30 +146,30 @@ ensure_paths_exist()
 #
 # Removes the given files, if they exist.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # One or more file names/paths.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # The named files will no longer exist on the system, if they existed to begin
 # with.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no files were named.
 # Fails if a named file is a directory.
 # Fails if a named file exists but is not a file.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ touch a b c
 #     user$ ls -a
@@ -204,28 +204,28 @@ remove_files()
 #
 # Removes the given entries, if they exist.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # One or more file, directory or symlink names/paths.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # The named files will no longer exist on the system, if they existed to begin
 # with.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no files were named.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ touch a
 #     user$ mkdir b
@@ -262,28 +262,28 @@ remove()
 #
 # Function Description
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # Positional Parameter listing and descriptions.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # What, if any, environmental side effects this function causes. 'None.' for none.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 if ...
 # 1 if ...
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if ...
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ {{ setup the scenario }}
 #     user$ function_name {{ parameters }}
@@ -315,27 +315,27 @@ remove_paths()
 # Iterates over the list of given files, creates the directory if it
 # does not exist.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # A list of files to create if missing.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # files that were given but do not exist will be created.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no files were given to.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ ls -a
 #     . ..
@@ -363,30 +363,30 @@ ensure_files_exist()
 #
 # Sets the executable bits on a file if it is not executable.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # One or more file name/paths
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # Files that were given and not executable will have their execute bits set.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no files were given as parameters.
 # Fails if one of the files given was a directory.
 # Fails if one of the files given does not exist.
 # Fails if one of the files paths does not exist.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ ensure_files_are_executable /etc/rc.d/postgresql
 #
@@ -428,29 +428,29 @@ ensure_files_are_executable()
 #
 # Create a symlink from source to target.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # First parameter is the source
 # Second parameter is the target
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # Symlink is created if no failure conditions are triggered.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if target exists and is a file.
 # Fails if target exists and is a directory.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 # The following usages are equivalent
 #
@@ -508,29 +508,29 @@ link()
 # Moves a directory from one location to another.
 # (This is also used to rename a directory.)
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # The first parameter is the source directory name
 # The second parameter is the target directory name
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # If successful, a directory is renamed (moved).
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if the source directory is not specified.
 # Fails if the target directory is not specified.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ move_directory "freetds-0.91rc"* to "freetds-0.91"
 #
@@ -588,29 +588,29 @@ move_directory()
 # Moves a file from one location to another.
 # (This is also used to rename a file.)
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # The first parameter is the source file name
 # The second parameter is the target file name
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # If successful, a file is renamed (moved).
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if the source file is not specified.
 # Fails if the target file is not specified.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ move_file "$HOME/.bashrc" to "$HOME/.bashrc.orig"
 #
@@ -668,29 +668,29 @@ move_file()
 # Copys a file from one location to another.
 # (This is also used to rename a file.)
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # The first parameter is the source file name
 # The second parameter is the target file name
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # If successful, a file is renamed (copyd).
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if the source file is not specified.
 # Fails if the target file is not specified.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ copy_file "$HOME/.bashrc" to "$HOME/.bashrc.orig"
 #
@@ -751,29 +751,29 @@ copy_file()
 #
 # Copys a given list of files into the named path.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # The first parameter is the path to copy the files into.
 # Remaining parameters are the file name/path list.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # If successful, all named files are copied into the target path.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no target path is given.
 # Fails if no files are given.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ copy_files_to "$HOME/backup" "$HOME/.bashrc" "$HOME/.bash_profile"
 #
@@ -816,29 +816,29 @@ copy_files_to()
 #
 # Copys a given list of files into the named path.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # The first parameter is the path to copy the files into.
 # Remaining parameters are the file name/path list.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # If successful, all named files are copied into the target path.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no target path is given.
 # Fails if no files are given.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ copy_files "$HOME/backup" "$HOME/.bashrc" "$HOME/.bash_profile"
 #
@@ -903,29 +903,29 @@ copy_files()
 #
 # Copys a given list of directories into the named path.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # The first parameter is the path to copy the directorys into.
 # Remaining parameters are the directory name/path list.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # If successful, all named directories are copied into the target path.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no target path is given.
 # Fails if no directories are given.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ copy_directories_to "$HOME/backup/" "$HOME/bin" "$HOME/projects"
 #
@@ -965,29 +965,29 @@ copy_directories_to()
 #
 # Copys a given list of directories into the named path.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # The first parameter is the path to copy the directorys into.
 # Remaining parameters are the directory name/path list.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # If successful, all named directories are copied into the target path.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no target path is given.
 # Fails if no directories are given.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ copy_directories to "$HOME/backup/" "$HOME/bin" "$HOME/projects"
 #
@@ -1049,29 +1049,29 @@ copy_directories()
 # Copys a directory from one location to another.
 # (This is also used to rename a directory.)
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # The first parameter is the source directory name
 # The second parameter is the target directory name
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # If successful, a directory is renamed (copyd).
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if the source directory is not specified.
 # Fails if the target directory is not specified.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ copy_directory "freetds-0.91rc"* to "freetds-0.91"
 #
@@ -1113,29 +1113,29 @@ copy_directory()
 #
 # Moves a given list of files into the named path.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # The first parameter is the path to move the files into.
 # Remaining parameters are the file name/path list.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # If successful, all named files are copied into the target path.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no target path is given.
 # Fails if no files are given.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ move_files_to "$HOME/backup" "$HOME/.bashrc" "$HOME/.bash_profile"
 #
@@ -1177,31 +1177,31 @@ move_files_to()
 #
 # Moves a given list of files into the named path.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # Parameters are file name/path for one or more files
 # Target directory is specified as 'to {{path}}'
 # Optional source directory is specified as 'from {{path}}'
 # Optional force flag '--force' may be specified
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # If successful, all named files are copied into the target path.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no target path is given.
 # Fails if no files are given.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ move_files "$HOME/.bashrc" "$HOME/.bash_profile" to "$HOME/backup"
 #
@@ -1275,29 +1275,29 @@ move_files()
 #
 # Change ownership of a list of files.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # First parameter is the new owner[:group] of the files.
 # Remaining parameters are the file names/paths.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no new owner[:group] was specified.
 # Fails if no list of files was given.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ chown_files $USER "$HOME/.bashrc" "$HOME/.bash_profile"
 #
@@ -1335,29 +1335,29 @@ chown_files()
 #
 # Change ownership of a list of paths.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # First parameter is the new owner[:group] of the paths.
 # Remaining parameters are the path names/paths.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no new owner[:group] was specified.
 # Fails if no list of paths was given.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ chown_paths $USER "$HOME" "/usr/local"
 #
@@ -1395,29 +1395,29 @@ chown_paths()
 #
 # Change ownership of a list of paths, recursively.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # First parameter is the new owner[:group] of the paths.
 # Remaining parameters are the path names/paths.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no new owner[:group] was specified.
 # Fails if no list of paths was given.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ chown_paths_recursively $USER "$HOME" "/usr/local"
 #
@@ -1455,29 +1455,29 @@ chown_paths_recursively()
 #
 # Change ownership of a list of files.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # First parameter is the new owner[:group] of the files.
 # Remaining parameters are the file names/files.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no new owner[:group] was specified.
 # Fails if no list of files was given.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ chmod_files $USER "$HOME" "/usr/local"
 #
@@ -1515,29 +1515,29 @@ chmod_files()
 #
 # Change ownership of a list of paths.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # First parameter is the new owner[:group] of the paths.
 # Remaining parameters are the path names/paths.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no new owner[:group] was specified.
 # Fails if no list of paths was given.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ chmod_paths $USER "$HOME" "/usr/local"
 #
@@ -1574,29 +1574,29 @@ chmod_paths()
 #
 # Change ownership of a list of paths, recursively.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # First parameter is the new owner[:group] of the paths.
 # Remaining parameters are the path names/paths.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no new owner[:group] was specified.
 # Fails if no list of paths was given.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ chmod_paths_recursively $USER "$HOME" "/usr/local"
 #
@@ -1632,29 +1632,29 @@ chmod_paths_recursively()
 # Changes the current working directory ($PWD) to the given directory with
 # sanity checks.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # First parameter is the directory to change into.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # The current working directory (PWD) will become the given directory if
 # successful.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no directory was given.
 # Fails if the given directory does not exist.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ enter "/usr/local/src"
 #
@@ -1683,32 +1683,32 @@ enter()
 #
 # Set and get key/value pairs from a given has file.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # The first parameter is the file name/path for the hash file.
 # The second parameter is the key name.
 # The third (optional) parameter is the value to assign to the given key.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # The value of the key retrieved is printed if no value parameter was given.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # If a value parameter was given the key=value pair is written to the named
 # hash file.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no file name/path was provided.
 # Fails if no key name was given.
 # Fails if the file path does not exist.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ hash_file /usr/local/bdsm/extensions/core/config/defaults website_url
 #     https://bdsm.beginrescueend.com/
@@ -1767,28 +1767,28 @@ hash_file()
 #
 # Check if a file name/path is executable.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # First parameter is a file name/path.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 if the named file is executable.
 # 1 if the named file is not executable or does not exist.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no file name/path was given.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ file_is_executable /bin/bash
 #     user$ echo $?
@@ -1820,28 +1820,28 @@ file_is_executable()
 #
 # Check if a file name/path exists.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # First parameter is a file name/path.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 if the named file exists.
 # 1 if the named file does not exist or does not exist.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no file name/path was given.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ file_exists /bin/bash
 #     user$ echo $?
@@ -1873,28 +1873,28 @@ file_exists()
 #
 # Check if a file name/path is nonempty.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # First parameter is a file name/path.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 if the named file is nonempty.
 # 1 if the named file is empty or does not exist.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no file name/path was given.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ file_is_nonempty /bin/bash
 #     user$ echo $?
@@ -1932,28 +1932,28 @@ file_is_nonempty()
 #
 # Check if a file name/path is empty.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # First parameter is a file name/path.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 if the named file is empty.
 # 1 if the named file is not empty or does not exist.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no file name/path was given.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ file_is_empty /bin/bash
 #     user$ echo $?
@@ -1985,28 +1985,28 @@ file_is_empty()
 #
 # Check if a file name/path is missing.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # First parameter is a file name/path.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 if the named file is missing.
 # 1 if the named file is not missing or does not exist.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no file name/path was given.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ file_is_missing /bin/bash
 #     user$ echo $?
@@ -2038,28 +2038,28 @@ file_is_missing()
 #
 # Check if a file name/path is empty or missing.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # First parameter is a file name/path.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 if the named file is empty or missing.
 # 1 if the named file exists or is nonempty.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no file name/path was given.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ file_is_missing /bin/bash
 #     user$ echo $?
@@ -2091,31 +2091,31 @@ file_is_empty_or_missing()
 #
 # Checks if a named file contains a given string/unix regexp pattern.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # First parameter is the file name/path.
 # Second parameter is the pattern to match.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 if the given file contains the given pattern.
 # 1 if the given file does not contain the given pattern.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if the file path/name was not given
 # Fails if the pattern is not given.
 # Fails if the file path/name given either does not exist or is not a file.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ cat "$HOME/test"
 #     #!/usr/bin/env bash
@@ -2168,28 +2168,28 @@ file_contains()
 #
 # Check if a symlink name/path exists.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # First parameter is a symlink name/path.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 if the named symlink exists.
 # 1 if the named symlink does not exist or does not exist.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no symlink name/path was given.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ symlink_exists /usr/local/bin/bdsm
 #     user$ echo $?
@@ -2221,28 +2221,28 @@ symlink_exists()
 #
 # Check if a directory name/path exists.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # First parameter is a directory name/path.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 if the named directory exists.
 # 1 if the named directory does not exist or does not exist.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no directory name/path was given.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ directory_exists /usr/local/bin/bdsm
 #     user$ echo $?
@@ -2274,28 +2274,28 @@ directory_exists()
 #
 # Function Description
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # Positional Parameter listing and descriptions.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # What, if any, environmental side effects this function causes. 'None.' for none.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 if ...
 # 1 if ...
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if ...
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ {{ setup the scenario }}
 #     user$ function_name {{ parameters }}
@@ -2407,28 +2407,28 @@ directories_under_matching()
 #
 # Function Description
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # Positional Parameter listing and descriptions.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # What, if any, environmental side effects this function causes. 'None.' for none.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 if ...
 # 1 if ...
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if ...
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ {{ setup the scenario }}
 #     user$ function_name {{ parameters }}
@@ -2460,28 +2460,28 @@ files_in()
 #
 # Function Description
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # Positional Parameter listing and descriptions.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # What, if any, environmental side effects this function causes. 'None.' for none.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 if ...
 # 1 if ...
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if ...
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ {{ setup the scenario }}
 #     user$ function_name {{ parameters }}
@@ -2513,29 +2513,29 @@ files_under()
 #
 # Find all files in given path matching a given name glob pattern.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # First parameter is the path to search in
 # Second parameter is the pattern to match in
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # What, if any, environmental side effects this function causes. 'None.' for none.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 if ...
 # 1 if ...
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if ...
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ files_in_path_matching ...
 #
@@ -2577,7 +2577,7 @@ files_in_path_matching()
 # Replaces a given (sed compatable) pattern with given replacement text in a
 # file.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # First parameter is the pattern
 # [optional 'with']
@@ -2585,27 +2585,27 @@ files_in_path_matching()
 # [optional 'in']
 # Third parameter is the file name/path
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # The pattern will be matched against the file name/path content and the
 # replacement text will be put in place.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no pattern was given
 # Fails if replacement content was not given
 # Fails if filename was not given
 # Fails if the file does not exist
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 # # Replace contents in a file with a given (sed) regex pattern.
 #
@@ -2673,36 +2673,36 @@ replace_content()
 #
 # Checks to see if the given file matches the given md5 sum.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # none.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 if the file matches the md5sum
 # 1 if the file does not match the md5sum
 # 1 if the file is empty or missing
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no file name/path was given.
 # Fails if no md5 string was given.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 # Example Usage:
 #
 # user$ file_matches_md5
 #
-# ##### Notes
+# ### Notes
 #
 file_matches_md5()
 {

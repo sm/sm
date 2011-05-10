@@ -5,29 +5,29 @@
 # Presents the user with a package related error message including the tail
 # of an optional log file.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # String to be logged, an optional log file containing more details and
 # an optional number of lines of the file to show (defaults to 25)
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # Prints arguments passed in to the calling environments STDOUT with a newline
 # character appended and 'ERROR ' prepended.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 1 for failure.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no arguments are given.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ package_error "Hello there! " configure.log 5
 #     ERROR Hello there!
@@ -65,30 +65,30 @@ package_error()
 #
 # Enables module developers to easily set package variables in name, value pairs.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # Parameters must come in pairs, variable name first (without the 'package'
 # prefix), value second.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # For each name/value pair, a variable package_${name} is created with the given
 # value.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if extension developer accidentailly separates key/value with an = :)
 # Fails if a key is given without a matching value.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 # Example Usage:
 #
@@ -97,7 +97,7 @@ package_error()
 #         version "4.2" \
 #         url "ftp.gnu.org/gnu/bash/"
 #
-# ##### Notes
+# ### Notes
 #
 # For readability it is recommended to split the line into "key value" lines by
 # ending the line with a singele backslash '\' character with no space afterwards.
@@ -187,27 +187,27 @@ package_definition()
 # * activation
 # * service setup, if service module is loaded
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # Steps performed are logged to STDOUT of the calling environment.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # Package installation artifacts are created in the system and source directories.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if any of the constituant components fail.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 # Example Usage:
 #
@@ -218,7 +218,7 @@ package_definition()
 #
 # user$ package_install
 #
-# ##### Notes
+# ### Notes
 #
 package_install()
 {
@@ -302,33 +302,33 @@ package_install()
 #
 # Fetches the package's md5 sum from the md5_url, if given.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # none.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # The 'package_md5' variable is set with the downloaded md5 sum.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if any of the constituant components fail.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 # Example Usage:
 #
 # user$ package_fetch_md5
 #
-# ##### Notes
+# ### Notes
 #
 package_fetch_md5()
 {
@@ -355,33 +355,33 @@ package_fetch_md5()
 #
 # Fetches the package's archive file.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # curl output goes to STDERR of the calling environment.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # The package archive file will be placed on the filesystem.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # No failure scenarios currently.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 # Example Usage:
 #
 # user$ package_fetch
 #
-# ##### Notes
+# ### Notes
 #
 package_fetch()
 {
@@ -414,34 +414,34 @@ package_fetch()
 #
 # Extracts the package archive into the package source directory.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # none.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # The 'package_md5' variable is set with the downloaded md5 sum.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Errors halting program if any extraction fails or if the archive format is
 # unknown.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 # Example Usage:
 #
 # user$ package_extract
 #
-# ##### Notes
+# ### Notes
 #
 package_extract()
 {
@@ -453,33 +453,33 @@ package_extract()
 #
 # Configures the package source (eg. ./configure ...).
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # none.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # Makefile will be generated for a standard package extension.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Errors halting program if configuration fails for any reason.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 # Example Usage:
 #
 # user$ package_configure
 #
-# ##### Notes
+# ### Notes
 #
 package_configure()
 {
@@ -509,33 +509,33 @@ package_configure()
 #
 # builds the package source (eg. make)
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # none.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # Makefile will be generated for a standard package extension.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Errors halting program if building fails for any reason.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 # Example Usage:
 #
 # user$ package_build
 #
-# ##### Notes
+# ### Notes
 #
 package_build()
 {
@@ -561,33 +561,33 @@ package_build()
 #
 # make install  the package source (eg. make)
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # none.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # Installation files will be installed to the install_path.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Errors halting program if make install fails for any reason.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 # Example Usage:
 #
 # user$ package_make_install
 #
-# ##### Notes
+# ### Notes
 #
 package_make_install()
 {
@@ -613,33 +613,33 @@ package_make_install()
 #
 # activates the package
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # none.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # Symlink will be created to the active version in the package install path.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Errors halting program if activateing fails for any reason.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 # Example Usage:
 #
 # user$ package_activate
 #
-# ##### Notes
+# ### Notes
 #
 package_activate()
 {
@@ -688,34 +688,34 @@ package_activate()
 #
 # Sets up the package
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # none.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # ldconfig, profile.d and service (init.d / conf.d) files will be put in place
 # on the system.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Errors halting program if setup fails for any reason.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 # Example Usage:
 #
 # user$ package_setup
 #
-# ##### Notes
+# ### Notes
 #
 package_setup()
 {
@@ -736,33 +736,33 @@ package_setup()
 #
 # deactivates the package
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # none.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # Active symlinks will be removed from the filesystem.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Errors halting program if deactivating fails for any reason.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 # Example Usage:
 #
 # user$ package_deactivate
 #
-# ##### Notes
+# ### Notes
 #
 package_deactivate()
 {
@@ -805,34 +805,34 @@ package_deactivate()
 # Activates the package version , if another package version has not yet been
 # activated.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # none.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # Active symlinks will be added to the filesystem if it is the first version
 # installed.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Errors halting program if deactivating fails for any reason.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 # Example Usage:
 #
 # user$ package_activate_if_first
 #
-# ##### Notes
+# ### Notes
 #
 package_activate_if_first()
 {
@@ -854,33 +854,33 @@ package_activate_if_first()
 #
 # Sets up system level ldconfigs for the package libraries.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # none.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # Adjusts ldconfig configuration and runs ldconfig (on linux).
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Errors halting program if deactivating fails for any reason.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 # Example Usage:
 #
 # user$ package_ldconfig
 #
-# ##### Notes
+# ### Notes
 #
 package_ldconfig()
 {
@@ -921,33 +921,33 @@ package_ldconfig()
 #
 # Sets up system level profile_d configuration for the package
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # none.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # Updates profile_d configuration for the given package
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Errors halting program if profile_d setup fails for any reason.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 # Example Usage:
 #
 # user$ package_profile_d
 #
-# ##### Notes
+# ### Notes
 #
 package_profile_d()
 {
@@ -971,33 +971,33 @@ package_profile_d()
 #
 # Uninstalls the package
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # none.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # Uninstalls the package install effects from the system.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Errors halting program if uninstall fails for any reason.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 # Example Usage:
 #
 # user$ package_uninstall
 #
-# ##### Notes
+# ### Notes
 #
 package_uninstall()
 {
@@ -1025,33 +1025,33 @@ package_uninstall()
 #
 # Applies any patches found for the current package.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # none.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # Updates the source code directory for the package with any patches found.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Errors halting program if patching fails for any reason.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 # Example Usage:
 #
 # user$ package_patch
 #
-# ##### Notes
+# ### Notes
 #
 package_patch()
 {
@@ -1100,33 +1100,33 @@ package_patch()
 #
 # Applies patches found
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # none.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # Applies any patches found for the current package.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Errors halting program if apply_patches fails for any reason.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 # Example Usage:
 #
 # user$ package_apply_patches
 #
-# ##### Notes
+# ### Notes
 #
 package_apply_patches()
 {
@@ -1148,33 +1148,33 @@ package_apply_patches()
 #
 # Sets up system level usage configuration for the package
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # none.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # Updates usage configuration for the given package
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Errors halting program if usage setup fails for any reason.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 # Example Usage:
 #
 # user$ package_usage
 #
-# ##### Notes
+# ### Notes
 #
 package_usage() {
   printf "
@@ -1201,33 +1201,33 @@ package_usage() {
 #
 # Parses package CLI arguments
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # none.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # Updates cli configuration for the given package
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Errors halting program if cli setup fails for any reason.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 # Example Usage:
 #
 # user$ package_cli
 #
-# ##### Notes
+# ### Notes
 #
 package_cli()
 {
@@ -1311,33 +1311,33 @@ package_cli()
 #
 # Parses package active arguments
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # none.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # Updates active configuration for the given package
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Errors halting program if active setup fails for any reason.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 # Example Usage:
 #
 # user$ package_active
 #
-# ##### Notes
+# ### Notes
 #
 package_is_active()
 {
@@ -1362,33 +1362,33 @@ package_is_active()
 #
 # Parses package must be arguments
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # none.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # Updates must be configuration for the given package
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Errors halting program if must be setup fails for any reason.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 # Example Usage:
 #
 # user$ package_must be
 #
-# ##### Notes
+# ### Notes
 #
 package_must_be_active()
 {
@@ -1412,33 +1412,33 @@ package_must_be_active()
 #
 # Parses package must_be_active arguments
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # none.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # Updates must_be_active configuration for the given package
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Errors halting program if must_be_active setup fails for any reason.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 # Example Usage:
 #
 # user$ packages_must_be_active
 #
-# ##### Notes
+# ### Notes
 #
 packages_must_be_active()
 {
@@ -1461,33 +1461,33 @@ packages_must_be_active()
 # Opens package documentation website either in the web browser (if able) or via
 # curl through PAGER (defaulting to less).
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None if can open web browser or website docs in PAGER otherwise.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # Web browser will open with documentation url if able.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Error if package_docs_url has not been set.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 # Example Usage:
 #
 # user$ package_docs
 #
-# ##### Notes
+# ### Notes
 #
 package_docs()
 {
@@ -1520,33 +1520,33 @@ package_docs()
 # Opens package documentation website either in the web browser (if able) or via
 # curl through PAGER (defaulting to less).
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None if can open web browser or website website in PAGER otherwise.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # Web browser will open with documentation url if able.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Error if package_website_url has not been set.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 # Example Usage:
 #
 # user$ package_website
 #
-# ##### Notes
+# ### Notes
 #
 package_website()
 {

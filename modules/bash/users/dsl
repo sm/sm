@@ -1,32 +1,32 @@
 #!/usr/bin/env bash
 
 #
-# ### user_create_if_missing()
+# ## user_create_if_missing()
 #
 # Create a system user if it does not exist on the system.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # The first parameter should be the user name, then optionally
 #   [with] group {{groupname}}
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # What, if any, environmental side effects this function causes. 'None.' for none.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no username is given.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ user_create_if_missing "nginx" with group "nginx"
 #
@@ -121,31 +121,31 @@ user_create_if_missing()
 }
 
 #
-# ### user_delete()
+# ## user_delete()
 #
 # Deletes the named system user.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # The first parameter is the system user to delete.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # The given user will no longer exist on the system.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if the user name was not specified.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ user_delete "nginx"
 #
@@ -225,32 +225,32 @@ user_delete()
 }
 
 #
-# ### user_is_root()
+# ## user_is_root()
 #
 # Tests if the user the current process is running as is root.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 if user is root (UID 0).
 # 1 if user is not root (UID 0).
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # No failure scenarios currently.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ user_is_root
 #     user$ echo $?
@@ -271,32 +271,32 @@ user_is_root()
 }
 
 #
-# ### user_is_not_root()
+# ## user_is_not_root()
 #
 # Tests if the user the current process is running as is not root.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 if user is not root (eg UID is nonzero)
 # 1 if user is root (UID 0)
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # No failure scenarios currently
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ user_is_not_root
 #     user$ echo $?
@@ -317,31 +317,31 @@ user_is_not_root()
 }
 
 #
-# ### user_must_be_root()
+# ## user_must_be_root()
 #
 # Halts the calling program with a failure message if the user is not root.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # A failure message is output to STDERR if the failure condition is met.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # What, if any, environmental side effects this function causes. 'None.' for none.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 if the user is root
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if the program user running is not root.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ user_must_be_root
 #     ERROR: bdsm test test must be run as root and NOT as a user(user)
@@ -353,31 +353,31 @@ user_must_be_root()
 }
 
 #
-# ### user_must_not_be_root()
+# ## user_must_not_be_root()
 #
 # Halts the calling program with a failure message if the user is not root.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # A failure message is output to STDERR if the failure condition is met.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # What, if any, environmental side effects this function causes. 'None.' for none.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 if the user is root
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if the program user running is root.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ user_must_not_be_root
 #     ERROR: bdsm test test must be run as a (project) user and NOT as a root.
@@ -389,31 +389,31 @@ user_must_not_be_root()
 }
 
 #
-# ### user_run_as()
+# ## user_run_as()
 #
 # Runs a command as a given user.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # Any stream outputs of the command being run.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # Any environmental effects of the command being run.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no user was specified.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     root# user_run_as "user" pwd
 #     /home/user
@@ -430,31 +430,31 @@ user_run_as()
 }
 
 #
-# ### user_run_as_login()
+# ## user_run_as_login()
 #
 # Runs a command as a given user, in that users login shell.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # Any stream outputs of the command being run.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # Any environmental effects of the command being run.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no user was specified.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     root# user_run_as_login "deploy" bdsm unicorn restart
 #     << unicorn restart output >>

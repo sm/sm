@@ -1,27 +1,27 @@
 #!/usr/bin/env bash
 
 #
-# ### modules()
+# ## modules()
 #
 # Loads named BDSM modules into the calling environment.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # Positional Parameter listing and descriptions.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None, unless loading the module causes output to a stream.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no module names were given as parameters.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ modules array system
 #     user$ modules_loaded
@@ -71,27 +71,27 @@ modules()
 }
 
 #
-# ### module_load()
+# ## module_load()
 #
 # Function Description
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # Positional Parameter listing and descriptions.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None, unless loading the module causes output to a stream.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no extension module files names have been given.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ ls ${extension_modules_path}/bash/
 #     cli dsl initialize zebra
@@ -119,28 +119,28 @@ module_load()
 }
 
 #
-# ### module_is_loaded()
+# ## module_is_loaded()
 #
 # Checks to see whether or not the named module has been loaded or not.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # First parameter is a module name.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 if the module has already been loaded
 # 1 if the module has not already been loaded
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no module name was given as the first parameter.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ module_is_loaded package
 #     user$ echo $?
@@ -167,28 +167,28 @@ module_is_loaded()
 }
 
 #
-# ### modules_loaded()
+# ## modules_loaded()
 #
 # Outputs a list of all modules that have been loaded.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # Positional Parameter listing and descriptions.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # Prints a space separated list of all loaded modules to the STDOUT stream of
 # the calling environment.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # No failure scenarios.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ modules_loaded
 #     logging trace filesystem
@@ -211,32 +211,32 @@ modules_installed()
 }
 
 #
-# ### module_dsl()
+# ## module_dsl()
 #
 # Print out a list of all dsl for the given module.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # First parameter is the module name to print out the dsl for.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # The named module's DSL function listing will is printed to the calling
 # environments STDOUT.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no module name was given.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ module_dsl defaults
 #     read_default()
@@ -262,32 +262,32 @@ module_dsl()
 }
 
 #
-# ### modules_list()
+# ## modules_list()
 #
 # Lists dsl for all modules.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # First parameter is the module name to print out the dsl for.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # DSL function listing for each module is printed to the STDOUT of the calling
 # environment.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # No failure scenarios currently.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ modules_list
 #     array
@@ -323,31 +323,31 @@ modules_list()
 }
 
 #
-# ### modules_docs()
+# ## modules_docs()
 #
 # Output the module DSL documentation for a given module name.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # First parameter is the module name to print out the dsl documentation for.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # DSL documentation for every function of the named module.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no module name is given.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ module_docs defaults
 #
@@ -355,7 +355,7 @@ modules_list()
 #
 #     Reads default values from an extension's config/defaults file.
 #
-#     ##### Input Parameters
+#     ### Input Parameters
 #
 #     First parameter is the defaults file key to read (key=value).
 #     Second parameter is the variable name to store the retrieved value in.
@@ -364,24 +364,24 @@ modules_list()
 #       prefix <name>
 #       <variable> # If no specifier.
 #
-#     ##### Stream Outputs
+#     ### Stream Outputs
 #
 #     None.
 #
-#     ##### Environmental effects
+#     ### Environmental effects
 #
 #     A variable will be set to the value, if the value is nonempty. If no variable
 #     name is specified the variable will be assigned the same name as the key.
 #
-#     ##### Return Codes
+#     ### Return Codes
 #
 #     0 for success.
 #
-#     ##### Failure Scenarios
+#     ### Failure Scenarios
 #
 #     Fails if no arguments are passed in, at least need to specify a key.
 #
-#     ##### Usage Examples
+#     ### Usage Examples
 #
 #         user$ read_default "version" prefix "package" # extension is nginx for example
 #         user$ echo $package_version
@@ -400,32 +400,32 @@ module_docs()
 }
 
 #
-# ### modules_docgen()
+# ## modules_docgen()
 #
 # Lists dsl for all modules.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # First parameter is the module name to print out the dsl for.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # DSL function listing for each module is printed to the STDOUT of the calling
 # environment.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # No failure scenarios currently.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ modules_list
 #     array

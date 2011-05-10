@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
 #
-# ### read_default()
+# ## read_default()
 #
 # Reads default values from an extension's config/defaults file.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # First parameter is the defaults file key to read (key=value).
 # Second parameter is the variable name to store the retrieved value in.
@@ -14,30 +14,30 @@
 #   prefix <name>
 #   <variable> # If no specifier.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # A variable will be set to the value, if the value is nonempty. If no variable
 # name is specified the variable will be assigned the same name as the key.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no arguments are passed in, at least need to specify a key.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ read_default "version" prefix "package" # extension is nginx for example
 #     user$ echo $package_version
 #     1.0.0
 #
-# ##### Notes
+# ### Notes
 #
 # read_default respects a tiered default file scheme,
 #

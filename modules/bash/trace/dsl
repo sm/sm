@@ -1,27 +1,27 @@
 #!/usr/bin/env bash
 
 #
-# ### set_ps4()
+# ## set_ps4()
 #
 # Set the environmental PS4 variable for informative tracing.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # No failure scenarios currently.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ echo "'$PS4'"
 #     '+ '
@@ -36,29 +36,29 @@ set_ps4()
 }
 
 #
-# ### trace()
+# ## trace()
 #
 # Toggle tracing functionality on or off. If 'on' is triggered then every line
 # of code execution after the function returns will be displayed in the format
 # specified by the PS4 environment variable (see set_ps4).
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # First parameter is either empty, 'on' or 'off'
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # No failure scenarios currently.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ trace on
 #     user$ echo "hi"
@@ -83,27 +83,27 @@ trace()
 }
 
 #
-# ### enable_trace()
+# ## enable_trace()
 #
 # Turns tracing on.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # No failure scenarios currently.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ enable_trace
 #
@@ -113,27 +113,27 @@ enable_trace()
 }
 
 #
-# ### disable_trace()
+# ## disable_trace()
 #
 # Turns tracing off.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # No current failure scenarios.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ disable_trace
 #
@@ -143,28 +143,28 @@ disable_trace()
 }
 
 #
-# ### debug()
+# ## debug()
 #
 # Toggle verbose debugging functionality on or off. If 'on' is triggered then
 # every line of code execution after the function returns will be displayed.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # First parameter is either empty, 'on' or 'off'
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # No failure scenarios currently.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ debug on
 #     user$ echo "hi"
@@ -188,27 +188,27 @@ debug()
 }
 
 #
-# ### enable_debug()
+# ## enable_debug()
 #
 # Enables verbose debugging output.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # No failure scenarios currently.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ enable_debug
 enable_debug()
@@ -217,27 +217,27 @@ enable_debug()
 }
 
 #
-# ### disable_debug()
+# ## disable_debug()
 #
 # Disables verbose debugging output.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # No failure scenarios currently.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ disable_debug
 #
@@ -247,29 +247,29 @@ disable_debug()
 }
 
 #
-# ### enable_backtrace()
+# ## enable_backtrace()
 #
 # Enables backtrace and program exit whenever a command returns a nonzero value
 # that is not handled.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # First parameter is optional. If it is passed it is a message that will be
 # outputed when a command trigger the program to error exit.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # No failure conditions currently.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ cat ./test
 #     #!/usr/bin/env bash
@@ -300,27 +300,27 @@ enable_backtrace()
 }
 
 #
-# ### function_name()
+# ## function_name()
 #
 # Function Description
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # No failure conditions currently.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ cat ./test
 #     #!/usr/bin/env bash
@@ -340,30 +340,30 @@ disable_backtrace()
 }
 
 #
-# ### backtrace()
+# ## backtrace()
 #
 # Display a backtrace of the current call stack to the point that backtrace was
 # called from. Currently trace is turned on as well so that execution after
 # calling backtrace is traced.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # None.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # The call stack up to the current point of execution is printed to STDOUT of
 # the calling environment.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # No failure scenarios currently.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ cat ./test
 #     #!/usr/bin/env bash

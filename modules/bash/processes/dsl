@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# ### lockfile_lock()
+# ## lockfile_lock()
 #
 # If the current process is the first to write to the lockfile then the process
 # continues processing past the line calling lockfile_lock "{file path/name}"

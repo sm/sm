@@ -1,32 +1,32 @@
 #!/usr/bin/env bash
 
 #
-# ### rvm_install()
+# ## rvm_install()
 #
 # Install the latest release version of RVM.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # First parameter is an optional version number of RVM to install.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # Output from rvm-installer will be printed to the enclosing environment's
 # STDOUT as well as curl output.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # No failure conditions currently.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ rvm_install
 #
@@ -45,33 +45,33 @@ rvm_install()
 }
 
 #
-# ### install_gem()
+# ## install_gem()
 #
 # installs the named gem(s) with --no-rdoc --no-ri flags
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # One or more gem names
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # The output of the gem install command will be printed to the calling
 # environments streams.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # Ruby gem(s) will be installed on the system, potentially enabling new commands.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 if gem install was successful
 # 1 if gem install was not successful
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if ...
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ {{ setup the scenario }}
 #     user$ function_name {{ parameters }}
@@ -87,33 +87,33 @@ install_gem()
 }
 
 #
-# ### install_gems()
+# ## install_gems()
 #
 # Installs listed gems using the install_gem function.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # One or more rubygems names
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # Output from underlying gem install will be printed to the calling environments
 # streams.
 #
-# ##### Environmental effects
+# ### Environmental effects
 #
 # One or more new commands may become available.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 if all gem installs were successful
 # n where n is the number of unsuccessful gem installs otherwise.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no gems were given to install.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ install_gems rake rack
 #

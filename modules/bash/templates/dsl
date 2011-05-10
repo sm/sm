@@ -1,28 +1,28 @@
 #!/usr/bin/env bash
 
 #
-# ### template_exists()
+# ## template_exists()
 #
 # Checks if a named template file exists in the extension_templates_path
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # First parameter must be the name of a template file, eg. a string.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 if the named template file exists and is nonempty.
 # 1 if the named template file does not exist or is empty.
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no template name is given.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ {{ setup the scenario }}
 #     user$ function_name {{ parameters }}
@@ -45,11 +45,11 @@ template_exists()
 }
 
 #
-# ### install_template()
+# ## install_template()
 #
 # Installs a named template to a given location.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # The first parameter should be the template name.
 # Remaining parameters specify the target, mode and owner:
@@ -57,21 +57,21 @@ template_exists()
 #   mode 0755
 #   to "/path/to/new/file"
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 if successful
 # 1 otherwise
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no template name was given.
 # Fails if the template name given is a directory.
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #     user$ install_template "nginx.conf" \
 #           to "${nginx_path}/nginx.conf" \
@@ -147,26 +147,26 @@ install_template()
 }
 
 #
-# ### seed_template()
+# ## seed_template()
 #
 # Seed a template file replacing all given keys with given values.
 #
-# ##### Input Parameters
+# ### Input Parameters
 #
 # First parameter must be the template filename to seed.
 # Remaining parameters must come in pairs, the first of each pair specifies
 # the key to search and replace in the template file and the second is the
 # value to replace {{$key}} with.
 #
-# ##### Stream Outputs
+# ### Stream Outputs
 #
 # None.
 #
-# ##### Return Codes
+# ### Return Codes
 #
 # 0 for success
 #
-# ##### Failure Scenarios
+# ### Failure Scenarios
 #
 # Fails if no template filename is given.
 # Fails if the template given does not exist.
@@ -174,7 +174,7 @@ install_template()
 # Fails if for every key there is no associated value.
 # Fails if the intermediate template file does not exist...
 #
-# ##### Usage Examples
+# ### Usage Examples
 #
 #    user$ seed_template "/etc/conf.d/${extension}.conf" \
 #      prefix_path "${prefix_path}" \
