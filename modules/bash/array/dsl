@@ -44,6 +44,40 @@ array_is_nonempty()
   eval "(( \${#${_array_name}[@]} > 0 ))"
 }
 
+#
+# ### array_is_empty()
+#
+# Checks to see if an array with the name given as the first parameter is empty.
+#
+# ##### Input Parameters
+#
+# The first parameter is the name of the array variable.
+#
+# ##### Stream Outputs
+#
+# None.
+#
+# ##### Return Codes
+#
+# 0 if the array is empty.
+# 1 if the array is non-empty.
+#
+# ##### Failure Scenarios
+#
+# Fails if the array name, the first parameter, is not given.
+#
+# ##### Usage Examples
+#
+#     user$ the_array=()
+#     user$ array_is_empty the_array
+#     user$ echo $?
+#     0
+#
+#     user$ the_array=(1 2 3 4 5)
+#     user$ array_is_empty the_array
+#     user$ echo $?
+#     1
+#
 array_is_empty()
 {
   local _array_name="$1"
