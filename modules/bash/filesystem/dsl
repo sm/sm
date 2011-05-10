@@ -1545,31 +1545,34 @@ chown_paths_recursively()
 #
 chmod_files()
 {
-  local _permissions="${1:-}" _file
+  local _permissions="${1:-}" _file _message
 
-  if [[ -z "${_permissions}" ]]
+  if [[ -n "${_permissions}" ]]
   then
-    fail "Permissions not given as the first parameter!!"
-  else
     shift
-  fi
+    local _files=("$@")
 
-  local _files=("$@")
-
-  if (( ${#_files[@]} == 0 ))
-  then
-    fail "No files given to chmod ${_permissions}."
-  fi
-
-  for _file in "${_files[@]}"
-  do
-    if file_exists "${_file}"
+    if (( ${#_files[@]} > 0 ))
     then
-      chmod ${_permissions} "${_file}"
+      for _file in "${_files[@]}"
+      do
+        if file_exists "${_file}"
+        then
+          chmod ${_permissions} "${_file}"
+        else
+          _message=(
+          "Cannot chmod file ${_file} to ${_permissions}"
+          " as the file does not exist."
+          )
+          error "${_message[*]}"
+        fi
+      done
     else
-      error "Cannot chmod file ${_file} to ${_permissions} as the file does not exist."
+      fail "No files given to chmod ${_permissions}."
     fi
-  done
+  else
+    fail "Permissions not given as the first parameter!!"
+  fi
 }
 
 #
@@ -1936,7 +1939,6 @@ file_is_executable()
 file_exists()
 {
   local _file="${1:-}"
-
   if [[ -n "${_file}" ]]
   then
     if [[ -f "${_file}" ]]
