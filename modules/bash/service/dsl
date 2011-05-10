@@ -1588,10 +1588,10 @@ service_activate()
         then
           chkconfig ${service} off
 
-        #elif command_exists svc
-        #then
-        #  svc ${service} off
-        #  TODO: daemontools remove start on boot
+          #elif command_exists svc
+          #then
+          #  svc ${service} off
+          #  TODO: daemontools remove start on boot
 
         else # Fall back on rc.local to start redis at system startup.
           if ! file_contains "/etc/rc.local" "${service} start"
@@ -1599,16 +1599,15 @@ service_activate()
             sed -i -e "d#${init_scripts_path}/${service} start#" /etc/rc.local
           fi
         fi
-      elif os_is_darwin
-      then
-        true # TODO: launchctl
-      else # ::shrug::
-        if ! file_contains "/etc/rc.local" "${service} start"
-        then
-          sed -i -e "d#${init_scripts_path}/${service} start#" /etc/rc.local
-        fi
       fi
-    else
+    elif os_is_darwin
+    then
+      true # TODO: launchctl
+    else # ::shrug::
+      if ! file_contains "/etc/rc.local" "${service} start"
+      then
+        sed -i -e "d#${init_scripts_path}/${service} start#" /etc/rc.local
+      fi
     fi
   fi
 }
