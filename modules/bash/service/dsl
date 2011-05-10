@@ -1028,7 +1028,7 @@ service_init_start()
 
   service_init_path
 
-  local _result=0 _command=( "${service_binary}" start )
+  local _result=0 _command=( "${service_binary}" )
 
   if array_is_nonempty service_flags
   then
@@ -1076,18 +1076,18 @@ service_init_stop()
 {
   service_init_path
 
-  if (( service_pid == 0 ))
+  if (( service_pid > 0 ))
   then
-    error "Service pid has not been set or is zero."
-  fi
+    log "Stopping ${service}..."
 
-  log "Stopping ${service}..."
-
-  if kill -QUIT "${service_pid}"
-  then
-    rm -f "$service_pid_file"
+    if kill -QUIT "${service_pid}"
+    then
+      rm -f "$service_pid_file"
+    else
+      return $?
+    fi
   else
-    return $?
+    error "Service pid has not been set or is zero."
   fi
 }
 
@@ -1126,7 +1126,7 @@ service_init_status()
 
   service_init_path
 
-  local _command=( "${service_binary}" status )
+  local _command=( "${service_binary}" )
 
   if array_is_nonempty service_flags
   then
@@ -1176,7 +1176,7 @@ service_init_reload()
 
   service_init_path
 
-  local _command=( "${service_binary}" reload)
+  local _command=( "${service_binary}" )
 
   if array_is_nonempty service_flags
   then
