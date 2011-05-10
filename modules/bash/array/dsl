@@ -238,7 +238,7 @@ array_first_element()
 #
 #     $ the_array=(1 2 3 4 5)
 #     $ array_push the_array 6
-#     $ echo "${the_array[@]}"
+#     $ array_join the_array # print the contents of the array, space separated
 #     1 2 3 4 5 6
 #
 array_push()
