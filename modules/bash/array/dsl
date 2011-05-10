@@ -173,7 +173,7 @@ array_last_element()
   then
     eval "_length=\${#${_array_name}[@]}"
 
-    eval "printf \"%s\\n\"\"\${${_array_name}[${_length}]}\""
+    eval "printf \"%s\\n\" \"\${${_array_name}[${_length}]}\""
   else
     fail "Cannot push onto array as an array name was not given."
   fi
@@ -245,8 +245,9 @@ array_first_element()
 # ### Usage Examples
 #
 #     $ the_array=(1 2 3 4 5)
-#     $ array_length the_array
-#     5
+#     $ array_push the_array 6
+#     $ array_join the_array # print the contents of the array, space separated
+#     1 2 3 4 5 6
 #
 array_push()
 {
@@ -266,7 +267,7 @@ array_push()
 
     for _element in "${_elements[@]}"
     do
-      eval "${_array_name}+=(\${_element})}"
+      eval "${_array_name}+=(\${_element})"
     done
   else
     fail "Cannot push elements onto array as an array name was not given."
