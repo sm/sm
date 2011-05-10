@@ -1028,7 +1028,7 @@ service_init_start()
 
   service_init_path
 
-  local _result=0 _command=("${service_binary}")
+  local _result=0 _command=( "${service_binary}" start )
 
   if array_is_nonempty service_flags
   then
@@ -1126,13 +1126,12 @@ service_init_status()
 
   service_init_path
 
-  local _command=("${service_binary}")
+  local _command=( "${service_binary}" status )
 
   if array_is_nonempty service_flags
   then
     _command+=("${service_flags[@]}")
   fi
-  _command+=("${service_config_file}" )
 
   if user_run_as "${service_user}" "${_command[*]}"
   then
@@ -1177,13 +1176,12 @@ service_init_reload()
 
   service_init_path
 
-  local _command=( "${service_binary}" )
+  local _command=( "${service_binary}" reload)
 
   if array_is_nonempty service_flags
   then
     _command+=("${service_flags[@]}")
   fi
-  _command+=("${service_config_file}" )
 
 
   if user_run_as "${service_user}" "${_command[*]}"
