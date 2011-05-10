@@ -1578,6 +1578,7 @@ service_activate()
     chmod_files 0755 "${init_scripts_path}/${service}"
 
     if os_is_linux
+    then
       if user_is_root
       then # Add service to system startup
         if command_exists rc-update
@@ -1600,7 +1601,7 @@ service_activate()
           fi
         fi
       fi
-    else if os_is_darwin
+    elif os_is_darwin
     then
       true # TODO: launchctl
     else # ::shrug::
