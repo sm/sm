@@ -87,10 +87,12 @@ array_length()
 {
   local _array_name="$1"
 
-  variable_is_nonempty _array_name ||
+  if variable_is_nonempty _array_name
+  then
+    eval "printf \"%s\\n\" \"\${#${_array_name}[@]}\""
+  else
     fail "Cannot push onto array as an array name was not given."
-
-  eval "printf \"%s\\n\"\"\${#${_array_name}[@]}\""
+  fi
 }
 
 #
@@ -125,12 +127,14 @@ array_last_element()
 {
   local _array_name="$1" _length
 
-  variable_is_nonempty _array_name ||
+  if variable_is_nonempty _array_name
+  then
+    eval "_length=\${#${_array_name}[@]}"
+
+    eval "printf \"%s\\n\"\"\${${_array_name}[${_length}]}\""
+  else
     fail "Cannot push onto array as an array name was not given."
-
-  eval "_length=\${#${_array_name}[@]}"
-
-  eval "printf \"%s\\n\"\"\${${_array_name}[${_length}]}\""
+  fi
 }
 
 #
@@ -165,10 +169,12 @@ array_first_element()
 {
   local _array_name="$1" _length
 
-  variable_is_nonempty _array_name ||
+  if variable_is_nonempty _array_name
+  then
+    eval "printf \"%s\\n\" \"\${${_array_name}[0]}\""
+  else
     fail "Cannot push onto array as an array name was not given."
-
-  eval "printf \"%s\\n\" \"\${${_array_name}[0]}\""
+  fi
 }
 
 #
@@ -205,20 +211,25 @@ array_push()
   local _array_name="$1"
   shift
 
-  variable_is_nonempty _array_name ||
+  if variable_is_nonempty _array_name
+  then
+    eval "(( \${#${_array_name}[@]} > 0 ))"
+
+    local _element _elements=("$@")
+
+    if (( ${#_elements[@]} == 0 ))
+    then
+      fail "Cannot push elements onto array as no elements were given."
+    fi
+
+    for _element in "${_elements[@]}"
+    do
+      eval "${_array_name}+=(\${_element})}"
+    done
+  else
     fail "Cannot push elements onto array as an array name was not given."
+  fi
 
-  eval "(( \${#${_array_name}[@]} > 0 ))"
-
-  local _element _elements=("$@")
-
-  (( ${#_elements[@]} > 0 )) ||
-    fail "Cannot push elements onto array as no elements were given."
-
-  for _element in "${_elements[@]}"
-  do
-    eval "${_array_name}+=(\${_element})}"
-  done
 }
 
 #
@@ -255,19 +266,23 @@ array_append()
 {
   local _array_name="$1"
 
-  variable_is_nonempty _array_name ||
+  if variable_is_nonempty _array_name
+  then
+    shift
+    local _element _elements=("$@")
+
+    if (( ${#_elements[@]} == 0 ))
+    then
+      fail "Cannot push elements onto array as no elements were given."
+    fi
+
+    for _element in "${_elements[@]}"
+    do
+      eval "${_array_name}+=(\${_element})}"
+    done
+  else
     fail "Cannot push onto array as an array name was not given."
-
-  shift
-  local _element _elements=("$@")
-
-  (( ${#_elements[@]} > 0 )) ||
-    fail "Cannot push elements onto array as no elements were given."
-
-  for _element in "${_elements[@]}"
-  do
-    eval "${_array_name}+=(\${_element})}"
-  done
+  fi
 }
 
 #
@@ -304,19 +319,22 @@ array_shift()
 {
   local _array_name="$1" new_array=() index
 
-  variable_is_nonempty _array_name ||
+  if variable_is_nonempty _array_name
+  then
+    shift
+
+    eval "
+    for (( index=0; index < \${${_array_name}[@]}; index++ ))
+    do
+      new_array[\${index}]=\${${_array_name}[\${index}]}
+    done
+
+    ${_array_name}=(\"\${new_array[@]}\")
+    "
+  else
     fail "Cannot push onto array as an array name was not given."
+  fi
 
-  shift
-
-  eval "
-  for (( index=0; index < \${${_array_name}[@]}; index++ ))
-  do
-    new_array[\${index}]=\${${_array_name}[\${index}]}
-  done
-
-  ${_array_name}=(\"\${new_array[@]}\")
-"
 }
 
 #
@@ -356,19 +374,24 @@ array_unshift()
 {
   local _array_name="$1"
 
-  variable_is_nonempty _array_name ||
+  if variable_is_nonempty _array_name
+  then
+    shift
+
+    local _element _elements=("$@")
+
+    if (( ${#_elements[@]} == 0 ))
+    then
+      fail "Cannot push elements onto array as no elements were given."
+    fi
+
+    for _element in "${_elements[@]}"
+    do
+      eval "${_array_name}=(\"${_element}\" \"\${${_array_name}[@]}\")"
+    done
+  else
     fail "Cannot push onto array as an array name was not given."
-  shift
-
-  local _element _elements=("$@")
-
-  (( ${#_elements[@]} > 0 )) ||
-    fail "Cannot push elements onto array as no elements were given."
-
-  for _element in "${_elements[@]}"
-  do
-    eval "${_array_name}=(\"${_element}\" \"\${${_array_name}[@]}\")"
-  done
+  fi
 }
 
 #
@@ -408,13 +431,15 @@ array_join()
 {
   local _array_name="$1"
 
-  variable_is_nonempty _array_name ||
+  if variable_is_nonempty _array_name
+  then
+    shift
+    local _separator="${1:-' '}"
+
+    eval "for (( index=0 ; index < \${#${_array_name}[@]} ; index++ )) ; do (( index >  0 )) && printf \"%s\"${_separator}\"\" ; printf \"%s\" \"\${${_array_name}[\${index}]}\" ; done"
+  else
     fail "Cannot join array as an array name was not given."
-
-  shift
-  local _separator="${1:-' '}"
-
-  eval "for (( index=0 ; index < \${#${_array_name}[@]} ; index++ )) ; do (( index >  0 )) && printf \"%s\"${_separator}\"\" ; printf \"%s\" \"\${${_array_name}[\${index}]}\" ; done"
+  fi
 }
 
 #
@@ -449,10 +474,9 @@ array_largest()
 {
   local _array_name="${1:-}" _index _largest=""
 
-  variable_is_nonempty _array_name ||
-    fail "Cannot find largest element of an array as an array name was not given."
-
-  eval "
+  if variable_is_nonempty _array_name
+  then
+    eval "
     for (( _index=0 ; _index < \${#${_array_name}[@]} ; _index++ ))
     do
       if (( \${#${_array_name}[\${_index}]} > \${#_largest} ))
@@ -460,7 +484,11 @@ array_largest()
         _largest=\${${_array_name}[\${_index}]}
       fi
     done
-  "
-  printf "%s" "${_largest}"
+    "
+    printf "%s" "${_largest}"
+
+  else
+    fail "Cannot find largest element of an array as an array name was not given."
+  fi
 }
 
