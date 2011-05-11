@@ -670,11 +670,11 @@ package_activate()
     files=($(find . -type f))
     for file in "${files[@]}"
     do
-      copy_file "${_package_path}/${file#.\/}" to "${active_path}/${file#.\/}"
+      cp -f "${_package_path}/${file#.\/}" "${active_path}/${file#.\/}"
     done
     )
 
-    link "${packages_path}/${_package}/${_version}" \
+    link --force "${packages_path}/${_package}/${_version}" \
       to "${packages_path}/${_package}/active"
   else
     log "Skipping activation of ${_package} ${_version} as '${_package_path}' does not exist."
@@ -779,7 +779,7 @@ package_deactivate()
   files=($(find . -type f))
   for file in "${files[@]}"
   do
-    remove_files "${active_path}/${file#.\/}"
+    rm -f "${active_path}/${file#.\/}"
   done
   )
 
