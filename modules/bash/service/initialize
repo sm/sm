@@ -9,7 +9,6 @@ variable_is_nonempty confd_path        || confd_path="$(confd_path)"
   "${service:="${extension}"}" \
   "${service_user:="${package_user:-"${service}"}"}" \
   "${prefix_path:="/usr/local/${service}/active"}" \
-  "${service_binary:="${active_path}/bin/${service}"}" \
   "${service_bin_path:="${active_path}/bin"}" \
   "${service_pid_path:="/var/run/${service}"}" \
   "${service_config_path:="/etc/${service}"}" \
@@ -32,8 +31,17 @@ service_paths=(
   "${service_log_path}"
 )
 
-service_actions=( start stop restart )
+if directory_exists "${active_path}/sbin"
+then
+  export PATH="${active_path}/sbin:$PATH"
+fi
 
+if variable_is_empty service_binary
+then
+  service_binary="$(command -v ${service})"
+fi
+
+service_actions=( start stop restart )
 service_flags=()
 service_start_flags=()
 service_stop_flags=()
@@ -49,9 +57,3 @@ then
 else
   service_pid=0
 fi
-
-if directory_exists "${active_path}/sbin"
-then
-  export PATH="${active_path}/sbin:$PATH"
-fi
-
