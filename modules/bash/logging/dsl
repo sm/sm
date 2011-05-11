@@ -61,7 +61,7 @@ log()
 
   if [[ -n "${_file}" ]]
   then
-    if (( _append_flag == 0 ))
+    if (( _append_flag == 1 ))
     then
       printf "${_message}\n" >> "${_file}"
     else
