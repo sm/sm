@@ -10,6 +10,7 @@ variable_is_nonempty confd_path        || confd_path="$(confd_path)"
   "${service_user:="${package_user:-"${service}"}"}" \
   "${prefix_path:="/usr/local/${service}/active"}" \
   "${service_bin_path:="${active_path}/bin"}" \
+  "${service_sbin_path:="${active_path}/sbin"}" \
   "${service_pid_path:="/var/run/${service}"}" \
   "${service_config_path:="/etc/${service}"}" \
   "${service_db_path:="/var/db/${service}"}" \
@@ -20,7 +21,8 @@ variable_is_nonempty confd_path        || confd_path="$(confd_path)"
   "${service_config_file:="${service_config_path}/${service}.conf"}" \
   "${service_log_file:="${service_log_path}/${service}.log"}" \
   "${service_pid_file:="${service_pid_path}/${service}.pid"}" \
-  "${service_lock_file:="${service_lock_path}/${service}.lock"}"
+  "${service_lock_file:="${service_lock_path}/${service}.lock"}" \
+  "${service_run_as_root_flag:=0}"
 
 service_paths=(
   "${service_bin_path}"
@@ -31,9 +33,9 @@ service_paths=(
   "${service_log_path}"
 )
 
-if directory_exists "${active_path}/sbin"
+if directory_exists "${service_sbin_path}"
 then
-  export PATH="${active_path}/sbin:$PATH"
+  export PATH="${service_sbin_path}:$PATH"
 fi
 
 if variable_is_empty service_binary

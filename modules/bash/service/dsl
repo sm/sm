@@ -1040,11 +1040,21 @@ service_init_start()
     _command+=("${service_flags[@]}")
   fi
 
-  if user_run_as "${service_user}" "${_command[*]}"
+  if (( service_run_as_root_flag == 1 ))
   then
-    touch "$service_pid_file"
+    if "${_command[*]}"
+    then
+      touch "$service_pid_file"
+    else
+      return $?
+    fi
   else
-    return $?
+    if user_run_as "${service_user}" "${_command[*]}"
+    then
+      touch "$service_pid_file"
+    else
+      return $?
+    fi
   fi
 }
 
