@@ -35,6 +35,11 @@ service_paths=(
 service_actions=( start stop restart )
 
 service_flags=()
+service_start_flags=()
+service_stop_flags=()
+service_restart_flags=()
+service_status_flags=()
+service_reload_flags=()
 
 export service_paths service_actions service_flags
 
