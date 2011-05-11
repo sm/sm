@@ -50,3 +50,8 @@ else
   service_pid=0
 fi
 
+if directory_exists "${active_path}/sbin"
+then
+  export PATH="${active_path}/sbin:$PATH"
+fi
+
