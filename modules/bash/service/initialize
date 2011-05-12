@@ -53,7 +53,7 @@ service_root_paths=(
   "/var/db/${service}"
 )
 
-for _path in  "${service_sbin_path}" "${service_sbin_path}"
+for _path in  "${service_bin_path}" "${service_sbin_path}"
 do
   if directory_exists "$_path"
   then
