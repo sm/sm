@@ -1703,7 +1703,7 @@ service_status()
       if (( ${#logs[@]} > 0 ))
       then
         log "  logs:"
-        for log in "${logs{@}}"
+        for log in "${logs[@]}"
         do
           printf "    - %s\n" "${log}"
         done
@@ -1712,7 +1712,7 @@ service_status()
       if (( ${#libraries[@]} > 0 ))
       then
         log "  libraries:"
-        for library in "${libraries{@}}"
+        for library in "${libraries[@]}"
         do
           printf "    - %s\n" "${library}"
         done
@@ -1721,7 +1721,7 @@ service_status()
       if (( ${#tcp_ports[@]} > 0 ))
       then
         log "  tcp_ports:"
-        for tcp_port in "${tcp_ports{@}}"
+        for tcp_port in "${tcp_ports[@]}"
         do
           printf "    - %s\n" "${tcp_port}"
         done
@@ -1730,7 +1730,7 @@ service_status()
       if (( ${#sockets[@]} > 0 ))
       then
         log "  sockets:"
-        for socket in "${sockets{@}}"
+        for socket in "${sockets[@]}"
         do
           printf "    - %s\n" "${socket}"
         done
