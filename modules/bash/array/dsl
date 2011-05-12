@@ -586,7 +586,7 @@ array_sort_desc()
   if variable_is_nonempty _array_name
   then
     eval "${_array_name}=(\$(
-    echo \"\${${_array_name}[@]}\" | tr ' ' \"\n\" | sort -r | uniq
+    echo \"\${${_array_name}[@]}\" | tr ' ' \"\n\" | sort -r
     ))"
   else
     fail "Cannot sort an array in decending order as an array"\
@@ -636,7 +636,7 @@ array_sort_asc()
   if variable_is_nonempty _array_name
   then
     eval "${_array_name}=(\$(
-    echo \"\${${_array_name}[@]}\" | tr ' ' \"\n\" | sort | uniq
+    echo \"\${${_array_name}[@]}\" | tr ' ' \"\n\" | sort
     ))"
   else
     fail "Cannot sort an array in ascending order as an array "\
@@ -644,3 +644,54 @@ array_sort_asc()
   fi
 }
 
+
+#
+# ## array_unique()
+#
+# Sorts the named array contents in ascending order.
+#
+# ### Input Parameters
+#
+# An array variable name.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 denoting success
+#
+# ### Failure Scenarios
+#
+# Fails if the array name, the first parameter, is not given.
+#
+# ### Usage Examples
+#
+#     user$ cat $HOME/test
+#     #!/usr/bin/env bash
+#     source "/usr/local/bdsm/modules/bash/core/initialize" # BDSM framework
+#     modules array
+#
+#     arr=(a a a b b c c c c d d d d d d)
+#     array_unique arr
+#     array_join arr
+#     echo
+#
+#     user$ $HOME/test
+#     a b c d
+#
+#
+array_unique()
+{
+  local _array_name="${1:-}" _index _largest=""
+  if variable_is_nonempty _array_name
+  then
+    eval "${_array_name}=(\$(
+    echo \" \${${_array_name}[@]} \" | awk -v RS=' ' -v ORS=' ' '!(\$0 in a){a[\$0];print}'
+    ))"
+  else
+    fail "Cannot sort an array in ascending order as an array "\
+      "variable name was not given."
+  fi
+}
