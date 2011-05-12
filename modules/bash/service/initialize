@@ -53,10 +53,13 @@ service_root_paths=(
   "/var/db/${service}"
 )
 
-if directory_exists "${service_sbin_path}"
-then
-  export PATH="${service_sbin_path}:$PATH"
-fi
+for _path in  "${service_sbin_path}" "${service_sbin_path}"
+do
+  if directory_exists "$_path"
+  then
+    export PATH="${_path}:$PATH"
+  fi
+done
 
 if variable_is_empty service_binary
 then
