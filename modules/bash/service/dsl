@@ -1704,7 +1704,7 @@ service_status()
       if (( ${#logs[@]} > 0 ))
       then
         log "  logs:"
-        logs=(echo "${logs[@]}" | sort)
+        logs=($(echo "${logs[@]}" | sort))
         for log in "${logs[@]}"
         do
           printf "    - %s\n" "${log}"
@@ -1714,7 +1714,7 @@ service_status()
       if (( ${#libraries[@]} > 0 ))
       then
         log "  libraries:"
-        libraries=(echo "${libraries[@]}" | sort)
+        libraries=($(echo "${libraries[@]}" | sort))
         for library in "${libraries[@]}"
         do
           printf "    - %s\n" "${library}"
@@ -1724,7 +1724,7 @@ service_status()
       if (( ${#tcp_ports[@]} > 0 ))
       then
         log "  tcp_ports:"
-        tcp_ports=(echo "${tcp_ports[@]}" | sort)
+        tcp_ports=($(echo "${tcp_ports[@]}" | sort))
         for tcp_port in "${tcp_ports[@]}"
         do
           printf "    - %s\n" "${tcp_port}"
@@ -1734,7 +1734,7 @@ service_status()
       if (( ${#sockets[@]} > 0 ))
       then
         log "  sockets:"
-        sockets=(echo "${sockets[@]}" | sort)
+        sockets=($(echo "${sockets[@]}" | sort))
         for socket in "${sockets[@]}"
         do
           printf "    - %s\n" "${socket}"
