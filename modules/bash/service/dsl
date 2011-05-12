@@ -1669,7 +1669,7 @@ service_status()
     log "    pid: ${pid}"
     if os_is_linux
     then
-      log "    pid: $(awk  '/^PPid:/{print $2}' /proc/${pid}/status)"
+      log "    parent_pid: $(awk  '/^PPid:/{print $2}' /proc/${pid}/status)"
       log "    state: $(awk  '/^State:/{print $2}' /proc/${pid}/status)"
     fi
     if command_exists lsof
