@@ -210,7 +210,7 @@ seed_template()
   if [[ -n "${_template}" ]]
   then
     shift
-    local _args="$@" _strings=()
+    local _args=("$@") _strings=()
     if [[ -f "${_template}" ]]
     then
       if (( ${#_args[@]} == 0 ))
