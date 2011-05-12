@@ -79,7 +79,7 @@ template_exists()
 #
 install_template()
 {
-  local _template _name _target _source _mode=0644 _owner=$USER
+  local _template _name _target _source="${extension_templates_path}" _mode=0644 _owner=$USER
 
   while (( $# > 0 )) ; do
     token="${1}" ; shift
@@ -117,33 +117,52 @@ install_template()
   if file_exists "${_name}"
   then
     _template="${_name}"
-  elif file_exists "${extension_templates_path}/${_name}"
+  elif file_exists "${_source}/${_name}"
   then
-    _template="${extension_templates_path}/${_name}"
+    _template="${_source}/${_name}"
   else
-    _template="${extension_templates_path}/${_name}.template"
+    _template="${_source}/${_name}.template"
   fi
 
   ensure_paths_exist "$(dirname "${_target}")"
 
-  [[ -f "${_template}" ]] ||
-    fail "Cannot install template as the template file '${_template}' is missing.'"
-
+  if [[ -f "${_template}" ]]
+  then
     if [[ -d "${_target}" ]]
     then
       if [[ -d "${_target}/${_name}" ]]
       then
-        fail "${_target}/${_name} is a directory, cannot install template ${_name}"
+        fail "Cannot install the template '${_template}' to ${_target}/${_name} "\
+          " as it is a directory"
       else
         cp -f "${_template}" "${_target}/${_name}"
-        [[ -n "${_mode:-}" ]]       && chmod "${_mode}" "${_target}/${_name}"
-        [[ -n "${_owner:-}" ]]      && chown "${_owner}" "${_target}/${_name}"
+
+        if [[ -n "${_mode:-}" ]]
+        then
+          chmod "${_mode}" "${_target}/${_name}"
+        fi
+
+        if [[ -n "${_owner:-}" ]]
+        then
+          chown "${_owner}" "${_target}/${_name}"
+        fi
       fi
     else
       cp -f "${_template}" "${_target}"
-      [[ -n "${_mode:-}" ]]       && chmod "${_mode}" "${_target}"
-      [[ -n "${_owner:-}" ]]      && chown "${_owner}" "${_target}"
+
+      if [[ -n "${_mode:-}" ]]
+      then
+        chmod "${_mode}" "${_target}"
+      fi
+
+      if [[ -n "${_owner:-}" ]]
+      then
+        chown "${_owner}" "${_target}"
+      fi
     fi
+  else
+    fail "Cannot install template as the template file '${_template}' is missing.'"
+  fi
 }
 
 #
