@@ -1705,6 +1705,7 @@ service_status()
       then
         log "  logs:"
         array_sort_asc logs
+        array_unique logs
         for log in "${logs[@]}"
         do
           printf "    - %s\n" "${log}"
@@ -1715,6 +1716,7 @@ service_status()
       then
         log "  libraries:"
         array_sort_asc libraries
+        array_unique libraries
         for library in "${libraries[@]}"
         do
           printf "    - %s\n" "${library}"
@@ -1725,6 +1727,7 @@ service_status()
       then
         log "  tcp_ports:"
         array_sort_asc tcp_ports
+        array_unique tcp_ports
         for tcp_port in "${tcp_ports[@]}"
         do
           printf "    - %s\n" "${tcp_port}"
@@ -1735,6 +1738,7 @@ service_status()
       then
         log "  sockets:"
         array_sort_asc sockets
+        array_unique sockets
         for socket in "${sockets[@]}"
         do
           printf "    - %s\n" "${socket}"
