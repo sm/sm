@@ -314,9 +314,9 @@ package_install()
 
   package_activate_if_first "${package_name}" "${package_version}"
 
-  if command_exists "${package_name}_presetup"
+  if command_exists "${package_name}_postactivate"
   then
-    "${package_name}_presetup"
+    "${package_name}_postactivate"
   fi
 
   package_setup
