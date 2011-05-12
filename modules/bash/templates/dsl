@@ -190,35 +190,43 @@ seed_template()
 
   if [[ -n "${_template}" ]]
   then
-    fail "Can not seed template as no template was given."
-  else
     shift
-  fi
+    local _args="$@" _strings=()
+    if [[ -f "${_template}" ]]
+    then
+      if (( ${#_args[@]} == 0 ))
+      then
+        fail "Cannot seed template '${_template}' as no replacement keys were"\
+          "specified"
+      fi
+      if (( (${#_args[@]} % 2) != 0 ))
+      then
+        fail "Every replacement key must have a replacement value."
+      fi
 
-  local _args="$@" _strings=()
+      warn "Template Seeding (replacing defaults) has not yet fully implemented."
 
-  [[ -f "${_template}" ]] ||
-    fail "Can not seed template template file '${_template}' does not exist."
+      # Aggregate the replacement strings.
+      for (( index=0 ; index < ${#_args[@]} ; index++ ))
+      do
+        _strings+=(" -e 's#${_args[${index}]}#${_args[$((++index))]}#g' ")
+      done
 
-  (( ${#_args[@]} > 0 ))  || fail "No replacement keys specified, cannot seed template '${_template}'."
-  ((  (${#_args[@]} % 2) == 0 )) || fail "Every replacement key must have a replacement value."
+      # Filter the template with the replacments.
+      sed ${_strings[@]} ${_template} >> ${_template}.${timestamp}
 
-  warn "Template Seeding (replacing defaults) has not yet been fully implemented."
-
-  # Aggregate the replacement strings.
-  for (( index=0 ; index < ${#_args[@]} ; index++ ))
-  do
-    _strings+=(" -e 's#${_args[${index}]}#${_args[$((++index))]}#g' ")
-  done
-
-  # Filter the template with the replacments.
-  sed ${_strings[@]} ${_template} >> ${_template}.${timestamp}
-
-  if file_exists "${_template}.${timestamp}"
-  then
-    mv -f "${_template}.${timestamp}" "${_template}"
+      if file_exists "${_template}.${timestamp}"
+      then
+        mv -f "${_template}.${timestamp}" "${_template}"
+      else
+        fail "Something went horribly wrong, the template intermediate file "\
+          "'${_template}.${timestamp}' does not exist."
+      fi
+    else
+      fail "Can not seed template template file '${_template}' does not exist."
+    fi
   else
-    fail "Something went horribly wrong, the template intermediate file '${_template}.${timestamp}' does not exist."
+    fail "Can not install template as no template was given."
   fi
 }
 
