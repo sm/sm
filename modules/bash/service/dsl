@@ -199,8 +199,9 @@ service_setup()
 
   ensure_paths_exist "${service_paths[@]}" "${install_path}"
 
+  chown_paths_recursively "${service_user}:${service_user}" "${service_paths[@]}"
   chown_paths_recursively "${service_user}:${service_user}"\
-    "${service_paths[@]}"
+    "${service_root_paths[@]}"
 
   if user_is_root
   then
