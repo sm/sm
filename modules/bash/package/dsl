@@ -238,12 +238,22 @@ package_install()
     package_fetch
   fi
 
+  if command_exists "${package_name}_preextract"
+  then
+    "${package_name}_preextract"
+  fi
+
   if command_exists "${package_name}_extract"
   then
     "${package_name}_extract"
   else
     log "Extracting ${package_name} ${package_version}"
     package_extract
+  fi
+
+  if command_exists "${package_name}_postextract"
+  then
+    "${package_name}_postextract"
   fi
 
   enter "${package_dir}"
@@ -255,6 +265,11 @@ package_install()
     package_patch
   fi
 
+  if command_exists "${package_name}_preconfigure"
+  then
+    "${package_name}_preconfigure"
+  fi
+
   if command_exists "${package_name}_configure"
   then
     "${package_name}_configure"
@@ -263,12 +278,22 @@ package_install()
     package_configure
   fi
 
+  if command_exists "${package_name}_postconfigure"
+  then
+    "${package_name}_postconfigure"
+  fi
+
   if command_exists "${package_name}_build"
   then
     "${package_name}_build"
   else
     log "Building ${package_name} ${package_version}"
     package_build
+  fi
+
+  if command_exists "${package_name}_preinstall"
+  then
+    "${package_name}_preinstall"
   fi
 
   if command_exists "${package_name}_install"
@@ -288,6 +313,11 @@ package_install()
   fi
 
   package_activate_if_first "${package_name}" "${package_version}"
+
+  if command_exists "${package_name}_presetup"
+  then
+    "${package_name}_presetup"
+  fi
 
   package_setup
 

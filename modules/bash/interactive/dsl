@@ -22,3 +22,8 @@ shell_is_interactive()
     return 1
   fi
 }
+
+if shell_is_interactive
+then
+  true # Interactive functions will be loaded here, only if shell is interactive.
+fi
