@@ -541,3 +541,167 @@ os_cpu_count()
   printf '%d' ${_count}
 }
 
+#
+# ## os_version()
+#
+# Prints the OS version to STDOUT and sets the 'os_version' variable
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# The OS (Kernel) Version is printed to STDOUT.
+#
+# ### Environmental effects
+#
+# After running this function the os version is stored in the 'os_version'
+# variable.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user@archlinux$ os_version
+#     2.6.38
+#
+#     user@osx$ os_version
+#     10.7.0
+#
+os_version()
+{
+  read -r os_version < <(uname -r)
+  os_version=${os_version//-*}
+  printf '%s' "${os_version}"
+}
+
+#
+# ## os_version_major()
+#
+# Prints the OS major version to STDOUT and sets the 'os_version_major' variable
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# The OS Major Version is printed to STDOUT.
+#
+# ### Environmental effects
+#
+# After running this function the os major version is stored in the
+# 'os_version_major' variable.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user@archlinux$ os_version
+#     2.6.38
+#
+#     user@osx$ os_version_major
+#     2
+#
+os_version_major()
+{
+  os_version_major=$(os_version)
+  os_version_major="${os_version_major//\.*}"
+  printf "${os_version_major}"
+}
+
+#
+# ## os_version_minor()
+#
+# Prints the OS minor version to STDOUT and sets the 'os_version_minor' variable
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# The OS minor Version is printed to STDOUT.
+#
+# ### Environmental effects
+#
+# After running this function the os minor version is stored in the
+# 'os_version_minor' variable.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user@archlinux$ os_version
+#     2.6.38
+#
+#     user@osx$ os_version_minor
+#     6
+#
+os_version_minor()
+{
+  os_version_minor=$(os_version)
+  os_version_minor="${os_version_minor#*\.}"
+  os_version_minor="${os_version_minor%\.*}"
+  printf "${os_version_minor}"
+}
+
+#
+# ## os_version_patch()
+#
+# Prints the OS patch version to STDOUT and sets the 'os_version_patch' variable
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# The OS patch Version is printed to STDOUT.
+#
+# ### Environmental effects
+#
+# After running this function the os patch version is stored in the
+# 'os_version_patch' variable.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user@archlinux$ os_version
+#     2.6.38
+#
+#     user@osx$ os_version_patch
+#     38
+#
+os_version_patch()
+{
+  os_version_patch=$(os_version)
+  os_version_patch="${os_version_patch//*\.}"
+  printf "${os_version_patch}"
+}
