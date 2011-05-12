@@ -1689,8 +1689,8 @@ service_status()
             sockets+=("${line##* }")
             ;;
           (*TCP*)
-            tcp_ports+=("${line##* }")
-            printf "    tcp: \n" "${line##*TCP }"
+            string="${line%% (*}"
+            tcp_ports+=("${string##* }")
             ;;
           (*)
             true # ignore
