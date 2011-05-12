@@ -105,7 +105,7 @@ log()
 #
 info()
 {
-  log "INFO\n$*"
+  log "INFO: $*"
 }
 
 #
@@ -137,11 +137,11 @@ info()
 # ### Usage Examples
 #
 #     user$ info "Bad Monkeys are Typing! "
-#     WARNING Bad Monkeys are Typing!
+#     WARNING: Bad Monkeys are Typing!
 #
 warn()
 {
-  log "WARNING\n$*"
+  log "WARNING: $*"
 }
 
 #
@@ -177,7 +177,7 @@ warn()
 #
 note()
 {
-  log "NOTE\n$*"
+  log "NOTE: $*"
 }
 
 #
@@ -215,7 +215,7 @@ debug()
 {
   if (( ${debug_flag:=0} == 0 ))
   then
-    log "DEBUG\n$*"
+    log "DEBUG: $*"
   fi
 }
 
@@ -255,7 +255,7 @@ debug()
 error()
 {
   set +o xtrace
-  log "\nERROR\n\n$*\n" >&2
+  log "\nERROR: $*" >&2
   disable_backtrace
   exit 1
 }
@@ -337,7 +337,6 @@ fail()
   backtrace "$*"
   exit 1
 }
-
 
 #
 # ## verbose()
