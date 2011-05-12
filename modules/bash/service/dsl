@@ -1662,10 +1662,16 @@ service_status()
 
   if [[ -s "${service_pid_file}" ]] && (( $(cat ${service_pid_file}) > 0 ))
   then
+    local pid=$(cat ${service_pid_file})
     log "  status: running"
     log "  version: $("${service_binary}" -v 2>&1 | sed -e 's#.*/##')"
-    log "  pid: $(cat ${service_pid_file})"
-
+    log "  process: "
+    log "    pid: ${pid}"
+    if os_is_linux
+    then
+      log "    pid: $(awk  '/^PPid:/{print $2}' /proc/${pid}/status)"
+      log "    state: $(awk  '/^State:/{print $2}' /proc/${pid}/status)"
+    fi
     if command_exists lsof
     then
       local cwd= binary= libraries=() tcp_ports=() udp_ports=() sockets=() logs=() string
@@ -1696,7 +1702,7 @@ service_status()
             true # ignore
           ;;
         esac
-      done < <(lsof -U -p $(cat ${service_pid_file}))
+      done < <(lsof -U -p ${pid})
 
       log "  cwd: ${cwd}"
       log "  binary: ${binary}"
