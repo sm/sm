@@ -49,7 +49,6 @@ service_root_paths=(
   "/var/spool/${service}"
   "/var/log/${service}"
   "/var/run/${service}"
-  "/var/etc/${service}"
   "/var/lock/${service}"
   "/var/db/${service}"
 )
