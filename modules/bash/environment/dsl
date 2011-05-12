@@ -40,9 +40,17 @@ command_exists()
 {
   local _name="${1:-}"
 
-  [[ -n "${_name}" ]] || fail "No function name given."
-
-  command -v "${_name}" > /dev/null 2>&1
+  if [[ -n "${_name}" ]]
+  then
+    if command -v "${_name}" > /dev/null 2>&1
+    then
+      return 0
+    else
+      return 1
+    fi
+  else
+    fail "Cannot test if command exists as no command name was given."
+  fi
 }
 
 #
@@ -52,7 +60,7 @@ command_exists()
 #
 # ### Input Parameters
 #
-# First parameter is a command name.
+# First parameter is a function name.
 #
 # ### Stream Outputs
 #
@@ -89,9 +97,17 @@ is_a_function()
 {
   local _name="${1:-}"
 
-  [[ -n "${_name}" ]] || fail "No function name given."
-
-  declare -f "${_name}" >/dev/null 2>&1
+  if [[ -n "${_name}" ]]
+  then
+    if declare -f "${_name}" >/dev/null 2>&1
+    then
+      return 0
+    else
+      return 1
+    fi
+  else
+    fail "Cannot test if function exists as no function name was given."
+  fi
 }
 
 #
@@ -142,13 +158,11 @@ is_a_function()
 #
 shell_is_interactive()
 {
-  case $- in
-    *i*)
-      return 0
-      ;;
-    *)
-      return 1
-      ;;
-  esac
+  if [[ "$-" = *i* ]]
+  then
+    return 0
+  else
+    return 1
+  fi
 }
 
