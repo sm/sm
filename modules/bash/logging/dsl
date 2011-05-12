@@ -136,12 +136,48 @@ info()
 #
 # ### Usage Examples
 #
-#     user$ info "Hello there! "
-#     INFO Hello there!
+#     user$ info "Bad Monkeys are Typing! "
+#     WARNING Bad Monkeys are Typing!
 #
 warn()
 {
   log "WARNING\n$*"
+}
+
+#
+# ## note()
+#
+# Log arguments to the calling environments STDOUT preceeded by 'NOTE .
+#
+# ### Input Parameters
+#
+# Strings to be logged.
+#
+# ### Stream Outputs
+#
+# Prints arguments passed in to the calling environments STDOUT with a newline
+# character appended and 'NOTE ' prepended.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# Fails if no arguments are given.
+#
+# ### Usage Examples
+#
+#     user$ info "You are not Smurfette! "
+#     NOTE You are not Smurfette!
+#
+note()
+{
+  log "NOTE\n$*"
 }
 
 #
