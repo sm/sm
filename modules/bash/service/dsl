@@ -1680,7 +1680,7 @@ service_status()
             ;;
           (*/lib/*)
             string="${line%% (*}"
-            libraries+=("${lib##* }")
+            libraries+=("${string##* }")
             ;;
           (*.log*)
             logs+=("${line##* }")
