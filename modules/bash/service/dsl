@@ -1668,7 +1668,7 @@ service_status()
 
     if command_exists lsof
     then
-      cwd=;libraries=();tcp_ports=();udp_ports=();sockets=();
+      local cwd= binary= libraries=() tcp_ports=() udp_ports=() sockets=() logs=() string
       while read -r line
       do
         case "$line" in
@@ -1679,7 +1679,8 @@ service_status()
             binary="${line##* }"
             ;;
           (*/lib/*)
-            libraries+=("${line##* }")
+            string="${line%% (*}"
+            libraries+=("${lib##* }")
             ;;
           (*.log*)
             logs+=("${line##* }")
