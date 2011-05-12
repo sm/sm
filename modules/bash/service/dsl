@@ -1061,7 +1061,7 @@ service_init_start()
 
   if (( service_run_as_root_flag == 1 ))
   then
-    if "${_command[*]}"
+    if ${_command[*]}
     then
       touch "$service_pid_file"
     else
@@ -1226,7 +1226,6 @@ service_init_reload()
   then
     _command+=("${service_flags[@]}")
   fi
-
 
   if user_run_as "${service_user}" "${_command[*]}"
   then
