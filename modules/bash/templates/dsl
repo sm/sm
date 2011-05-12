@@ -217,10 +217,11 @@ seed_template()
       then
         fail "Cannot seed template '${_template}' as no replacement keys were"\
           "specified"
-      fi
-      if (( (${#_args[@]} % 2) != 0 ))
-      then
-        fail "Every replacement key must have a replacement value."
+      else
+        if (( ( ${#_args[@]} % 2 ) == 1 ))
+        then
+          fail "Every replacement key must have a replacement value."
+        fi
       fi
 
       warn "Template Seeding (replacing defaults) has not yet fully implemented."
