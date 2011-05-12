@@ -941,7 +941,7 @@ service_install_init_d()
           mode 0755
       else
         # Use core srv init.d template
-        install_template "init_d" \
+        install_template "init.d" \
           from "${extensions_path}/srv/templates" \
           to "${init_scripts_path}/${_service}" mode 0755
       fi
