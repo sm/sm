@@ -1265,7 +1265,7 @@ move_files_to()
 #
 # ### Usage Examples
 #
-#     user$ move_files "$HOME/.bashrc" "$HOME/.bash_profile" to "$HOME/backup"
+#     user$
 #
 # Alternatively,
 #
@@ -1299,37 +1299,40 @@ move_files()
     esac
   done
 
-  if [[ -z "${_target}" ]]
+  if [[ -n "${_target}" ]]
   then
-    fail "Cannot move files as no target path was given (eg. move_files ... to {path})."
-  fi
-
-  if (( ${#_files[@]} == 0 ))
-  then
-    fail "Cannot move files as no files were given to move."
-  fi
-
-  ensure_paths_exist "${_target}"
-
-  for _file in "${_files[@]}"
-  do
-    if [[ -n "${_source}" ]]
+    if (( ${#_files[@]} > 0 ))
     then
-      _file="${_source}/${_file}"
-    fi
-
-    if file_exists "${_file}"
-    then
-      if (( _force_flag == 1 ))
+      if [[ -d "${_target}" ]]
       then
-        mv -f "${_file}" "${_target}/${_file//*\/}"
+        for _file in "${_files[@]}"
+        do
+          if [[ -n "${_source}" ]]
+          then
+            _file="${_source}/${_file}"
+          fi
+
+          if file_exists "${_file}"
+          then
+            if (( _force_flag == 1 ))
+            then
+              mv -f "${_file}" "${_target}/${_file//*\/}"
+            else
+              mv "${_file}" "${_target}/${_file//*\/}"
+            fi
+          else
+            error "Cannot move file ${_file} to ${_path} as the file does not exist."
+          fi
+        done
       else
-        mv "${_file}" "${_target}/${_file//*\/}"
+        error "Cannot move files to '${_target}' as the directory does not exist"
       fi
     else
-      error "Cannot move file ${_file} to ${_path} as the file does not exist."
+      fail "Cannot move files as no files were given to move."
     fi
-  done
+  else
+    fail "Cannot move files as no target path was given (eg. move_files ... to {path})."
+  fi
 }
 
 #
