@@ -544,3 +544,103 @@ array_largest()
   fi
 }
 
+#
+# ## array_sort_desc()
+#
+# Sorts the named array contents in descending order.
+#
+# ### Input Parameters
+#
+# An array variable name.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 denoting success
+#
+# ### Failure Scenarios
+#
+# Fails if the array name, the first parameter, is not given.
+#
+# ### Usage Examples
+#
+#     user$ cat $HOME/test
+#     #!/usr/bin/env bash
+#     source "/usr/local/bdsm/modules/bash/core/initialize" # BDSM framework
+#     modules array
+#
+#     arr=(c a d e f b h j i )
+#     array_sort_desc arr
+#     array_join arr
+#     echo
+#
+#     user$ $HOME/test
+#     j i h f e d c b a
+#
+array_sort_desc()
+{
+  local _array_name="${1:-}" _index _largest=""
+  if variable_is_nonempty _array_name
+  then
+    eval "${_array_name}=(\$(
+    echo \"\${${_array_name}[@]}\" | tr ' ' \"\n\" | sort -u -r
+    ))"
+  else
+    fail "Cannot sort an array in decending order as an array"\
+      "variable name was not given."
+  fi
+}
+
+#
+# ## array_sort_asc()
+#
+# Sorts the named array contents in ascending order.
+#
+# ### Input Parameters
+#
+# An array variable name.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 denoting success
+#
+# ### Failure Scenarios
+#
+# Fails if the array name, the first parameter, is not given.
+#
+# ### Usage Examples
+#
+#     user$ cat $HOME/test
+#     #!/usr/bin/env bash
+#     source "/usr/local/bdsm/modules/bash/core/initialize" # BDSM framework
+#     modules array
+#
+#     arr=(c a d e f b h j i )
+#     array_sort_asc arr
+#     array_join arr
+#     echo
+#
+#     user$ $HOME/test
+#     a b c d e f h i j
+#
+array_sort_asc()
+{
+  local _array_name="${1:-}" _index _largest=""
+  if variable_is_nonempty _array_name
+  then
+    eval "${_array_name}=(\$(
+    echo \"\${${_array_name}[@]}\" | tr ' ' \"\n\" | sort -u
+    ))"
+  else
+    fail "Cannot sort an array in ascending order as an array "\
+      "variable name was not given."
+  fi
+}
+
