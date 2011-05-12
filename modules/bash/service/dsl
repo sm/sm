@@ -1696,7 +1696,7 @@ service_status()
             true # ignore
           ;;
         esac
-      done < <(lsof -U -p ${master_pid})
+      done < <(lsof -U -p $(cat ${service_pid_file}))
 
       log "  cwd: ${cwd}"
       log "  binary: ${binary}"
