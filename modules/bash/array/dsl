@@ -586,7 +586,7 @@ array_sort_desc()
   if variable_is_nonempty _array_name
   then
     eval "${_array_name}=(\$(
-    echo \"\${${_array_name}[@]}\" | tr ' ' \"\n\" | sort -u -r
+    echo \"\${${_array_name}[@]}\" | tr ' ' \"\n\" | sort -r | uniq
     ))"
   else
     fail "Cannot sort an array in decending order as an array"\
@@ -636,7 +636,7 @@ array_sort_asc()
   if variable_is_nonempty _array_name
   then
     eval "${_array_name}=(\$(
-    echo \"\${${_array_name}[@]}\" | tr ' ' \"\n\" | sort -u
+    echo \"\${${_array_name}[@]}\" | tr ' ' \"\n\" | sort | uniq
     ))"
   else
     fail "Cannot sort an array in ascending order as an array "\
