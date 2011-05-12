@@ -1656,3 +1656,87 @@ service_activate()
   fi
 }
 
+service_status()
+{
+  log "${service}:"
+
+  if [[ -s "${service_pid_file}" ]] && (( $(cat ${service_pid_file}) > 0 ))
+  then
+    log "  status: running"
+    log "  version: $("${service_binary}" -v 2>&1 | sed -e 's#.*/##')"
+    log "  pid: $(cat ${service_pid_file})"
+
+    service_list_open_files
+    if command_exists lsof
+    then
+      cwd=;libraries=();tcp_ports=();udp_ports=();sockets=();
+      while read -r line
+      do
+        case "$line" in
+          (*[[:space:]]cwd[[:space:]]*)
+            cwd="${line##* }"
+            ;;
+          (*[[:space:]]txt[[:space:]]*)
+            binary="${line##* }"
+            ;;
+          (*/lib/*)
+            libraries+=("${line##* }")
+            ;;
+          (*.log*)
+            logs+=("${line##* }")
+            ;;
+          (*.sock*)
+            sockets+=("${line##* }")
+            ;;
+          (*TCP*)
+            tcp_ports+=("${line##* }")
+            printf "    tcp: \n" "${line##*TCP }"
+            ;;
+          (*)
+            true # ignore
+          ;;
+        esac
+      done < <(lsof -U -p ${master_pid})
+
+      log "  cwd: ${cwd}"
+      log "  binary: ${binary}"
+
+      if (( ${#logs[@]} > 0 ))
+      then
+        log "  logs:"
+        for log in "${logs{@}}"
+        do
+          printf "    - %s\n" "${log}"
+        done
+      fi
+
+      if (( ${#libraries[@]} > 0 ))
+      then
+        log "  libraries:"
+        for library in "${libraries{@}}"
+        do
+          printf "    - %s\n" "${library}"
+        done
+      fi
+
+      if (( ${#tcp_ports[@]} > 0 ))
+      then
+        log "  tcp_ports:"
+        for tcp_port in "${tcp_ports{@}}"
+        do
+          printf "    - %s\n" "${tcp_port}"
+        done
+      fi
+
+      if (( ${#sockets[@]} > 0 ))
+      then
+        log "  sockets:"
+        for socket in "${sockets{@}}"
+        do
+          printf "    - %s\n" "${socket}"
+        done
+      fi
+  else
+    log "  status: not running"
+  fi
+}
