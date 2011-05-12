@@ -1666,7 +1666,6 @@ service_status()
     log "  version: $("${service_binary}" -v 2>&1 | sed -e 's#.*/##')"
     log "  pid: $(cat ${service_pid_file})"
 
-    service_list_open_files
     if command_exists lsof
     then
       cwd=;libraries=();tcp_ports=();udp_ports=();sockets=();
@@ -1736,6 +1735,7 @@ service_status()
           printf "    - %s\n" "${socket}"
         done
       fi
+    fi
   else
     log "  status: not running"
   fi
