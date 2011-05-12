@@ -199,10 +199,20 @@ service_setup()
 
   ensure_paths_exist "${service_paths[@]}" "${install_path}"
 
-  # TODO: create an 'user_exists' function and use it here.
-  user_create_if_missing "${service_user}" with group "${service_user}" 2>/dev/null
+  chown_paths_recursively "${service_user}:${service_user}"\
+    "${service_paths[@]}"
 
-  chown_paths_recursively "${service_user}:${service_user}" "${service_paths[@]}"
+  if user_is_root
+  then
+    # TODO: create an 'user_exists' function and use it here.
+    user_create_if_missing "${service_user}"\
+      with group "${service_user}" 2>/dev/null
+
+    ensure_paths_exist "${service_root_paths[@]}"
+
+    chown_paths_recursively "${service_user}:${service_user}"\
+      "${service_root_paths[@]}"
+  fi
 
   service_install_init_d "${service}"
 }

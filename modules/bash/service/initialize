@@ -2,8 +2,18 @@
 
 modules system array
 
-variable_is_nonempty init_scripts_path || init_scripts_path="$(init_scripts_path)"
-variable_is_nonempty confd_path        || confd_path="$(confd_path)"
+if variable_is_empty init_scripts_path
+then
+  init_scripts_path="$(init_scripts_path)"
+fi
+
+if variable_is_empty confd_path
+then
+  confd_path="$(confd_path)"
+fi
+
+# TODO: Account for user service installs...
+# TODO: Merge service_paths and service_root_paths...
 
 : \
   "${service:="${extension}"}" \
@@ -31,6 +41,15 @@ service_paths=(
   "${service_data_path}"
   "${service_lock_path}"
   "${service_log_path}"
+)
+
+service_root_paths=(
+  "/var/spool/${service}"
+  "/var/log/${service}"
+  "/var/run/${service}"
+  "/var/etc/${service}"
+  "/var/lock/${service}"
+  "/var/db/${service}"
 )
 
 if directory_exists "${service_sbin_path}"
