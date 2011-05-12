@@ -944,6 +944,11 @@ service_install_init_d()
         install_template "init.d" \
           from "${extensions_path}/srv/templates" \
           to "${init_scripts_path}/${_service}" mode 0755
+
+        seed_template "${init_scripts_path}/${_service}" \
+          modules_path "${modules_path}" \
+          service "${service}" \
+          service_user "${service_user}"
       fi
 
       service_activate "${service}" "${package_version}"
