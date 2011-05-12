@@ -179,7 +179,10 @@ do
         fi
       fi
 
-      (( parse_break == 1 )) && break
+      if (( parse_break == 1 ))
+      then
+        break
+      fi
 
       if [[ -z "${action:-}" ]]
       then
