@@ -1660,7 +1660,7 @@ service_status()
 {
   log "${service}:"
 
-  if [[ -s "${service_pid_file}" ]] && (( $(cat ${service_pid_file}) > 0 ))
+  if [[ -s "${service_pid_file}" ]] && (( $(head -1 ${service_pid_file}) > 0 ))
   then
     local pid=$(head -1 ${service_pid_file})
     log "  status: running"
