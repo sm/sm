@@ -319,7 +319,7 @@ install_core()
 install_configuration_files()
 {
   log "  Ensuring that the configuration files (${configs[*]}) exist in ${config_path}"
-  ensure_files_exist "${install_path}/cofig/user"
+  ensure_files_exist "${install_path}/config/user"
 }
 
 symlink_bdsm()
