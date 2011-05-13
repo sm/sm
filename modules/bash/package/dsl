@@ -678,36 +678,40 @@ package_activate()
 
   variables_must_be_nonempty _package _version
 
-  local _package_path="${packages_path}/${_package}/${_version}"
-
   if symlink_exists "${packages_path}/${_package}/active"
   then
     package_deactivate "${_package}"
   fi
 
-  if directory_exists "${_package_path}"
+  if directory_exists "${install_path}"
   then
     log "Activating ${_package} ${_version}"
 
     (
-    enter "${_package_path}"
-    directories=($(find . -type d))
-    for directory in "${directories[@]}"
-    do
-      mkdir -p "${active_path}/${directory#.\/}"
-    done
+    if command_exists rsync
+    then
+      rsync -a "${install_path}/" "${active_path}/"
+    else
+      enter "${install_path}"
+      directories=($(find . -type d))
+      for directory in "${directories[@]}"
+      do
+        mkdir -p "${active_path}/${directory#.\/}"
+      done
 
-    files=($(find . -type f))
-    for file in "${files[@]}"
-    do
-      cp -f "${_package_path}/${file#.\/}" "${active_path}/${file#.\/}"
-    done
+      files=($(find . -type f))
+      for file in "${files[@]}"
+      do
+        cp -f "${install_path}/${file#.\/}" "${active_path}/${file#.\/}"
+      done
+      fi
     )
 
     link --force "${packages_path}/${_package}/${_version}" \
       to "${packages_path}/${_package}/active"
   else
-    log "Skipping activation of ${_package} ${_version} as '${_package_path}' does not exist."
+    warn "Skipping activation of ${_package} ${_version} "\
+      "as '${install_path}' does not exist."
   fi
 
   package_setup "${_package}"
@@ -803,7 +807,7 @@ package_deactivate()
   log "Deactivating ${_package}"
 
   (
-  enter "${_package_path}"
+  enter "${install_path}"
   directories=($(find . -type d))
 
   files=($(find . -type f))
@@ -1033,14 +1037,12 @@ package_uninstall()
 {
   variables_must_be_nonempty package_name package_version archive_format
 
-  local _package_path="${packages_path}/${package_name}/${package_version}"
-
   if package_is_active "${package_name}" "${package_version}"
   then # Deactivate the package if active.
      package_deactivate "${package_name}"
   fi
 
-  remove_paths "${_package_path}"
+  remove_paths "${install_path}"
 
   if module_is_loaded service
   then # Remove any service reminants.
