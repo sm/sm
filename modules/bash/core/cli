@@ -204,12 +204,6 @@ do
       ;;
   esac
 
-  if [[ -z "${action:-}" &&
-    -x "${extensions_path}/${extension}/bin/${extension}" ]]
-  then # A default action has the same name as the extension.
-    action="${extension}"
-  fi
-
   if [[ -n "$parse_break" || -n "$error_message" ]]
   then
     unset parse_break
@@ -217,4 +211,9 @@ do
   fi
 
 done
+
+if [[ -z "${action:-}" && -x "${extensions_path}/${extension}/bin/${extension}" ]]
+then # A default action has the same name as the extension.
+  action="${extension}"
+fi
 
