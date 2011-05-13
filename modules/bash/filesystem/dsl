@@ -2731,7 +2731,7 @@ replace_content()
       then
         if [[ -f "${_file:-}" ]]
         then
-          if sed -i -e "s#${_pattern//#/\\#/}#${_content//#/\\#/}#g" "${_file}"
+          if sed -i -e "s#${_pattern//\#/\\\#}#${_content//\#/\\\#}#g" "${_file}"
           then
             return 0
           else
