@@ -687,25 +687,12 @@ package_activate()
   then
     log "Activating ${_package} ${_version}"
 
-    (
     if command_exists rsync
     then
       rsync -a "${install_path}/" "${active_path}/"
     else
-      enter "${install_path}"
-      directories=($(find . -type d))
-      for directory in "${directories[@]}"
-      do
-        mkdir -p "${active_path}/${directory#.\/}"
-      done
-
-      files=($(find . -type f))
-      for file in "${files[@]}"
-      do
-        cp -f "${install_path}/${file#.\/}" "${active_path}/${file#.\/}"
-      done
-      fi
-    )
+      cp -Rf "${install_path}/" "${active_path}"
+    fi
 
     link --force "${packages_path}/${_package}/${_version}" \
       to "${packages_path}/${_package}/active"
