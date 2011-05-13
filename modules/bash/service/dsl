@@ -1663,6 +1663,8 @@ service_status()
   if [[ -s "${service_pid_file}" ]] && (( $(head -1 ${service_pid_file}) > 0 ))
   then
     local pid=$(head -1 ${service_pid_file})
+    local ps=$(ps -p 16424 -ostate,sgi_rss,vsize | tail -1)
+
     log "  status: running"
     log "  version: ${service_version}"
     log "  process: "
@@ -1670,7 +1672,9 @@ service_status()
     if os_is_linux
     then
       log "    parent_pid: $(awk  '/^PPid:/{print $2}' /proc/${pid}/status)"
-      log "    state: $(awk  '/^State:/{print $2}' /proc/${pid}/status)"
+      log "    state: $(printf "$ps" | awk '{print $1}')"
+      log "    rss: $(printf "$ps" | awk '{print $2}')"
+      log "    vsz: $(printf "$ps" | awk '{print $3}')"
     fi
 
     if command_exists lsof
