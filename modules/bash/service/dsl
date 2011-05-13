@@ -1663,7 +1663,7 @@ service_status()
   if [[ -s "${service_pid_file}" ]] && (( $(head -1 ${service_pid_file}) > 0 ))
   then
     local pid=$(head -1 ${service_pid_file})
-    local ps=$(ps -p 16424 -ostate,sgi_rss,vsize | tail -1)
+    local ps=$(ps -p ${service_pid_file} -ostate,sgi_rss,vsize | tail -1)
 
     log "  status: running"
     log "  version: ${service_version}"
