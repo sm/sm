@@ -1063,16 +1063,16 @@ service_init_start()
   then
     if ${_command[*]}
     then
-      touch "$service_pid_file"
+      true
     else
-      return $?
+      error "${service} failed to start."
     fi
   else
-    if user_run_as "${service_user}" "${_command[*]}"
+    if ! user_run_as "${service_user}" "${_command[*]}"
     then
-      touch "$service_pid_file"
+      true
     else
-      return $?
+      error "${service} failed to start."
     fi
   fi
 }
