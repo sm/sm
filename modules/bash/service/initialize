@@ -18,6 +18,7 @@ fi
 : \
   "${service:="${extension}"}" \
   "${service_user:="${package_user:-"${service}"}"}" \
+  "${service_version:="${package_version}"}" \
   "${prefix_path:="/usr/local/${service}/active"}" \
   "${service_bin_path:="${active_path}/bin"}" \
   "${service_sbin_path:="${active_path}/sbin"}" \

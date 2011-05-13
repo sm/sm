@@ -1664,7 +1664,7 @@ service_status()
   then
     local pid=$(head -1 ${service_pid_file})
     log "  status: running"
-    log "  version: ${package_version}"
+    log "  version: ${service_version}"
     log "  process: "
     log "    pid: ${pid}"
     if os_is_linux
