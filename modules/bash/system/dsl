@@ -705,3 +705,35 @@ os_version_patch()
   os_version_patch="${os_version_patch//*\.}"
   printf "${os_version_patch}"
 }
+
+# TODO: Document os_open
+os_open()
+{
+  local _uri="${1:-}"
+
+  if [[ -n "${_uri}" ]]
+  then
+    if command_exists open
+    then
+      open "${_uri}"
+    elif command_exists xdg-open
+    then
+      xdg-open "${_uri}"
+    else
+      if shell_is_interactive
+      then
+        if [[ "${_uri}" = file* ]]
+        then
+          ${EDITOR:-less} "${_uri}"
+        else
+          curl -s "${_uri}"
+        fi
+      else
+        echo "$PWD"
+      fi
+    fi
+  else
+    fail "Cannot open URI as no uri was given."
+  fi
+}
+

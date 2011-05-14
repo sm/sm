@@ -472,12 +472,72 @@ modules_docgen()
   # for file in modules/bash/*/dsl ; do (name=${file%%\/dsl}; shocco $file > html/${name//*\/}.html)& done ; wait
 
   local _module _modules _function _dsl
-  local _prefix="${core_development_path}/html"
+  local _prefix="${core_development_path}/html/modules"
   local _path="${site_development_path}"
 
   if directory_exists "${core_development_path}"
   then
-    log "  <ul>" > "${_prefix}/index.html"
+    ensure_paths_exist "${_prefix}"
+
+    log "<html><body><h2>BDSM Module Documentation</h2><ul>" \
+      > "${_prefix}/index.html"
+
+    _modules=($(
+    find "${core_development_path}/modules/bash" -mindepth 1 -maxdepth 1 \
+      -type d | sed -e 's#.*/##g' -e '/\..*/d'
+    ))
+
+    ensure_paths_exist "${_prefix}"
+
+    for _module in "${_modules[@]}"
+    do
+      (
+      _base="${_prefix}/${_module}"
+      log "Generating ${_base}.html"
+      module_docs "${_module}" > "${_base}.html"
+      log "<li><a href=\"./${_module}.html\">${_module}</a></li>" \
+        >> "${_prefix}/index.html"
+      )&
+    done
+    wait
+
+    log "  </ul></body></html>" >> "${_prefix}/index.html"
+    log "Modules documentation content has been generated in ${_prefix}."
+  else
+    fail "Set core_development_path in ~/.bdsmrc in order to run docgen."
+  fi
+}
+
+modules_docopen()
+{
+  # TODO: Replace with,
+  # for file in modules/bash/*/dsl ; do (name=${file%%\/dsl}; shocco $file > html/${name//*\/}.html)& done ; wait
+  if variable_is_nonempty core_development_path
+  then
+    if file_exists "${core_development_path}/html/modules/index.html"
+    then
+      os_open "${core_development_path}/html/modules/index.html"
+    else
+      error "Run '$ bdsm mod docgen' before trying docopen."
+    fi
+  else
+    error "Set core_development_path in ~/.bdsmrc in order to run docopen."
+  fi
+}
+
+modules_site_docgen()
+{
+  # TODO: Replace with,
+  # for file in modules/bash/*/dsl ; do (name=${file%%\/dsl}; shocco $file > html/${name//*\/}.html)& done ; wait
+
+  local _module _modules _function _dsl
+  local _prefix="${core_development_path}/html/modules"
+  local _path="${site_development_path}"
+
+  if directory_exists "${core_development_path}"
+  then
+    log "<html><body><h2>BDSM Module Documentation</h2><ul>" \
+      > "${_prefix}/index.html"
 
     _modules=($(
     find "${core_development_path}/modules/bash" -mindepth 1 -maxdepth 1 \
@@ -487,24 +547,22 @@ modules_docgen()
     do
       (
       ensure_paths_exist "${_prefix}/${_module}"
-      _base="${_prefix}/${_module}/index"
+      _base="${_prefix}/${_module}"
       log "Generating ${_base}.html"
       module_docs "${_module}" > "${_base}.html"
-      html2haml "${_base}.html" \
-        >> "${site_development_path}/content/modules/bash/${name}/dsl.haml"
-      log "<li><a href=\"/${_module}/${_module}.html\">${_module}</a></li>" \
+      log "<li><a href=\"./${_module}.html\">${_module}</a></li>" \
         >> "${_prefix}/index.html"
       )&
     done
     wait
-    log "  </ul>" >> "${_prefix}/index.html"
+    log "  </ul></body></html>" >> "${_prefix}/index.html"
     log "Modules documentation content has been generated in ${_prefix}."
   else
     fail "Set core_development_path in ~/.bdsmrc in order to run docgen."
   fi
 
   if directory_exists "${site_development_path}"
-  then
+  then # TODO: Extract this section into a separate location.
     # Copy the generated files into the proper site content dir.
     files=($(find "${_prefix}" -mindepth 1 -iname '*.haml'))
     for file in "${files[@]}"
@@ -539,6 +597,9 @@ modules_docgen()
 
 Header
       cat $file >> "${site_development_path}/content/modules/bash/${name}/dsl.haml"
+
+      html2haml "${_base}.html" \
+        >> "${site_development_path}/content/modules/bash/${name}/dsl.haml"
       )&
     done
 
