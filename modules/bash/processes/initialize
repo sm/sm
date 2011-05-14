@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-on_exit_commands=()
+process_exit_commands=()
 

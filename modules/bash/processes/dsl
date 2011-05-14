@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-# ## lockfile_lock()
+#
+# ## process\_lockfile\_lock()
 #
 # If the current process is the first to write to the lockfile then the process
 # continues processing past the line calling lockfile_lock "{file path/name}"
@@ -12,58 +13,113 @@
 #
 # Usage Examples:
 #
-# lockfile_lock /var/run/my_script.pid
+#     lockfile_lock /var/run/my_script.pid
 #
-lockfile_lock()
+# ## Code Walkthrough.
+process_lockfile_lock()
 {
+  # Set the lockfile to the value of the first parameter passed into the function
+  # or the empty string if no parameters were passed in.
   local _lockfile="${1:-}"
-
+  # If the lockfile variable is empty, then
   if [[ -z "${_lockfile}" ]]
   then
-    fail "Cannot lock onto a lockfile as no lockfile was specified as the first parameter."
+    # a lockfile name/path was not passed in. This is programmer error,
+    # so we fail which yields a backtrace allowing the developer to fix their
+    # code.
+    fail "Cannot lock onto a lockfile"\
+      "as no lockfile was specified as the first parameter."
   fi
 
-  # The first instance that successfully writes it's pid to the lockfile 'wins'
+  # *Append* the current running process's pid to the lockfile
   printf "$$" >> "${_lockfile}"
 
+  # Now read in the first pidfile from the lockfile.  This means that the first
+  # instance that successfully writes it's pid to the lockfile obtains the lock.
   read -r _pid < "${_lockfile}"
 
+  # If the pidfile read in matches the pid of the current process, then
   if [[ "${_pid}" == "$$" ]]
   then
+    # The currently running process has the lock, immediately add an on exit
+    # hook that removes the lockfile when the process exits thus relinquishing
+    # the filesystem level lock. This also preserves existing EXIT code.
     on_exit "rm -f ${_lockfile}"
-    # Ensure the lockfile is released on exit while preserving existing EXIT traps.
-    trap "rm -f ${_lockfile};$(trap | awk '/EXIT/' | sed -e "s#' EXIT##" -e "s#.*'##")" EXIT
-    return 0 # The lock has been obtained! Proceed with nefarious things!
-  else # Question: Should this be an error exit code or ?
-    succeed "Another process already owns the lockfile, exiting."
+
+    # The lock has been obtained! Proceed with nefarious things!
+    return 0
+  else
+    # Notify the user that another process owns the lockfile and
+    # exit with error code 1
+    error "Another process already owns the lockfile, exiting."
   fi
 }
 
-on_exit()
+#
+# ## process\_on\_exit()
+#
+# ### Input
+#
+# Code to be run when the current process exits.
+#
+# ### Code Walkthrough
+process_on_exit()
 {
-  local _commands="$*"
-  local _on_exit_code="$(trap | awk '/EXIT/' | sed -e "s#' EXIT##" -e "s#.*'##")"
+  # Store the new on exit code/commands into the _code variable.
+  local _process_exit_code _code="$*"
 
-  if [[ "${_on_exit_code}" != *on_exit* ]]
+  # Grab the existing EXIT code so that we may preserve it.
+  # Grab the entire trap output listing
+  _process_exit_code="$(trap)"
+  # Filter trap output for
+  _process_exit_code="$(
+  echo "${_process_exit_code}" | awk '/ EXIT$/' | sed -e "s#' EXIT##" -e "s#.*'##"
+  )"
+
+  # If the existing process exit code does not call the process_exit_commands()
+  # function then
+  if [[ "${_process_exit_code}" != *process_exit_commands* ]]
   then
-    trap "on_exit_commands;${_on_exit_code}" EXIT
+    # ensure that process_exit_commands() is called on exit while preserving
+    # any original on exit code.
+    trap "process_exit_commands;${_process_exit_code}" EXIT
   fi
 
-  on_exit_commands+=( "${_commands}" )
+  # Apend the code passed to process_on_exit() to the end of the
+  # on_exit_commands array variable.
+  process_exit_commands+=( "${_code}" )
 }
 
-on_exit_commands()
+#
+# ## process\_exit\_commands()
+#
+# ### Input
+#
+# None.
+#
+# ### Code Walkthrough
+process_exit_commands()
 {
-  local _result="$?" # Preserve actual exit code.
+  # Grab the exit code of the last command run in the _result variable.
+  local _result="$?" _command
 
-  local _command
+  # Loop over each command in the on_exit_commands array
   for _command in "${on_exit_commands[@]}"
   do
-    if ! eval "${_command}"
+    # Evaluate the command
+    if eval "${_command}"
     then
-      log "On Exit Command Failed: ${_command}"
+      # Continue processing the process exit commands array
+      continue
+    else
+      # If the command failed warn the user and continue processing the
+      # process exit commands array.
+      warn "process_on_exit() command failed > '${_command}'"
     fi
   done
 
+  # Return the original process exit status regardless of what happened
+  # while processing exit codes.
   return "${_result}"
 }
+

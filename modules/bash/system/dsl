@@ -706,7 +706,15 @@ os_version_patch()
   printf "${os_version_patch}"
 }
 
-# TODO: Document os_open
+#
+# ## os_open()
+#
+# Opens given URI via whatever OS mechanism can be found.
+#
+# ### Input Parameters
+#
+# The first parameter is a URI.
+#
 os_open()
 {
   local _uri="${1:-}"

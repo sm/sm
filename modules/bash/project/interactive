@@ -1,29 +1,35 @@
 #!/usr/bin/env bash
 #
-# In order to use the bdsm interactive project functions,
-# source this file in your profiles, such as ~/.bash_profile, for example:
+# In order to use the bdsm interactive project functions, the project module's
+# interactive file must be sourced in your profile, such as ~/.bash_profile,
 #
-#   [[ -s "/usr/local/bdsm/modules/bash/project/interactive" ]] && source "/usr/local/bdsm/modules/bash/project/interactive"
+# The following example sources the file only if it exists and is nonempty:
+#
+#     if [[ -s "/usr/local/bdsm/modules/bash/project/interactive" ]]
+#     then
+#       source "/usr/local/bdsm/modules/bash/project/interactive"
+#     fi
 #
 true "${projects_path:="$HOME/projects"}" ; export projects_path
 
+# ## p() -- Project
+#
+# Project function.
+#
+# Project function,
+# cd into the first directory matching the parameters passed in
+#
+# Examples:
+#
+# user ~ $ p bdsm core
+# user ~/projects/bdsm/core $
+#
+# Partial prefix completion is also supported,
+# user ~ $ p bd e
+# user ~/projects/bdsm/extensions $
+#
 p()
 {
-  #
-  # Project function.
-  #
-  # Project function,
-  # cd into the first directory matching the parameters passed in
-  #
-  # Examples:
-  #
-  # user ~ $ p bdsm core
-  # user ~/projects/bdsm/core $
-  #
-  # Partial prefix completion is also supported,
-  # user ~ $ p bd e
-  # user ~/projects/bdsm/extensions $
-  #
   local _path pattern1 pattern2;
   if [[ "$PS4" = "+ " ]]
   then
@@ -56,6 +62,11 @@ p()
   fi
 }
 
+# ## pe() -- Project Edit
+#
+# Changes directory to a project based on the parameters passed into the
+# function and then launches the editor on the given directory.
+#
 pe()
 {
   # Project edit function,
@@ -64,11 +75,17 @@ pe()
   ${EDITOR:-vim} .
 }
 
+#
+# ## po() -- Project Open
+#
+# Changes directory to a project based on the parameters passed into the
+# function and then opens the given directory in the operating system.
+#
 po()
 {
   # Project open function, use the project switch function in addition to
   # opening the filesystem directory.
   p $*
-  open .
+  os_open
 }
 
