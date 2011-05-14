@@ -389,14 +389,39 @@ modules_list()
 #
 module_docs()
 {
-  local _function _dsl _module="${1:-}"
+  local _function _dsl _module content_flag table_flag
 
-  [[ -n "${_module}" ]] ||
+  while (( $# > 0 ))
+  do
+    token="$1"
+    shift
+    case "${token}" in
+      --content)
+        content_flag=1
+        ;;
+      --table)
+        table_flag=1
+        ;;
+      *)
+        _module="$token"
+    esac
+  done
+
+  if [[ -n "${_module}" ]]
+  then
+    local _path="${core_development_path}/modules/bash/${_module}"
+    if (( content_flag == 1 ))
+    then
+      shocco "${_path}/dsl" | awk '/<body>/{p=1;next;} /\/body>/{p=0;next;} {if (p == 1) print ; } '
+    elif (( table_flag == 1 ))
+    then
+      shocco "${_path}/dsl" | awk '/<table/{p=1;} {if (p == 1) print ; } /\/table>/{p=0;} '
+    else
+      shocco "${_path}/dsl"
+    fi
+  else
     fail "Cannot glean documentation for a module as no module name was given"
-
-  local _path="${core_development_path}/modules/bash/${_module}"
-
-  awk '/^#/{print }' "${_path}/dsl" | sed -e "1d" -e "s/^# //g" -e "s/^#\s*//"
+  fi
 }
 
 #
@@ -447,84 +472,82 @@ modules_docgen()
   # for file in modules/bash/*/dsl ; do (name=${file%%\/dsl}; shocco $file > html/${name//*\/}.html)& done ; wait
 
   local _module _modules _function _dsl
-  local _prefix="/tmp/docs/modules"
+  local _prefix="${core_development_path}/html"
   local _path="${site_development_path}"
 
-  directory_exists "${site_development_path}" ||
-    fail "Set site_development_path in ~/.bdsmrc in order to run docgen."
+  if directory_exists "${core_development_path}"
+  then
+    log "  <ul>" > "${_prefix}/index.html"
 
-  _modules=($(modules_installed))
-  for _module in "${_modules[@]}"
-  do
-    (
-    ensure_paths_exist "${_prefix}/${_module}"
-
-    _base="${_prefix}/${_module}/${_module}"
-
-    log "Generating ${_base}.md"
-    module_docs "${_module}" > "${_base}.md"
-
-    if command_exists redcarpet
-    then
+    _modules=($(
+    find "${core_development_path}/modules/bash" -mindepth 1 -maxdepth 1 \
+      -type d | sed -e 's#.*/##g' -e '/\..*/d'
+    ))
+    for _module in "${_modules[@]}"
+    do
+      (
+      ensure_paths_exist "${_prefix}/${_module}"
+      _base="${_prefix}/${_module}/index"
       log "Generating ${_base}.html"
-      redcarpet "${_base}.md" > "${_base}.html"
-    else
-      log "Skipping html conversion as the 'redcarpet' command was not found (gem install redcarpet for this feature)"
-    fi
+      module_docs "${_module}" > "${_base}.html"
+      html2haml "${_base}.html" \
+        >> "${site_development_path}/content/modules/bash/${name}/dsl.haml"
+      log "<li><a href=\"/${_module}/${_module}.html\">${_module}</a></li>" \
+        >> "${_prefix}/index.html"
+      )&
+    done
+    wait
+    log "  </ul>" >> "${_prefix}/index.html"
+    log "Modules documentation content has been generated in ${_prefix}."
+  else
+    fail "Set core_development_path in ~/.bdsmrc in order to run docgen."
+  fi
 
-    if command_exists html2haml
-    then
-      log "Generating ${_base}.html"
-      html2haml "${_base}.html" > "${_base}.haml"
-    else
-      log "Skipping haml conversion as the 'html2haml' command was not found (gem install haml for this feature)"
-    fi
-    )&
-  done
-  wait
+  if directory_exists "${site_development_path}"
+  then
+    # Copy the generated files into the proper site content dir.
+    files=($(find "${_prefix}" -mindepth 1 -iname '*.haml'))
+    for file in "${files[@]}"
+    do
+      (
+      name=${file##*\/}
+      name=${name%.haml}
 
-  # perl Markdown.pl --html4tags foo.text
-  log "Modules documentation has been generated in ${_prefix}."
+      ensure_paths_exist "${site_development_path}/content/modules/bash/${name}"
 
-  # Copy the generated files into the proper site content dir.
-  files=($(find "${_prefix}" -mindepth 1 -iname '*.haml'))
-  for file in "${files[@]}"
-  do
-    (
-    name=${file##*\/}
-    name=${name%.haml}
+      log "Building ${name} dsl from generated docs."
+      cat > "${site_development_path}/content/modules/bash/${name}/dsl.haml" <<Header
+  .breadcrumbs
+    %a{ :href => "/" }
+      Documentation
+    &nbsp;>&nbsp;
+    %a{ :href => "/modules/" }
+      Modules
+    &nbsp;>&nbsp;
+    %a{ :href => "/modules/bash/" }
+      Bash
+    &nbsp;>&nbsp;
+    %a{ :href => "/modules/bash/${name}/" }
+      ${name}
+    &nbsp;>&nbsp;
+    %a{ :href => "/modules/bash/${name}/dsl/" }
+      DSL API :: ${name}
+    %hr
 
-    ensure_paths_exist "${site_development_path}/content/modules/bash/${name}"
-
-    log "Building ${name} dsl from generated docs."
-    cat > "${site_development_path}/content/modules/bash/${name}/dsl.haml" <<Header
-.breadcrumbs
-  %a{ :href => "/" }
-    Documentation
-  &nbsp;>&nbsp;
-  %a{ :href => "/modules/" }
-    Modules
-  &nbsp;>&nbsp;
-  %a{ :href => "/modules/bash/" }
-    Bash
-  &nbsp;>&nbsp;
-  %a{ :href => "/modules/bash/${name}/" }
-    ${name}
-  &nbsp;>&nbsp;
-  %a{ :href => "/modules/bash/${name}/dsl/" }
-    DSL API :: ${name}
-  %hr
-
-%h1
-  Module ${name}
+  %h1
+    Module ${name}
 
 Header
-    cat $file >> "${site_development_path}/content/modules/bash/${name}/dsl.haml"
-    )&
-  done
+      cat $file >> "${site_development_path}/content/modules/bash/${name}/dsl.haml"
+      )&
+    done
 
-  wait
+    wait
 
-  log "Module documentation has been generated from the source code path ${core_development_path} into the site development path ${site_development_path}"
+    log "Module documentation has been generated from the source code path ${core_development_path} into the site development path ${site_development_path}"
+  else
+    fail "Set site_development_path in ~/.bdsmrc in order to run docgen."
+  fi
+
 }
 
