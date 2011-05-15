@@ -808,32 +808,52 @@ os_version_patch()
 #
 # The first parameter is a URI.
 #
+# ### Code Walkthrough
 os_open()
 {
+  # Store the URI in a local variable, set to the empty string if it was not
+  # passed in.
   local _uri="${1:-}"
 
-  if [[ -n "${_uri}" ]]
+  # If the URI variable is not empty
+  if variable_is_nonempty _uri
   then
+    # and if the 'open' command exists on the system
     if command_exists open
     then
+      # then call open passing in the URI
       open "${_uri}"
+
+    # otherwise if the 'xdg-open' command exists on the system
     elif command_exists xdg-open
     then
+      # then call xdg-open passing in the URI
       xdg-open "${_uri}"
+
+    # otherwise
     else
+      # If the shell is interactive
       if shell_is_interactive
       then
+        # and if the uri is a file uri
         if [[ "${_uri}" = file* ]]
         then
+          # Then open it up in the shell set editor or less if the editor
+          # variable has not been set.
           ${EDITOR:-less} "${_uri}"
         else
+          # The URL must be http:// ??? So let's just curl it.
           curl -s "${_uri}"
         fi
       else
+        # the shell is non-interactive, for now print the directory.
         echo "$PWD"
       fi
     fi
   else
+    # otherwise the uri was not passed in, this is a programming error
+    # so send a fail message which will send a backtrace allowing the developer
+    # to quickly debug where they are missing the URI.
     fail "Cannot open URI as no uri was given."
   fi
 }
