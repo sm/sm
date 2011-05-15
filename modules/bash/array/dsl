@@ -38,6 +38,8 @@
 #     user$ echo $?
 #     1
 #
+# ### Code Walkthrough
+#
 array_is_nonempty()
 {
   local _array_name="$1"
@@ -46,6 +48,10 @@ array_is_nonempty()
   then
     eval "(( \${#${_array_name}[@]} > 0 ))"
   else
+    # otherwise the array name variable was not passed in. This is a programming
+    # error and as such we call the fail function which yields a message and
+    # a backtrace thus enabling the developer to pinpoint and fix the issue
+    # quickly.
     fail "Cannot push onto array as an array name was not given."
   fi
 }
@@ -84,6 +90,8 @@ array_is_nonempty()
 #     user$ echo $?
 #     1
 #
+# ### Code Walkthrough
+#
 array_is_empty()
 {
   local _array_name="$1"
@@ -92,6 +100,10 @@ array_is_empty()
   then
     eval "(( \${#${_array_name}[@]} == 0 ))"
   else
+    # otherwise the array name variable was not passed in. This is a programming
+    # error and as such we call the fail function which yields a message and
+    # a backtrace thus enabling the developer to pinpoint and fix the issue
+    # quickly.
     fail "Cannot push onto array as an array name was not given."
   fi
 }
@@ -124,6 +136,8 @@ array_is_empty()
 #     user$ array_length the_array
 #     5
 #
+# ### Code Walkthrough
+#
 array_length()
 {
   local _array_name="$1"
@@ -132,6 +146,10 @@ array_length()
   then
     eval "printf \"%s\\n\" \"\${#${_array_name}[@]}\""
   else
+    # otherwise the array name variable was not passed in. This is a programming
+    # error and as such we call the fail function which yields a message and
+    # a backtrace thus enabling the developer to pinpoint and fix the issue
+    # quickly.
     fail "Cannot push onto array as an array name was not given."
   fi
 }
@@ -164,6 +182,8 @@ array_length()
 #     $ array_last_element the_array
 #     five
 #
+# ### Code Walkthrough
+#
 array_last_element()
 {
   local _array_name="$1" _length
@@ -174,6 +194,10 @@ array_last_element()
 
     eval "printf \"%s\\n\" \"\${${_array_name}[${_length}]}\""
   else
+    # otherwise the array name variable was not passed in. This is a programming
+    # error and as such we call the fail function which yields a message and
+    # a backtrace thus enabling the developer to pinpoint and fix the issue
+    # quickly.
     fail "Cannot push onto array as an array name was not given."
   fi
 }
@@ -206,6 +230,8 @@ array_last_element()
 #     $ array_first_element the_array
 #     one
 #
+# ### Code Walkthrough
+#
 array_first_element()
 {
   local _array_name="$1" _length
@@ -214,6 +240,10 @@ array_first_element()
   then
     eval "printf \"%s\\n\" \"\${${_array_name}[0]}\""
   else
+    # otherwise the array name variable was not passed in. This is a programming
+    # error and as such we call the fail function which yields a message and
+    # a backtrace thus enabling the developer to pinpoint and fix the issue
+    # quickly.
     fail "Cannot push onto array as an array name was not given."
   fi
 }
@@ -248,6 +278,8 @@ array_first_element()
 #     $ array_join the_array # print the contents of the array, space separated
 #     1 2 3 4 5 6
 #
+# ### Code Walkthrough
+#
 array_push()
 {
   local _array_name="$1"
@@ -269,9 +301,12 @@ array_push()
       eval "${_array_name}+=(\${_element})"
     done
   else
+    # otherwise the array name variable was not passed in. This is a programming
+    # error and as such we call the fail function which yields a message and
+    # a backtrace thus enabling the developer to pinpoint and fix the issue
+    # quickly.
     fail "Cannot push elements onto array as an array name was not given."
   fi
-
 }
 
 #
@@ -305,6 +340,8 @@ array_push()
 #     space separated.
 #     1 2 3 4 5
 #
+# ### Code Walkthrough
+#
 array_append()
 {
   local _array_name="$1"
@@ -324,6 +361,10 @@ array_append()
       eval "${_array_name}+=(\${_element})}"
     done
   else
+    # otherwise the array name variable was not passed in. This is a programming
+    # error and as such we call the fail function which yields a message and
+    # a backtrace thus enabling the developer to pinpoint and fix the issue
+    # quickly.
     fail "Cannot push onto array as an array name was not given."
   fi
 }
@@ -359,6 +400,8 @@ array_append()
 #     1
 #     2 3 4
 #
+# ### Code Walkthrough
+#
 array_shift()
 {
   local _array_name="$1" new_array=() index first_element
@@ -378,6 +421,10 @@ array_shift()
     "
     printf "%s" "${first_element}"
   else
+    # otherwise the array name variable was not passed in. This is a programming
+    # error and as such we call the fail function which yields a message and
+    # a backtrace thus enabling the developer to pinpoint and fix the issue
+    # quickly.
     fail "Cannot shift from array as an array name was not given."
   fi
 }
@@ -415,6 +462,8 @@ array_shift()
 #     user$ array_join the_array # print contents of the array, space separated.
 #     1 2 3 4 5
 #
+# ### Code Walkthrough
+#
 array_unshift()
 {
   local _array_name="$1"
@@ -435,6 +484,10 @@ array_unshift()
       eval "${_array_name}=(\"${_element}\" \"\${${_array_name}[@]}\")"
     done
   else
+    # otherwise the array name variable was not passed in. This is a programming
+    # error and as such we call the fail function which yields a message and
+    # a backtrace thus enabling the developer to pinpoint and fix the issue
+    # quickly.
     fail "Cannot push onto array as an array name was not given."
   fi
 }
@@ -474,6 +527,8 @@ array_unshift()
 #     $ array_join the_array '.'
 #     1.2.3.4.5
 #
+# ### Code Walkthrough
+#
 array_join()
 {
   local _array_name="$1"
@@ -489,6 +544,10 @@ array_join()
       printf \"%s\" \"\${${_array_name}[\${index}]}\" ;
     done"
   else
+    # otherwise the array name variable was not passed in. This is a programming
+    # error and as such we call the fail function which yields a message and
+    # a backtrace thus enabling the developer to pinpoint and fix the issue
+    # quickly.
     fail "Cannot join array as an array name was not given."
   fi
 }
@@ -521,6 +580,8 @@ array_join()
 #     $ array_largest the_array
 #     billie
 #
+# ### Code Walkthrough
+#
 array_largest()
 {
   local _array_name="${1:-}" _index _largest=""
@@ -539,6 +600,10 @@ array_largest()
     printf "%s" "${_largest}"
 
   else
+    # otherwise the array name variable was not passed in. This is a programming
+    # error and as such we call the fail function which yields a message and
+    # a backtrace thus enabling the developer to pinpoint and fix the issue
+    # quickly.
     fail "Cannot find largest element as an array variable name was not given."
   fi
 }
@@ -579,6 +644,8 @@ array_largest()
 #     user$ $HOME/test
 #     j i h f e d c b a
 #
+# ### Code Walkthrough
+#
 array_sort_desc()
 {
   local _array_name="${1:-}" _index _largest=""
@@ -588,6 +655,10 @@ array_sort_desc()
     echo \"\${${_array_name}[@]}\" | tr ' ' \"\n\" | sort -r
     ))"
   else
+    # otherwise the array name variable was not passed in. This is a programming
+    # error and as such we call the fail function which yields a message and
+    # a backtrace thus enabling the developer to pinpoint and fix the issue
+    # quickly.
     fail "Cannot sort an array in decending order as an array"\
       "variable name was not given."
   fi
@@ -629,6 +700,8 @@ array_sort_desc()
 #     user$ $HOME/test
 #     a b c d e f h i j
 #
+# ### Code Walkthrough
+#
 array_sort_asc()
 {
   local _array_name="${1:-}" _index _largest=""
@@ -638,6 +711,10 @@ array_sort_asc()
     echo \"\${${_array_name}[@]}\" | tr ' ' \"\n\" | sort
     ))"
   else
+    # otherwise the array name variable was not passed in. This is a programming
+    # error and as such we call the fail function which yields a message and
+    # a backtrace thus enabling the developer to pinpoint and fix the issue
+    # quickly.
     fail "Cannot sort an array in ascending order as an array "\
       "variable name was not given."
   fi
@@ -680,17 +757,124 @@ array_sort_asc()
 #     user$ $HOME/test
 #     a b c d
 #
+# ### Code Walkthrough
 #
 array_unique()
 {
+  # Store the array name into a local variable, set to the empty string if it
+  # was not passed in. Also initialize the index and largest variables.
   local _array_name="${1:-}" _index _largest=""
+
+  # If the array name variable is not empty
   if variable_is_nonempty _array_name
   then
+    # Then loop over the array finding the largest element using awk.
     eval "${_array_name}=(\$(
     echo \" \${${_array_name}[@]} \" | awk -v RS=' ' -v ORS=' ' '!(\$0 in a){a[\$0];print}'
     ))"
   else
+    # otherwise the array name variable was not passed in. This is a programming
+    # error and as such we call the fail function which yields a message and
+    # a backtrace thus enabling the developer to pinpoint and fix the issue
+    # quickly.
     fail "Cannot sort an array in ascending order as an array "\
       "variable name was not given."
+  fi
+}
+
+# ## array\_is\_even()
+#
+# Checks to see if an array with the name given as the first parameter
+# is even.
+#
+# ### Input Parameters
+#
+# The first parameter is the name of the array variable.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 if the array is non-empty.
+# 1 if the array is empty.
+#
+# ### Failure Scenarios
+#
+# Fails if the array name, the first parameter, is not given.
+#
+# ### Usage Examples
+#
+#     user$ cat $HOME/test
+#     #!/usr/bin/env bash
+#     source "/usr/local/bdsm/modules/bash/core/initialize" # BDSM framework
+#     modules array
+#
+#     the_array=()
+#     printf "($(array_join the_array))"
+#     if array_is_even the_array
+#     then
+#       echo " has an even number of elements"
+#     else
+#       echo " has an odd number of elements"
+#     fi
+#
+#     the_array=(1)
+#     printf "($(array_join the_array))"
+#     if array_is_even the_array
+#     then
+#       echo " has an even number of elements"
+#     else
+#       echo " has an odd number of elements"
+#     fi
+#
+#     the_array=(1 2 3 4)
+#     printf "($(array_join the_array))"
+#     if array_is_even the_array
+#     then
+#       echo " has an even number of elements"
+#     else
+#       echo " has an odd number of elements"
+#     fi
+#
+#     the_array=(1 2 3 4 5)
+#     printf "($(array_join the_array))"
+#     if array_is_even the_array
+#     then
+#       echo " has an even number of elements"
+#     else
+#       echo " has an odd number of elements"
+#     fi
+#
+#     user$ "$HOME/test"
+#     () has an even number of elements
+#     (1) has an odd number of elements
+#     (1 2 3 4) has an even number of elements
+#     (1 2 3 4 5) has an odd number of elements
+#
+# ### Code Walkthrough
+array_is_even()
+{
+  # Store the array name into a local variable, set to the empty string if it
+  # was not passed in.
+  local _array_name="${1:-}"
+
+  # If the array name variable is not empty
+  if variable_is_nonempty _array_name
+  then
+    if eval "(( ( \${#${_array_name}[@]} % 2 ) == 0 ))"
+    then
+      # the array is even, return true, 0
+      return 0
+    else
+      # the array is odd, return false, 1
+      return 1
+    fi
+  else
+    # otherwise the array name was not passed in, this is a programming error
+    # so send a fail message which will send a backtrace allowing the developer
+    # to quickly debug where they have an issue.
+    fail "Cannot push onto array as an array name was not given."
   fi
 }
