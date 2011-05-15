@@ -30,37 +30,61 @@
 #
 #     user$ user_create_if_missing "nginx" with group "nginx"
 #
+# ### Code Walkthrough
 user_create_if_missing()
 {
-  local _token _group
+  # Declare the token, group and user variables.
+  local _token _group _user
   # parse arguments
   while (( $# > 0 )) ; do
     _token="$1" ; shift
 
     case "${_token}" in
+      # if the token is 'group' then
       group)
-        _group="${1}" ; shift
+        _group="${1}"
+        # and remove the next parameter from the parameters list
+        shift
         ;;
+      # if the token is 'with' then
       with)
-        continue # Syntatic sugar, ignore, next!
+        # move on to processing the next token as this is syntactic sugar.
+        continue
         ;;
+      # if the token is 'from' then
       from)
-        _source="${1}" ; shift
+        _source="${1}"
+        # and remove the next parameter from the parameters list
+        shift
         ;;
+      # if the token is '--force' then
       --force)
         _force_flag=1
         ;;
 
+      # if the token does not match any of the above then
       *)
-        if [[ -z "${_group}" ]] ; then
+        # and if the user variable has not yet been set
+        if [[ -z "${_user}" ]]
+        then
+          # then assign the token into the user variable
+          _user="${_token}"
+
+        # otherwise if the group variable has not yet been set
+        elif [[ -z "${_group}" ]]
+        then
+          # then assign the token into the group variable
           _group="${_token}"
-          break
         fi
         ;;
     esac
   done
 
-  if (( UID == 0 )) ; then
+  # If the user is root (eg. id 0)
+  if (( UID == 0 ))
+  then
+    # then we switch based on the uname command ouptput for os type
+    # ##### TODO: Use the os_is_X functions here instead.
     (
     case "$(uname)" in
       "OpenBSD")
@@ -149,39 +173,72 @@ user_create_if_missing()
 #
 #     user$ user_delete "nginx"
 #
+# ### Code Walkthrough`
 user_delete()
 {
-  local _token _group
-  # parse arguments
-  while (( $# > 0 )) ; do
-    _token="$1" ; shift
+  # #### TODO: Finish documenting this function
+  # Declare local variables for token and group
+  local _token _user
 
+  # While there are parameters, loop over them
+  while (( $# > 0 ))
+  do
+    # Set the first parameter into the token variable.
+    _token="$1"
+
+    # Remove the token from the parameters list now that it is in a variable.
+    shift
+
+    # Switch on the token variable's contents
     case "${_token}" in
-      group)
-        _group="${1}" ; shift
+      # if the token is 'user' then
+      user)
+        # assign the next parameter to the user variable.
+        _user="${1}"
+        # and remove the next parameter from the parameters list
+        shift
         ;;
+      # if the token is 'with' then
       with)
-        continue # Syntatic sugar, ignore, next!
+        # go to processing the next token as this is syntactic sugar.
+        continue
         ;;
+      # if the token is 'from' then
       from)
-        _source="${1}" ; shift
+        # assign the next parameter to the source variable
+        _source="${1}"
+        # and remove the next parameter from the parameters list
+        shift
         ;;
+      # if the token is '--force' then
       --force)
+        # then set the force_flag to 1 (non-default value )
         _force_flag=1
         ;;
-
+      # if the token does not match any of the above then
       *)
-        if [[ -z "${_group}" ]] ; then
-          _group="${_token}"
+        # if the user variable is empty
+        if [[ -z "${_user}" ]]
+        then
+          # then assign the current token into the user variable
+          _user="${_token}"
+          # and stop processing input parameters
           break
         fi
         ;;
     esac
   done
 
-  if (( UID == 0 )) ; then
+  # If the user is root (eg. id 0)
+  if (( UID == 0 ))
+  then
     (
+    # Then we switch based on the os type
+    # TODO: Switch these to use the os_is_X system module dsl
     case "$(uname)" in
+      "Linux")
+        userdel "${package_user}"
+      ;;
       "OpenBSD")
         groupdel "$package_user"
         userdel -g "$package_user" "$package_user"
@@ -190,10 +247,6 @@ user_delete()
       "FreeBSD")
         pw groupdel -q "$package_user"
         ;;
-
-      "Linux")
-        userdel "${package_user}"
-      ;;
 
       "Darwin")
         gid="501" #only gids > 500 show up in user preferences
@@ -260,12 +313,16 @@ user_delete()
 #     root# echo $?
 #     0
 #
+# ### Code Walkthrough
 user_is_root()
 {
+  # If the user is root (eg. id is 0)
   if (( UID == 0 ))
   then
+    # then return true, 0
     return 0
   else
+    # otherwise return false, 1
     return 1
   fi
 }
@@ -306,12 +363,16 @@ user_is_root()
 #     root# echo $?
 #     1
 #
+# ### Code Walkthrough
 user_is_not_root()
 {
+  # If the user is not root (eg. id not 0)
   if (( UID != 0 ))
   then
+    # then return true, 0
     return 0
   else
+    # otherwise return false, 1
     return 1
   fi
 }
@@ -348,8 +409,16 @@ user_is_not_root()
 #
 user_must_be_root()
 {
-  user_is_root ||
-    fail "bdsm $extension $action must be run as a root and NOT as a user ($USER)."
+  # if the user is root
+  if user_is_root
+  then
+    # then return true, 0
+    return 0
+  else
+    # otherwise send an error message informing the user that the current script
+    # must be run as a root and not as a user.
+    error "bdsm $extension $action must be run as a root and NOT as a user ($USER)."
+  fi
 }
 
 #
@@ -384,8 +453,16 @@ user_must_be_root()
 #
 user_must_not_be_root()
 {
-  user_is_not_root ||
+  # if the user is not root
+  if user_is_not_root
+  then
+    # then return true, 0
+    return 0
+  else
+    # otherwise send an error message informing the user that the current script
+    # must be run as a root and not as a user.
     fail "bdsm $extension $action must be run as a (project) user and NOT as root."
+  fi
 }
 
 #
@@ -418,15 +495,30 @@ user_must_not_be_root()
 #     root# user_run_as "user" pwd
 #     /home/user
 #
+# ### Code Walkthrough
 user_run_as()
 {
+  # Assign the first parameter into the user variable
   local _user="$1"
 
-  [[ -n "${_user:-}" ]] ||
+  # If the user variable is nonempty
+  if variable_is_nonempty _user
+  then
+    # then run the given command as the user, with a nonlogin shell.
+    if su "${_user}" -c "$*"
+    then
+      # the command completed successfully so return true, 0
+      return 0
+    else
+      # the command did not complete successfully so return false, 1
+      return 1
+    fi
+  else
+    # otherwise the user was not passed in. This is a programming error so we
+    # send a fail message which includes a backtrace allowing the developer
+    # to quickly pinpoinnt and fix their error.
     fail "Cannot run as user as no user or commands were given."
-  shift
-
-  su "${_user}" -c "$*"
+  fi
 }
 
 #
@@ -461,11 +553,25 @@ user_run_as()
 #
 user_run_as_login()
 {
+  # Assign the first parameter into the user variable
   local _user="$1"
 
-  [[ -n "${_user:-}" ]] ||
-    fail "Cannot run as login user as no user or commands were given."
-  shift
-
-  su - "${_user}" -c "$*"
+  # If the user variable is nonempty
+  if variable_is_nonempty _user
+  then
+    # then run the given command as the user, with a login shell.
+    if su - "${_user}" -c "$*"
+    then
+      # the command completed successfully so return true, 0
+      return 0
+    else
+      # the command did not complete successfully so return false, 1
+      return 1
+    fi
+  else
+    # otherwise the user was not passed in. This is a programming error so we
+    # send a fail message which includes a backtrace allowing the developer
+    # to quickly pinpoinnt and fix their error.
+    fail "Cannot run as user as no user or commands were given."
+  fi
 }
