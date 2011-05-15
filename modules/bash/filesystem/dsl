@@ -5,7 +5,7 @@
 #
 
 #
-# ## source_files
+# ## source\_files
 #
 # Safely source files only if they exists and are nonempty.
 #
@@ -57,7 +57,7 @@ source_files()
 }
 
 #
-# ## nonempty_files
+# ## nonempty\_files
 #
 # Outputs a subset of the named files that are nonempty.
 #
@@ -106,7 +106,7 @@ nonempty_files()
 }
 
 #
-# ## ensure_paths_exist
+# ## ensure\_paths\_exist
 #
 # Iterates over the list of given paths, creates the directory if it
 # does not exist.
@@ -158,7 +158,7 @@ ensure_paths_exist()
 }
 
 #
-# ## remove_files
+# ## remove\_files
 #
 # Removes the given files, if they exist.
 #
@@ -280,7 +280,7 @@ remove()
 }
 
 #
-# ## remove_paths
+# ## remove\_paths
 #
 # Function Description
 #
@@ -344,7 +344,7 @@ remove_paths()
 }
 
 #
-# ## ensure_files_exist
+# ## ensure\_files\_exist
 #
 # Iterates over the list of given files, creates the directory if it
 # does not exist.
@@ -403,7 +403,7 @@ ensure_files_exist()
 }
 
 #
-# ## ensure_files_are_executable
+# ## ensure\_files\_are\_executable
 #
 # Sets the executable bits on a file if it is not executable.
 #
@@ -557,7 +557,7 @@ link()
 }
 
 #
-# ## move_directory
+# ## move\_directory
 #
 # Moves a directory from one location to another.
 # (This is also used to rename a directory.)
@@ -654,7 +654,7 @@ move_directory()
 }
 
 #
-# ## move_file
+# ## move\_file
 #
 # Moves a file from one location to another.
 # (This is also used to rename a file.)
@@ -747,7 +747,7 @@ move_file()
 }
 
 #
-# ## copy_file
+# ## copy\_file
 #
 # Copys a file from one location to another.
 # (This is also used to rename a file.)
@@ -832,7 +832,7 @@ copy_file()
 }
 
 #
-# ## copy_files_to
+# ## copy\_files\_to
 #
 # depreciated, please use copy_files with the 'to' specifier instead
 #
@@ -871,7 +871,7 @@ copy_files_to()
 }
 
 #
-# ## copy_files
+# ## copy\_files
 #
 # Copys a given list of files into the named path.
 #
@@ -959,7 +959,7 @@ copy_files()
 }
 
 #
-# ## copy_directories_to
+# ## copy\_directories\_to
 #
 # Copys a given list of directories into the named path.
 #
@@ -1021,7 +1021,7 @@ copy_directories_to()
 }
 
 #
-# ## copy_directories to
+# ## copy\_directories to
 #
 # Copys a given list of directories into the named path.
 #
@@ -1104,7 +1104,7 @@ copy_directories()
 
 
 #
-# ## copy_directory
+# ## copy\_directory
 #
 # Copys a directory from one location to another.
 # (This is also used to rename a directory.)
@@ -1171,7 +1171,7 @@ copy_directory()
 }
 
 #
-# ## move_files_to
+# ## move\_files\_to
 #
 # Moves a given list of files into the named path.
 #
@@ -1235,7 +1235,7 @@ move_files_to()
 }
 
 #
-# ## move_files
+# ## move\_files
 #
 # Moves a given list of files into the named path.
 #
@@ -1336,7 +1336,7 @@ move_files()
 }
 
 #
-# ## chown_files
+# ## chown\_files
 #
 # Change ownership of a list of files.
 #
@@ -1396,7 +1396,7 @@ chown_files()
 }
 
 #
-# ## chown_paths
+# ## chown\_paths
 #
 # Change ownership of a list of paths.
 #
@@ -1456,7 +1456,7 @@ chown_paths()
 }
 
 #
-# ## chown_paths_recursively
+# ## chown\_paths\_recursively
 #
 # Change ownership of a list of paths, recursively.
 #
@@ -1516,7 +1516,7 @@ chown_paths_recursively()
 }
 
 #
-# ## chmod_files
+# ## chmod\_files
 #
 # Change ownership of a list of files.
 #
@@ -1579,7 +1579,7 @@ chmod_files()
 }
 
 #
-# ## chmod_paths
+# ## chmod\_paths
 #
 # Change ownership of a list of paths.
 #
@@ -1648,7 +1648,7 @@ chmod_paths()
 }
 
 #
-# ## chmod_paths_recursively
+# ## chmod\_paths\_recursively
 #
 # Change ownership of a list of paths, recursively.
 #
@@ -1763,7 +1763,7 @@ enter()
 }
 
 #
-# ## hash_file
+# ## hash\_file
 #
 # Set and get key/value pairs from a given has file.
 #
@@ -1851,7 +1851,7 @@ hash_file()
 }
 
 #
-# ## file_is_executable
+# ## file\_is\_executable
 #
 # Check if a file name/path is executable.
 #
@@ -1904,7 +1904,7 @@ file_is_executable()
 }
 
 #
-# ## file_exists
+# ## file\_exists
 #
 # Check if a file name/path exists.
 #
@@ -1956,7 +1956,7 @@ file_exists()
 }
 
 #
-# ## file_is_nonempty
+# ## file\_is\_nonempty
 #
 # Check if a file name/path is nonempty.
 #
@@ -2014,7 +2014,7 @@ file_is_nonempty()
 }
 
 #
-# ## file_is_empty
+# ## file\_is\_empty
 #
 # Check if a file name/path is empty.
 #
@@ -2067,7 +2067,7 @@ file_is_empty()
 }
 
 #
-# ## file_is_missing
+# ## file\_is\_missing
 #
 # Check if a file name/path is missing.
 #
@@ -2120,7 +2120,7 @@ file_is_missing()
 }
 
 #
-# ## file_is_empty_or_missing
+# ## file\_is\_empty\_or\_missing()
 #
 # Check if a file name/path is empty or missing.
 #
@@ -2173,7 +2173,7 @@ file_is_empty_or_missing()
 }
 
 #
-# ## file_contains()
+# ## file\_contains()
 #
 # Checks if a named file contains a given string/unix regexp pattern.
 #
@@ -2251,7 +2251,7 @@ file_contains()
 }
 
 #
-# ## symlink_exists
+# ## symlink\_exists()
 #
 # Check if a symlink name/path exists.
 #
@@ -2304,7 +2304,7 @@ symlink_exists()
 }
 
 #
-# ## directory_exists
+# ## directory\_exists()
 #
 # Check if a directory name/path exists.
 #
@@ -2357,7 +2357,7 @@ directory_exists()
 }
 
 #
-# ## function_name
+# ## directories\_in()
 #
 # Function Description
 #
@@ -2409,6 +2409,10 @@ directories_in()
   fi
 }
 
+#
+# ## directories\_in\_matching()
+#
+#
 directories_in_matching()
 {
   local _path="${1:-}" _pattern="${2:-}"
@@ -2436,6 +2440,10 @@ directories_in_matching()
   fi
 }
 
+#
+# ## directories\_under()
+#
+#
 directories_under()
 {
   local _path="${1:-}"
@@ -2458,6 +2466,10 @@ directories_under()
   fi
 }
 
+#
+# ## directories\_under\_matching()
+#
+#
 directories_under_matching()
 {
   local _path="${1:-}"
@@ -2488,7 +2500,7 @@ directories_under_matching()
 }
 
 #
-# ## function_name
+# ## files\_in()
 #
 # Function Description
 #
@@ -2541,7 +2553,7 @@ files_in()
 }
 
 #
-# ## function_name
+# ## files\_under()
 #
 # Function Description
 #
@@ -2594,7 +2606,7 @@ files_under()
 }
 
 #
-# ## files_in_path_matching
+# ## files\_in\_path\_matching()
 #
 # Find all files in given path matching a given name glob pattern.
 #
@@ -2655,7 +2667,7 @@ files_in_path_matching()
 }
 
 #
-# ## replace_content
+# ## replace\_content()
 #
 # Replaces a given (sed compatable) pattern with given replacement text in a
 # file.
@@ -2760,7 +2772,7 @@ replace_content()
 }
 
 #
-# ## file_matches_md5
+# ## file\_matches\_md5()
 #
 # Checks to see if the given file matches the given md5 sum.
 #
@@ -2824,6 +2836,11 @@ file_matches_md5()
   fi
 }
 
+#
+# ## extract\_archive()
+#
+#
+#
 extract_archive()
 {
   local _archive="${1:-}"
@@ -2869,6 +2886,11 @@ extract_archive()
 
 }
 
+#
+# ## file\_md5()
+#
+#
+#
 file_md5()
 {
   local _file="${1:-}" _command _md5

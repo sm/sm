@@ -4,7 +4,7 @@
 # # Array Module
 #
 #
-# ## array_is_nonempty()
+# ## array\_is\_nonempty()
 #
 # Checks to see if an array with the name given as the first parameter
 # is nonempty.
@@ -51,7 +51,7 @@ array_is_nonempty()
 }
 
 #
-# ## array_is_empty()
+# ## array\_is\_empty()
 #
 # Checks to see if an array with the name given as the first parameter is empty.
 #
@@ -97,7 +97,7 @@ array_is_empty()
 }
 
 #
-# ## array_length()
+# ## array\_length()
 #
 # Return the length of the given array.
 #
@@ -137,7 +137,7 @@ array_length()
 }
 
 #
-# ## array_last_element()
+# ## array\_last\_element()
 #
 # Print the last element of the given array.
 #
@@ -179,7 +179,7 @@ array_last_element()
 }
 
 #
-# ## array_first_element()
+# ## array\_first\_element()
 #
 # Print the first element of the given array.
 #
@@ -219,7 +219,7 @@ array_first_element()
 }
 
 #
-# ## array_push()
+# ## array\_push()
 #
 # Appends one or more elements to the array with the given name.
 #
@@ -275,7 +275,7 @@ array_push()
 }
 
 #
-# ## array_append()
+# ## array\_append()
 #
 # Return the length of the given array.
 #
@@ -329,7 +329,7 @@ array_append()
 }
 
 #
-# ## array_shift()
+# ## array\_shift()
 #
 # Removes the first element of the array and prints it.
 #
@@ -383,7 +383,7 @@ array_shift()
 }
 
 #
-# ## array_unshift()
+# ## array\_unshift()
 #
 #   Prepends one or more elements to the array whose name is given, in the order
 #   given.
@@ -440,7 +440,7 @@ array_unshift()
 }
 
 #
-# ## array_join()
+# ## array\_join()
 #
 # Joins the named array into a string separated by either a space or
 # a given string.
@@ -494,7 +494,7 @@ array_join()
 }
 
 #
-# ## array_largest()
+# ## array\_largest()
 #
 # Outputs the first string in the array with the largest length.
 #
@@ -544,7 +544,7 @@ array_largest()
 }
 
 #
-# ## array_sort_desc()
+# ## array\_sort\_desc()
 #
 # Sorts the named array contents in descending order.
 #
@@ -594,7 +594,7 @@ array_sort_desc()
 }
 
 #
-# ## array_sort_asc()
+# ## array\_sort\_asc()
 #
 # Sorts the named array contents in ascending order.
 #
@@ -645,7 +645,7 @@ array_sort_asc()
 
 
 #
-# ## array_unique()
+# ## array\_unique()
 #
 # Sorts the named array contents in ascending order.
 #

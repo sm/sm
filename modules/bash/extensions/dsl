@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# ## extension_action()
+# ## extension\_action()
 #
 # Load the environment for a given extension action and then call it.
 # This is the main function for BDSM.
@@ -191,7 +191,7 @@ extension_action()
 }
 
 #
-# ## extension_reload()
+# ## extension\_reload()
 #
 # Reloads (re-sources) the current extension's DSL and initialization files.
 #
@@ -228,7 +228,7 @@ extension_reload()
 }
 
 #
-# ## extension_reinitialize()
+# ## extension\_reinitialize()
 #
 # Reinitializes the current extension.
 #
@@ -265,7 +265,7 @@ extension_reinitialize()
 }
 
 #
-# ## extension_version()
+# ## extension\_version()
 #
 # Outputs the named extension's version
 #
@@ -314,7 +314,7 @@ extension_version()
 }
 
 #
-# ## extension_licence()
+# ## extension\_licence()
 #
 # Emits the extension's license file, if it exists.
 #
@@ -371,7 +371,7 @@ extension_license()
 }
 
 #
-# ## extensions_installed()
+# ## extensions\_installed()
 #
 # Lists the extensions installed on the currently running process's system.
 #
@@ -413,7 +413,7 @@ extensions_installed()
 }
 
 #
-# ## extensions_available()
+# ## extensions\_available()
 #
 # Lists the extensions available to install on the currently running process's
 # system.
@@ -456,7 +456,7 @@ extensions_available()
 }
 
 #
-# ## extensions_in_development()
+# ## extensions\_in\_development()
 #
 # Lists the extensions available in the development repository, if set.
 #
@@ -500,7 +500,7 @@ extensions_in_development()
 }
 
 #
-# ## extensions_in()
+# ## extensions\_in()
 #
 # Lists the extensions in a given directory.
 #
@@ -571,7 +571,7 @@ extensions_in()
 }
 
 #
-# ## extension_actions()
+# ## extension\_actions()
 #
 # Lists actions exposed by the named extension.
 #
@@ -634,7 +634,7 @@ extension_actions()
 }
 
 #
-# ## extension_is_installed()
+# ## extension\_is\_installed()
 #
 # Tests if a given extension is installed.
 #
@@ -703,7 +703,7 @@ extension_is_installed()
 
 
 #
-# ## extensions_install()
+# ## extensions\_install()
 #
 # Installs the given extensions.
 #
@@ -765,7 +765,7 @@ extensions_install()
 }
 
 #
-# ## extension_install()
+# ## extension\_install()
 #
 # Installs the given extension.
 #

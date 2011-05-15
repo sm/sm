@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# ## show_help()
+# ## show\_help()
 #
 # Display help for the current extension based on settings declared in the help
 # action.
@@ -130,42 +130,6 @@ help_description()
       printf "  %s\n" "${_description}"
     done
   fi
-}
-
-#
-# ## actions()
-#
-# Set the string that will be printed when the actions help section is output.
-#
-# ### Input Parameters
-#
-# First parameter is a string of the action descriptions.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if no actions are given.
-#
-# ### Usage Examples
-#
-#     user$ actions "install  - Installs the extension..."
-#
-actions()
-{
-  [[ -n "$*" ]] || fail "No help actions were given."
-  warn "help actions() is depreciated, use action() instead for each action."
-  help_actions="$*"
 }
 
 #
@@ -317,7 +281,7 @@ resource()
 }
 
 #
-# ## help_actions()
+# ## help\_actions()
 #
 # Outputs the help actions in a formatted manner.
 # Outputs a message if there are no actions.
@@ -383,7 +347,7 @@ help_actions()
 }
 
 #
-# ## help_notes()
+# ## help\_notes()
 #
 # Outputs the help notes in a formatted manner.
 # Outputs a message if there are no notes.
@@ -440,7 +404,7 @@ help_notes()
 }
 
 #
-# ## help_dependencies()
+# ## help\_dependencies()
 #
 # Outputs the help dependencies in a formatted manner.
 #
@@ -482,7 +446,7 @@ help_dependencies()
 }
 
 #
-# ## help_resources()
+# ## help\_resources()
 #
 # Outputs the help notes in a formatted manner.
 # Outputs a message if there are no notes.
@@ -526,7 +490,7 @@ help_resources()
 }
 
 #
-# ## help_section()
+# ## help\_section()
 #
 # Displays a help section header.
 #
@@ -560,7 +524,7 @@ help_section()
 }
 
 #
-# ## help_usage()
+# ## help\_usage()
 #
 # Display the CLI signature.
 #

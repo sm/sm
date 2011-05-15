@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# ## project_initialize()
+# ## project\_initialize()
 #
 # Initializes paths and environment for the logical concept of a 'project'.
 #

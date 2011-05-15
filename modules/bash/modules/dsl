@@ -71,7 +71,7 @@ modules()
 }
 
 #
-# ## module_load()
+# ## module\_load()
 #
 # Function Description
 #
@@ -119,7 +119,7 @@ module_load()
 }
 
 #
-# ## module_is_loaded()
+# ## module\_is\_loaded()
 #
 # Checks to see whether or not the named module has been loaded or not.
 #
@@ -167,7 +167,7 @@ module_is_loaded()
 }
 
 #
-# ## modules_loaded()
+# ## modules\_loaded()
 #
 # Outputs a list of all modules that have been loaded.
 #
@@ -199,6 +199,7 @@ modules_loaded()
 }
 
 # Print out a list of all installed modules.
+# ## modules\_installed()
 modules_installed()
 {
   local _module
@@ -211,7 +212,7 @@ modules_installed()
 }
 
 #
-# ## module_dsl()
+# ## module\_dsl()
 #
 # Print out a list of all dsl for the given module.
 #
@@ -262,7 +263,7 @@ module_dsl()
 }
 
 #
-# ## modules_list()
+# ## modules\_list()
 #
 # Lists dsl for all modules.
 #
@@ -323,7 +324,7 @@ modules_list()
 }
 
 #
-# ## modules_docs()
+# ## modules\_docs()
 #
 # Output the module DSL documentation for a given module name.
 #
@@ -425,7 +426,7 @@ module_docs()
 }
 
 #
-# ## modules_docgen()
+# ## modules\_docgen()
 #
 # Lists dsl for all modules.
 #
@@ -508,6 +509,7 @@ modules_docgen()
   fi
 }
 
+# ## modules_docopen()
 modules_docopen()
 {
   # TODO: Replace with,
@@ -525,6 +527,7 @@ modules_docopen()
   fi
 }
 
+# ## modules_site_docopen()
 modules_site_docgen()
 {
   # TODO: Replace with,

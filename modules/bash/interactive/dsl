@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# ## shell_is_interactive()
+# ## shell\_is\_interactive()
 #
 # Test if the current shell is an interactive shell.
 #

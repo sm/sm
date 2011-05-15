@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# ## command_exists()
+# ## command\_exists()
 #
 # Checks to see whether a command exists within the current environment and PATH
 #
@@ -54,7 +54,7 @@ command_exists()
 }
 
 #
-# ## is_a_function()
+# ## is\_a\_function()
 #
 # Checks to see whether a named function exists within the current environment
 #
@@ -111,7 +111,7 @@ is_a_function()
 }
 
 #
-# ## shell_is_interactive()
+# ## shell\_is\_interactive()
 #
 # Checks if the currently running shell is interactive (user controlled).
 #

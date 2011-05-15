@@ -4,7 +4,7 @@
 # # General Services functions.
 #
 #
-# ## services_list()
+# ## services\_list()
 #
 # List installed services. These are extensions that have loaded the service
 # module.
@@ -41,7 +41,7 @@
 # # General Services functions.
 #
 #
-# ## services_list()
+# ## services\_list()
 #
 # List installed services. These are extensions that have loaded the service
 # module.
@@ -82,7 +82,7 @@ services_avilable()
 }
 
 #
-# ## services_installed()
+# ## services\_installed()
 #
 # List installed services. These are extensions that have loaded the service
 # module.
@@ -121,7 +121,7 @@ services_installed()
 }
 
 #
-# ## services_available()
+# ## services\_available()
 #
 # List available services. These are extensions that load the service module.
 #
@@ -162,7 +162,7 @@ services_available()
 # # Single Service functions.
 #
 #
-# ## service_setup()
+# ## service\_setup()
 #
 # Service setup and configuration.
 #
@@ -222,7 +222,7 @@ service_setup()
 # # Single Service functions.
 #
 #
-# ## service_uninstall()
+# ## service\_uninstall()
 #
 # Service uninstall and configuration.
 #
@@ -262,7 +262,7 @@ service_uninstall()
 }
 
 #
-# ## service_start()
+# ## service\_start()
 #
 # Starts the given service using init scripts.
 #
@@ -314,7 +314,7 @@ service_start()
 }
 
 #
-# ## service_stop()
+# ## service\_stop()
 #
 # stops the given service using init scripts.
 #
@@ -361,7 +361,7 @@ service_stop()
 }
 
 #
-# ## service_reload()
+# ## service\_reload()
 #
 # reloads the given service using init scripts.
 #
@@ -408,7 +408,7 @@ service_reload()
 }
 
 #
-# ## service_restart()
+# ## service\_restart()
 #
 # restarts the given service using init scripts.
 #
@@ -456,7 +456,7 @@ service_restart()
 }
 
 #
-# ## service_status()
+# ## service\_status()
 #
 # statuss the given service using init scripts.
 #
@@ -503,7 +503,7 @@ service_status()
 }
 
 #
-# ## service_logtail()
+# ## service\_logtail()
 #
 # logtails the given service using init scripts.
 #
@@ -551,7 +551,7 @@ service_logtail()
 }
 
 #
-# ## service_info()
+# ## service\_info()
 #
 # infos the given service using init scripts.
 #
@@ -599,7 +599,7 @@ service_info()
 }
 
 #
-# ## service_configcheck()
+# ## service\_configcheck()
 #
 # configchecks the given service using init scripts.
 #
@@ -644,7 +644,7 @@ service_configcheck()
 }
 
 #
-# ## service_usage()
+# ## service\_usage()
 #
 # usages the given service using init scripts.
 #
@@ -697,7 +697,7 @@ Options:
 }
 
 #
-# ## service_cli()
+# ## service\_cli()
 #
 # clis the given service using init scripts.
 #
@@ -804,7 +804,7 @@ service_cli()
 }
 
 #
-# ## service_pid()
+# ## service\_pid()
 #
 # List installed services. These are extensions that have loaded the service
 # module.
@@ -863,7 +863,7 @@ service_pid()
 }
 
 #
-# ## service_load_conf_d()
+# ## service\_load\_conf\_d()
 #
 # Load the /etc/conf.d/{service}.conf configuration file into the calling
 # environment.
@@ -902,7 +902,7 @@ service_load_conf_d()
 # # Service init functions.
 #
 #
-# ## service_install_init_d()
+# ## service\_install\_init\_d()
 #
 # Installs the BDSM service module init.d script for the current extension.
 #
@@ -979,7 +979,7 @@ service_install_init_d()
 }
 
 #
-# ## service_init_path()
+# ## service\_init\_path()
 #
 # Sets the PATH explicitely for purposes of the current service extension.
 #
@@ -1013,7 +1013,7 @@ service_init_path()
 }
 
 #
-# ## service_init_start()
+# ## service\_init\_start()
 #
 # This is the generalized service init start function.
 #
@@ -1078,7 +1078,7 @@ service_init_start()
 }
 
 #
-# ## service_init_stop()
+# ## service\_init\_stop()
 #
 # This is the generalized service init stop function.
 #
@@ -1126,7 +1126,7 @@ service_init_stop()
 }
 
 #
-# ## service_init_status()
+# ## service\_init\_status()
 #
 # This is the generalized service init status function.
 #
@@ -1181,7 +1181,7 @@ service_init_status()
 }
 
 #
-# ## service_init_reload()
+# ## service\_init\_reload()
 #
 # This is the generalized service init reload function.
 #
@@ -1236,7 +1236,7 @@ service_init_reload()
 }
 
 #
-# ## service_init_usage()
+# ## service\_init\_usage()
 #
 # This is the generalized service init usage function.
 #
@@ -1270,7 +1270,7 @@ service_init_usage()
 }
 
 #
-# ## service_init_logtail()
+# ## service\_init\_logtail()
 #
 # This is the generalized service init logtail function.
 #
@@ -1306,7 +1306,7 @@ service_init_logtail()
 }
 
 #
-# ## service_init_info()
+# ## service\_init\_info()
 #
 # This is the generalized service init info function.
 #
@@ -1340,7 +1340,7 @@ service_init_info()
 }
 
 #
-# ## service_conf_d()
+# ## service\_conf\_d()
 #
 # Installs the conf.d template for the service, if it exists.
 #
@@ -1393,7 +1393,7 @@ service_conf_d()
 }
 
 #
-# ## service_init_start()
+# ## service\_init\_start()
 #
 # This is the generalized service init start function.
 #
@@ -1443,7 +1443,7 @@ service_init_action()
 }
 
 #
-# ## service_init_d()
+# ## service\_init\_d()
 #
 # The main logic for generalized service init.d scripts.
 #
@@ -1492,7 +1492,7 @@ service_init_d()
 }
 
 #
-# ## service_deactivate()
+# ## service\_deactivate()
 #
 # Deactivates the named service or
 #
@@ -1560,7 +1560,7 @@ service_deactivate()
 }
 
 #
-# ## service_activate()
+# ## service\_activate()
 #
 # Activates the named service or
 #
@@ -1656,6 +1656,10 @@ service_activate()
   fi
 }
 
+#
+# ## service\_status()
+#
+#
 service_status()
 {
   log "${service}:"

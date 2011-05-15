@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# ## package_error
+# ## package\_error
 #
 # Presents the user with a package related error message including the tail
 # of an optional log file.
@@ -61,7 +61,7 @@ package_error()
 }
 
 #
-# ## package_definition
+# ## package\_definition
 #
 # Enables module developers to easily set package variables in name, value pairs.
 #
@@ -174,7 +174,7 @@ package_definition()
 }
 
 #
-# ## package_install
+# ## package\_install
 #
 # Performs all package installation steps:
 # * download
@@ -328,7 +328,7 @@ package_install()
 }
 
 #
-# ## package_fetch_md5
+# ## package\_fetch\_md5
 #
 # Fetches the package's md5 sum from the md5_url, if given.
 #
@@ -381,7 +381,7 @@ package_fetch_md5()
 }
 
 #
-# ## package_fetch
+# ## package\_fetch
 #
 # Fetches the package's archive file.
 #
@@ -440,7 +440,7 @@ package_fetch()
 }
 
 #
-# ## package_extract
+# ## package\_extract
 #
 # Extracts the package archive into the package source directory.
 #
@@ -479,7 +479,7 @@ package_extract()
 }
 
 #
-# ## package_configure
+# ## package\_configure
 #
 # Configures the package source (eg. ./configure ...).
 #
@@ -535,7 +535,7 @@ package_configure()
 }
 
 #
-# ## package_build
+# ## package\_build
 #
 # builds the package source (eg. make)
 #
@@ -587,7 +587,7 @@ package_build()
 }
 
 #
-# ## package_make_install
+# ## package\_make\_install
 #
 # make install  the package source (eg. make)
 #
@@ -639,7 +639,7 @@ package_make_install()
 }
 
 #
-# ## package_activate
+# ## package\_activate
 #
 # activates the package
 #
@@ -705,7 +705,7 @@ package_activate()
 }
 
 #
-# ## package_setup
+# ## package\_setup
 #
 # Sets up the package
 #
@@ -753,7 +753,7 @@ package_setup()
 }
 
 #
-# ## package_deactivate
+# ## package\_deactivate
 #
 # deactivates the package
 #
@@ -821,7 +821,7 @@ package_deactivate()
 }
 
 #
-# ## package_activate_if_first
+# ## package\_activate\_if\_first
 #
 # Activates the package version , if another package version has not yet been
 # activated.
@@ -871,7 +871,7 @@ package_activate_if_first()
 }
 
 #
-# ## package_ldconfig
+# ## package\_ldconfig
 #
 # Sets up system level ldconfigs for the package libraries.
 #
@@ -938,7 +938,7 @@ package_ldconfig()
 }
 
 #
-# ## package_profile_d
+# ## package\_profile\_d
 #
 # Sets up system level profile_d configuration for the package
 #
@@ -988,7 +988,7 @@ package_profile_d()
 }
 
 #
-# ## package_uninstall
+# ## package\_uninstall
 #
 # Uninstalls the package
 #
@@ -1040,7 +1040,7 @@ package_uninstall()
 }
 
 #
-# ## package_patch
+# ## package\_patch
 #
 # Applies any patches found for the current package.
 #
@@ -1115,7 +1115,7 @@ package_patch()
 }
 
 #
-# ## package_apply_patches
+# ## package\_apply\_patches
 #
 # Applies patches found
 #
@@ -1163,7 +1163,7 @@ package_apply_patches()
 }
 
 #
-# ## package_usage
+# ## package\_usage
 #
 # Sets up system level usage configuration for the package
 #
@@ -1216,7 +1216,7 @@ package_usage() {
 }
 
 #
-# ## package_cli
+# ## package\_cli
 #
 # Parses package CLI arguments
 #
@@ -1326,7 +1326,7 @@ package_cli()
 }
 
 #
-# ## package_active
+# ## package\_active
 #
 # Parses package active arguments
 #
@@ -1377,7 +1377,7 @@ package_is_active()
 }
 
 #
-# ## package_must be
+# ## package\_must\_be\_active
 #
 # Parses package must be arguments
 #
@@ -1427,7 +1427,7 @@ package_must_be_active()
 }
 
 #
-# ## packages_must_be_active
+# ## packages\_must\_be\_active
 #
 # Parses package must_be_active arguments
 #
@@ -1475,7 +1475,7 @@ packages_must_be_active()
 }
 
 #
-# ## package_docs
+# ## package\_docs
 #
 # Opens package documentation website either in the web browser (if able) or via
 # curl through PAGER (defaulting to less).
@@ -1534,7 +1534,7 @@ package_docs()
 }
 
 #
-# ## package_website
+# ## package\_website
 #
 # Opens package documentation website either in the web browser (if able) or via
 # curl through PAGER (defaulting to less).

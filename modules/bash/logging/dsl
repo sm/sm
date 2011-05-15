@@ -51,7 +51,7 @@ log()
       (*)
         _message="${_token}"
         ;;
-    esac
+   esac
   done
 
   if [[ -z "${_message:-}" ]]
@@ -424,7 +424,7 @@ logrotate()
   rm "${file}.$$.log"
 }
 
-# ## log_streams()
+# ## log\_streams()
 #
 # Log streams to three files:
 #   - standard out

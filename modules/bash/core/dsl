@@ -131,7 +131,7 @@ then
 
   command_not_found_handle()
   {
-    if [[ -n "${MC_SID}" || ! -t 1 ]]
+    if [[ -n "$MC_SID" || ! -t 1 ]]
     then # do not run when inside Midnight Commander or within a Pipe
       command_not_found "$@"
     fi
