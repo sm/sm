@@ -29,6 +29,7 @@
 #     user$ echo "'$PS4'"
 #     ' > ${BASH_SOURCE##${bdsm_path}\/} ${FUNCNAME[0]:+${FUNCNAME[0]}()} ${LINENO} $ '
 #
+# ### Code Walkthrough
 set_ps4()
 {
   # Set the PS4 variable
@@ -86,10 +87,10 @@ trace()
   then
     # set and export the trace flag to 1
     export trace_flag=1
-    # Start shell tracing
+    # Turn on shell tracing
     set -o xtrace
   else
-    # Stop shell tracing
+    # Turn on shell tracing
     set +o xtrace
     # set and export the trace flag to 0
     export trace_flag=0
@@ -198,6 +199,7 @@ debug()
   # Declare the option varibale and set it to the first parameter, if nonempty,
   # and to 'on' if no parameters were given.
   local _option="${1:-on}"
+  # ### Code Walkthrough
 
   # If the option variable is set to on (the default) then
   if [[ "${_option}" = "on" ]]
@@ -334,7 +336,7 @@ enable_backtrace()
     # Enable the backtrace with no message attached to the backtrace call.
     trap "backtrace \"A command has returned an unhandled error code (nonzero return value).\"" ERR
   fi
-  # Set the shell exit on error option
+  # Turn on shell exit on error option
   set -o errexit
 }
 
@@ -456,57 +458,100 @@ disable_backtrace()
 # ### Code Walkthrough
 backtrace()
 {
+  # Turn off shell tracing
   set +o xtrace
-  local _separator _columns=$(tput cols)
-  printf -v _separator '%*s' "${_columns:-${COLUMNS:-80}}"
-  local _message="${1:-}"
 
-  if [[ -n "${_message}" ]]
+  # Declare separator and columns variables. Initialize columns to the terminal
+  local _separator _columns
+
+  # If setting the columns via tput does not work
+  if ! _columns=$(tput cols)
   then
-    printf "\n${_message}\n\n"
+    # then default the columns to 80
+    _columns=80
   fi
 
+  # Set the separator variable contents to the separator filled out to the
+  # number of columns.
+  printf -v _separator '%*s' "${_columns:-${COLUMNS:-80}}"
+
+  # Store the passed in message, if given as the first parameter, in the
+  # message variable, default to empty string.
+  local _message="${1:-}"
+
+  # If a message was given
+  if [[ -n "${_message}" ]]
+  then
+    # Print the message to the calling environment's STDERR
+    printf "\n${_message}\n\n" >&2
+  fi
+
+  # Declare function local variables
   local _source _function _line _index _largest _format _digits _longest
 
+  # Loop over the function names in the function array stack to determine
+  # which has the longest length.
+  # Note that we do not use array_largest here as we are in an error function.
   for (( _index=0 ; _index < ${#FUNCNAME[@]} ; _index++ ))
   do
+    # For each function name in the stack if the function name is longer than
+    # the length of current largest then
     if (( ${#FUNCNAME[${_index}]} > ${#_largest} ))
     then
+      # set it as the new largest element
       _largest=${FUNCNAME[${_index}]}
     fi
   done
 
+  # Loop over the bash source files array in order to determine
+  # which has the the longest length.
+  # Note that we do not use array_largest here as we are in an error function.
   for (( _index=0 ; _index < ${#BASH_SOURCE[@]} ; _index++ ))
   do
+    # For each source file in the source files array, if the file name/path
+    # is longer than the current longest then
     if (( ${#BASH_SOURCE[${_index}]} > ${#_longest} ))
     then
+      # set it as the new longest element
       _longest=${BASH_SOURCE[${_index}]}
     fi
   done
 
   for (( _index=0 ; _index < ${#BASH_LINENO[@]} ; _index++ ))
   do
+    # For each line number in the line numbers array, if the number of digits
+    # is longer than the current longest digits then
     if (( ${#BASH_LINENO[${_index}]} > ${#_digits} ))
     then
+      # set it as the new largest digit
       _digits=${BASH_LINENO[${_index}]}
     fi
   done
 
-  case "${EDITOR:-}" in
+  # Determine the format string output for the backtrace based on the users
+  # set editor. If an editor has not been set, default the editor variable to
+  # the pager or empty string.
+  case "${EDITOR:=${PAGER:-}}" in
     (mvim*|mate*)
-      #_format=" %-$((${#_largest} + 2))s %-$((${#EDITOR} + ${#_digits} + 19 + ${#_longest}))s\n"
+      # Set the format based on GUI editing tools format for opening
+      # a file to a given line using a file URI.
       _format="%-$((${#_largest} + 2))s %-s\n"
+      # Print the backtrace header to the calling environment's STDERR
       printf "${_format}" "function()" "Source"  1>&2
       ;;
     (vi*|gvim*|emacs*|*)
+      # Set the format based on the console editing tools format for opening
+      # a file to a given line.
       _format="%-$((${#_largest} + 2))s $ %${#EDITOR}s +%-$((${#_digits}))s %-$((${#_longest} + 2))s %s\n"
+      # Print the backtrace header to the calling environment's STDERR
       printf "${_format}" "function()" ' ' "#" "source file"  1>&2
-
       ;;
   esac
 
+  # Print the backtrace separator line.
   printf "${_separator// /=}\n" 1>&2
 
+  # Iterate over the functions array stack skipping this backtrace function [0]
   for (( _index=1 ; _index < ${#FUNCNAME[@]} ; ++_index ))
   do
     _source="${BASH_SOURCE[${_index}]}"
@@ -519,19 +564,33 @@ backtrace()
         ;;
     esac
 
+    # Determine the format string output for the backtrace based on the users
+    # set editor. Note that if an editor was not set then previously we have
+    # defualted it to the pager. If no pager is set we simply output a standard
+    # unix utility trace line.
     case "${EDITOR:-}" in
+      # Print with the format and content for GUI editing tools a file to open a
+      # given line using a file URI.
       (mvim*|mate*)
+        # Print the backtrace line to the calling environment's STDERR
         printf "${_format}" "${_function}" "${EDITOR// *}://open?url=file://${_source}&line=${_line}" 1>&2
         ;;
+      # Print with the format and content for console editing tools a to open a
+      # file to a given line.
       (vi*|gvim*|emacs*|*)
+        # Print the backtrace line to the calling environment's STDERR
         printf "${_format}" "${_function}" "${EDITOR}" "${_line}" "${_source} " 1>&2
         ;;
     esac
   done
+
+  # Print the backtrace separator line.
   printf "${_separator// /=}\n" 1>&2
 
+  # If the trace flag is nonnegative then
   if (( trace_flag > 0 ))
   then
+    # turn tracing back on
     enable_trace
   fi
 }
