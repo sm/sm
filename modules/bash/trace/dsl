@@ -31,8 +31,14 @@
 #
 set_ps4()
 {
+  # Set the PS4 variable
   PS4=" > \${BASH_SOURCE##\${bdsm_path}\/} \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO} $ "
+  # Export the PS4 variabel so that this script and called bash scripts will
+  # display a more detailed and formatted trace output.
   export PS4
+
+  # Return true, 0, for success.
+  return 0
 }
 
 #
@@ -68,16 +74,24 @@ set_ps4()
 #     >  trace() 3 $ [[ off = \o\n ]]
 #     >  trace() 8 $ set +o xtrace
 #
+# ### Code Walkthrough
 trace()
 {
+  # Declare the option varibale and set it to the first parameter, if nonempty,
+  # and to 'on' if no parameters were given.
   local _option="${1:-on}"
 
+  # If the option is on (default) then
   if [[ "${_option}" = "on" ]]
   then
+    # set and export the trace flag to 1
     export trace_flag=1
+    # Start shell tracing
     set -o xtrace
   else
+    # Stop shell tracing
     set +o xtrace
+    # set and export the trace flag to 0
     export trace_flag=0
   fi
 }
@@ -107,8 +121,10 @@ trace()
 #
 #     user$ enable_trace
 #
+# ### Code Walkthrough
 enable_trace()
 {
+  # Enable shell tracing
   trace on
 }
 
@@ -137,8 +153,10 @@ enable_trace()
 #
 #     user$ disable_trace
 #
+# ### Code Walkthrough
 disable_trace()
 {
+  # Disable shell tracing
   trace off
 }
 
@@ -174,15 +192,24 @@ disable_trace()
 #     >  debug() 3 $ [[ off = \o\n ]]
 #     >  debug() 8 $ set +o xdebug
 #
+# ### Code Walkthrough
 debug()
 {
+  # Declare the option varibale and set it to the first parameter, if nonempty,
+  # and to 'on' if no parameters were given.
   local _option="${1:-on}"
 
-  if [[ "${_option}" = "on" ]] ;then
+  # If the option variable is set to on (the default) then
+  if [[ "${_option}" = "on" ]]
+  then
+    # Set and export the debug_flag variable to 1 (enable)
     export debug_flag=1
+    # Enable verbose shell echoing (every code line is printed before execution)
     set -o verbose
   else
+    # Disable verbose shell echoing.
     set +o verbose
+    # Set and export the debug_flag variable to 0 (disable)
     export debug_flag=0
   fi
 }
@@ -211,8 +238,11 @@ debug()
 # ### Usage Examples
 #
 #     user$ enable_debug
+#
+# ### Code Walkthrough
 enable_debug()
 {
+  # Turn debugging on.
   debug on
 }
 
@@ -241,8 +271,10 @@ enable_debug()
 #
 #     user$ disable_debug
 #
+# ### Code Walkthrough
 disable_debug()
 {
+  # Turn debugging off
   debug off
 }
 
@@ -286,16 +318,23 @@ disable_debug()
 #        Trace   Function           Line  File
 #           1.   main()                7  /Users/wayneeseguin/test
 #
+# ### Code Walkthrough
 enable_backtrace()
 {
+  # Declare a message local variable and set it to the first parameter or empty
+  # string if the first paramter was not passed in.
   local _message="${1:-}"
 
-  if [[ -n "${_message}" ]]
+  # If the message variable is not empty then
+  if variable_is_nonempty _message
   then
+    # Enable the backtrace with the message attached to the backtrace call.
     trap "backtrace \"${_message}\"" ERR
   else
+    # Enable the backtrace with no message attached to the backtrace call.
     trap "backtrace \"A command has returned an unhandled error code (nonzero return value).\"" ERR
   fi
+  # Set the shell exit on error option
   set -o errexit
 }
 
@@ -332,10 +371,14 @@ enable_backtrace()
 #
 #     user$ ./test
 #     Error exit with backtrace is now off.
-
+#
+# ### Code Walkthrough
 disable_backtrace()
 {
+  # Turn off shell error exit option.
   set +o errexit
+
+  # Clear all ERR signal traps.
   trap - ERR
 }
 
@@ -410,6 +453,7 @@ disable_backtrace()
 #      > /Users/wayneeseguin/test functiona() 12 $ echo 'function a'
 #     function a
 #
+# ### Code Walkthrough
 backtrace()
 {
   set +o xtrace
