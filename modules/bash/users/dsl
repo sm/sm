@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# ## user_create_if_missing()
+# ## user\_create\_if\_missing()
 #
 # Create a system user if it does not exist on the system.
 #
@@ -36,9 +36,14 @@ user_create_if_missing()
   # Declare the token, group and user variables.
   local _token _group _user
   # parse arguments
-  while (( $# > 0 )) ; do
-    _token="$1" ; shift
+  while (( $# > 0 ))
+  do
+    # Set the token to the first parameter
+    _token="$1"
+    # Remove the token from the parameters list
+    shift
 
+    # Switched based on the value of the token
     case "${_token}" in
       # if the token is 'group' then
       group)
@@ -145,7 +150,7 @@ user_create_if_missing()
 }
 
 #
-# ## user_delete()
+# ## user\_delete()
 #
 # Deletes the named system user.
 #
@@ -173,7 +178,7 @@ user_create_if_missing()
 #
 #     user$ user_delete "nginx"
 #
-# ### Code Walkthrough`
+# ### Code Walkthrough
 user_delete()
 {
   # #### TODO: Finish documenting this function
@@ -278,7 +283,7 @@ user_delete()
 }
 
 #
-# ## user_is_root()
+# ## user\_is\_root()
 #
 # Tests if the user the current process is running as is root.
 #
@@ -328,7 +333,7 @@ user_is_root()
 }
 
 #
-# ## user_is_not_root()
+# ## user\_is\_not\_root()
 #
 # Tests if the user the current process is running as is not root.
 #
@@ -378,7 +383,7 @@ user_is_not_root()
 }
 
 #
-# ## user_must_be_root()
+# ## user\_must\_be\_root()
 #
 # Halts the calling program with a failure message if the user is not root.
 #
@@ -422,7 +427,7 @@ user_must_be_root()
 }
 
 #
-# ## user_must_not_be_root()
+# ## user\_must\_not\_be\_root()
 #
 # Halts the calling program with a failure message if the user is not root.
 #
@@ -466,7 +471,7 @@ user_must_not_be_root()
 }
 
 #
-# ## user_run_as()
+# ## user\_run\_as()
 #
 # Runs a command as a given user.
 #
@@ -522,7 +527,7 @@ user_run_as()
 }
 
 #
-# ## user_run_as_login()
+# ## user\_run\_as\_login()
 #
 # Runs a command as a given user, in that users login shell.
 #
