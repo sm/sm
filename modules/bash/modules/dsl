@@ -496,8 +496,15 @@ modules_docgen()
       _base="${_prefix}/${_module}"
       log "Generating ${_base}.html"
       module_docs "${_module}" > "${_base}.html"
+
       log "<li><a href=\"./${_module}.html\">${_module}</a></li>" \
         >> "${_prefix}/index.html"
+
+      # Replace the shocco generated css url with a local filesystem css file
+      # so that a network request is not required in order to have styling when
+      # viewing the documentation offline.
+      replace_content "http://jashkenas.github.com/docco/resources/docco" \
+        with "../css/shocco" in "${_base}.html"
       )&
     done
     wait
