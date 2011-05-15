@@ -57,7 +57,6 @@ array_is_nonempty()
     else
       # otherwise return false, 1
       return 1
-    else
     fi
   else
     # otherwise the array name variable was not passed in. This is a programming
@@ -119,6 +118,7 @@ array_is_empty()
       return 0
     else
       # otherwise return false, 1
+      return 1
     fi
   else
     # otherwise the array name variable was not passed in. This is a programming
