@@ -27,20 +27,32 @@
 #     user$ {{ setup the scenario }}
 #     user$ function_name {{ parameters }}
 #     user$ {{ demonstrate the results}}
+#
+# ### Code Walkthrough
 template_exists()
 {
-  if [[ -z "${1:-}" ]]
+  local _template_name="${1:-}"
+  if [[ -n "${_template_name}" ]]
   then
-    fail "Cannot check if a template exists as no template name was given."
-  fi
+    # Set the template file to be the full path to the current extensions
+    # templates directory and template name.template
+    local _template="${extension_templates_path}/${_template_name}.template"
 
-  local _template="${extension_templates_path}/${1}.template"
-
-  if [[ -s "${_template}" ]]
-  then
-    return 0
+    # If the template exists and is nonempty
+    if [[ -s "${_template}" ]]
+    then
+      # then return true/success, 0
+      return 0
+    else
+      # otherwise return false/error, 1 (nonzero)
+      return 1
+    fi
   else
-    return 1
+    # Fail yielding a backtrace as no template name was given this is a
+    # programming error and the developer will be able to debug with the
+    # backtrace.
+    fail "Cannot check if a template exists"\
+      "as no template name was given as the first parameter."
   fi
 }
 
@@ -77,91 +89,143 @@ template_exists()
 #           to "${nginx_path}/nginx.conf" \
 #           mode 0644 owner "${nginx_user}"
 #
+# ### Code Walkthrough
 install_template()
 {
-  local _template _name _target _source="${extension_templates_path}" _mode=0644 _owner=$USER
+  # Declare function local variables, also set source mode and owner defaults
+  local _template _name _target _source="${extension_templates_path}" \
+    _mode=0644 _owner=$USER
 
-  while (( $# > 0 )) ; do
-    token="${1}" ; shift
+  # While there are still function parameters left
+  while (( $# > 0 ))
+  do
+    # Grab a parameter
+    token="${1}"
+    # and shift it off of the parameter list
+    shift
 
+    # Then switch based on what the parameter contains.
     case "${token}" in
+      # If the parameter is 'to' then
       to)
-         _target="$1" ; shift
+        # Next parameter contains the target, store it in the target variable
+        _target="$1"
+        # Remove the target from the parameters list.
+        shift
         ;;
-
       mode)
-         _mode="$1" ; shift
+        # Next parameter contains the mode, store it in the mode variable
+        _mode="$1"
+        # Remove the mode from the parameters list.
+        shift
         ;;
-
       owner)
-         _owner="$1" ; shift
+        # Next parameter contains the owner, store it in the owner variable
+        _owner="$1"
+        # Remove the owner from the parameters list.
+        shift
         ;;
-
-      from) # TODO: finish this part.
-         _source="$1" ; shift
+      from)
+        # Next parameter contains the source, store it in the source variable
+        _source="$1"
+        shift
         ;;
-
+      # We do not know what the token is
       *)
-        if [[ -z "${_name}" ]] ; then
+        # If a name has not yet been set
+        if [[ -z "${_name}" ]]
+        then
+          # then the token must be the name, store it in the name variable
           _name="$token"
-        elif [[ -z "${_target}" ]] ; then
+        elif [[ -z "${_target}" ]]
+        then
+          # otherwise if the target has not yet been set then the token must
+          # be the target, store it in the target variable.
           _target="$token"
-          break # When we have a target we are done.
-          # An alternative idea would be to allow an array of multiple targets
-          # to symlink to...
+          # We have a name and a target we are done processing, ignore all
+          # futher input
+          break
         fi
         ;;
     esac
   done
 
+  # If the named file exists in the filesystem
   if file_exists "${_name}"
   then
+    # Then set the template variable directly to the name
     _template="${_name}"
+
+  # otherwise if the named file exists in the source (templates) directory on
+  # the filesystem
   elif file_exists "${_source}/${_name}"
   then
+    # Then set the template variable to the name prefixed with the source
+    # (templates) directory
     _template="${_source}/${_name}"
-  else
+
+  # otherwise if the named template inside of the templates directory postfixed
+  # with .template exists
+  elif file_exists "${_source}/${_name}.template"
+    # set the template variable to the named template inside of the templates
+    # directory postfixed with .template
     _template="${_source}/${_name}.template"
+  else
+    # otherwise the template was not found, we cannot install it. Most likely
+    # this is a programming error, template was not included with the package,
+    # etc... so we will send a fail message which includes a backtrace so that
+    # the developer may either add the missing template or remove the
+    # install_template() call.
+    fail "No template was found matching '${_name}' either "\
+      "directly on the filesystem or in the '${_source}' directory."
   fi
 
+  # Create the target path if it does not exist.
   ensure_paths_exist "$(dirname "${_target}")"
 
-  if [[ -f "${_template}" ]]
+  if directory_exists "${_target}"
   then
-    if [[ -d "${_target}" ]]
+    if directory_exists "${_target}/${_name}"
     then
-      if [[ -d "${_target}/${_name}" ]]
-      then
-        fail "Cannot install the template '${_template}' to ${_target}/${_name} "\
-          " as it is a directory"
-      else
-        cp -f "${_template}" "${_target}/${_name}"
-
-        if [[ -n "${_mode:-}" ]]
-        then
-          chmod "${_mode}" "${_target}/${_name}"
-        fi
-
-        if [[ -n "${_owner:-}" ]]
-        then
-          chown "${_owner}" "${_target}/${_name}"
-        fi
-      fi
+      fail "Cannot install the template '${_template}' to ${_target}/${_name}"\
+        " as it is a directory"
     else
-      cp -f "${_template}" "${_target}"
+      # Copy the template file to the target location and name given.
+      cp -f "${_template}" "${_target}/${_name}"
 
-      if [[ -n "${_mode:-}" ]]
+      # If the mode variable is not empty
+      if variable_is_nonempty _mode
       then
-        chmod "${_mode}" "${_target}"
+        # then we change the file access mode of the file.
+        chmod "${_mode}" "${_target}/${_name}"
       fi
 
-      if [[ -n "${_owner:-}" ]]
+      # If the owner variable is not empty
+      if variable_is_nonempty _owner
       then
-        chown "${_owner}" "${_target}"
+        # then we change the owner of the file
+        chown "${_owner}" "${_target}/${_name}"
       fi
     fi
   else
-    fail "Cannot install template as the template file '${_template}' is missing.'"
+    # The target is not a directory, so it must be a fully specified template
+    # name. So we will copy the template directly to the target as a file.
+    # TODO: Ensure that the target's path exists.
+    cp -f "${_template}" "${_target}"
+
+    # If the mode variable is not empty
+    if variable_is_nonempty _mode
+    then
+      # then we change the file access mode of the file.
+      chmod "${_mode}" "${_target}/${_name}"
+    fi
+
+    # If the owner variable is not empty
+    if variable_is_nonempty _owner
+    then
+      # then we change the owner of the file
+      chown "${_owner}" "${_target}/${_name}"
+    fi
   fi
 }
 
@@ -203,44 +267,62 @@ install_template()
 #      confd_path "${confd_path}" \
 #      extension "${extension}"
 #
+# ### Code Walkthrough
 seed_template()
 {
+  # Store the first parameter into the template variable
   local _template="${1:-}"
 
-  if [[ -n "${_template}" ]]
+  # if the template variable is not empty
+  if variable_is_nonempty _template
   then
+    # then remove the template from the parameters list
     shift
-    local _args=("$@") _strings=()
-    if [[ -f "${_template}" ]]
+    # and store the remaining parameters into the hash variable
+    local _hash=("$@") _strings=()
+
+    # If the template file exists on the filesystem
+    if file_exists "${_template}"
     then
-      if (( ${#_args[@]} == 0 ))
+      # if the hash array is nonempty
+      array_is_nonempty _hash
       then
-        fail "Cannot seed template '${_template}' as no replacement keys were"\
-          "specified"
-      else
-        if (( ( ${#_args[@]} % 2 ) == 1 ))
+        if array_is_even _hash
         then
           fail "Every replacement key must have a replacement value."
         fi
+      else
+        # otherwise no key/value pairs were specified. This is typically a
+        # programming error so send a fail message which will also trigger a
+        # backtrace allowing the developer to fix the issue quickly.
+        fail "Cannot seed template '${_template}'"\
+          "as no replacement keys were specified"
       fi
 
       warn "Template Seeding (replacing defaults) has not yet fully implemented."
 
-      # Aggregate the replacement strings.
-      for (( index=0 ; index < ${#_args[@]} ; index++ ))
+      # Loop over the hash and aggregate the replacement strings into their
+      # own array.
+      for (( index=0 ; index < ${#_hash[@]} ; index++ ))
       do
-        _strings+=(" -e 's#${_args[${index}]}#${_args[$((++index))]}#g' ")
+        _strings+=(" -e 's#${_hash[${index}]}#${_hash[$((++index))]}#g' ")
       done
 
       # Filter the template with the replacments.
-      sed ${_strings[@]} ${_template} >> ${_template}.${timestamp}
-
-      if file_exists "${_template}.${timestamp}"
+      if sed ${_strings[@]} ${_template} >> ${_template}.${timestamp}
       then
-        mv -f "${_template}.${timestamp}" "${_template}"
+        # If the filtering happened successfully the timestamped template file
+        # will exist on the filesystem
+        if file_exists "${_template}.${timestamp}"
+        then
+          mv -f "${_template}.${timestamp}" "${_template}"
+        else
+          fail "Something went horribly wrong, the template intermediate file "\
+            "'${_template}.${timestamp}' does not exist."
+        fi
       else
-        fail "Something went horribly wrong, the template intermediate file "\
-          "'${_template}.${timestamp}' does not exist."
+        error "There was an error (?) seeding the template '${_template}'" \
+          "Most often this is due to filesystem permissions / disk full."
       fi
     else
       fail "Can not seed template template file '${_template}' does not exist."

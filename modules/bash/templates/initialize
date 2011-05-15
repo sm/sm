@@ -1,6 +1,3 @@
 #!/usr/bin/env bash
 
-#
-# BDSM templates module initialization
-#
-
+modules variables array

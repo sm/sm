@@ -42,7 +42,9 @@
 #
 array_is_nonempty()
 {
-  local _array_name="$1"
+  # Store the array name into a local variable, set to the empty string if it
+  # was not passed in.
+  local _array_name="${1:-}"
 
   if variable_is_nonempty _array_name
   then
@@ -94,7 +96,9 @@ array_is_nonempty()
 #
 array_is_empty()
 {
-  local _array_name="$1"
+  # Store the array name into a local variable, set to the empty string if it
+  # was not passed in.
+  local _array_name="${1:-}"
 
   if variable_is_nonempty _array_name
   then
@@ -140,7 +144,9 @@ array_is_empty()
 #
 array_length()
 {
-  local _array_name="$1"
+  # Store the array name into a local variable, set to the empty string if it
+  # was not passed in.
+  local _array_name="${1:-}"
 
   if variable_is_nonempty _array_name
   then
@@ -186,13 +192,22 @@ array_length()
 #
 array_last_element()
 {
-  local _array_name="$1" _length
+  # Store the array name into a local variable, set to the empty string if it
+  # was not passed in.
+  local _array_name="${1:-}" _length _element
 
+  # if the array name variable is not empty
   if variable_is_nonempty _array_name
   then
+    # Set the length variable's value to the length of the named array.
     eval "_length=\${#${_array_name}[@]}"
 
-    eval "printf \"%s\\n\" \"\${${_array_name}[${_length}]}\""
+    # Set the element variable to the largest element
+    eval "_element=\"\${${_array_name}[${_length}]}\""
+
+    # Print the element at the index of the length of the named array to
+    # the calling environments STDOUT stream.
+    printf "%{_element}"
   else
     # otherwise the array name variable was not passed in. This is a programming
     # error and as such we call the fail function which yields a message and
@@ -234,8 +249,11 @@ array_last_element()
 #
 array_first_element()
 {
-  local _array_name="$1" _length
+  # Store the array name into a local variable, set to the empty string if it
+  # was not passed in.
+  local _array_name="${1:-}" _length
 
+  # if the array name variable is not empty
   if variable_is_nonempty _array_name
   then
     eval "printf \"%s\\n\" \"\${${_array_name}[0]}\""
@@ -282,9 +300,12 @@ array_first_element()
 #
 array_push()
 {
-  local _array_name="$1"
+  # Store the array name into a local variable, set to the empty string if it
+  # was not passed in.
+  local _array_name="${1:-}"
   shift
 
+  # if the array name variable is not empty
   if variable_is_nonempty _array_name
   then
     eval "(( \${#${_array_name}[@]} > 0 ))"
@@ -344,8 +365,11 @@ array_push()
 #
 array_append()
 {
-  local _array_name="$1"
+  # Store the array name into a local variable, set to the empty string if it
+  # was not passed in.
+  local _array_name="${1:-}"
 
+  # if the array name variable is not empty
   if variable_is_nonempty _array_name
   then
     shift
@@ -404,8 +428,11 @@ array_append()
 #
 array_shift()
 {
-  local _array_name="$1" new_array=() index first_element
+  # Store the array name into a local variable, set to the empty string if it
+  # was not passed in.
+  local _array_name="${1:-}" new_array=() index first_element
 
+  # if the array name variable is not empty
   if variable_is_nonempty _array_name
   then
     shift
@@ -466,8 +493,11 @@ array_shift()
 #
 array_unshift()
 {
-  local _array_name="$1"
+  # Store the array name into a local variable, set to the empty string if it
+  # was not passed in.
+  local _array_name="${1:-}"
 
+  # if the array name variable is not empty
   if variable_is_nonempty _array_name
   then
     shift
@@ -531,8 +561,11 @@ array_unshift()
 #
 array_join()
 {
-  local _array_name="$1"
+  # Store the array name into a local variable, set to the empty string if it
+  # was not passed in.
+  local _array_name="${1:-}"
 
+  # if the array name variable is not empty
   if variable_is_nonempty _array_name
   then
     shift
@@ -584,8 +617,11 @@ array_join()
 #
 array_largest()
 {
+  # Store the array name into a local variable, set to the empty string if it
+  # was not passed in.
   local _array_name="${1:-}" _index _largest=""
 
+  # if the array name variable is not empty
   if variable_is_nonempty _array_name
   then
     eval "
@@ -648,7 +684,11 @@ array_largest()
 #
 array_sort_desc()
 {
+  # Store the array name into a local variable, set to the empty string if it
+  # was not passed in.
   local _array_name="${1:-}" _index _largest=""
+
+  # if the array name variable is not empty
   if variable_is_nonempty _array_name
   then
     eval "${_array_name}=(\$(
@@ -704,7 +744,11 @@ array_sort_desc()
 #
 array_sort_asc()
 {
+  # Store the array name into a local variable, set to the empty string if it
+  # was not passed in.
   local _array_name="${1:-}" _index _largest=""
+
+  # if the array name variable is not empty
   if variable_is_nonempty _array_name
   then
     eval "${_array_name}=(\$(
@@ -770,7 +814,8 @@ array_unique()
   then
     # Then loop over the array finding the largest element using awk.
     eval "${_array_name}=(\$(
-    echo \" \${${_array_name}[@]} \" | awk -v RS=' ' -v ORS=' ' '!(\$0 in a){a[\$0];print}'
+    echo \" \${${_array_name}[@]} \" |
+    awk -v RS=' ' -v ORS=' ' '!(\$0 in a){a[\$0];print}'
     ))"
   else
     # otherwise the array name variable was not passed in. This is a programming
