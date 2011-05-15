@@ -3,6 +3,7 @@
 #
 # # Array Module
 #
+:
 #
 # ## array\_is\_nonempty()
 #
@@ -39,16 +40,25 @@
 #     1
 #
 # ### Code Walkthrough
-#
 array_is_nonempty()
 {
   # Store the array name into a local variable, set to the empty string if it
   # was not passed in.
   local _array_name="${1:-}"
 
+  # if the array name variable is not empty then
   if variable_is_nonempty _array_name
   then
-    eval "(( \${#${_array_name}[@]} > 0 ))"
+    # if the length of the named array is greater than zero
+    if eval "(( \${#${_array_name}[@]} > 0 ))"
+    then
+      # then return true, 0
+      return 0
+    else
+      # otherwise return false, 1
+      return 1
+    else
+    fi
   else
     # otherwise the array name variable was not passed in. This is a programming
     # error and as such we call the fail function which yields a message and
@@ -93,16 +103,23 @@ array_is_nonempty()
 #     1
 #
 # ### Code Walkthrough
-#
 array_is_empty()
 {
   # Store the array name into a local variable, set to the empty string if it
   # was not passed in.
   local _array_name="${1:-}"
 
+  # If the array name variable is not empty
   if variable_is_nonempty _array_name
   then
-    eval "(( \${#${_array_name}[@]} == 0 ))"
+    # then if the length of the named array is zero
+    if eval "(( \${#${_array_name}[@]} == 0 ))"
+    then
+      # then return true, 0
+      return 0
+    else
+      # otherwise return false, 1
+    fi
   else
     # otherwise the array name variable was not passed in. This is a programming
     # error and as such we call the fail function which yields a message and
@@ -141,16 +158,21 @@ array_is_empty()
 #     5
 #
 # ### Code Walkthrough
-#
 array_length()
 {
   # Store the array name into a local variable, set to the empty string if it
   # was not passed in.
-  local _array_name="${1:-}"
+  local _array_name="${1:-}" _length
 
+  # if the array name variable is not empty
   if variable_is_nonempty _array_name
   then
-    eval "printf \"%s\\n\" \"\${#${_array_name}[@]}\""
+    # Record the lenght of the array to the length variable.
+    eval "_length=\${#${_array_name}[@]}"
+    # print out the length of the array
+    print ${_length}
+    # Return true, 0, for success.
+    return 0
   else
     # otherwise the array name variable was not passed in. This is a programming
     # error and as such we call the fail function which yields a message and
@@ -189,7 +211,6 @@ array_length()
 #     five
 #
 # ### Code Walkthrough
-#
 array_last_element()
 {
   # Store the array name into a local variable, set to the empty string if it
@@ -246,23 +267,35 @@ array_last_element()
 #     one
 #
 # ### Code Walkthrough
-#
 array_first_element()
 {
   # Store the array name into a local variable, set to the empty string if it
   # was not passed in.
-  local _array_name="${1:-}" _length
+  local _array_name="${1:-}" _element
 
   # if the array name variable is not empty
   if variable_is_nonempty _array_name
   then
-    eval "printf \"%s\\n\" \"\${${_array_name}[0]}\""
+    # if the array is not empty
+    if (( $(eval "\${#${_array_name}[@]}") > 0 ))
+    then
+      # Set the element variable to the value of the first element of the array.
+      eval "_element=\"\${${_array_name}[0]}\""
+
+      # Print the element to the STDOUT of the calling environment.
+      printf "${_element}"
+    else
+      # Return false, 1 for error as the array is empty and we cannot return an
+      # element.
+      return 1
+    fi
   else
     # otherwise the array name variable was not passed in. This is a programming
     # error and as such we call the fail function which yields a message and
     # a backtrace thus enabling the developer to pinpoint and fix the issue
     # quickly.
-    fail "Cannot push onto array as an array name was not given."
+    fail "Cannot print the first element of an array"\
+      "as an array name was not given."
   fi
 }
 
@@ -297,30 +330,42 @@ array_first_element()
 #     1 2 3 4 5 6
 #
 # ### Code Walkthrough
-#
 array_push()
 {
   # Store the array name into a local variable, set to the empty string if it
   # was not passed in.
   local _array_name="${1:-}"
-  shift
 
   # if the array name variable is not empty
   if variable_is_nonempty _array_name
   then
-    eval "(( \${#${_array_name}[@]} > 0 ))"
+    # Remove the array name from the parameters list.
+    shift
 
-    local _element _elements=("$@")
-
-    if (( ${#_elements[@]} == 0 ))
+    # If the array is nonempty then
+    if eval "(( \${#${_array_name}[@]} > 0 ))"
     then
-      fail "Cannot push elements onto array as no elements were given."
-    fi
+      # Set the elements array to the remaining parameters and declare an
+      # element variable.
+      local _element _elements=("$@")
 
-    for _element in "${_elements[@]}"
-    do
-      eval "${_array_name}+=(\${_element})"
-    done
+      # If the number of elements is nonzero then
+      if (( ${#_elements[@]} > 0 ))
+      then
+        # for each element in the passed in elements,
+        for _element in "${_elements[@]}"
+        do
+          # append the element to the named array
+          eval "${_array_name}+=(\${_element})"
+        done
+      else
+        # otherwise no elements were passed in to push onto the array.
+        # This is a programming error and as such we call the fail function
+        # which yields a message and a backtrace thus enabling developers
+        # to pinpoint and fix their code quickly.
+        fail "Cannot push elements onto array as no elements were given."
+      fi
+    fi
   else
     # otherwise the array name variable was not passed in. This is a programming
     # error and as such we call the fail function which yields a message and
@@ -362,7 +407,6 @@ array_push()
 #     1 2 3 4 5
 #
 # ### Code Walkthrough
-#
 array_append()
 {
   # Store the array name into a local variable, set to the empty string if it
@@ -372,18 +416,30 @@ array_append()
   # if the array name variable is not empty
   if variable_is_nonempty _array_name
   then
+    # Remove the array name from the parameters list.
     shift
+
+    # Set the elements array to the remaining parameters and declare an
+    # element variable.
     local _element _elements=("$@")
 
-    if (( ${#_elements[@]} == 0 ))
+    # if the number of elements is nonzero
+    if (( ${#_elements[@]} > 0 ))
     then
+      # then for each element in the elements
+      for _element in "${_elements[@]}"
+      do
+        # append the element to the named array
+        eval "${_array_name}+=(\${_element})}"
+      done
+    else
+      # otherwise no elements were passed in to push onto the array.
+      # This is a programming error and as such we call the fail function
+      # which yields a message and a backtrace thus enabling developers
+      # to pinpoint and fix their code quickly.
       fail "Cannot push elements onto array as no elements were given."
     fi
 
-    for _element in "${_elements[@]}"
-    do
-      eval "${_array_name}+=(\${_element})}"
-    done
   else
     # otherwise the array name variable was not passed in. This is a programming
     # error and as such we call the fail function which yields a message and
@@ -425,27 +481,33 @@ array_append()
 #     2 3 4
 #
 # ### Code Walkthrough
-#
 array_shift()
 {
   # Store the array name into a local variable, set to the empty string if it
   # was not passed in.
-  local _array_name="${1:-}" new_array=() index first_element
+  local _array_name="${1:-}" temp_array=() index first_element
 
   # if the array name variable is not empty
   if variable_is_nonempty _array_name
   then
+    # Remove the array name from the parameters list.
     shift
-    eval "
-    first_element=\${${_array_name}[0]}
 
+    # Store the value of the first element of the named array.
+    eval "first_element=\${${_array_name}[0]}"
+
+    # Now we shift the array contents over by one using a temporary array.
+    eval "
     for (( index=1; index < \${#${_array_name}[@]}; index++ ))
     do
-      new_array+=(\${${_array_name}[\${index}]})
+      temp_array+=(\${${_array_name}[\${index}]})
     done
-
-    ${_array_name}=(\"\${new_array[@]}\")
     "
+
+    # Reassign the shifted temp array contents to the original named variable.
+    eval "${_array_name}=(\"\${temp_array[@]}\") "
+
+    # Print out the first element of the array
     printf "%s" "${first_element}"
   else
     # otherwise the array name variable was not passed in. This is a programming
@@ -490,7 +552,6 @@ array_shift()
 #     1 2 3 4 5
 #
 # ### Code Walkthrough
-#
 array_unshift()
 {
   # Store the array name into a local variable, set to the empty string if it
@@ -500,19 +561,25 @@ array_unshift()
   # if the array name variable is not empty
   if variable_is_nonempty _array_name
   then
+    # Remove the array name from the parameters list.
     shift
 
-    local _element _elements=("$@")
+    # Declare and set the elements variable to the remaining parameters.
+    local _elements=("$@")
 
-    if (( ${#_elements[@]} == 0 ))
+    # If the elements array length is nonzero
+    if (( ${#_elements[@]} > 0 ))
     then
+      # Concatinate the two arrays into the named array, with the elements of
+      # the parameters at the front of the array in the order passed in.
+      eval "${_array_name}=(\"${_elements[@]}\" \"\${${_array_name}[@]}\")"
+    else
+      # otherwise no elements were passed in to push onto the array.
+      # This is a programming error and as such we call the fail function
+      # which yields a message and a backtrace thus enabling developers
+      # to pinpoint and fix their code quickly.
       fail "Cannot push elements onto array as no elements were given."
     fi
-
-    for _element in "${_elements[@]}"
-    do
-      eval "${_array_name}=(\"${_element}\" \"\${${_array_name}[@]}\")"
-    done
   else
     # otherwise the array name variable was not passed in. This is a programming
     # error and as such we call the fail function which yields a message and
@@ -558,7 +625,6 @@ array_unshift()
 #     1.2.3.4.5
 #
 # ### Code Walkthrough
-#
 array_join()
 {
   # Store the array name into a local variable, set to the empty string if it
@@ -568,13 +634,23 @@ array_join()
   # if the array name variable is not empty
   if variable_is_nonempty _array_name
   then
+    # Remove the array name from the parameters list.
     shift
+
+    # Declare and set the separator variable, default it's value to a space.
     local _separator="${1:-' '}"
 
+    # Loop over each element of the array, print it out to the calling
+    # environment's STDOUT stream with the separator between its entries.
     eval "
-    for (( index=0 ; index < \${#${_array_name}[@]} ; index++ )) ;
-    do (( index >  0 )) && printf \"%s\"${_separator}\"\" ;
-      printf \"%s\" \"\${${_array_name}[\${index}]}\" ;
+    for (( index=0 ; index < \${#${_array_name}[@]} ; index++ ))
+    do
+      if (( index >  0 ))
+      then
+        printf \"%s\" \"${_separator}\"
+      fi
+
+      printf \"%s\" \"\${${_array_name}[\${index}]}\"
     done"
   else
     # otherwise the array name variable was not passed in. This is a programming
@@ -614,16 +690,21 @@ array_join()
 #     billie
 #
 # ### Code Walkthrough
-#
 array_largest()
 {
   # Store the array name into a local variable, set to the empty string if it
   # was not passed in.
   local _array_name="${1:-}" _index _largest=""
 
-  # if the array name variable is not empty
+  # if the array name variable is not empty then
   if variable_is_nonempty _array_name
   then
+
+    # loop over the array comparing the size of each element with the currently
+    # known 'largest' element. If the size of the element at each index is
+    # greater than the size of the current largest element then replace the
+    # largest variable contents witht the contents of the array at the current
+    # index.
     eval "
     for (( _index=0 ; _index < \${#${_array_name}[@]} ; _index++ ))
     do
@@ -633,6 +714,8 @@ array_largest()
       fi
     done
     "
+
+    # Print out the value string of the largest array element that was found.
     printf "%s" "${_largest}"
 
   else
@@ -681,7 +764,6 @@ array_largest()
 #     j i h f e d c b a
 #
 # ### Code Walkthrough
-#
 array_sort_desc()
 {
   # Store the array name into a local variable, set to the empty string if it
@@ -691,6 +773,8 @@ array_sort_desc()
   # if the array name variable is not empty
   if variable_is_nonempty _array_name
   then
+    # Replace the named array's contents with the same contents sorted in
+    # decending ("reverse") order.
     eval "${_array_name}=(\$(
     echo \"\${${_array_name}[@]}\" | tr ' ' \"\n\" | sort -r
     ))"
@@ -741,7 +825,6 @@ array_sort_desc()
 #     a b c d e f h i j
 #
 # ### Code Walkthrough
-#
 array_sort_asc()
 {
   # Store the array name into a local variable, set to the empty string if it
@@ -751,6 +834,8 @@ array_sort_asc()
   # if the array name variable is not empty
   if variable_is_nonempty _array_name
   then
+    # Replace the named array's contents with the same contents sorted in
+    # ascending order.
     eval "${_array_name}=(\$(
     echo \"\${${_array_name}[@]}\" | tr ' ' \"\n\" | sort
     ))"
@@ -763,7 +848,6 @@ array_sort_asc()
       "variable name was not given."
   fi
 }
-
 
 #
 # ## array\_unique()
@@ -802,17 +886,16 @@ array_sort_asc()
 #     a b c d
 #
 # ### Code Walkthrough
-#
 array_unique()
 {
   # Store the array name into a local variable, set to the empty string if it
   # was not passed in. Also initialize the index and largest variables.
   local _array_name="${1:-}" _index _largest=""
 
-  # If the array name variable is not empty
+  # If the array name variable is not empty then
   if variable_is_nonempty _array_name
   then
-    # Then loop over the array finding the largest element using awk.
+    # loop over the array finding the largest element using awk.
     eval "${_array_name}=(\$(
     echo \" \${${_array_name}[@]} \" |
     awk -v RS=' ' -v ORS=' ' '!(\$0 in a){a[\$0];print}'
@@ -908,6 +991,7 @@ array_is_even()
   # If the array name variable is not empty
   if variable_is_nonempty _array_name
   then
+    # if the length of the array modulo two is zero then
     if eval "(( ( \${#${_array_name}[@]} % 2 ) == 0 ))"
     then
       # the array is even, return true, 0
@@ -923,3 +1007,4 @@ array_is_even()
     fail "Cannot push onto array as an array name was not given."
   fi
 }
+
