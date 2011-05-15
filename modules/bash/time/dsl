@@ -37,9 +37,12 @@
 #
 #     user$ $PWD/test
 #     2011-04-24T22:28:16
+#
+# ### Code Walkthrough
 timestamp_set()
 {
-  timestamp=$(timestamp)
+  # Set the timestamp variable to the STDOUT of the timestamp function call.
+  timestamp="$(timestamp)"
 }
 
 #
@@ -82,10 +85,15 @@ timestamp_set()
 #     user$ $PWD/test
 #     2011-04-24T22:31:54
 #
+# ### Code Walkthrough
 timestamp()
 {
+  # Set the format to either the first parameter, if nonempty or to the
+  # iso-something format ;) otherwise.
   local _format="${1:-"%Y-%m-%dT%H:%M:%S"}"
 
-  printf "%s" "$(date +"${_format}")"
+  # Use the date command with the format string and print the result to the
+  # STDOUT of the calling environment.
+  date +"${_format}"
 }
 
