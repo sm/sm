@@ -685,64 +685,129 @@ move_directory()
 #
 #     user$ move_file "$HOME/.bashrc" to "$HOME/.bashrc.orig"
 #
+# ### Code Walkthrough
 move_file()
 {
-  local _source _target _mode _owner
+  # Declare the source, target, mode, owner and token local variables.
+  local _source _target _mode _owner token
 
-  while (( $# > 0 )) ; do
-    token="$1" ; shift
+  # While the parameter list is not empty
+  while (( $# > 0 ))
+  do
+    # Set the token variable to the first parameter
+    token="$1"
+    # and remove the token parameter from the list of parameters
+    shift
+    # Now we examine the token and switch based on what is found.
     case "${token}" in
+      # the token is 'to',
       to)
         _target="${1}"
+        # and remove the target paramter from the parameters.
         shift
         ;;
+      # the token is 'from',
       from)
         _source="${1}"
+        # and remove the from paramter from the parameters.
         shift
         ;;
+      # the token is 'mode',
       mode)
-         _mode="${1}"
-         shift
+        # Set the mode variable to the first parameter
+        _mode="${1}"
+        # and remove the mode paramter from the parameters.
+        shift
         ;;
+      # the token is 'owner',
       owner)
-         _owner="${1}"
-         shift
+        # Set the owner variable to the first parameter
+        _owner="${1}"
+        # and remove the owner paramter from the parameters.
+        shift
         ;;
 
+      # If we do not know
       *)
+        # If the source variable is empty
         if [[ -z "${_source}" ]]
         then
+          # then assign the unknown token to the source variable
           _source="$token"
 
+        # otherwise if the target variable is empty
         elif [[ -z "${_target}" ]]
         then
+          # then assign the Unknown token to the target variable.
           _target="$token"
-          break
+        else
+          # At this point we have both a source and a target, so we do not know
+          # what to do with further unknown parameters. This indicates a
+          # programming error, fail giving developers an error message and
+          # a backtrace which they can use to debug their code.
+          fail "The source '${_source}' and target '${_target}' have been set"\n
+            "and the current token token is unknown'${token}'."
         fi
         ;;
     esac
   done
 
-  if [[ -z "${_source}" ]]
+  # If the source variable is not empty
+  if variable_is_nonempty _source
   then
-    fail "Cannot move file as the source and target must be specified. "
-  fi
+    # and if the target variable is not empty
+    if variable_is_nonempty _target
+    then
+      # then move the source to the target
+      if mv "${_source}" "${_target}"
+      then
+        # The move was successful, now we process mode and owner if specified.
 
-  if [[ -z "${_target}" ]]
-  then
-    fail "Cannot move file as the source and target must be specified. "
-  fi
+        # If the mode variable is set, change the target's filesystem mode
+        if variable_is_nonempty _mode
+        then
+          # If the file mode change is not successful
+          if ! chmod "${_mode}" "${_target}"
+          then
+            # Then print out a warning to the user and continue processing
+            # this is typically a non-fatal error which can be rectified
+            # afterwards.
+            warn "There was an error ($?) changing the "\
+              "target's '${_target}' mode to '${_mode}'"
+          fi
+        fi
 
-  mv "${_source}" "${_target}"
-
-  if [[ -n "${_mode:-}" ]]
-  then
-    chmod "${_mode}" "${_target}"
-  fi
-
-  if [[ -n "${_owner:-}" ]]
-  then
-    chown "${_owner}" "${_target}"
+        # If the owner variable is set, change the target's owner
+        if variable_is_nonempty _owner
+        then
+          # If the ownership change is not successful
+          if ! chown "${_owner}" "${_target}"
+          then
+            # Then print out a warning to the user and continue processing
+            # this is typically a non-fatal error which can be rectified
+            # afterwards.
+            warn "There was an error ($?) changing the "\
+              "target's '${_target}' owner to '${_owner}'"
+          fi
+        fi
+      else
+        # There was an error moving the file, inform the user with a failure
+        # message and provide a backtrace as this could very well indicate a
+        # larger issue overall and debugging will be necessary.
+        fail "There was an error ($?) moving the source '${_source}'" \
+          "to the target '${_target}'"
+      fi
+    else
+      # The target was not specified, this is a programming error
+      # send a fail message which will send a backtrace allowing the developer
+      # to quickly debug and pass in the proper parameters.
+      fail "Cannot move file as both the source and target must be specified."
+    fi
+  else
+      # The source was not specified, this is a programming error
+      # send a fail message which will send a backtrace allowing the developer
+      # to quickly debug and pass in the proper parameters.
+      fail "Cannot move file as both the source and target must be specified."
   fi
 }
 
