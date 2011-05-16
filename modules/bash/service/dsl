@@ -76,8 +76,8 @@
 #
 services_avilable()
 {
-  log "Available service listing has not yet been implemented."
-  NIY
+  # Notify that the services_available() function has not yet been implemented.
+  NIY "Available service listing has not yet been implemented."
   services_installed
 }
 
@@ -116,8 +116,8 @@ services_avilable()
 #
 services_installed()
 {
-  log "Installed services has not yet been implemented."
-  NIY
+  # Notify that the services_installed() function has not yet been implemented.
+  NIY "Installed services has not yet been implemented."
 }
 
 #
@@ -154,8 +154,8 @@ services_installed()
 #
 services_available()
 {
-  log "Installed services has not yet been implemented."
-  NIY
+  # Notify that the services_available() function has not yet been implemented.
+  NIY "Installed services has not yet been implemented."
 }
 
 #
@@ -195,26 +195,33 @@ services_available()
 #
 service_setup()
 {
+  # Notify the user that we are now creating paths for the service/version
   log "#creating paths for ${service} ${package_version}..."
 
-  ensure_paths_exist "${service_paths[@]}" "${install_path}"
-
-  chown_paths_recursively "${service_user}:${service_user}" "${service_paths[@]}"
-  chown_paths_recursively "${service_user}:${service_user}"\
-    "${service_root_paths[@]}"
-
+  # If the user is root
   if user_is_root
   then
-    # TODO: create an 'user_exists' function and use it here.
+    # then create the service_user on the system if it is missing with the
+    # same group as the name.
+    # ##### TODO: create an 'user_exists' function and use it here.
     user_create_if_missing "${service_user}"\
       with group "${service_user}" 2>/dev/null
 
+    # Create the paths for the service_root_paths if they do not exist
     ensure_paths_exist "${service_root_paths[@]}"
 
+    # then ensure that the service_user has ownership of the root serivce paths.
     chown_paths_recursively "${service_user}:${service_user}"\
       "${service_root_paths[@]}"
   fi
 
+  # Create the paths for the service/version if they do not exist
+  ensure_paths_exist "${service_paths[@]}" "${install_path}"
+
+  # Ensure that the service_user has ownership of the serivce paths.
+  chown_paths_recursively "${service_user}:${service_user}" "${service_paths[@]}"
+
+  # Install the service init.d scripts.
   service_install_init_d "${service}"
 }
 
@@ -255,7 +262,7 @@ service_setup()
 #
 service_uninstall()
 {
-  log "TODO: service_uninstall is NIY"
+  NIY "service_uninstall() has not yet been implemented."
   # 1. Remove init scripts
   # 2. Unload OS service hooks
   # 3. Deactivate database path.
@@ -295,21 +302,25 @@ service_uninstall()
 #
 service_start()
 {
-  if [[ -z "${service}" ]]
+  # if the service variable is nonempty
+  if variable_is_nonempty service
   then
-    fail "In order to start a service the 'service' variable must be set."
-  fi
-
-  if command_exists "${service}_start"
-  then
-    "${service}_start"
-  else
-    if file_is_executable "${init_scripts_path}/${service}"
+    # and if the service extension has defined a start method prefixed with the
+    # service's name
+    if command_exists "${service}_start"
     then
-      service_init_start
+      # then call the extension defined service start function.
+      "${service}_start"
     else
-      fail "${init_scripts_path}/${service} is missing or not executable."
+      # Start the service using the configuration defined in the extension.
+      service_init_start
     fi
+  else
+    # otherwise the service name variable was not set. This is a programming
+    # error and as such we call the fail function which yields a message and
+    # a backtrace thus enabling the developer to pinpoint and fix the issue
+    # quickly.
+    fail "In order to start a service the 'service' variable must be set."
   fi
 }
 
@@ -347,16 +358,25 @@ service_start()
 #
 service_stop()
 {
-  if command_exists "${service}_stop"
+  # if the service variable is nonempty
+  if variable_is_nonempty service
   then
-    "${service}_stop"
-  else
-    if file_is_executable "${init_scripts_path}/${service}"
+    # and if the service extension has defined a start method prefixed with the
+    # service's name
+    if command_exists "${service}_stop"
     then
-      service_init_stop
+      # then call the extension defined service stop function.
+      "${service}_stop"
     else
-      fail "${init_scripts_path}/${service} is missing or not executable."
+      # stop the service using the configuration defined in the extension.
+      service_init_stop
     fi
+  else
+    # otherwise the service name variable was not set. This is a programming
+    # error and as such we call the fail function which yields a message and
+    # a backtrace thus enabling the developer to pinpoint and fix the issue
+    # quickly.
+    fail "In order to start a service the 'service' variable must be set."
   fi
 }
 
@@ -394,16 +414,25 @@ service_stop()
 #
 service_reload()
 {
-  if command_exists "${service}_reload"
+  # if the service variable is nonempty
+  if variable_is_nonempty service
   then
-    "${service}_reload"
-  else
-    if file_is_executable "${init_scripts_path}/${service}"
+    # and if the service extension has defined a reload method prefixed with the
+    # service's name
+    if command_exists "${service}_reload"
     then
-      service_init_reload
+      # then call the extension defined service reload function.
+      "${service}_reload"
     else
-      fail "${init_scripts_path}/${service} is missing or not executable."
+      # reload the service using the configuration defined in the extension.
+      service_init_reload
     fi
+  else
+    # otherwise the service name variable was not set. This is a programming
+    # error and as such we call the fail function which yields a message and
+    # a backtrace thus enabling the developer to pinpoint and fix the issue
+    # quickly.
+    fail "In order to start a service the 'service' variable must be set."
   fi
 }
 
@@ -441,17 +470,25 @@ service_reload()
 #
 service_restart()
 {
-  if command_exists "${service}_restart"
+  # if the service variable is nonempty
+  if variable_is_nonempty service
   then
-    "${service}_restart"
-  else
-    if file_is_executable "${init_scripts_path}/${service}"
+    # and if the service extension has defined a restart method prefixed with the
+    # service's name
+    if command_exists "${service}_restart"
     then
-      service_init_stop
-      service_init_start
+      # then call the extension defined service restart function.
+      "${service}_restart"
     else
-      fail "${init_scripts_path}/${service} is missing or not executable."
+      # restart the service using the configuration defined in the extension.
+      service_init_restart
     fi
+  else
+    # otherwise the service name variable was not set. This is a programming
+    # error and as such we call the fail function which yields a message and
+    # a backtrace thus enabling the developer to pinpoint and fix the issue
+    # quickly.
+    fail "In order to start a service the 'service' variable must be set."
   fi
 }
 
@@ -489,16 +526,25 @@ service_restart()
 #
 service_status()
 {
-  if command_exists "${service}_status"
+  # if the service variable is nonempty
+  if variable_is_nonempty service
   then
-    "${service}_status"
-  else
-    if file_is_executable "${init_scripts_path}/${service}"
+    # and if the service extension has defined a status method prefixed with the
+    # service's name
+    if command_exists "${service}_status"
     then
-      service_init_status
+      # then call the extension defined service status function.
+      "${service}_status"
     else
-      fail "${init_scripts_path}/${service} is missing or not executable."
+      # status the service using the configuration defined in the extension.
+      service_init_status
     fi
+  else
+    # otherwise the service name variable was not set. This is a programming
+    # error and as such we call the fail function which yields a message and
+    # a backtrace thus enabling the developer to pinpoint and fix the issue
+    # quickly.
+    fail "In order to start a service the 'service' variable must be set."
   fi
 }
 
@@ -536,17 +582,25 @@ service_status()
 #
 service_logtail()
 {
-  if command_exists "${service}_logtail"
+  # if the service variable is nonempty
+  if variable_is_nonempty service
   then
-    "${service}_logtail"
-  else
-    if file_is_executable "${init_scripts_path}/${service}"
+    # and if the service extension has defined a logtail method prefixed with the
+    # service's name
+    if command_exists "${service}_logtail"
     then
-      service_init_logtail
+      # then call the extension defined service logtail function.
+      "${service}_logtail"
     else
-      fail "${init_scripts_path}/${service} is missing or not executable."
+      # logtail the service using the configuration defined in the extension.
+      service_init_logtail
     fi
-
+  else
+    # otherwise the service name variable was not set. This is a programming
+    # error and as such we call the fail function which yields a message and
+    # a backtrace thus enabling the developer to pinpoint and fix the issue
+    # quickly.
+    fail "In order to start a service the 'service' variable must be set."
   fi
 }
 
@@ -584,17 +638,25 @@ service_logtail()
 #
 service_info()
 {
-  if command_exists "${service}_info"
+  # if the service variable is nonempty
+  if variable_is_nonempty service
   then
-    "${service}_info"
-  else
-    if file_is_executable "${init_scripts_path}/${service}"
+    # and if the service extension has defined a info method prefixed with the
+    # service's name
+    if command_exists "${service}_info"
     then
-      service_init_info
+      # then call the extension defined service info function.
+      "${service}_info"
     else
-      fail "${init_scripts_path}/${service} is missing or not executable."
+      # info the service using the configuration defined in the extension.
+      service_init_info
     fi
-
+  else
+    # otherwise the service name variable was not set. This is a programming
+    # error and as such we call the fail function which yields a message and
+    # a backtrace thus enabling the developer to pinpoint and fix the issue
+    # quickly.
+    fail "In order to get info of a service the 'service' variable must be set."
   fi
 }
 
@@ -632,14 +694,25 @@ service_info()
 #
 service_configcheck()
 {
-  if command_exists "${service}_configcheck"
+  # if the service variable is nonempty
+  if variable_is_nonempty service
   then
-    "${service}_configcheck"
+    # and if the service extension has defined a configcheck method prefixed with the
+    # service's name
+    if command_exists "${service}_configcheck"
+    then
+      # then call the extension defined service configcheck function.
+      "${service}_configcheck"
+    else
+      # configcheck the service using the configuration defined in the extension.
+      service_init_configcheck
+    fi
   else
-    file_is_executable "${init_scripts_path}/${service}" ||
-      fail "${init_scripts_path}/${service} is missing or not executable."
-
-    "${init_scripts_path}/${service}" configcheck
+    # otherwise the service name variable was not set. This is a programming
+    # error and as such we call the fail function which yields a message and
+    # a backtrace thus enabling the developer to pinpoint and fix the issue
+    # quickly.
+    fail "In order to configcheck a service the 'service' variable must be set."
   fi
 }
 
