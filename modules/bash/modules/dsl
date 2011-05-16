@@ -476,7 +476,8 @@ modules_docgen()
   local _prefix="${core_development_path}/html/modules"
   local _path="${site_development_path}"
 
-  if directory_exists "${core_development_path}"
+  if variable_is_nonempty "${core_development_path}" &&
+     directory_exists "${core_development_path}"
   then
     ensure_paths_exist "${_prefix}"
 
