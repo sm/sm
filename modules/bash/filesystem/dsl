@@ -58,10 +58,11 @@ source_files()
           # Successfully sourced the file, go to the next element in the list.
           continue
         else
-          # print  a debugging statement if debugging is turned on.
-          debug "There was an error sourcing the file '${_file}'."
-          # process the next file in the list.
-          continue
+          # Failed sourcing the file.
+          # This indicates either a programming or a system error.
+          # Fail yielding a message with a backtrace which can be used
+          # to debug the issue.
+          fail "There was an error sourcing the file '${_file}'."
         fi
       fi
     done
@@ -369,6 +370,7 @@ remove()
             "as the 'rm' command failed with error code '$?'"
         fi
       else
+        fail "The entity does not exist on the filesystem"
       fi
     done
   else
@@ -515,25 +517,46 @@ remove_paths()
 #
 ensure_files_exist()
 {
+  # Declare the file, files and path variables, set the files variable to an
+  # array containing all of the parameters passed in.
   local _file _files=("$@") _path
 
+  # If the files array is nonempty
   if (( ${#_files[@]} > 0 ))
   then
+    # then for each file in the files array
     for _file in "${_files[@]}"
     do
-      _path="${_file%\/*}"
-
-      if [[ ! -d "${_path}" ]]
+      if file_exists "${_file}"
       then
-        mkdir -p "${_path}"
-      fi
+        # The file exists, continue on to processing the next file
+        continue
+      else
+        # Strip the filename off of the end yielding the path
+        _path="${_file%\/*}"
 
-      if [[ ! -e "${_file}" ]]
-      then
-        touch "${_file}"
+        # Ensure that the path exists
+        ensure_paths_exist "${_path}"
+
+        # Now touch the file to create it.
+        if touch "${_file}"
+        then
+        # The file exists, continue on to processing the next file
+          continue
+        else
+          # Failed touching the file.
+          # This indicates either a programming or a system error.
+          # Fail yielding a message with a backtrace which can be used
+          # to debug the issue.
+          fail "There was an error creating the file '${_file}' on the"\
+            "filesystem, the touch command returned error code '$?'"
+        fi
       fi
     done
   else
+    # No files were passed given.
+    # This indicates a programming error, fail giving developers an error
+    # message with a backtrace which they can use to debug their code.
     fail "Cannot ensure files exist as no files were given."
   fi
 }
@@ -574,31 +597,42 @@ ensure_files_exist()
 #       make this into make_files_executable or some such
 ensure_files_are_executable()
 {
+  # Declare the file, files and path variables, set the files variable to an
+  # array containing all of the parameters passed in.
   local _file _files=("$@") _path
 
+  # If the files array is nonempty
   if (( ${#_files[@]} > 0 ))
   then
+    # then for each file in the files array
     for _file in "${_files[@]}"
     do
-      if [[ -d "${_file}" ]]
+      # if the file exists on the filesystem but is a directory
+      if directory_exists "${_file}"
       then
-        fail "Cannot make the file '${_file}' executable as it is a directory."
-      fi
-
-      if [[ ! -f "${_file}" ]]
+        # This indicates either a programming or a system error.
+        # Fail yielding a message with a backtrace which can be used
+        # to debug the issue.
+        fail "Cannot make the file '${_file}' executable "\
+          "as it is unexpectedly a directory."
+      # Otherwise if
+      elif ! file_exists "${_file}"
       then
         fail "Cannot make the file '${_file}' executable as the file does not exist."
-      fi
+      else
+        _path="${_file%\/*}"
 
-      _path="${_file%\/*}"
-
-      if ! [[ -n "${_path}" && ! -d "${_file}" ]]
-      then
-        fail "Cannot make the file '${_file} executable as '${_path}' does not even exist."
+        if ! [[ -n "${_path}" && ! -d "${_file}" ]]
+        then
+          fail "Cannot make the file '${_file} executable as '${_path}' does not even exist."
+        fi
+        chmod +x "${_file}"
       fi
-      chmod +x "${_file}"
     done
   else
+    # No files were passed given.
+    # This indicates a programming error, fail giving developers an error
+    # message with a backtrace which they can use to debug their code.
     fail "Cannot ensure files are executable as no files were given."
   fi
 }
@@ -2141,6 +2175,58 @@ file_is_executable()
 #     1
 #
 file_exists()
+{
+  local _file="${1:-}"
+  if [[ -n "${_file}" ]]
+  then
+    if [[ -f "${_file}" ]]
+    then
+      return 0
+    else
+      return 1
+    fi
+  else
+    fail "Cannot check to see if a file exists as no file name/path was given"
+  fi
+}
+
+#
+# ## file\_does\_not\_exist
+#
+# Check if a file name/path exists.
+#
+# ### Input Parameters
+#
+# First parameter is a file name/path.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 if the named file does not exist.
+# 1 if the named file exists.
+#
+# ### Failure Scenarios
+#
+# Fails if no file name/path was given.
+#
+# ### Usage Examples
+#
+#     user$ file_does_not_exist /bin/bash
+#     user$ echo $?
+#     1
+#
+#     user$ file_does_not_exist /bin/asdfasdf
+#     user$ echo $?
+#     0
+#
+file_does_not_exist()
 {
   local _file="${1:-}"
   if [[ -n "${_file}" ]]

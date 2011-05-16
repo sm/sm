@@ -273,7 +273,8 @@ install_head()
 
 prepare_for_installation()
 {
-  (
+  local initial_pwd="$PWD"
+
   log "  Ensuring that install_path '${install_path}' exists"
   ensure_paths_exist "${install_path}"
   enter "${install_path}"
@@ -285,26 +286,28 @@ prepare_for_installation()
 
   log "  Removing core and old extensions, if they exist"
   remove_paths "${extensions[@]}" extension bdsm
-  ) || fail "Could not create installation target"
+  # || fail "Could not create installation target"
+
+  enter "${initial_pwd}"
 }
 
 create_auxillary_paths()
 {
-  (
+  local initial_pwd="$PWD"
   log "  Ensuring auxillary directories (${aux[*]}) exist in ${install_path}"
   enter "${install_path}"
   ensure_paths_exist "${install_path}/" "${aux[@]}"
-  )
+  enter "${initial_pwd}"
 }
 
 install_core_extensions()
 {
-  (
+  local initial_pwd="$PWD"
   log "  Installing core extensions (${extensions[*]}) into ${install_path}/extensions"
   ensure_paths_exist "${install_path}/extensions"
   enter extensions
   copy_directories to "${install_path}/extensions" "${extensions[@]}"
-  )
+  enter "${initial_pwd}"
 }
 
 install_core()

@@ -54,7 +54,7 @@ export bdsm_path install_path modules_path
 source "${PWD}/modules/bash/core/dsl"
 
 # Load fundamental Module DSL's
-for module in logging trace filesystem core
+for module in variables modules logging trace filesystem core
 do
   for file in dsl initialize
   do
