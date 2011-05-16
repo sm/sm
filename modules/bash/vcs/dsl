@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 
+#
+# # VCS (SCM) Module
+#
+:
+# ## scm\_fetch()
+#
+#
+#
+# Code Walkthrough
 scm_fetch()
 {
   local _url="${1:-${extension_url:-}}"
@@ -45,6 +54,11 @@ scm_fetch()
   esac
 }
 
+# ## scm\_update()
+#
+#
+#
+# Code Walkthrough
 scm_update()
 {
   local _url="${1:-${extension_url:-}}"
