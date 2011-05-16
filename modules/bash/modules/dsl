@@ -476,7 +476,7 @@ modules_docgen()
   local _prefix="${core_development_path}/html/modules"
   local _path="${site_development_path}"
 
-  if variable_is_nonempty "${core_development_path}" &&
+  if variable_is_nonempty core_development_path &&
      directory_exists "${core_development_path}"
   then
     ensure_paths_exist "${_prefix}"
@@ -513,7 +513,8 @@ modules_docgen()
     log "  </ul></body></html>" >> "${_prefix}/index.html"
     log "Modules documentation content has been generated in ${_prefix}."
   else
-    fail "Set core_development_path in ~/.bdsmrc in order to run docgen."
+    error "Set core_development_path in ~/.bdsmrc and clone the bdsm core "\
+      "repository into it in order to run docgen."
   fi
 }
 
@@ -522,7 +523,8 @@ modules_docopen()
 {
   # TODO: Replace with,
   # for file in modules/bash/*/dsl ; do (name=${file%%\/dsl}; shocco $file > html/${name//*\/}.html)& done ; wait
-  if variable_is_nonempty core_development_path
+  if variable_is_nonempty core_development_path &&
+     directory_exists "${core_development_path}"
   then
     if file_exists "${core_development_path}/html/modules/index.html"
     then
@@ -531,7 +533,8 @@ modules_docopen()
       error "Run '$ bdsm mod docgen' before trying docopen."
     fi
   else
-    error "Set core_development_path in ~/.bdsmrc in order to run docopen."
+    error "Set core_development_path in ~/.bdsmrc and clone the bdsm core "\
+      "repository into it in order to run docopen."
   fi
 }
 
