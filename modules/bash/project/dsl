@@ -32,24 +32,34 @@
 #     user$ echo $environment
 #     production
 #
+# ### Code Walkthrough
 project_initialize()
 {
-  if [[ -n "${project_path}" ]] ; then
+  # If the project_path variable is nonempty
+  if variable_is_nonempty project_path
+  then
+    # then ensure that the shared_path, release_path, environment and vcs
+    # varaibles are set.
     : \
       "${shared_path:=${project_path}/shared}" \
       "${release_path:=${project_path}/current}" \
-      "${environment:="production"}"
-
-    : \
+      "${environment:="production"}" \
       "${vcs:=$(vcs "${shared_path}/${project}")}"
 
-    log_path="$shared_path/log" # Override default BDSM log path.
-    extension_log_path="${log_path}"
+    # Set the project log path into the shared path's log directory
+    project_log_path="$shared_path/log"
+
+    # Set the extension_log_path to the project_log_path direcotory
+    extension_log_path="${project_log_path}"
   fi
 
-  if [[ -n "${project}" ]] ; then
-    database_name="${database_name:-"${project}_${environment}"}"
+  # If the project variable is nonempty
+  if variable_is_nonempty project
+  then
+    # then ensure the database_name is set
+    true "${database_name:="${project}_${environment}"}"
 
+    # And source the project name rc file, if they exist
     source_files ".${project}rc"
   fi
 }
@@ -85,24 +95,43 @@ project_initialize()
 #     user$ vcs /home/appuser/shared/appuser
 #     user$ echo $vcs
 #     git
+#
+# ##### Code Walkthrough
 vcs()
 {
+  # Store the first parameter in the path variable. This is the path that we
+  # will check to see what vcs it contains.
   local _path="$1"
 
-  [[ -n "${_path}" ]] ||
-    fail "Repository path must be given in order to detect the VCS used."
+  # if the path variable is nonempty
+  if variable_is_nonempty _path
+  then
+    # and if there is a .git directory in the given path
+    if directory_exists "${_path}/.git"
+    then
+      # Then set the vcs variable to git.
+      vcs="git"
 
-  if [[ -d "${_path}/.git" ]] ; then
-    vcs="git"
-  elif [[ -d "${_path}/.svn" ]] ; then
-    vcs="svn"
-  elif [[ -d "${_path}/.hg" ]] ; then
-    vcs="hg"
-  # TODO:
-  # elif [[ ... ]] ; then
-  # vcs="fossil"
+    # and if there is a .svn directory in the given path
+    elif directory_exists "${_path}/.svn"
+    then
+      # Then set the vcs variable to svn.
+      vcs="svn"
+
+    # and if there is a .hg directory in the given path
+    elif directory_exists "${_path}/.hg"
+    then
+      # Then set the vcs variable to hg.
+      vcs="hg"
+
+      # # TODO: detect when vcs="fossil"
+    else
+      # otherwise default the scm to git
+      vcs="git"
+    fi
   else
-    vcs="git" # default
+    # Programming error, no path was passed in in order to determine the vcs
+    fail "Repository path must be given in order to detect the VCS used."
   fi
 }
 
