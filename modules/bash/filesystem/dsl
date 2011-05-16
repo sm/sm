@@ -66,7 +66,7 @@ source_files()
       fi
     done
   else
-    # No files were passed in.
+    # No files were passed given.
     # This indicates a programming error, fail giving developers an error
     # message with a backtrace which they can use to debug their code.
     fail "Cannot source files as no files were given."
@@ -128,7 +128,7 @@ nonempty_files()
       fi
     done
   else
-    # No files were passed in.
+    # No files were given.
     # This indicates a programming error, fail giving developers an error
     # message with a backtrace which they can use to debug their code.
     fail "Cannot return nonempty files as no files were given."
@@ -192,7 +192,7 @@ ensure_paths_exist()
         then
           # then issue a warning
           # Question: Should this be a fail scenario?
-          warn "Coudl not ensure path '${_path}' exists"\
+          warn "Could not ensure path '${_path}' exists"\
             " as a directory as it is a file."
         else
           # Create the full path in the filesystem, including intermediate
@@ -213,7 +213,7 @@ ensure_paths_exist()
       fi
     done
   else
-    # No files were passed in.
+    # No files were given.
     # This indicates a programming error, fail giving developers an error
     # message with a backtrace which they can use to debug their code.
     fail "Cannot ensure paths exist as no paths were given."
@@ -290,24 +290,23 @@ remove_files()
         fail "Failed to remove the file from the filesystem "\
           "as the file exists as an unknown/unhandled filesystem entity type:"\
           "$(file "${_file}")."
-
       else
         # The file already does not exist so return true, 0, for success.
         return 0
       fi
     done
   else
-    # Cannot remove files as no files were given.
+    # No files were given to remove.
     # This indicates a programming error, fail giving developers an error
     # message with a backtrace which they can use to debug their code.
-    fail "Cannot remove files as no files were given."
+    fail "Cannot remove files as no files were given to remove."
   fi
 }
 
 #
 # ## remove
 #
-# Removes the given entries, if they exist.
+# Removes the given filesystem entries, if they exist.
 #
 # ### Input Parameters
 #
@@ -343,23 +342,41 @@ remove_files()
 #
 remove()
 {
-  local _file _files=("$@")
+  # Declare the entry and entries variables, set the entries variable to an
+  # array containing all of the parameters passed in.
+  local _entity _entities=("$@")
 
-  if (( ${#_files[@]} > 0 ))
+  # If the entities array is nonempty
+  if (( ${#_entities[@]} > 0 ))
   then
-    for _file in "${_files[@]}"
+    # for each entity in the entires array
+    for _entity in "${_entities[@]}"
     do
-      if [[ -f "${_file}" || -L "${_file}" || -d "${_file}" ]]
+      # if the entitiy exists on the filesystem
+      if [[ -e "${_entity}" ]]
       then
-        rm -rf "${_file}"
-
-      elif [[ -e "${_file}" ]]
-      then
-        error "Unhandled filesystem entity type located at ${_file}, cannot remove. (File, link and directory types are handled)"
+        # then forcedly remove it from the filesystem
+        if rm -rf "${_entity}"
+        then
+          # Successfully removed the filesytem entity, continue processing the
+          # next entity in the list
+          continue
+        else
+          # Failed to remove the entity from the filesystem.
+          # This indicates a system error, fail giving sysadmins an error
+          # message with a backtrace which they can use to debug the issue.
+          fail "Could not remove the entity '${_entity}'"\
+            "as the 'rm' command failed with error code '$?'"
+        fi
+      else
       fi
     done
   else
-    fail "Cannot remove files as no files were given."
+    # No files were given.
+    # This indicates a programming error, fail giving developers an error
+    # message with a backtrace which they can use to debug their code.
+    fail "Cannot remove entities as no filesystem entities were given "\
+      "as parameters."
   fi
 }
 
@@ -396,33 +413,68 @@ remove()
 #     user$ {{ demonstrate the results}}
 remove_paths()
 {
+  # Declare the path and paths variables, set the files variable to an array
+  # containing all of the parameters passed in.
   local _path _paths=("$@")
 
+  # If the paths array is nonempty
   if (( ${#_paths[@]} > 0 ))
   then
+    # then for each path in the paths array
     for _path in "${_paths[@]}"
     do
-      if [[ -f "${_path}" ]]
+      # If the path is a symlink
+      if [[ -L "${_path}" ]]
       then
-        error "Cannot remove the path '${_path}' as it is a file."
-
-      elif [[ -L "${_path}" ]]
-      then
-        rm -f "${_path}"
-
+        # remove it from the filesystem
+        if rm -f "${_path}"
+        then
+          # Successfully removed the filesytem path, continue processing the
+          # next path in the list
+          continue
+        else
+          # Failed to remove the entity from the filesystem.
+          # This indicates a system error, fail giving sysadmins an error
+          # message with a backtrace which they can use to debug the issue.
+          fail "Could not remove the entity '${_entity}'"\
+            "as the 'rm' command failed with error code '$?'"
+        fi
+      # if the path is a directory
       elif [[ -d "${_path}" ]]
       then
-        rm -rf "${_path}"
-
+        # remove it, recursively, from the filesystem
+        if rm -rf "${_path}"
+        then
+          # Successfully removed the filesytem path, continue processing the
+          # next path in the list
+          continue
+        else
+          # Failed to remove the entity from the filesystem.
+          # This indicates a system error, fail giving sysadmins an error
+          # message with a backtrace which they can use to debug the issue.
+          fail "Could not remove the entity '${_entity}'"\
+            "as the 'rm' command failed with error code '$?'"
+        fi
+      # If the path is not a symlink or a directory and it still exists on the
+      # filesystem
       elif [[ -e "${_path}" ]]
       then
-        error "Unknown filesystem entity type at ${_path}, cannot remove."
+        # Then path is an unhandled filesystem type and we have failed to
+        # remove it.
+        # This likely indicates a system error, fail giving sysadmins an error
+        # message with a backtrace which they can use to debug the issue.
+        fail "Cannot remove the path '${_path}' as it is a file."
 
       else
-        true # already gone
+        # The filesystem path already does not exist, continue processing the
+        # next path in the list
+        continue
       fi
     done
   else
+    # No paths were given.
+    # This indicates a programming error, fail giving developers an error
+    # message with a backtrace which they can use to debug their code.
     fail "Cannot remove paths as no paths were given."
   fi
 }
