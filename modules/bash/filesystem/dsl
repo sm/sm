@@ -33,25 +33,42 @@
 #
 #     user$ source_files "$HOME/.dotfiles/scripts/functions"
 #
+# ### Code Walkthrough
 source_files()
 {
+  # Declare the file and files variables, set the files variable to an array
+  # containing all of the parameters passed in.
   local _file _files=("$@")
 
+  # If the files array is nonempty
   if (( ${#_files[@]} > 0 ))
   then
+    # then for each file in the files array
     for _file in "${_files[@]}"
     do
+      # Expand the HOME path if the file contains '~'
       _file=${_file/\~\//$HOME\/} # Expand ~/ to full value of $HOME
 
+      # If the file is nonempty
       if file_is_nonempty "${_file}"
       then
-        source "${_file}"
-        # TODO: figure out how to see if 'source' itself failed or simply
-        # returning nonzero code.
-        # || fail "Failed to source ${_file}."
+        # Then source the file
+        if source "${_file}"
+        then
+          # Successfully sourced the file, go to the next element in the list.
+          continue
+        else
+          # print  a debugging statement if debugging is turned on.
+          debug "There was an error sourcing the file '${_file}'."
+          # process the next file in the list.
+          continue
+        fi
       fi
     done
   else
+    # No files were passed in.
+    # This indicates a programming error, fail giving developers an error
+    # message with a backtrace which they can use to debug their code.
     fail "Cannot source files as no files were given."
   fi
 }
@@ -89,18 +106,31 @@ source_files()
 #
 nonempty_files()
 {
+  # Declare the file and files variables, set the files variable to an array
+  # containing all of the parameters passed in.
   local _file _files=("$@")
 
+  # If the files array is nonempty
   if (( ${#_files[@]} > 0 ))
   then
+    # Expand the HOME path if the file contains '~'
+    _file=${_file/\~\//$HOME\/} # Expand ~/ to full value of $HOME
+
+    # then for each file in the files array
     for _file in "${_files[@]}"
     do
+      # If the file is nonempty
       if file_is_nonempty "${_file}"
       then
+        # print the file to STDOUT including a carriage return for explicit
+        # list separation (in case any of the files contain a path).
         printf "${_file}\n"
       fi
     done
   else
+    # No files were passed in.
+    # This indicates a programming error, fail giving developers an error
+    # message with a backtrace which they can use to debug their code.
     fail "Cannot return nonempty files as no files were given."
   fi
 }
@@ -141,18 +171,51 @@ nonempty_files()
 #
 ensure_paths_exist()
 {
+  # Declare the path and paths variables, set the files variable to an array
+  # containing all of the parameters passed in.
   local _path _paths=("$@")
 
+  # If the paths array is nonempty
   if (( ${#_paths[@]} > 0 ))
   then
+    # then for each path in the paths array
     for _path in "${_paths[@]}"
     do
-      if ! directory_exists "${_path}"
+      # if the path exists as a directory
+      if directory_exists "${_path}"
       then
-        mkdir -p "${_path}"
+        # The path already exists, move along to the next path.
+        continue
+      else
+        # if the path already exists as a file
+        if file_exists "${_path}"
+        then
+          # then issue a warning
+          # Question: Should this be a fail scenario?
+          warn "Coudl not ensure path '${_path}' exists"\
+            " as a directory as it is a file."
+        else
+          # Create the full path in the filesystem, including intermediate
+          # directories if they do not already exist.
+          if mkdir -p "${_path}"
+          then
+            # the path was created successfully, continue on to processing the
+            # next path
+            continue
+          else
+            # Failed to create the path on the filesystem.
+            # This indicates a system error, fail giving sysadmins an error
+            # message with a backtrace which they can use to debug the issue.
+            fail "Could not create the path '${_path}' "\
+              "as the 'mkdir' command failed with error code '$?'"
+          fi
+        fi
       fi
     done
   else
+    # No files were passed in.
+    # This indicates a programming error, fail giving developers an error
+    # message with a backtrace which they can use to debug their code.
     fail "Cannot ensure paths exist as no paths were given."
   fi
 }
@@ -196,26 +259,47 @@ ensure_paths_exist()
 #
 remove_files()
 {
+  # Declare the file and files variables, set the files variable to an array
+  # containing all of the parameters passed in.
   local _file _files=("$@")
 
+  # If the files array is nonempty
   if (( ${#_files[@]} > 0 ))
   then
+    # then for each file in the files array
     for _file in "${_files[@]}"
     do
+      # if the file exists as a regular file or a symlink
       if [[ -f "${_file}" || -L "${_file}" ]]
       then
+        # then remove it from the filesystem
         rm -f "${_file}"
+
+      # otherwise if the file is a directory
       elif [[ -d "${_file}" ]]
       then
-        error "Cannot remove the file ${_file} as it is a directory."
+        # Failed to remove the file as the file is actually a directory.
+        # This indicates a programming error, fail giving developers an error
+        # message with a backtrace which they can use to debug the issue.
+        fail "Cannot remove the file ${_file} as it is a directory."
+
       elif [[ -e "${_file}" ]]
       then
-        error "Unknown filesystem entity type located at ${_file}, cannot remove."
+        # This indicates a system error, fail giving sysadmins an error
+        # message with a backtrace which they can use to debug the issue.
+        fail "Failed to remove the file from the filesystem "\
+          "as the file exists as an unknown/unhandled filesystem entity type:"\
+          "$(file "${_file}")."
+
       else
-        true # already gone
+        # The file already does not exist so return true, 0, for success.
+        return 0
       fi
     done
   else
+    # Cannot remove files as no files were given.
+    # This indicates a programming error, fail giving developers an error
+    # message with a backtrace which they can use to debug their code.
     fail "Cannot remove files as no files were given."
   fi
 }
