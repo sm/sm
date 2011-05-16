@@ -266,9 +266,7 @@ install_head()
 
   enter "${src_path}/bdsm/"
 
-  ensure_files_are_executable "install"
-
-  ./install
+  exec bash ./install
 }
 
 prepare_for_installation()
