@@ -370,7 +370,9 @@ remove()
             "as the 'rm' command failed with error code '$?'"
         fi
       else
-        fail "The entity does not exist on the filesystem"
+        # The entity already does not exist on the filesystem, continue
+        # processing the entities
+        continue
       fi
     done
   else

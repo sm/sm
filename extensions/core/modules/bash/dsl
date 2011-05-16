@@ -305,7 +305,7 @@ install_core_extensions()
   local initial_pwd="$PWD"
   log "  Installing core extensions (${extensions[*]}) into ${install_path}/extensions"
   ensure_paths_exist "${install_path}/extensions"
-  enter extensions
+  enter "extensions"
   copy_directories to "${install_path}/extensions" "${extensions[@]}"
   enter "${initial_pwd}"
 }
