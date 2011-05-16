@@ -615,7 +615,7 @@ ensure_files_are_executable()
         # This indicates either a programming or a system error.
         # Fail yielding a message with a backtrace which can be used
         # to debug the issue.
-        fail "Cannot make the file '${_file}' executable "\
+        fail "Cannot make the file '${_file}' executable"\
           "as it is unexpectedly a directory."
       # Otherwise if
       elif ! file_exists "${_file}"
@@ -624,11 +624,23 @@ ensure_files_are_executable()
       else
         _path="${_file%\/*}"
 
-        if ! [[ -n "${_path}" && ! -d "${_file}" ]]
+        if variable_is_empty "${_path}" || ! directory_exists "${_path}"
         then
           fail "Cannot make the file '${_file} executable as '${_path}' does not even exist."
+        else
+          if chmod +x "${_file}"
+          then
+            # Successfully made the file executable, continue processing the
+            # next file in the files array.
+            continue
+          else
+          # Failed to remove the entity from the filesystem.
+          # This indicates a system error, fail giving sysadmins an error
+          # message with a backtrace which they can use to debug the issue.
+          fail "Could not make the file '${_file}' executable"\
+            "as the 'chmod +x' command failed with error code '$?'"
+          fi
         fi
-        chmod +x "${_file}"
       fi
     done
   else
