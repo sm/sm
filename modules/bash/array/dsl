@@ -271,13 +271,16 @@ array_first_element()
 {
   # Store the array name into a local variable, set to the empty string if it
   # was not passed in.
-  local _array_name="${1:-}" _element
+  local _array_name="${1:-}" _element _array_length
 
   # if the array name variable is not empty
   if variable_is_nonempty _array_name
   then
+    # Determine the length of the named array
+    _array_length="$(eval "\${#${_array_name}[@]}")"
+
     # if the array is not empty
-    if (( $(eval "\${#${_array_name}[@]}") > 0 ))
+    if (( _array_length > 0 ))
     then
       # Set the element variable to the value of the first element of the array.
       eval "_element=\"\${${_array_name}[0]}\""
