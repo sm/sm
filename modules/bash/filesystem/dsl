@@ -454,8 +454,8 @@ remove_paths()
           continue
         else
           # Failed to remove the entity from the filesystem.
-          # This indicates a system error, fail giving sysadmins an error
-          # message with a backtrace which they can use to debug the issue.
+          # This indicates either a a system or programming error.
+          # Fail giving a message with a backtrace that can be used to debug.
           fail "Could not remove the entity '${_entity}'"\
             "as the 'rm' command failed with error code '$?'"
         fi
@@ -620,26 +620,31 @@ ensure_files_are_executable()
       # Otherwise if
       elif ! file_exists "${_file}"
       then
-        fail "Cannot make the file '${_file}' executable as the file does not exist."
+        fail "Cannot make the file '${_file}' executable"\
+          " as the file does not exist."
       else
+        # Strip off the filename to get the path.
         _path="${_file%\/*}"
 
-        if variable_is_empty "${_path}" || ! directory_exists "${_path}"
+        # if the path variable is nonempty and the path exists on the filesystem
+        if variable_is_nonempty _path && directory_exists "${_path}"
         then
-          fail "Cannot make the file '${_file} executable as '${_path}' does not even exist."
-        else
+          # then we attempt to perform the file mode execute setting.
           if chmod +x "${_file}"
           then
             # Successfully made the file executable, continue processing the
             # next file in the files array.
             continue
           else
-          # Failed to remove the entity from the filesystem.
-          # This indicates a system error, fail giving sysadmins an error
-          # message with a backtrace which they can use to debug the issue.
-          fail "Could not make the file '${_file}' executable"\
-            "as the 'chmod +x' command failed with error code '$?'"
+            # Failed to remove the entity from the filesystem.
+            # This indicates a system error, fail giving sysadmins an error
+            # message with a backtrace which they can use to debug the issue.
+            fail "Could not make the file '${_file}' executable"\
+              "as the 'chmod +x' command failed with error code '$?'"
           fi
+        else
+          fail "Cannot make the file '${_file} executable"\
+            " as '${_path}' does not even exist."
         fi
       fi
     done
@@ -688,55 +693,107 @@ ensure_files_are_executable()
 #
 link()
 {
-  local token _source _target _force_flag=0
+  # Declare the token, source, target and force_flag variables.
+  # Default force_flag to 0.
+  local token _source _target _force_flag=0 _path
 
+  # While the parameters list is nonempty.
   while (( $# > 0 ))
   do
+    # Assign the first parameter to the token variable.
     token="$1"
+    # Remove the first paramter from the parameters list.
     shift
 
+    # Switch based on the token string's contents
     case "${token}" in
+      # if the token is 'to' then
       to)
+        # assign the next parameter to the target variable.
         _target="${1}"
+        # Remove the first paramter from the parameters list.
         shift
         ;;
+
+      # if the token is 'to' then
       from)
+        # assign the first parameter to the source variable.
         _source="${1}"
+        # Remove the first paramter from the parameters list.
         shift
         ;;
+
+      # if the token is '--force' then
       --force)
+        # set the force flag to 1
         _force_flag=1
         ;;
+
+      # if the token is unknown then
       *)
-        if [[ -z "${_source}" ]]
+        # and if the source variable is empty
+        if variable_is_empty _source
         then
+          # assign the token to the source variable
           _source="$token"
 
-        elif [[ -z "${_target}" ]]
+        # if the source variable is set but the target variable is empty
+        elif variable_is_empty _target
         then
+          # assign the token to the target variable
           _target="$token"
         fi
         ;;
     esac
   done
 
+  # if force_flag is set to 1 then
   if (( _force_flag == 1 ))
   then
+    # remove the target entity from the filesystem regardless
     remove "${_target}"
   fi
 
   # TODO: What should we do if files already exist?
-  if [[ -f "${_target}" ]]
+  # if the target exists and is a file then
+  if file_exists "${_target}"
   then
-    error "Cannot link ${_source} to ${_target} exists and is a file!"
+    # This indicates either a system or programming error.
+    # Fail giving an error message with a backtrace which can then be used to
+    # address the issue.
+    fail "Cannot link ${_source} to ${_target} exists and is a file!"
 
-  elif [[ -d "${_target}" ]]
+  # otherwise if the target exits and is a directory then
+  elif directory_exists "${_target}"
   then
-    error "Cannot link ${_source} to ${_target} exists and is a directory"
+    # This indicates either a system or programming error.
+    # Fail giving an error message with a backtrace which can then be used to
+    # address the issue.
+    fail "Cannot link ${_source} to ${_target} exists and is a directory"
 
   else
-    ensure_paths_exist "${_target%\/*}"
-    ln -fs "${_source}" "${_target}"
+    # Ensure the target's base path exists
+    _path="${_target%\/*}"
+
+    # If the path is nonempty
+    if variable_is_nonempty _path
+    then
+      # ensure that it exists
+      ensure_paths_exist "${_path}"
+    fi
+
+    # try to create a symbolic link the source to the target
+    if ln -fs "${_source}" "${_target}"
+    then
+      # the fileystem symbolic link was created successfully.
+      return 0
+    else
+      # Failed to create a symbolic link from the source to the target.
+      # This indicates either a a system or programming error.
+      # Fail giving a message with a backtrace that can be used to debug.
+      fail "Failed to create a symbolic link from '${_source}' to '${_target}'"\
+        "as the 'ln -fs' command failed with error code '$?'"
+    fi
   fi
 }
 
@@ -776,64 +833,120 @@ move_directory()
 {
   local _source _target _mode _owner
 
-  while (( $# > 0 )) ; do
-    token="$1" ; shift
+  # While the parameters list is nonempty.
+  while (( $# > 0 ))
+  do
+    # Assign the first parameter to the token variable.
+    token="$1"
+    # Remove the first paramter from the parameters list.
+    shift
+
+    # Switch based on the token string's contents
     case "${token}" in
+      # if the token is 'to' then
       to)
+        # assign the next parameter to the target variable.
         _target="${1}"
+        # Remove the first paramter from the parameters list.
         shift
         ;;
 
+      # if the token is 'to' then
       from)
+        # assign the next parameter to the source variable.
         _source="${1}"
+        # Remove the first paramter from the parameters list.
         shift
         ;;
 
+      # if the token is 'mode' then
       mode)
-         _mode="${1}"
-         shift
+        # assign the next parameter to the mode variable.
+        _mode="${1}"
+        # Remove the first paramter from the parameters list.
+        shift
         ;;
 
+      # if the token is 'owner' then
       owner)
-         _owner="${1}"
-         shift
+        # assign the next parameter to the owner variable.
+        _owner="${1}"
+        # Remove the first paramter from the parameters list.
+        shift
         ;;
 
+      # if the token is unknown then
       *)
-        if [[ -z "${_source}" ]]
+        # and if the source variable is empty
+        if variable_is_empty _source
         then
+          # assign the token to the source variable
           _source="$token"
 
-        elif [[ -z "${_target}" ]]
+        # if the source variable is set but the target variable is empty
+        elif variable_is_empty _target
         then
+          # assign the token to the target variable
           _target="$token"
-          # When we have a target we are done.
-          break
         fi
         ;;
     esac
   done
 
-  if [[ -z "${_source}" ]]
+  # if the source variable is not empty
+  if variable_is_nonempty _source
   then
-    fail "Cannot move file as the source and target must be specified. "
-  fi
+    # if the target variable is not empty
+    if variable_is_nonempty _target
+    then
+      # if we successfully move the source to the target
+      if mv "${_source}" "${_target}"
+      then
+        # and if the mode variable is not empty
+        if variable_is_nonempty _mode
+        then
+          # then set the filesystem mode of the target to the given mode
+          if ! chmod -R "${_mode}" "${_target}"
+          then
+            # Failed to change filesystem mode recursively of the target
+            # This indicates either a a system or programming error.
+            # Fail giving a message with a backtrace that can be used to debug.
+            fail "Could not change mode recursively of '${_target}' to"\
+              "${_mode} as the 'chmod -R' command failed with error code '$?'"
+          fi
+        fi
 
-  if [[ -z "${_target}" ]]
-  then
-    fail "Cannot move file as the source and target must be specified. "
-  fi
-
-  mv "${_source}" "${_target}"
-
-  if [[ -n "${_mode:-}" ]]
-  then
-    chmod -R "${_mode}" "${_target}"
-  fi
-
-  if [[ -n "${_owner:-}" ]]
-  then
-    chown -R "${_owner}" "${_target}"
+        # if the owner variable is not empty
+        if variable_is_nonempty _owner
+        then
+          # then set the filesystem owner of the target to the given mode
+          if ! chown -R "${_owner}" "${_target}"
+          then
+            # Failed to change filesystem ownership recursively of the target
+            # This indicates either a a system or programming error.
+            # Fail giving a message with a backtrace that can be used to debug.
+            fail "Could not change ownership recursively of '${_target}' to"\
+              "${_owner} as the 'chown -R' command failed with error code '$?'"
+          fi
+        fi
+      else
+        # Failed to move the source to the target
+        # This indicates either a a system or programming error.
+        # Fail giving a message with a backtrace that can be used to debug.
+        fail "Could not move '${_source}' to '${_target}'"\
+          "as the 'chmod -R' command failed with error code '$?'"
+      fi
+    else
+      # The target was not passed in.
+      # This indicates either a a system or programming error.
+      # Fail giving a message with a backtrace that can be used to debug.
+      fail "Cannot move file as the target must be specified. "
+    fi
+  else
+    # The source was not passed in.
+    # This indicates either a a system or programming error.
+    # Fail giving a message with a backtrace that can be used to debug.
+    fail "Cannot move file as the source must be specified. "
   fi
 }
 
@@ -890,20 +1003,21 @@ move_file()
         # and remove the target paramter from the parameters.
         shift
         ;;
-      # the token is 'from',
+      # if the token is 'from',
       from)
+        # assign the first parameter to the source variable.
         _source="${1}"
         # and remove the from paramter from the parameters.
         shift
         ;;
-      # the token is 'mode',
+      # if the token is 'mode',
       mode)
         # Set the mode variable to the first parameter
         _mode="${1}"
         # and remove the mode paramter from the parameters.
         shift
         ;;
-      # the token is 'owner',
+      # if the token is 'owner',
       owner)
         # Set the owner variable to the first parameter
         _owner="${1}"
@@ -911,7 +1025,7 @@ move_file()
         shift
         ;;
 
-      # If we do not know
+      # if the token is unknown
       *)
         # If the source variable is empty
         if [[ -z "${_source}" ]]
@@ -985,13 +1099,13 @@ move_file()
       # The target was not specified, this is a programming error
       # send a fail message which will send a backtrace allowing the developer
       # to quickly debug and pass in the proper parameters.
-      fail "Cannot move file as both the source and target must be specified."
+      fail "Cannot move file as the target must be specified."
     fi
   else
       # The source was not specified, this is a programming error
       # send a fail message which will send a backtrace allowing the developer
       # to quickly debug and pass in the proper parameters.
-      fail "Cannot move file as both the source and target must be specified."
+      fail "Cannot move file as both the source must be specified."
   fi
 }
 
@@ -1029,94 +1143,117 @@ move_file()
 #
 copy_file()
 {
+  # Declare the source and target variables.
   local _source _target
 
-  while (( $# > 0 )) ; do
+  # While there are parameters left
+  while (( $# > 0 ))
+  do
+    # Assign the first parameter into the token variable
     token="$1"
+    # Remove the token parameter from the parameter's list
     shift
-    case "${token}" in
-      to)
-        _target="${1}"
-        shift
-        ;;
-      from)
-        _source="${1}"
-        shift
-        ;;
-      mode)
-         _mode="${1}"
-         shift
-        ;;
-      owner)
-         _owner="${1}"
-         shift
-        ;;
-      *)
-        if [[ -z "${_source:-}" ]]
-        then
-          _source="$token"
-          shift
 
-        elif [[ -z "${_target:-}" ]]
+    # switch based on the token contents
+    case "${token}" in
+      # if the token is 'to'
+      to)
+        # assign the next parameter to the target variable.
+        _target="${1}"
+        # Remove the first paramter from the parameters list.
+        shift
+        ;;
+      # if the token is 'to' then
+      from)
+        # assign the next parameter to the source variable.
+        _source="${1}"
+        # Remove the first paramter from the parameters list.
+        shift
+        ;;
+      # if the token is 'mode' then
+      mode)
+        # set the mode variable to the first parameter and
+        _mode="${1}"
+        # Remove the first paramter from the parameters list.
+        shift
+        ;;
+      # if the token is 'owner' then
+      owner)
+        # set the mode variable to the next parameter
+        _owner="${1}"
+        # Remove the first paramter from the parameters list.
+        shift
+        ;;
+      # if the token is unknown then
+      *)
+        # and if the source variable is empty
+        if variable_is_empty _source
         then
+          # assign the token to the source variable
+          _source="$token"
+
+        # if the source variable is set but the target variable is empty
+        elif variable_is_empty _target
+        then
+          # assign the token to the target variable
           _target="$token"
-          break
         fi
         ;;
     esac
   done
 
-  cp "${_source}" "${_target}"
-
-  if [[ -n "${_mode:-}" ]]
+  # if the source variable is not empty
+  if variable_is_nonempty _source
   then
-    chmod "${_mode}" "${_target}"
-  fi
-
-  if [[ -n "${_owner:-}" ]]
-  then
-    chown "${_owner}" "${_target}"
-  fi
-
-}
-
-#
-# ## copy\_files\_to
-#
-# depreciated, please use copy_files with the 'to' specifier instead
-#
-copy_files_to()
-{
-  local _path="${1:-}" _file
-
-  if [[ -z "${_path}" ]]
-  then
-    fail "Path was not given as the first parameter."
-  else
-    shift
-  fi
-
-  local _files=("$@")
-
-  if (( ${#_files[@]} == 0 ))
-  then
-    fail "No files were given in order to copy them into ${_path}."
-  fi
-
-  log "copy_files_to is depreciated, please use copy_files with the 'to' specifier instead"
-
-  ensure_paths_exist "${_path}"
-
-  for _file in "${_files[@]}"
-  do
-    if file_is_missing "${_file}"
+    # if the target variable is not empty
+    if variable_is_nonempty _target
     then
-      error "Cannot copy file ${_file} to ${_path} as the file does not exist."
+      if cp "${_source}" "${_target}"
+      then
+        if variable_is_nonempty _mode
+        then
+          # then set the filesystem mode of the target to the given mode
+          if ! chmod "${_mode}" "${_target}"
+          then
+            # Failed to change filesystem mode of the target
+            # This indicates either a a system or programming error.
+            # Fail giving a message with a backtrace that can be used to debug.
+            fail "Could not change mode of '${_target}' to"\
+              "${_mode} as the 'chmod' command failed with error code '$?'"
+          fi
+        fi
+        # if the owner variable is not empty
+        if variable_is_nonempty _owner
+        then
+          # then set the filesystem owner of the target to the given mode
+          if ! chown "${_owner}" "${_target}"
+          then
+            # Failed to change filesystem ownership of the target
+            # This indicates either a a system or programming error.
+            # Fail giving a message with a backtrace that can be used to debug.
+            fail "Could not change ownership of '${_target}' to"\
+              "${_owner} as the 'chown' command failed with error code '$?'"
+          fi
+        fi
+      else
+        # There was an error copying the file, inform the user with a failure
+        # message and provide a backtrace as this could very well indicate a
+        # larger issue overall and debugging will be necessary.
+        fail "Could not copy '${_source}' to '${_target}' "\
+          "as the 'cp' command failed with error code '$?'"
+      fi
     else
-      cp "${_file}" "${_path}/${_file}"
+      # The target was not specified, this is a programming error
+      # send a fail message which will send a backtrace allowing the developer
+      # to quickly debug and pass in the proper parameters.
+      fail "Cannot move file as both the target must be specified."
     fi
-
-  done
+  else
+      # The source was not specified, this is a programming error
+      # send a fail message which will send a backtrace allowing the developer
+      # to quickly debug and pass in the proper parameters.
+      fail "Cannot move file as both the source must be specified."
+  fi
 }
 
 #
@@ -1153,120 +1290,111 @@ copy_files_to()
 #
 copy_files()
 {
+  # Declare the source, target, file, force_flag and files variables.
   local _source _target _file _force_flag=0 _files=()
 
+  # while the parameters list is not empty
   while (( $# > 0 ))
   do
+    # Set the token variable to the first parameter
     token="$1"
+    # and remove the token parameter from the list of parameters
     shift
-
+    # Now we examine the token and switch based on what is found.
     case "${token}" in
+      # if the token is 'to',
       to)
         _target="${1}"
+        # and remove the target paramter from the parameters.
         shift
         ;;
+
+      # if the token is 'from',
       from)
+        # assign the first parameter to the source variable.
         _source="${1}"
+        # and remove the from paramter from the parameters.
         shift
         ;;
+
+      # if the token is '--force'
       --force)
+        # set the force_flag variable to 1
         _force_flag=1
         ;;
 
+      # if the token is unknown
       *)
+        # then append it to the files array
         _files+=( "${token}" )
         ;;
     esac
   done
 
-  if [[ -z "${_target}" ]]
+  # and if the target variable is not empty
+  if variable_is_nonempty _target
   then
-    fail "Cannot copy files as no target path was given (eg. copy_files ... to {path})."
-  fi
-
-  if (( ${#_files[@]} == 0 ))
-  then
-    fail "Cannot copy files as no files were given to copy."
-  fi
-
-  ensure_paths_exist "${_target}"
-
-  for _file in "${_files[@]}"
-  do
-    if file_is_missing "${_file}"
+    # and if the files array is nonempty
+    if array_is_nonempty _files
     then
-      error "Cannot copy file ${_file} to ${_target} as the file does not exist."
+      # Then ensure that the target path exists
+      ensure_paths_exist "${_target}"
+
+      # For each file in the files
+      for _file in "${_files[@]}"
+      do
+        # If the file exists
+        if file_exists "${_file}"
+        then
+          # if force flag has been set
+          if (( _force_flag == 1 ))
+          then
+            # then forcedly copy the source file to the target file.
+            if cp -f "${_file}" "${_target}/${_file//*\/}"
+            then
+              # Successfully forcedly copied the filesytem entity,
+              # continue processing the next entity in the list
+              continue
+            else
+              # Failed to remove the entity from the filesystem.
+              # This indicates a system error, fail giving sysadmins an error
+              # message with a backtrace which they can use to debug the issue.
+              fail "Could not remove the entity '${_entity}'"\
+                "as the 'rm' command failed with error code '$?'"
+            fi
+          else
+            # copy the source file to the target file.
+            if cp "${_file}" "${_target}/${_file//*\/}"
+            then
+              # Successfully copied the filesytem entity,
+              # continue processing the next entity in the list
+              continue
+            else
+              # Failed to copy the entity from the filesystem.
+              # This indicates a system error, fail giving sysadmins an error
+              # message with a backtrace which they can use to debug the issue.
+              fail "Failed to copy '${_file}' to '${_target}/${_file//*\/}'"
+                "as the 'cp' command failed with error code '$?'"
+            fi
+          fi
+        else
+          error "Cannot copy file ${_file} to ${_target}"\
+            "as the file does not exist."
+        fi
+      done
     else
-      if (( _force_flag == 1 ))
-      then
-        cp -f "${_file}" "${_target}/${_file//*\/}"
-      else
-        cp "${_file}" "${_target}/${_file//*\/}"
-      fi
+      # No files were given.
+      # This indicates a programming error, fail giving developers an error
+      # message with a backtrace which they can use to debug their code.
+      fail "Cannot copy files as no files were given."
     fi
-  done
-}
 
-#
-# ## copy\_directories\_to
-#
-# Copys a given list of directories into the named path.
-#
-# ### Input Parameters
-#
-# The first parameter is the path to copy the directorys into.
-# Remaining parameters are the directory name/path list.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# If successful, all named directories are copied into the target path.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if no target path is given.
-# Fails if no directories are given.
-#
-# ### Usage Examples
-#
-#     user$ copy_directories_to "$HOME/backup/" "$HOME/bin" "$HOME/projects"
-#
-copy_directories_to()
-{
-  local _path="${1:-}" _directory
-
-  if [[ -z "${_path}" ]]
-  then
-    fail "Path was not given as the first parameter."
   else
-    shift
+    # The target was not specified, this is a programming error.
+    # send a fail message which will send a backtrace allowing the developer
+    # to quickly debug and pass in the proper parameters.
+    fail "Cannot move file as the and target must be specified."
   fi
-
-  local _directories=("$@")
-
-  if (( ${#_directories[@]} == 0 ))
-  then
-    fail "No directories were given in order to copy them into ${_path}."
-  fi
-
-  ensure_paths_exist "${_path}"
-
-  for _directory in "${_directories[@]}"
-  do
-    if directory_exists "${_directory}"
-    then
-      cp -Rf "${_directory}" "${_path}/"
-    else
-      error "Cannot copy directory ${_directory} to ${_path} as the directory '${_directory}' does not exist (in '$PWD')."
-    fi
-  done
 }
 
 #
@@ -1304,51 +1432,90 @@ copy_directories()
 {
   local _source _target _directory _force_flag=0 _directories=()
 
+  # while the parameters list is not empty
   while (( $# > 0 ))
   do
+    # Set the token variable to the first parameter
     token="$1"
+    # and remove the token parameter from the list of parameters
     shift
-
+    # Now we examine the token and switch based on what is found.
     case "${token}" in
+      # if the token is 'to',
       to)
         _target="${1}"
+        # and remove the target paramter from the parameters.
         shift
         ;;
+
+      # if the token is 'from',
       from)
+        # assign the first parameter to the source variable.
         _source="${1}"
+        # and remove the from paramter from the parameters.
         shift
         ;;
+
+      # if the token is '--force'
       --force)
+        # set the force_flag variable to 1
         _force_flag=1
         ;;
 
+      # if the token is unknown
       *)
+        # then append it to the files array
         _directories+=( "${token}" )
         ;;
     esac
   done
 
-  if [[ -z "${_target}" ]]
+  # and if the target variable is not empty
+  if variable_is_nonempty _target
   then
-    fail "Cannot copy directories as no target path was given (eg. copy_directories ... to {path})."
-  fi
-
-  if (( ${#_directories[@]} == 0 ))
-  then
-    fail "Cannot copy directories as no directories were given to copy."
-  fi
-
-  ensure_paths_exist "${_target}"
-
-  for _directory in "${_directories[@]}"
-  do
-    if directory_exists "${_directory}"
+    # and if the directories array is nonempty
+    if array_is_nonempty _directories
     then
-      cp -Rf "${_directory}" "${_target}/"
+      # ensure that the target path exists
+      ensure_paths_exist "${_target}"
+
+      # for each directory in the directories array
+      for _directory in "${_directories[@]}"
+      do
+        # if the directory exists
+        if directory_exists "${_directory}"
+        then
+          # then recurively copy it into the target path.
+          if cp -Rf "${_directory}" "${_target}/"
+          then
+            # Successfully forcedly copied the filesytem entity,
+            # continue processing the next entity in the list
+            continue
+          else
+            # Failed to remove the entity from the filesystem.
+            # This indicates a system error, fail giving sysadmins an error
+            # message with a backtrace which they can use to debug the issue.
+            fail "Could not copy the entity '${_entity}'"\
+              "as the 'cp -Rf' command failed with error code '$?'"
+          fi
+        else
+          error "Cannot copy directory ${_directory} to ${_target}"\
+            "as the directory '${_directory}' does not exist (in '$PWD')."
+        fi
+      done
     else
-      error "Cannot copy directory ${_directory} to ${_target} as the directory '${_directory}' does not exist (in '$PWD')."
+      # No directories were passed given.
+      # This indicates a programming error, fail giving developers an error
+      # message with a backtrace which they can use to debug their code.
+      fail "Cannot copy directories as no files were given."
     fi
-  done
+
+  else
+    # The target was not specified, this is a programming error.
+    # send a fail message which will send a backtrace allowing the developer
+    # to quickly debug and pass in the proper parameters.
+    fail "Cannot move file as the and target must be specified."
+  fi
 }
 
 
@@ -1386,101 +1553,80 @@ copy_directories()
 #
 copy_directory()
 {
+  # Declare the source and target variables.
   local _source _target
 
+  # While there are parameters left
   while (( $# > 0 ))
   do
+    # Assign the first parameter into the token variable
     token="$1"
+    # Remove the token parameter from the parameter's list
     shift
-    case "${token}" in
-      to)
-        _target="${1}"
-        shift
-        ;;
-      from)
-        _source="${1}"
-        shift
-        ;;
-      *)
-        if [[ -z "${_source}" ]]
-        then
-          _source="$token"
-          shift
 
-        elif [[ -z "${_target}" ]]
+    # switch based on the token contents
+    case "${token}" in
+      # if the token is 'to'
+      to)
+      # assign the next parameter to the target variable.
+      _target="${1}"
+      # Remove the first paramter from the parameters list.
+      shift
+      ;;
+      # if the token is 'to' then
+      from)
+      # assign the next parameter to the source variable.
+      _source="${1}"
+      # Remove the first paramter from the parameters list.
+      shift
+      ;;
+      # if the token is unknown then
+      *)
+        # and if the source variable is empty
+        if variable_is_empty _source
         then
+          # assign the token to the source variable
+          _source="$token"
+
+        # if the source variable is set but the target variable is empty
+        elif variable_is_empty _target
+        then
+          # assign the token to the target variable
           _target="$token"
-          break
         fi
         ;;
     esac
   done
 
-  cp -Rf "${_source}" "${_target}"
-}
-
-#
-# ## move\_files\_to
-#
-# Moves a given list of files into the named path.
-#
-# ### Input Parameters
-#
-# The first parameter is the path to move the files into.
-# Remaining parameters are the file name/path list.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# If successful, all named files are copied into the target path.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if no target path is given.
-# Fails if no files are given.
-#
-# ### Usage Examples
-#
-#     user$ move_files_to "$HOME/backup" "$HOME/.bashrc" "$HOME/.bash_profile"
-#
-move_files_to()
-{
-  local _path="${1:-}" _file
-
-  if [[ -n "${_path}" ]]
+  # if the source variable is not empty
+  if variable_is_nonempty _source
   then
-    fail "Path was not given as the first parameter."
-  else
-    shift
-  fi
-
-  log "DEPRECIATED, use 'move_files ... to _path' instead"
-
-  local _files=("$@")
-
-  if (( ${#_files[@]} > 0 ))
-  then
-    fail "No files given in order to chmod ${_permissions} them."
-  fi
-
-  ensure_paths_exist "${_path}"
-
-  for _file in "${_files[@]}"
-  do
-    if file_exists "${_file}"
+    # if the target variable is not empty
+    if variable_is_nonempty _target
     then
-      mv "${_file}" "${_path}/${_file}"
+      if cp -Rf "${_source}" "${_target}"
+      then
+        # successfully recursively copied source to the target return true, 0
+        return 0
+      else
+        # There was an error copying the file, inform the user with a failure
+        # message and provide a backtrace as this could very well indicate a
+        # larger issue overall and debugging will be necessary.
+        fail "Could not copy '${_source}' to '${_target}' "\
+          "as the 'cp' command failed with error code '$?'"
+      fi
     else
-      error "Cannot move file ${_file} to ${_path} as the file does not exist."
+      # The target was not specified, this is a programming error
+      # send a fail message which will send a backtrace allowing the developer
+      # to quickly debug and pass in the proper parameters.
+      fail "Cannot move file as both the target must be specified."
     fi
-  done
+  else
+    # The source was not specified, this is a programming error
+    # send a fail message which will send a backtrace allowing the developer
+    # to quickly debug and pass in the proper parameters.
+    fail "Cannot move file as both the source must be specified."
+  fi
 }
 
 #
@@ -1520,67 +1666,133 @@ move_files_to()
 #
 #     user$ move_files ".bashrc" ".bash_profile" from "$HOME" to "$HOME/backup"
 #
+# ### Code Walkthrough
 move_files()
 {
+  # Declare the source target file force_flag and files variables
+  # Initialize force_flag to zero and the files array to empty
   local _source _target _file _force_flag=0 _files=()
 
+  # While the parameters list is nonempty.
   while (( $# > 0 ))
   do
+    # Assign the first parameter to the token variable.
     token="$1"
+    # Remove the first paramter from the parameters list.
     shift
 
+    # Switch based on the token string's contents
     case "${token}" in
+      # if the token is 'to' then
       to)
+        # assign the next parameter to the target variable.
         _target="${1}"
+        # Remove the first paramter from the parameters list.
         shift
         ;;
+
+      # if the token is 'to' then
       from)
+        # assign the first parameter to the source variable.
         _source="${1}"
+        # Remove the first paramter from the parameters list.
         shift
         ;;
+
+      # if the token is '--force' then
       --force)
+        # set the force flag to 1
         _force_flag=1
         ;;
 
+      # if the token is unknown then
       *)
+        # add the token to the files array
         _files+=( "${token}" )
         ;;
     esac
   done
 
-  if [[ -n "${_target}" ]]
+  # If the source variable is not empty
+  if variable_is_nonempty _source
   then
-    if (( ${#_files[@]} > 0 ))
+    # and if the target variable is not empty
+    if variable_is_nonempty _target
     then
-      if [[ -d "${_target}" ]]
+      # and if the files array is nonempty
+      if array_is_nonempty _files
       then
+        # for each file in the files array
         for _file in "${_files[@]}"
         do
-          if [[ -n "${_source}" ]]
+          # if the source variable is nonempty
+          if variable_is_nonempty _source
           then
+            # then prepend source to the file
             _file="${_source}/${_file}"
           fi
 
+          # if the file exists
           if file_exists "${_file}"
           then
+            # and force_flag is set
             if (( _force_flag == 1 ))
             then
-              mv -f "${_file}" "${_target}/${_file//*\/}"
+              # then forcedly move the file
+              if mv -f "${_file}" "${_target}/${_file//*\/}"
+              then
+                # Successfully forcedly moved the file to the target
+                # continue processing the next entity in the list
+                continue
+              else
+                # Failed to forcedly move file to target
+                # This indicates a system error, fail giving sysadmins an error
+                # message with a backtrace which they can use to debug the issue
+                fail "Could not forcedly move the entity '${_entity}'"\
+                  "as the 'mv -f' command failed with error code '$?'"
+              fi
             else
-              mv "${_file}" "${_target}/${_file//*\/}"
+              # otherwise move the file
+              if mv "${_file}" "${_target}/${_file//*\/}"
+              then
+                # Successfully copied the filesytem entity,
+                # continue processing the next entity in the list
+                continue
+              else
+                # Failed to remove the entity from the filesystem.
+                # This indicates a system error, fail giving sysadmins an error
+                # message with a backtrace which they can use to debug the issue.
+                fail "Could not move the file '${_file}' to "\
+                  "'${_target}/${_file//*\/}"\
+                  "as the 'rm' command failed with error code '$?'"
+              fi
             fi
           else
-            error "Cannot move file ${_file} to ${_path} as the file does not exist."
+            # Failed to move the the file as the file is missing
+            # This indicates a system error, fail giving sysadmins an error
+            # message with a backtrace which they can use to debug the issue.
+            fail "Could not move the source file '${_file}' to the target"\
+              "'${_target}/${_file//*\/}"\
+              "as the source file does not exist"
           fi
         done
       else
-        error "Cannot move files to '${_target}' as the directory does not exist"
+        # No files were given.
+        # This indicates a programming error, fail giving developers an error
+        # message with a backtrace which they can use to debug their code.
+        fail "Cannot move files as no files were given."
       fi
     else
-      fail "Cannot move files as no files were given to move."
+      # The target was not specified, this is a programming error
+      # send a fail message which will send a backtrace allowing the developer
+      # to quickly debug and pass in the proper parameters.
+      fail "Cannot move file as the target must be specified."
     fi
   else
-    fail "Cannot move files as no target path was given (eg. move_files ... to {path})."
+      # The source was not specified, this is a programming error
+      # send a fail message which will send a backtrace allowing the developer
+      # to quickly debug and pass in the proper parameters.
+      fail "Cannot move file as both the source must be specified."
   fi
 }
 
@@ -1617,31 +1829,57 @@ move_files()
 #
 chown_files()
 {
+  # Declare the identity and file and set the identiy to the first parameter
   local _identity="${1:-}" _file
 
-  if [[ -z "${_identity}" ]]
+  # if the identity variable is nonempty
+  if variable_is_nonempty _identity
   then
-    fail "user[:group] not given as the first parameter."
-  else
+    # Remove the identity from the path
     shift
-  fi
 
-  local _files=("$@")
+    # Set the files array to the remaining parameters
+    local _files=("$@")
 
-  if (( ${#_files[@]} == 0 ))
-  then
-    fail "No paths given to chmod ${_permissions}."
-  fi
-
-  for _file in "${_files[@]}"
-  do
-    if file_exists "${_file}"
+    # if the file sarray is nonempty
+    if array_is_nonempty _files
     then
-      chown -R ${_identity} "${_file}"
+      # for each file in the files array
+      for _file in "${_files[@]}"
+      do
+        # if the file exists on the filesystem
+        if file_exists "${_file}"
+        then
+          if chown -R ${_identity} "${_file}"
+          then
+            # Successfully copied the filesytem entity,
+            # continue processing the next entity in the list
+            continue
+          else
+            # Failed to recursively chown the entity on the filesystem.
+            # This indicates a system error, fail giving sysadmins an error
+            # message with a backtrace which they can use to debug the issue.
+            fail "Could not recursively chown the file '${_file}' to "\
+              "'${_target}/${_file//*\/}"\
+              "as the 'chown -R' command failed with error code '$?'"
+          fi
+        else
+          # The file does not exist.
+          # This indicates a system error, fail giving sysadmins an error
+          # message with a backtrace which they can use to debug the issue.
+          fail "Cannot chown file ${_file} to ${_identity}"\
+            "as the file does not exist."
+        fi
+      done
     else
-      error "Cannot chown file ${_file} to ${_identity} as the file does not exist."
+      # No files were given.
+      # This indicates a programming error, fail giving developers an error
+      # message with a backtrace which they can use to debug their code.
+      fail "Cannot chown files as no files were given."
     fi
-  done
+  else
+    fail "user[:group] not given as the first parameter."
+  fi
 }
 
 #
@@ -1677,91 +1915,80 @@ chown_files()
 #
 chown_paths()
 {
-  local _identity="${1:-}" _path
+  # Declare the identity and file and set the identiy to the first parameter
+  local _identity="${1:-}" _path _recursive_flag=0 _command
 
-  if [[ -z "${_identity}" ]]
+  # If the first parameter is --recursive
+  if [[ "${1:-}" == "--recursive" ]]
   then
-    fail "user[:group] not given as the first parameter."
-  else
+    # Set the recursive flag to 1
+    _recursive_flag=1
+    # Remove the recursive flag parameter
     shift
+    # Set identity to the next parameter
+    _identity="${1}"
   fi
 
-  local _paths=("$@")
-
-  if (( ${#_paths[@]} == 0 ))
+  # if the identity variable is nonempty
+  if variable_is_nonempty _identity
   then
-    fail "No paths given to chmod ${_permissions}."
-  fi
-
-  for _path in "${_paths[@]}"
-  do
-    if directory_exists "${_path}"
-    then
-      chown ${_identity} "${_path}"
-    else
-      error "Cannot chown path ${_path} to ${_identity} as the directory does not exist."
-    fi
-  done
-}
-
-#
-# ## chown\_paths\_recursively
-#
-# Change ownership of a list of paths, recursively.
-#
-# ### Input Parameters
-#
-# First parameter is the new owner[:group] of the paths.
-# Remaining parameters are the path names/paths.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success
-#
-# ### Failure Scenarios
-#
-# Fails if no new owner[:group] was specified.
-# Fails if no list of paths was given.
-#
-# ### Usage Examples
-#
-#     user$ chown_paths_recursively $USER "$HOME" "/usr/local"
-#
-chown_paths_recursively()
-{
-  local _identity="${1:-}" _path
-
-  if [[ -z "${_identity}" ]]
-  then
-    fail "user[:group] not given as the first parameter!!"
-  else
+    # Remove the identity from the path
     shift
-  fi
+    # Set the paths array to the remaining parameters
+    local _paths=("$@")
 
-  local _paths=("$@")
-
-  if (( ${#_paths[@]} == 0 ))
-  then
-    fail "No paths given to chmod ${_permissions}."
-  fi
-
-  for _path in "${_paths[@]}"
-  do
-    if directory_exists "${_path}"
+    # if the paths sarray is nonempty
+    if array_is_nonempty _paths
     then
-      chown -R ${_identity} "${_path}"
+      # for each path in the paths array
+      for _path in "${_paths[@]}"
+      do
+        # if the path exists on the filesystem
+        if directory_exists "${_path}"
+        then
+          if (( _recursive_flag == 1 ))
+          then
+            # the chown command will be with the recursive flag
+            _command="chown -R ${_identity} '${_path}'"
+          else
+            # the chown command will be without the recursive flag
+            _command="chown ${_identity} '${_path}'"
+          fi
+
+          # Run the command
+          if ${_command}
+          then
+            # Successfully changed ownership of the filesytem entity,
+            # continue processing the next entity in the list
+            continue
+          else
+            # Failed to chown the entity on the filesystem.
+            # This indicates a system error, fail giving sysadmins an error
+            # message with a backtrace which they can use to debug the issue.
+            fail "Could not chown the file '${_file}' to "\
+              "'${_target}/${_file//*\/}"\
+              "as the 'chown' command failed with error code '$?'"
+          fi
+        else
+          # The file does not exist.
+          # This indicates a system error, fail giving sysadmins an error
+          # message with a backtrace which they can use to debug the issue.
+          fail "Cannot chown path ${_path} to ${_identity}"\
+            "as the path (directory) does not exist."
+        fi
+      done
     else
-      error "Cannot recursively chown ${_path} to ${_identity} as the directory does not exist."
+      # No paths were given.
+      # This indicates a programming error, fail giving developers an error
+      # message with a backtrace which they can use to debug their code.
+      fail "Cannot chown paths as no files were given."
     fi
-  done
+  else
+    # The user[:group] was not given.
+    # This indicates a programming error, fail giving developers an error
+    # message with a backtrace which they can use to debug their code.
+    fail "Cannot chown paths as no user[:group] was given as the first parameter"
+  fi
 }
 
 #
@@ -1793,37 +2020,63 @@ chown_paths_recursively()
 #
 # ### Usage Examples
 #
-#     user$ chmod_files $USER "$HOME" "/usr/local"
+#     user$ chmod_files $USER "$HOME/.bashrc" "$HOME/.bsah_profile"
 #
 chmod_files()
 {
-  local _permissions="${1:-}" _file _message
+  # Declare the identity and file and set the identiy to the first parameter
+  local _permissions="${1:-}" _file _recursive_flag=0 _command
 
-  if [[ -n "${_permissions}" ]]
+  # if the permissions variable is nonempty
+  if variable_is_nonempty _permissions
   then
+    # Remove the permissions from the file
     shift
+    # Set the files array to the remaining parameters
     local _files=("$@")
 
-    if (( ${#_files[@]} > 0 ))
+    # if the files sarray is nonempty
+    if array_is_nonempty _files
     then
+      # for each file in the files array
       for _file in "${_files[@]}"
       do
+        # if the file exists on the filesystem
         if file_exists "${_file}"
         then
-          chmod ${_permissions} "${_file}"
+          # Run the chmod command
+          if chmod ${_permissions} "${_file}"
+          then
+            # Successfully changed ownership of the filesytem entity,
+            # continue processing the next entity in the list
+            continue
+          else
+            # Failed to chmod the entity on the filesystem.
+            # This indicates a system error, fail giving sysadmins an error
+            # message with a backtrace which they can use to debug the issue.
+            fail "Could not chmod the file '${_file}' to "\
+              "'${_target}/${_file//*\/}"\
+              "as the 'chmod' command failed with error code '$?'"
+          fi
         else
-          _message=(
-          "Cannot chmod file ${_file} to ${_permissions}"
-          " as the file does not exist."
-          )
-          error "${_message[*]}"
+          # The file does not exist.
+          # This indicates a system error, fail giving sysadmins an error
+          # message with a backtrace which they can use to debug the issue.
+          fail "Cannot chmod file ${_file} to ${_permissions}"\
+            "as the file (directory) does not exist."
         fi
       done
     else
-      fail "No files given to chmod ${_permissions}."
+      # No files were given.
+      # This indicates a programming error, fail giving developers an error
+      # message with a backtrace which they can use to debug their code.
+      fail "Cannot chmod files as no files were given."
     fi
   else
-    fail "Permissions not given as the first parameter!!"
+    # The user[:group] was not given.
+    # This indicates a programming error, fail giving developers an error
+    # message with a backtrace which they can use to debug their code.
+    fail "Cannot chmod files as no user[:group] was given as the first parameter"
   fi
 }
 
@@ -1860,39 +2113,79 @@ chmod_files()
 #
 chmod_paths()
 {
-  local _permissions="$1" _path _message
+  # Declare the permissions and file and set the identiy to the first parameter
+  local _permissions="${1:-}" _path _recursive_flag=0 _command
 
-  if [[ -n "${_permissions}" ]]
+  # If the first parameter is --recursive
+  if [[ "${1:-}" == "--recursive" ]]
   then
+    # Set the recursive flag to 1
+    _recursive_flag=1
+    # Remove the recursive flag parameter
     shift
+    # Set permissions to the next parameter
+    _permissions="${1}"
+  fi
+
+  # if the permissions variable is nonempty
+  if variable_is_nonempty _permissions
+  then
+    # Remove the permissions from the path
+    shift
+    # Set the paths array to the remaining parameters
     local _paths=("$@")
-    if (( ${#_paths[@]} > 0 ))
+
+    # if the paths sarray is nonempty
+    if array_is_nonempty _paths
     then
+      # for each path in the paths array
       for _path in "${_paths[@]}"
       do
+        # if the path exists on the filesystem
         if directory_exists "${_path}"
         then
-          chmod ${_permissions} "${_path}"
+          if (( _recursive_flag == 1 ))
+          then
+            # the chmod command will be with the recursive flag
+            _command="chmod -R ${_permissions} '${_path}'"
+          else
+            # the chmod command will be without the recursive flag
+            _command="chmod ${_permissions} '${_path}'"
+          fi
+
+          # Run the command
+          if ${_command}
+          then
+            # Successfully changed ownership of the filesytem entity,
+            # continue processing the next entity in the list
+            continue
+          else
+            # Failed to chmod the entity on the filesystem.
+            # This indicates a system error, fail giving sysadmins an error
+            # message with a backtrace which they can use to debug the issue.
+            fail "Could not chmod the file '${_file}' to "\
+              "'${_target}/${_file//*\/}"\
+              "as the 'chmod' command failed with error code '$?'"
+          fi
         else
-          _message=(
-          "Cannot chmod directory ${_path} to ${_permissions}"
-          " as the directory does not exist.")
-          error "${_message[*]}"
+          # The file does not exist.
+          # This indicates a system error, fail giving sysadmins an error
+          # message with a backtrace which they can use to debug the issue.
+          fail "Cannot chmod path ${_path} to ${_permissions}"\
+            "as the path (directory) does not exist."
         fi
       done
     else
-      _message=(
-      "Cannot chmod_paths as no paths were given in "
-      "order to change permissions to ${_permissions}."
-      )
-      fail "${_message[*]}"
+      # No paths were given.
+      # This indicates a programming error, fail giving developers an error
+      # message with a backtrace which they can use to debug their code.
+      fail "Cannot chmod paths as no files were given."
     fi
   else
-    _message=(
-    "Cannot chmod_paths as the permissions were "
-    "not given as the first parameter!!"
-    )
-    fail "${_message[*]}"
+    # The user[:group] was not given.
+    # This indicates a programming error, fail giving developers an error
+    # message with a backtrace which they can use to debug their code.
+    fail "Cannot chmod paths as no user[:group] was given as the first parameter"
   fi
 }
 
