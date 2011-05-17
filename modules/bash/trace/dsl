@@ -535,16 +535,17 @@ backtrace()
     (mvim*|mate*)
       # Set the format based on GUI editing tools format for opening
       # a file to a given line using a file URI.
-      _format="%-$((${#_largest} + 2))s %-s\n"
+      _format="%-60s # %-$((${#_largest} + 2))s \n"
       # Print the backtrace header to the calling environment's STDERR
-      printf "${_format}" "function()" "Source"  1>&2
+      printf "${_format}" "Source" "function()"  1>&2
       ;;
     (vi*|gvim*|emacs*|*)
       # Set the format based on the console editing tools format for opening
       # a file to a given line.
-      _format="%-$((${#_largest} + 2))s $ %${#EDITOR}s +%-$((${#_digits}))s %-$((${#_longest} + 2))s %s\n"
+      # _format="%-$((${#_largest} + 2))s $ %${#EDITOR}s +%-$((${#_digits}))s %-$((${#_longest} + 2))s %s\n"
+      _format="%${#EDITOR}s +%-$((${#_digits}))s %-$((${#_longest} + 2))s # %s %-$((${#_largest} + 2))s\n"
       # Print the backtrace header to the calling environment's STDERR
-      printf "${_format}" "function()" ' ' "#" "source file"  1>&2
+      printf "${_format}" ' ' "#" "source file" "function()"  1>&2
       ;;
   esac
 
@@ -573,13 +574,13 @@ backtrace()
       # given line using a file URI.
       (mvim*|mate*)
         # Print the backtrace line to the calling environment's STDERR
-        printf "${_format}" "${_function}" "${EDITOR// *}://open?url=file://${_source}&line=${_line}" 1>&2
+        printf "${_format}" "open ${EDITOR// *}://open?url=file://${_source}&line=${_line}" "${_function}" 1>&2
         ;;
       # Print with the format and content for console editing tools a to open a
       # file to a given line.
       (vi*|gvim*|emacs*|*)
         # Print the backtrace line to the calling environment's STDERR
-        printf "${_format}" "${_function}" "${EDITOR}" "${_line}" "${_source} " 1>&2
+        printf "${_format}" "${EDITOR}" "${_line}" "${_source} " "${_function}" 1>&2
         ;;
     esac
   done
