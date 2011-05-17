@@ -439,6 +439,8 @@ variables_are_nonempty()
         return 1
       fi
     done
+    # If we get to this point, then all variables were set so return true, 0
+    # to the caller.
     return 0
   else
     # Otherwise no parameters were passed in, this is a programming error.

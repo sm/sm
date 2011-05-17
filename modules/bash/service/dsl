@@ -211,7 +211,7 @@ service_setup()
     ensure_paths_exist "${service_root_paths[@]}"
 
     # then ensure that the service_user has ownership of the root serivce paths.
-    chown_paths_recursively "${service_user}:${service_user}"\
+    chown_paths --recursively "${service_user}:${service_user}"\
       "${service_root_paths[@]}"
   fi
 
@@ -219,7 +219,8 @@ service_setup()
   ensure_paths_exist "${service_paths[@]}" "${install_path}"
 
   # Ensure that the service_user has ownership of the serivce paths.
-  chown_paths_recursively "${service_user}:${service_user}" "${service_paths[@]}"
+  chown_paths --recursively "${service_user}:${service_user}" \
+    "${service_paths[@]}"
 
   # Install the service init.d scripts.
   service_install_init_d "${service}"
