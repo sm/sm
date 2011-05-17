@@ -177,7 +177,7 @@ ensure_paths_exist()
   local _path _paths=("$@")
 
   # If the paths array is nonempty
-  if (( ${#_paths[@]} > 0 ))
+  if array_is_nonempty _paths
   then
     # then for each path in the paths array
     for _path in "${_paths[@]}"
@@ -2190,69 +2190,6 @@ chmod_paths()
 }
 
 #
-# ## chmod\_paths\_recursively
-#
-# Change ownership of a list of paths, recursively.
-#
-# ### Input Parameters
-#
-# First parameter is the new owner[:group] of the paths.
-# Remaining parameters are the path names/paths.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success
-#
-# ### Failure Scenarios
-#
-# Fails if no new owner[:group] was specified.
-# Fails if no list of paths was given.
-#
-# ### Usage Examples
-#
-#     user$ chmod_paths_recursively $USER "$HOME" "/usr/local"
-#
-chmod_paths_recursively()
-{
-  local _permissions="${1:-}" _path _message
-
-  if [[ -n "${_permissions}" ]]
-  then
-    shift
-    local _paths=("$@")
-
-    if (( ${#_paths[@]} > 0 ))
-    then
-      for _path in "${_paths[@]}"
-      do
-        if directory_exists "${_path}"
-        then
-          chmod -R ${_permissions} "${_path}"
-        else
-          _message=(
-          "Cannot chmod directory ${_path} to ${_permissions} "
-          "as the directory does not exist."
-          )
-          error "${_message[*]}"
-        fi
-      done
-    else
-      fail "No paths given to chmod ${_permissions}."
-    fi
-  else
-    fail "Permissions not given as the first parameter!!"
-  fi
-}
-
-#
 # ## enter
 #
 # Changes the current working directory ($PWD) to the given directory with
@@ -2286,20 +2223,38 @@ chmod_paths_recursively()
 #
 enter()
 {
+  # set the path variable to the first parameter.
   local _path="$1"
 
-  if [[ -n "${_path}" ]]
+  # If the path variable was passed in
+  if variable_is_nonempty _path
   then
-    if [[ -d "${_path}" ]]
+    # and if the path exists on the filesystem
+    if directory_exists "${_path}"
     then
-      if ! builtin cd "${_path}"
+      # then change the calling environment's working directory into the
+      # given path
+      if cd "${_path}"
       then
-        error "There was an error ($?) while entering the directory '${_path}'."
+        # return true, 0 for success
+        return 0
+      else
+        # Failed to chmod the entity on the filesystem.
+        # This indicates a system error, fail giving sysadmins an error
+        # message with a backtrace which they can use to debug the issue.
+        fail "Could not cd into the given path '${_path}' "\
+          "as the 'cd' command failed with error code '$?'"
       fi
     else
-      error "Cannot enter the directory '${_path}' as it does not exist."
+    # The path does not exist on the filesystem.
+    # This indicates a programming error, fail giving developers an error
+    # message with a backtrace which they can use to debug their code.
+      fail "Cannot enter the directory '${_path}' as it does not exist."
     fi
   else
+    # No path was passed into the function.
+    # This indicates a programming error, fail giving developers an error
+    # message with a backtrace which they can use to debug their code.
     fail "Cannot enter a directory as no directory was given."
   fi
 }
@@ -2341,55 +2296,76 @@ enter()
 #
 hash_file()
 {
-  local _file="${1:-}" _message
+  # Declare the message, key, value and file variables
+  local _message _key _value _file="${1:-}"
 
-  if [[ -z "${_file}" ]]
+  # If the file variable is nonempty
+  if variable_is_nonempty _file
   then
-    fail "File path/name not given.\n => Usage: $0 <filename> <key> [value]"
-  else
+    # remove the file from the parameters list
     shift
-  fi
+    # assign the next parameter into the key varibale
+    local _key="${1:-}"
+    # if the key variable is nonempty
+    if variable_is_nonempty _key
+    then
+      # then remove the key variable from the parameters list
+      shift
+      # Determine the path of the file
+      # Note that this will be '.' if only a file name was given.
+      local _path=$(dirname "${_file}")
 
-  local _key="${1:-}"
-
-  if [[ -z "${_key}" ]]
-  then
-    fail "Key not given.\n => Usage: $0 <filename> <key> [value]"
-  else
-    shift
-  fi
-
-  local _path=$(dirname "${_file}")
-  if [[ -d "${_path}" ]]
-  then
-    ensure_files_exist "$_file"
-  else
-    _message=(
-    "Cannot access the database file '${_file}' "
-    "as the directory '${_file%\/*}' does not exist."
-    )
-    error "{$_message[*]}"
-  fi
-
-  value="$*"
-  case "$value" in
-    unset|delete)
-      sed -i.tmp "s#^${_key}=.*\$##" "${_file}"
-      ;;
-    *)
-      if [[ -z "${value}" ]]
-      then # get
-        awk -F= '/^'"${_key}"'=/{print $2}' "$_file"
-      else # set
-        if ! awk -F= "/^'"${_key}"'=/{print $2}" "${_file}" >/dev/null 2>&1
-        then
-          echo "${_key}=$value" >> "${_file}"
-        else # overwrite
-          sed -i.tmp "s#^${_key}=.*\$#${_key}=$value#" "${_file}"
-        fi
+      # if the directory exists on the filesystem
+      if directory_exists "${_path}"
+      then
+        # ensure that the file exists in the directory, creating an empty file
+        # if it does not exist.
+        ensure_files_exist "$_file"
+      else
+        # The directory does not exist.
+        # This indicates a system error, fail giving sysadmins an error
+        # message with a backtrace which they can use to debug the issue.
+        fail "{$_message[*]}"\
+          "Cannot access the database file '${_file}' "\
+          "as the directory '${_path}' does not exist on the filesystem."
       fi
-      ;;
-  esac
+
+      # Assign the remaining parameters as a single string into the value
+      # variable
+      value="$*"
+
+      # pattern match against the parameters value
+      case "$value" in
+        # if unset or delete was specified then
+        unset|delete)
+          sed -i.tmp "s#^${_key}=.*\$##" "${_file}"
+          ;;
+        # if the parameters value was not unset or delete
+        *)
+          # if the value variable is nonempty then
+          if variable_is_empty value
+          then
+            # use awk in order to retrieve the value for the given key from
+            # the file on the filesystem
+            awk -F= '/^'"${_key}"'=/{print $2}' "${_file}"
+          else # set
+            # use awk in order to set the value for the given key to the value
+            # given onto the file on the filesystem
+            if ! awk -F= "/^'"${_key}"'=/{print $2}" "${_file}" >/dev/null 2>&1
+            then
+              echo "${_key}=$value" >> "${_file}"
+            else # overwrite
+              sed -i.tmp "s#^${_key}=.*\$#${_key}=$value#" "${_file}"
+            fi
+          fi
+          ;;
+      esac
+    else
+      fail "Key not given.\n => Usage: $0 <filename> <key> [value]"
+    fi
+  else
+    fail "File path/name not given.\n => Usage: $0 <filename> <key> [value]"
+  fi
 }
 
 #
