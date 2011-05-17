@@ -276,8 +276,9 @@ array_first_element()
   # if the array name variable is not empty
   if variable_is_nonempty _array_name
   then
-    # Determine the length of the named array
-    _array_length="$(eval "\${#${_array_name}[@]}")"
+    # Determine the length of the named array and assign it into the
+    # array_length variable
+    eval "_array_length=\"\${#${_array_name}[@]}\""
 
     # if the array is not empty
     if (( _array_length > 0 ))
