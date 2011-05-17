@@ -53,7 +53,7 @@ do
           ;;
 
         --debug)
-          (( debug_flag++ ))
+          true ${debug_flag:=0} $(( debug_flag++ ))
           enable_debug
           ;;
 
@@ -69,7 +69,7 @@ do
           ;;
 
         --trace)
-          (( ++trace_flag ))
+          true ${trace_flag:=0} $(( trace_flag++ ))
           enable_trace
           ;;
 

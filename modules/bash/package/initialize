@@ -11,7 +11,9 @@ true "${package_name:=${extension}}"
 
 true \
   "${source_path:="${bdsm_path}/src"}" \
-  "${install_base_path:="${packages_path}/${package_name}"}"
+  "${install_base_path:="${packages_path}/${package_name}"}" \
+  ${static_flag:=0}
+
 
 if user_is_root
 then
