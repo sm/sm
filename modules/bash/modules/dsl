@@ -408,17 +408,31 @@ module_docs()
     esac
   done
 
-  if [[ -n "${_module}" ]]
+  if variable_is_nonempty _module
   then
-    local _path="${core_development_path}/modules/bash/${_module}"
-    if (( content_flag == 1 ))
+    if command_exists shocco
     then
-      shocco "${_path}/dsl" | awk '/<body>/{p=1;next;} /\/body>/{p=0;next;} {if (p == 1) print ; } '
-    elif (( table_flag == 1 ))
-    then
-      shocco "${_path}/dsl" | awk '/<table/{p=1;} {if (p == 1) print ; } /\/table>/{p=0;} '
+      if command_exists pygmentize
+      then
+        local _path="${core_development_path}/modules/bash/${_module}"
+        if (( content_flag == 1 ))
+        then
+          shocco "${_path}/dsl" |
+            awk '/<body>/{p=1;next;} /\/body>/{p=0;next;} {if (p == 1) print ; } '
+        elif (( table_flag == 1 ))
+        then
+          shocco "${_path}/dsl" |
+            awk '/<table/{p=1;} {if (p == 1) print ; } /\/table>/{p=0;} '
+        else
+          shocco "${_path}/dsl"
+        fi
+      else
+        fail "Cannot generate documentation for the '${_module}' module"\
+          " as the pygmentize command was not found in the PATH"
+      fi
     else
-      shocco "${_path}/dsl"
+      fail "Cannot generate documentation for the '${_module}' module"\
+        " as the shocco command was not found in the PATH"
     fi
   else
     fail "Cannot glean documentation for a module as no module name was given"
@@ -514,7 +528,8 @@ modules_docgen()
     log "Modules documentation content has been generated in ${_prefix}."
   else
     error "Set core_development_path in ~/.bdsmrc and clone the bdsm core "\
-      "repository into it in order to run docgen."
+      "repository into it in order to run docgen."\
+      "For more information see https://bdsm.beginrescueend.com/development/core"
   fi
 }
 
