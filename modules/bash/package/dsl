@@ -526,13 +526,13 @@ package_configure()
 {
   local _command
 
-  if [[ -n ${configure_command:-} ]]
+  if variable_is_nonempty configure_command
   then
     _command="${configure_command}"
   else
     export PREFIX="${install_base_path}/${package_version}"
 
-    _command="./configure ${configure_flags[@]:-"--prefix=${install_path:-$packages_path}"}"
+    _command="./configure ${configure_flags[@]:-"--prefix=${install_path}"}"
 
     file_is_executable "configure" || return 0
   fi
@@ -1337,6 +1337,9 @@ package_cli()
     fi
 
   done
+
+  # explicitely reload the package module to pickup any CLI overrides.
+  modules_reinitialize package
 }
 
 #

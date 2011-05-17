@@ -151,7 +151,7 @@ modules_reinitialize()
   then
     for _module in "${_modules[@]}"
     do
-      source_files "${modules_path}/bash/initialize"
+      source_files "${modules_path}/bash/${_module}/initialize"
     done
   else
     fail "Cannot load a module as no module was given."
