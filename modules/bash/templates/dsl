@@ -286,7 +286,7 @@ seed_template()
     if file_exists "${_template}"
     then
       # if the hash array is nonempty
-      array_is_nonempty _hash
+      if array_is_nonempty _hash
       then
         if array_is_even _hash
         then

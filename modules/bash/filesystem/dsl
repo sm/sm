@@ -1919,7 +1919,7 @@ chown_paths()
   local _identity="${1:-}" _path _recursive_flag=0 _command
 
   # If the first parameter is --recursive
-  if [[ "${1:-}" == "--recursive" ]]
+  if [[ "${1:-}" == --recursive* ]]
   then
     # Set the recursive flag to 1
     _recursive_flag=1
