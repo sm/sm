@@ -167,6 +167,7 @@ install_template()
   # otherwise if the named template inside of the templates directory postfixed
   # with .template exists
   elif file_exists "${_source}/${_name}.template"
+  then
     # set the template variable to the named template inside of the templates
     # directory postfixed with .template
     _template="${_source}/${_name}.template"
@@ -315,7 +316,8 @@ seed_template()
         # will exist on the filesystem
         if file_exists "${_template}.${timestamp}"
         then
-          mv -f "${_template}.${timestamp}" "${_template}"
+          # Move the file
+          move_file "${_template}.${timestamp}" "${_template}"
         else
           fail "Something went horribly wrong, the template intermediate file "\
             "'${_template}.${timestamp}' does not exist."
