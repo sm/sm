@@ -119,6 +119,46 @@ module_load()
 }
 
 #
+# ## modules\_reinitialize()
+#
+# Function Description
+#
+# ### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ### Stream Outputs
+#
+# None, unless loading the module causes output to a stream.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# Fails if no extension module files names have been given.
+#
+# ### Usage Examples
+#
+#     user$ module_reinitialize package
+#
+modules_reinitialize()
+{
+  local _module _modules=("$@")
+
+  if array_is_nonempty _modules
+  then
+    for _module in "${_modules[@]}"
+    do
+      source_files "${modules_path}/bash/initialize"
+    done
+  else
+    fail "Cannot load a module as no module was given."
+  fi
+}
+
+#
 # ## module\_is\_loaded()
 #
 # Checks to see whether or not the named module has been loaded or not.

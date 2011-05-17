@@ -31,10 +31,13 @@ fi
 extension_patches_path="${extension_path}/patches"
 
 # Ensure that package_version is set at this point
-variable_is_nonempty package_version || \
+if variable_is_empty package_version
+then
   read_default version prefix package
+fi
 
-if variable_is_nonempty package_version ; then
+if variable_is_nonempty package_version
+then
   install_path="${install_base_path}/${package_version}"
 else
   case ${package_name} in
