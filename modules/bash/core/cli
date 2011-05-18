@@ -102,6 +102,12 @@ do
               parse_break=1
               ;;
 
+            docopen)
+              extension="core"
+              action="docopen"
+              parse_break=1
+              ;;
+
             help)
               action="help"
               extension="${1:-core}"
