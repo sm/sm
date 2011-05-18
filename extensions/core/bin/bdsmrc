@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if file_is_nempty "$extension_templates_path/bdsmrc"
+if file_is_nonempty "$extension_templates_path/bdsmrc"
 then
   fail "The template file $extension_templates_path/bdsmrc is missing."
 fi
