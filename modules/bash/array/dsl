@@ -170,7 +170,7 @@ array_length()
     # Record the lenght of the array to the length variable.
     eval "_length=\${#${_array_name}[@]}"
     # print out the length of the array
-    print ${_length}
+    printf ${_length}
     # Return true, 0, for success.
     return 0
   else
