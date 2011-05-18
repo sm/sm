@@ -1949,10 +1949,10 @@ chown_paths()
           if (( _recursive_flag == 1 ))
           then
             # the chown command will be with the recursive flag
-            _command="chown -R ${_identity} '${_path}'"
+            _command="chown -R ${_identity} ${_path}"
           else
             # the chown command will be without the recursive flag
-            _command="chown ${_identity} '${_path}'"
+            _command="chown ${_identity} ${_path}"
           fi
 
           # Run the command

@@ -64,7 +64,12 @@ done
 
 if variable_is_empty service_binary
 then
-  true service_binary="$(command -v ${service} 2>/dev/null)"
+  if command_exists ${service}
+  then
+    service_binary="$(command -v ${service})"
+  else
+    service_binary="${service}"
+  fi
 fi
 
 service_actions=( start stop restart )
