@@ -1926,7 +1926,7 @@ chown_files()
 chown_paths()
 {
   # Declare the identity and file and set the identiy to the first parameter
-  local _identity="${1:-}" _path _recursive_flag=0 _command
+  local _identity="${1:-}" _path _recursive_flag=0 _command _flags=()
 
   # If the first parameter is --recursive
   if [[ "${1:-}" == --recursive* ]]
@@ -1959,14 +1959,11 @@ chown_paths()
           if (( _recursive_flag == 1 ))
           then
             # the chown command will be with the recursive flag
-            _command="chown -R ${_identity} ${_path}"
-          else
-            # the chown command will be without the recursive flag
-            _command="chown ${_identity} ${_path}"
+            _flags+=(-R)
           fi
 
           # Run the command
-          if ${_command}
+          if chown ${_flags[*]} ${_identity} "${_path}"
           then
             # Successfully changed ownership of the filesytem entity,
             # continue processing the next entity in the list
@@ -2035,7 +2032,7 @@ chown_paths()
 chmod_files()
 {
   # Declare the identity and file and set the identiy to the first parameter
-  local _permissions="${1:-}" _file _recursive_flag=0 _command
+  local _permissions="${1:-}" _file _command
 
   # if the permissions variable is nonempty
   if variable_is_nonempty _permissions
@@ -2123,8 +2120,9 @@ chmod_files()
 #
 chmod_paths()
 {
-  # Declare the permissions and file and set the identiy to the first parameter
-  local _permissions="${1:-}" _path _recursive_flag=0 _command
+  # Declare the permissions, flags and file and set the identiy to the
+  # first parameter
+  local _permissions="${1:-}" _path _recursive_flag=0 _command _flags=()
 
   # If the first parameter is --recursive
   if [[ "${1:-}" == "--recursive" ]]
@@ -2157,14 +2155,11 @@ chmod_paths()
           if (( _recursive_flag == 1 ))
           then
             # the chmod command will be with the recursive flag
-            _command="chmod -R ${_permissions} '${_path}'"
-          else
-            # the chmod command will be without the recursive flag
-            _command="chmod ${_permissions} '${_path}'"
+            _flags+=(-R)
           fi
 
           # Run the command
-          if ${_command}
+          if chmod ${_flags[*]} ${_permissions} "${_path}"
           then
             # Successfully changed ownership of the filesytem entity,
             # continue processing the next entity in the list
