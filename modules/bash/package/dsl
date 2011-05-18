@@ -1338,6 +1338,13 @@ package_cli()
 
   done
 
+  if (( static_flag = 1 ))
+  then
+    configure_flags+=( --disable-shared )
+  else
+    configure_flags+=( --enable-shared )
+  fi
+
   # explicitely reload the package module to pickup any CLI overrides.
   modules_reinitialize package
 }
