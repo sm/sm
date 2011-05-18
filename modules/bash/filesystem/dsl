@@ -1144,7 +1144,7 @@ move_file()
 copy_file()
 {
   # Declare the source and target variables.
-  local _source _target
+  local _source _target _flags _force_flag
 
   # While there are parameters left
   while (( $# > 0 ))
@@ -1169,6 +1169,11 @@ copy_file()
         _source="${1}"
         # Remove the first paramter from the parameters list.
         shift
+        ;;
+      # if the token is '--force'
+      --force)
+        # set the force_flag variable to 1
+        _force_flag=1
         ;;
       # if the token is 'mode' then
       mode)
@@ -1202,13 +1207,18 @@ copy_file()
     esac
   done
 
+  if (( _force_flag == 1 ))
+  then
+    _flags+=(-f)
+  fi
+
   # if the source variable is not empty
   if variable_is_nonempty _source
   then
     # if the target variable is not empty
     if variable_is_nonempty _target
     then
-      if cp "${_source}" "${_target}"
+      if cp ${flags[*]} "${_source}" "${_target}"
       then
         if variable_is_nonempty _mode
         then
