@@ -67,7 +67,7 @@ true \
   "${user:=$USER}" \
   "${keep_releases:=4}" \
   "${hooks_flag:=1}" \
-  "${PAGER:="cat -v"}" \
+  "${PAGER:="less"}" \
   "${config_path:="${extensions_path}/core/config"}" \
   "${packages_path:="${bdsm_path}/pkg"}" \
   "${active_path:="${packages_path}/active"}"
