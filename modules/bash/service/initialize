@@ -67,8 +67,6 @@ then
   if command_exists ${service}
   then
     service_binary="$(command -v ${service})"
-  else
-    service_binary="${service}"
   fi
 fi
 
