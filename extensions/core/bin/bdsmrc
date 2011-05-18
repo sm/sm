@@ -2,35 +2,35 @@
 
 if file_is_nonempty "$extension_templates_path/bdsmrc"
 then
+  if file_is_nonempty "$HOME/.bdsmrc"
+  then
+    set_timestamp
+
+    log "An existing $HOME/.bdsmrc file was found."
+    log "Reinaming it as ${HOME}/.bdsmrc.${timestamp} in order to preserve it."
+    log "Please examine the file and if it is not needed, remove it."
+
+    move_file "$HOME/.bdsmrc" to "$HOME/.bdsmrc.$timestamp"
+
+    #
+    # TODO: Move this into the project module and call as a function.
+    #       bdsmrc_install, this does *not* belong here.
+    #
+    # TODO: Read project, repository_url and environment from defaults file.
+    #       ~/.bdsm/project/config/defaults
+    #
+    modules project
+
+    true  "${repository_url:="git@github.com:username/repository.git"}"
+
+    command sed \
+      -e "s#{{project}}#$project#g" \
+      -e "s#{{repository_url}}#$repository_url#g" \
+      -e "s#{{environment}}#$environment#g" \
+      "$extension_templates_path/bdsmrc" \
+      >> "$HOME/.bdsmrc"
+
+  fi
+else
   fail "The template file $extension_templates_path/bdsmrc is missing."
 fi
-
-if file_is_nonempty "$HOME/.bdsmrc"
-then
-  set_timestamp
-
-  log "An existing $HOME/.bdsmrc file was found."
-  log "Reinaming it as ${HOME}/.bdsmrc.${timestamp} in order to preserve it."
-  log "Please examine the file and if it is not needed, remove it."
-
-  move_file "$HOME/.bdsmrc" to "$HOME/.bdsmrc.$timestamp"
-fi
-
-#
-# TODO: Move this into the project module and call as a function.
-#       bdsmrc_install, this does *not* belong here.
-#
-# TODO: Read project, repository_url and environment from defaults file.
-#       ~/.bdsm/project/config/defaults
-#
-modules project
-
-true  "${repository_url:="git@github.com:username/repository.git"}"
-
-command sed \
-  -e "s#{{project}}#$project#g" \
-  -e "s#{{repository_url}}#$repository_url#g" \
-  -e "s#{{environment}}#$environment#g" \
-  "$extension_templates_path/bdsmrc" \
-  >> "$HOME/.bdsmrc"
-
