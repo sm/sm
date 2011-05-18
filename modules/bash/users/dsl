@@ -509,6 +509,8 @@ user_run_as()
   # If the user variable is nonempty
   if variable_is_nonempty _user
   then
+    # Remove the user from the parameters list.
+    shift
     # then run the given command as the user, with a nonlogin shell.
     if su "${_user}" -c "$*"
     then
