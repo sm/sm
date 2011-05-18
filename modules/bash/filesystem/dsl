@@ -1218,7 +1218,7 @@ copy_file()
     # if the target variable is not empty
     if variable_is_nonempty _target
     then
-      if cp ${flags[*]} "${_source}" "${_target}"
+      if cp ${_flags[*]} "${_source}" "${_target}"
       then
         if variable_is_nonempty _mode
         then
