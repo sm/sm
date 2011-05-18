@@ -1728,7 +1728,8 @@ service_activate()
     then
       true # TODO: launchctl
     else # ::shrug::
-      if ! file_contains "/etc/rc.local" "${service} start"
+      if file_exists "/etc/rc.local" &&
+        ! file_contains "/etc/rc.local" "${service} start"
       then
         sed -i -e "d#${init_scripts_path}/${service} start#" /etc/rc.local
       fi
