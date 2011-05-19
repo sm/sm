@@ -400,6 +400,10 @@ remove()
 # ### Environmental effects
 #
 # What, if any, environmental side effects this function causes. 'None.' for none.
+# If paths were requested to be removed and they already nonexistent then they
+# will be listed in the nonexistant_paths array after this function returns.
+# Additionally, paths that were successfully removed will be avialable in the
+# remove_paths array.
 #
 # ### Return Codes
 #
@@ -420,6 +424,9 @@ remove_paths()
   # Declare the path and paths variables, set the files variable to an array
   # containing all of the parameters passed in.
   local _path _paths=("$@")
+  # Declare new variables that will be available after the function returns.
+  removed_paths=()
+  nonexistant_paths=()
 
   # If the paths array is nonempty
   if (( ${#_paths[@]} > 0 ))
@@ -435,6 +442,7 @@ remove_paths()
         then
           # Successfully removed the filesytem path, continue processing the
           # next path in the list
+          removed_paths+=("${_path}")
           continue
         else
           # Failed to remove the entity from the filesystem.
@@ -451,6 +459,7 @@ remove_paths()
         then
           # Successfully removed the filesytem path, continue processing the
           # next path in the list
+          removed_paths+=("${_path}")
           continue
         else
           # Failed to remove the entity from the filesystem.
@@ -472,6 +481,7 @@ remove_paths()
       else
         # The filesystem path already does not exist, continue processing the
         # next path in the list
+        nonexistant_paths+=("${_path}")
         continue
       fi
     done
