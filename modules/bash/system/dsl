@@ -3,7 +3,7 @@
 #
 # # Bash System Module DSL
 #
-:
+
 # ## init\_scripts\_path()
 #
 # Returns the system init scripts path (eg. /etc/init.d /etc/rc.d)
