@@ -22,7 +22,7 @@ do
   (
   enter "$extensions_path/ext/templates/${language:-bash}"
 
-  copy_directories to "$target_path/$extension/" \
+  copy_paths to "$target_path/$extension/" \
     bin modules templates config
 
   copy_files to "$target_path/$extension/" \

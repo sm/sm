@@ -1446,9 +1446,9 @@ copy_files()
 #
 # ### Usage Examples
 #
-#     user$ copy_directories to "$HOME/backup/" "$HOME/bin" "$HOME/projects"
+#     user$ copy_paths to "$HOME/backup/" "$HOME/bin" "$HOME/projects"
 #
-copy_directories()
+copy_paths()
 {
   local _source _target _directory _force_flag=0 _directories=()
 
