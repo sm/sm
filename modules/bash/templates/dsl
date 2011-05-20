@@ -184,9 +184,9 @@ install_template()
   # Create the target path if it does not exist.
   ensure_paths_exist "$(dirname "${_target}")"
 
-  if directory_exists "${_target}"
+  if path_exists "${_target}"
   then
-    if directory_exists "${_target}/${_name}"
+    if path_exists "${_target}/${_name}"
     then
       fail "Cannot install the template '${_template}' to ${_target}/${_name}"\
         " as it is a directory"

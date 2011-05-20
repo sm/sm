@@ -9,12 +9,12 @@ target_path="${extensions_development_path:-"$initial_pwd"}"
 
 for extension in ${extension_args[@]}
 do
-  if directory_exists "$target_path/$extension"
+  if path_exists "$target_path/$extension"
   then
     fail "Extension '$extension' already exists at ${target_path}/${extension}."
   fi
 
-  if directory_exists "${extensions_path}/ext/templates/${language}"
+  if path_exists "${extensions_path}/ext/templates/${language}"
   then
     fail "Extension template files for are missing from $target_path/ext/templates/${language}."
   fi

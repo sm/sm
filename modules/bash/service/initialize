@@ -56,7 +56,7 @@ service_root_paths=(
 
 for _path in  "${install_path}/bin" "${install_path}/sbin"
 do
-  if directory_exists "$_path"
+  if path_exists "$_path"
   then
     export PATH="${_path}:$PATH"
   fi

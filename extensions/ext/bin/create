@@ -6,12 +6,12 @@ then
 
   for extension in ${extension_args[@]} ; do
 
-    if directory_exists "${target_path}/${extension}"
+    if path_exists "${target_path}/${extension}"
     then
       error "Extension '${extension}' already exists at ${target_path}/${extension}."
     fi
 
-    if ! directory_exists "${extensions_path}/ext/templates/${language:-bash}"
+    if ! path_exists "${extensions_path}/ext/templates/${language:-bash}"
     then
       fail "Extension template files for are missing from $target_path/ext/templates/${language:-bash}."
     fi

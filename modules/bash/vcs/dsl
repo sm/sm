@@ -25,11 +25,11 @@ scm_fetch()
 
   case "${_url}" in
     *git*)
-      if directory_exists "${repo_path}/.git"
+      if path_exists "${repo_path}/.git"
       then
         true # already fetched!
       else
-        if directory_exists "${repo_path}"
+        if path_exists "${repo_path}"
         then
           remove_paths "${repo_path}"
         fi

@@ -694,7 +694,7 @@ package_activate()
     package_deactivate "${_package}"
   fi
 
-  if directory_exists "${install_path}"
+  if path_exists "${install_path}"
   then
     log "Activating ${_package} ${_version}"
 
@@ -872,7 +872,7 @@ package_activate_if_first()
 
   variables_must_be_nonempty _package _version
 
-  if directory_exists "${install_path}"
+  if path_exists "${install_path}"
   then
     symlink_exists "${packages_path}/${_package}/active" ||
       package_activate "${_package}" "${_version}"
@@ -920,7 +920,7 @@ package_ldconfig()
 
   variables_must_be_nonempty _package
 
-  directory_exists "${packages_path}/${_package}/active/lib" ||
+  path_exists "${packages_path}/${_package}/active/lib" ||
     return 0 # no lib/ directory for activated package, no need to update ldconfig
 
   # TODO: Figure out if solaris and freebsd have an analog to this?
@@ -1087,7 +1087,7 @@ package_patch()
 {
   local _patches _patch
 
-  if ! directory_exists "${extension_patches_path}"
+  if ! path_exists "${extension_patches_path}"
   then
     return 0
   fi
@@ -1107,7 +1107,7 @@ package_patch()
 
   package_apply_patches "${_patches[@]}"
 
-  if ! directory_exists "${extension_patches_path}/$(os_type)"
+  if ! path_exists "${extension_patches_path}/$(os_type)"
   then
     return 0
   fi
@@ -1115,14 +1115,14 @@ package_patch()
   _patches=($(find "${extension_patches_path}/$(os_type)" -mindepth 1 -maxdepth 1 -iname '*.patch' -type f))
   package_apply_patches "${_patches[@]}"
 
-  if ! directory_exists "${extension_patches_path}/$(os_type)/${package_version}"
+  if path_exists "${extension_patches_path}/$(os_type)/${package_version}"
   then
+    _patches=($(find "${extension_patches_path}/$(os_type)/${package_version}" -mindepth 1 -maxdepth 1 -iname '*.patch' -type f))
+
+    package_apply_patches "${_patches[@]}"
+  else
     return 0
   fi
-
-  _patches=($(find "${extension_patches_path}/$(os_type)/${package_version}" -mindepth 1 -maxdepth 1 -iname '*.patch' -type f))
-
-  package_apply_patches "${_patches[@]}"
 }
 
 #

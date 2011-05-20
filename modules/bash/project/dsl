@@ -107,19 +107,19 @@ vcs()
   if variable_is_nonempty _path
   then
     # and if there is a .git directory in the given path
-    if directory_exists "${_path}/.git"
+    if path_exists "${_path}/.git"
     then
       # Then set the vcs variable to git.
       vcs="git"
 
     # and if there is a .svn directory in the given path
-    elif directory_exists "${_path}/.svn"
+    elif path_exists "${_path}/.svn"
     then
       # Then set the vcs variable to svn.
       vcs="svn"
 
     # and if there is a .hg directory in the given path
-    elif directory_exists "${_path}/.hg"
+    elif path_exists "${_path}/.hg"
     then
       # Then set the vcs variable to hg.
       vcs="hg"

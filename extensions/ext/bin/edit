@@ -5,7 +5,7 @@ then
   error "An extension name must be specified."
 fi
 
-if directory_exists "${extensions_development_path}/${extension_args[0]}"
+if path_exists "${extensions_development_path}/${extension_args[0]}"
 then
   enter "${extensions_development_path}/${extension_args[0]}"
   exec ${EDITOR:-vi} .

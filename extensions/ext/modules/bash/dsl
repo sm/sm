@@ -38,7 +38,7 @@ fetch_extensions_repository()
   local initial_pwd="$PWD"
   local _identifier="${extensions_repository_url//\//_}" # Convert '/' to an invalid url component '_'
 
-  if directory_exists "$extensions_src_path/.git"
+  if path_exists "$extensions_src_path/.git"
   then
     log "Updating $extension repository."
     scm_update "${extensions_repository_url}"

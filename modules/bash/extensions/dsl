@@ -542,7 +542,7 @@ extensions_in()
 {
   local _path="${1:-}"
 
-  directory_exists "${_path}" ||
+  path_exists "${_path}" ||
     fail "Cannot list extensions in '${_path}' as the directory does not exist."
 
   _files=($(find "${_path}" -mindepth 2 -maxdepth 2 -name 'VERSION' -type f))
@@ -618,19 +618,22 @@ extension_actions()
 
   local _path="$extensions_path/${_extension}/bin"
 
-  directory_exists "${_path}" || return 0
+  if path_exists "${_path}"
+  then
+    local _files=($(find "${_path}" -mindepth 1 -maxdepth 1 -type f))
+    local _file _actions=()
 
-  local _files=($(find "${_path}" -mindepth 1 -maxdepth 1 -type f))
-  local _file _actions=()
+    for _file in "${_files[@]}"
+    do
+      [[ ! -x "${_file}" ]] || _actions+=("${_file//*\/}")
+    done
 
-  for _file in "${_files[@]}"
-  do
-    [[ ! -x "${_file}" ]] || _actions+=("${_file//*\/}")
-  done
+    _actions="${_actions[@]}" # Convert from array to string.
 
-  _actions="${_actions[@]}" # Convert from array to string.
-
-  printf "${_actions}"
+    printf "${_actions}"
+  else
+    return 0
+  fi
 }
 
 #

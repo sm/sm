@@ -183,7 +183,7 @@ ensure_paths_exist()
     for _path in "${_paths[@]}"
     do
       # if the path exists as a directory
-      if directory_exists "${_path}"
+      if path_exists "${_path}"
       then
         # The path already exists, move along to the next path.
         continue
@@ -620,7 +620,7 @@ ensure_files_are_executable()
     for _file in "${_files[@]}"
     do
       # if the file exists on the filesystem but is a directory
-      if directory_exists "${_file}"
+      if path_exists "${_file}"
       then
         # This indicates either a programming or a system error.
         # Fail yielding a message with a backtrace which can be used
@@ -637,7 +637,7 @@ ensure_files_are_executable()
         _path="${_file%\/*}"
 
         # if the path variable is nonempty and the path exists on the filesystem
-        if variable_is_nonempty _path && directory_exists "${_path}"
+        if variable_is_nonempty _path && path_exists "${_path}"
         then
           # then we attempt to perform the file mode execute setting.
           if chmod +x "${_file}"
@@ -774,7 +774,7 @@ link()
     fail "Cannot link ${_source} to ${_target} exists and is a file!"
 
   # otherwise if the target exits and is a directory then
-  elif directory_exists "${_target}"
+  elif path_exists "${_target}"
   then
     # This indicates either a system or programming error.
     # Fail giving an error message with a backtrace which can then be used to
@@ -1503,7 +1503,7 @@ copy_paths()
       for _directory in "${_directories[@]}"
       do
         # if the directory exists
-        if directory_exists "${_directory}"
+        if path_exists "${_directory}"
         then
           # then recurively copy it into the target path.
           if cp -Rf "${_directory}" "${_target}/"
@@ -1964,7 +1964,7 @@ chown_paths()
       for _path in "${_paths[@]}"
       do
         # if the path exists on the filesystem
-        if directory_exists "${_path}"
+        if path_exists "${_path}"
         then
           if (( _recursive_flag == 1 ))
           then
@@ -2160,7 +2160,7 @@ chmod_paths()
       for _path in "${_paths[@]}"
       do
         # if the path exists on the filesystem
-        if directory_exists "${_path}"
+        if path_exists "${_path}"
         then
           if (( _recursive_flag == 1 ))
           then
@@ -2245,7 +2245,7 @@ enter()
   if variable_is_nonempty _path
   then
     # and if the path exists on the filesystem
-    if directory_exists "${_path}"
+    if path_exists "${_path}"
     then
       # then change the calling environment's working directory into the
       # given path
@@ -2331,7 +2331,7 @@ hash_file()
       local _path=$(dirname "${_file}")
 
       # if the directory exists on the filesystem
-      if directory_exists "${_path}"
+      if path_exists "${_path}"
       then
         # ensure that the file exists in the directory, creating an empty file
         # if it does not exist.
@@ -2916,15 +2916,15 @@ symlink_exists()
 #
 # ### Usage Examples
 #
-#     user$ directory_exists /usr/local/bin/bdsm
+#     user$ path_exists /usr/local/bin/bdsm
 #     user$ echo $?
 #     0
 #
-#     user$ directory_exists /bin/asdfasdf
+#     user$ path_exists /bin/asdfasdf
 #     user$ echo $?
 #     1
 #
-directory_exists()
+path_exists()
 {
   local _directory="${1:-}"
 

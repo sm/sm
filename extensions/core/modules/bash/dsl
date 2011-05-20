@@ -49,7 +49,7 @@ bdsm_development_setup()
       log "Setting ${_component}_development_path in .bdsmrc"
     fi
 
-    if directory_exists "${_component}"
+    if path_exists "${_component}"
     then
       log "  * Repository already exists at $PWD/${_component}/"
     else
@@ -230,7 +230,7 @@ install_head()
 {
   local remote="origin"
 
-  if directory_exists "${src_path}/bdsm/.git" ]]
+  if path_exists "${src_path}/bdsm/.git" ]]
   then
     enter "${src_path}/bdsm/"
 
@@ -328,7 +328,7 @@ symlink_bdsm()
   log "  Linking ${install_path}/bin/bdsm to ${prefix_path}/bin/bdsm"
   link --force "${install_path}/bin/bdsm" to "${active_path}/bin/bdsm"
 
-  if directory_exists "${prefix_path}/bin"
+  if path_exists "${prefix_path}/bin"
   then
     link --force "${install_path}/bin/bdsm" to "${prefix_path}/bin/bdsm"
   fi
