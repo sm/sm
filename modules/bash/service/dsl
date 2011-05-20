@@ -1142,11 +1142,13 @@ service_init_start()
       error "${service} failed to start."
     fi
   else
-    if ! user_run_as "${service_user}" "${_command[*]}"
+    if user_run_as "${service_user}" "${_command[*]}"
     then
-      true
+      succeed "${service} reported success when starting."
     else
-      error "${service} failed to start."
+      log "${service} failed to start, check ${service_log_file} for details:"
+      exec tail -n 50 "${service_log_file}"
+      error
     fi
   fi
 }
