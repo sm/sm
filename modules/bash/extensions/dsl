@@ -836,7 +836,7 @@ extension_fetch_and_install()
 
 extension_fetch()
 {
-  local _url="${1:-$extension_uri}"
+  local _url="${1:-"$extension_uri"}"
   local _identifier="${_url//\//_}" # Convert '/' to an invalid url component '_'
   local repo_path="${repos_path}/${_identifier}"
 
