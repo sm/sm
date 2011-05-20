@@ -15,4 +15,3 @@ files=( $(nonempty_files "${rvm_files[@]}") )
 
 array_is_nonempty "files" &&
   source_files $(array_first_element files)
-
