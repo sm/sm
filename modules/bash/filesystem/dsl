@@ -1696,38 +1696,34 @@ move_files()
   # While the parameters list is nonempty.
   while (( $# > 0 ))
   do
-    # Assign the first parameter to the token variable.
+    # Assign the first parameter to the token variable and remove the first
+    # paramter from the parameters list.
     token="$1"
-    # Remove the first paramter from the parameters list.
     shift
 
     # Switch based on the token string's contents
     case "${token}" in
-      # if the token is 'to' then
+      # if the token is 'to' then assign the next parameter to the target
+      # variable and remove the first paramter from the parameters list.
       to)
-        # assign the next parameter to the target variable.
         _target="${1}"
-        # Remove the first paramter from the parameters list.
         shift
         ;;
 
-      # if the token is 'to' then
+      # if the token is 'to' then assign the first parameter to the source
+      # variable and remove the first paramter from the parameters list.
       from)
-        # assign the first parameter to the source variable.
         _source="${1}"
-        # Remove the first paramter from the parameters list.
         shift
         ;;
 
-      # if the token is '--force' then
+      # if the token is '--force' then set the force flag to 1
       --force)
-        # set the force flag to 1
         _force_flag=1
         ;;
 
-      # if the token is unknown then
+      # if the token is unknown then add the token to the files array
       *)
-        # add the token to the files array
         _files+=( "${token}" )
         ;;
     esac
@@ -1745,10 +1741,9 @@ move_files()
         # for each file in the files array
         for _file in "${_files[@]}"
         do
-          # if the source variable is nonempty
+          # if the source variable is nonempty then prepend source to the file.
           if variable_is_nonempty _source
           then
-            # then prepend source to the file
             _file="${_source}/${_file}"
           fi
 
@@ -1758,16 +1753,14 @@ move_files()
             # and force_flag is set
             if (( _force_flag == 1 ))
             then
-              # then forcedly move the file
+              # then forcedly move the file and continue processing the next
+              # entity in the list or fail with an error message and a backtrace
+              # As there was a system error, fail with a message and backtrace
+              # which can be used to debug the issue
               if mv -f "${_file}" "${_target}/${_file//*\/}"
               then
-                # Successfully forcedly moved the file to the target
-                # continue processing the next entity in the list
                 continue
               else
-                # Failed to forcedly move file to target
-                # This indicates a system error, fail giving sysadmins an error
-                # message with a backtrace which they can use to debug the issue
                 fail "Could not forcedly move the entity '${_entity}'"\
                   "as the 'mv -f' command failed with error code '$?'"
               fi
@@ -1812,7 +1805,7 @@ move_files()
       # The source was not specified, this is a programming error
       # send a fail message which will send a backtrace allowing the developer
       # to quickly debug and pass in the proper parameters.
-      fail "Cannot move file as both the source must be specified."
+      fail "Cannot move file as the source must be specified."
   fi
 }
 
