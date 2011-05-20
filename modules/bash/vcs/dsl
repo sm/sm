@@ -62,6 +62,7 @@ scm_fetch()
 scm_update()
 {
   local _url="${1:-${extension_url:-}}"
+  local initial_pwd="$PWD"
 
   if [[ -z "${_url}" ]]
   then
@@ -70,6 +71,8 @@ scm_update()
 
   local _identifier="${_url//\//_}" # Convert '/' to an invalid url component '_'
   local repo_path="${repos_path}/${_identifier}"
+
+  enter repo_path
 
   case "${_url}" in
     *git*)
@@ -110,5 +113,7 @@ scm_update()
       error "Unknownn SCM for url '${_url}'"
       ;;
   esac
+
+  enter "$initial_pwd"
 }
 
