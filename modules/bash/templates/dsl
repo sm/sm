@@ -290,6 +290,33 @@ seed_template()
       then
         if array_is_even _hash
         then
+          warn "Template Seeding (replacing defaults) has not yet fully implemented."
+
+          # Loop over the hash and aggregate the replacement strings into their
+          # own array.
+          for (( index=0 ; index < ${#_hash[@]} ; index++ ))
+          do
+            _strings+=(" -e 's#${_hash[${index}]}#${_hash[$((++index))]}#g' ")
+          done
+
+          # Filter the template with the replacments.
+          if sed ${_strings[@]} ${_template} >> ${_template}.${timestamp}
+          then
+            # If the filtering happened successfully the timestamped template file
+            # will exist on the filesystem
+            if file_exists "${_template}.${timestamp}"
+            then
+              # Move the file
+              move_file "${_template}.${timestamp}" "${_template}"
+            else
+              fail "Something went horribly wrong, the template intermediate file "\
+                "'${_template}.${timestamp}' does not exist."
+            fi
+          else
+            error "There was an error (?) seeding the template '${_template}'" \
+              "Most often this is due to filesystem permissions / disk full."
+          fi
+        else
           fail "Every replacement key must have a replacement value."
         fi
       else
@@ -300,32 +327,6 @@ seed_template()
           "as no replacement keys were specified"
       fi
 
-      warn "Template Seeding (replacing defaults) has not yet fully implemented."
-
-      # Loop over the hash and aggregate the replacement strings into their
-      # own array.
-      for (( index=0 ; index < ${#_hash[@]} ; index++ ))
-      do
-        _strings+=(" -e 's#${_hash[${index}]}#${_hash[$((++index))]}#g' ")
-      done
-
-      # Filter the template with the replacments.
-      if sed ${_strings[@]} ${_template} >> ${_template}.${timestamp}
-      then
-        # If the filtering happened successfully the timestamped template file
-        # will exist on the filesystem
-        if file_exists "${_template}.${timestamp}"
-        then
-          # Move the file
-          move_file "${_template}.${timestamp}" "${_template}"
-        else
-          fail "Something went horribly wrong, the template intermediate file "\
-            "'${_template}.${timestamp}' does not exist."
-        fi
-      else
-        error "There was an error (?) seeding the template '${_template}'" \
-          "Most often this is due to filesystem permissions / disk full."
-      fi
     else
       fail "Can not seed template template file '${_template}' does not exist."
     fi
