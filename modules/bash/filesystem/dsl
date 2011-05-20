@@ -1266,13 +1266,13 @@ copy_file()
       # The target was not specified, this is a programming error
       # send a fail message which will send a backtrace allowing the developer
       # to quickly debug and pass in the proper parameters.
-      fail "Cannot move file as both the target must be specified."
+      fail "Cannot move file as the target must be specified."
     fi
   else
       # The source was not specified, this is a programming error
       # send a fail message which will send a backtrace allowing the developer
       # to quickly debug and pass in the proper parameters.
-      fail "Cannot move file as both the source must be specified."
+      fail "Cannot move file as the source must be specified."
   fi
 }
 

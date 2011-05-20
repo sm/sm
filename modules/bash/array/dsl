@@ -29,15 +29,26 @@
 #
 # ### Usage Examples
 #
-#     user$ the_array=(1 2 3 4 5)
-#     user$ array_is_nonempty the_array
-#     user$ echo $?
-#     0
+#     user$ cat $HOME/test
+#     the_array=(1 2 3 4 5)
+#     if array_is_nonempty the_array
+#     then
+#       log "the array is not empty"
+#     else
+#       log "the array is empty"
+#     fi
 #
-#     user$ the_array=()
-#     user$ array_is_nonempty the_array
-#     user$ echo $?
-#     1
+#     the_array=()
+#     if array_is_nonempty the_array
+#     then
+#       log "the array is not empty"
+#     else
+#       log "the array is empty"
+#     fi
+#
+#     user$ $HOME/test
+#     the array not empty
+#     the array is empty
 #
 # ### Code Walkthrough
 array_is_nonempty()
@@ -49,13 +60,12 @@ array_is_nonempty()
   # if the array name variable is not empty then
   if variable_is_nonempty _array_name
   then
-    # if the length of the named array is greater than zero
+    # if the length of the named array is greater than zero then
+    # return true (0) otherwise return false (1)
     if eval "(( \${#${_array_name}[@]} > 0 ))"
     then
-      # then return true, 0
       return 0
     else
-      # otherwise return false, 1
       return 1
     fi
   else
