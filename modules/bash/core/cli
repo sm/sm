@@ -142,6 +142,13 @@ do
               parse_break=1
               ;;
 
+            install)
+              extension="ext"
+              action="extend_and"
+              extension_args=(install "$@")
+              parse_break=1
+              ;;
+
             ext|extension|extensions)
               extension="ext"
               action="${1:-help}"

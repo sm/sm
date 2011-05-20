@@ -1340,7 +1340,7 @@ package_cli()
 
   if (( static_flag = 1 ))
   then
-    configure_flags+=( --disable-shared )
+    configure_flags+=( --static ) # --disable-shared
   else
     configure_flags+=( --enable-shared )
   fi

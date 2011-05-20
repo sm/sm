@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+if (( ${#extension_args[@]} > 1 ))
+then
+  log "Installing extensions ${extension_args[*]} to ${extensions_path}\n"
+
+  action=${extension_args[0]}
+  array_shift extension_args
+  extension=${extension_args[0]}
+  array_shift extension_args
+
+  case "${extension_version:-head}" in
+    *([[:digit:]]).*([[:digit:]]).*([[:digit:]]))
+      fetch_tarball
+      ;;
+
+    head|master)
+      fetch_extensions_repository # default is head
+      ;;
+  esac
+
+  extension_fetch_and_install "${extension}"
+
+  extension_action "${extension}" "${action}"
+
+  succeed "Installed extensions ${extension_args[*]}"
+else
+  fail "At least one extension name must be specified."
+fi

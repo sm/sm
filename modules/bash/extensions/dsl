@@ -824,14 +824,13 @@ extension_fetch_and_install()
 {
   local _extension="${1:-}"
 
-  if [[ -z "${_extension}" ]]
+  if variable_is_nonempty _extension
   then
+    extension_fetch "${extension_uri:="${extensions_repository_url}"}"
+    extension_install "${_extension}"
+  else
     fail "Cannot fetch and install an extension as no extension name was given."
   fi
-
-  extension_fetch "${extension_uri:="${extensions_repository_url}"}"
-
-  extension_install "${_extension}"
 }
 
 extension_fetch()
