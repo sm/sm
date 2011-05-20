@@ -6,6 +6,7 @@ then
 
   action=${extension_args[0]}
   array_shift extension_args
+
   extension=${extension_args[0]}
   array_shift extension_args
 
