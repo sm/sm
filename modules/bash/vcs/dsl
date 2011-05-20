@@ -72,7 +72,7 @@ scm_update()
   local _identifier="${_url//\//_}" # Convert '/' to an invalid url component '_'
   local repo_path="${repos_path}/${_identifier}"
 
-  enter repo_path
+  enter "${repo_path}"
 
   case "${_url}" in
     *git*)
