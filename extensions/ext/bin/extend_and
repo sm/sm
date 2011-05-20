@@ -24,9 +24,9 @@ then
 
   if extension_action "${extension}" "${action}"
   then
-    error "${extension} ${action} ${extension_args[*]} failed."
-  else
     succeed "${extension} ${action} ${extension_args[*]} reported success."
+  else
+    error "${extension} ${action} ${extension_args[*]} failed."
   fi
 else
   fail "At least one extension name must be specified."
