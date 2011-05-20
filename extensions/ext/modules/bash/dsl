@@ -68,6 +68,8 @@ fetch_extensions_repository()
         "into ${extensions_src_path} as git pull returned error code ($?)"
     fi
   else
+    remove_paths "${extensions_src_path}"
+
     log "Cloning $extension repository from ${extensions_repository_url}"
 
     enter "${extensions_src_path%\/*}"
