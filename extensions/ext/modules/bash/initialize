@@ -10,7 +10,3 @@ modules environment vcs
 
 extensions_src_path="${src_path}/extensions"
 
-ensure_paths_exist "${extensions_src_path}"
-
-enter "${extensions_src_path}"
-
