@@ -499,7 +499,7 @@ array_shift()
 {
   # Store the array name into a local variable, set to the empty string if it
   # was not passed in.
-  local _array_name="${1:-}" temp_array=() index first_element
+  local _array_name="${1:-}" temp_array=() index _variable="${2:-}"
 
   # if the array name variable is not empty
   if variable_is_nonempty _array_name
@@ -507,8 +507,13 @@ array_shift()
     # Remove the array name from the parameters list.
     shift
 
-    # Store the value of the first element of the named array.
-    eval "first_element=\${${_array_name}[0]}"
+    # If a variable was specified, assign the first element of the named array
+    # into the variable before shifting.
+    if variable_is_nonempty _variable
+    then
+      # Store the value of the first element of the named array.
+      eval "${_variable}=\${${_array_name}[0]}"
+    fi
 
     # Now we shift the array contents over by one using a temporary array.
     eval "
@@ -521,8 +526,6 @@ array_shift()
     # Reassign the shifted temp array contents to the original named variable.
     eval "${_array_name}=(\"\${temp_array[@]}\") "
 
-    # Print out the first element of the array
-    printf "%s" "${first_element}"
   else
     # otherwise the array name variable was not passed in. This is a programming
     # error and as such we call the fail function which yields a message and

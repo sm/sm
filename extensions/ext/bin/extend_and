@@ -4,11 +4,8 @@ if (( ${#extension_args[@]} > 1 ))
 then
   log "Installing extensions ${extension_args[*]} to ${extensions_path}\n"
 
-  action=${extension_args[0]}
-  array_shift extension_args
-
-  extension=${extension_args[0]}
-  array_shift extension_args
+  array_shift extension_args action
+  array_shift extension_args extension
 
   case "${extension_version:-head}" in
     *([[:digit:]]).*([[:digit:]]).*([[:digit:]]))
