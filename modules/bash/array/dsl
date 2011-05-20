@@ -47,7 +47,7 @@
 #     fi
 #
 #     user$ $HOME/test
-#     the array not empty
+#     the array is not empty
 #     the array is empty
 #
 # ### Code Walkthrough

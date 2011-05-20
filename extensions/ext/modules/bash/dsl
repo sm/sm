@@ -36,53 +36,23 @@ md5_match()
 fetch_extensions_repository()
 {
   local initial_pwd="$PWD"
+  local _identifier="${extensions_repository_url//\//_}" # Convert '/' to an invalid url component '_'
 
   if directory_exists "$extensions_src_path/.git"
   then
     log "Updating $extension repository."
-
-    enter "$extensions_src_path"
-
-    if git fetch ${remote:-origin}
-    then
-      log "Successfully fetched from ${extensions_repository_url}"
-    else
-      fail "Failed fetching ${extensions_repository_url}"\
-        "into ${extensions_src_path} as git fetch returned error code ($?)"
-    fi
-
-    # TODO: Branch switching logic
-    if git reset --hard HEAD
-    then
-      log "Successfully reset to HEAD from ${extensions_repository_url}"
-    else
-      fail "Failed fetching ${extensions_repository_url}"\
-        "into ${extensions_src_path} as git reset returned error code ($?)"
-    fi
-
-    if git pull --rebase --force ${remote:-origin} "${branch:-master}"
-    then
-      log "Successfully updated from ${extensions_repository_url}"
-    else
-      fail "Failed pulling ${extensions_repository_url}"\
-        "into ${extensions_src_path} as git pull returned error code ($?)"
-    fi
+    scm_update "${extensions_repository_url}"
+    copy_paths --force "${repos_path}/${_identifier}" \
+      to "${extensions_src_path}"
   else
     remove_paths "${extensions_src_path}"
 
     log "Cloning $extension repository from ${extensions_repository_url}"
 
-    enter "${extensions_src_path%\/*}"
+    scm_fetch "${extensions_repository_url}"
 
-    # TODO: git/hg/svn url detection, only git to start for now
-
-    if git clone --depth 1 "${extensions_repository_url}" "${extensions_src_path}"
-    then
-      log "Successfully cloned ${extensions_repository_url}"
-    else
-      fail "Failed cloning ${extensions_repository_url}"\
-        "into ${extensions_src_path} as git clone returned error code ($?)"
-    fi
+    copy_paths "${repos_path}/${_identifier}" \
+      to "${extensions_src_path}"
   fi
 
   enter "$initial_pwd"
