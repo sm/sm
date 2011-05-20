@@ -296,11 +296,11 @@ seed_template()
           # own array.
           for (( index=0 ; index < ${#_hash[@]} ; index++ ))
           do
-            _strings+=(" -e 's#${_hash[${index}]}#${_hash[$((++index))]}#g' ")
+            _strings+=(-e 's#${_hash[${index}]}#${_hash[$((++index))]}#g')
           done
 
           # Filter the template with the replacments.
-          if sed ${_strings[@]} ${_template} >> ${_template}.${timestamp}
+          if sed ${_strings[*]} ${_template} >> ${_template}.${timestamp}
           then
             # If the filtering happened successfully the timestamped template file
             # will exist on the filesystem
