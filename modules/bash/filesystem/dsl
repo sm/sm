@@ -40,36 +40,31 @@ source_files()
   # containing all of the parameters passed in.
   local _file _files=("$@")
 
-  # If the files array is nonempty
+  # If the files array is nonempty then for each file in the files array expand
+  # the HOME path if the file contains '~'. If the file is nonempty then source
+  # the file. If the file is successfully sourced then go to the next element in
+  # the list.  If sourcing the file failed then this indicates either a
+  # programming or a system error.
+  # Fail yielding a message with a backtrace which can be used to debug.
+  # Also if no files were passed given this is a programming error.
+  # Fail yielding a message with a backtrace which can be used to debug.
   if (( ${#_files[@]} > 0 ))
   then
-    # then for each file in the files array
     for _file in "${_files[@]}"
     do
-      # Expand the HOME path if the file contains '~'
       _file=${_file/\~\//$HOME\/} # Expand ~/ to full value of $HOME
 
-      # If the file is nonempty
       if file_is_nonempty "${_file}"
       then
-        # Then source the file
         if source "${_file}"
         then
-          # Successfully sourced the file, go to the next element in the list.
           continue
         else
-          # Failed sourcing the file.
-          # This indicates either a programming or a system error.
-          # Fail yielding a message with a backtrace which can be used
-          # to debug the issue.
           fail "There was an error sourcing the file '${_file}'."
         fi
       fi
     done
   else
-    # No files were passed given.
-    # This indicates a programming error, fail giving developers an error
-    # message with a backtrace which they can use to debug their code.
     fail "Cannot source files as no files were given."
   fi
 }
@@ -111,27 +106,24 @@ nonempty_files()
   # containing all of the parameters passed in.
   local _file _files=("$@")
 
-  # If the files array is nonempty
-  if (( ${#_files[@]} > 0 ))
+  # If the files array is nonempty then expand the HOME path if the file
+  # contains '~' and for each file in the files array if the file is nonempty
+  # print the file to STDOUT including a carriage return for explicit
+  # list separation (in case any of the files contain a path).
+  # If No files were given.  This indicates a programming error.
+  # Fail yielding a message with a backtrace which can be used to debug.
+  if array_is_nonempty _files
   then
-    # Expand the HOME path if the file contains '~'
     _file=${_file/\~\//$HOME\/} # Expand ~/ to full value of $HOME
 
-    # then for each file in the files array
     for _file in "${_files[@]}"
     do
-      # If the file is nonempty
       if file_is_nonempty "${_file}"
       then
-        # print the file to STDOUT including a carriage return for explicit
-        # list separation (in case any of the files contain a path).
         printf "${_file}\n"
       fi
     done
   else
-    # No files were given.
-    # This indicates a programming error, fail giving developers an error
-    # message with a backtrace which they can use to debug their code.
     fail "Cannot return nonempty files as no files were given."
   fi
 }
@@ -176,37 +168,33 @@ ensure_paths_exist()
   # containing all of the parameters passed in.
   local _path _paths=("$@")
 
-  # If the paths array is nonempty
+  # If the paths array is nonempty then for each path in the paths array if the
+  # path already exists as a directory, move along to the next path.
+  # if the path already exists as a file then issue a warning (Question: Should
+  # this be a fail scenario?) Create the full path in the filesystem, including
+  # intermediate directories if they do not already exist.
+  # If the path was created successfully, continue on to processing the next
+  # path, if we failed to create the path on the filesystem is a system error
+  # Fail yielding a message with a backtrace which can be used to debug.
+  # If no no files were given then this indicates a programming error
+  # Fail yielding a message with a backtrace which can be used to debug.
   if array_is_nonempty _paths
   then
-    # then for each path in the paths array
     for _path in "${_paths[@]}"
     do
-      # if the path exists as a directory
       if path_exists "${_path}"
       then
-        # The path already exists, move along to the next path.
         continue
       else
-        # if the path already exists as a file
         if file_exists "${_path}"
         then
-          # then issue a warning
-          # Question: Should this be a fail scenario?
           warn "Could not ensure path '${_path}' exists"\
             " as a directory as it is a file."
         else
-          # Create the full path in the filesystem, including intermediate
-          # directories if they do not already exist.
           if mkdir -p "${_path}"
           then
-            # the path was created successfully, continue on to processing the
-            # next path
             continue
           else
-            # Failed to create the path on the filesystem.
-            # This indicates a system error, fail giving sysadmins an error
-            # message with a backtrace which they can use to debug the issue.
             fail "Could not create the path '${_path}' "\
               "as the 'mkdir' command failed with error code '$?'"
           fi
@@ -214,9 +202,6 @@ ensure_paths_exist()
       fi
     done
   else
-    # No files were given.
-    # This indicates a programming error, fail giving developers an error
-    # message with a backtrace which they can use to debug their code.
     fail "Cannot ensure paths exist as no paths were given."
   fi
 }

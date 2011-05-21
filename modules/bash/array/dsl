@@ -342,7 +342,6 @@ array_push()
   # the remaining parameters and declare an element variable.
   # If the number of elements is nonzero then for each element in the passed in
   # elements, append the element to the named array
-
   # Otherwise if no elements were passed in to push onto the array.
   # This indicates a programming error and as such we call the fail function
   # which yields a message and a backtrace thus enabling quick debugging
