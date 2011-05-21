@@ -249,42 +249,36 @@ remove_files()
   # containing all of the parameters passed in.
   local _file _files=("$@")
 
-  # If the files array is nonempty
-  if (( ${#_files[@]} > 0 ))
+  # If the files array is nonempty then for each file in the files array
+  # if the file exists or is a symlink then forcedly remove the file
+  # if the file exists as a directory then this indicates an
+  # unexpected scenario, fail with a message and a backtrace for debugging.
+  # if the file still exists on the system then we do not know what it is,
+  # fail with an error message and a backtrace for debuging.
+  # if the files array is empty then this is a programming error,
+  # Fail yielding a message with a backtrace which can be used to debug.
+  if array_is_nonempty _files
   then
-    # then for each file in the files array
     for _file in "${_files[@]}"
     do
-      # if the file exists as a regular file or a symlink
       if [[ -f "${_file}" || -L "${_file}" ]]
       then
-        # then remove it from the filesystem
         rm -f "${_file}"
 
-      # otherwise if the file is a directory
       elif [[ -d "${_file}" ]]
       then
-        # Failed to remove the file as the file is actually a directory.
-        # This indicates a programming error, fail giving developers an error
-        # message with a backtrace which they can use to debug the issue.
         fail "Cannot remove the file ${_file} as it is a directory."
 
       elif [[ -e "${_file}" ]]
       then
-        # This indicates a system error, fail giving sysadmins an error
-        # message with a backtrace which they can use to debug the issue.
         fail "Failed to remove the file from the filesystem "\
           "as the file exists as an unknown/unhandled filesystem entity type:"\
           "$(file "${_file}")."
       else
-        # The file already does not exist so return true, 0, for success.
         return 0
       fi
     done
   else
-    # No files were given to remove.
-    # This indicates a programming error, fail giving developers an error
-    # message with a backtrace which they can use to debug their code.
     fail "Cannot remove files as no files were given to remove."
   fi
 }
@@ -332,38 +326,30 @@ remove()
   # array containing all of the parameters passed in.
   local _entity _entities=("$@")
 
-  # If the entities array is nonempty
-  if (( ${#_entities[@]} > 0 ))
+  # If the entities array is nonempty then for each entity in the array
+  # if the entity exists on the filesystem then forcedly remove it (recursively)
+  # if the remove was successful, continue, otherwise fail yielding an error
+  # message and a backtrace for debugging.
+  # If the entities array is empty then this is a programming error,
+  # Fail yielding a message with a backtrace which can be used to debug.
+  if array_is_nonempty _entities
   then
-    # for each entity in the entires array
     for _entity in "${_entities[@]}"
     do
-      # if the entitiy exists on the filesystem
       if [[ -e "${_entity}" ]]
       then
-        # then forcedly remove it from the filesystem
         if rm -rf "${_entity}"
         then
-          # Successfully removed the filesytem entity, continue processing the
-          # next entity in the list
           continue
         else
-          # Failed to remove the entity from the filesystem.
-          # This indicates a system error, fail giving sysadmins an error
-          # message with a backtrace which they can use to debug the issue.
           fail "Could not remove the entity '${_entity}'"\
             "as the 'rm' command failed with error code '$?'"
         fi
       else
-        # The entity already does not exist on the filesystem, continue
-        # processing the entities
         continue
       fi
     done
   else
-    # No files were given.
-    # This indicates a programming error, fail giving developers an error
-    # message with a backtrace which they can use to debug their code.
     fail "Cannot remove entities as no filesystem entities were given "\
       "as parameters."
   fi
@@ -409,71 +395,61 @@ remove_paths()
   # Declare the path and paths variables, set the files variable to an array
   # containing all of the parameters passed in.
   local _path _paths=("$@")
-  # Declare new variables that will be available after the function returns.
+  # Declare variables that will be available after the function returns.
   removed_paths=()
   nonexistant_paths=()
 
-  # If the paths array is nonempty
-  if (( ${#_paths[@]} > 0 ))
+  # If the paths array is nonempty then for each path in the paths array
+  # If the path is a symlink then remove it from the filesystem
+  #   If the remove was successful, add it to the removed_paths array and
+  #   continue processing the next path. Otherwise there was a system error,
+  #   Fail yielding a message with a backtrace which can be used to debug.
+  # If the path is directory then recursively remove it
+  #   If the remove was successful, add it to the removed_paths array and
+  #   continue processing the next path. Otherwise there was a system error,
+  #   Fail yielding a message with a backtrace which can be used to debug.
+  # If the path is not a symlink or a directory and it still exists on the
+  #   filesystem then path is an unhandled filesystem type and we have failed to
+  #   remove it. This likely indicates a system error, fail giving sysadmins an
+  #   error message with a backtrace which they can use to debug the issue.
+  # If the filesystem path already does not exist, add it to the
+  #   nonexistant_paths array continue processing the next path in the list
+  # If no paths were given then this is a programming error, fail giving
+  # developers an error message with a backtrace for debugging
+  if array_is_nonempty _paths
   then
-    # then for each path in the paths array
     for _path in "${_paths[@]}"
     do
-      # If the path is a symlink
       if [[ -L "${_path}" ]]
       then
-        # remove it from the filesystem
         if rm -f "${_path}"
         then
-          # Successfully removed the filesytem path, continue processing the
-          # next path in the list
           removed_paths+=("${_path}")
           continue
         else
-          # Failed to remove the entity from the filesystem.
-          # This indicates a system error, fail giving sysadmins an error
-          # message with a backtrace which they can use to debug the issue.
           fail "Could not remove the entity '${_entity}'"\
             "as the 'rm' command failed with error code '$?'"
         fi
-      # if the path is a directory
       elif [[ -d "${_path}" ]]
       then
-        # remove it, recursively, from the filesystem
         if rm -rf "${_path}"
         then
-          # Successfully removed the filesytem path, continue processing the
-          # next path in the list
           removed_paths+=("${_path}")
           continue
         else
-          # Failed to remove the entity from the filesystem.
-          # This indicates either a a system or programming error.
-          # Fail giving a message with a backtrace that can be used to debug.
           fail "Could not remove the entity '${_entity}'"\
             "as the 'rm' command failed with error code '$?'"
         fi
-      # If the path is not a symlink or a directory and it still exists on the
-      # filesystem
       elif [[ -e "${_path}" ]]
       then
-        # Then path is an unhandled filesystem type and we have failed to
-        # remove it.
-        # This likely indicates a system error, fail giving sysadmins an error
-        # message with a backtrace which they can use to debug the issue.
         fail "Cannot remove the path '${_path}' as it is a file."
 
       else
-        # The filesystem path already does not exist, continue processing the
-        # next path in the list
         nonexistant_paths+=("${_path}")
         continue
       fi
     done
   else
-    # No paths were given.
-    # This indicates a programming error, fail giving developers an error
-    # message with a backtrace which they can use to debug their code.
     fail "Cannot remove paths as no paths were given."
   fi
 }
