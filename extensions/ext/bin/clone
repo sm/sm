@@ -1,49 +1,58 @@
 #!/usr/bin/env bash
 
-if array_is_empty extension_args
+if array_is_nonempty extension_args
 then
+
+  # Parse arguments
+  for (( index = 0 ; index < ${#extension_args[@]} ; index++ ))
+  do
+    token="${extension_args[${index}]}"
+    case "${token}" in
+      to)
+        _target="${extension_args[$((++index))]}"
+        ;;
+      from)
+        _source="${extension_args[$((++index))]}"
+        ;;
+      *)
+        if [[ -z "${_source}" ]] ; then
+          _source="$token"
+        elif [[ -z "${_target}" ]] ; then
+          _target="$token"
+        else
+          break
+        fi
+        ;;
+    esac
+  done
+
+  # Sanity checks
+  if variable_is_nonempty _source
+  then
+    if variable_is_nonempty _target
+    then
+      if extension_is_installed "${_source}"
+      then
+        if extension_is_installed "${_target}"
+        then
+          error "The target extension '${_target}' already exists, "\
+            "cannot create it from ${_source}."
+        else
+          copy_directory \
+            from "${extensions_development_path}/${_source}" \
+            to "${extensions_development_path}/${_target}"
+
+        fi
+      else
+        error "The extension '${_source}' was not found installed, "\
+          "cannot create a new extension from it."
+      fi
+    else
+      error "A target extension name must be specified."
+    fi
+  else
+    error "A source extension name must be specified."
+  fi
+else
   error "An extension name must be specified."
 fi
-
-# Parse arguments
-for (( index = 0 ; index < ${#extension_args[@]} ; index++ ))
-do
-  token="${extension_args[${index}]}"
-  case "${token}" in
-    to)
-      _target="${extension_args[$((++index))]}"
-      ;;
-    from)
-      _source="${extension_args[$((++index))]}"
-      ;;
-    *)
-      if [[ -z "${_source}" ]] ; then
-        _source="$token"
-      elif [[ -z "${_target}" ]] ; then
-        _target="$token"
-      else
-        break
-      fi
-      ;;
-  esac
-done
-
-# Sanity checks
-variable_is_nonempty _source ||
-  error "A source extension name must be specified."
-
-variable_is_nonempty _target ||
-  error "A target extension name must be specified."
-
-extension_is_installed "${_source}" ||
-  error "The extension '${_source}' was not found installed, cannot create a new extension from it."
-
-if extension_is_installed "${_target}"
-then
-  error "The target extension '${_target}' already exists, cannot create it from ${_source}."
-fi
-
-copy_directory \
-  from "${extensions_development_path}/${_source}" \
-  to "${extensions_development_path}/${_target}"
-

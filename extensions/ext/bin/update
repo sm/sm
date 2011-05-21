@@ -8,16 +8,6 @@
 #  * Where extension sources will be stored
 #  * How an extension will be updated
 #
-usage()
-{
-  log "
-
-Usage:
-
-  bdsm extensions update repository
-
-"
-}
 
 extension_action=${extension_args[0]}
 
@@ -27,14 +17,14 @@ case "$extension_action" in
   ;;
 
   help|usage)
-    usage
+    log "\nUsage:\n\n  bdsm extensions update repository"
   ;;
 
   all)
     extensions=($(extensions_installed))
 
     # TODO: Updates for released extensions instead of only from repository.
-    if (( ${#extension_args[@]} > 0 ))
+    if array_is_nonempty extension_args
     then
       fetch_extensions_repository
 
@@ -51,7 +41,7 @@ case "$extension_action" in
   ;;
 esac
 
-if [[ -n "${extension_action}" ]]
+if variable_is_nonempty extension_action
 then
   log "Updated extensions: ${extension_action} ${extensions[*]}"
 fi

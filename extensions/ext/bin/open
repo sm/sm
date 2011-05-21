@@ -1,25 +1,17 @@
 #!/usr/bin/env bash
 
-if (( ${#extension_args[@]} == 0 ))
+if array_is_nonempty extension_args
 then
-  fail "At least one extension name must be specified."
-fi
-
-if path_exists "${extensions_development_path}/${extension_args[0]}"
-then
-  enter "${extensions_development_path}/${extension_args[0]}"
-
-  if command_exists "open"
+  if path_exists "${extensions_development_path}/${extension_args[0]}"
   then
-    open .
-  elif command_exists "xdg-open"
-  then
-    xdg-open .
+    enter "${extensions_development_path}/${extension_args[0]}"
+
+    os_open "$PWD"
   else
-    echo "$PWD"
+    error "Failed to open '${extension_args[0]}' "\
+      "as it appears to not be installed. Installed extensions are,"
+    extensions_installed
   fi
 else
-  error "Failed to open '${extension_args[0]}' as it appears to not be installed. Installed extensions are,"
-  extensions_installed
+  fail "At least one extension name must be specified."
 fi
-

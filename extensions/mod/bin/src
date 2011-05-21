@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-if (( ${#extension_args[@]} == 0 ))
+if array_is_nonempty extension_args
 then
+  printf "${extensions_development_path}/${extension_args[0]}/"
+else
   fail "An extension name must be specified."
 fi
 
-printf "${extensions_development_path}/${extension_args[0]}/"

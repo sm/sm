@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 
-if (( ${#extension_args[@]} == 0 ))
+if array_is_nonempty extension_args
 then
-  fail "An extension name must be specified."
-fi
-
-if path_exists "${extensions_development_path}/${extension_args[0]}"
-then
-  printf "${extensions_development_path}/${extension_args[0]}"
+  if path_exists "${extensions_development_path}/${extension_args[0]}"
+  then
+    printf "${extensions_development_path}/${extension_args[0]}"
+  else
+    printf "." # Stay put!
+    error "Failed to edit '${extension_args[0]}' as it appears to not be installed. Installed extensions are,\n$(extensions_installed)"
+  fi
 else
-  printf "." # Stay put!
-  error "Failed to edit '${extension_args[0]}' as it appears to not be installed. Installed extensions are,\n$(extensions_installed)"
+  fail "An extension name must be specified."
 fi
 
