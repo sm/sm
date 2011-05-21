@@ -910,13 +910,58 @@ extension_package()
         log "  - ${file}"
         log "$( file_md5 "${file}" )" to "${file}.md5"
         log "  - ${file}.md5"
-        move_files --force "${file}" "${file}.md5" to "${_path}/pkg"
+        move_files --force "${file}" "${file}.md5" \
+          to "${_path}/pkg" from "${_path}"
       done
     done
-
     log "Packaging complete (packages are located in '${_path}/pkg' )"
   else
     error "Cannot package extension '${_name}' as the extension is not valid."
   fi
+}
+
+extension_publish()
+{
+  local _name="${1:-}" _path _version
+
+  NIY "Extension publishing to extensions.beginrescueend.com has not yet been implemented."
+
+  if variable_is_nonempty _name
+  then
+    _path="${extensions_development_path:-"$extensions_src_path"}"
+
+    enter "${_path}"
+
+    if extension_is_valid "${_path}/${_name}"
+    then
+      _version="$(cat "${_name}/VERSION")"
+      log "Packaging extension ${_name}"
+      log "${_name}-${_version}:"
+
+      for formats in ".tar.gz" ".tar.bz2" ".tar.xz"
+      do
+        if path_exists "${_path}/pkg/"
+        then
+          log "publishing ${_name}-${_version}"
+
+          for file in "${_pth}/${_name}-${_version}".tar.{gz,xz,bz2}
+          do
+            log "  - ${file}"
+            log "  - ${file}.md5"
+            NIY "publishing"
+          done
+        else
+          error "The local package path '${_path}' does not exist, did you run"\
+            "'extension package ${_name}' before 'extension publish ${_name}'?"
+        fi
+      done
+      log "Packaging complete (packages are located in '${_path}/pkg' )"
+    else
+      error "Cannot package extension '${_name}' as the extension is not valid."
+    fi
+  else
+    fail "Cannot publish an extension as no extension name was given."
+  fi
+
 }
 

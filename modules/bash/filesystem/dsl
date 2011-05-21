@@ -1729,83 +1729,74 @@ move_files()
     esac
   done
 
-  # If the source variable is not empty
-  if variable_is_nonempty _source
+  # and if the target variable is not empty
+  if variable_is_nonempty _target
   then
-    # and if the target variable is not empty
-    if variable_is_nonempty _target
+    # and if the files array is nonempty
+    if array_is_nonempty _files
     then
-      # and if the files array is nonempty
-      if array_is_nonempty _files
-      then
-        # for each file in the files array
-        for _file in "${_files[@]}"
-        do
-          # if the source variable is nonempty then prepend source to the file.
-          if variable_is_nonempty _source
-          then
-            _file="${_source}/${_file}"
-          fi
+      # for each file in the files array
+      for _file in "${_files[@]}"
+      do
+        # if the source variable is nonempty then prepend source to the file.
+        if variable_is_nonempty _source
+        then
+          _file="${_source}/${_file}"
+        fi
 
-          # if the file exists
-          if file_exists "${_file}"
+        # if the file exists
+        if file_exists "${_file}"
+        then
+          # and force_flag is set
+          if (( _force_flag == 1 ))
           then
-            # and force_flag is set
-            if (( _force_flag == 1 ))
+            # then forcedly move the file and continue processing the next
+            # entity in the list or fail with an error message and a backtrace
+            # As there was a system error, fail with a message and backtrace
+            # which can be used to debug the issue
+            if mv -f "${_file}" "${_target}/${_file//*\/}"
             then
-              # then forcedly move the file and continue processing the next
-              # entity in the list or fail with an error message and a backtrace
-              # As there was a system error, fail with a message and backtrace
-              # which can be used to debug the issue
-              if mv -f "${_file}" "${_target}/${_file//*\/}"
-              then
-                continue
-              else
-                fail "Could not forcedly move the entity '${_entity}'"\
-                  "as the 'mv -f' command failed with error code '$?'"
-              fi
+              continue
             else
-              # otherwise move the file
-              if mv "${_file}" "${_target}/${_file//*\/}"
-              then
-                # Successfully copied the filesytem entity,
-                # continue processing the next entity in the list
-                continue
-              else
-                # Failed to remove the entity from the filesystem.
-                # This indicates a system error, fail giving sysadmins an error
-                # message with a backtrace which they can use to debug the issue.
-                fail "Could not move the file '${_file}' to "\
-                  "'${_target}/${_file//*\/}"\
-                  "as the 'rm' command failed with error code '$?'"
-              fi
+              fail "Could not forcedly move the entity '${_entity}'"\
+                "as the 'mv -f' command failed with error code '$?'"
             fi
           else
-            # Failed to move the the file as the file is missing
-            # This indicates a system error, fail giving sysadmins an error
-            # message with a backtrace which they can use to debug the issue.
-            fail "Could not move the source file '${_file}' to the target"\
-              "'${_target}/${_file//*\/}"\
-              "as the source file does not exist"
+            # otherwise move the file
+            if mv "${_file}" "${_target}/${_file//*\/}"
+            then
+              # Successfully copied the filesytem entity,
+              # continue processing the next entity in the list
+              continue
+            else
+              # Failed to remove the entity from the filesystem.
+              # This indicates a system error, fail giving sysadmins an error
+              # message with a backtrace which they can use to debug the issue.
+              fail "Could not move the file '${_file}' to "\
+                "'${_target}/${_file//*\/}"\
+                "as the 'rm' command failed with error code '$?'"
+            fi
           fi
-        done
-      else
-        # No files were given.
-        # This indicates a programming error, fail giving developers an error
-        # message with a backtrace which they can use to debug their code.
-        fail "Cannot move files as no files were given."
-      fi
+        else
+          # Failed to move the the file as the file is missing
+          # This indicates a system error, fail giving sysadmins an error
+          # message with a backtrace which they can use to debug the issue.
+          fail "Could not move the source file '${_file}' to the target"\
+            "'${_target}/${_file//*\/}"\
+            "as the source file does not exist"
+        fi
+      done
     else
-      # The target was not specified, this is a programming error
-      # send a fail message which will send a backtrace allowing the developer
-      # to quickly debug and pass in the proper parameters.
-      fail "Cannot move file as the target must be specified."
+      # No files were given.
+      # This indicates a programming error, fail giving developers an error
+      # message with a backtrace which they can use to debug their code.
+      fail "Cannot move files as no files were given."
     fi
   else
-      # The source was not specified, this is a programming error
-      # send a fail message which will send a backtrace allowing the developer
-      # to quickly debug and pass in the proper parameters.
-      fail "Cannot move file as the source must be specified."
+    # The target was not specified, this is a programming error
+    # send a fail message which will send a backtrace allowing the developer
+    # to quickly debug and pass in the proper parameters.
+    fail "Cannot move file as the target must be specified."
   fi
 }
 
