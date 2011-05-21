@@ -82,8 +82,10 @@ do
       ;;
 
     *)
-      if [[ -z "$extension" ]] ; then
-        if [[ -d "$extensions_path/$token" ]] ; then
+      if variable_is_empty extension
+      then
+        if path_exists "$extensions_path/$token"
+        then
           extension="$token"
           continue
         else
@@ -197,19 +199,21 @@ do
         break
       fi
 
-      if [[ -z "${action:-}" ]]
+      if variable_is_empty action
       then
-        if [[ -x "${extensions_path}/${extension}/bin/$token" ]]
+        if file_is_executable "${extensions_path}/${extension}/bin/$token"
         then
           action="$token"
           extension_args=("$@")
           parse_break=1
         fi
-      elif [[ -d "/data/$token" ]]
+
+      elif path_exists "/data/$token"
       then
         project="$token"
         project_path="/data/$token"
-      elif [[ -d "/home/$token" ]]
+
+      elif path_exists "/home/$token"
       then
         project="$token"
         project_path="/home/$token"
@@ -217,16 +221,17 @@ do
       ;;
   esac
 
-  if [[ -n "$parse_break" || -n "$error_message" ]]
+  if variable_is_nonempty parse_break || variable_is_nonempty error_message
   then
     unset parse_break
     break
   fi
-
 done
 
-if [[ -z "${action:-}" && -x "${extensions_path}/${extension}/bin/${extension}" ]]
-then # A default action has the same name as the extension.
+# A default action has the same name as the extension.
+if variable_is_empty action &&
+  file_is_executable "${extensions_path}/${extension}/bin/${extension}"
+then
   action="${extension}"
 fi
 

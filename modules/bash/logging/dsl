@@ -54,21 +54,21 @@ log()
    esac
   done
 
-  if [[ -z "${_message:-}" ]]
+  if variable_is_nonempty _message
   then
-    fail "Cannot log a message as no message was given."
-  fi
-
-  if [[ -n "${_file}" ]]
-  then
-    if (( _append_flag == 1 ))
+    if variable_is_nonempty _file
     then
-      printf "${_message}\n" >> "${_file}"
+      if (( _append_flag == 1 ))
+      then
+        printf "${_message}\n" >> "${_file}"
+      else
+        printf "${_message}\n" > "${_file}"
+      fi
     else
-      printf "${_message}\n" > "${_file}"
+        printf "${_message}\n"
     fi
   else
-      printf "${_message}\n"
+    fail "Cannot log a message as no message was given."
   fi
 }
 
@@ -216,6 +216,8 @@ debug()
   if (( ${debug_flag:=0} == 1 ))
   then
     log "DEBUG: $*"
+  else
+    return 0
   fi
 }
 
@@ -377,6 +379,8 @@ verbose()
   if (( ${verbose_flag:=0} == 1 ))
   then
     log "$*"
+  else
+    return 0
   fi
 }
 
@@ -393,35 +397,35 @@ verbose()
 logrotate()
 {
   local _file="${1:-}"
-  if [[ -z "${_file}" ]]
+  if variable_is_nonempty _file
   then
+    set_timestamp
+
+    verbose "Tailing the file in a background process into a tail logfile."
+    ( tail -n 0 -f "${_file}" > ${file}.$$.log )&
+
+    local _tail_pid=$!
+
+    verbose "Copying the file's contentes into a new timestamped file."
+    cp "${_file}" "${_file}.${timestamp}"
+
+    verbose "Truncating the file."
+    cp /dev/null ${_file}
+
+    verbose "Signaling the tail background process to stop."
+    kill -QUIT ${_tail_pid}
+
+    verbose "Appending the tail logfile to the new timestamped logfile."
+    cat "${file}.$$.log" >> "${file}.${timestamp}"
+
+    verbose "Compressing the timestamped file (gzip)"
+    gzip -f -9 "${file}.${timestamp}"
+
+    verbose "Removing the tail logfile"
+    rm "${file}.$$.log"
+  else
     fail "Cannot rotate a log file as no log file was given."
   fi
-
-  set_timestamp
-
-  verbose "Tailing the file in a background process into a tail logfile."
-  ( tail -n 0 -f "${_file}" > ${file}.$$.log )&
-
-  local _tail_pid=$!
-
-  verbose "Copying the file's contentes into a new timestamped file."
-  cp "${_file}" "${_file}.${timestamp}"
-
-  verbose "Truncating the file."
-  cp /dev/null ${_file}
-
-  verbose "Signaling the tail background process to stop."
-  kill -QUIT ${_tail_pid}
-
-  verbose "Appending the tail logfile to the new timestamped logfile."
-  cat "${file}.$$.log" >> "${file}.${timestamp}"
-
-  verbose "Compressing the timestamped file (gzip)"
-  gzip -f -9 "${file}.${timestamp}"
-
-  verbose "Removing the tail logfile"
-  rm "${file}.$$.log"
 }
 
 # ## log\_streams()
@@ -452,7 +456,6 @@ log_streams()
   local _command="${1:-}" _prefix _err _out _mix
 
   # TODO: allow specification of path, name prefix
-
   while (( $# > 0 ))
   do
     _token="${1}"
@@ -485,6 +488,7 @@ log_streams()
     "${_stderr="${3:-stderr.log}"}" \
     "${_stdmix="${4:-stdmix.log}"}"
 
+  # It's like fireworks~! :)
   {
     {
       ${_command} 2>&1 1>&3 | tee "${_stderr}"

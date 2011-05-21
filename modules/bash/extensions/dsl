@@ -49,21 +49,20 @@ extension_action()
 
   export extension="${1:-}"
 
-  if [[ -z "${extension}" ]]
+  if variable_is_nonempty extension
   then
+    shift
+    export action="${1:-}"
+
+    if variable_is_nonempty action
+    then
+      shift
+    else
+      fail "'action' is not set! Something has gone terribly wrong."
+    fi
+  else
     fail "'extension' is not set! Something has gone terribly wrong."
   fi
-
-  shift
-
-  export action="${1:-}"
-
-  if [[ -z "${action}" ]]
-  then
-    fail "'action' is not set! Something has gone terribly wrong."
-  fi
-
-  shift
 
   if (( ${#extension_args[@]} == 0 ))
   then
@@ -297,20 +296,22 @@ extension_version()
 {
   local _extension="${1:-}"
 
-  variable_is_nonempty ||
-    fail "Can not retrieve extension version as no extension was given."
-
-  shift
-  true ${extension_path:="${extensions_path}/${_extension}"}
-
-  if file_exists "${extension_path}/VERSION"
+  if variable_is_nonempty _extension
   then
-    read -r extension_version < "${extension_path}/VERSION"
-  else
-    extension_version="head"
-  fi
+    shift
+    true ${extension_path:="${extensions_path}/${_extension}"}
 
-  log "${extension}-${extension_version}"
+    if file_exists "${extension_path}/VERSION"
+    then
+      read -r extension_version < "${extension_path}/VERSION"
+    else
+      extension_version="head"
+    fi
+
+    log "${extension}-${extension_version}"
+  else
+    fail "Can not retrieve extension version as no extension was given."
+  fi
 }
 
 #
@@ -364,10 +365,12 @@ extension_license()
 {
   local _extension="${1:-${extension}}"
 
-  variable_is_nonempty _extension ||
+  if variable_is_nonempty _extension
+  then
+    cat -v "${extensions_path}/${_extension}/LICENSE"
+  else
     fail "Can not display extension license as an extension was not given."
-
-  cat -v "${extensions_path}/${_extension}/LICENSE"
+  fi
 }
 
 #
@@ -542,32 +545,35 @@ extensions_in()
 {
   local _path="${1:-}"
 
-  path_exists "${_path}" ||
+  if path_exists "${_path}"
+  then
+    _files=($(
+    find "${_path}" -mindepth 2 -maxdepth 2 -name 'VERSION' -type f
+    ))
+    extensions=()
+
+    for _file in "${_files[@]}"
+    do
+      extension_source_path="${_file/%\/VERSION}"
+      extension_name="${extension_source_path//*\/}"
+
+      case ${extension_name} in
+        (core|ext|mod|pkg|srv|svc|[[=.=]]*)
+          true # Ignore core extensions, they are updated with BDSM itself.
+          ;;
+
+        (*)
+          extensions[${#extensions[@]}]="${extension_name//*\//}"
+          ;;
+      esac
+    done
+
+    extensions="${extensions[@]}"
+
+    printf "${extensions}"
+  else
     fail "Cannot list extensions in '${_path}' as the directory does not exist."
-
-  _files=($(find "${_path}" -mindepth 2 -maxdepth 2 -name 'VERSION' -type f))
-
-  extensions=()
-
-  for _file in "${_files[@]}"
-  do
-    extension_source_path="${_file/%\/VERSION}"
-    extension_name="${extension_source_path//*\/}"
-
-    case ${extension_name} in
-      (core|ext|mod|pkg|srv|svc|[[=.=]]*)
-        true # Ignore core extensions, they are updated with BDSM itself.
-        ;;
-
-      (*)
-        extensions[${#extensions[@]}]="${extension_name//*\//}"
-        ;;
-    esac
-  done
-
-  extensions="${extensions[@]}"
-
-  printf "${extensions}"
+  fi
 }
 
 #
@@ -611,28 +617,27 @@ extensions_in()
 #
 extension_actions()
 {
-  local _extension="${1:-}"
+  local _extension="${1:-}" _files _file _actions=() _path
 
-  [[ -n "${_extension}" ]] ||
-    fail "Cannot list actions for extension as no extension was given."
-
-  local _path="$extensions_path/${_extension}/bin"
-
-  if path_exists "${_path}"
+  if variable_is_nonempty _extension
   then
-    local _files=($(find "${_path}" -mindepth 1 -maxdepth 1 -type f))
-    local _file _actions=()
+    _path="$extensions_path/${_extension}/bin"
 
-    for _file in "${_files[@]}"
-    do
-      [[ ! -x "${_file}" ]] || _actions+=("${_file//*\/}")
-    done
+    if path_exists "${_path}"
+    then
+      _files=($(find "${_path}" -mindepth 1 -maxdepth 1 -type f))
 
-    _actions="${_actions[@]}" # Convert from array to string.
-
-    printf "${_actions}"
+      for _file in "${_files[@]}"
+      do
+        [[ ! -x "${_file}" ]] || _actions+=("${_file//*\/}")
+      done
+      _actions="${_actions[@]}" # Convert from array to string.
+      printf "${_actions}"
+    else
+      return 0
+    fi
   else
-    return 0
+    fail "Cannot list actions for extension as no extension was given."
   fi
 }
 
@@ -689,19 +694,21 @@ extension_is_installed()
 {
   local _name="${1:-}"
 
-  [[ -n "${_name}" ]] ||
+  if variable_is_nonempty _name
+  then
+    local _extensions=" $(extensions_in "${extensions_path}") "
+
+    case "${_extensions}" in
+      (*[[:space:]]${_name}[[:space:]]*)
+        return 0
+        ;;
+      (*)
+        return 1
+        ;;
+    esac
+  else
     fail "Can not check for an installed extension as no extension name was given."
-
-  local _extensions=" $(extensions_in "${extensions_path}") "
-
-  case "${_extensions}" in
-    (*[[:space:]]${_name}[[:space:]]*)
-      return 0
-      ;;
-    (*)
-      return 1
-      ;;
-  esac
+  fi
 }
 
 
@@ -737,34 +744,33 @@ extension_is_installed()
 #
 extensions_install()
 {
-  local _extension
-  local _extensions=("$@")
+  local _extension _extensions=("$@")
 
-  if (( ${#_extensions[@]} == 0 ))
+  if array_is_nonempty _extensions
   then
+    # We need to ensure that the extensions directory already exists before calling
+    # install in parallel.
+    extension_fetch "${extension_uri:="${extensions_repository_url}"}"
+
+    for _extension in "${_extensions[@]}"
+    do
+      case "${_extension#\/}" in
+        ext|srv|pkg|core|mod)
+          continue # Skip core extensions.
+          ;;
+      esac
+
+      if [[ -z "${_extension}" ]]
+      then # Skip any empty extensions / 'artifact'.
+        continue
+      else
+        ( extension_install "${_extension}" )&
+      fi
+    done
+    wait
+  else
     fail "Cannot install extensions as no extensions were given to install."
   fi
-
-  # We need to ensure that the extensions directory already exists before calling
-  # install in parallel.
-  extension_fetch "${extension_uri:="${extensions_repository_url}"}"
-
-  for _extension in "${_extensions[@]}"
-  do
-    case "${_extension#\/}" in
-      ext|srv|pkg|core|mod)
-        continue # Skip core extensions.
-        ;;
-    esac
-
-    if [[ -z "${_extension}" ]]
-    then # Skip any empty extensions / 'artifact'.
-      continue
-    else
-      ( extension_install "${_extension}" )&
-    fi
-  done
-  wait
 }
 
 #
@@ -801,25 +807,25 @@ extension_install()
 {
   local _extension="${1:-}"
 
-  if [[ -z "${_extension}" ]]
+  if variable_is_nonempty _extension
   then
-    fail "Cannot install an extension as no extension name was given."
-  fi
+    if extension_is_valid "${extension_src_path}/${_extension}"
+    then
+      log " - ${_extension}"
+      copy_paths to "${bdsm_path}/extensions" "${extension_src_path}/${_extension}"
 
-  if extension_is_valid "${extension_src_path}/${_extension}"
-  then
-    log " - ${_extension}"
-    copy_paths to "${bdsm_path}/extensions" "${extension_src_path}/${_extension}"
+      log "${extension_uri}" to "${bdsm_path}/extensions/${_extension}/.uri"
 
-    log "${extension_uri}" to "${bdsm_path}/extensions/${_extension}/.uri"
-
-    #
-    # TODO: Process extension dependencies...
-    #
+      #
+      # TODO: Process extension dependencies...
+      #
+    else
+      error "${extension_src_path} is not a proper extension.
+     The named extension is missing VERSION and/or bin/help files.
+     Halting installation."
+    fi
   else
-    error "${extension_src_path} is not a proper extension.
-   The named extension is missing VERSION and/or bin/help files.
-   Halting installation."
+    fail "Cannot install an extension as no extension name was given."
   fi
 }
 
@@ -838,85 +844,86 @@ extension_fetch_and_install()
 
 extension_fetch()
 {
-  local _url="${1:-"$extension_uri"}"
-  local _identifier="${_url//\//_}" # Convert '/' to an invalid url component '_'
-  local repo_path="${repos_path}/${_identifier}"
+  local _url="${1:-"$extension_uri"}" _identifier repo_path
+  _identifier="${_url//\//_}" # Convert '/' to an invalid url component '_'
+  repo_path="${repos_path}/${_identifier}"
 
-  if [[ -z "${_url}" ]]
+  if variable_is_nonempty _url
   then
+     # TODO: scm fetch vs tarball fetch
+    scm_fetch "${_url}"
+
+    scm_update "${_url}"
+
+    extension_src_path="${repo_path}"
+  else
     fail "Cannot fetch an extension from a url as no url was given"
   fi
-
-   # TODO: scm fetch vs tarball fetch
-  scm_fetch "${_url}"
-
-  scm_update "${_url}"
-
-  extension_src_path="${repo_path}"
 }
 
 extension_is_valid()
 {
   local _path="${1:-}"
 
-  if [[ -z "${_path}" ]]
+  if variable_is_nonempty _path
   then
-    fail "Cannot determine if an extension is valid as the path to the extension was not given."
-  fi
-
-  # TODO: Add all extension requirement checks here.
-  if [[ -s "${_path}/VERSION" && -x "${_path}/bin/help" ]]
-  then
-    return 0
+    # TODO: Add all extension requirement checks here.
+    if [[ -s "${_path}/VERSION" && -x "${_path}/bin/help" ]]
+    then
+      return 0
+    else
+      return 1
+    fi
   else
-    return 1
+    fail "Cannot determine if an extension is valid as the path to the extension was not given."
   fi
 }
 
 extension_package()
 {
-  local _name="${1:-}"
+  local _name="${1:-}" _path _version file
 
-  if [[ -z "${_name}" ]]
+  if variable_is_nonempty _name
   then
-    fail "Cannot package an extension as no extension name was given."
-  fi
+    _path="${extensions_development_path:-"$extensions_src_path"}"
 
-  local _path="${extensions_development_path:-"$extensions_src_path"}"
+    enter "${_path}"
 
-  enter "${_path}"
+    if extension_is_valid "${_path}/${_name}"
+    then
+      _version="$(cat "${_name}/VERSION")"
+      log "Packaging extension ${_name}"
+      log "${_name}-${_version}:"
 
-  if extension_is_valid "${_path}/${_name}"
-  then
-    local _version="$(cat "${_name}/VERSION")"
-    log "Packaging extension ${_name}"
-    log "${_name}-${_version}:"
-
-    for archiver in "gzip" "bzip2 -z" "xz -z"
-    do
-      if command_exists ${archiver// *}
-      then
-        if tar cf "${_name}-${_version}.tar" "${_name}/"
-        then
-          ${archiver} -f -9 "${_name}-${_version}.tar"
-        else
-          error "There was an error ($?) while trying to create a tar of the '${_name}' directory while packaging."
-        fi
-      fi
-
-      ensure_paths_exist "${_path}/pkg"
-      for file in "${_name}-${_version}".tar.*
+      for archiver in "gzip" "bzip2 -z" "xz -z"
       do
-        log "  - ${file}"
-        log "$( file_md5 "${file}" )" to "${file}.md5"
-        log "  - ${file}.md5"
-        move_files --force "${file}" "${file}.md5" \
-          to "${_path}/pkg" from "${_path}"
+        if command_exists ${archiver// *}
+        then
+          if tar cf "${_name}-${_version}.tar" "${_name}/"
+          then
+            ${archiver} -f -9 "${_name}-${_version}.tar"
+          else
+            error "There was an error ($?) while trying to create a tar of the '${_name}' directory while packaging."
+          fi
+        fi
+
+        ensure_paths_exist "${_path}/pkg"
+
+        for file in "${_name}-${_version}".tar.*
+        do
+          log "  - ${file}"
+          log "$( file_md5 "${file}" )" to "${file}.md5"
+          log "  - ${file}.md5"
+          move_files --force "${file}" "${file}.md5" \
+            to "${_path}/pkg" from "${_path}"
+        done
       done
-    done
-    log "Packaging complete (packages are located in '${_path}/pkg' )"
+      log "Packaging complete (packages are located in '${_path}/pkg' )"
+    else
+      error "Cannot package extension '${_name}' as the extension is not valid."
+    fi
   else
-    error "Cannot package extension '${_name}' as the extension is not valid."
+    fail "Cannot package an extension as no extension name was given."
   fi
 }
 
@@ -962,6 +969,5 @@ extension_publish()
   else
     fail "Cannot publish an extension as no extension name was given."
   fi
-
 }
 

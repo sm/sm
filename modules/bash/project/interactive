@@ -10,7 +10,8 @@
 #       source "/usr/local/bdsm/modules/bash/project/interactive"
 #     fi
 #
-true "${projects_path:="$HOME/projects"}" ; export projects_path
+true "${projects_path:="$HOME/projects"}"
+export projects_path
 
 # ## p() -- Project
 #
@@ -30,29 +31,33 @@ true "${projects_path:="$HOME/projects"}" ; export projects_path
 #
 p()
 {
-  local _path pattern1 pattern2;
+  local _path regex1 regex2
+
   if [[ "$PS4" = "+ " ]]
   then
-    export PS4="+ \${BASH_SOURCE##\${bdsm_path}} \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO} > "
+    PS4="+ \${BASH_SOURCE##\${bdsm_path}} \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO} > "
+    export PS4
   fi
 
-  pattern1="${1:-}"
-  pattern2="${2:-}"
+  regex1="${1:-}"
+  regex2="${2:-}"
 
   true "${projects_path:="$HOME/projects"}"
 
-  if [[ -n "${pattern1}" ]]
+  if [[ -n "${regex1}" ]]
   then
     _path=$(
-    find "$projects_path" -mindepth 1 -maxdepth 2 -iname "${pattern1}*" -type d | head -1
+    find "$projects_path" -mindepth 1 -maxdepth 2 -iname "${regex1}*" -type d |
+    head -1
     )
 
     cd "$_path"
 
-    if [[ -n "${pattern2}" ]]
+    if [[ -n "${regex2}" ]]
     then
       _path=$(
-      find "$_path" -mindepth 1 -maxdepth 1 -iname "${pattern2}*" -type d | head -1
+      find "$_path" -mindepth 1 -maxdepth 1 -iname "${regex2}*" -type d |
+      head -1
       )
 
       cd "$_path"

@@ -81,7 +81,7 @@ fi
 source "${modules_path}/bash/modules/dsl"
 source "${modules_path}/bash/modules/initialize"
 
-modules array trace logging time variables environment filesystem system users \
+modules variables array trace logging time environment filesystem system users \
   extensions
 
 module_load core/dsl

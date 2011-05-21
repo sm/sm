@@ -22,7 +22,7 @@ process_lockfile_lock()
   # or the empty string if no parameters were passed in.
   local _lockfile="${1:-}"
   # If the lockfile variable is empty, then
-  if [[ -z "${_lockfile}" ]]
+  if variable_is_empty _lockfile
   then
     # a lockfile name/path was not passed in. This is programmer error,
     # so we fail which yields a backtrace allowing the developer to fix their
@@ -73,7 +73,8 @@ process_on_exit()
   _process_exit_code="$(trap)"
   # Filter trap output for
   _process_exit_code="$(
-  echo "${_process_exit_code}" | awk '/ EXIT$/' | sed -e "s#' EXIT##" -e "s#.*'##"
+  echo "${_process_exit_code}" | awk '/ EXIT$/' |
+  sed -e "s#' EXIT##" -e "s#.*'##"
   )"
 
   # If the existing process exit code does not call the process_exit_commands()

@@ -40,7 +40,7 @@ command_exists()
 {
   local _name="${1:-}"
 
-  if [[ -n "${_name}" ]]
+  if variable_is_nonempty _name
   then
     if command -v "${_name}" > /dev/null 2>&1
     then
@@ -97,7 +97,7 @@ is_a_function()
 {
   local _name="${1:-}"
 
-  if [[ -n "${_name}" ]]
+  if variable_is_nonempty _name
   then
     if declare -f "${_name}" >/dev/null 2>&1
     then
@@ -107,62 +107,6 @@ is_a_function()
     fi
   else
     fail "Cannot test if function exists as no function name was given."
-  fi
-}
-
-#
-# ## shell\_is\_interactive()
-#
-# Checks if the currently running shell is interactive (user controlled).
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# none.
-#
-# ### return codes
-#
-# 0 if the shell is interactive (user controlled)
-# 1 if the shell is not interactive
-#
-# ### failure scenarios
-#
-# None currently.
-#
-# ### usage examples
-#
-# user$ cat $HOME/test
-# #!/usr/bin/env bash
-# source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
-# modules environment # Load the trace module.
-#
-# if shell_is_interactive
-# then
-#   echo "Shell is Interactive! "
-# else
-#   echo "Shell is Not Interactive! "
-# fi
-#
-# user$ "$HOME/test"
-# Shell is Not Interactive!
-#
-# user$ source "$HOME/test"
-# Shell is Interactive!
-#
-shell_is_interactive()
-{
-  if [[ "$-" = *i* ]]
-  then
-    return 0
-  else
-    return 1
   fi
 }
 

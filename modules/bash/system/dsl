@@ -103,13 +103,12 @@ init_scripts_path()
 # ### Code Walkthrough
 confd_path()
 {
-  # If the user id is 0 (eg. the user is root)
+  # If the user id is 0 (eg. the user is root) then Use the FHS standard /etc
+  # direcotry otherwise place the conf.d directory inside the user's $HOME
   if (( UID == 0 ))
   then
-    # Use the FHS standard /etc direcotry
     printf "/etc/conf.d"
   else
-    # Place the conf.d directory inside the user's $HOME
     printf "$HOME/.conf.d"
   fi
 }
@@ -149,13 +148,12 @@ confd_path()
 # ### Code Walkthrough
 os_is_linux()
 {
-  # If the machine type is linux
+  # If the machine type is linux then return the code for true/success, 0
+  # Otherwise return a nonzero error code, 1
   if [[ "$MACHTYPE" = *linux* ]]
   then
-    # Then return the code for true/success, 0
     return 0
   else
-    # Otherwise return a nonzero error code, 1
     return 1
   fi
 }
@@ -195,13 +193,12 @@ os_is_linux()
 # ### Code Walkthrough
 os_is_darwin()
 {
-  # If the machine type is darwin
+  # If the machine type is darwin then return the code for true/success, 0
+  # otherwise return a nonzero error code, 1
   if [[ "$MACHTYPE" = *darwin* ]]
   then
-    # then return the code for true/success, 0
     return 0
   else
-    # otherwise return a nonzero error code, 1
     return 1
   fi
 }
@@ -241,13 +238,12 @@ os_is_darwin()
 # ### Code Walkthrough
 os_is_bsd()
 {
-  # If the machine type is BSD
+  # If the machine type is BSD then return the code for true/success, 0
+  # otherwise return a nonzero error code, 1
   if [[ "$MACHTYPE" = *bsd* ]]
   then
-    # then return the code for true/success, 0
     return 0
   else
-    # otherwise return a nonzero error code, 1
     return 1
   fi
 }
@@ -287,13 +283,12 @@ os_is_bsd()
 # ### Code Walkthrough
 os_is_solaris()
 {
-  # If the machine type is Solaris
+  # If the machine type is Solaris then return the code for true/success, 0
+  # otherwise return a nonzero error code, 1
   if [[ "$MACHTYPE" = *solaris* ]]
   then
-    # then return the code for true/success, 0
     return 0
   else
-    # otherwise return a nonzero error code, 1
     return 1
   fi
 }
@@ -333,13 +328,12 @@ os_is_solaris()
 # ### Code Walkthrough
 os_is_aix()
 {
-  # If the machine type is aix
+  # If the machine type is aix then return the code for true/success, 0
+  # otherwise return a nonzero error code, 1
   if [[ "$MACHTYPE" = *aix* ]]
   then
-    # then return the code for true/success, 0
     return 0
   else
-    # otherwise return a nonzero error code, 1
     return 1
   fi
 }
@@ -529,24 +523,22 @@ os_arch()
 os_arch_capable()
 {
   # If the operating system is 'darwin' (OSX)
+  # Otherwise return the default for the OS, defer to os_arch_type()
   if os_is_darwin
   then
-    # Now determine whether the CPU has 64 bit capabilities
+    # Now determine whether the CPU has 64 bit capabilities, on OSX we use
+    # sysctl key hw.cpu64bit_capable key to find this out.  If the value is 1
+    # then the CPU is 64 bit capable, emit x86_64 to the calling environments
+    # STDOUT otherwise output either i386 or ppc, by derring to os_arch_type()
     local _string
-    # on OSX we use sysctl key hw.cpu64bit_capable key to find this out.
     read -r _string < <(sysctl hw.cpu64bit_capable)
-    # If the key's value is 1 then
     if (( ${_string//* } == 1 ))
     then
-      # the CPU is 64 bit capable, emit x86_64 to the calling environments
-      # STDOUT stream
       printf "%s" "x86_64"
     else
-      # Either i386 or ppc, defer to os_arch_type()
       os_arch_type
     fi
   else
-    # Return the default for the OS, defer to os_arch_type()
     os_arch_type
   fi
 }
@@ -588,29 +580,31 @@ os_cpu_count()
   local _cpu_count=1
 
   # If the operating system is Darwin (OSX)
+  # Then read the CPU count using the sysctl key hw.ncpu, and trim off
+  # everything except the last space separated field.
   if os_is_darwin
   then
-    # Then read the CPU count using the sysctl key hw.ncpu
     read -r _cpu_count < <(sysctl hw.ncpu)
-    # Trim off everything except the last space separated field.
     _cpu_count="${_cpu_count//* }"
+  # If the operating system is Linux then gather the information directly from
+  # the proc filesystem
   elif os_is_linux
   then
-    # If the operating system is Linux then gather the information directly from
-    # the proc filesystem
     _cpu_count=$(awk '/^processor/{count++} END{print count}' /proc/cpuinfo 2>&1)
 
+  # Warn the user that this function has not yet been implemented for solaris.
   elif os_is_solaris
   then
-    # Warn the user that this function has not yet been implemented for solaris.
     warn "CPU counting for solaris has not yet been implemented, returning 1."
+
+  # Warn the user that this function has not yet been implemented for bsd.
   elif os_is_bsd
   then
-    # Warn the user that this function has not yet been implemented for bsd.
     warn "CPU counting for bsd has not yet been implemented, returning 1."
+
+  # Warn the user that this function has not yet been implemented for aix.
   elif os_is_aix
   then
-    # Warn the user that this function has not yet been implemented for aix.
     warn "CPU counting for aix has not yet been implemented, returning 1."
   fi
 
@@ -654,11 +648,11 @@ os_cpu_count()
 # ### Code Walkthrough
 os_version()
 {
-  # Read the revisin string using the uname utility
+  # Read the revisin string using the uname utility and strip off the rightmost
+  # piece, which typically contains additional info. Then print the remaining
+  # string to the STDOUT of the calling environment.
   read -r os_version < <(uname -r)
-  # Strip off the rightmost piece, which typically contains additional info
   os_version=${os_version//-*}
-  # Print the remaining string to the STDOUT of the calling environment.
   printf '%s' "${os_version}"
 }
 
@@ -699,11 +693,10 @@ os_version()
 # ### Code Walkthrough
 os_version_major()
 {
-  # Grab the full version string from os_version()
+  # Grab the full version string from os_version(). Then strip off everything to
+  # the right of the first set of digits and print it to STDOUT.
   os_version_major=$(os_version)
-  # Strip off everything to the right of the first set of digits.
   os_version_major="${os_version_major//\.*}"
-  # Print the remaining string to the STDOUT of the calling environment.
   printf "${os_version_major}"
 }
 
@@ -744,13 +737,12 @@ os_version_major()
 # ### Code Walkthrough
 os_version_minor()
 {
-  # Grab the full version string from os_version()
+  # Grab the full version string from os_version(). Strip off everything to the
+  # left of the middle set of digits, then strip off everything to the right of
+  # the middle set of digits. Print the remaining string to STDOUT.
   os_version_minor=$(os_version)
-  # Strip off everything to the left of the middle set of digits.
   os_version_minor="${os_version_minor#*\.}"
-  # Strip off everything to the right of the middle set of digits.
   os_version_minor="${os_version_minor%\.*}"
-  # Print the remaining string to the STDOUT of the calling environment.
   printf "${os_version_minor}"
 }
 
@@ -791,11 +783,10 @@ os_version_minor()
 # ### Code Walkthrough
 os_version_patch()
 {
-  # Grab the full version string from os_version()
+  # Grab the full version string from os_version(). Strip off everything to the
+  # left of the last set of digits. Print the version string to STDOUT.
   os_version_patch=$(os_version)
-  # Strip off everything to the left of the last set of digits.
   os_version_patch="${os_version_patch//*\.}"
-  # Print the version string to the STDOUT of the calling environment.
   printf "${os_version_patch}"
 }
 
@@ -833,21 +824,19 @@ os_open()
     # otherwise
     else
       # If the shell is interactive
+      # and if the uri is a file uri then open it up in the shell set editor
+      # or less if the editor variable has not been set.
+      # Otherwise the shell is non-interactive so for now print the uri.
       if shell_is_interactive
       then
-        # and if the uri is a file uri
-        if [[ "${_uri}" = file* ]]
+        if [[ "${_uri}" == file* ]]
         then
-          # Then open it up in the shell set editor or less if the editor
-          # variable has not been set.
           ${EDITOR:-less} "${_uri}"
         else
-          # The URL must be http:// ??? So let's just curl it.
           curl -s "${_uri}"
         fi
       else
-        # the shell is non-interactive, for now print the directory.
-        echo "$PWD"
+        echo "$_uri"
       fi
     fi
   else

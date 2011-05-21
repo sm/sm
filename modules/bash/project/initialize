@@ -14,11 +14,13 @@ then
   project_initialize
 fi
 
-export project environment project_path shared previous_path release_path stage_path log_path
+export project environment project_path shared previous_path release_path \
+  stage_path log_path
 
 if module_is_loaded rvm
 then
-  if variable_is_nonempty release_path && file_is_nonempty "${release_path}/.rvmrc"
+  if variable_is_nonempty release_path &&
+    file_is_nonempty "${release_path}/.rvmrc"
   then
     source "${release_path}/.rvmrc"
   fi

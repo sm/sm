@@ -32,8 +32,8 @@
 #
 rvm_install()
 {
-  local _version=${1:-latest} _result=0
-  local url="https://rvm.beginrescueend.com/install/rvm"
+  local _version=${1:-latest} _result=0 url
+  url="https://rvm.beginrescueend.com/install/rvm"
   (
     set -o errexit
     curl -s "$url" -o rvm-installer

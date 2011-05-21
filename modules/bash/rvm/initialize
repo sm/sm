@@ -12,6 +12,7 @@ rvm_files=(
 
 # Attempt to load RVM
 files=( $(nonempty_files "${rvm_files[@]}") )
-
-array_is_nonempty "files" &&
+if array_is_nonempty "files"
+then
   source_files $(array_first_element files)
+fi

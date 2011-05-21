@@ -83,9 +83,13 @@ show_help()
 #
 description()
 {
-  [[ -n "$*" ]] || fail "Cannot add description to help as no help description was given."
-
-  help_descriptions+=("$*")
+  local _description="$*"
+  if variable_is_nonempty _description
+  then
+    help_descriptions+=("$*")
+  else
+    fail "Cannot add description to help as no help description was given."
+  fi
 }
 
 #
@@ -121,7 +125,7 @@ help_description()
 {
   local _description
 
-  if (( ${#help_descriptions[@]} > 0 ))
+  if array_is_nonempty help_descriptions
   then
     help_section "Description"
 
@@ -165,14 +169,16 @@ help_description()
 #
 action()
 {
-  local _name="${1:-}"
-  local _description="${2:-}"
+  local _name="${1:-}" _description="${2:-}"
 
-  [[ -n "${_name}" && -n "${_description}" ]] ||
+  if variable_is_nonempty _name &&
+    variable_is_nonempty _description
+  then
+    help_action_names+=( "${_name}" )
+    help_action_descriptions+=( "${_description}" )
+  else
     fail "An action and a description must be provided:\naction {name} {description}"
-
-  help_action_names+=( "${_name}" )
-  help_action_descriptions+=( "${_description}" )
+  fi
 }
 
 #
@@ -329,7 +335,7 @@ help_actions()
 {
   local _largest _index
 
-  if (( ${#help_action_names[@]} > 0 ))
+  if array_is_nonempty help_action_names
   then
     _largest=$( array_largest help_action_names ) # Use the array DSL to grab largest
     _largest=$(( ${#_largest} + 1 ))
@@ -392,7 +398,7 @@ help_notes()
 {
   local _index
 
-  if (( ${#help_notes[@]} > 0 ))
+  if array_is_nonempty help_notes
   then
     help_section "Notes"
 
@@ -434,7 +440,7 @@ help_dependencies()
 {
   local _index
 
-  if (( ${#help_dependencies[@]} > 0 ))
+  if array_is_nonempty help_dependencies
   then
     help_section "Dependencies"
 
@@ -478,7 +484,7 @@ help_resources()
 {
   local _index
 
-  if (( ${#help_resources[@]} > 0 ))
+  if array_is_nonempty help_resources
   then
     help_section "Resources"
 
@@ -594,7 +600,9 @@ usage()
 
   log "\nbdsm ${bdsm_version} https://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)"
 
-  sections=(usage description actions notes dependencies resources)
+  sections=(
+  usage description actions notes dependencies resources
+  )
   for section in "${sections[@]}"
   do
     "help_${section}"

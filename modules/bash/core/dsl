@@ -120,7 +120,7 @@ NIY()
   fail "This feature has not yet been implemented.\n${*:-}"
 }
 
-# Allow for method_missing when a command is not found during lookup.
+# Allow for command_missing when a command is not found during lookup.
 if (( ${BASH_VERSINFO[0]} > 3 ))
 then
   command_not_found()
@@ -131,8 +131,9 @@ then
 
   command_not_found_handle()
   {
-    if [[ -n "$MC_SID" || ! -t 1 ]]
-    then # do not run when inside Midnight Commander or within a Pipe
+    # do not run when inside Midnight Commander or within a Pipe
+    if variable_is_nonempty MC_SID || [[ ! -t 1 ]]
+    then
       command_not_found "$@"
     fi
 
@@ -140,17 +141,22 @@ then
     then # do not run when within a subshell, Linux version.
       local cmd state remainder
       local -i pid ppid pgrp session tty_nr tpgid
-      read pid cmd state ppid pgrp session tty_nr tpgid remainder < /proc/self/stat
+      read pid cmd state ppid pgrp session tty_nr tpgid remainder \
+        < /proc/self/stat
+
       if (( $$ == ${tpgid} ))
       then
         command_not_found "$@"
       fi
     fi
 
-    if command -v method_missing
-    then # Pass to method_missing.
-      method_missing "$@"
-    else # Default behavior.
+    # If a function named 'command_missing' is defined then call it with the
+    # parameters of the unknown command and name otherwise call
+    # 'command_not_found' for default behavior.
+    if command -v command_missing
+    then
+      command_missing "$@"
+    else
       command_not_found "$@"
     fi
   }

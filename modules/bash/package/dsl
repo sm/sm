@@ -1112,12 +1112,18 @@ package_patch()
     return 0
   fi
 
-  _patches=($(find "${extension_patches_path}/$(os_type)" -mindepth 1 -maxdepth 1 -iname '*.patch' -type f))
+  _patches=($(
+  find "${extension_patches_path}/$(os_type)" \
+    -mindepth 1 -maxdepth 1 -iname '*.patch' -type f
+  ))
   package_apply_patches "${_patches[@]}"
 
   if path_exists "${extension_patches_path}/$(os_type)/${package_version}"
   then
-    _patches=($(find "${extension_patches_path}/$(os_type)/${package_version}" -mindepth 1 -maxdepth 1 -iname '*.patch' -type f))
+    _patches=($(
+    find "${extension_patches_path}/$(os_type)/${package_version}" \
+      -mindepth 1 -maxdepth 1 -iname '*.patch' -type f
+    ))
 
     package_apply_patches "${_patches[@]}"
   else
@@ -1162,15 +1168,15 @@ package_apply_patches()
 {
   local _patch _patches=("$@")
 
-  if (( ${#_patches[@]} == 0 ))
+  if array_is_nonempty _patches
   then
+    for _patch in "${_patches[@]}"
+    do
+      log "TODO: patch application is NIY"
+    done
+  else
     fail "Cannot apply patches as no patches were given."
   fi
-
-  for _patch in "${_patches[@]}"
-  do
-    log "TODO: patch application is NIY"
-  done
 }
 
 #
@@ -1385,18 +1391,19 @@ package_cli()
 package_is_active()
 {
   local _name="${1:-${package_name}}"
-  if [[ -z "${_name}" ]]
-  then
-    fail "Can not query if a package is active as no package name was given or name is empty."
-  fi
 
-  local _path="${packages_path}/${_name}"
-
-  if [[ -L "${_path}/active" && -d $(readlink "${_path}/active") ]]
+  if variable_is_nonempty _name
   then
-    return 0
+    local _path="${packages_path}/${_name}"
+
+    if [[ -L "${_path}/active" && -d $(readlink "${_path}/active") ]]
+    then
+      return 0
+    else
+      return 1
+    fi
   else
-    return 1
+    fail "Can not query if a package is active as no package name was given or name is empty."
   fi
 }
 
@@ -1437,16 +1444,16 @@ package_must_be_active()
 {
   local _name="${1:-}"
 
-  if [[ -z "${_name}" ]]
+  if variable_is_nonempty _name
   then
-    fail "Can not ensure that package is active as no package name was given or name is empty."
-  fi
-
-  if package_is_active "${_name}"
-  then
-    return 0
+    if package_is_active "${_name}"
+    then
+      return 0
+    else
+      error "Install/activate the node package extension before installing ${_name}."
+    fi
   else
-    error "Install/activate the node package extension before installing ${_name}."
+    fail "Can not ensure that package is active as no package name was given or name is empty."
   fi
 }
 
@@ -1487,15 +1494,15 @@ packages_must_be_active()
 {
   local _package _packages="$@"
 
-  if (( "${#@}" == 0 ))
+  if array_is_nonempty _packages
   then
+    for _package in "${_packages[@]}"
+    do
+      package_must_be_active "${_package}"
+    done
+  else
     fail "Can not ensure that packages are active as no packages were given."
   fi
-
-  for _package in "${_packages[@]}"
-  do
-    package_must_be_active "${_package}"
-  done
 }
 
 #

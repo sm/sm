@@ -1378,7 +1378,7 @@ service_init_logtail()
 {
   # TODO: Adjust this to allow for parameter passing.
 
-  exec tail -n 10 "${service_log_file}"
+  tail -n 10 "${service_log_file}"
 }
 
 #

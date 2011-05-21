@@ -107,15 +107,15 @@ module_load()
 {
   local _file _files=("$@")
 
-  if (( ${#_files[@]} == 0 ))
+  if array_is_nonempty _files
   then
+    for _file in "${_files[@]}"
+    do
+      source_files "${extension_modules_path:-"$modules_path"}/bash/${_file}"
+    done
+  else
     fail "Cannot load a module as no module was given."
   fi
-
-  for _file in "${_files[@]}"
-  do
-    source_files "${extension_modules_path:-"$modules_path"}/bash/${_file}"
-  done
 }
 
 #
@@ -193,17 +193,19 @@ module_is_loaded()
 {
   local _name="${1:-}"
 
-  [[ -n "${_name}" ]] ||
+  if variable_is_nonempty _name
+  then
+    case " ${modules[@]} " in
+      (*[[:space:]]${_name}[[:space:]]*)
+        return 0
+        ;;
+      (*)
+        return 1
+        ;;
+    esac
+  else
     fail "Cannot determine if a module is loaded as no module was given."
-
-  case " ${modules[@]} " in
-    (*[[:space:]]${_name}[[:space:]]*)
-      return 0
-      ;;
-    (*)
-      return 1
-      ;;
-  esac
+  fi
 }
 
 #
@@ -242,11 +244,15 @@ modules_loaded()
 # ## modules\_installed()
 modules_installed()
 {
-  local _module
-  local _module_type="${1:-"bash"}"
-  local _modules=($(find "${modules_path}/${_module_type}" -mindepth 1 -maxdepth 1 -type d | sed -e 's#.*/##g' -e '/\..*/d'))
+  local _module _module_type="${1:-"bash"}" _modules
 
-  for _module in ${_modules[@]} ; do
+  _modules=($(
+  find "${modules_path}/${_module_type}" -mindepth 1 -maxdepth 1 -type d |
+  sed -e 's#.*/##g' -e '/\..*/d'
+  ))
+
+  for _module in ${_modules[@]}
+  do
     printf "%s\n" "${_module}"
   done
 }
@@ -286,20 +292,20 @@ module_dsl()
 {
   local _function _dsl _modules="${@:-}"
 
-  if (( ${#_modules[@]} == 0 ))
+  if array_is_nonempty _modules
   then
+    local _path="${modules_path}/bash/${_module}"
+
+    _dsl=($(find "${_path}" -mindepth 1 -maxdepth 1 -name dsl -type f -print0 | xargs -0 grep '^[a-z_]*()$' 2>/dev/null || true))
+
+    for _function in "${_dsl[@]}"
+    do
+      _function="${_function##*modules\/bash\/}"
+      printf "%s\n" "${_function//*:}"
+    done
+  else
     fail "Cannot print the DSL for module(s) as no module names were given."
   fi
-
-  local _path="${modules_path}/bash/${_module}"
-
-  _dsl=($(find "${_path}" -mindepth 1 -maxdepth 1 -name dsl -type f -print0 | xargs -0 grep '^[a-z_]*()$' 2>/dev/null || true))
-
-  for _function in "${_dsl[@]}"
-  do
-    _function="${_function##*modules\/bash\/}"
-    printf "%s\n" "${_function//*:}"
-  done
 }
 
 #
@@ -633,7 +639,9 @@ modules_site_docgen()
   if path_exists "${site_development_path}"
   then # TODO: Extract this section into a separate location.
     # Copy the generated files into the proper site content dir.
-    files=($(find "${_prefix}" -mindepth 1 -iname '*.haml'))
+    files=($(
+    find "${_prefix}" -mindepth 1 -iname '*.haml'
+    ))
     for file in "${files[@]}"
     do
       (
@@ -678,6 +686,5 @@ Header
   else
     fail "Set site_development_path in ~/.bdsmrc in order to run docgen."
   fi
-
 }
 
