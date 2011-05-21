@@ -910,10 +910,10 @@ extension_package()
         log "  - ${file}"
         log "$( file_md5 "${file}" )" to "${file}.md5"
         log "  - ${file}.md5"
-        move_files --force "${file}" "${file}.md5" to "${_path}/pkg"
+        move_files --force "${file}" "${file}.md5" \
+          to "${_path}/pkg" from "${_path}"
       done
     done
-
     log "Packaging complete (packages are located in '${_path}/pkg' )"
   else
     error "Cannot package extension '${_name}' as the extension is not valid."
