@@ -11,47 +11,47 @@
 # Code Walkthrough
 scm_fetch()
 {
-  local _url="${1:-${extension_url:-}}"
+  local _url="${1:-${extension_url:-}}" _identifier repo_path
 
-  if [[ -z "${_url}" ]]
+  if variable_is_nonempty _url
   then
+    _identifier="${_url//\//_}" # Convert '/' to an invalid url component '_'
+    repo_path="${repos_path}/${_identifier}"
+
+    ensure_paths_exist "${repos_path}"
+
+    case "${_url}" in
+      *git*)
+        if path_exists "${repo_path}/.git"
+        then
+          true # already fetched!
+        else
+          if path_exists "${repo_path}"
+          then
+            remove_paths "${repo_path}"
+          fi
+
+          if ! git clone --depth 1 ${_url} "${repo_path}"
+          then
+            error "There was an error while cloning the repository from the url '${_url}'"
+          fi
+        fi
+        ;;
+      *svn*)
+        NIY
+        ;;
+      *hg*)
+        NIY
+        ;;
+      *fossil*)
+        NIY
+        ;;
+      *)
+        ;;
+    esac
+  else
     fail "Cannot fetch an extension from a url as no url was given"
   fi
-
-  local _identifier="${_url//\//_}" # Convert '/' to an invalid url component '_'
-  local repo_path="${repos_path}/${_identifier}"
-
-  ensure_paths_exist "${repos_path}"
-
-  case "${_url}" in
-    *git*)
-      if path_exists "${repo_path}/.git"
-      then
-        true # already fetched!
-      else
-        if path_exists "${repo_path}"
-        then
-          remove_paths "${repo_path}"
-        fi
-
-        if ! git clone --depth 1 ${_url} "${repo_path}"
-        then
-          error "There was an error while cloning the repository from the url '${_url}'"
-        fi
-      fi
-      ;;
-    *svn*)
-      NIY
-      ;;
-    *hg*)
-      NIY
-      ;;
-    *fossil*)
-      NIY
-      ;;
-    *)
-      ;;
-  esac
 }
 
 # ## scm\_update()
@@ -61,59 +61,58 @@ scm_fetch()
 # Code Walkthrough
 scm_update()
 {
-  local _url="${1:-${extension_url:-}}"
-  local initial_pwd="$PWD"
+  local _url initial_pwd _identifier repo_path
 
-  if [[ -z "${_url}" ]]
+  _url="${1:-${extension_url:-}}"
+  initial_pwd="$PWD"
+
+  if variable_is_nonempty _url
   then
+    _identifier="${_url//\//_}" # Convert '/' to an invalid url component '_'
+    repo_path="${repos_path}/${_identifier}"
+
+    enter "${repo_path}"
+
+    case "${_url}" in
+      *git*)
+        # TODO: Use git cli instead of awking it :)
+        if [[ -z "$(git branch | awk "/${branch:=master}$/")" ]]
+        then
+          if ! ( builtin cd  "${repo_path}";
+            git checkout -b "$branch" --track "$remote/$branch" 2>/dev/null )
+          then
+            error "$remote $branch remote branch not found. Halting."
+          fi
+        elif [[ -z "$(git branch | awk "/\* $branch$/{print \$2}")" ]]
+        then
+          if ! ( builtin cd "${repo_path}"; git checkout $branch 2>/dev/null)
+          then
+            error "Unable to checkout $branch.\nCould not get head. Halting."
+          fi
+        fi
+
+        if ! ( builtin cd "${repo_path}" ; git pull --rebase origin $branch )
+        then
+          error "Git pull failed. Halting."
+        fi
+        ;;
+      *svn*)
+        NIY "Subversion scm_update"
+        ;;
+      *hg*)
+        NIY "hg scm_update"
+        ;;
+      *fossil*)
+        NIY "fossil scm_update"
+        ;;
+      *)
+        error "Unknownn SCM for url '${_url}'"
+        ;;
+    esac
+
+    enter "$initial_pwd"
+  else
     fail "Cannot fetch an extension from a url as no url was given"
   fi
-
-  local _identifier="${_url//\//_}" # Convert '/' to an invalid url component '_'
-  local repo_path="${repos_path}/${_identifier}"
-
-  enter "${repo_path}"
-
-  case "${_url}" in
-    *git*)
-      # TODO: Use git cli instead of awking it :)
-      if [[ -z "$(git branch | awk "/${branch:=master}$/")" ]]
-      then
-        if ! ( builtin cd  "${repo_path}";
-          git checkout -b "$branch" --track "$remote/$branch" 2>/dev/null )
-        then
-          error "$remote $branch remote branch not found. Halting."
-        fi
-
-      elif [[ -z "$(git branch | awk "/\* $branch$/{print \$2}")" ]]
-      then
-        if ! ( builtin cd "${repo_path}";
-          git checkout $branch 2>/dev/null)
-        then
-          error "Unable to checkout $branch.\nCould not get head. Halting."
-        fi
-      fi
-
-      if ! ( builtin cd "${repo_path}" ;
-        git pull --rebase origin $branch )
-      then
-        error "Git pull failed. Halting."
-      fi
-      ;;
-    *svn*)
-      NIY "Subversion scm_update"
-      ;;
-    *hg*)
-      NIY "hg scm_update"
-      ;;
-    *fossil*)
-      NIY "fossil scm_update"
-      ;;
-    *)
-      error "Unknownn SCM for url '${_url}'"
-      ;;
-  esac
-
-  enter "$initial_pwd"
 }
 

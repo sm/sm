@@ -89,11 +89,9 @@ timestamp_set()
 timestamp()
 {
   # Set the format to either the first parameter, if nonempty or to the
-  # iso-something format ;) otherwise.
+  # iso-something format ;) otherwise. Use the date command with the format
+  # string and print the result to the STDOUT of the calling environment.
   local _format="${1:-"%Y-%m-%dT%H:%M:%S"}"
-
-  # Use the date command with the format string and print the result to the
-  # STDOUT of the calling environment.
   date +"${_format}"
 }
 

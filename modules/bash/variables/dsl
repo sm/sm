@@ -39,15 +39,14 @@ first()
   # Store the parameters in an array variable
   local _array=("$@")
 
-  # If the array is nonempty
+  # If the array is nonempty then print the first element out
+  # Otherwise no parameters were passed in, this is a programming error.
+  # Send a failure message which also triggers a backtrace enabling the
+  # developer to quickly pinpoint and fix their error.
   if (( ${#_array[@]} > 0 ))
   then
-    # then print the first element out
     printf "%s" "${_array[0]}"
   else
-    # Otherwise no parameters were passed in, this is a programming error.
-    # Send a failure message which also triggers a backtrace enabling the
-    # developer to quickly pinpoint and fix their error.
     fail "No parameters given, cannot return the first one."
   fi
 }
@@ -91,15 +90,14 @@ last()
   # Store the parameters in an array variable
   local _array=("$@")
 
-  # If the parameters array is nonempty
+  # If the parameters array is nonempty then print the last element of the array
+  # Otherwise no parameters were passed in, this is a programming error.
+  # Send a failure message which also triggers a backtrace enabling the
+  # developer to quickly pinpoint and fix their error.
   if (( ${#_array[@]} > 0 ))
   then
-    # then print the last element of the array
     printf "%s" "${_array[$((${#_array[@]} - 1))]}"
   else
-    # Otherwise no parameters were passed in, this is a programming error.
-    # Send a failure message which also triggers a backtrace enabling the
-    # developer to quickly pinpoint and fix their error.
     fail "No parameters given, cannot return the last one."
   fi
 }
@@ -147,28 +145,27 @@ match()
   local _value="$1"
 
   # If the varable is nonempty
-  if [[ -n "${_value}" ]]
+  if variable_is_nonempty _value
   then
-    # then remove the value from the parameters list
+    # then remove the value from the parameters list and set the regex variable
+    # to the next parameter
     shift
-    # and set the regex variable to the new first parameter
     local _regex="$1"
 
     # if the regex variable is nonempty
-    if [[ -n "${_regex}" ]]
+    if variable_is_nonempty _regex
     then
-      # then first turn on extended shell globbing (bash) and
+      # Ensure that extended shell globbing (bash) is turned on
       shopt -s extglob
       # use a case statement for pattern matching the regex against the value
+      # If the value matches the given regex pattern then return true, 0
+      # otherwise the value does not match the given regex pattern so return
+      # false, 1
       case "${_value}" in
-        # If the value matches the given regex pattern
         (${_regex})
-          # then return true, 0
           return 0
           ;;
-        # if the value does not match the given regex pattern
         (*)
-          # then return false, 1
           return 1
           ;;
       esac

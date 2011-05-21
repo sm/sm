@@ -32,13 +32,11 @@
 # ### Code Walkthrough
 set_ps4()
 {
-  # Set the PS4 variable
+  # Set the PS4 variable. Then export the PS4 variabel so that this script and
+  # called bash scripts will display a more detailed and formatted trace output.
+  # Finally return true, 0, for success.
   PS4=" > \${BASH_SOURCE##\${bdsm_path}\/} \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO} $ "
-  # Export the PS4 variabel so that this script and called bash scripts will
-  # display a more detailed and formatted trace output.
   export PS4
-
-  # Return true, 0, for success.
   return 0
 }
 
@@ -82,18 +80,18 @@ trace()
   # and to 'on' if no parameters were given.
   local _option="${1:-on}"
 
-  # If the option is on (default) then
+  # If the option is on (default) then Set the trace_flag to 1, export
+  # trace_flag and then turn on shell tracing.  Otherwise turn off shell
+  # tracing, set the trace_flag to 0 and export it.
   if [[ "${_option}" = "on" ]]
   then
-    # set and export the trace flag to 1
-    export trace_flag=1
-    # Turn on shell tracing
+    trace_flag=1
+    export trace_flag
     set -o xtrace
   else
-    # Turn on shell tracing
     set +o xtrace
-    # set and export the trace flag to 0
-    export trace_flag=0
+    trace_flag=0
+    export trace_flag
   fi
 }
 
@@ -199,20 +197,19 @@ debug()
   # Declare the option varibale and set it to the first parameter, if nonempty,
   # and to 'on' if no parameters were given.
   local _option="${1:-on}"
-  # ### Code Walkthrough
 
-  # If the option variable is set to on (the default) then
+  # If the option variable is set to on (the default) then set and export the
+  # debug_flag variable to 1 (enable) thus enabling verbose shell echoing
+  # (every code line is printed before execution). Otherwise disable verbose
+  # shell echoing, set debug_flag to 0 (disabled) and export
   if [[ "${_option}" = "on" ]]
   then
-    # Set and export the debug_flag variable to 1 (enable)
     export debug_flag=1
-    # Enable verbose shell echoing (every code line is printed before execution)
     set -o verbose
   else
-    # Disable verbose shell echoing.
     set +o verbose
-    # Set and export the debug_flag variable to 0 (disable)
-    export debug_flag=0
+    debug_flag=0
+    export debug_flag
   fi
 }
 
@@ -327,16 +324,16 @@ enable_backtrace()
   # string if the first paramter was not passed in.
   local _message="${1:-}"
 
-  # If the message variable is not empty then
+  # If the message variable is not empty then enable the backtrace with the
+  # message attached to the backtrace call. Otherwise enable the backtrace with
+  # no message attached to the backtrace call.
+  # Then turn on shell exit on error option.
   if variable_is_nonempty _message
   then
-    # Enable the backtrace with the message attached to the backtrace call.
     trap "backtrace \"${_message}\"" ERR
   else
-    # Enable the backtrace with no message attached to the backtrace call.
     trap "backtrace \"A command has returned an unhandled error code (nonzero return value).\"" ERR
   fi
-  # Turn on shell exit on error option
   set -o errexit
 }
 
@@ -377,10 +374,8 @@ enable_backtrace()
 # ### Code Walkthrough
 disable_backtrace()
 {
-  # Turn off shell error exit option.
+  # Turn off shell error exit option and clear all ERR signal traps.
   set +o errexit
-
-  # Clear all ERR signal traps.
   trap - ERR
 }
 
@@ -464,10 +459,9 @@ backtrace()
   # Declare separator and columns variables. Initialize columns to the terminal
   local _separator _columns
 
-  # If setting the columns via tput does not work
+  # If setting the columns via tput does not work then default the columns to 80
   if ! _columns=$(tput cols)
   then
-    # then default the columns to 80
     _columns=80
   fi
 
@@ -479,10 +473,9 @@ backtrace()
   # message variable, default to empty string.
   local _message="${1:-}"
 
-  # If a message was given
-  if [[ -n "${_message}" ]]
+  # If a message was given print the message to the calling environment's STDERR
+  if variable_is_nonempty _message
   then
-    # Print the message to the calling environment's STDERR
     printf "\n${_message}\n\n" >&2
   fi
 
@@ -509,10 +502,9 @@ backtrace()
   for (( _index=0 ; _index < ${#BASH_SOURCE[@]} ; _index++ ))
   do
     # For each source file in the source files array, if the file name/path
-    # is longer than the current longest then
+    # is longer than the current longest then set it as the new longest element
     if (( ${#BASH_SOURCE[${_index}]} > ${#_longest} ))
     then
-      # set it as the new longest element
       _longest=${BASH_SOURCE[${_index}]}
     fi
   done
@@ -520,10 +512,9 @@ backtrace()
   for (( _index=0 ; _index < ${#BASH_LINENO[@]} ; _index++ ))
   do
     # For each line number in the line numbers array, if the number of digits
-    # is longer than the current longest digits then
+    # is longer than the current longest digits then set it as the new largest
     if (( ${#BASH_LINENO[${_index}]} > ${#_digits} ))
     then
-      # set it as the new largest digit
       _digits=${BASH_LINENO[${_index}]}
     fi
   done
@@ -571,27 +562,24 @@ backtrace()
     # unix utility trace line.
     case "${EDITOR:-}" in
       # Print with the format and content for GUI editing tools a file to open a
-      # given line using a file URI.
+      # given line using a URI. print backtrace to calling environment's STDERR
       (mvim*|mate*)
-        # Print the backtrace line to the calling environment's STDERR
         printf "${_format}" "open ${EDITOR// *}://open?url=file://${_source}&line=${_line}" "${_function}" 1>&2
         ;;
       # Print with the format and content for console editing tools a to open a
-      # file to a given line.
+      # file to a given line print backtrace to calling environment's STDERR
       (vi*|gvim*|emacs*|*)
-        # Print the backtrace line to the calling environment's STDERR
         printf "${_format}" "${EDITOR}" "${_line}" "${_source} " "${_function}" 1>&2
         ;;
     esac
   done
 
-  # Print the backtrace separator line.
+  # Print the backtrace separator line and if the trace flag is nonnegative
+  # then turn tracing back on
   printf "${_separator// /=}\n" 1>&2
 
-  # If the trace flag is nonnegative then
   if (( trace_flag > 0 ))
   then
-    # turn tracing back on
     enable_trace
   fi
 }

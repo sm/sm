@@ -45,40 +45,40 @@ user_create_if_missing()
 
     # Switched based on the value of the token
     case "${_token}" in
-      # if the token is 'group' then
+      # if the token is 'group' then set the group variable to the next prameter
+      # and remove the next parameter from the parameters list
       group)
         _group="${1}"
-        # and remove the next parameter from the parameters list
         shift
         ;;
-      # if the token is 'with' then
+      # if the token is 'with' then move on to processing the next token
+      # as this is syntactic sugar.
       with)
-        # move on to processing the next token as this is syntactic sugar.
         continue
         ;;
-      # if the token is 'from' then
+      # if the token is 'from' then set the source variable to the next parameter
+      # and remove the next parameter from the parameters list
       from)
         _source="${1}"
-        # and remove the next parameter from the parameters list
         shift
         ;;
-      # if the token is '--force' then
+      # if the token is '--force' then set the force_flag to 1
       --force)
         _force_flag=1
         ;;
 
       # if the token does not match any of the above then
       *)
-        # and if the user variable has not yet been set
-        if [[ -z "${_user}" ]]
+        # if the user variable has not yet been set then assign the token into
+        # the user variable
+        if variable_is_empty _user
         then
-          # then assign the token into the user variable
           _user="${_token}"
 
-        # otherwise if the group variable has not yet been set
-        elif [[ -z "${_group}" ]]
+        # otherwise if the group variable has not yet been set then assign
+        # the token into the group variable
+        elif variable_is_empty _group
         then
-          # then assign the token into the group variable
           _group="${_token}"
         fi
         ;;
@@ -188,46 +188,42 @@ user_delete()
   # While there are parameters, loop over them
   while (( $# > 0 ))
   do
-    # Set the first parameter into the token variable.
+    # Set the first parameter into the token variable and remove the token from
+    # the parameters list now that it is in a variable.
     _token="$1"
-
-    # Remove the token from the parameters list now that it is in a variable.
     shift
 
     # Switch on the token variable's contents
     case "${_token}" in
-      # if the token is 'user' then
+      # if the token is 'user' then assign the next parameter to the user
+      # variable and remove the next parameter from the parameters list
       user)
-        # assign the next parameter to the user variable.
         _user="${1}"
-        # and remove the next parameter from the parameters list
         shift
         ;;
-      # if the token is 'with' then
+      # if the token is 'with' then go on to processing the next token as this
+      # is syntactic sugar.
       with)
-        # go to processing the next token as this is syntactic sugar.
         continue
         ;;
-      # if the token is 'from' then
+      # if the token is 'from' then assign the next parameter to the source
+      # variable and remove the next parameter from the parameters list
       from)
-        # assign the next parameter to the source variable
         _source="${1}"
-        # and remove the next parameter from the parameters list
         shift
         ;;
-      # if the token is '--force' then
+      # if the token is '--force' then then set the force_flag to 1
+      # (non-default value)
       --force)
-        # then set the force_flag to 1 (non-default value )
         _force_flag=1
         ;;
       # if the token does not match any of the above then
       *)
-        # if the user variable is empty
-        if [[ -z "${_user}" ]]
+        # if the user variable is empty then assign the current token into the
+        # user variable and stop processing input parameters
+        if variable_is_empty _user
         then
-          # then assign the current token into the user variable
           _user="${_token}"
-          # and stop processing input parameters
           break
         fi
         ;;
@@ -321,13 +317,11 @@ user_delete()
 # ### Code Walkthrough
 user_is_root()
 {
-  # If the user is root (eg. id is 0)
+  # If the user is root (id is 0) then return true, 0. otherwise return false, 1
   if (( UID == 0 ))
   then
-    # then return true, 0
     return 0
   else
-    # otherwise return false, 1
     return 1
   fi
 }
@@ -371,13 +365,11 @@ user_is_root()
 # ### Code Walkthrough
 user_is_not_root()
 {
-  # If the user is not root (eg. id not 0)
+  # If the user is not root (id > 0), return true, 0 otherwise return false, 1
   if (( UID != 0 ))
   then
-    # then return true, 0
     return 0
   else
-    # otherwise return false, 1
     return 1
   fi
 }
@@ -414,14 +406,12 @@ user_is_not_root()
 #
 user_must_be_root()
 {
-  # if the user is root
+  # if the user is root then return true, 0. otherwise send an error message
+  # informing the user that the script must be run as a root and not as user
   if user_is_root
   then
-    # then return true, 0
     return 0
   else
-    # otherwise send an error message informing the user that the current script
-    # must be run as a root and not as a user.
     error "bdsm $extension $action must be run as a root and NOT as a user ($USER)."
   fi
 }
@@ -458,14 +448,12 @@ user_must_be_root()
 #
 user_must_not_be_root()
 {
-  # if the user is not root
+  # if the user is not root then return true, 0. otherwise send an error message
+  # informing the user that the script must be run as a root and not as user.
   if user_is_not_root
   then
-    # then return true, 0
     return 0
   else
-    # otherwise send an error message informing the user that the current script
-    # must be run as a root and not as a user.
     fail "bdsm $extension $action must be run as a (project) user and NOT as root."
   fi
 }
@@ -510,14 +498,14 @@ user_run_as()
   if variable_is_nonempty _user
   then
     # Remove the user from the parameters list.
+    # Then run the given command as the user, with a nonlogin shell.
+    # If the command completed successfully then return true, 0. otherwise
+    # the command did not complete successfully so return false, 1
     shift
-    # then run the given command as the user, with a nonlogin shell.
     if su "${_user}" -c "$*"
     then
-      # the command completed successfully so return true, 0
       return 0
     else
-      # the command did not complete successfully so return false, 1
       return 1
     fi
   else
@@ -566,13 +554,13 @@ user_run_as_login()
   # If the user variable is nonempty
   if variable_is_nonempty _user
   then
-    # then run the given command as the user, with a login shell.
+    # Then run the given command as the user, with a login shell.
+    # If the command completed successfully so return true, 0. Otherwise the
+    # command did not complete successfully so return false, 1
     if su - "${_user}" -c "$*"
     then
-      # the command completed successfully so return true, 0
       return 0
     else
-      # the command did not complete successfully so return false, 1
       return 1
     fi
   else

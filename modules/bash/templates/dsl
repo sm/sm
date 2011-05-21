@@ -194,17 +194,15 @@ install_template()
       # Copy the template file to the target location and name given.
       cp -f "${_template}" "${_target}/${_name}"
 
-      # If the mode variable is not empty
+      # If the mode variable is not empty then we change the files access mode
       if variable_is_nonempty _mode
       then
-        # then we change the file access mode of the file.
         chmod "${_mode}" "${_target}/${_name}"
       fi
 
-      # If the owner variable is not empty
+      # If the owner variable is not empty then we change the owner of the file
       if variable_is_nonempty _owner
       then
-        # then we change the owner of the file
         chown "${_owner}" "${_target}/${_name}"
       fi
     fi
