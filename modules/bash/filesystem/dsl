@@ -41,12 +41,17 @@ source_files()
   local _file _files=("$@")
 
   # If the files array is nonempty then for each file in the files array expand
-  # the HOME path if the file contains '~'. If the file is nonempty then source
-  # the file. If the file is successfully sourced then go to the next element in
-  # the list.  If sourcing the file failed then this indicates either a
-  # programming or a system error.
-  # Fail yielding a message with a backtrace which can be used to debug.
-  # Also if no files were passed given this is a programming error.
+  #   the HOME path if the file contains '~'.
+  #
+  # If the file is nonempty then source the file.
+  #
+  # If the file is sourced then go to the next element in the list.
+  #
+  # If sourcing the file failed then this indicates either a programming or a
+  #   system error.
+  #   Fail yielding a message with a backtrace which can be used to debug.
+  #
+  # If no files were passed given this is a programming error.
   # Fail yielding a message with a backtrace which can be used to debug.
   if (( ${#_files[@]} > 0 ))
   then
@@ -107,10 +112,13 @@ nonempty_files()
   local _file _files=("$@")
 
   # If the files array is nonempty then expand the HOME path if the file
-  # contains '~' and for each file in the files array if the file is nonempty
-  # print the file to STDOUT including a carriage return for explicit
-  # list separation (in case any of the files contain a path).
-  # If No files were given.  This indicates a programming error.
+  #   contains '~'
+  #
+  # For each file in the files array if the file is nonempty print the file to
+  #   STDOUT including a carriage return for explicit
+  #   list separation (in case any of the files contain a path).
+  #
+  # If no files were given.  This indicates a programming error.
   # Fail yielding a message with a backtrace which can be used to debug.
   if array_is_nonempty _files
   then
@@ -169,13 +177,16 @@ ensure_paths_exist()
   local _path _paths=("$@")
 
   # If the paths array is nonempty then for each path in the paths array if the
-  # path already exists as a directory, move along to the next path.
-  # if the path already exists as a file then issue a warning (Question: Should
-  # this be a fail scenario?) Create the full path in the filesystem, including
-  # intermediate directories if they do not already exist.
+  #   path already exists as a directory, move along to the next path.
+  #
+  # If the path already exists as a file then issue a warning (Question: Should
+  #   this be a fail scenario?) Create the full path in the filesystem,
+  #   including intermediate directories if they do not already exist.
+  #
   # If the path was created successfully, continue on to processing the next
-  # path, if we failed to create the path on the filesystem is a system error
+  # path, otherwise it failed to create path on filesystem, a system error
   # Fail yielding a message with a backtrace which can be used to debug.
+  #
   # If no no files were given then this indicates a programming error
   # Fail yielding a message with a backtrace which can be used to debug.
   if array_is_nonempty _paths
@@ -250,12 +261,14 @@ remove_files()
   local _file _files=("$@")
 
   # If the files array is nonempty then for each file in the files array
-  # if the file exists or is a symlink then forcedly remove the file
-  # if the file exists as a directory then this indicates an
-  # unexpected scenario, fail with a message and a backtrace for debugging.
-  # if the file still exists on the system then we do not know what it is,
-  # fail with an error message and a backtrace for debuging.
-  # if the files array is empty then this is a programming error,
+  #   if the file exists or is a symlink then forcedly remove the file
+  #   if the file exists as a directory then this indicates an
+  #   unexpected scenario, fail with a message and a backtrace for debugging.
+  #
+  # If the file still exists on the system then we do not know what it is,
+  #   fail with an error message and a backtrace for debuging.
+  #
+  # If the files array is empty then this is a programming error,
   # Fail yielding a message with a backtrace which can be used to debug.
   if array_is_nonempty _files
   then
@@ -327,9 +340,11 @@ remove()
   local _entity _entities=("$@")
 
   # If the entities array is nonempty then for each entity in the array
-  # if the entity exists on the filesystem then forcedly remove it (recursively)
-  # if the remove was successful, continue, otherwise fail yielding an error
-  # message and a backtrace for debugging.
+  #
+  # If the entity exists on the filesystem then forcedly remove it recursively
+  #   if the remove was successful, continue, otherwise fail yielding an error
+  #   message and a backtrace for debugging.
+  #
   # If the entities array is empty then this is a programming error,
   # Fail yielding a message with a backtrace which can be used to debug.
   if array_is_nonempty _entities
@@ -400,20 +415,25 @@ remove_paths()
   nonexistant_paths=()
 
   # If the paths array is nonempty then for each path in the paths array
+  #
   # If the path is a symlink then remove it from the filesystem
   #   If the remove was successful, add it to the removed_paths array and
   #   continue processing the next path. Otherwise there was a system error,
   #   Fail yielding a message with a backtrace which can be used to debug.
+  #
   # If the path is directory then recursively remove it
   #   If the remove was successful, add it to the removed_paths array and
   #   continue processing the next path. Otherwise there was a system error,
   #   Fail yielding a message with a backtrace which can be used to debug.
+  #
   # If the path is not a symlink or a directory and it still exists on the
   #   filesystem then path is an unhandled filesystem type and we have failed to
   #   remove it. This likely indicates a system error, fail giving sysadmins an
   #   error message with a backtrace which they can use to debug the issue.
+  #
   # If the filesystem path already does not exist, add it to the
   #   nonexistant_paths array continue processing the next path in the list
+  #
   # If no paths were given then this is a programming error, fail giving
   # developers an error message with a backtrace for debugging
   if array_is_nonempty _paths
@@ -494,42 +514,44 @@ ensure_files_exist()
   # array containing all of the parameters passed in.
   local _file _files=("$@") _path
 
-  # If the files array is nonempty
-  if (( ${#_files[@]} > 0 ))
+  # If the files array is nonempty then for each file in the files array
+  #
+  # If the file exists, continue on to processing the next file
+  #
+  # Strip the file path off of file, ensure that the path exists then touch the
+  # file to create it.
+  #
+  # If the file already exists, then continue on to processing the next file
+  #
+  # If touching the file failed then this indicates either a programming or a
+  # system error.
+  # Fail yielding a message with a backtrace which can be used
+  # to debug the issue.
+  #
+  # If no files were passed in then this is a programming error,
+  # Fail yielding a message with a backtrace which can be used to debug.
+  if array_is_nonempty _files
   then
-    # then for each file in the files array
     for _file in "${_files[@]}"
     do
       if file_exists "${_file}"
       then
-        # The file exists, continue on to processing the next file
         continue
       else
-        # Strip the filename off of the end yielding the path
         _path="${_file%\/*}"
 
-        # Ensure that the path exists
         ensure_paths_exist "${_path}"
 
-        # Now touch the file to create it.
         if touch "${_file}"
         then
-        # The file exists, continue on to processing the next file
           continue
         else
-          # Failed touching the file.
-          # This indicates either a programming or a system error.
-          # Fail yielding a message with a backtrace which can be used
-          # to debug the issue.
           fail "There was an error creating the file '${_file}' on the"\
             "filesystem, the touch command returned error code '$?'"
         fi
       fi
     done
   else
-    # No files were passed given.
-    # This indicates a programming error, fail giving developers an error
-    # message with a backtrace which they can use to debug their code.
     fail "Cannot ensure files exist as no files were given."
   fi
 }
@@ -574,42 +596,43 @@ ensure_files_are_executable()
   # array containing all of the parameters passed in.
   local _file _files=("$@") _path
 
-  # If the files array is nonempty
-  if (( ${#_files[@]} > 0 ))
+  # If the files array is nonempty then for each file in the files array
+  #
+  # if the file exists on the filesystem but is a directory
+  # This indicates either a programming or a system error.
+  # Fail yielding a message with a backtrace for debugging
+  #
+  # otherwise strip off the filename to get the path.
+  # if the path variable is nonempty and the path exists on the filesystem
+  # then we attempt to perform the file mode execute setting.
+  # If the file is successfully made executable then continue processing the
+  # next file in the files array.
+  # otherwise if it failed then this indicates a system error, fail giving
+  # an error message with a backtrace for debugging
+  #
+  # If no files were passed in this indicates a programming error,
+  # Fail yielding a message with a backtrace which can be used to debug.
+  if array_is_nonempty _files
   then
-    # then for each file in the files array
     for _file in "${_files[@]}"
     do
-      # if the file exists on the filesystem but is a directory
       if path_exists "${_file}"
       then
-        # This indicates either a programming or a system error.
-        # Fail yielding a message with a backtrace which can be used
-        # to debug the issue.
         fail "Cannot make the file '${_file}' executable"\
           "as it is unexpectedly a directory."
-      # Otherwise if
       elif ! file_exists "${_file}"
       then
         fail "Cannot make the file '${_file}' executable"\
           " as the file does not exist."
       else
-        # Strip off the filename to get the path.
         _path="${_file%\/*}"
 
-        # if the path variable is nonempty and the path exists on the filesystem
         if variable_is_nonempty _path && path_exists "${_path}"
         then
-          # then we attempt to perform the file mode execute setting.
           if chmod +x "${_file}"
           then
-            # Successfully made the file executable, continue processing the
-            # next file in the files array.
             continue
           else
-            # Failed to remove the entity from the filesystem.
-            # This indicates a system error, fail giving sysadmins an error
-            # message with a backtrace which they can use to debug the issue.
             fail "Could not make the file '${_file}' executable"\
               "as the 'chmod +x' command failed with error code '$?'"
           fi
@@ -620,9 +643,6 @@ ensure_files_are_executable()
       fi
     done
   else
-    # No files were passed given.
-    # This indicates a programming error, fail giving developers an error
-    # message with a backtrace which they can use to debug their code.
     fail "Cannot ensure files are executable as no files were given."
   fi
 }
