@@ -28,20 +28,26 @@ md5_match()
       ;;
   esac
 
-  [[ "$archive_md5" == "$md5" ]]
-
-  return $?
+  if [[ "$archive_md5" == "$md5" ]]
+  then
+    return 0
+  else
+    return 1
+  fi
 }
 
 fetch_extensions_repository()
 {
-  local initial_pwd="$PWD"
-  local _identifier="${extensions_repository_url//\//_}" # Convert '/' to an invalid url component '_'
+  local initial_pwd="$PWD" _identifier
+
+  # Convert '/' to an invalid url component '_'
+  _identifier="${extensions_repository_url//\//_}"
 
   if path_exists "$extensions_src_path/.git"
   then
     log "Updating $extension repository."
     scm_update "${extensions_repository_url}"
+
     copy_paths --force "${repos_path}/${_identifier}" \
       to "${extensions_src_path}"
   else
@@ -82,8 +88,10 @@ package_extension()
 
   extension_path="${extensions_path}/${extension}"
 
-  version="$(cat "$extension_path/VERSION" 2>/dev/null)" ||
+  if !read -r version < "$extension_path/VERSION"
+  then
     fail "${extension_path}/VERSION file is missing. Halting packaging."
+  fi
 
   # TODO: add a sanity check to ensure that VERSION matches x.y.x
 
@@ -99,7 +107,8 @@ package_extension()
 
   enter "${extension_path}"
 
-  if [[ -d ".git" ]] ; then
+  if [[ -d ".git" ]]
+  then
     sha1=$(git log -n 1 | head -1 | awk '{print $2}')
 
     # Tag & push
@@ -109,8 +118,11 @@ package_extension()
   fi
 
   release_files=(VERSION README.md)
-  for file in "${release_files[@]}" ; do
-    if [[ -f "${file}" ]] ; then
+
+  for file in "${release_files[@]}"
+  do
+    if [[ -f "${file}" ]]
+    then
       cp -f "${file}" "${release_path}/"
     else
       log "WARNING: Missing extension file: '${file}'"
@@ -118,25 +130,29 @@ package_extension()
   done
 
   release_directories=(bin config modules templates)
-  for directory in "${release_directories[@]}" ; do
-    if [[ -d "${directory}" ]] ; then
+
+  for directory in "${release_directories[@]}"
+  do
+    if path_exists "${directory}"
+    then
       cp -Rf "${directory}" "${release_path}/"
     else
       log "WARNING: Missing extension directory: '${directory}'"
     fi
   done
 
-  if [[ -n "${sha1}" ]] ; then
+  if variable_is_nonempty sha1
+  then
     echo "${sha1:0:7}" > "${release_path}/sha1"
   fi
 
   enter "$releases_path"
 
   tar zcvf "$release_name".tar.gz "$release_name/"
-  md5 "${release_name}.tar.gz" | awk '{print $NF}' > "${release_name}.tar.gz.md5"
+  file_md5 "${release_name}.tar.gz" > "${release_name}.tar.gz.md5"
 
   tar jcvf "$release_name".tar.bz2 "$release_name/"
-  md5 "${release_name}.tar.bz2" | awk '{print $NF}' > "${release_name}.tar.bz2.md5"
+  file_md5 "${release_name}.tar.bz2" > "${release_name}.tar.bz2.md5"
 
   remove_paths "${release_name}/"
 
@@ -151,7 +167,6 @@ get_help()
 #
 # TODO: There is a lot of redundency in the get_{X}(), reduce it.
 #
-
 get_latest()
 {
   local version_url stable_version archive
@@ -173,7 +188,10 @@ get_version()
 {
   version="$1"
 
-  md5=$(curl -B http://bdsm.beginrescueend.com/releases/bdsm-${version}.tar.gz.md5 2>/dev/null)
+  md5=$(
+  curl -B http://bdsm.beginrescueend.com/releases/bdsm-${version}.tar.gz.md5 \
+    2>/dev/null
+  )
 
   echo "bdsm-${version}"
 
@@ -193,23 +211,26 @@ get_version()
       ;;
   esac
 
-  if [[ "$archive_md5" != "$md5" ]]; then
-    error "Archive package bdsm-${version}.tar.gz downloaded does not match it's md5 checksum ${md5}.
-    Aborting BDSM Installation."
+  if [[ "$archive_md5" != "$md5" ]]
+  then
+    error "Archive package bdsm-${version}.tar.gz downloaded does not "\
+      "match it's md5 checksum ${md5}." \
+      "Aborting BDSM Installation."
   fi
 
   tar zxf "${path}/archives/bdsm-${version}.tar.gz" -C "$extensions_src_path/"
 
   (
-    cd "$src_path/bdsm-${version}"
-
-    chmod +x ./install
-
-    ./install
+  cd "$src_path/bdsm-${version}"
+  chmod +x ./install
+  ./install
   )
 
   log "Installed BDSM version:"
-  ( source $modules_path/bdsm ; bdsm --version )
+  (
+  source $modules_path/bdsm
+  bdsm --version
+  )
 
   hook="after_update"
 
@@ -220,37 +241,36 @@ get_branch()
 {
   local clone=1
   (
-    if [[ -d "${extensions_src_path}/bdsm/.git" ]]
+  if path_exists "${extensions_src_path}/bdsm/.git"
+  then
+    enter "${extensions_src_path}/bdsm"
+    git fetch ${remote}
+    if git pull --rebase --force ${remote} ${branch}
     then
-      enter "${extensions_src_path}/bdsm"
-      git fetch ${remote}
-      if git pull --rebase --force ${remote} ${branch}
-      then
-        clone=0
-      else
-        enter "${extensions_src_path}"
-        remove_paths "${extensions_src_path}/bdsm"
-      fi
+      clone=0
     else
-      clone=1
-      (
-        if ! git clone --depth 1 ${extensions_repository_url}
-        then # reattempt replacing the url scheme.
-          git clone ${extensions_repository_url/git:\/\//https://}
-        fi
-      )
-      enter "bdsm"
+      enter "${extensions_src_path}"
+      remove_paths "${extensions_src_path}/bdsm"
     fi
+  else
+    (
+    if ! git clone --depth 1 ${extensions_repository_url}
+    then # reattempt replacing the url scheme.
+      git clone ${extensions_repository_url/git:\/\//https://}
+    fi
+    )
+    enter "bdsm"
+  fi
 
-    chmod_files 0755 "install"
+  chmod_files 0755 "install"
 
-    ./install
+  ./install
   )
 }
 
 extension_cli()
 {
-  local _ignored_args=()
+  local _ignored_args=() _string
 
   number_of_args=${#extension_args[@]}
 
@@ -272,6 +292,10 @@ extension_cli()
         extension_license
         exit 0
         ;;
+      --modules)
+        _string="${extension_args[$((++index))]}"
+        extension_modules=(${_string//,/ })
+        ;;
       --help)
         extension_action "ext" "help"
         exit 0
@@ -285,7 +309,7 @@ extension_cli()
     esac
   done
 
-  if (( ${#_ignored_args[@]} > 0 ))
+  if array_is_nonempty _ignored_args
   then
     extension_args=( "${_ignored_args[@]}" )
   fi

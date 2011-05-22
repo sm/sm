@@ -4,7 +4,7 @@ if file_is_nonempty "$extension_templates_path/bdsmrc"
 then
   if file_is_nonempty "$HOME/.bdsmrc"
   then
-    set_timestamp
+    timestamp_set
 
     log "An existing $HOME/.bdsmrc file was found."
     log "Reinaming it as ${HOME}/.bdsmrc.${timestamp} in order to preserve it."

@@ -53,7 +53,7 @@ source_files()
   #
   # If no files were passed given this is a programming error.
   # Fail yielding a message with a backtrace which can be used to debug.
-  if (( ${#_files[@]} > 0 ))
+  if array_is_nonempty _files
   then
     for _file in "${_files[@]}"
     do
@@ -1007,13 +1007,14 @@ move_file()
       # programming error, fail giving developers an error message and
       # a backtrace which they can use to debug their code.
       *)
-        if [[ -z "${_source}" ]]
+        if variable_is_empty _source
         then
           _source="$token"
 
-        elif [[ -z "${_target}" ]]
+        if variable_is_empty _target
         then
           _target="$token"
+
         else
           fail "The source '${_source}' and target '${_target}' have been set"\n
             "and the current token token is unknown'${token}'."
@@ -1736,7 +1737,7 @@ move_files()
               # message with a backtrace which they can use to debug the issue.
               fail "Could not move the file '${_file}' to "\
                 "'${_target}/${_file//*\/}"\
-                "as the 'rm' command failed with error code '$?'"
+                "as the 'mv' command failed with error code '$?'"
             fi
           fi
         else

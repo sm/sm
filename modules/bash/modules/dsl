@@ -29,40 +29,40 @@
 #
 modules()
 {
-  if (( trace_flag < 2 ))
-  then
-    set +o xtrace
-  fi
+  #if (( trace_flag < 2 ))
+  #then
+  #  set +o xtrace
+  #fi
 
   local _module _bdsm _extension _path _file _modules=("$@")
 
-  if (( ${#_modules[@]} == 0 ))
+  if (( ${#_modules[@]} > 0 ))
   then
+    for _module in "${_modules[@]}"
+    do
+      if module_is_loaded "${_module}"
+      then
+        continue # The module has already been loaded, continue to the next one.
+      else
+        _bdsm="${modules_path}/bash/${_module}"
+        _extension="${extension_modules_path}/bash/${_module}"
+
+        for _path in "${_bdsm}" "${_extension}"
+        do
+          for _file in dsl initialize
+          do
+            if [[ -s "${_path}/${_file}" ]]
+            then
+              source "${_path}/${_file}"
+            fi
+          done
+        done
+        modules+=("${_module}")
+      fi
+    done
+  else
     fail "No modules specified to load."
   fi
-
-  for _module in "${_modules[@]}"
-  do
-    if module_is_loaded "${_module}"
-    then
-      continue # The module has already been loaded, continue to the next one.
-    else
-      _bdsm="${modules_path}/bash/${_module}"
-      _extension="${extension_modules_path}/bash/${_module}"
-
-      for _path in "${_bdsm}" "${_extension}"
-      do
-        for _file in dsl initialize
-        do
-          if [[ -s "${_path}/${_file}" ]]
-          then
-            source "${_path}/${_file}"
-          fi
-        done
-      done
-      modules+=("${_module}")
-    fi
-  done
 
   if (( trace_flag > 0 ))
   then

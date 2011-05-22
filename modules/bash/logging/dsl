@@ -399,7 +399,7 @@ logrotate()
   local _file="${1:-}"
   if variable_is_nonempty _file
   then
-    set_timestamp
+    timestamp_set
 
     verbose "Tailing the file in a background process into a tail logfile."
     ( tail -n 0 -f "${_file}" > ${file}.$$.log )&

@@ -971,3 +971,35 @@ extension_publish()
   fi
 }
 
+extension_module_add()
+{
+  local _extension="${1}" _module="${2}" _path
+  _path="${3:-"${extensions_development_path}/${_extension}"}"
+
+  timestamp_set
+
+  if awk "/modules /{printf \$0; print \" ${_module}\"}
+    ! /modules/{print \$0}" "${_path}/modules/bash/initialize" \
+      >> "${_path}/modules/bash/initialize.${timestamp}"
+  then
+    if move_file "${_path}/modules/bash/initialize.${timestamp}"\
+      to "${_path}/modules/bash/initialize"
+    then
+      return 0
+    else
+      fail "Failed to move ${_path}/modules/bash/initialize.${timestamp}"\
+        "to ${_path}/modules/bash"\
+        "while adding module '${_module}'"
+    fi
+  else
+    fail "Failed to modify ${_path}/modules/bash/initialize" \
+      "when trying to add module '${_module}'"
+  fi
+}
+
+extension_module_setup()
+{
+  local _extension="${1}" _module="${2}" _path="${3}"
+  # TODO: Run the module generator, if it exists
+}
+
