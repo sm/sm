@@ -119,7 +119,21 @@ description()
 #
 # ### Usage Examples
 #
-#     user$ description "This extension handles X Y and Z."
+#     user$ cat $HOME/test
+#     #!/usr/bin/env bash
+#     source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
+#     modules help
+#     
+#     description "This extension handles X Y and Z."
+#     description "It also handles A B and C."
+#     
+#     help_description
+#
+#     user$ "$HOME/test"
+#     Description
+#     
+#       This extension handles X Y and Z.
+#       It also handles A B and C.
 #
 help_description()
 {
