@@ -193,7 +193,7 @@ module_is_loaded()
 {
   local _name="${1:-}"
 
-  if variable_is_nonempty _name
+  if [[ -n "${_name:-}" ]]
   then
     case " ${modules[@]} " in
       (*[[:space:]]${_name}[[:space:]]*)
