@@ -339,10 +339,17 @@ setup_shell_completion()
   if user_is_root
   then
     log "  Setting up bdsm shell completion."
-    ensure_paths_exist "/etc/profile.d/"
+
+    if path_exists "/etc/bash_completion.d"
+    then
+      completion_prefix="/etc/bash_completion.d"
+    else
+      completion_prefix="/etc/profile.d"
+      ensure_paths_exist "/etc/profile.d/"
+    fi
 
     copy_file from "${install_path}/completion/bdsm.bash" \
-      to "/etc/profile.d/bdsm-completion.sh" \
+      to "${completion_prefix}/bdsm-completion.sh" \
       mode 0755 owner "root"
   fi
 }
