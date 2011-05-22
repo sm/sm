@@ -689,99 +689,86 @@ link()
   local token _source _target _force_flag=0 _path
 
   # While the parameters list is nonempty.
+  # Assign the first parameter to the token variable.
+  # Remove the first paramter from the parameters list.
+  # Switch based on the token string's contents
   while (( $# > 0 ))
   do
-    # Assign the first parameter to the token variable.
     token="$1"
-    # Remove the first paramter from the parameters list.
     shift
 
-    # Switch based on the token string's contents
     case "${token}" in
-      # if the token is 'to' then
+      # If the token is 'to' then assign the next parameter to the target
+      # variable and remove the first paramter from the parameters list.
       to)
-        # assign the next parameter to the target variable.
         _target="${1}"
-        # Remove the first paramter from the parameters list.
         shift
         ;;
 
-      # if the token is 'to' then
+      # if the token is 'from' then assign the first parameter to the source
+      # variable  and remove the first paramter from the parameters list.
       from)
-        # assign the first parameter to the source variable.
         _source="${1}"
-        # Remove the first paramter from the parameters list.
         shift
         ;;
 
-      # if the token is '--force' then
+      # if the token is '--force' then set the force flag to 1
       --force)
-        # set the force flag to 1
         _force_flag=1
         ;;
 
-      # if the token is unknown then
+      # if the token is unknown and if the source variable is empty then assign
+      # the token to the source variable otherwise if the source variable is
+      # set but the target variable is empty then assign the token to the target
+      # variable
       *)
-        # and if the source variable is empty
         if variable_is_empty _source
         then
-          # assign the token to the source variable
           _source="$token"
 
-        # if the source variable is set but the target variable is empty
         elif variable_is_empty _target
         then
-          # assign the token to the target variable
           _target="$token"
         fi
         ;;
     esac
   done
 
-  # if force_flag is set to 1 then
+  # if force_flag is 1 then remove the target from the filesystem
   if (( _force_flag == 1 ))
   then
-    # remove the target entity from the filesystem regardless
     remove "${_target}"
   fi
 
   # TODO: What should we do if files already exist?
-  # if the target exists and is a file then
+  # If target exists and is a file then this is a system or programming error
+  # Fail yielding a message with a backtrace which can be used to debug.
   if file_exists "${_target}"
   then
-    # This indicates either a system or programming error.
-    # Fail giving an error message with a backtrace which can then be used to
-    # address the issue.
     fail "Cannot link ${_source} to ${_target} exists and is a file!"
 
-  # otherwise if the target exits and is a directory then
+  # If target exists and is a directory then this is a system/programming error
+  # Fail yielding a message with a backtrace which can be used to debug.
   elif path_exists "${_target}"
   then
-    # This indicates either a system or programming error.
-    # Fail giving an error message with a backtrace which can then be used to
-    # address the issue.
     fail "Cannot link ${_source} to ${_target} exists and is a directory"
 
   else
-    # Ensure the target's base path exists
+    # If the targets base path is nonempty then ensure that it exists
     _path="${_target%\/*}"
-
-    # If the path is nonempty
     if variable_is_nonempty _path
     then
-      # ensure that it exists
       ensure_paths_exist "${_path}"
     fi
 
     # try to create a symbolic link the source to the target
+    # the fileystem symbolic link was created successfully.
+    # if it failed to create a symbolic link from the source to the target.
+    # Fail yielding a message with a backtrace which can be used to debug.
     if ln -fs "${_source}" "${_target}"
     then
-      # the fileystem symbolic link was created successfully.
       return 0
     else
-      # Failed to create a symbolic link from the source to the target.
-      # This indicates either a a system or programming error.
-      # Fail giving a message with a backtrace that can be used to debug.
       fail "Failed to create a symbolic link from '${_source}' to '${_target}'"\
         "as the 'ln -fs' command failed with error code '$?'"
     fi
@@ -827,116 +814,112 @@ move_directory()
   # While the parameters list is nonempty.
   while (( $# > 0 ))
   do
-    # Assign the first parameter to the token variable.
+    # Assign the first parameter to the token variable and remove the first
+    # paramter from the parameters list.
     token="$1"
-    # Remove the first paramter from the parameters list.
     shift
 
     # Switch based on the token string's contents
     case "${token}" in
-      # if the token is 'to' then
+      # if the token is 'to' then assign the next parameter to the target
+      # variable and remove the first paramter from the parameters list.
       to)
-        # assign the next parameter to the target variable.
         _target="${1}"
-        # Remove the first paramter from the parameters list.
         shift
         ;;
 
-      # if the token is 'to' then
+      # if the token is 'to' then assign the next parameter to the source
+      # variable and remove the first paramter from the parameters list.
       from)
-        # assign the next parameter to the source variable.
         _source="${1}"
-        # Remove the first paramter from the parameters list.
         shift
         ;;
 
-      # if the token is 'mode' then
+      # if the token is 'mode' then assign the next parameter to the mode
+      # variable and remove the first paramter from the parameters list.
       mode)
-        # assign the next parameter to the mode variable.
         _mode="${1}"
-        # Remove the first paramter from the parameters list.
         shift
         ;;
 
-      # if the token is 'owner' then
+      # if the token is 'owner' then assign the next parameter to the owner
+      # variable and remove the first paramter from the parameters list.
       owner)
-        # assign the next parameter to the owner variable.
         _owner="${1}"
-        # Remove the first paramter from the parameters list.
         shift
         ;;
 
-      # if the token is unknown then
+      # if the token is unknown and if the source variable is empty assign the
+      # token to the source variable otherwise if the source variable is set
+      # but the target variable is empty assign the token to the target variable
       *)
-        # and if the source variable is empty
         if variable_is_empty _source
         then
-          # assign the token to the source variable
           _source="$token"
 
-        # if the source variable is set but the target variable is empty
         elif variable_is_empty _target
         then
-          # assign the token to the target variable
           _target="$token"
         fi
         ;;
     esac
   done
 
-  # if the source variable is not empty
+  # if the source variable is not empty and if the target variable is not empty
+  # if we successfully move the source to the target
+  # and if the mode variable is not empty
+  # then set the filesystem mode of the target to the given mode
+  #
+  # if the filesystem mode change failedrecursively of the target
+  # This indicates either a a system or programming error.
+  # Fail yielding a message with a backtrace which can be used to debug.
+  #
+  # if the owner variable is not empty then set the filesystem owner of
+  # the target to the given mode
+  #
+  # If the filesystem ownership change recursively of the target failed
+  # This indicates either a system or programming error.
+  # Fail yielding a message with a backtrace which can be used to debug.
+  #
+  # If the move of the source to the target failed this indicates an error.
+  # Fail yielding a message with a backtrace which can be used to debug.
+  #
+  # If the target was not passed in this is a system / programming error.
+  # Fail yielding a message with a backtrace which can be used to debug.
+  #
+  # If the source was not passed in this is a system / programming error.
+  # Fail yielding a message with a backtrace which can be used to debug.
   if variable_is_nonempty _source
   then
-    # if the target variable is not empty
     if variable_is_nonempty _target
     then
-      # if we successfully move the source to the target
       if mv "${_source}" "${_target}"
       then
-        # and if the mode variable is not empty
         if variable_is_nonempty _mode
         then
-          # then set the filesystem mode of the target to the given mode
           if ! chmod -R "${_mode}" "${_target}"
           then
-            # Failed to change filesystem mode recursively of the target
-            # This indicates either a a system or programming error.
-            # Fail giving a message with a backtrace that can be used to debug.
             fail "Could not change mode recursively of '${_target}' to"\
               "${_mode} as the 'chmod -R' command failed with error code '$?'"
           fi
         fi
 
-        # if the owner variable is not empty
         if variable_is_nonempty _owner
         then
-          # then set the filesystem owner of the target to the given mode
           if ! chown -R "${_owner}" "${_target}"
           then
-            # Failed to change filesystem ownership recursively of the target
-            # This indicates either a a system or programming error.
-            # Fail giving a message with a backtrace that can be used to debug.
             fail "Could not change ownership recursively of '${_target}' to"\
               "${_owner} as the 'chown -R' command failed with error code '$?'"
           fi
         fi
       else
-        # Failed to move the source to the target
-        # This indicates either a a system or programming error.
-        # Fail giving a message with a backtrace that can be used to debug.
         fail "Could not move '${_source}' to '${_target}'"\
           "as the 'chmod -R' command failed with error code '$?'"
       fi
     else
-      # The target was not passed in.
-      # This indicates either a a system or programming error.
-      # Fail giving a message with a backtrace that can be used to debug.
       fail "Cannot move file as the target must be specified. "
     fi
   else
-    # The source was not passed in.
-    # This indicates either a a system or programming error.
-    # Fail giving a message with a backtrace that can be used to debug.
     fail "Cannot move file as the source must be specified. "
   fi
 }
@@ -988,52 +971,50 @@ move_file()
     shift
     # Now we examine the token and switch based on what is found.
     case "${token}" in
-      # the token is 'to',
+      # the token is 'to' assign the target variable to the next parameter
+      # and remove the target paramter from the parameters.
       to)
         _target="${1}"
-        # and remove the target paramter from the parameters.
         shift
         ;;
-      # if the token is 'from',
+      # if the token is 'from' tehn assign the first parameter to the source
+      # variable and remove the from paramter from the parameters.
       from)
-        # assign the first parameter to the source variable.
         _source="${1}"
-        # and remove the from paramter from the parameters.
         shift
         ;;
-      # if the token is 'mode',
+      # if the token is 'mode' then assign the mode variable to the first
+      # parameter and remove the mode paramter from the parameters.
       mode)
-        # Set the mode variable to the first parameter
         _mode="${1}"
-        # and remove the mode paramter from the parameters.
         shift
         ;;
-      # if the token is 'owner',
+      # if the token is 'owner' then assign the owner variable to the first
+      # parameter and remove the owner paramter from the parameters.
       owner)
-        # Set the owner variable to the first parameter
         _owner="${1}"
-        # and remove the owner paramter from the parameters.
         shift
         ;;
 
-      # if the token is unknown
+      # if the token is unknown and if the source variable is empty then assign
+      # the unknown token to the source variable
+      #
+      # otherwise if the target variable is empty then assign the unknown token
+      # to the target variable.
+      #
+      # Otherwise we have both a source and a target, so we do not know
+      # what to do with further unknown parameters. This indicates a
+      # programming error, fail giving developers an error message and
+      # a backtrace which they can use to debug their code.
       *)
-        # If the source variable is empty
         if [[ -z "${_source}" ]]
         then
-          # then assign the unknown token to the source variable
           _source="$token"
 
-        # otherwise if the target variable is empty
         elif [[ -z "${_target}" ]]
         then
-          # then assign the Unknown token to the target variable.
           _target="$token"
         else
-          # At this point we have both a source and a target, so we do not know
-          # what to do with further unknown parameters. This indicates a
-          # programming error, fail giving developers an error message and
-          # a backtrace which they can use to debug their code.
           fail "The source '${_source}' and target '${_target}' have been set"\n
             "and the current token token is unknown'${token}'."
         fi
