@@ -1011,7 +1011,7 @@ move_file()
         then
           _source="$token"
 
-        if variable_is_empty _target
+        elif variable_is_empty _target
         then
           _target="$token"
 
