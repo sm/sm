@@ -2835,7 +2835,7 @@ symlink_exists()
 }
 
 #
-# ## directory\_exists()
+# ## path\_exists()
 #
 # Check if a directory name/path exists.
 #
