@@ -45,11 +45,14 @@ fetch_extensions_repository()
 
   if path_exists "$extensions_src_path/.git"
   then
-    log "Updating $extension repository."
-    scm_update "${extensions_repository_url}"
-
-    copy_paths --force "${repos_path}/${_identifier}" \
-      to "${extensions_src_path}"
+    log "# Updating repository from ${extensions_repository_url}"
+    if scm_update "${extensions_repository_url}"
+    then
+      copy_paths --force "${repos_path}/${_identifier}" \
+        to "${extensions_src_path}"
+    else
+      error "There was an error updating the repository."
+    fi
   else
     remove_paths "${extensions_src_path}"
 

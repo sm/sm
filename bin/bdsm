@@ -19,6 +19,7 @@
 
 # Load System then User Configuration, if exists.
 . /etc/profile
+
 unset prefix_path bdsm_path
 
 if [[ $MACHTYPE = *solaris* ]]
@@ -28,6 +29,7 @@ fi
 
 # Clean environment of all *_path variables.
 paths=(prefix_path $(env | awk -F= '/_path=/{print $1}' | sort))
+
 unset "${paths[@]}"
 
 for file in /etc/bdsmrc "$HOME/.bdsmrc"

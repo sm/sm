@@ -31,7 +31,7 @@ scm_fetch()
             remove_paths "${repo_path}"
           fi
 
-          if ! git clone --depth 1 ${_url} "${repo_path}"
+          if ! git clone --depth 1 ${_url} "${repo_path}" >/dev/null 2>&1
           then
             error "There was an error while cloning the repository from the url '${_url}'"
           fi
@@ -76,22 +76,30 @@ scm_update()
     case "${_url}" in
       *git*)
         # TODO: Use git cli instead of awking it :)
-        if [[ -z "$(git branch | awk "/${branch:=master}$/")" ]]
+        if [[ -z "$(git branch | awk "/${branch:=master}$/" 2>/dev/null)" ]]
         then
-          if ! ( builtin cd  "${repo_path}";
-            git checkout -b "$branch" --track "$remote/$branch" 2>/dev/null )
+          if ! (
+            builtin cd  "${repo_path}"
+            git checkout -b "$branch" --track "$remote/$branch" >/dev/null 2>&1
+            )
           then
             error "$remote $branch remote branch not found. Halting."
           fi
-        elif [[ -z "$(git branch | awk "/\* $branch$/{print \$2}")" ]]
+        elif [[ -z "$(git branch | awk "/\* $branch$/{print \$2}" 2>/dev/null)" ]]
         then
-          if ! ( builtin cd "${repo_path}"; git checkout $branch 2>/dev/null)
+          if ! (
+            builtin cd "${repo_path}"
+            git checkout $branch >/dev/null 2>&1
+            )
           then
             error "Unable to checkout $branch.\nCould not get head. Halting."
           fi
         fi
 
-        if ! ( builtin cd "${repo_path}" ; git pull --rebase origin $branch )
+        if ! (
+          builtin cd "${repo_path}"
+          git pull --rebase origin $branch >/dev/null 2>&1
+          )
         then
           error "Git pull failed. Halting."
         fi

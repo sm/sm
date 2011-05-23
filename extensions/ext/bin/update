@@ -37,12 +37,7 @@ case "$extension_action" in
   *)
     # TODO: Updates for released extensions instead of only from repository.
     fetch_extensions_repository
-    extensions_install "${extension_action}" "${extension_args[@]}"
+    extensions_install "${extension_args[@]}"
   ;;
 esac
-
-if variable_is_nonempty extension_action
-then
-  log "Updated extensions: ${extension_action} ${extensions[*]}"
-fi
 

@@ -694,7 +694,7 @@ extension_is_installed()
 {
   local _name="${1:-}"
 
-  if variable_is_nonempty _name
+  if [[ -n "${_name}" ]]
   then
     local _extensions=" $(extensions_in "${extensions_path}") "
 
@@ -744,7 +744,7 @@ extension_is_installed()
 #
 extensions_install()
 {
-  local _extension _extensions=("$@")
+  local _extension _extensions=("$@") _installed _failed
 
   if array_is_nonempty _extensions
   then
@@ -764,10 +764,23 @@ extensions_install()
       then # Skip any empty extensions / 'artifact'.
         continue
       else
-        ( extension_install "${_extension}" )&
+        if ( extension_install "${_extension}") >/dev/null 2>&1
+        then
+          _installed+=("${_extension}")
+        else
+          _failed+=("${_extension}")
+        fi
       fi
     done
     wait
+    if array_is_nonempty _installed
+    then
+      log "  Installed: ${_installed[*]}"
+    fi
+    if array_is_nonempty _failed
+    then
+      log "  Failed: ${_failed[*]}"
+    fi
   else
     fail "Cannot install extensions as no extensions were given to install."
   fi
@@ -812,7 +825,8 @@ extension_install()
     if extension_is_valid "${extension_src_path}/${_extension}"
     then
       log " - ${_extension}"
-      copy_paths to "${bdsm_path}/extensions" "${extension_src_path}/${_extension}"
+      copy_paths "${extension_src_path}/${_extension}" \
+        to "${bdsm_path}/extensions"
 
       log "${extension_uri}" to "${bdsm_path}/extensions/${_extension}/.uri"
 
@@ -820,9 +834,8 @@ extension_install()
       # TODO: Process extension dependencies...
       #
     else
-      error "${extension_src_path} is not a proper extension.
-     The named extension is missing VERSION and/or bin/help files.
-     Halting installation."
+      error "${extension_src_path}/${_extension} is not a valid extension"\
+        "as it is missing VERSION and/or bin/help files."
     fi
   else
     fail "Cannot install an extension as no extension name was given."
@@ -883,7 +896,7 @@ extension_package()
 {
   local _name="${1:-}" _path _version file
 
-  if variable_is_nonempty _name
+  if [[ -n "${_name}" ]]
   then
     _path="${extensions_development_path:-"$extensions_src_path"}"
 
@@ -933,7 +946,7 @@ extension_publish()
 
   NIY "Extension publishing to extensions.beginrescueend.com has not yet been implemented."
 
-  if variable_is_nonempty _name
+  if [[ -n "${_name}" ]]
   then
     _path="${extensions_development_path:-"$extensions_src_path"}"
 
