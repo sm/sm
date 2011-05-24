@@ -17,7 +17,6 @@ fi
 
 : \
   "${service:="${extension}"}" \
-  "${service_user:="${package_user:-"${service}"}"}" \
   "${service_version:="${package_version}"}" \
   "${prefix_path:="/usr/local/${service}/active"}" \
   "${service_bin_path:="${active_path}/bin"}" \
@@ -53,6 +52,13 @@ service_root_paths=(
   "/var/lock/${service}"
   "/var/db/${service}"
 )
+
+if user_is_root
+then
+  true "${service_user:="${package_user:-"${service}"}"}"
+else
+  true "${service_user:="${package_user:-"$USER"}"}"
+fi
 
 for _path in  "${install_path}/bin" "${install_path}/sbin"
 do
