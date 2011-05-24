@@ -2,7 +2,7 @@
 
 if file_is_nonempty "$extension_templates_path/bdsmrc"
 then
-  if file_is_missing "$HOME/.bdsmrc"
+  if file_exists "$HOME/.bdsmrc"
   then
     timestamp_set
 
@@ -11,25 +11,25 @@ then
     log "Please examine the file and if it is not needed, remove it."
 
     move_file "$HOME/.bdsmrc" to "$HOME/.bdsmrc.$timestamp"
-
-    #
-    # TODO: Move this into the project module and call as a function.
-    #       bdsmrc_install, this does *not* belong here.
-    #
-    # TODO: Read project, repository_url and environment from defaults file.
-    #       ~/.bdsm/project/config/defaults
-    #
-    modules project
-
-    true  "${repository_url:="git@github.com:username/repository.git"}"
-
-    install_template "bdsmrc" to "$HOME/.bdsmrc"
-
-    seed_template "$HOME/.bdsmrc" \
-      project "$project" \
-      repository_url "$repository_url" \
-      environment "$environment"
   fi
+
+  #
+  # TODO: Move this into the project module and call as a function.
+  #       bdsmrc_install, this does *not* belong here.
+  #
+  # TODO: Read project, repository_url and environment from defaults file.
+  #       ~/.bdsm/project/config/defaults
+  #
+  modules project
+
+  true  "${repository_url:="git@github.com:username/repository.git"}"
+
+  install_template "bdsmrc" to "$HOME/.bdsmrc"
+
+  seed_template "$HOME/.bdsmrc" \
+    project "$project" \
+    repository_url "$repository_url" \
+    environment "$environment"
 else
   fail "The template file $extension_templates_path/bdsmrc is missing."
 fi
