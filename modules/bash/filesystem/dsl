@@ -1896,6 +1896,12 @@ chown_paths()
     _identity="${1}"
   fi
 
+  if (( _recursive_flag == 1 ))
+  then
+    # the chown command will be with the recursive flag
+    _flags+=(-R)
+  fi
+
   # if the identity variable is nonempty
   if variable_is_nonempty _identity
   then
@@ -1913,11 +1919,6 @@ chown_paths()
         # if the path exists on the filesystem
         if path_exists "${_path}"
         then
-          if (( _recursive_flag == 1 ))
-          then
-            # the chown command will be with the recursive flag
-            _flags+=(-R)
-          fi
 
           # Run the command
           if chown ${_flags[*]} ${_identity} "${_path}"
@@ -2092,6 +2093,12 @@ chmod_paths()
     _permissions="${1}"
   fi
 
+  if (( _recursive_flag == 1 ))
+  then
+    # the chmod command will be with the recursive flag
+    _flags+=(-R)
+  fi
+
   # if the permissions variable is nonempty
   if variable_is_nonempty _permissions
   then
@@ -2109,11 +2116,6 @@ chmod_paths()
         # if the path exists on the filesystem
         if path_exists "${_path}"
         then
-          if (( _recursive_flag == 1 ))
-          then
-            # the chmod command will be with the recursive flag
-            _flags+=(-R)
-          fi
 
           # Run the command
           if chmod ${_flags[*]} ${_permissions} "${_path}"
