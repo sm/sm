@@ -71,7 +71,8 @@ array_is_nonempty()
       return 1
     fi
   else
-    fail "Cannot push onto array as an array name was not given."
+    fail "Cannot determine if an array is nonempty"\
+      "as an array name was not given."
   fi
 }
 
