@@ -1,8 +1,5 @@
 # Bash Delectable Scripting Modules (BDSM) Framework
 
-# asfasdfasdf         
-    
-
 The BDSM Framework is a... scripting management framework, with modules
 (go figure)!
 
