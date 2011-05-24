@@ -1117,7 +1117,7 @@ move_file()
 copy_file()
 {
   # Declare the source and target variables.
-  local _source _target _flags _force_flag
+  local _source _target _flags=() _force_flag
 
   # While there are parameters left
   while (( $# > 0 ))
