@@ -154,17 +154,19 @@ install_template()
   then
     _template="${_source}/${_name}"
 
-  # otherwise if the named file exists in the filesystem then set the template
-  # variable directly to the name
-  elif file_exists "${_name}"
-  then
-    _template="${_name}"
   # otherwise if the named template inside of the templates directory postfixed
   # with .template exists set the template variable to the named template inside
   # of the templates directory postfixed with .template
   elif file_exists "${_source}/${_name}.template"
   then
     _template="${_source}/${_name}.template"
+
+  # otherwise if the named file exists in the filesystem then set the template
+  # variable directly to the name
+  elif file_exists "${_name}"
+  then
+    _template="${_name}"
+
   else
     # otherwise the template was not found, we cannot install it. Most likely
     # this is a programming error, template was not included with the package,
