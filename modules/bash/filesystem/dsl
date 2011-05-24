@@ -1654,7 +1654,7 @@ move_files()
 {
   # Declare the source target file force_flag and files variables
   # Initialize force_flag to zero and the files array to empty
-  local _source _target _file _force_flag=0 _files=()
+  local _source _target _file _force_flag=0 _files=() _if_exists_flag=0
 
   # While the parameters list is nonempty.
   while (( $# > 0 ))
@@ -1678,6 +1678,9 @@ move_files()
       from)
         _source="${1}"
         shift
+        ;;
+      --if-exists)
+        _if_exists_flag=1
         ;;
 
       # if the token is '--force' then set the force flag to 1
@@ -1708,7 +1711,7 @@ move_files()
         fi
 
         # if the file exists
-        if file_exists "${_file}"
+        if  file_exists "${_file}"
         then
           # and force_flag is set
           if (( _force_flag == 1 ))
@@ -1741,12 +1744,17 @@ move_files()
             fi
           fi
         else
-          # Failed to move the the file as the file is missing
-          # This indicates a system error, fail giving sysadmins an error
-          # message with a backtrace which they can use to debug the issue.
-          fail "Could not move the source file '${_file}' to the target"\
-            "'${_target}/${_file//*\/}"\
-            "as the source file does not exist"
+          if (( _if_exists_flag == 0 ))
+          then
+            # Failed to move the the file as the file is missing
+            # This indicates a system error, fail giving sysadmins an error
+            # message with a backtrace which they can use to debug the issue.
+            fail "Could not move the source file '${_file}' to the target"\
+              "'${_target}/${_file//*\/}"\
+              "as the source file does not exist"
+          else
+            continue
+          fi
         fi
       done
     else
