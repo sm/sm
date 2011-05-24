@@ -826,6 +826,9 @@ service_cli()
       --user)
         service_user="${extension_args[$((++index))]}"
         ;;
+      --as-root)
+        service_run_as_root_flag=1
+        ;;
       --version)
         service_version="${extension_args[$((++index))]}"
         ;;
@@ -1033,7 +1036,8 @@ service_install_init_d()
         seed_template "${init_scripts_path}/${_service}" \
           modules_path "${modules_path}" \
           service "${service}" \
-          service_user "${service_user}"
+          service_user "${service_user}" \
+          service_config_path "${service_config_path}"
       fi
 
       service_activate "${service}" "${package_version}"
@@ -1135,7 +1139,14 @@ service_init_start()
 
   if (( service_run_as_root_flag == 1 ))
   then
-    if ${_command[*]}
+    if user_is_not_root
+    then
+      prefix="sudo"
+    else
+      prefix=""
+    fi
+
+    if $prefix ${_command[*]}
     then
       true
     else
