@@ -15,19 +15,29 @@ fi
 # TODO: Account for user service installs...
 # TODO: Merge service_paths and service_root_paths...
 
+# TODO: determine root_install vs user_install...
+if user_is_root
+then
+  etc_path="/etc"
+  var_path="/var"
+else
+  etc_path="$bdsm_path/pkg/active/etc"
+  var_path="$bdsm_path/pkg/active/var"
+fi
+
 : \
   "${service:="${extension}"}" \
   "${service_version:="${package_version}"}" \
-  "${prefix_path:="/usr/local/${service}/active"}" \
+  "${prefix_path:="${bdsm_path}/active"}" \
   "${service_bin_path:="${active_path}/bin"}" \
   "${service_sbin_path:="${active_path}/sbin"}" \
-  "${service_pid_path:="/var/run/${service}"}" \
-  "${service_spool_path:="/var/spool/${service}"}" \
-  "${service_config_path:="/etc/${service}"}" \
-  "${service_db_path:="/var/db/${service}"}" \
-  "${service_data_path:="/var/db/${service}/${package_version}"}" \
-  "${service_log_path:="/var/log/${service}"}" \
-  "${service_lock_path:="/var/lock/${service}"}" \
+  "${service_pid_path:="${var_path}/run/${service}"}" \
+  "${service_spool_path:="${var_path}/spool/${service}"}" \
+  "${service_config_path:="${etc_path}/${service}"}" \
+  "${service_db_path:="${var_path}/db/${service}"}" \
+  "${service_data_path:="${var_path}/db/${service}/${package_version}"}" \
+  "${service_log_path:="${var_path}/log/${service}"}" \
+  "${service_lock_path:="${var_path}/lock/${service}"}" \
   "${service_src_path:="${source_path}/${service}-${package_version}"}" \
   "${service_config_file:="${service_config_path}/${service}.conf"}" \
   "${service_log_file:="${service_log_path}/${service}.log"}" \
@@ -46,11 +56,11 @@ service_paths=(
 )
 
 service_root_paths=(
-  "/var/spool/${service}"
-  "/var/log/${service}"
-  "/var/run/${service}"
-  "/var/lock/${service}"
-  "/var/db/${service}"
+  "${var_path}/spool/${service}"
+  "${var_path}/log/${service}"
+  "${var_path}/run/${service}"
+  "${var_path}/lock/${service}"
+  "${var_path}/db/${service}"
 )
 
 if user_is_root
