@@ -195,7 +195,7 @@ module_is_loaded()
 
   if [[ -n "${_name:-}" ]]
   then
-    case " ${modules[@]} " in
+    case " ${modules[*]} " in
       (*[[:space:]]${_name}[[:space:]]*)
         return 0
         ;;
