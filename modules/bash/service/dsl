@@ -1259,11 +1259,29 @@ service_init_status()
     _command+=("${service_flags[@]}")
   fi
 
-  if user_run_as "${service_user}" "${_command[*]}"
+  if (( service_run_as_root_flag == 1 ))
   then
-    return 0
+    if user_is_not_root
+    then
+      prefix="sudo"
+    else
+      prefix=""
+    fi
+
+    if $prefix ${_command[*]}
+    then
+      true
+    else
+      error "failed check status of ${service}"
+    fi
   else
-    touch "$service_pid_file"
+    if user_run_as "${service_user}" "${_command[*]}"
+    then
+      touch "$service_pid_file"
+      succeed
+    else
+      error "failed check status of ${service}"
+    fi
   fi
 }
 
@@ -1777,7 +1795,8 @@ service_status()
 
     if command_exists lsof
     then
-      local cwd= binary= libraries=() tcp_ports=() udp_ports=() sockets=() logs=() string
+      local cwd= binary= libraries=() tcp_ports=() udp_ports=() sockets=() \
+        logs=() string
       while read -r line
       do
         case "$line" in
