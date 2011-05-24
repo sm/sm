@@ -204,7 +204,7 @@ install_template()
     # The target is not a directory, so it must be a fully specified template
     # name. So we will copy the template directly to the target as a file.
     # TODO: Ensure that the target's path exists.
-    copy_file --force "${_template}" from "${_source}" to "${_target}"
+    copy_file --force "${_template}" to "${_target}"
 
     # If mode variable is not empty then change the file mode of the target.
     if variable_is_nonempty _mode
