@@ -146,19 +146,19 @@ install_template()
     esac
   done
 
-  # If the named file exists in the filesystem then set the template variable
-  # directly to the name
-  if file_exists "${_name}"
-  then
-    _template="${_name}"
 
-  # otherwise if the named file exists in the source (templates) directory on
+  # if the named file exists in the source (templates) directory on
   # the filesystem then set the template variable to the name prefixed with the
   # source (templates) directory
-  elif file_exists "${_source}/${_name}"
+  if file_exists "${_source}/${_name}"
   then
     _template="${_source}/${_name}"
 
+  # otherwise if the named file exists in the filesystem then set the template
+  # variable directly to the name
+  elif file_exists "${_name}"
+  then
+    _template="${_name}"
   # otherwise if the named template inside of the templates directory postfixed
   # with .template exists set the template variable to the named template inside
   # of the templates directory postfixed with .template
