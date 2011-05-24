@@ -23,13 +23,12 @@ then
 
     true  "${repository_url:="git@github.com:username/repository.git"}"
 
-    command sed \
-      -e "s#{{project}}#$project#g" \
-      -e "s#{{repository_url}}#$repository_url#g" \
-      -e "s#{{environment}}#$environment#g" \
-      "$extension_templates_path/bdsmrc" \
-      >> "$HOME/.bdsmrc"
+    install_template "bdsmrc" to "$HOME/.bdsmrc"
 
+    seed_template "$HOME/.bdsmrc" \
+      project "$project" \
+      repository_url "$repository_url" \
+      environment "$environment"
   fi
 else
   fail "The template file $extension_templates_path/bdsmrc is missing."
