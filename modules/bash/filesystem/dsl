@@ -1196,8 +1196,10 @@ copy_file()
         if variable_is_nonempty _mode
         then
           # then set the filesystem mode of the target to the given mode
-          if ! chmod "${_mode}" "${_target}"
+          if chmod "${_mode}" "${_target}"
           then
+            true
+          else
             # Failed to change filesystem mode of the target
             # This indicates either a a system or programming error.
             # Fail giving a message with a backtrace that can be used to debug.
@@ -1209,8 +1211,10 @@ copy_file()
         if variable_is_nonempty _owner
         then
           # then set the filesystem owner of the target to the given mode
-          if ! chown "${_owner}" "${_target}"
+          if chown "${_owner}" "${_target}"
           then
+            true
+          else
             # Failed to change filesystem ownership of the target
             # This indicates either a a system or programming error.
             # Fail giving a message with a backtrace that can be used to debug.
