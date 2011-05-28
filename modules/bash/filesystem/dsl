@@ -1942,8 +1942,7 @@ chown_paths()
             # Failed to chown the entity on the filesystem.
             # This indicates a system error, fail giving sysadmins an error
             # message with a backtrace which they can use to debug the issue.
-            fail "Could not chown the file '${_file}' to "\
-              "'${_target}/${_file//*\/}"\
+            fail "Could not chown the path '${_path}' to '${_identity}"\
               "as the 'chown' command failed with error code '$?'"
           fi
         else

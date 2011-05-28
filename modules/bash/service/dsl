@@ -214,6 +214,8 @@ service_setup()
     # then ensure that the service_user has ownership of the root serivce paths.
     chown_paths --recursively "${service_user}:${service_user}"\
       "${service_root_paths[@]}"
+
+    user_create_if_missing "${service_user}" with group "${service_user}"
   fi
 
   # Create the paths for the service/version if they do not exist
