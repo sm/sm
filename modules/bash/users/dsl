@@ -90,30 +90,29 @@ user_create_if_missing()
   then
     # then we switch based on the uname command ouptput for os type
     # ##### TODO: Use the os_is_X functions here instead.
-    (
     case "$(uname)" in
       "OpenBSD")
-        groupadd "$package_user"
-        useradd -g "$package_user" "$package_user" -s /bin/bash
-        usermod -s /bin/bash "$package_user"
+        groupadd "$_user"
+        useradd -g "$_user" "$_user" -s /bin/bash
+        usermod -s /bin/bash "$_user"
         ;;
 
       "FreeBSD")
-        pw groupadd -q "$package_user"
+        pw groupadd -q "$_user"
         ;;
 
       "Linux")
         # groupadd nginx
         # useradd -G nginx -M nginx
         if [[ -f "/etc/SuSE-release" ]] ; then
-          groupadd "$package_user"
+          groupadd "$_user"
         else
-          groupadd -f "$package_user"
+          groupadd -f "$_user"
         fi
 
-        useradd -g "${package_user}" "${package_user}"
-        usermod -d "${data_path%\/*}" "${package_user}"
-        usermod -s /bin/bash "${package_user}"
+        useradd -g "${_user}" "${_user}"
+        usermod -d "${data_path%\/*}" "${_user}"
+        usermod -s /bin/bash "${_user}"
       ;;
 
       "Darwin")
@@ -123,27 +122,26 @@ user_create_if_missing()
         current_max_uid=$(dscl . -list /Users UniqueID | awk '{print $2}' | sort -g -r | head -1)
         next_uid=$((current_max_uid+1))
 
-        if ! dscl . -list /Users | grep -q "^${package_user}$" ; then
-          dscl . -create "/Groups/$package_user"
-          dscl . -create "/Groups/$package_user" gid "$next_gid"
-          dscl . -create "/Users/${package_user}"
-          dscl . -create "/Users/${package_user}" PrimaryGroupID "$gid" # UserShell /bin/bash
-          dscl . -create "/Users/${package_user}" uid "$next_uid"
-          dscl . -create "/Users/${package_user}" realname "Postgresql User"
-          dscl . -create "/Users/${package_user}" home "${data_path%\/*}"
-          dscl . -create "/Users/${package_user}" shell "/bin/bash"
-          dscl . -create "/Users/${package_user}" gid "$gid"
-          dscl . -create "/Users/${package_user}" passwd "*"
+        if ! dscl . -list /Users | grep -q "^${_user}$" ; then
+          dscl . -create "/Groups/$_user"
+          dscl . -create "/Groups/$_user" gid "$next_gid"
+          dscl . -create "/Users/${_user}"
+          dscl . -create "/Users/${_user}" PrimaryGroupID "$gid" # UserShell /bin/bash
+          dscl . -create "/Users/${_user}" uid "$next_uid"
+          dscl . -create "/Users/${_user}" realname "Postgresql User"
+          dscl . -create "/Users/${_user}" home "${data_path%\/*}"
+          dscl . -create "/Users/${_user}" shell "/bin/bash"
+          dscl . -create "/Users/${_user}" gid "$gid"
+          dscl . -create "/Users/${_user}" passwd "*"
         fi
       ;;
 
       "SunOS")
-        groupadd "$package_user"
-        useradd -g "$package_user" -s /bin/bash -d "${data_path}" "$package_user"
-        usermod -s /bin/bash "$package_user"
+        groupadd "$_user"
+        useradd -g "$_user" -s /bin/bash -d "${data_path}" "$_user"
+        usermod -s /bin/bash "$_user"
         ;;
     esac
-    ) || true # Ignore failures with this for now...
   else
     fail "Users and groups may be manipulated only by the super user (root) via su or sudo."
   fi
