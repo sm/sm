@@ -5,12 +5,12 @@ do
   token="${extension_args[$index]}"
   shopt -s extglob
   case "$token" in
-    --trace)
+    (--trace)
       export trace_flag=1
       enable_trace
       ;;
 
-    head|master)
+    (head|master)
       extension_action="head"
       ;;
 
@@ -20,7 +20,7 @@ do
       extension_action="version"
       ;;
 
-    latest|release)
+    (latest|release)
       extension_action="latest"
       ;;
   esac
