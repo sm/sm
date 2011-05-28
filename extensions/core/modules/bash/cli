@@ -3,7 +3,7 @@
 for (( index=0 ; index < ${#extension_args[@]} ; index++ ))
 do
   token="${extension_args[$index]}"
-
+  shopt -s extglob
   case "$token" in
     --trace)
       export trace_flag=1
@@ -14,7 +14,7 @@ do
       extension_action="head"
       ;;
 
-    +([[:digit:]]).+([[:digit:]]).+([[:digit:]])) # x.y.z
+    (+([[:digit:]]).+([[:digit:]]).+([[:digit:]])) # x.y.z
       # TODO: Set env vars instead of calling the method.
       version="${token}"
       extension_action="version"
