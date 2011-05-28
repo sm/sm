@@ -224,7 +224,7 @@ service_setup()
   # Ensure that the service_user has ownership of the serivce paths.
   for _path in "${service_paths[@]}"
   do
-    if variable_is_nonempty "${_path}"
+    if variable_is_nonempty _path
     then
       if path_exists "${_path}"
       then
