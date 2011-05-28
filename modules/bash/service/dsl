@@ -195,6 +195,7 @@ services_available()
 #
 service_setup()
 {
+  local _path
   # Notify the user that we are now creating paths for the service/version
   log "#creating paths for ${service} ${package_version}..."
 
@@ -219,8 +220,19 @@ service_setup()
   ensure_paths_exist "${service_paths[@]}" "${install_path}"
 
   # Ensure that the service_user has ownership of the serivce paths.
-  chown_paths --recursively "${service_user}:${service_user}" \
-    "${service_paths[@]}"
+  for _path in "${service_paths[@]}"
+  do
+    if variable_is_nonempty "${_path}"
+    then
+      if path_exists "${_path}"
+      then
+        chown_paths --recursively "${service_user}:${service_user}" "${_path}"
+      else
+        warn "While chowning paths it was discovered that '${_path}' is in"\
+          "fact nonexistant on the filesystem, this might indicate an error."
+      fi
+    fi
+  done
 
   # Install the service init.d scripts.
   service_install_init_d "${service}"
