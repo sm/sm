@@ -61,12 +61,19 @@ source_files()
 
       if file_is_nonempty "${_file}"
       then
-        if source "${_file}"
+        if bash -n "${_file}"
         then
-          continue
+          if source "${_file}"
+          then
+            continue
+          else
+            fail "There was an error sourcing the file '${_file}'."
+          fi
         else
-          fail "There was an error sourcing the file '${_file}'."
+            fail "Not sourcing the file '${_file}' as it has invalid syntax."
         fi
+      else
+        continue
       fi
     done
   else
