@@ -85,6 +85,11 @@ user_create_if_missing()
     esac
   done
 
+  if variable_is_empty _group
+  then
+    _group="${_user}"
+  fi
+
   # If the user is root (eg. id 0)
   if (( UID == 0 ))
   then
@@ -92,7 +97,7 @@ user_create_if_missing()
     # ##### TODO: Use the os_is_X functions here instead.
     case "$(uname)" in
       "OpenBSD")
-        groupadd "$_user"
+        groupadd "$_group"
         useradd -g "$_user" "$_user" -s /bin/bash
         usermod -s /bin/bash "$_user"
         ;;
@@ -105,9 +110,9 @@ user_create_if_missing()
         # groupadd nginx
         # useradd -G nginx -M nginx
         if [[ -f "/etc/SuSE-release" ]] ; then
-          groupadd "$_user"
+          groupadd "$_group"
         else
-          groupadd -f "$_user"
+          groupadd -f "$_group"
         fi
 
         useradd -g "${_user}" "${_user}"
@@ -123,8 +128,8 @@ user_create_if_missing()
         next_uid=$((current_max_uid+1))
 
         if ! dscl . -list /Users | grep -q "^${_user}$" ; then
-          dscl . -create "/Groups/$_user"
-          dscl . -create "/Groups/$_user" gid "$next_gid"
+          dscl . -create "/Groups/$_group"
+          dscl . -create "/Groups/$_group" gid "$next_gid"
           dscl . -create "/Users/${_user}"
           dscl . -create "/Users/${_user}" PrimaryGroupID "$gid" # UserShell /bin/bash
           dscl . -create "/Users/${_user}" uid "$next_uid"
@@ -137,7 +142,7 @@ user_create_if_missing()
       ;;
 
       "SunOS")
-        groupadd "$_user"
+        groupadd "$_group"
         useradd -g "$_user" -s /bin/bash -d "${data_path}" "$_user"
         usermod -s /bin/bash "$_user"
         ;;
