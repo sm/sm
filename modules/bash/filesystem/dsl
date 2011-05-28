@@ -70,7 +70,7 @@ source_files()
             fail "There was an error sourcing the file '${_file}'."
           fi
         else
-            fail "Not sourcing the file '${_file}' as it has invalid syntax."
+          fail "Not sourcing the file '${_file}' as it has invalid syntax."
         fi
       else
         continue
