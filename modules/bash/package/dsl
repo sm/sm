@@ -323,7 +323,7 @@ package_install()
 
   if module_is_loaded "service"
   then
-    service_setup
+    service_activate
   fi
 }
 
@@ -689,13 +689,13 @@ package_activate()
 
   variables_must_be_nonempty _package _version
 
-  if symlink_exists "${packages_path}/${_package}/active"
-  then
-    package_deactivate "${_package}"
-  fi
-
   if path_exists "${install_path}"
   then
+    if symlink_exists "${packages_path}/${_package}/active"
+    then
+      package_deactivate "${_package}"
+    fi
+
     log "Activating ${_package} ${_version}"
 
     if command_exists rsync
@@ -710,6 +710,11 @@ package_activate()
   else
     warn "Skipping activation of ${_package} ${_version} "\
       "as '${install_path}' does not exist."
+  fi
+
+  if module_is_loaded "service"
+  then
+    service_activate "${_package}"
   fi
 
   package_setup "${_package}"

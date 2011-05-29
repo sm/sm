@@ -1773,6 +1773,7 @@ service_activate()
         if file_exists "/etc/rc.local" &&
           ! file_contains "/etc/rc.local" "${service} start"
         then
+          # TODO: change this to use replace_content
           sed -i -e "d#${init_scripts_path}/${service} start#" /etc/rc.local
         fi
       fi
