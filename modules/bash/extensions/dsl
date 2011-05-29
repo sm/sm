@@ -85,7 +85,7 @@ extension_action()
 
   bdsm_exports
 
-  action_file="${extension_path}/bin/${action}"
+  action_file="${extension_path}/actions/${action}"
 
   file_exists "${action_file}" ||
     fail "Action binary/file ${action} missing for extension ${extension}\n    (${action_file})"
