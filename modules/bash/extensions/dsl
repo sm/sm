@@ -74,7 +74,7 @@ extension_action()
   extension_config_path="$extensions_path/$extension/config"
   extension_templates_path="$extensions_path/$extension/templates"
   extension_modules_path="$extensions_path/$extension/modules"
-  extension_bin_path="$extensions_path/$extension/bin"
+  extension_actions_path="$extensions_path/$extension/actions"
   extension_log_path="$log_path/$extension"
 
   paths=$(env | awk -F= -v ORS=' ' '/_path/{print $1}')
@@ -85,10 +85,14 @@ extension_action()
 
   bdsm_exports
 
+  # TODO: Alter this here for nexting.
   action_file="${extension_path}/actions/${action}"
-
-  file_exists "${action_file}" ||
+  if file_exists "${action_file}" || directory_exists "${action_file}"
+  then
+    true
+  else
     fail "Action binary/file ${action} missing for extension ${extension}\n    (${action_file})"
+  fi
 
   action_file_type="$(file "$action_file")"
 
