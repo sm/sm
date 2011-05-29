@@ -835,7 +835,7 @@ extension_install()
       #
     else
       error "${extension_src_path}/${_extension} is not a valid extension"\
-        "as it is missing VERSION and/or bin/help files."
+        "as it is missing VERSION and/or actions/help files."
     fi
   else
     fail "Cannot install an extension as no extension name was given."
@@ -881,7 +881,7 @@ extension_is_valid()
   if variable_is_nonempty _path
   then
     # TODO: Add all extension requirement checks here.
-    if [[ -s "${_path}/VERSION" && -x "${_path}/bin/help" ]]
+    if [[ -s "${_path}/VERSION" && -x "${_path}/actions/help" ]]
     then
       return 0
     else
