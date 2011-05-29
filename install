@@ -67,5 +67,5 @@ source_files \
   "${PWD}/extensions/core/modules/bash/initialize" \
   "${PWD}/extensions/core/modules/bash/cli"
 
-source "${PWD}/extensions/core/bin/install"
+source "${PWD}/extensions/core/actions/install"
 
