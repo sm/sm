@@ -263,6 +263,10 @@ install_template()
 #      confd_path "${confd_path}" \
 #      extension "${extension}"
 #
+# Note that if you wish to eliminate all unset strings then you pass the pair
+#     ".*" ""
+# As the last pair of arguments to seed_template
+#
 # ### Code Walkthrough
 seed_template()
 {
