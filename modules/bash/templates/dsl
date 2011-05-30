@@ -305,7 +305,7 @@ seed_template()
             _strings+=(-e "s#{{${_hash[${index}]}}}#${_hash[$((++index))]}#g")
           done
 
-          if sed ${_strings[*]} ${_template} >> ${_template}.${timestamp}
+          if sed "${_strings[@]}" ${_template} >> ${_template}.${timestamp}
           then
             if file_exists "${_template}.${timestamp}"
             then
