@@ -65,7 +65,7 @@ then
 fi
 modules_path="${bdsm_path}/modules"
 
-export prefix_path bdsm_path modules_path initial_pwd
+export prefix_path bdsm_path modules_path initial_pwd namespace
 
 # Load BDSM bash DSL and initialize for BDSM core itself manually.
 # Ensure that backtrace and logging are defined first as everything depends on them.
@@ -85,13 +85,14 @@ then
   exit 1
 fi
 
-if [[ -z ${action} ]]
+if [[ -z ${action} && -z ${namespace} ]]
 then
   modules extensions
-  log "Usage: \n  bdsm ${extension} [action|namespace]\nActions:\n   $(extension_actions "${extension}")"
+  log "Usage: \n  bdsm ${extension} [namespace] [action]\nActions:\n   $(extension_actions "${extension}")"
   exit 0
 fi
 
 disable_backtrace
+
 extension_action "${extension}" "${action}"
 

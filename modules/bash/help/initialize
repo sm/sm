@@ -9,3 +9,5 @@ declare -a help_notes
 declare -a help_dependencies
 declare -a help_resources
 
+help_usage="bdsm ${extension} ${namespace:-"[namespace]"} {action} [arguments...]"
+

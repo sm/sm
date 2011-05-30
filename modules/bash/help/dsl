@@ -123,15 +123,15 @@ description()
 #     #!/usr/bin/env bash
 #     source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
 #     modules help
-#     
+#
 #     description "This extension handles X Y and Z."
 #     description "It also handles A B and C."
-#     
+#
 #     help_description
 #
 #     user$ "$HOME/test"
 #     Description
-#     
+#
 #       This extension handles X Y and Z.
 #       It also handles A B and C.
 #
@@ -576,7 +576,7 @@ help_section()
 help_usage()
 {
   help_section "Usage"
-  log "  bdsm ${extension} {action} [arguments...]"
+  log "  ${help_usage}"
 }
 
 #
