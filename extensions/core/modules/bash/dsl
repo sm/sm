@@ -364,7 +364,7 @@ setup_profile_d()
     then
       if ! file_contains /etc/profile "${profile_d_path}"
       then
-        log "if test -d '${profile_d_path}' ; then for profile in \"${profile_d_path}\"/*.sh ; do if test -x \"\$profile\" ; then . \"\$profile\" ; fi ; done ; unset profile ; fi" \
+        log "\nif test -d '${profile_d_path}' ; then for profile in \"${profile_d_path}\"/*.sh ; do if test -x \"\$profile\" ; then . \"\$profile\" ; fi ; done ; unset profile ; fi\n" \
           to /etc/profile
       fi
     fi
@@ -385,7 +385,7 @@ setup_profile_d()
 
     if ! file_contains "$HOME/.profile" "${profile_d_path}"
     then
-      log "if test -d '${profile_d_path}' ; then for profile in \"${profile_d_path}\"/*.sh ; do if test -x \"\$profile\" ; then . \"\$profile\" ; fi ; done ; unset profile ; fi" \
+      log "\nif test -d '${profile_d_path}' ; then for profile in \"${profile_d_path}\"/*.sh ; do if test -x \"\$profile\" ; then . \"\$profile\" ; fi ; done ; unset profile ; fi\n" \
         append to "$HOME/.profile"
     fi
   fi
