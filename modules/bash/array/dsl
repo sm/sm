@@ -633,7 +633,7 @@ array_join()
     do
       if (( index >  0 ))
       then
-        printf \"%s\" \"${_separator}\"
+        printf \"${_separator}\"
       fi
 
       printf \"%s\" \"\${${_array_name}[\${index}]}\"
