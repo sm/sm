@@ -86,17 +86,20 @@ extension_action()
   bdsm_exports
 
   # TODO: Alter this here for nexting.
-  action_file="${extension_path}/actions/${action}"
-  if file_exists "${action_file}" || directory_exists "${action_file}"
+  action_path="${extension_actions_path}/${action}"
+  if file_exists "${action_path}"
   then
-    true
+    true # Direct action
+  elif path_exists "${action_path}"
+  then
+    true # Namespace...
   else
-    fail "Action binary/file ${action} missing for extension ${extension}\n    (${action_file})"
+    fail "Action or namespace '${action}' missing for extension ${extension}\n    (${action_path})"
   fi
 
-  action_file_type="$(file "$action_file")"
+  action_path_type="$(file "$action_path")"
 
-  case "${action_file_type}" in
+  case "${action_path_type}" in
 
     *sh[[:space:]]script*|*POSIX[[:space:]]shell*|*Bourne-Again*)
       action_type="bash"
@@ -104,7 +107,7 @@ extension_action()
 
     *ASCII*)
       # Launch with helper dsl, if possible.
-      extension="${action_file//.}"
+      extension="${action_path//.}"
 
       case "${extension}" in
         bash|sh)
@@ -112,7 +115,7 @@ extension_action()
           #rb) action_type="ruby"   ;;
           ;;
         *)
-          read -r shebang < "${action_file}"
+          read -r shebang < "${action_path}"
 
           case "${shebang}" in
             *ruby|*rbx|*jruby|*macruby)
@@ -121,7 +124,7 @@ extension_action()
               action_type="ruby"
               ;;
             *)
-              if [[ -x "${action_file}" ]] ; then
+              if [[ -x "${action_path}" ]] ; then
                 action_type="binary"
               else
                 action_type="not executable"
@@ -138,7 +141,8 @@ extension_action()
       ;;
 
     *)
-      if file_is_executable "${action_file}" ; then
+      if file_is_executable "${action_path}"
+      then
         action_type="binary"
       else
         action_type="noexec"
@@ -151,7 +155,7 @@ extension_action()
     bash)
       (
       enable_backtrace
-      if [[ "${action}" = "help" ]]
+      if [[ "${action##*/}" == help ]]
       then # Load the help module also.
         modules core help
       else
@@ -163,7 +167,7 @@ extension_action()
         "${extension_modules_path}/bash/initialize" \
         "${extension_modules_path}/bash/cli"
 
-      . "${action_file}"
+      . "${action_path}"
       ) || result=$?
       return $result
       ;;
@@ -176,17 +180,17 @@ extension_action()
       done
 
       "${binary:-ruby}" -I"${modules_path}/ruby" -I"${extension_modules_path}/ruby" \
-        ${requires[@]} "${action_file}"
+        ${requires[@]} "${action_path}"
       ;;
     # python|lua|javascript)
       #   ADD "${modules_path}/${action_type}/" to the lib path so the script can require "bdsm"
-      #  "${action_file}"
+      #  "${action_path}"
       #  ;;
     dne|noexec)
       fail "Processing ${action} failed, file type is unknown, file does not exist or file is not executable."
       ;;
     binary|*)
-      "${action_file}" "${extension_action}" "${extension_args[@]}"
+      "${action_path}" "${extension_action}" "${extension_args[@]}"
       ;;
   esac || result=$?
 
@@ -621,19 +625,19 @@ extensions_in()
 #
 extension_actions()
 {
-  local _extension="${1:-}" _files _file _actions=() _path
+  local _extension="${1:-}" _files _file _actions=()
 
   if variable_is_nonempty _extension
   then
-    _path="$extensions_path/${_extension}/bin"
-
-    if path_exists "${_path}"
+    if path_exists "${extension_actions_path}"
     then
-      _files=($(find "${_path}" -mindepth 1 -maxdepth 1 -type f))
+      _files=($(
+      find "${extension_actions_path}" -mindepth 1 -type f -perm -o+rx
+      ))
 
       for _file in "${_files[@]}"
       do
-        [[ ! -x "${_file}" ]] || _actions+=("${_file//*\/}")
+        _actions+=("${_file#${extension_actions_path}}")
       done
       _actions="${_actions[@]}" # Convert from array to string.
       printf "${_actions}"

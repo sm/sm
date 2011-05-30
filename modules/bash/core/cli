@@ -187,8 +187,10 @@ do
               ;;
 
             *)
-              [[ -z "${extension}" ]] ||
-                error "Extension '${token}' not found"
+              if variable_is_empty extension
+              then
+                error "Extension '${token}' is not installed."
+              fi
               ;;
           esac
         fi
@@ -201,22 +203,22 @@ do
 
       if variable_is_empty action
       then
-        if file_is_executable "${extensions_path}/${extension}/bin/$token"
+        if path_exists "${extensions_path}/${extension}/actions/$token"
         then
-          action="$token"
+          namespace="$token"
           extension_args=("$@")
-          parse_break=1
+        else
+          if variable_is_nonempty namespace
+          then
+            token="${namespace}/${token}"
+          fi
+          if file_is_executable "${extensions_path}/${extension}/actions/$token"
+          then
+            action="$token"
+            extension_args=("$@")
+            parse_break=1
+          fi
         fi
-
-      elif path_exists "/data/$token"
-      then
-        project="$token"
-        project_path="/data/$token"
-
-      elif path_exists "/home/$token"
-      then
-        project="$token"
-        project_path="/home/$token"
       fi
       ;;
   esac
@@ -229,9 +231,22 @@ do
 done
 
 # A default action has the same name as the extension.
-if variable_is_empty action &&
-  file_is_executable "${extensions_path}/${extension}/bin/${extension}"
+if variable_is_empty action
 then
-  action="${extension}"
+  if file_is_executable "${extensions_path}/${extension}/actions/${extension}"
+  then
+    action="${extension}"
+  elif symlink_exists "${extensions_path}/${extension}/actions/default"
+  then
+    action="default"
+  else
+    action="help"
+  fi
+
+  if variable_is_nonempty namespace
+  then
+    action="${namespace}/${action}"
+  fi
 fi
+
 

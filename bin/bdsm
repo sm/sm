@@ -88,7 +88,7 @@ fi
 if [[ -z ${action} ]]
 then
   modules extensions
-  log "Usage: \n  bdsm ${extension} [action]\nActions:\n   $(extension_actions "${extension}")"
+  log "Usage: \n  bdsm ${extension} [action|namespace]\nActions:\n   $(extension_actions "${extension}")"
   exit 0
 fi
 
