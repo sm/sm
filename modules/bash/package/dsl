@@ -301,10 +301,7 @@ package_install()
     "${package_name}_install"
   else
     log "Installing ${package_name} ${package_version}"
-
     package_make_install
-
-    log "Installed ${package_name} ${package_version}."
   fi
 
   if command_exists "${package_name}_postinstall"
@@ -544,7 +541,7 @@ package_configure()
 
   if ${_command} > configure.log 2>&1
   then
-    log "Configuration of ${package_name} ${package_version} successful."
+    return 0
   else
     package_error "Configuration of ${package_name} ${package_version} failed" "configure.log"
   fi
