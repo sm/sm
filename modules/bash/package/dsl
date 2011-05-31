@@ -709,7 +709,10 @@ package_activate()
     service_activate "${_package}"
   fi
 
-  package_setup "${_package}"
+  if module_is_loaded "database"
+  then
+    database_activate "${_package}"
+  fi
 }
 
 #
