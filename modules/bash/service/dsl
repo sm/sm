@@ -1174,7 +1174,7 @@ service_init_start()
   else
     if user_run_as "${service_user}" "${_command[*]}"
     then
-      succeed "${service} reported success when starting."
+      succeed "${service} successfully started."
     else
       log "${service} failed to start, check ${service_log_file} for details:"
       exec tail -n 50 "${service_log_file}"

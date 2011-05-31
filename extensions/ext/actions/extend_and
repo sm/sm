@@ -22,7 +22,7 @@ then
 
   if extension_action "${extension}" "${action}"
   then
-    succeed "${extension} ${action} ${extension_args[*]} reported success."
+    succeed
   else
     error "${extension} ${action} ${extension_args[*]} failed."
   fi
