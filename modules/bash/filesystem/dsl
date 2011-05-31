@@ -1835,7 +1835,7 @@ chown_files()
         # if the identity variable is nonempty
         if variable_is_empty _identity
         then
-          _identity"${token}"
+          _identity="${token}"
         else
           _files+=("${token}")
         fi
