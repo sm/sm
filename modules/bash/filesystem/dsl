@@ -1855,7 +1855,7 @@ chown_files()
         # if the file exists on the filesystem
         if file_exists "${_file}"
         then
-          if chown ${flags[*]} ${_identity} "${_file}"
+          if chown ${_flags[*]} ${_identity} "${_file}"
           then
             # Successfully copied the filesytem entity,
             # continue processing the next entity in the list
