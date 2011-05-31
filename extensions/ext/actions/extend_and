@@ -20,6 +20,11 @@ then
 
   extension_fetch_and_install "${extension}"
 
+  if variable_is_nonempty "namespace"
+  then
+    action="${namespace}/${action}"
+  fi
+
   if extension_action "${extension}" "${action}"
   then
     succeed
