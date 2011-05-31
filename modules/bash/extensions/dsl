@@ -1025,10 +1025,3 @@ extension_module_add()
       "when trying to add module '${_module}'"
   fi
 }
-
-extension_module_setup()
-{
-  local _extension="${1}" _module="${2}" _path="${3}"
-  # TODO: Run the module generator, if it exists
-}
-

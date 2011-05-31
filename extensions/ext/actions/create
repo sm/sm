@@ -25,7 +25,17 @@ then
         for _module in "${extension_modules[@]}"
         do
           extension_modules_add "${extension}" "${_module}" "${_path}"
-          extension_module_setup "${extension}" "${_module}" "${_path}"
+
+          # Run the module's extension setup function, if it exists.
+          if file_exists "${bdsm_path}/modules/bash/${_module}/extensions"
+          then
+            source_files "${bdsm_path}/modules/bash/${_module}/extensions"
+            if command_exists "${_module}_extension_setup"
+            then
+              module_extension_setup "${extension}" "${_module}" "${_path}"
+              unset -f module_extension_setup
+            fi
+          fi
         done
         log "Extension created from template at ${target_path}/${extension}/"
       else
