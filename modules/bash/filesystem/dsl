@@ -1816,17 +1816,36 @@ move_files()
 chown_files()
 {
   # Declare the identity and file and set the identiy to the first parameter
-  local _identity="${1:-}" _file
+  local _identity="${1:-}" _file _flags=()
 
-  # if the identity variable is nonempty
-  if variable_is_nonempty _identity
-  then
-    # Remove the identity from the path
+  # While the parameters list is nonempty.
+  while (( $# > 0 ))
+  do
+    # Assign the first parameter to the token variable and remove the first
+    # paramter from the parameters list.
+    token="$1"
     shift
 
-    # Set the files array to the remaining parameters
-    local _files=("$@")
+    # Switch based on the token string's contents
+    case "${token}" in
+      --recursive)
+        _flags+=("-R")
+        ;;
+      *)
+        # if the identity variable is nonempty
+        if variable_is_empty _identity
+        then
+          _identity"${token}"
+        else
+          _files+=("${token}")
+        fi
+        ;;
 
+    esac
+  done
+
+  if variable_is_empty _identity
+  then
     # if the file sarray is nonempty
     if array_is_nonempty _files
     then
@@ -1836,7 +1855,7 @@ chown_files()
         # if the file exists on the filesystem
         if file_exists "${_file}"
         then
-          if chown -R ${_identity} "${_file}"
+          if chown ${flags[*]} ${_identity} "${_file}"
           then
             # Successfully copied the filesytem entity,
             # continue processing the next entity in the list
