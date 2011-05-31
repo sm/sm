@@ -323,7 +323,12 @@ package_install()
 
   if module_is_loaded "service"
   then
-    service_activate
+    service_setup
+  fi
+
+  if module_is_loaded "database"
+  then
+    database_setup
   fi
 }
 
