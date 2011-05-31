@@ -1844,7 +1844,7 @@ chown_files()
     esac
   done
 
-  if variable_is_empty _identity
+  if variable_is_nonempty _identity
   then
     # if the file sarray is nonempty
     if array_is_nonempty _files
