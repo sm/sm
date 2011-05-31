@@ -1816,7 +1816,7 @@ move_files()
 chown_files()
 {
   # Declare the identity and file and set the identiy to the first parameter
-  local _identity="${1:-}" _file _flags=()
+  local _identity _file _flags=()
 
   # While the parameters list is nonempty.
   while (( $# > 0 ))
