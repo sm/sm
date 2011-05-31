@@ -22,6 +22,16 @@ then
 
   array_shift extension_args action
 
+  if [[ -n "${extension_args[0]}" ]]
+  then
+    if file_exists "${extension_actions_path}/${namespace}/${action}" &&
+       file_is_executable "${extension_actions_path}/${namespace}/${action}"
+    then
+      namespace="${action}"
+      array_shift extension_args action
+    fi
+  fi
+
   if extension_action "${extension}" "${action}"
   then
     succeed

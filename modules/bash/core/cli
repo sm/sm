@@ -147,8 +147,7 @@ do
             install)
               extension="ext"
               action="extend_and"
-              namespace="package"
-              extension_args=(install "$@")
+              extension_args=(package install "$@")
               parse_break=1
               ;;
 
