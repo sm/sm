@@ -54,13 +54,11 @@ fetch_extensions_repository()
       error "There was an error updating the repository."
     fi
   else
-    remove_paths "${extensions_src_path}"
-
     log "Cloning $extension repository from ${extensions_repository_url}"
 
     scm_fetch "${extensions_repository_url}"
 
-    copy_paths "${repos_path}/${_identifier}" \
+    copy_paths --force "${repos_path}/${_identifier}" \
       to "${extensions_src_path}"
   fi
 
