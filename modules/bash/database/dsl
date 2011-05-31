@@ -60,6 +60,11 @@ database_setup()
       data_path "${data_path}"
   fi
 
+  if command_exists "${extension}_database_setup"
+  then
+    "${extension}_database_setup"
+  fi
+
   if command_exists "${extension}_initialize"
   then
     "${extension}_initialize"
@@ -68,4 +73,7 @@ database_setup()
 
 # TODO: Should 'service_db_path' in service_{activate,deactivate} be moved into
 # here with database_activate / database_deactivate
-
+database_activate()
+{
+  true # NIY
+}

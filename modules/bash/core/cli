@@ -207,11 +207,15 @@ do
         then
           namespace="$token"
           extension_args=("$@")
-        else
-          if variable_is_nonempty namespace
+        elif variable_is_nonempty namespace
+        then
+          if file_is_executable "${extensions_path}/${extension}/actions/${namespace}/${token}"
           then
-            token="${namespace}/${token}"
+            action="$token"
+            extension_args=("$@")
+            parse_break=1
           fi
+        else
           if file_is_executable "${extensions_path}/${extension}/actions/$token"
           then
             action="$token"
