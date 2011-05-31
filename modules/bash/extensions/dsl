@@ -167,6 +167,14 @@ extension_action()
         "${extension_modules_path}/bash/initialize" \
         "${extension_modules_path}/bash/cli"
 
+      if variable_is_nonempty namespace
+      then
+        source_files \
+          "${extension_modules_path}/bash/${namespace}/dsl" \
+          "${extension_modules_path}/bash/${namespace}/initialize" \
+          "${extension_modules_path}/bash/${namespace}/cli"
+      fi
+
       . "${action_path}"
       ) || result=$?
       return $result
