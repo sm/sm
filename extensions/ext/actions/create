@@ -16,7 +16,8 @@ then
         enter "${extensions_path}/ext/templates/${language:-bash}"
 
         _path="${target_path}/${extension}"
-        copy_paths bin modules templates config \
+
+        copy_paths actions modules templates config \
           to "${_path}"
 
         copy_files README.md VERSION CHANGELOG.md TODO.md \
@@ -24,7 +25,7 @@ then
 
         for _module in "${extension_modules[@]}"
         do
-          extension_modules_add "${extension}" "${_module}" "${_path}"
+          extension_module_add "${extension}" "${_module}" "${_path}"
 
           # Run the module's extension setup function, if it exists.
           if file_exists "${bdsm_path}/modules/bash/${_module}/extensions"
@@ -32,8 +33,8 @@ then
             source_files "${bdsm_path}/modules/bash/${_module}/extensions"
             if command_exists "${_module}_extension_setup"
             then
-              module_extension_setup "${extension}" "${_module}" "${_path}"
-              unset -f module_extension_setup
+              "${_module}_extension_setup" "${extension}" "${_module}" "${_path}"
+              #unset -f "${_module}_extension_setup"
             fi
           fi
         done

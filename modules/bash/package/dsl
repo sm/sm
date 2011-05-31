@@ -1335,6 +1335,9 @@ package_cli()
         package_usage
         exit 0
         ;;
+      --with*|--enable*|--disable*)
+        configure_flags+=("$token" "${extension_args[$((++index))]}")
+        ;;
       --trace)
         set -o xtrace
         ;;

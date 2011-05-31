@@ -1010,21 +1010,26 @@ extension_module_add()
 
   timestamp_set
 
-  if awk "/modules /{printf \$0; print \" ${_module}\"}
-    ! /modules/{print \$0}" "${_path}/modules/bash/initialize" \
-      >> "${_path}/modules/bash/initialize.${timestamp}"
+  if file_contains "${_path}/modules/bash/initialize" "modules "
   then
-    if move_file "${_path}/modules/bash/initialize.${timestamp}"\
-      to "${_path}/modules/bash/initialize"
+    if awk "/modules /{printf \$0; print \" ${_module}\"}
+      ! /modules/{print \$0}" "${_path}/modules/bash/initialize" \
+        >> "${_path}/modules/bash/initialize.${timestamp}"
     then
-      return 0
+      if move_file "${_path}/modules/bash/initialize.${timestamp}"\
+        to "${_path}/modules/bash/initialize"
+      then
+        return 0
+      else
+        fail "Failed to move ${_path}/modules/bash/initialize.${timestamp}"\
+          "to ${_path}/modules/bash"\
+          "while adding module '${_module}'"
+      fi
     else
-      fail "Failed to move ${_path}/modules/bash/initialize.${timestamp}"\
-        "to ${_path}/modules/bash"\
-        "while adding module '${_module}'"
+      fail "Failed to modify ${_path}/modules/bash/initialize" \
+        "when trying to add module '${_module}'"
     fi
   else
-    fail "Failed to modify ${_path}/modules/bash/initialize" \
-      "when trying to add module '${_module}'"
+    log "modules ${_module}\n" append to "${_path}/modules/bash/initialize"
   fi
 }
