@@ -774,7 +774,6 @@ Options:
 
   --prefix   - specify prefix path
   --src)     - specify source directory
-  --data)    - specify data directory
   --user)    - specify user to install as
   --version) - specify version to install
   --licence) - view licence
@@ -833,9 +832,6 @@ service_cli()
         ;;
       --src)
         src_path="${extension_args[$((++index))]}"
-        ;;
-      --data)
-        data_path="${extension_args[$((++index))]}"
         ;;
       --user)
         service_user="${extension_args[$((++index))]}"
@@ -1503,7 +1499,6 @@ service_conf_d()
         prefix_path "${prefix_path}" \
         init_scripts_path "${init_scripts_path}" \
         modules_path "${modules_path}" \
-        data_path "${data_path}" \
         confd_path "${confd_path}" \
         extension "${service}" \
         service "${service}"

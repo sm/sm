@@ -766,6 +766,11 @@ package_setup()
   then
     service_setup "${_package}"
   fi
+
+  if module_is_loaded "database"
+  then
+    database_setup "${_package}"
+  fi
 }
 
 #

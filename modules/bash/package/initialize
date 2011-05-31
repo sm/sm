@@ -17,13 +17,11 @@ true \
 if user_is_root
 then
   true \
-    "${data_base_path:="/var/db/${package_name}"}" \
     "${log_path:="/var/log/${package_name}"}" \
     "${package_user:="${package_name}"}"
 else
   true \
     "${log_path:="${packages_path}/log"}" \
-    "${data_base_path:="${packages_path}/db/${package_name}"}" \
     "${package_user:="$USER"}"
 fi
 
@@ -54,7 +52,7 @@ variable_is_nonempty package_md5_url   || read_default md5_url prefix package
 variable_is_nonempty archive_format    || read_default archive_format
 variable_is_nonempty init_scripts_path || init_scripts_path="$(init_scripts_path)"
 
-true "${archive_format:=tar.gz}" "${data_path:="${data_base_path}/${package_version}"}"
+true "${archive_format:=tar.gz}"
 
 ensure_paths_exist "${active_path}"
 

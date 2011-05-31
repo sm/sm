@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+if user_is_root
+then
+  true \
+    "${data_base_path:="/var/db/${package_name}"}" \
+    "${database_user:="${package_user:-"${extension}"}"}"
+else
+  true \
+    "${data_base_path:="${packages_path}/db/${package_name}"}" \
+    "${database_user:="${package_user:-"$USER"}"}"
+fi
+
+true "${data_path:="${data_base_path}/${package_version}"}"
+
