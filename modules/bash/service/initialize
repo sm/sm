@@ -21,8 +21,8 @@ then
   etc_path="/etc"
   var_path="/var"
 else
-  etc_path="$bdsm_path/pkg/active/etc"
-  var_path="$bdsm_path/pkg/active/var"
+  etc_path="${packages_path}/active/etc"
+  var_path="${packages_path}/active/var"
 fi
 
 : \
