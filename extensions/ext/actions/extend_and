@@ -20,6 +20,8 @@ then
 
   extension_fetch_and_install "${extension}"
 
+  array_shift extension_args action
+
   if extension_action "${extension}" "${action}"
   then
     succeed
