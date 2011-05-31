@@ -2,11 +2,6 @@
 
 description "${extension} BDSM extension."
 
-action "install" "Install $extension ${package_version}."
-action "setup" "Setup and Configure $extension."
-action "start" "Start ${extensoin}."
-action "stop" "Stop ${extension}."
-action "restart" "Restart ${extension}."
-action "status" "Display ${extension} status."
+action "help" "Display help for ${extension}."
 
 show_help usage

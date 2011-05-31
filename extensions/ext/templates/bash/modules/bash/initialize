@@ -1,4 +1,2 @@
 #!/usr/bin/env bash
 
-modules package service
-
