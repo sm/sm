@@ -298,8 +298,6 @@ seed_template()
       then
         if array_is_even _hash
         then
-          warn "Template Seeding (replacing defaults) has not yet fully implemented."
-
           for (( index=0 ; index < ${#_hash[@]} ; index++ ))
           do
             _strings+=(-e "s#{{${_hash[${index}]}}}#${_hash[$((++index))]}#g")
