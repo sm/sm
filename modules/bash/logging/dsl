@@ -296,7 +296,10 @@ error()
 #
 succeed() {
   set +o xtrace
-  log "$*"
+  if [[ -n "$*" ]]
+  then
+    log "$*"
+  fi
   exit 0
 }
 
