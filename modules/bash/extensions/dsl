@@ -86,13 +86,16 @@ extension_action()
   bdsm_exports
 
   # TODO: Alter this here for nexting.
-  action_path="${extension_actions_path}/${action}"
-  if file_exists "${action_path}"
+  if variable_is_nonempty namespace
   then
-    true # Direct action
-  elif path_exists "${action_path}"
+    action_path="${extension_actions_path}/${namespace}/${action}"
+  else
+    action_path="${extension_actions_path}/${action}"
+  fi
+
+  if file_exists "${action_path}" && file_is_executable "${action_path}"
   then
-    true # Namespace...
+    true # Direct action, continue.
   else
     fail "Action or namespace '${action}' missing for extension ${extension}\n    (${action_path})"
   fi
