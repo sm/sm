@@ -195,7 +195,13 @@ services_available()
 #
 service_setup()
 {
-  local _path
+  local _path _file
+
+  for _file in dsl initialize cli
+  do
+    source_files "${extension_path}/modules/${language:=bash}/${_file}"
+  done
+
   # Notify the user that we are now creating paths for the service/version
   log "#creating paths for ${service} ${package_version}..."
 
@@ -235,6 +241,11 @@ service_setup()
       fi
     fi
   done
+
+  if command_exists "${service}_service_setup"
+  then
+    "${service}_service_setup"
+  fi
 
   # Install the service init.d scripts.
   service_install_init_d "${service}"
