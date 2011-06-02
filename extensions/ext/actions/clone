@@ -2,8 +2,6 @@
 
 if array_is_nonempty extension_args
 then
-
-  # Parse arguments
   for (( index = 0 ; index < ${#extension_args[@]} ; index++ ))
   do
     token="${extension_args[${index}]}"
@@ -15,9 +13,11 @@ then
         _source="${extension_args[$((++index))]}"
         ;;
       *)
-        if [[ -z "${_source}" ]] ; then
+        if [[ -z "${_source}" ]]
+        then
           _source="$token"
-        elif [[ -z "${_target}" ]] ; then
+        elif [[ -z "${_target}" ]]
+        then
           _target="$token"
         else
           break

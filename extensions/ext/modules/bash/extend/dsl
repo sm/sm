@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+
+extend_from()
+{
+  # "release" "${extension_args[@]}"
+  local _source="${1:-}"
+  if variable_is_nonempty _source
+  then
+    shift
+    local _params=($@)
+    if array_is_nonempty _params
+    then
+      case "${_source}" in
+        git)
+          NIY "extend from git"
+          ;;
+        github)
+          NIY "extend from github"
+          ;;
+        help)
+          NIY "extend from help"
+          ;;
+        release)
+          NIY "extend from release"
+          ;;
+        tarball)
+          NIY "extend from tarball"
+          ;;
+        default|wayneeseguin)
+          fetch_extensions_repository
+          extensions_install "${_params[@]}"
+          ;;
+      esac
+    else
+      fail "An extension name must be given."
+    fi
+  else
+    fail "Source must be specified."
+  fi
+}
+

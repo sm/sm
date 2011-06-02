@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+action "extend <name>" \
+  "Extend from the default wayneeseguin/bdsm-extensions repository on github."
+
+action "extend release <name>" \
+  "Extend with a specific release from extensions.beginrescueend.com/<name>/"
+
+action "extend tarball <name> <path>"\
+  "Extend from a given tarball on the filesystem."
+
+action "extend tarball <name> <url>"\
+  "Extend from a given tarball after downloading from the given url."
+
+action "extend git <name> <git url>"\
+  "Extend from a given git repository after cloning from the given url."
+
+action "extend github <name> <github user>/<repo>"\
+  "Extend from a given github repository after cloning from the given user/repo."
+
