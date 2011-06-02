@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+#
+# user$ bdsm extend rsync <local ext name> <rsync url>
+#
+
+extend_from "rsync" "${extension_args[@]}"
+

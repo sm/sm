@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+#
+# user$ bdsm extend git <local ext name> <scp url>
+#
+
+extend_from "scp" "${extension_args[@]}"
+

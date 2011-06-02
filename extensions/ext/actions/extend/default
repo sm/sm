@@ -1,1 +1,8 @@
-./wayneeseguin
+#!/usr/bin/env bash
+
+#
+# use default repository wayneeseguin/bdsm-extensions.
+# user$ bdsm extend default <local ext name>
+#
+extend_from "default" "${extension_args[@]}"
+

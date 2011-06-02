@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+#
+# user$ bdsm extend git <local ext name> git@git.myserver.com:myrepo.git
+#
+
+extend_from "svn" "${extension_args[@]}"
+

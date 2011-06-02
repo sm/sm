@@ -18,3 +18,14 @@ action "extend git <name> <git url>"\
 action "extend github <name> <github user>/<repo>"\
   "Extend from a given github repository after cloning from the given user/repo."
 
+action "extend hg <name> <hg repo url>"\
+  "Extend from a given hg repository after cloning from the given url."
+
+action "extend svn <name> <svn repo url>"\
+  "Extend from a given svn repository after cloning from the given url."
+
+action "extend rsync <name> <rsync url>"\
+  "Extend from a given repository after rsyncing from the given url."
+
+action "extend scp <name> <scp url>"\
+  "Extend from a given tarball after scp'ing from the given tarball url."
