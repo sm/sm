@@ -1,5 +1,54 @@
 #!/usr/bin/env bash
 
+build_path()
+{
+  # Prepare for windows :(
+  ( IFS='/'; printf "$*" )
+}
+
+detect_action_path()
+{
+  local _extension=$1 _action_var=$2 _variables_var=$3 _action_path=()
+  local extension_actions_path=$(build_path ${extensions_path} ${_extension} actions)
+  shift 3
+
+  while (( $# > 0 ))
+  do
+    token=$1
+    shift
+    if path_exists $(build_path $extension_actions_path "${_action_path[@]}" $token)
+    then
+      array_push _action_path $token
+      continue
+    elif file_exists $(build_path $extension_actions_path "${_action_path[@]}" $token)
+    then
+      array_push _action_path $token
+      eval "${_action_var}=(\"\${_action_path[@]}\" \"\$token\")"
+      eval "${_variables_var}=(\"\$@\")"
+      return
+    elif ( file_exists $(build_path $extension_actions_path "${_action_path[@]}" .functions) && file_contains $(build_path $extension_actions_path "${_action_path[@]}" .functions) "^\s*(function )?${token}\(\)" )
+    then
+      array_push _action_path $token
+      eval "${_action_var}=(\"\${_action_path[@]}\" \"\$token\")"
+      eval "${_variables_var}=(\"\$@\")"
+      return
+    elif file_exists $(build_path $extension_actions_path "${_action_path[@]}" defualt)
+    then
+      eval "${_action_var}=(\"\${_action_path[@]}\" 'default')"
+      eval "${_variables_var}=(\"\$token\" \"\$@\")"
+      return
+    elif file_exists $(build_path $extension_actions_path "${_action_path[@]}" help)
+    then
+      eval "${_action_var}=(\"\${_action_path[@]}\" 'help')"
+      eval "${_variables_var}=(\"\$token\" \"\$@\")"
+      return
+    else
+      fail "Action or namespace '${token}' missing for extension ${extension}"
+    fi
+  done
+  fail "Action or namespace '${token}' missing for extension ${extension}"
+}
+
 #
 # ## extension\_action()
 #
@@ -52,21 +101,13 @@ extension_action()
   if variable_is_nonempty extension
   then
     shift
-    export action="${1:-}"
-
-    if variable_is_nonempty action
+    if array_is_empty extension_args
     then
-      shift
-    else
-      fail "'action' is not set! Something has gone terribly wrong."
+      extension_args="$@"
     fi
+    detect_action_path $extension action extension_args "${extension_args[@]}"
   else
     fail "'extension' is not set! Something has gone terribly wrong."
-  fi
-
-  if (( ${#extension_args[@]} == 0 ))
-  then
-    extension_args="$@"
   fi
   export extension_args
 
@@ -87,82 +128,91 @@ extension_action()
 
   # TODO: Alter this here for nexting.
   #if variable_is_nonempty namespace
-  if [[ -n "$extension_args" ]] && file_exists "${extension_actions_path}/${action}/$extension_args"
-  then
-    #action_path="${extension_actions_path}/${namespace}/${action}"
-    action_path="${extension_actions_path}/${action}/$extension_args"
-    if [[ "$extension_args" != "default" ]]
-    then
-      namespace=$action
-      action=$extension_args
-    fi
-  else
-    action_path="${extension_actions_path}/${action}"
-  fi
-
+#  if [[ -n "$extension_args" ]] && file_exists "${extension_actions_path}/${action}/$extension_args"
+#  then
+#    #action_path="${extension_actions_path}/${namespace}/${action}"
+#    action_path="${extension_actions_path}/${action}/$extension_args"
+#    if [[ "$extension_args" != "default" ]]
+#    then
+#      namespace=$action
+#      action=$extension_args
+#    fi
+#  else
+#    action_path="${extension_actions_path}/${action}"
+#  fi
+  action_path=$(build_path ${extension_actions_path} "${action[@]}")
+  namespace=("${action[@]}")
+  unset namespace[${#namespace[@]}-1] #array_pop
   if file_exists "${action_path}" && file_is_executable "${action_path}"
   then
-    true # Direct action, continue.
+    action_type="action"
   else
-    fail "Action or namespace '${action}' missing for extension ${extension}\n    (${action_path})"
+    action_type="function"
   fi
 
-  action_path_type="$(file "$action_path")"
+#  if file_exists "${action_path}" && file_is_executable "${action_path}"
+#  then
+#    true # Direct action, continue.
+#  else
+#    fail "Action or namespace '${action}' missing for extension ${extension}\n    (${action_path})"
+#  fi
 
-  case "${action_path_type}" in
-
-    *sh[[:space:]]script*|*POSIX[[:space:]]shell*|*Bourne-Again*)
-      action_type="bash"
-      ;;
-
-    *ASCII*)
-      # Launch with helper dsl, if possible.
-      extension="${action_path//.}"
-
-      case "${extension}" in
-        bash|sh)
-          action_type="bash"
-          #rb) action_type="ruby"   ;;
-          ;;
-        *)
-          read -r shebang < "${action_path}"
-
-          case "${shebang}" in
-            *ruby|*rbx|*jruby|*macruby)
-              binary="${shebang##*(#|!)}"
-              binary="${binary##* }"
-              action_type="ruby"
-              ;;
-            *)
-              if [[ -x "${action_path}" ]] ; then
-                action_type="binary"
-              else
-                action_type="not executable"
-              fi
-              ;;
-          esac
-          ;;
-      esac
-      result=$?
-      ;;
-
-    cannot[[:space:]]open)
-      action_type="dne"
-      ;;
-
-    *)
-      if file_is_executable "${action_path}"
-      then
-        action_type="binary"
-      else
-        action_type="noexec"
-      fi
-      ;;
-  esac || result=$?
+#  action_path_type="$(file "$action_path")"
+#
+#  case "${action_path_type}" in
+#
+#    *sh[[:space:]]script*|*POSIX[[:space:]]shell*|*Bourne-Again*)
+#      action_type="bash"
+#      ;;
+#
+#    *ASCII*)
+#      # Launch with helper dsl, if possible.
+#      extension="${action_path//.}"
+#
+#      case "${extension}" in
+#        bash|sh)
+#          action_type="bash"
+#          #rb) action_type="ruby"   ;;
+#          ;;
+#        *)
+#          read -r shebang < "${action_path}"
+#
+#          case "${shebang}" in
+#            *ruby|*rbx|*jruby|*macruby)
+#              binary="${shebang##*(#|!)}"
+#              binary="${binary##* }"
+#              action_type="ruby"
+#              ;;
+#            *)
+#              if [[ -x "${action_path}" ]] ; then
+#                action_type="binary"
+#              else
+#                action_type="not executable"
+#              fi
+#              ;;
+#          esac
+#          ;;
+#      esac
+#      result=$?
+#      ;;
+#
+#    cannot[[:space:]]open)
+#      action_type="dne"
+#      ;;
+#
+#    *)
+#      if file_is_executable "${action_path}"
+#      then
+#        action_type="binary"
+#      else
+#        action_type="noexec"
+#      fi
+#      ;;
+#  esac || result=$?
 
   # Now based on the determined action_type we launch the extension.
   case "${action_type}" in
-    bash)
+    action|function)
       (
       enable_backtrace
       if [[ "${action##*/}" == help ]]
@@ -185,7 +235,12 @@ extension_action()
           "${extension_modules_path}/bash/${namespace}/cli"
       fi
 
-      . "${action_path}"
+      if [[ "${action_type}" == "action" ]]
+      then
+        . "${action_path}"
+      else
+        $(array_last_element action)
+      fi
       ) || result=$?
       return $result
       ;;
