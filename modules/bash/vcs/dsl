@@ -124,3 +124,20 @@ scm_update()
   fi
 }
 
+scm_get()
+{
+  local _url="$1" repo_path
+
+  _identifier="${_url//\//_}" # Convert '/' to an invalid url component '_'
+  repo_path="${repos_path}/${_identifier}"
+
+  if path_exists "$repo_path/.git"
+  then
+    log "# Updating repository from ${_url}"
+    scm_update "${_url}"
+  else
+    log "# Cloning repository from ${_url}"
+    scm_fetch "${_url}"
+  fi
+
+}

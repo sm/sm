@@ -86,9 +86,16 @@ extension_action()
   bdsm_exports
 
   # TODO: Alter this here for nexting.
-  if variable_is_nonempty namespace
+  #if variable_is_nonempty namespace
+  if [[ -n "$extension_args" ]] && file_exists "${extension_actions_path}/${action}/$extension_args"
   then
-    action_path="${extension_actions_path}/${namespace}/${action}"
+    #action_path="${extension_actions_path}/${namespace}/${action}"
+    action_path="${extension_actions_path}/${action}/$extension_args"
+    if [[ "$extension_args" != "default" ]]
+    then
+      namespace=$action
+      action=$extension_args
+    fi
   else
     action_path="${extension_actions_path}/${action}"
   fi
@@ -802,6 +809,61 @@ extensions_install()
     fi
   else
     fail "Cannot install extensions as no extensions were given to install."
+  fi
+}
+
+#
+# ## external\_extension\_install()
+#
+# Installs the given external extension.
+#
+# ### Input Parameters
+#
+# First parameter is the name of the external extension to install
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# The named external extension will be installed to the filesystem in the BDSM
+# extension directory.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# Fails if no external extension are passed in to install.
+#
+# ### Usage Examples
+#
+#     user$ external_extension_install backup
+#
+external_extension_install()
+{
+  local _extension="${1:-}"
+  local extension_src_path="${src_path}/${_extension}"
+
+  if variable_is_nonempty _extension
+  then
+    if extension_is_valid "${extension_src_path}"
+    then
+      log " - ${_extension}"
+      copy_paths "${extension_src_path}" \
+        to "${bdsm_path}/extensions"
+
+      #
+      # TODO: Process extension dependencies...
+      #
+    else
+      error "${extension_src_path} is not a valid extension"\
+        "as it is missing VERSION and/or actions/help files."
+    fi
+  else
+    fail "Cannot install an extension as no extension name was given."
   fi
 }
 
