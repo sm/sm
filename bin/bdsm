@@ -67,6 +67,8 @@ modules_path="${bdsm_path}/modules"
 
 export prefix_path bdsm_path modules_path initial_pwd extension namespace action
 
+export params=("$@")
+
 # Load BDSM bash DSL and initialize for BDSM core itself manually.
 # Ensure that backtrace and logging are defined first as everything depends on them.
 # Then load the main BDSM CLI
@@ -94,5 +96,9 @@ fi
 
 disable_backtrace
 
-extension_action "${extension}" "${action}"
+if [[ "$params" =~ "--" ]]
+then
+  array_shift params
+fi
+extension_action "${params[@]}" # "${extension}" "${action}"
 

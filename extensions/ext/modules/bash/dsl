@@ -36,6 +36,21 @@ md5_match()
   fi
 }
 
+fetch_git_extension()
+{
+  local _extension="${1:-}" _url="${2}" _identifier repo_path
+  local extension_src_path="${src_path}/${_extension}"
+  local identifier="${_url//\//_}" # Convert '/' to an invalid url component '_'
+  local repo_path="${repos_path}/${identifier}"
+
+  variables_must_be_nonempty _extension _repository
+  scm_get "${_url}"
+  local _path=$PWD
+  enter "${repo_path}/"
+  cp -Rf * "${extension_src_path}"
+  enter ${_path}
+}
+
 fetch_extensions_repository()
 {
   local initial_pwd="$PWD" _identifier

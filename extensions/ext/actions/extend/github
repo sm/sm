@@ -4,5 +4,6 @@
 # user$ bdsm extend github <local ext name> <github username>/<github repo name>
 #
 
-extend_from "github" "$user/$repo"
+#extend_from "github" "$user/$repo"
+extend_from "${extension_args[@]}"
 

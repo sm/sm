@@ -13,10 +13,12 @@ extend_from()
     then
       case "${_source}" in
         git)
-          NIY "extend from git repository"
+          fetch_git_extension "$1" "$2"
+          external_extension_install "$1" "$2"
           ;;
         github)
-          NIY "extend from github repository"
+          fetch_git_extension "$1" "git://github.com/${2}.git"
+          external_extension_install "$1" "git://github.com/${2}.git"
           ;;
         help)
           NIY "extend from help"
