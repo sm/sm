@@ -681,7 +681,7 @@ package_activate()
 
   variables_must_be_nonempty _package _version
 
-  if path_exists "${install_path}"
+  if path_exists "${packages_path}/${_package}/${_version}"
   then
     if symlink_exists "${packages_path}/${_package}/active"
     then
@@ -809,13 +809,21 @@ package_setup()
 #
 package_deactivate()
 {
-  local _package="${1:-}" _file _files
+  local _package="${1:-}" _file _files _version
 
   variables_must_be_nonempty _package
 
   log "Deactivating ${_package}"
 
-  _files=($( find "${install_path}" -type f ))
+  if symlink_exists "${packages_path}/${_package}/active"
+  then
+    _version=$(readlink "${packages_path}/${_package}/active")
+    _version=${_version##*/}
+  else
+    return 0
+  fi
+
+  _files=($( find "${packages_path}/${_package}/${_version}" -type f ))
   for _file in "${_files[@]}"
   do
     remove_files --force "${_file}"
@@ -1316,7 +1324,13 @@ package_cli()
         # TODO: Throw error if parameter is not specified.
         if (( ${#extension_args[@]} > 0 ))
         then
-          package_activate "${extension}" "${extension_args[$((++index))]}"
+          if [[ "${extension}" == "pkg" ]]
+          then
+            array_shift extension_args
+            package_activate "${extension_args[@]}"
+          else
+            package_activate "${extension}" "${extension_args[@]}"
+          fi
         else
           error "Cannot activate ${extension}, no version was given."
         fi

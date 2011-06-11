@@ -33,7 +33,7 @@ list_available()
 {
   if ! directory_exists "${extensions_src_path}"
   then
-    fetch_extensions_repository
+    fetch_extensions_git_repository
   fi
 
   extensions=($(extensions_available))

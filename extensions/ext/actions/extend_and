@@ -24,7 +24,7 @@ then
       ;;
 
     head|master)
-      fetch_extensions_repository # default is head
+      fetch_extensions_git_repository # default is head
       ;;
   esac
 

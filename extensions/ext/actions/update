@@ -13,7 +13,7 @@ extension_action=${extension_args[0]}
 
 case "$extension_action" in
   repo|repository)
-    fetch_extensions_repository
+    fetch_extensions_git_repository
   ;;
 
   help|usage)
@@ -26,7 +26,7 @@ case "$extension_action" in
     # TODO: Updates for released extensions instead of only from repository.
     if array_is_nonempty extension_args
     then
-      fetch_extensions_repository
+      fetch_extensions_git_repository
 
       extensions_install "${extensions[@]}"
     else
@@ -36,7 +36,7 @@ case "$extension_action" in
 
   *)
     # TODO: Updates for released extensions instead of only from repository.
-    fetch_extensions_repository
+    fetch_extensions_git_repository
     extensions_install "${extension_args[@]}"
   ;;
 esac

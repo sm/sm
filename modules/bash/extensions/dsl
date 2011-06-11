@@ -85,7 +85,7 @@ extension_action()
 
   bdsm_exports
 
-  # TODO: Alter this here for nexting.
+  # TODO: Alter this here for nesting.
   if variable_is_nonempty namespace
   then
     action_path="${extension_actions_path}/${namespace}/${action}"
@@ -165,11 +165,13 @@ extension_action()
         modules core
       fi
 
+      # Load the extensions's core module
       source_files \
         "${extension_modules_path}/bash/dsl" \
         "${extension_modules_path}/bash/initialize" \
         "${extension_modules_path}/bash/cli"
 
+      # If a namespace was called, load the namespace's module.
       if variable_is_nonempty namespace
       then
         source_files \
@@ -179,6 +181,7 @@ extension_action()
       fi
 
       . "${action_path}"
+
       ) || result=$?
       return $result
       ;;

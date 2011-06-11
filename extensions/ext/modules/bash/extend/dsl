@@ -4,16 +4,21 @@
 extend_from()
 {
   # "release" "${extension_args[@]}"
-  local _source="${1:-}"
+  local _source="${1:-}" _params _name
   if variable_is_nonempty _source
   then
     shift
-    local _params=($@)
     if array_is_nonempty _params
     then
+      _name="${1}"
+      shift
+      _params=($@)
+
       case "${_source}" in
         git)
           NIY "extend from git repository"
+          #fetch_extensions_git_repository "${_params[${#_params[@]}]}"
+          #extensions_install "${_name}" "${_params[@]}"
           ;;
         github)
           NIY "extend from github repository"
@@ -40,7 +45,7 @@ extend_from()
           NIY "extend from scp tarball url"
           ;;
         default|wayneeseguin|*)
-          fetch_extensions_repository
+          fetch_extensions_git_repository
           extensions_install "${_params[@]}"
           ;;
       esac
