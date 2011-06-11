@@ -690,17 +690,17 @@ package_activate()
 
     log "Activating ${_package} ${_version}"
 
-    _paths=($( find "${install_path}" -type d ))
+    _paths=($( find "${packages_path}/${_package}/${_version}" -type d ))
     for _path in "${_paths[@]}"
     do
-      ensure_paths_exist "${active_path}${_path##${install_path}}"
+      ensure_paths_exist "${active_path}${_path##${packages_path}/${_package}/${_version}}"
     done
 
-    _files=($( find "${install_path}" -type f ))
+    _files=($( find "${packages_path}/${_package}/${_version}" -type f ))
     for _file in "${_files[@]}"
     do
       link --force "${_file}" \
-        to "${active_path}${_file##${install_path}}"
+        to "${active_path}${_file##${packages_path}/${_package}/${_version}}"
     done
 
     link --force "${packages_path}/${_package}/${_version}" \
@@ -712,12 +712,12 @@ package_activate()
 
   if module_is_loaded "service"
   then
-    service_activate "${_package}"
+    service_activate "${_package}" "${_version}"
   fi
 
   if module_is_loaded "database"
   then
-    database_activate "${_package}"
+    database_activate "${_package}" "${_version}"
   fi
 }
 
@@ -1331,6 +1331,7 @@ package_cli()
           else
             package_activate "${extension}" "${extension_args[@]}"
           fi
+          exit $?
         else
           error "Cannot activate ${extension}, no version was given."
         fi
