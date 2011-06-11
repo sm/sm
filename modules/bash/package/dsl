@@ -681,7 +681,9 @@ package_activate()
 
   variables_must_be_nonempty _package _version
 
-  if path_exists "${packages_path}/${_package}/${_version}"
+  true "${install_path:="${packages_path}/${_package}/${_version}"}"
+
+  if path_exists "${install_path}"
   then
     if symlink_exists "${packages_path}/${_package}/active"
     then
@@ -690,20 +692,20 @@ package_activate()
 
     log "Activating ${_package} ${_version}"
 
-    _paths=($( find "${packages_path}/${_package}/${_version}" -type d ))
+    _paths=($( find "${install_path}" -type d ))
     for _path in "${_paths[@]}"
     do
-      ensure_paths_exist "${active_path}${_path##${packages_path}/${_package}/${_version}}"
+      ensure_paths_exist "${active_path}${_path##${install_path}}"
     done
 
-    _files=($( find "${packages_path}/${_package}/${_version}" -type f ))
+    _files=($( find "${install_path}" -type f ))
     for _file in "${_files[@]}"
     do
       link --force "${_file}" \
-        to "${active_path}${_file##${packages_path}/${_package}/${_version}}"
+        to "${active_path}${_file##${install_path}}"
     done
 
-    link --force "${packages_path}/${_package}/${_version}" \
+    link --force "${install_path}" \
       to "${packages_path}/${_package}/active"
   else
     warn "Skipping activation of ${_package} ${_version} "\
@@ -823,7 +825,9 @@ package_deactivate()
     return 0
   fi
 
-  _files=($( find "${packages_path}/${_package}/${_version}" -type f ))
+  true "${install_path:="${packages_path}/${_package}/${_version}"}"
+
+  _files=($( find "${install_path}" -type f ))
   for _file in "${_files[@]}"
   do
     remove_files --force "${_file}"
@@ -842,6 +846,7 @@ package_deactivate()
       remove_files "${_file}"
     fi
   done
+
   log "${_package} deactivated"
 }
 
