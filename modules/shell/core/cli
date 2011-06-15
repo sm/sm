@@ -163,20 +163,3 @@ do
   fi
 done
 
-# A default action has the same name as the extension.
-if variable_is_empty action
-then
-  if file_is_executable "${extensions_path}/${extension}/actions/${extension}"
-  then
-    action="${extension}"
-  else
-    action="default"
-  fi
-
-  if variable_is_nonempty namespace
-  then
-    action="${namespace}/${action}"
-  fi
-fi
-
-
