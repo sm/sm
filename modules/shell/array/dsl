@@ -459,7 +459,7 @@ array_append()
 #
 #     user$ cat $HOME/test
 #     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework.
+#     source "/usr/local/bdsm/modules/shell/core/initialize" # Load BDSM framework.
 #     modules array
 #
 #     my_array=(1 2 3 4)
@@ -730,7 +730,7 @@ array_largest()
 #
 #     user$ cat $HOME/test
 #     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/modules/bash/core/initialize" # BDSM framework
+#     source "/usr/local/bdsm/modules/shell/core/initialize" # BDSM framework
 #     modules array
 #
 #     arr=(c a d e f b h j i )
@@ -790,7 +790,7 @@ array_sort_desc()
 #
 #     user$ cat $HOME/test
 #     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/modules/bash/core/initialize" # BDSM framework
+#     source "/usr/local/bdsm/modules/shell/core/initialize" # BDSM framework
 #     modules array
 #
 #     arr=(c a d e f b h j i )
@@ -850,7 +850,7 @@ array_sort_asc()
 #
 #     user$ cat $HOME/test
 #     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/modules/bash/core/initialize" # BDSM framework
+#     source "/usr/local/bdsm/modules/shell/core/initialize" # BDSM framework
 #     modules array
 #
 #     arr=(a a a b b c c c c d d d d d d)
@@ -912,7 +912,7 @@ array_unique()
 #
 #     user$ cat $HOME/test
 #     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/modules/bash/core/initialize" # BDSM framework
+#     source "/usr/local/bdsm/modules/shell/core/initialize" # BDSM framework
 #     modules array
 #
 #     the_array=()

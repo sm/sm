@@ -15,7 +15,7 @@ then
         fail "Extension template files for are missing from "\
           "$target_path/ext/templates/${language}."
       else
-        enter "$extensions_path/ext/templates/${language:-bash}"
+        enter "$extensions_path/ext/templates/${language:-shell}"
 
         copy_paths bin modules templates config \
           to "$target_path/$extension/"

@@ -81,7 +81,7 @@ detect_action_path()
 #
 #     $ cat $HOME/test
 #     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
+#     source "/usr/local/bdsm/modules/shell/core/initialize" # Load BDSM framework core.
 #     modules extensions
 #     extension_action ext list
 #
@@ -153,7 +153,7 @@ extension_action()
   case "${action_path_type}" in
 
     *sh[[:space:]]script*|*POSIX[[:space:]]shell*|*Bourne-Again*)
-      action_type="bash"
+      action_type="shell"
       ;;
 
     *ASCII*)
@@ -161,8 +161,8 @@ extension_action()
       extension="${action_path//.}"
 
       case "${extension}" in
-        bash|sh)
-          action_type="bash"
+        shell|zsh|bash|sh)
+          action_type="shell"
           #rb) action_type="ruby"   ;;
           ;;
         *)
@@ -203,7 +203,7 @@ extension_action()
 
   # Now based on the determined action_type we launch the extension.
   case "${action_type}" in
-    bash)
+    shell)
       (
       enable_backtrace
       if [[ "${action##*/}" == help ]]
@@ -215,17 +215,17 @@ extension_action()
 
       # Load the extensions's core module
       source_files \
-        "${extension_modules_path}/bash/dsl" \
-        "${extension_modules_path}/bash/initialize" \
-        "${extension_modules_path}/bash/cli"
+        "${extension_modules_path}/shell/dsl" \
+        "${extension_modules_path}/shell/initialize" \
+        "${extension_modules_path}/shell/cli"
 
       # If a namespace was called, load the namespace's module.
       if variable_is_nonempty namespace
       then
         source_files \
-          "${extension_modules_path}/bash/${namespace}/dsl" \
-          "${extension_modules_path}/bash/${namespace}/initialize" \
-          "${extension_modules_path}/bash/${namespace}/cli"
+          "${extension_modules_path}/shell/${namespace}/dsl" \
+          "${extension_modules_path}/shell/${namespace}/initialize" \
+          "${extension_modules_path}/shell/${namespace}/cli"
       fi
 
       . "${action_path}"
@@ -291,7 +291,7 @@ extension_action()
 #
 extension_reload()
 {
-  local _path="${extension_modules_path}/bash"
+  local _path="${extension_modules_path}/shell"
 
   source_files "${_path}/dsl" "${_path}/initialize"
 }
@@ -328,7 +328,7 @@ extension_reload()
 #
 extension_reinitialize()
 {
-  local _path="${extension_modules_path}/bash"
+  local _path="${extension_modules_path}/shell"
 
   source_files "${_path}/initialize"
 }
@@ -413,7 +413,7 @@ extension_version()
 #
 #     $ cat $HOME/test
 #     !/usr/bin/env bash
-#     source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
+#     source "/usr/local/bdsm/modules/shell/core/initialize" # Load BDSM framework core.
 #     modules extensions
 #     extension_license postgresql
 #
@@ -473,7 +473,7 @@ extension_license()
 #
 #     $ cat $HOME/test
 #     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
+#     source "/usr/local/bdsm/modules/shell/core/initialize" # Load BDSM framework core.
 #     modules extensions
 #     extensions_installed
 #
@@ -516,7 +516,7 @@ extensions_installed()
 #
 #      $ cat $HOME/test
 #      #!/usr/bin/env bash
-#      source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
+#      source "/usr/local/bdsm/modules/shell/core/initialize" # Load BDSM framework core.
 #      modules extensions
 #      extensions_available
 
@@ -558,7 +558,7 @@ extensions_available()
 #
 #      $ cat $HOME/test
 #      #!/usr/bin/env bash
-#      source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
+#      source "/usr/local/bdsm/modules/shell/core/initialize" # Load BDSM framework core.
 #      modules extensions
 #      extensions_in_development
 
@@ -603,7 +603,7 @@ extensions_in_development()
 #
 #     $ cat $HOME/test
 #     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
+#     source "/usr/local/bdsm/modules/shell/core/initialize" # Load BDSM framework core.
 #     modules extensions
 #     extensions_in /usr/local/bdsm/extensions
 #
@@ -676,7 +676,7 @@ extensions_in()
 #
 #      $ cat $HOME/test
 #      #!/usr/bin/env bash
-#      source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
+#      source "/usr/local/bdsm/modules/shell/core/initialize" # Load BDSM framework core.
 #      modules extensions
 #      extension_actions "postgresql"
 #
@@ -741,7 +741,7 @@ extension_actions()
 #
 #     $ cat $HOME/test
 #     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
+#     source "/usr/local/bdsm/modules/shell/core/initialize" # Load BDSM framework core.
 #     modules extensions
 #     extensions_installed
 #     echo
@@ -1061,26 +1061,26 @@ extension_module_add()
 
   timestamp_set
 
-  if file_contains "${_path}/modules/bash/initialize" "modules "
+  if file_contains "${_path}/modules/shell/initialize" "modules "
   then
     if awk "/modules /{printf \$0; print \" ${_module}\"}
-      ! /modules/{print \$0}" "${_path}/modules/bash/initialize" \
-        >> "${_path}/modules/bash/initialize.${timestamp}"
+      ! /modules/{print \$0}" "${_path}/modules/shell/initialize" \
+        >> "${_path}/modules/shell/initialize.${timestamp}"
     then
-      if move_file "${_path}/modules/bash/initialize.${timestamp}"\
-        to "${_path}/modules/bash/initialize"
+      if move_file "${_path}/modules/shell/initialize.${timestamp}"\
+        to "${_path}/modules/shell/initialize"
       then
         return 0
       else
-        fail "Failed to move ${_path}/modules/bash/initialize.${timestamp}"\
-          "to ${_path}/modules/bash"\
+        fail "Failed to move ${_path}/modules/shell/initialize.${timestamp}"\
+          "to ${_path}/modules/shell"\
           "while adding module '${_module}'"
       fi
     else
-      fail "Failed to modify ${_path}/modules/bash/initialize" \
+      fail "Failed to modify ${_path}/modules/shell/initialize" \
         "when trying to add module '${_module}'"
     fi
   else
-    log "modules ${_module}\n" append to "${_path}/modules/bash/initialize"
+    log "modules ${_module}\n" append to "${_path}/modules/shell/initialize"
   fi
 }

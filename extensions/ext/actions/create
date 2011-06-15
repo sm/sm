@@ -11,9 +11,9 @@ then
       error "Extension '${extension}' already exists "\
         "at ${target_path}/${extension}."
     else
-      if path_exists "${extensions_path}/ext/templates/${language:-bash}"
+      if path_exists "${extensions_path}/ext/templates/${language:-shell}"
       then
-        enter "${extensions_path}/ext/templates/${language:-bash}"
+        enter "${extensions_path}/ext/templates/${language:-shell}"
 
         _path="${target_path}/${extension}"
 
@@ -28,9 +28,9 @@ then
           extension_module_add "${extension}" "${_module}" "${_path}"
 
           # Run the module's extension setup function, if it exists.
-          if file_exists "${bdsm_path}/modules/bash/${_module}/extensions"
+          if file_exists "${bdsm_path}/modules/shell/${_module}/extensions"
           then
-            source_files "${bdsm_path}/modules/bash/${_module}/extensions"
+            source_files "${bdsm_path}/modules/shell/${_module}/extensions"
             if command_exists "${_module}_extension_setup"
             then
               "${_module}_extension_setup" "${extension}" "${_module}" "${_path}"
@@ -41,7 +41,7 @@ then
         log "Extension created from template at ${target_path}/${extension}/"
       else
         fail "Extension template files for are missing from "\
-          "$target_path/ext/templates/${language:-bash}."
+          "$target_path/ext/templates/${language:-shell}."
       fi
     fi
   done

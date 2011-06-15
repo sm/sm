@@ -5,9 +5,9 @@
 #
 # The following example sources the file only if it exists and is nonempty:
 #
-#     if [[ -s "/usr/local/bdsm/modules/bash/project/interactive" ]]
+#     if [[ -s "/usr/local/bdsm/modules/shell/project/interactive" ]]
 #     then
-#       source "/usr/local/bdsm/modules/bash/project/interactive"
+#       source "/usr/local/bdsm/modules/shell/project/interactive"
 #     fi
 #
 true "${projects_path:="$HOME/projects"}"

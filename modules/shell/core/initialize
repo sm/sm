@@ -63,7 +63,7 @@ true \
   "${extensions_src_path:="${src_path}/extensions"}" \
   "${remote:="origin"}" \
   "${branch:="master"}" \
-  "${language:="bash"}" \
+  "${language:="shell"}" \
   "${user:=$USER}" \
   "${keep_releases:=4}" \
   "${hooks_flag:=1}" \
@@ -78,8 +78,8 @@ then
 fi
 
 # Load module() function and then load core modules.
-source "${modules_path}/bash/modules/dsl"
-source "${modules_path}/bash/modules/initialize"
+source "${modules_path}/shell/modules/dsl"
+source "${modules_path}/shell/modules/initialize"
 
 modules variables array trace logging time environment filesystem system users \
   extensions

@@ -2776,7 +2776,7 @@ file_is_empty_or_missing()
 #
 #     user$ cat "$HOME/test"
 #     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
+#     source "/usr/local/bdsm/modules/shell/core/initialize" # Load BDSM framework core.
 #
 #     modules filesystem
 #

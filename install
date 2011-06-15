@@ -51,21 +51,21 @@ modules_path="${bdsm_path}/modules"
 export bdsm_path install_path modules_path
 
 # Load DSL and initialize BDSM core itself, manually.
-source "${PWD}/modules/bash/core/dsl"
+source "${PWD}/modules/shell/core/dsl"
 
 # Load fundamental Module DSL's
 for module in variables modules logging trace filesystem core
 do
   for file in dsl initialize
   do
-    source "${PWD}/modules/bash/${module}/${file}"
+    source "${PWD}/modules/shell/${module}/${file}"
   done
 done
 
 source_files \
-  "${PWD}/extensions/core/modules/bash/dsl" \
-  "${PWD}/extensions/core/modules/bash/initialize" \
-  "${PWD}/extensions/core/modules/bash/cli"
+  "${PWD}/extensions/core/modules/shell/dsl" \
+  "${PWD}/extensions/core/modules/shell/initialize" \
+  "${PWD}/extensions/core/modules/shell/cli"
 
 source "${PWD}/extensions/core/actions/install"
 

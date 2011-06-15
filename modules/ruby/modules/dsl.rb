@@ -22,7 +22,7 @@ end
 
 def extension_module_load(*files)
   files.each do |name|
-    file = "#{ENV["extension_modules_path"]}/bash/#{name}.rb"
+    file = "#{ENV["extension_modules_path"]}/shell/#{name}.rb"
     if File.exist?(file) && File.size(file) > 0
       puts "Loading #{file}" if $trace_flag
       load file

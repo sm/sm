@@ -28,7 +28,7 @@ bdsm_development_setup()
   else
     log "  * project functions are now setup in $HOME/.bash_profile."
 
-    log '[[ -s "/usr/local/bdsm/modules/bash/project/interactive" ]] && source "/usr/local/bdsm/modules/bash/project/interactive"'  \
+    log '[[ -s "/usr/local/bdsm/modules/shell/project/interactive" ]] && source "/usr/local/bdsm/modules/bash/project/interactive"'  \
       append to "$HOME/.bash_profile"
   fi
 

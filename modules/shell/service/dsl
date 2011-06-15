@@ -199,7 +199,7 @@ service_setup()
 
   for _file in dsl initialize cli
   do
-    source_files "${extension_path}/modules/${language:=bash}/${_file}"
+    source_files "${extension_path}/modules/${language:=shell}/${_file}"
   done
 
   # Notify the user that we are now creating paths for the service/version

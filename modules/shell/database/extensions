@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
-package_extension_setup()
+database_extension_setup()
 {
   local extension="${1}" module="${2}" path="${3}"
 
   enter "${path}"
 
-  ensure_paths_exist "modules/${language:=bash}/${module}" "actions/${module}"
+  ensure_paths_exist "modules/${language:=shell}/${module}" "actions/${module}"
 
-  # Setup modules/bash/package/{dsl,initialize,cli}
+  # Setup modules/shell/package/{dsl,initialize,cli}
   for file in dsl initialize cli
   do
     log '#!/usr/bin/env bash' to "modules/${language}/${module}/${file}"
@@ -17,24 +17,22 @@ package_extension_setup()
   log "\n${module}_cli\n" append to "modules/${language}/${module}/cli"
 
   # setup actions/package/{...}
-  for action in help install uninstall
+  for action in help initialize
   do
     log '#!/usr/bin/env bash' to "actions/${module}/${action}"
     chmod_files 0755 "actions/${module}/${action}"
   done
 
   log "
-description \"Extension for managing ${extension} \${website_url:-}.\"
+description \"Extension for managing ${extension} (${website_url}).\"
 
-action \"install\" \"Installs ${extension}.\"
-action \"uninstall\" \"Uninstalls ${extension}.\"
+action \"initialize\" \"Initialize ${extension} database.\"
 
 show_help usage
 " append to "actions/${module}/help"
 
-  for action in install uninstall
+  for action in initialize
   do
     log "\n${module}_${action}\n" append to "actions/${module}/${action}"
   done
 }
-

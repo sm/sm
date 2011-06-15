@@ -121,7 +121,7 @@ description()
 #
 #     user$ cat $HOME/test
 #     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
+#     source "/usr/local/bdsm/modules/shell/core/initialize" # Load BDSM framework core.
 #     modules help
 #
 #     description "This extension handles X Y and Z."
@@ -331,7 +331,7 @@ resource()
 #
 #     user$ cat $HOME/test
 #     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
+#     source "/usr/local/bdsm/modules/shell/core/initialize" # Load BDSM framework core.
 #     modules help
 #
 #     action "help" "Displays the help output for the ${extension} extension"
@@ -396,7 +396,7 @@ help_actions()
 #
 #     user$ cat $HOME/test
 #     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
+#     source "/usr/local/bdsm/modules/shell/core/initialize" # Load BDSM framework core.
 #     modules help
 #
 #     note "Don't forget the milk! "

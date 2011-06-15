@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Bash Delectable Scripting Management (BDSM) Framework
+# Badass Delectable Scripting Management (BDSM) Framework
 #
 # Copyright (c) 2009-2011 Wayne E. Seguin
 #
@@ -67,12 +67,12 @@ modules_path="${bdsm_path}/modules"
 
 export prefix_path bdsm_path modules_path initial_pwd extension namespace action
 
-# Load BDSM bash DSL and initialize for BDSM core itself manually.
+# Load BDSM shell DSL and initialize for BDSM core itself manually.
 # Ensure that backtrace and logging are defined first as everything depends on them.
 # Then load the main BDSM CLI
-. "${modules_path}/bash/core/dsl"
-. "${modules_path}/bash/core/initialize"
-. "${modules_path}/bash/core/cli"
+. "${modules_path}/shell/core/dsl"
+. "${modules_path}/shell/core/initialize"
+. "${modules_path}/shell/core/cli"
 
 if [[ -n "${error_message}" ]]
 then

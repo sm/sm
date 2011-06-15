@@ -44,8 +44,8 @@ modules()
       then
         continue # The module has already been loaded, continue to the next one.
       else
-        _bdsm="${modules_path}/bash/${_module}"
-        _extension="${extension_modules_path}/bash/${_module}"
+        _bdsm="${modules_path}/shell/${_module}"
+        _extension="${extension_modules_path}/shell/${_module}"
 
         for _path in "${_bdsm}" "${_extension}"
         do
@@ -93,10 +93,10 @@ modules()
 #
 # ### Usage Examples
 #
-#     user$ ls ${extension_modules_path}/bash/
+#     user$ ls ${extension_modules_path}/shell/
 #     cli dsl initialize zebra
 #
-#     user$ cat ${extension_modules_path}/bash/zebra
+#     user$ cat ${extension_modules_path}/shell/zebra
 #     #!/usr/bin/env bash
 #     echo "Zebra!!! "
 #
@@ -111,7 +111,7 @@ module_load()
   then
     for _file in "${_files[@]}"
     do
-      source_files "${extension_modules_path:-"$modules_path"}/bash/${_file}"
+      source_files "${extension_modules_path:-"$modules_path"}/shell/${_file}"
     done
   else
     fail "Cannot load a module as no module was given."
@@ -151,7 +151,7 @@ modules_reinitialize()
   then
     for _module in "${_modules[@]}"
     do
-      source_files "${modules_path}/bash/${_module}/initialize"
+      source_files "${modules_path}/shell/${_module}/initialize"
     done
   else
     fail "Cannot load a module as no module was given."
@@ -244,7 +244,7 @@ modules_loaded()
 # ## modules\_installed()
 modules_installed()
 {
-  local _module _module_type="${1:-"bash"}" _modules
+  local _module _module_type="${1:-"shell"}" _modules
 
   _modules=($(
   find "${modules_path}/${_module_type}" -mindepth 1 -maxdepth 1 -type d |
@@ -294,13 +294,13 @@ module_dsl()
 
   if array_is_nonempty _modules
   then
-    local _path="${modules_path}/bash/${_module}"
+    local _path="${modules_path}/shell/${_module}"
 
     _dsl=($(find "${_path}" -mindepth 1 -maxdepth 1 -name dsl -type f -print0 | xargs -0 grep '^[a-z_]*()$' 2>/dev/null || true))
 
     for _function in "${_dsl[@]}"
     do
-      _function="${_function##*modules\/bash\/}"
+      _function="${_function##*modules\/shell\/}"
       printf "%s\n" "${_function//*:}"
     done
   else
@@ -354,7 +354,7 @@ modules_list()
 {
   local _module _modules _function _dsl
 
-  for language in bash ruby
+  for language in shell ruby
   do
     _modules=($(modules_installed ${language}))
     for _module in "${_modules[@]}"
@@ -460,7 +460,7 @@ module_docs()
     then
       if command_exists pygmentize
       then
-        local _path="${core_development_path}/modules/bash/${_module}"
+        local _path="${core_development_path}/modules/shell/${_module}"
         if (( content_flag == 1 ))
         then
           shocco "${_path}/dsl" |
@@ -530,7 +530,7 @@ module_docs()
 modules_docgen()
 {
   # TODO: Replace with,
-  # for file in modules/bash/*/dsl ; do (name=${file%%\/dsl}; shocco $file > html/${name//*\/}.html)& done ; wait
+  # for file in modules/shell/*/dsl ; do (name=${file%%\/dsl}; shocco $file > html/${name//*\/}.html)& done ; wait
 
   local _module _modules _function _dsl
   local _prefix="${core_development_path}/html/modules"
@@ -545,7 +545,7 @@ modules_docgen()
       > "${_prefix}/index.html"
 
     _modules=($(
-    find "${core_development_path}/modules/bash" -mindepth 1 -maxdepth 1 \
+    find "${core_development_path}/modules/shell" -mindepth 1 -maxdepth 1 \
       -type d | sed -e 's#.*/##g' -e '/\..*/d'
     ))
 
@@ -583,7 +583,7 @@ modules_docgen()
 modules_docopen()
 {
   # TODO: Replace with,
-  # for file in modules/bash/*/dsl ; do (name=${file%%\/dsl}; shocco $file > html/${name//*\/}.html)& done ; wait
+  # for file in modules/shell/*/dsl ; do (name=${file%%\/dsl}; shocco $file > html/${name//*\/}.html)& done ; wait
   if variable_is_nonempty core_development_path &&
      path_exists "${core_development_path}"
   then
@@ -603,7 +603,7 @@ modules_docopen()
 modules_site_docgen()
 {
   # TODO: Replace with,
-  # for file in modules/bash/*/dsl ; do (name=${file%%\/dsl}; shocco $file > html/${name//*\/}.html)& done ; wait
+  # for file in modules/shell/*/dsl ; do (name=${file%%\/dsl}; shocco $file > html/${name//*\/}.html)& done ; wait
 
   local _module _modules _function _dsl
   local _prefix="${core_development_path}/html/modules"
@@ -615,7 +615,7 @@ modules_site_docgen()
       > "${_prefix}/index.html"
 
     _modules=($(
-    find "${core_development_path}/modules/bash" -mindepth 1 -maxdepth 1 \
+    find "${core_development_path}/modules/shell" -mindepth 1 -maxdepth 1 \
       -type d | sed -e 's#.*/##g' -e '/\..*/d'
     ))
     for _module in "${_modules[@]}"
@@ -648,10 +648,10 @@ modules_site_docgen()
       name=${file##*\/}
       name=${name%.haml}
 
-      ensure_paths_exist "${site_development_path}/content/modules/bash/${name}"
+      ensure_paths_exist "${site_development_path}/content/modules/shell/${name}"
 
       log "Building ${name} dsl from generated docs."
-      cat > "${site_development_path}/content/modules/bash/${name}/dsl.haml" <<Header
+      cat > "${site_development_path}/content/modules/shell/${name}/dsl.haml" <<Header
   .breadcrumbs
     %a{ :href => "/" }
       Documentation
@@ -659,13 +659,13 @@ modules_site_docgen()
     %a{ :href => "/modules/" }
       Modules
     &nbsp;>&nbsp;
-    %a{ :href => "/modules/bash/" }
-      Bash
+    %a{ :href => "/modules/shell/" }
+      shell
     &nbsp;>&nbsp;
-    %a{ :href => "/modules/bash/${name}/" }
+    %a{ :href => "/modules/shell/${name}/" }
       ${name}
     &nbsp;>&nbsp;
-    %a{ :href => "/modules/bash/${name}/dsl/" }
+    %a{ :href => "/modules/shell/${name}/dsl/" }
       DSL API :: ${name}
     %hr
 
@@ -673,10 +673,10 @@ modules_site_docgen()
     Module ${name}
 
 Header
-      cat $file >> "${site_development_path}/content/modules/bash/${name}/dsl.haml"
+      cat $file >> "${site_development_path}/content/modules/shell/${name}/dsl.haml"
 
       html2haml "${_base}.html" \
-        >> "${site_development_path}/content/modules/bash/${name}/dsl.haml"
+        >> "${site_development_path}/content/modules/shell/${name}/dsl.haml"
       )&
     done
 

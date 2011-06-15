@@ -304,7 +304,7 @@ disable_debug()
 #
 #     user$ cat ./test
 #     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
+#     source "/usr/local/bdsm/modules/shell/core/initialize" # Load BDSM framework core.
 #     modules trace # Load the trace module.
 #     enable_backtrace
 #     echo "Error exit with backtrace is now off."
@@ -362,7 +362,7 @@ enable_backtrace()
 #
 #     user$ cat ./test
 #     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
+#     source "/usr/local/bdsm/modules/shell/core/initialize" # Load BDSM framework core.
 #     modules trace # Load the trace module.
 #     disable_backtrace
 #     echo "Error exit with backtrace is now off."
@@ -407,7 +407,7 @@ disable_backtrace()
 #
 #     user$ cat ./test
 #     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/modules/bash/core/initialize" # Load BDSM framework core.
+#     source "/usr/local/bdsm/modules/shell/core/initialize" # Load BDSM framework core.
 #     modules trace # Load the trace module.
 #
 #     functiona()
