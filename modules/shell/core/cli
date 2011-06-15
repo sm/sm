@@ -94,10 +94,6 @@ do
           extension_args=("${extension:-core}" "help" "$@")
           ;;
 
-        get|version)
-          extension_args=("core" "get" "$@")
-          ;;
-
         activate|enable)
           extension_args=("ext" "package" "activate" "$@")
           ;;
@@ -113,14 +109,6 @@ do
         edit|open|update|create)
           extension_args=("ext" "${token}" "$@")
           ;;
-
-        list|ls)
-          extension_args=("ext" "list" "$@")
-          ;;
-
-        #ext|extension|extensions)
-        #  extension_args=("ext" "$@")
-        #  ;;
 
         mod|module|modules)
           extension_args=("mod" "${1:-list}" "$@")

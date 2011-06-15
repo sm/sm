@@ -1,1 +1,4 @@
 extension=ext
+extend=ext extend
+ls=ext list
+list=ext list

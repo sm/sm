@@ -9,12 +9,13 @@ detect_action()
   extension="${1:=core}"
   shift
 
+  local _params=("$@")
+
   local _action_path=("$extensions_path/$extension/actions")
 
-  while (( $# > 0 ))
+  while (( ${#_params[@]} > 0 ))
   do
-    token=$1
-    shift
+    array_shift _params token
 
     # Detect a namespace
     if path_exists "$(path_join "${_action_path[@]}" $token)"
@@ -27,31 +28,17 @@ detect_action()
     then
       action_path=$(array_join _action_path '/')
       action="$token"
-      extension_args=("$@")
+      extension_args=("${_params[@]}")
       return 0
 
     elif file_exists "$(path_join "${_action_path[@]}" .actions)" &&
          file_contains "$(path_join "${_action_path[@]}" .actions)" "^${token}="
     then
       _array=($(hash_file "$(path_join "${_action_path[@]}" .actions)" $token))
+      _params=(${_array[@]} ${_params[@]})
+      continue
 
-      if path_exists $(path_join "${_action_path[@]}" ${_array})
-      then
-        _action_path+=("$_array")
-        continue
-      else
-        while (( ${#_array[@]} > 1 ))
-        do
-          array_shift _array _word
-          _action_path+=("${_word}")
-        done
-
-        action="${_array[0]}"
-        action_path=$( array_join _action_path '/' )
-        extension_args=("$@")
-      return 0
-
-      fi
+    # TODO: functions
 
     # run default if found
     elif file_exists "$(path_join "${_action_path[@]}" default)"
@@ -59,7 +46,7 @@ detect_action()
       action="default"
       action_path=$(array_join _action_path '/')
       extension_args=("$token")
-      extension_args+=("$@")
+      extension_args+=("${_params[@]}")
       return 0
 
     # default to help if no defualt set in path
@@ -68,7 +55,7 @@ detect_action()
       action="help"
       action_path=$(array_join _action_path '/')
       extension_args=("$token")
-      extension_args+=("$@")
+      extension_args+=("${_params[@]}")
       return 0
 
     # Not found, error.
