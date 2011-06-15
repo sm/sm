@@ -9,7 +9,7 @@
 
 directories=( bin modules completion )
 aux=( log tmp src )
-extensions=( core ext mod pkg srv )
+extensions=( core pkg srv )
 files=( LICENSE VERSION README.md )
 configs=( user ) # TODO move this to /etc/bdsm/ and/or $HOME/.bdsm/
 

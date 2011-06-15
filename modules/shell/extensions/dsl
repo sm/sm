@@ -4,7 +4,9 @@
 # detect_action $extension action extension_args "${extension_args[@]}"
 detect_action()
 {
-  local _extension="${1:=core}"
+  local token _word
+
+  extension="${1:=core}"
   shift
 
   local _action_path=("$extensions_path/$extension/actions")
@@ -28,6 +30,29 @@ detect_action()
       extension_args=("$@")
       return 0
 
+    elif file_exists "$(path_join "${_action_path[@]}" .actions)" &&
+         file_contains "$(path_join "${_action_path[@]}" .actions)" "^${token}="
+    then
+      _array=($(hash_file "$(path_join "${_action_path[@]}" .actions)" $token))
+
+      if path_exists $(path_join "${_action_path[@]}" ${_array})
+      then
+        _action_path+=("$_array")
+        continue
+      else
+        while (( ${#_array[@]} > 1 ))
+        do
+          array_shift _array _word
+          _action_path+=("${_word}")
+        done
+
+        action="${_array[0]}"
+        action_path=$( array_join _action_path '/' )
+        extension_args=("$@")
+      return 0
+
+      fi
+
     # run default if found
     elif file_exists "$(path_join "${_action_path[@]}" default)"
     then
@@ -48,18 +73,25 @@ detect_action()
 
     # Not found, error.
     else
-      log "Usage: \n  bdsm ${extension} [namespace] [action]\nActions:\n   $(extension_actions "${extension}")"
+      return 1
     fi
   done
-
-  fail "Action or namespace '${token}' missing for extension ${extension}"
+  return 1
 }
 
 detect_action_type()
 {
   local _path="${1:-}" _action="${2:-}"
 
-  _path_type="$(file "${_path}/${_action}")"
+  case "${action}" in
+    (*\(\))
+      action_type="function"
+      return 0
+      ;;
+    *)
+      _path_type="$(file "${_path}/${_action}")"
+      ;;
+  esac
 
   case "${_path_type}" in
 
@@ -145,6 +177,16 @@ extension_run()
 
   # Now based on the determined _type we launch the extension.
   case "${_type}" in
+    function)
+      (
+      enable_backtrace
+      _namespaces=${_path##${extension_actions_path}}
+      extension_modules_load ${_namespaces//\// }
+      ${action%%(*}
+      ) || result=$?
+      return $result
+      ;;
+
     shell)
       (
       enable_backtrace
@@ -154,13 +196,9 @@ extension_run()
       else
         modules core
       fi
-
       _namespaces=${_path##${extension_actions_path}}
-
       extension_modules_load ${_namespaces//\// }
-
       . "${_path}/${action}"
-
       ) || result=$?
       return $result
       ;;
@@ -308,17 +346,21 @@ extension_action()
 
   export extension_args
 
+  if ! detect_action core ${extension_args[@]} &&
+     ! detect_action ${extension_args[@]}
+  then
+    log "Usage: \n  bdsm ${extension} [namespace] [action]\nActions:\n   $(extension_actions "${extension}")"
+  fi
+
   extension_path="$extensions_path/$extension"
-  extension_config_path="$extensions_path/$extension/config"
-  extension_templates_path="$extensions_path/$extension/templates"
-  extension_modules_path="$extensions_path/$extension/modules"
-  extension_actions_path="$extensions_path/$extension/actions"
+  extension_config_path="$extension_path/config"
+  extension_templates_path="$extension_path/templates"
+  extension_modules_path="$extension_path/modules"
+  extension_actions_path="$extension_path/actions"
   extension_log_path="$log_path/$extension"
 
   paths=$(env | awk -F= -v ORS=' ' '/_path/{print $1}')
   flags=$(env | awk -F= -v ORS=' ' '/_flag/{print $1}')
-
-  detect_action ${extension_args[@]}
 
   enter "${extension_path}"
 
