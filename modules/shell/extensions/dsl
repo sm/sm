@@ -23,8 +23,15 @@ detect_action()
       _action_path+=("$token")
       continue
 
+    # TODO: functions
+    elif [[ "${token}" =~ "*()" ]]
+    then
+      action_path=$(array_join _action_path '/')
+      action="$token"
+      return 0
+
     # Detect a file
-    elif file_exists "$(path_join "${_action_path[@]}" $token)"
+    elif file_is_executable "$(path_join "${_action_path[@]}" $token)"
     then
       action_path=$(array_join _action_path '/')
       action="$token"
@@ -37,8 +44,6 @@ detect_action()
       _array=($(hash_file "$(path_join "${_action_path[@]}" .actions)" $token))
       _params=(${_array[@]} ${_params[@]})
       continue
-
-    # TODO: functions
 
     # run default if found
     elif file_exists "$(path_join "${_action_path[@]}" default)"
@@ -333,8 +338,8 @@ extension_action()
 
   export extension_args
 
-  if ! detect_action core ${extension_args[@]} &&
-     ! detect_action ${extension_args[@]}
+  if ! detect_action ${extension_args[@]} &&
+     ! detect_action core ${extension_args[@]}
   then
     log "Usage: \n  bdsm ${extension} [namespace] [action]\nActions:\n   $(extension_actions "${extension}")"
   fi

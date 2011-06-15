@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-#
-# parse CLI arguments
-#
 set +o nounset
 set +o noclobber
 
@@ -10,134 +7,40 @@ while (( $# > 0 ))
 do
   token="$1"
   shift
+  case "$token" in # TODO: extension detection "did you mean"
 
-  case "$token" in
-    # TODO: extension detection "did you mean"
+    --help)
+      extension_args=("core" "help" "$@")
+      break
+      ;;
 
-    # TODO: Fall back on default actions instead of specifying them here
-    #       In case the user has set their default serfice in the environment.
+    -v|--version)
+      extension_args=("core" "version" "$@")
+      break
+      ;;
+
+    --trace)
+      true ${trace_flag:=0} $(( trace_flag++ ))
+      enable_trace
+      ;;
+
+    --debug)
+      true ${debug_flag:=0} $(( debug_flag++ ))
+      enable_debug
+      ;;
+
+    --)
+      extension_args=("$@") # Stop processing arguments.
+      break
+      ;;
 
     -*)
-      case "$token" in
-        --disable-hooks)
-          hooks_flag=0
-          ;;
-
-        --project)
-          project="$1"
-          shift
-          ;;
-
-        --environment)
-          environment="$1"
-          shift
-          ;;
-
-        --repo|repository)
-          repository="$1"
-          shift
-          ;;
-
-        --revision)
-          revision="$1"
-          shift
-          ;;
-
-        --user)
-          user="$1"
-          shift
-          ;;
-
-        --head)
-          head_flag=1
-          ;;
-
-        --debug)
-          true ${debug_flag:=0} $(( debug_flag++ ))
-          enable_debug
-          ;;
-
-        --help)
-          parse_break=1
-          extension_args=("core" "help" "$@")
-          ;;
-
-        -v|--version)
-          parse_break=1
-          extension_args=("core" "version" "$@")
-          ;;
-
-        --trace)
-          true ${trace_flag:=0} $(( trace_flag++ ))
-          enable_trace
-          ;;
-
-        --)
-          extension_args=("$@") # Stop processing arguments.
-          ;;
-        *)
-          error "Unknown flag '${token}'"
-          ;;
-      esac
+      error "Unknown flag '${token}'"
       ;;
-
     *)
-      parse_break=1
-
-      # TODO: replace the below with /actions/**/.actions files :)
-      case "$token" in
-        bdsmrc)
-          extension_args=("$token" "${action}" "$@")
-          ;;
-
-        help)
-          extension_args=("${extension:-core}" "help" "$@")
-          ;;
-
-        activate|enable)
-          extension_args=("ext" "package" "activate" "$@")
-          ;;
-
-        deactivate|disable)
-          extension_args=("ext" "package" "deactivate" "$@")
-          ;;
-
-        install)
-          extension_args=("ext" "extend_and" "package" "install" "$@")
-          ;;
-
-        edit|open|update|create)
-          extension_args=("ext" "${token}" "$@")
-          ;;
-
-        mod|module|modules)
-          extension_args=("mod" "${1:-list}" "$@")
-          ;;
-
-        srv|service|services)
-          extension_args=("srv" "${1:-list}" "$@")
-          ;;
-
-        pkg|package|packages)
-          extension_args=("pkg" "${1:-list}" "$@")
-          ;;
-
-        *)
-          extension_args=("${token:-core} $@")
-          ;;
-      esac
-
-      if (( parse_break == 1 ))
-      then
-        break
-      fi
+      extension_args=("${token:-core} $@")
+      break
       ;;
   esac
-
-  if variable_is_nonempty parse_break || variable_is_nonempty error_message
-  then
-    unset parse_break
-    break
-  fi
 done
 
