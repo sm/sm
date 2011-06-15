@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+version_pattern="+([[:digit:]]).+([[:digit:]]).+([[:digit:]])"
+for (( index=0 ; index < ${#extension_args[@]} ; index++ ))
+do
+  token="${extension_args[$index]}"
+  shopt -s extglob
+  case "$token" in
+    (--trace)
+      export trace_flag=1
+      enable_trace
+      ;;
+
+    (head|master)
+      extension_action="head"
+      ;;
+
+    (${version_pattern}) # x.y.z
+      # TODO: Set env vars instead of calling the method.
+      version="${token}"
+      extension_action="version"
+      ;;
+
+    (latest|release)
+      extension_action="latest"
+      ;;
+  esac
+done
+

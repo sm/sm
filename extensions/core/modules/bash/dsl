@@ -1,0 +1,446 @@
+#!/usr/bin/env bash
+
+bdsm_development_setup()
+{
+  local _component _separator _string
+
+  printf -v _separator '%*s' "${_columns:-${COLUMNS:-80}}"
+
+  true "${projects_path:="$HOME/projects"}"
+
+  log "\nBDSM development environment setup"
+
+  log "\n=> configuration\n${_separator// /=}"
+
+  if file_contains "$HOME/.bash_profile" "projects_path="
+  then
+    log "  * projects_path is already set in $HOME/.bash_profile."
+  else
+    log 'export projects_path="$HOME/projects"' \
+      append to "$HOME/.bash_profile"
+
+    log "  * Setting projects_path in $HOME/.bash_profile."
+  fi
+
+  if file_contains "$HOME/.bash_profile" "modules/bash/project/interactive"
+  then
+    log "  * project functions are setup in $HOME/.bash_profile."
+  else
+    log "  * project functions are now setup in $HOME/.bash_profile."
+
+    log '[[ -s "/usr/local/bdsm/modules/bash/project/interactive" ]] && source "/usr/local/bdsm/modules/bash/project/interactive"'  \
+      append to "$HOME/.bash_profile"
+  fi
+
+  ensure_paths_exist "${projects_path}/bdsm"
+  ensure_files_exist "${HOME}/.bdsmrc"
+
+  enter "${projects_path}/bdsm"
+
+  for _component in core extensions site
+  do
+    log "\n=> ${_component}\n${_separator// /=}"
+    if file_contains "$HOME/.bdsmrc" "${_component}_development_path"
+    then
+      log "  * ${_component}_development_path is already set in .bdsmrc"
+    else
+      log "export ${_component}_development_path=\"${projects_path}/bdsm/${_component}\"" \
+        append to "$HOME/.bdsmrc"
+      log "Setting ${_component}_development_path in .bdsmrc"
+    fi
+
+    if path_exists "${_component}"
+    then
+      log "  * Repository already exists at $PWD/${_component}/"
+    else
+      log "  * Cloning Core repository into $PWD/${_component}/"
+      case ${_component} in
+        core)
+          _url="https://github.com/wayneeseguin/bdsm"
+          ;;
+        *)
+          _url="https://github.com/wayneeseguin/bdsm-${_component}"
+          ;;
+      esac
+
+      if git clone ${_url} ${_component}
+      then
+        log "  * ${_component} repository successfully cloned into $PWD/${_component}/"
+      else
+        error "There was an error cloning ${_component} repository from ${_url} into ${PWD}/${_component}"
+      fi
+    fi
+  done
+
+  log "\nBDSM development environment setup has completed."
+}
+
+bdsm_development_update()
+{
+  NIY
+}
+
+fetch_version()
+{
+  version=$(curl -s "${releases_url}/latest-version.txt" 2>/dev/null) ||
+    fail "Unable to fetch version from "
+}
+
+md5_match()
+{ # TODO: switch this to using system module's os_* DSL
+  local archive="$1"
+
+  case "$(uname)" in
+    Darwin|FreeBSD)
+      archive_md5="$(/sbin/md5 -q "${archive}")"
+      ;;
+
+    OpenBSD)
+      archive_md5="$(/bin/md5 -q "${archive}")"
+      ;;
+
+    Linux|*)
+      archive_md5="$(md5sum "${archive}" | awk '{print $1}')"
+      ;;
+  esac
+
+  [[ "$archive_md5" == "$md5" ]]
+
+  return $?
+}
+
+
+fetch()
+{ # TODO: Extract fetch dsl into it's own DSL module
+  # TODO: allow either curl or wget, defaulting to curl...
+  if ! command_exists curl
+  then
+    fail "bdsm requires curl, which was not found in the PATH :(\nPlease install curl and try again."
+  fi
+
+  fetch_command="$fetch_command -O -L --create-dirs -C - " # -s for silent
+  (
+  enter "$archives_path"
+
+  if [[ -z "${1:-}" ]]
+  then
+    fail "BUG: $0 called without an argument :/"
+  fi
+
+  archive=$(basename "$1")
+  download=1
+
+  debug "Fetching $archive"
+
+  # Check first if we have the correct archive
+  if file_exists "$archive" && file_exists "$archive.md5"
+  then
+    debug "Found archive and its md5, testing correctness"
+
+    if (( $(md5sum --status -c "$archive.md5") > 0 ))
+    then
+      debug "Archive is bad, downloading"
+      download=1
+    else
+      debug "Archive is good, not downloading"
+      download=0
+      result=0
+    fi
+  else
+    debug "No '${archive}' does not exist or does not match md5, downloading"
+    download=1
+  fi
+
+  if (( download > 0 ))
+  then
+    if ! eval $fetch_command "$1"
+    then
+      retry=0
+      if (( result == 78 ))
+      then
+        error "The requested url does not exist: '$1'"
+      elif (( result == 18 ))
+      then
+        error "Only a part of the file was transferred. Removing and re-trying."
+        rm -f "$archive"
+        retry=1
+      elif (( result == 33 ))
+      then
+        debug "Remote server does not support 'range' command, removing '$archive'"
+        rm -f "$archive"
+        retry=1
+      else
+        error "There was an error, please check $log_path/*.error.log"
+      fi
+
+      if (( retry == 1 ))
+      then
+        if ! eval $fetch_command "$1"
+        then
+          error "There was an error, please check $log_path/*.error.log"
+        fi
+      fi
+    fi
+  fi
+  )
+
+  return $0
+}
+
+install_release()
+{
+  archive="$archives_path/bdsm-${version}.tar.gz"
+
+  md5=$(curl -s "${releases_url}/bdsm-${version}.tar.gz.md5" 2>/dev/null)
+
+  if file_exists "${archive}" && ! md5_match
+  then
+    # Remove old installs, if they exist and have incorrect md5.
+    file_exists "$archives_path/bdsm-${version}.tar.gz" &&
+      rm -f "$archives_path/bdsm-${version}.tar.gz"
+  fi
+
+  ensure_paths_exist "${archives_path}"
+
+  curl -L "${releases_url}/bdsm-${version}.tar.gz" -o "$archive"
+
+  if ! file_matches_md5 "${archive}" "${md5}"
+  then
+      fail "
+Archive package downloaded does not match it's calculated md5 checksum ${md5}:
+
+  $archives_path/bdsm-${version}.tar.gz
+
+Retry the installation and/or check your networking setup.
+
+Halting the installation.
+"
+  fi
+
+  tar zxf "${archives_path}/bdsm-${version}.tar.gz" -C "$src_path/"
+
+  enter "$src_path/bdsm-${version}"
+
+  ensure_files_are_executable "install"
+
+  ./install
+}
+
+install_head()
+{
+  local remote="origin"
+
+  if path_exists "${src_path}/bdsm/.git" ]]
+  then
+    enter "${src_path}/bdsm/"
+
+    if [[ -z "$(git branch | awk "/$branch$/")" ]]
+    then
+      if ! git checkout -b "$branch" --track "$remote/$branch" 2>/dev/null
+      then
+        fail "$remote $branch remote branch not found."
+      fi
+    elif [[ -z "$(git branch | awk "/\* $branch$/{print \$2}")" ]]
+    then
+      git checkout $branch 2>/dev/null ||
+        fail "Unable to checkout $branch.\nCould not get head. Sucks to be you... or rather... doesn't suck :-p"
+    fi
+
+    git pull --rebase origin $branch
+  else
+    enter "${src_path}"
+
+    if ! git clone --depth 1 git://github.com/wayneeseguin/bdsm.git
+    then
+      if ! git clone https://github.com/wayneeseguin/bdsm.git
+      then
+        fail "Unable to clone the BDSM repository, attempted both git:// and https://\nCould not get head, terribly sorry about the blue balls :("
+      fi
+    fi
+  fi
+
+  if (( ${sense_of_humor_flag:=0} == 1 ))
+  then
+    log "Ahh... that's better...\nIt always feels so nice to get head.\nQuite a load this time eh?\nRemember to get head often!\n"
+  fi
+
+  enter "${src_path}/bdsm/"
+
+  exec bash ./install
+}
+
+prepare_for_installation()
+{
+  local initial_pwd="$PWD"
+
+  log "  Ensuring that install_path '${install_path}' exists"
+  ensure_paths_exist "${install_path}"
+  enter "${install_path}"
+
+  log "  Removing target directories"
+  remove_paths "${directories[@]}"
+  ensure_paths_exist "${directories[@]}" extensions
+  enter "${install_path}/extensions"
+
+  log "  Removing core and old extensions, if they exist"
+  remove_paths "${extensions[@]}" extension bdsm
+  # || fail "Could not create installation target"
+
+  enter "${initial_pwd}"
+}
+
+create_auxillary_paths()
+{
+  local initial_pwd="$PWD"
+  log "  Ensuring auxillary directories (${aux[*]}) exist in ${install_path}"
+  enter "${install_path}"
+  ensure_paths_exist "${install_path}/" "${aux[@]}"
+  enter "${initial_pwd}"
+}
+
+install_core_extensions()
+{
+  local initial_pwd="$PWD"
+  log "  Installing core extensions (${extensions[*]}) into ${install_path}/extensions"
+  ensure_paths_exist "${install_path}/extensions"
+  enter "extensions"
+  copy_paths to "${install_path}/extensions" "${extensions[@]}"
+  enter "${initial_pwd}"
+}
+
+install_core()
+{
+  log "  Installing core directories (${directories[*]}) into ${install_path}"
+  copy_paths to "${install_path}" "${directories[@]}"
+
+  log "  Installing core files (${files[*]}) into ${install_path}"
+  copy_files to "${install_path}" ${files[@]}
+}
+
+install_configuration_files()
+{
+  log "  Ensuring that the configuration files (${configs[*]}) exist in ${config_path}"
+  ensure_files_exist "${install_path}/config/user"
+}
+
+symlink_bdsm()
+{
+  log "  Linking ${install_path}/bin/bdsm to ${prefix_path}/bin/bdsm"
+  link --force "${install_path}/bin/bdsm" to "${active_path}/bin/bdsm"
+
+  if path_exists "${prefix_path}/bin"
+  then
+    link --force "${install_path}/bin/bdsm" to "${prefix_path}/bin/bdsm"
+  fi
+}
+
+setup_shell_completion()
+{
+  if user_is_root
+  then
+    log "  Setting up bdsm shell completion."
+
+    if path_exists "/etc/bash_completion.d"
+    then
+      completion_prefix="/etc/bash_completion.d"
+    else
+      completion_prefix="/etc/profile.d"
+      ensure_paths_exist "/etc/profile.d/"
+    fi
+
+    copy_file from "${install_path}/completion/bdsm.bash" \
+      to "${completion_prefix}/bdsm-completion.sh" \
+      mode 0755 owner "root"
+  fi
+}
+
+setup_profile_d()
+{
+  ensure_paths_exist "${profile_d_path}"
+
+  if user_is_root
+  then
+    if os_is_darwin
+    then
+      if ! file_contains /etc/profile "${profile_d_path}"
+      then
+        log "\nif test -d '${profile_d_path}' ; then for profile in \"${profile_d_path}\"/*.sh ; do if test -x \"\$profile\" ; then . \"\$profile\" ; fi ; done ; unset profile ; fi\n" \
+          to /etc/profile
+      fi
+    fi
+  else
+    ensure_files_exist "$HOME/.profile" "$HOME/.bashrc" "$HOME/.bash_profile"
+
+    if ! file_contains "$HOME/.bashrc" "$HOME/.profile"
+    then
+      log "if test -s \"$HOME/.profile\" ; then . \"$HOME/.profile\" ; fi"\
+        append to "$HOME/.bashrc"
+    fi
+
+    if ! file_contains "$HOME/.bash_profile" "$HOME/.bashrc"
+    then
+      log "if test -s \"$HOME/.bashrc\" ; then . \"$HOME/.bashrc\" ; fi"\
+        append to "$HOME/.bash_profile"
+    fi
+
+    if ! file_contains "$HOME/.profile" "${profile_d_path}"
+    then
+      log "\nif test -d '${profile_d_path}' ; then for profile in \"${profile_d_path}\"/*.sh ; do if test -x \"\$profile\" ; then . \"\$profile\" ; fi ; done ; unset profile ; fi\n" \
+        append to "$HOME/.profile"
+    fi
+  fi
+
+  if ! file_exists "${profile_d_path}/bdsm.sh" ||
+     ! file_contains "${profile_d_path}/bdsm.sh" "${packages_path}/active/bin"
+  then
+    log "PATH=\"${packages_path}/active/bin:\${PATH}\"\n" \
+      append to "${profile_d_path}/bdsm.sh"
+
+    chmod_files 0755 "${profile_d_path}/bdsm.sh"
+  fi
+}
+
+setup_bdsmrc()
+{
+  unset bdsm_path
+
+  for file in /etc/bdsmrc "$HOME/.bdsmrc"
+  do
+    if [[ -s "${file}" ]]
+    then
+      source "${file}" || true # Continue if it fails.
+    fi
+  done
+
+  # The default prefix is /usr/local,
+  # this should be set to where BDSM is installed to in /etc/bdsmrc
+  prefix_path="${prefix_path:-/usr/local}"
+
+  if [[ -z "${bdsm_path}" ]]
+  then
+    if [[ "$prefix_path" = "$HOME" ]]
+    then
+      bdsm_path="${prefix_path}/.bdsm"
+    else
+      bdsm_path="${prefix_path}/bdsm"
+    fi
+  fi
+
+  if user_is_root
+  then
+    ensure_files_exist "/etc/bdsmrc"
+    if ! file_contains "/etc/bdsmrc" "bdsm_path="
+    then
+      log "export bdsm_path=\"${bdsm_path}\"" \
+        append to "/etc/bdsmrc"
+    fi
+  else
+    ensure_files_exist "$HOME/.bdsmrc"
+    if ! file_contains "$HOME/.bdsmrc" "bdsm_path="
+    then
+      log "export bdsm_path=\"${bdsm_path}\"" \
+        append to "$HOME/.bdsmrc"
+    fi
+  fi
+}
+

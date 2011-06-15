@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+modules_path="${bdsm_path}/modules"
+
+modules system
+

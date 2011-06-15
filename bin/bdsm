@@ -79,20 +79,7 @@ then
   error "$error_message"
 fi
 
-if [[ -z ${extension} ]]
-then
-  extension_action "core" "help"
-  exit 1
-fi
-
-if [[ -z ${action} && -z ${namespace} ]]
-then
-  modules extensions
-  log "Usage: \n  bdsm ${extension} [namespace] [action]\nActions:\n   $(extension_actions "${extension}")"
-  exit 0
-fi
-
 disable_backtrace
 
-extension_action "${extension}" "${action}"
+extension_action "${extension}" "${extension_args[@]}"
 

@@ -58,14 +58,15 @@ do
           ;;
 
         --help)
-          action="help"
           extension="${1:-core}"
           parse_break=1
+          action_path="${extensions_path}/core/actions/help"
           ;;
 
         -v|--version)
           extension="core"
           action="version"
+          action_path="${extensions_path}/core/actions/version"
           ;;
 
         --trace)
@@ -73,7 +74,8 @@ do
           enable_trace
           ;;
 
-        --) extension_args=("$@") # Stop processing arguments.
+        --)
+          extension_args=("$@") # Stop processing arguments.
           ;;
         *)
           error "Unknown flag '${token}'"
@@ -82,147 +84,74 @@ do
       ;;
 
     *)
-      if variable_is_empty extension
-      then
-        if path_exists "$extensions_path/$token"
-        then
-          extension="$token"
-          continue
-        else
-          case "$token" in
-            list|ls)
-              extension="ext"
-              action="list"
-              extension_args=("$@")
-              parse_break=1
-              ;;
+      parse_break=1
 
-            bdsmrc)
-              extension="core"
-              action="$token"
-              extension_args=("${action}" "$@")
-              parse_break=1
-              ;;
+      # TODO: replace the below with /actions/**/.actions files :)
+      case "$token" in
+        list|ls)
+          extension_args=("ext" "list" "$@")
+          ;;
 
-            docopen)
-              extension="core"
-              action="docopen"
-              parse_break=1
-              ;;
+        bdsmrc)
+          extension_args=("$token" "${action}" "$@")
+          ;;
 
-            help)
-              action="help"
-              extension="${1:-core}"
-              parse_break=1
-              ;;
+        docopen)
+          extension_args=("core" "docopen" "$@")
+          ;;
 
-            get|version)
-              extension="core"
-              action="${token}"
-              extension_args=("$@")
-              parse_break=1
-              ;;
+        help)
+          extension_args=("${extension:-core}" "help" "$@")
+          ;;
 
-            activate|enable)
-              extension="ext"
-              action="package"
-              extension_args=("activate" "$@")
-              parse_break=1
-              ;;
+        get|version)
+          extension_args=("core" "get" "$@")
+          ;;
 
-            deactivate|disable)
-              extension="ext"
-              action="package"
-              extension_args=("deactivate" "$@")
-              parse_break=1
-              ;;
+        activate|enable)
+          extension_args=("ext" "package" "activate" "$@")
+          ;;
 
-            add|extend)
-              extension="ext"
-              action="extend"
-              extension_args=("$@")
-              parse_break=1
-              ;;
+        deactivate|disable)
+          extension_args=("ext" "package" "deactivate" "$@")
+          ;;
 
-            install)
-              extension="ext"
-              action="extend_and"
-              extension_args=(package install "$@")
-              parse_break=1
-              ;;
+        add|extend)
+          extension_args=("ext" "extend" "$@")
+          ;;
 
-            ext|extension|extensions)
-              extension="ext"
-              action="${1:-help}"
-              extension_args=("$@")
-              parse_break=1
-              ;;
+        install)
+          extension_args=("ext" "extend_and" "package" "install" "$@")
+          ;;
 
-            mod|module|modules)
-              extension="mod"
-              action="${1:-list}"
-              extension_args=("$@")
-              parse_break=1
-              ;;
+        ext|extension|extensions)
+          extension_args=("ext" "$@")
+          ;;
 
-            srv|service|services)
-              extension="srv"
-              action="${1:-list}"
-              extension_args=("$@")
-              parse_break=1
-              ;;
+        mod|module|modules)
+          extension_args=("mod" "${1:-list}" "$@")
+          ;;
 
-            pkg|package|packages)
-              extension="pkg"
-              action="${1:-list}"
-              extension_args=("$@")
-              parse_break=1
-              ;;
+        srv|service|services)
+          extension_args=("srv" "${1:-list}" "$@")
+          ;;
 
-            edit|open|update|create)
-              extension="ext"
-              action="${token}"
-              extension_args=("$@")
-              parse_break=1
-              ;;
+        pkg|package|packages)
+          extension_args=("pkg" "${1:-list}" "$@")
+          ;;
 
-            *)
-              if variable_is_empty extension
-              then
-                error "Extension '${token}' is not installed."
-              fi
-              ;;
-          esac
-        fi
-      fi
+        edit|open|update|create)
+          extension_args=("ext" "${token}" "$@")
+          ;;
+
+        *)
+          extension_args=("${token:-core} $@")
+          ;;
+      esac
 
       if (( parse_break == 1 ))
       then
         break
-      fi
-
-      if variable_is_empty action
-      then
-        if path_exists "${extensions_path}/${extension}/actions/$token"
-        then
-          namespace="$token"
-          extension_args=("$@")
-        elif variable_is_nonempty namespace
-        then
-          if file_is_executable "${extensions_path}/${extension}/actions/${namespace}/${token}"
-          then
-            action="$token"
-            extension_args=("$@")
-            parse_break=1
-          fi
-        else
-          if file_is_executable "${extensions_path}/${extension}/actions/$token"
-          then
-            action="$token"
-            extension_args=("$@")
-            parse_break=1
-          fi
-        fi
       fi
       ;;
   esac

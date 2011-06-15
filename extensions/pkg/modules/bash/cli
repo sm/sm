@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+package_cli
+
+# service_cli
+
