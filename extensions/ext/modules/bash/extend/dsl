@@ -8,17 +8,17 @@ extend_from()
   if variable_is_nonempty _source
   then
     shift
-    if array_is_nonempty _params
-    then
-      _name="${1}"
-      shift
-      _params=($@)
+    _name="${1}"
+    shift
+    _params=($@)
 
+    if variable_is_nonempty _name
+    then
       case "${_source}" in
         git)
           NIY "extend from git repository"
-          #fetch_extensions_git_repository "${_params[${#_params[@]}]}"
-          #extensions_install "${_name}" "${_params[@]}"
+          fetch_extensions_git_repository "${_params[${#_params[@]}]}"
+          extensions_install "${_name}" "${_params[@]}"
           ;;
         github)
           NIY "extend from github repository"
@@ -46,7 +46,7 @@ extend_from()
           ;;
         default|wayneeseguin|*)
           fetch_extensions_git_repository
-          extensions_install "${_params[@]}"
+          extensions_install "${_name}" "${_params[@]}"
           ;;
       esac
     else

@@ -240,11 +240,8 @@ then
   if file_is_executable "${extensions_path}/${extension}/actions/${extension}"
   then
     action="${extension}"
-  elif symlink_exists "${extensions_path}/${extension}/actions/default"
-  then
-    action="default"
   else
-    action="help"
+    action="default"
   fi
 
   if variable_is_nonempty namespace

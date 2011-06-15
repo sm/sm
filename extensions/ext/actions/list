@@ -31,7 +31,7 @@ list_installed()
 
 list_available()
 {
-  if ! directory_exists "${extensions_src_path}"
+  if ! path_exists "${extensions_src_path}"
   then
     fetch_extensions_git_repository
   fi
@@ -42,7 +42,7 @@ list_available()
   then
     log "${extensions[*]}"
   else
-    log "No extensions found (in '${src_path}'). Run 'bdsm extensions clone' to make them available. "
+    log "No extensions found (in '${extensions_src_path}'). Run 'bdsm ext update repository' to make them available. "
   fi
 }
 

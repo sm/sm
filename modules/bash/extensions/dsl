@@ -1,5 +1,53 @@
 #!/usr/bin/env bash
 
+
+detect_action_path()
+{
+  local _extension=$1 _action_var=$2 _variables_var=$3 _action_path=()
+  local extension_actions_path=$(path_join ${extensions_path} ${_extension} actions)
+  shift 3
+
+  while (( $# > 0 ))
+  do
+    token=$1
+    shift
+
+    # Detect a namespace
+    if path_exists $(path_join $extension_actions_path "${_action_path[@]}" $token)
+    then
+      array_push _action_path $token
+      continue
+
+    # Detect a file
+    elif file_exists $(path_join $extension_actions_path "${_action_path[@]}" $token)
+    then
+      array_push _action_path $token
+      eval "${_action_var}=(\"\${_action_path[@]}\" \"\$token\")"
+      eval "${_variables_var}=(\"\$@\")"
+      return 0
+
+    # run default if found
+    elif file_exists $(path_join $extension_actions_path "${_action_path[@]}" default)
+    then
+      eval "${_action_var}=(\"\${_action_path[@]}\" 'default')"
+      eval "${_variables_var}=(\"\$token\" \"\$@\")"
+      return 0
+
+    # default to help if no defualt set in path
+    elif file_exists $(path_join $extension_actions_path "${_action_path[@]}" help)
+    then
+      eval "${_action_var}=(\"\${_action_path[@]}\" 'help')"
+      eval "${_variables_var}=(\"\$token\" \"\$@\")"
+      return 0
+
+    # Not found, error.
+    else
+      fail "Action or namespace '${token}' missing for extension ${extension}"
+    fi
+  done
+  fail "Action or namespace '${token}' missing for extension ${extension}"
+}
+
 #
 # ## extension\_action()
 #

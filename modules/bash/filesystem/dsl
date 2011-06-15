@@ -2928,6 +2928,19 @@ path_exists()
 }
 
 #
+# ## path\_join()
+#
+# Joins path elements together passed as arguments into one path string.
+#
+path_join()
+{
+  (
+  IFS='/'
+  printf "$*"
+  )
+}
+
+#
 # ## directories\_in()
 #
 # Function Description

@@ -48,7 +48,7 @@ fetch_extensions_git_repository()
     log "# Updating repository from ${_url}"
     if scm_update "${_url}"
     then
-      copy_paths --force "${repos_path}/${_identifier}" \
+      copy_paths --force "${repos_path}/${_identifier}/" \
         to "${extensions_src_path}"
     else
       error "There was an error updating the repository."
@@ -58,7 +58,7 @@ fetch_extensions_git_repository()
 
     scm_fetch "${_url}"
 
-    copy_paths --force "${repos_path}/${_identifier}" \
+    copy_paths --force "${repos_path}/${_identifier}/" \
       to "${extensions_src_path}"
   fi
 
