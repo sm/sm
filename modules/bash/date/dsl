@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+
+date_range()
+{
+  local _start _end _date _step="day" \
+    _format_in="%Y-%m-%d" _format_out="%Y-%m-%d"
+
+  while (( $# > 0 ))
+  do
+    _token="$1"
+    shift
+
+    case "${_token}" in
+      (step)
+        _step="${1:-}"
+        shift
+        ;;
+      (format_in)
+        _format_in="${1}"
+        shift
+        ;;
+      (format|format_out)
+        _format_out="${1}"
+        shift
+        ;;
+      (start)
+        _start="${1}"
+        shift
+        ;;
+      (end)
+        _end="${1}"
+        shift
+        ;;
+      (*)
+        if variable_is_empty _start
+        then
+          _start="${_token}"
+        elif variable_is_empty _end
+        then
+          _end="${_token}"
+        else
+          fail "Unknown token '${_token}' passed as a parameter.'"
+        fi
+        ;;
+    esac
+  done
+
+  if variable_is_empty _start
+  then
+    fail "Start date must be specified."
+  elif variable_is_empty _end
+  then
+    fail "End date must be specified."
+  else
+    case "${_step}" in
+      minute)
+        _minute=60
+        ;;
+      hour)
+        _step=3600
+        ;;
+      day)
+        _step=86400
+        ;;
+      week)
+        _step=604800
+        ;;
+      month)
+        _step=2629743
+        ;;
+      year)
+        _step=31556926
+        ;;
+      *)
+        fail "Unknown step token ${1:-}, valid steps are {minute,hour,day,week,month,year}"
+        ;;
+    esac
+
+    if ! _start=$(date -j -f "${_format_in}" ${_start} "+%s")
+    then
+      fail "Date error: Input format '${_format_in}' for start date '${_start}'"
+    fi
+
+    if ! _end=$(date -j -f "${_format_in}" ${_end} "+%s")
+    then
+      fail "Date error: Input format '${_format_in}' for end date '${_end}'"
+    fi
+
+    while (( _start <= _end ))
+    do
+      if _date=$(date -r ${_start} "+${_format_out}")
+      then
+        printf "%s\n" "${_date}"
+        _date=$(date -j -f "${_format_out}" ${_date} "+%s" 2>/dev/null)
+        (( _start = _date + _step ))
+      else
+        fail "Date error: Output format '${_format_out}' for date '${_start}'"
+      fi
+    done
+  fi
+}
+
