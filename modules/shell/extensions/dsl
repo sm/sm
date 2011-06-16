@@ -23,8 +23,7 @@ detect_action()
       _action_path+=("$token")
       continue
 
-    # TODO: functions
-    elif [[ "${token}" =~ "*()" ]]
+    elif match "${token}" "*\(\)"
     then
       action_path=$(array_join _action_path '/')
       action="$token"
@@ -999,6 +998,11 @@ extension_install()
     if extension_is_valid "${extension_src_path}/${_extension}"
     then
       log " - ${_extension}"
+      if directory_exists "${bdsm_path}/extensions/${_extension}"
+      then
+        remove_paths "${bdsm_path}/extensions/${_extension}"
+      fi
+
       copy_paths "${extension_src_path}/${_extension}" \
         to "${bdsm_path}/extensions"
 
