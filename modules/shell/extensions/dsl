@@ -44,6 +44,13 @@ detect_action()
       _params=(${_array[@]} ${_params[@]})
       continue
 
+    elif file_exists "$(path_join "${_action_path[@]}" .actions)" &&
+         file_contains "$(path_join "${_action_path[@]}" .actions)" "^default="
+    then
+      _array=($(hash_file "$(path_join "${_action_path[@]}" .actions)" $token))
+      _params=(${_array[@]} ${_params[@]})
+      continue
+
     # run default if found
     elif file_exists "$(path_join "${_action_path[@]}" default)"
     then
