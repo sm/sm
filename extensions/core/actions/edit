@@ -1,9 +1,20 @@
 #!/usr/bin/env bash
 
-_path="${core_development_path:="$source_path/bdsm"}"
+if (( ${#extension_args[@]} == 0 ))
+then # edit core
+  _path="${core_development_path:="$source_path/bdsm"}"
 
-enter "${_path}"
+  enter "${_path}"
 
-exec ${EDITOR:-vi} .
+  exec ${EDITOR:-vi} .
+else # edit extension
+  if path_exists "${extensions_development_path}/${extension_args[0]}"
+  then
+    enter "${extensions_development_path}/${extension_args[0]}"
+    exec ${EDITOR:-vi} .
+  else
+    error "Failed to edit '${extension_args[0]}' as it appears to not be "\
+      "installed. Installed extensions are:\n$(extensions_installed)"
+  fi
+fi
 
-exit 0 # For sanity.
