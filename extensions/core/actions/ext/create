@@ -11,9 +11,9 @@ then
       error "Extension '${extension}' already exists "\
         "at ${target_path}/${extension}."
     else
-      if path_exists "${extensions_path}/ext/templates/${language:-shell}"
+      if path_exists "${extensions_path}/core/templates/ext/${language:-shell}"
       then
-        enter "${extensions_path}/ext/templates/${language:-shell}"
+        enter "${extensions_path}/core/templates/ext/${language:-shell}"
 
         _path="${target_path}/${extension}"
 
@@ -41,7 +41,7 @@ then
         log "Extension created from template at ${target_path}/${extension}/"
       else
         fail "Extension template files for are missing from "\
-          "$target_path/ext/templates/${language:-shell}."
+          "$target_path/core/templates/ext/${language:-shell}."
       fi
     fi
   done

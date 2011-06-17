@@ -2,11 +2,11 @@
 
 package_extension_setup()
 {
-  local extension="${1}" module="${2}" path="${3}"
+  local extension="${1}" module="${2}" path="${3}" ${language:=shell}
 
   enter "${path}"
 
-  ensure_paths_exist "modules/${language:=shell}/${module}" "actions/${module}"
+  ensure_paths_exist "modules/${language}/${module}" "actions/${module}"
 
   # Setup modules/shell/package/{dsl,initialize,cli}
   for file in dsl initialize cli
@@ -16,25 +16,20 @@ package_extension_setup()
 
   log "\n${module}_cli\n" append to "modules/${language}/${module}/cli"
 
-  # setup actions/package/{...}
-  for action in help install uninstall
-  do
-    log '#!/usr/bin/env bash' to "actions/${module}/${action}"
-    chmod_files 0755 "actions/${module}/${action}"
-  done
-
-  log "
+  log "#!/usr/bin/env bash
 description \"Extension for managing ${extension} \${website_url:-}.\"
 
-action \"install\" \"Installs ${extension}.\"
-action \"uninstall\" \"Uninstalls ${extension}.\"
+action \"package install\" \"Installs ${extension} package.\"
+action \"package uninstall\" \"Uninstalls ${extension} package.\"
 
 show_help usage
 " append to "actions/${module}/help"
+  chmod_files 0755 "actions/${module}/help"
 
   for action in install uninstall
   do
-    log "\n${module}_${action}\n" append to "actions/${module}/${action}"
+    log "${action}=package_${action}()" append to "actions/${module}/.actions"
   done
+  chmod_files 0755 "actions/${module}/.actions"
 }
 
