@@ -1424,7 +1424,7 @@ copy_files()
 #
 copy_paths()
 {
-  local _source _target _directory _force_flag=0 _directories=()
+  local _target _directory _force_flag=0 _directories=()
 
   # while the parameters list is not empty
   while (( $# > 0 ))
@@ -1444,8 +1444,8 @@ copy_paths()
 
       # if the token is 'from',
       from)
-        # assign the first parameter to the source variable.
-        _source="${1}"
+        # Add the first parameter to the source directories.
+        _directories+=( "${1}" )
         # and remove the from paramter from the parameters.
         shift
         ;;
