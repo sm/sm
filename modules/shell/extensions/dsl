@@ -13,6 +13,11 @@ detect_action()
 
   local _action_path=("$extensions_path/$extension/actions")
 
+  if array_is_empty _params
+  then
+    _params=("default")
+  fi
+
   while (( ${#_params[@]} > 0 ))
   do
     array_shift _params token
