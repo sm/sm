@@ -1220,11 +1220,16 @@ service_init_stop()
   then
     log "Stopping ${service}..."
 
-    if kill -QUIT "${service_pid}"
+    if command_exists "${service}_stop"
     then
-      rm -f "$service_pid_file"
+      "${service}_stop"
     else
-      return $?
+      if kill -QUIT "${service_pid}"
+      then
+        rm -f "$service_pid_file"
+      else
+        return $?
+      fi
     fi
   else
     error "Service pid has not been set or is zero."
