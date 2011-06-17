@@ -8,7 +8,6 @@ service_extension_setup()
 
   ensure_paths_exist "modules/${language}/${module}" "actions/${module}"
 
-  # Setup modules/shell/package/{dsl,initialize,cli}
   for file in dsl initialize cli
   do
     log '#!/usr/bin/env bash' to "modules/${language}/${module}/${file}"
@@ -33,7 +32,7 @@ show_help usage
 
   for action in start stop restart status
   do
-    log "${action}=package_${action}()" append to "actions/${module}/.actions"
+    log "${action}=${module}_${action}()" append to "actions/${module}/.actions"
   done
   chmod_files 0755 "actions/${module}/.actions"
 }
