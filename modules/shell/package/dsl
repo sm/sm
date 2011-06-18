@@ -1427,8 +1427,8 @@ package_cli()
 #
 package_is_active()
 {
-  local _name="${1:-${package_name}}"
-  local _version="${2:-${package_version}}"
+  local _name="${1:-}"
+  local _version="${2:-}"
 
   if variable_is_nonempty _name
   then
