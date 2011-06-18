@@ -2,3 +2,5 @@
 
 modules package
 
+package_name="${extension_args[0]}"
+

@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-NIY
+package_deactivate "${extension_args[@]}"
 
