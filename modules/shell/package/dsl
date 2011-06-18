@@ -1432,10 +1432,12 @@ package_is_active()
 
   if variable_is_nonempty _name
   then
+    shift
     local _path="${packages_path}/${_name}"
 
     if variable_is_nonempty _version
     then
+      shift
       if [[ -d "${_path}/${_version}" ]]
       then
         return 0
