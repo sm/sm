@@ -1428,17 +1428,29 @@ package_cli()
 package_is_active()
 {
   local _name="${1:-${package_name}}"
+  local _version="${2:-${package_version}}"
 
   if variable_is_nonempty _name
   then
     local _path="${packages_path}/${_name}"
 
-    if [[ -L "${_path}/active" && -d $(readlink "${_path}/active") ]]
+    if variable_is_nonempty _version
     then
-      return 0
+      if [[ -d "${_path}/${_version}" ]]
+      then
+        return 0
+      else
+        return 1
+      fi
     else
-      return 1
+      if [[ -L "${_path}/active" && -d $(readlink "${_path}/active") ]]
+      then
+        return 0
+      else
+        return 1
+      fi
     fi
+
   else
     fail "Can not query if a package is active as no package name was given or name is empty."
   fi
@@ -1671,7 +1683,7 @@ package_dependencies()
   # TODO: improve dependency management.
   for dependency in "${_dependencies[@]}"
   do
-    if ! package_is_active "${dependency}"
+    if ! package_is_active ${dependency/-/ }
     then
       error "${extension} requires ${dependency}, please install the ${dependency} via bdsm package module and retry.
 Typically this would be done as follows:
