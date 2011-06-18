@@ -185,7 +185,14 @@ extension_run()
       enable_backtrace
       _namespaces=${_path##${extension_actions_path}}
       extension_modules_load ${_namespaces//\// }
+
+      if command_exists "${action##_*}_cli"
+      then
+        "${action##_*}_cli"
+      fi
+
       ${action%%(*}
+
       ) || result=$?
       return $result
       ;;
@@ -330,24 +337,17 @@ extension_extend_from()
 #
 extension_action()
 {
-  local result=0
-
   unset extension action
 
-  export extension="${1:-}" action="${2:-}"
+  export extension="${1:-}"
 
   if variable_is_nonempty extension
   then
-    shift
-    if array_is_empty extension_args
-    then
-      extension_args="$@"
-    fi
+    # shift
+    extension_args=("$@")
   else
-    fail "'extension' is not set! Something has gone terribly wrong."
+    fail "'extension' is not set as the first parameter to extension_action()!"
   fi
-
-  export extension_args
 
   if ! detect_action ${extension_args[@]} &&
      ! detect_action core ${extension_args[@]}

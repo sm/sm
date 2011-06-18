@@ -3,13 +3,11 @@
 modules extensions filesystem system users templates environment defaults
 
 # Ensure that default values are set.
-
 fhs_dirs=(bin etc include lib libexec sbin share man)
 
-# Default name for the package is the extension name.
-true "${package_name:=${extension}}"
+declare -a package_dependencies
 
-true \
+true "${package_name:=${extension}}" \
   "${source_path:="${bdsm_path}/src"}" \
   "${install_base_path:="${packages_path}/${package_name}"}" \
   ${static_flag:=0}

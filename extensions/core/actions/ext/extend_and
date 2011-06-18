@@ -30,7 +30,7 @@ then
 
   extension_fetch_and_install "${extension}"
 
-  if extension_action "${extension}" "${action}"
+  if extension_action "${extension}" "${action}" ${extension_args[@]}
   then
     succeed
   else

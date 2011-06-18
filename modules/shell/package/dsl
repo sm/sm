@@ -230,6 +230,14 @@ package_install()
 
   enter "${source_path}"
 
+  if command_exists "${package_name}_dependencies"
+  then
+    "${package_name}_dependencies"
+  else
+    log "Installing dependencies for ${package_name} ${package_version}"
+    package_dependencies
+  fi
+
   if command_exists "${package_name}_download"
   then
     "${package_name}_download"
@@ -1647,8 +1655,32 @@ package_website()
     links $package_website_url
 
   else
-    curl -s -L $package_website_url -o /tmp/${package_name}-${package_version}.website
+    curl -s -L $package_website_url \
+      -o /tmp/${package_name}-${package_version}.website
+
     ${EDITOR:-/bin/less} /tmp/${package_name}-${package_version}.website
   fi
+}
+
+package_dependencies()
+{
+  local dependency _dependencies=(${package_dependencies[@]})
+
+  unset package_dependencies
+
+  # TODO: improve dependency management.
+  for dependency in "${_dependencies[@]}"
+  do
+    if ! package_is_active "${dependency}"
+    then
+      error "${extension} requires ${dependency}, please install the ${dependency} via bdsm package module and retry.
+Typically this would be done as follows:
+
+sudo bdsm extend ${dependency}
+sudo bdsm ${dependency} package install
+
+      "
+    fi
+  done
 }
 
