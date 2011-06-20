@@ -2934,10 +2934,8 @@ path_exists()
 #
 path_join()
 {
-  (
-  IFS='/'
+  local IFS='/'
   printf "$*"
-  )
 }
 
 #
