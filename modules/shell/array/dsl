@@ -627,17 +627,8 @@ array_join()
   if variable_is_nonempty _array_name
   then
     shift
-    local _separator="${1:-' '}"
-    eval "
-    for (( index=0 ; index < \${#${_array_name}[@]} ; index++ ))
-    do
-      if (( index >  0 ))
-      then
-        printf \"${_separator}\"
-      fi
-
-      printf \"%s\" \"\${${_array_name}[\${index}]}\"
-    done"
+    local IFS=${1:-' '}
+    eval "printf \"\${${_array_name}[*]}\""
   else
     fail "Cannot join array as an array name was not given."
   fi
