@@ -5,5 +5,5 @@
 #
 # user$ bdsm extend tarball <local ext name> https://.....tar.bz2
 #
-extend_from "tarball" "${extension_args[@]}"
 
+NIY "extend from tarball"

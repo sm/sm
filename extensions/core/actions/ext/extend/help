@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+description "install BDSM extension"
+
 action "extend <name>" \
   "Extend from the default wayneeseguin/bdsm-extensions repository on github."
 
@@ -29,3 +31,5 @@ action "extend rsync <name> <rsync url>"\
 
 action "extend scp <name> <scp url>"\
   "Extend from a given tarball after scp'ing from the given tarball url."
+
+show_help usage

@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-case "$extension_action" in
+param="${extension_action:-$extension_args}"
+
+case "${param}" in
   head)
     install_head
     ;;
@@ -12,6 +14,10 @@ case "$extension_action" in
   latest)
     fetch_version
     install_release
+    ;;
+
+  *)
+    install_remote "${param}"
     ;;
 esac
 

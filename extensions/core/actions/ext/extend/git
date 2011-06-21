@@ -4,5 +4,9 @@
 # user$ bdsm extend git <local ext name> git@git.myserver.com:myrepo.git
 #
 
-extend_from "git" "${extension_args[@]}"
+name=${extension_args[0]}
+extension_uri=${extension_args[1]}
+extension_src_path=$extensions_src_path
 
+fetch_extensions_git_repository "${extension_uri}"
+extension_install "${name}" "${extension_uri//\//_}"

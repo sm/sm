@@ -4,5 +4,4 @@
 # user$ bdsm extend git <local ext name> git@git.myserver.com:myrepo.git
 #
 
-extend_from "hg" "${extension_args[@]}"
-
+NIY "extend from github repository"
