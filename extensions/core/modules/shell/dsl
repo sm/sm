@@ -293,11 +293,11 @@ install_remote()
   else
     enter "${src_path}"
 
-    if ! git clone --depth 1 git://github.com/wayneeseguin/bdsm.git "bdsm-${owner}"
+    if ! git clone --depth 1 "git://github.com/${owner}/bdsm.git" "bdsm-${owner}"
     then
-      if ! git clone https://github.com/wayneeseguin/bdsm.git "bdsm-${owner}"
+      if ! git clone "https://github.com/${owner}/bdsm.git" "bdsm-${owner}"
       then
-        fail "Unable to clone the BDSM repository, attempted both git:// and https://\nCould not get head, terribly sorry about the blue balls :("
+        fail "Unable to clone the ${owner} BDSM repository, attempted both git:// and https://\nCould not get head, terribly sorry about the blue balls :("
       fi
     fi
   fi
