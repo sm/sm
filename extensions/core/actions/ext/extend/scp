@@ -4,5 +4,4 @@
 # user$ bdsm extend git <local ext name> <scp url>
 #
 
-extend_from "scp" "${extension_args[@]}"
-
+NIY "extend from scp tarball url"

@@ -4,5 +4,4 @@
 # user$ bdsm extend rsync <local ext name> <rsync url>
 #
 
-extend_from "rsync" "${extension_args[@]}"
-
+NIY "extend from rsync dirctory url"

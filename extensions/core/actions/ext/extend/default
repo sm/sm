@@ -4,5 +4,9 @@
 # use default repository wayneeseguin/bdsm-extensions.
 # user$ bdsm extend default <local ext name>
 #
-extend_from "default" "${extension_args[@]}"
 
+extension_uri=$extensions_repository_url
+extension_src_path=$extensions_src_path/${extension_uri//\//_}
+
+fetch_extensions_git_repository $extension_uri
+extensions_install "${extension_args[@]}"

@@ -929,7 +929,7 @@ extension_is_installed()
 #
 extensions_install()
 {
-  local _extension _extensions=("$@") _installed _failed
+  local _extension _extensions=("$@") _installed=() _failed=()
 
   if array_is_nonempty _extensions
   then
@@ -1003,20 +1003,21 @@ extensions_install()
 #
 extension_install()
 {
-  local _extension="${1:-}"
+  local _extension="${1:-}" _src
+  _src="${2:-${_extension}}"
 
   if variable_is_nonempty _extension
   then
-    if extension_is_valid "${extension_src_path}/${_extension}"
+    if extension_is_valid "${extension_src_path}/${_src}"
     then
       log " - ${_extension}"
-      if directory_exists "${bdsm_path}/extensions/${_extension}"
+      if path_exists "${bdsm_path}/extensions/${_extension}"
       then
         remove_paths "${bdsm_path}/extensions/${_extension}"
       fi
 
-      copy_paths "${extension_src_path}/${_extension}" \
-        to "${bdsm_path}/extensions"
+      copy_directory "${extension_src_path}/${_src}" \
+        to "${bdsm_path}/extensions/${_extension}"
 
       log "${extension_uri}" to "${bdsm_path}/extensions/${_extension}/.uri"
 
@@ -1024,7 +1025,7 @@ extension_install()
       # TODO: Process extension dependencies...
       #
     else
-      error "${extension_src_path}/${_extension} is not a valid extension"\
+      error "${extension_src_path}/${_src} is not a valid extension"\
         "as it is missing VERSION and/or actions/help files."
     fi
   else
