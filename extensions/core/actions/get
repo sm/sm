@@ -13,5 +13,8 @@ case "$extension_action" in
     fetch_version
     install_release
     ;;
+  *)
+    install_remote "$extension_args"
+    ;;
 esac
 

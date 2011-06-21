@@ -269,6 +269,49 @@ install_head()
   exec bash ./install
 }
 
+install_remote()
+{
+  local remote="origin" owner="$1"
+
+  if path_exists "${src_path}/bdsm-${owner}/.git" ]]
+  then
+    enter "${src_path}/bdsm-${owner}/"
+
+    if [[ -z "$(git branch | awk "/$branch$/")" ]]
+    then
+      if ! git checkout -b "$branch" --track "$remote/$branch" 2>/dev/null
+      then
+        fail "$remote $branch remote branch not found."
+      fi
+    elif [[ -z "$(git branch | awk "/\* $branch$/{print \$2}")" ]]
+    then
+      git checkout $branch 2>/dev/null ||
+        fail "Unable to checkout $branch.\nCould not get head. Sucks to be you... or rather... doesn't suck :-p"
+    fi
+
+    git pull --rebase origin $branch
+  else
+    enter "${src_path}"
+
+    if ! git clone --depth 1 git://github.com/wayneeseguin/bdsm.git "bdsm-${owner}"
+    then
+      if ! git clone https://github.com/wayneeseguin/bdsm.git "bdsm-${owner}"
+      then
+        fail "Unable to clone the BDSM repository, attempted both git:// and https://\nCould not get head, terribly sorry about the blue balls :("
+      fi
+    fi
+  fi
+
+  if (( ${sense_of_humor_flag:=0} == 1 ))
+  then
+    log "Ahh... that's better...\nIt always feels so nice to get head.\nQuite a load this time eh?\nRemember to get head often!\n"
+  fi
+
+  enter "${src_path}/bdsm-${owner}/"
+
+  exec bash ./install
+}
+
 prepare_for_installation()
 {
   local initial_pwd="$PWD"
