@@ -43,12 +43,16 @@ fetch_extensions_git_repository()
   # Convert '/' to an invalid url component '_'
   _identifier="${_url//\//_}"
 
-  if path_exists "$extensions_src_path/.git"
+  if path_exists "$extensions_src_path/${_identifier}/.git"
   then
     log "# Updating repository from ${_url}"
     if scm_update "${_url}"
     then
-      copy_paths --force "${repos_path}/${_identifier}/" \
+      if path_exists "${extensions_src_path}/${_identifier}"
+      then
+        remove_paths "${extensions_src_path}/${_identifier}"
+      fi
+      copy_paths "${repos_path}/${_identifier}/" \
         to "${extensions_src_path}"
     else
       error "There was an error updating the repository."
@@ -58,7 +62,11 @@ fetch_extensions_git_repository()
 
     scm_fetch "${_url}"
 
-    copy_paths --force "${repos_path}/${_identifier}/" \
+    if path_exists "${extensions_src_path}/${_identifier}"
+    then
+      remove_paths "${extensions_src_path}/${_identifier}"
+    fi
+    copy_paths "${repos_path}/${_identifier}/" \
       to "${extensions_src_path}"
   fi
 
@@ -315,60 +323,3 @@ extension_cli()
     extension_args=( "${_ignored_args[@]}" )
   fi
 }
-
-extend_from()
-{
-  # "release" "${extension_args[@]}"
-  local _source="${1:-}" _params _name
-  if variable_is_nonempty _source
-  then
-    shift
-    _name="${1}"
-    shift
-    _params=($@)
-
-    if variable_is_nonempty _name
-    then
-      case "${_source}" in
-        git)
-          NIY "extend from git repository"
-          fetch_extensions_git_repository "${_params[${#_params[@]}]}"
-          extensions_install "${_name}" "${_params[@]}"
-          ;;
-        github)
-          NIY "extend from github repository"
-          ;;
-        help)
-          NIY "extend from help"
-          ;;
-        release)
-          NIY "extend from release"
-          ;;
-        tarball)
-          NIY "extend from tarball"
-          ;;
-        hg)
-          NIY "extend from hg repository"
-          ;;
-        svn)
-          NIY "extend from svn repository"
-          ;;
-        rsync)
-          NIY "extend from rsync dirctory url"
-          ;;
-        scp)
-          NIY "extend from scp tarball url"
-          ;;
-        default|wayneeseguin|*)
-          fetch_extensions_git_repository
-          extensions_install "${_name}" "${_params[@]}"
-          ;;
-      esac
-    else
-      fail "An extension name must be given."
-    fi
-  else
-    fail "Source must be specified."
-  fi
-}
-
