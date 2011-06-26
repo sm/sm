@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+#TODO: unused?
 bdsm_development_setup()
 {
   local _component _separator _string
@@ -228,46 +229,19 @@ Halting the installation.
 
 install_head()
 {
-  install_bdsm_git "bdsm" "wayneeseguin"
+  install_bdsm_scm "bdsm" "wayneeseguin"
 }
 
 install_remote()
 {
-  install_bdsm_git "bdsm-$1" "$1"
+  install_bdsm_scm "bdsm-$1" "$1"
 }
 
-install_bdsm_git()
+install_bdsm_scm()
 {
   local remote="origin" dir="${1}" owner="${2}"
 
-  if path_exists "${src_path}/${dir}/.git" ]]
-  then
-    enter "${src_path}/${dir}/"
-
-    if [[ -z "$(git branch | awk "/$branch$/")" ]]
-    then
-      if ! git checkout -b "$branch" --track "$remote/$branch" 2>/dev/null
-      then
-        fail "$remote $branch remote branch not found."
-      fi
-    elif [[ -z "$(git branch | awk "/\* $branch$/{print \$2}")" ]]
-    then
-      git checkout $branch 2>/dev/null ||
-        fail "Unable to checkout $branch.\nCould not get head. Sucks to be you... or rather... doesn't suck :-p"
-    fi
-
-    git pull --rebase origin $branch
-  else
-    enter "${src_path}"
-
-    if ! git clone --depth 1 "git://github.com/${owner}/bdsm.git" "${dir}"
-    then
-      if ! git clone "https://github.com/${owner}/bdsm.git" "${dir}"
-      then
-        fail "Unable to clone the ${owner} BDSM repository, attempted both git:// and https://\nCould not get head, terribly sorry about the blue balls :("
-      fi
-    fi
-  fi
+  scm_get "${owner}/bdsm" "${src_path}/${dir}"
 
   if (( ${sense_of_humor_flag:=0} == 1 ))
   then

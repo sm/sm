@@ -81,5 +81,5 @@ fi
 
 disable_backtrace
 
-extension_action ${extension_args[@]}
+extension_action
 
