@@ -381,14 +381,7 @@ variable_is_nonempty()
   if [[ -n "${_variable}" ]]
   then
     # if the evaluation of a nonempty test with the variable name used
-    if eval "[[ -n \"\${${_variable}:-}\" ]]"
-    then
-      # is true then return true, 0
-      return 0
-    else
-      # otherwise return false, 1
-      return 1
-    fi
+    eval "[[ -n \"\${${_variable}:-}\" ]]"
   else
     # Otherwise no parameters were passed in, this is a programming error.
     # Send a failure message which also triggers a backtrace enabling the

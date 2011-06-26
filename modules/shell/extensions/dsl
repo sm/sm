@@ -4,9 +4,10 @@
 detect_action()
 {
   extensions_path=$1
+  shift
   extension="${2:-core}"
+  shift
   local token _word _action_path=("$extensions_path/$extension/actions")
-  shift 2
 
   local _params=("$@")
 
@@ -17,70 +18,76 @@ detect_action()
     # Detect a namespace
     if path_exists "$(path_join "${_action_path[@]}" $token)"
     then
-      _action_path+=("$token")
+      _action_path+=("${token}")
       continue
 
     # Detect mapping in .actions
     elif file_exists "$(path_join "${_action_path[@]}" .actions)" &&
          file_contains "$(path_join "${_action_path[@]}" .actions)" "^${token}="
     then
-      _array=($(hash_file "$(path_join "${_action_path[@]}" .actions)" $token))
-      _params=(${_array[@]} ${_params[@]})
+      _array=( $(hash_file "$(path_join "${_action_path[@]}" .actions)" ${token}) )
+      _params=( "${_array[@]}" "${_params[@]}" )
       continue
 
     # Detect default mapping in .actions
     elif file_exists "$(path_join "${_action_path[@]}" .actions)" &&
          file_contains "$(path_join "${_action_path[@]}" .actions)" "^default="
     then
-      _array=($(hash_file "$(path_join "${_action_path[@]}" .actions)" default))
-      _params=(${_array[@]} ${_params[@]})
+      _array=( $(hash_file "$(path_join "${_action_path[@]}" .actions)" default) )
+      _params=( "${_array[@]}" "${_params[@]}" )
       continue
+
+    # finish searching path
+    else
+      _params=( "${token}" "${_params[@]}" )
+      break
     fi
   done
 
   if array_is_empty _params
   then
-    _params=("default")
+    token="default"
+  else
+    array_shift _params token
   fi
-  array_shift _params token
 
   # Detect function
   if match "${token}" "*\(\)"
   then
-    action_path=$(array_join _action_path '/')
+    action_path=$(path_join "${_action_path[@]}")
     action="$token"
-    return 0
+    extension_args=( "${_params[@]}" )
 
   # Detect a file
-  elif file_is_executable "$(path_join "${_action_path[@]}" $token)"
+  elif file_is_executable "$(path_join "${_action_path[@]}" ${token})"
   then
-    action_path=$(array_join _action_path '/')
+    action_path=$(path_join "${_action_path[@]}")
     action="$token"
-    extension_args=("${_params[@]}")
-    return 0
+    extension_args=( "${_params[@]}" )
 
   # Detect default if nothing else matches
   elif file_exists "$(path_join "${_action_path[@]}" default)"
   then
+    action_path=$(path_join "${_action_path[@]}")
     action="default"
-    action_path=$(array_join _action_path '/')
-    extension_args=("$token")
-    extension_args+=("${_params[@]}")
-    return 0
+    extension_args=( "$token" "${_params[@]}" )
 
   # Detect help if no default
   elif file_exists "$(path_join "${_action_path[@]}" help)"
   then
+    action_path=$(path_join "${_action_path[@]}")
     action="help"
-    action_path=$(array_join _action_path '/')
-    extension_args=("$token")
-    extension_args+=("${_params[@]}")
-    return 0
+    [[ "$token" != "default" ]] && extension_args=("$token") || extension_args=()
+    extension_args+=( "${_params[@]}" )
 
-  # Not found, error.
   else
+    # Not found, error.
     return 1
   fi
+
+  # Found, OK
+  extension_args+=( "${_params[@]}" )
+  return 0
 }
 
 detect_action_type()
@@ -289,6 +296,7 @@ extension_action()
   local _extensions_path=$extensions_path
   if ! detect_action $_extensions_path/external     "${extension_args[@]}" &&
      ! detect_action $_extensions_path/internal     "${extension_args[@]}" &&
+     ! detect_action $_extensions_path/builtin      "${extension_args[@]}" &&
      ! detect_action $_extensions_path/builtin core "${extension_args[@]}" &&
      ! detect_action $_extensions_path/builtin pkg  "${extension_args[@]}" &&
      ! detect_action $_extensions_path/builtin srv  "${extension_args[@]}"
@@ -314,6 +322,7 @@ extension_action()
 
   debug "extension_path=${extension_path}"
   debug "action_path=${action_path/${extension_path}\///}, action=${action}, action_type=${action_type}."
+  debug "extension_args=${extension_args[@]}"
 
   extension_run "${action_type}" "${action_path}"
 }
