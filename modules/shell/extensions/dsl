@@ -1,22 +1,14 @@
 #!/usr/bin/env bash
 
-
 # detect_action $extension action extension_args "${extension_args[@]}"
 detect_action()
 {
-  local token _word
-
-  extension="${1:=core}"
-  shift
+  extensions_path=$1
+  extension="${2:-core}"
+  local token _word _action_path=("$extensions_path/$extension/actions")
+  shift 2
 
   local _params=("$@")
-
-  local _action_path=("$extensions_path/$extension/actions")
-
-  if array_is_empty _params
-  then
-    _params=("default")
-  fi
 
   while (( ${#_params[@]} > 0 ))
   do
@@ -28,20 +20,7 @@ detect_action()
       _action_path+=("$token")
       continue
 
-    elif match "${token}" "*\(\)"
-    then
-      action_path=$(array_join _action_path '/')
-      action="$token"
-      return 0
-
-    # Detect a file
-    elif file_is_executable "$(path_join "${_action_path[@]}" $token)"
-    then
-      action_path=$(array_join _action_path '/')
-      action="$token"
-      extension_args=("${_params[@]}")
-      return 0
-
+    # Detect mapping in .actions
     elif file_exists "$(path_join "${_action_path[@]}" .actions)" &&
          file_contains "$(path_join "${_action_path[@]}" .actions)" "^${token}="
     then
@@ -49,37 +28,59 @@ detect_action()
       _params=(${_array[@]} ${_params[@]})
       continue
 
-    # run default if found
-    elif file_exists "$(path_join "${_action_path[@]}" default)"
-    then
-      action="default"
-      action_path=$(array_join _action_path '/')
-      extension_args=("$token")
-      extension_args+=("${_params[@]}")
-      return 0
-
+    # Detect default mapping in .actions
     elif file_exists "$(path_join "${_action_path[@]}" .actions)" &&
          file_contains "$(path_join "${_action_path[@]}" .actions)" "^default="
     then
       _array=($(hash_file "$(path_join "${_action_path[@]}" .actions)" default))
       _params=(${_array[@]} ${_params[@]})
       continue
-
-    # default to help if no defualt set in path
-    elif file_exists "$(path_join "${_action_path[@]}" help)"
-    then
-      action="help"
-      action_path=$(array_join _action_path '/')
-      extension_args=("$token")
-      extension_args+=("${_params[@]}")
-      return 0
-
-    # Not found, error.
-    else
-      return 1
     fi
   done
-  return 1
+
+  if array_is_empty _params
+  then
+    _params=("default")
+  fi
+  array_shift _params token
+
+  # Detect function
+  if match "${token}" "*\(\)"
+  then
+    action_path=$(array_join _action_path '/')
+    action="$token"
+    return 0
+
+  # Detect a file
+  elif file_is_executable "$(path_join "${_action_path[@]}" $token)"
+  then
+    action_path=$(array_join _action_path '/')
+    action="$token"
+    extension_args=("${_params[@]}")
+    return 0
+
+  # Detect default if nothing else matches
+  elif file_exists "$(path_join "${_action_path[@]}" default)"
+  then
+    action="default"
+    action_path=$(array_join _action_path '/')
+    extension_args=("$token")
+    extension_args+=("${_params[@]}")
+    return 0
+
+  # Detect help if no default
+  elif file_exists "$(path_join "${_action_path[@]}" help)"
+  then
+    action="help"
+    action_path=$(array_join _action_path '/')
+    extension_args=("$token")
+    extension_args+=("${_params[@]}")
+    return 0
+
+  # Not found, error.
+  else
+    return 1
+  fi
 }
 
 detect_action_type()
@@ -238,62 +239,6 @@ extension_run()
   return $result
 }
 
-extension_extend_from()
-{
-  # "release" "${extension_args[@]}"
-  local _source="${1:-}" _params _name
-  if variable_is_nonempty _source
-  then
-    shift
-    _name="${1}"
-    shift
-    _params=($@)
-
-    if variable_is_nonempty _name
-    then
-      case "${_source}" in
-        git)
-          NIY "extend from git repository"
-          fetch_extensions_git_repository "${_params[${#_params[@]}]}"
-          extensions_install "${_name}" "${_params[@]}"
-          ;;
-        github)
-          NIY "extend from github repository"
-          ;;
-        help)
-          NIY "extend from help"
-          ;;
-        release)
-          NIY "extend from release"
-          ;;
-        tarball)
-          NIY "extend from tarball"
-          ;;
-        hg)
-          NIY "extend from hg repository"
-          ;;
-        svn)
-          NIY "extend from svn repository"
-          ;;
-        rsync)
-          NIY "extend from rsync dirctory url"
-          ;;
-        scp)
-          NIY "extend from scp tarball url"
-          ;;
-        default|wayneeseguin|*)
-          fetch_extensions_git_repository
-          extensions_install "${_name}" "${_params[@]}"
-          ;;
-      esac
-    else
-      fail "An extension name must be given."
-    fi
-  else
-    fail "Source must be specified."
-  fi
-}
-
 #
 # ## extension\_action()
 #
@@ -339,24 +284,20 @@ extension_action()
 {
   unset extension action
 
-  export extension="${1:-}"
+  extension_args=("$@")
 
-  if variable_is_nonempty extension
+  local _extensions_path=$extensions_path
+  if ! detect_action $_extensions_path/external     "${extension_args[@]}" &&
+     ! detect_action $_extensions_path/internal     "${extension_args[@]}" &&
+     ! detect_action $_extensions_path/builtin core "${extension_args[@]}" &&
+     ! detect_action $_extensions_path/builtin pkg  "${extension_args[@]}" &&
+     ! detect_action $_extensions_path/builtin srv  "${extension_args[@]}"
   then
-    # shift
-    extension_args=("$@")
-  else
-    fail "'extension' is not set as the first parameter to extension_action()!"
-  fi
-
-  if ! detect_action ${extension_args[@]} &&
-     ! detect_action core ${extension_args[@]}
-  then
-    log "Usage: \n  bdsm ${extension} [namespace] [action]\nActions:\n   $(extension_actions "${extension}")"
+    fail "Usage: \n  bdsm ${extension} [namespace] [action]\nActions:\n   $(extension_actions "${extension}")"
   fi
 
   extension_path="$extensions_path/$extension"
-  extension_config_path="$extension_path/config"
+  extension_config_path="$extension_path/builtin/config"
   extension_templates_path="$extension_path/templates"
   extension_modules_path="$extension_path/modules"
   extension_actions_path="$extension_path/actions"
@@ -370,6 +311,9 @@ extension_action()
   bdsm_exports
 
   detect_action_type "${action_path}" "${action}"
+
+  debug "extension_path=${extension_path}"
+  debug "action_path=${action_path/${extension_path}\///}, action=${action}, action_type=${action_type}."
 
   extension_run "${action_type}" "${action_path}"
 }
@@ -896,89 +840,15 @@ extension_is_installed()
   fi
 }
 
-
-#
-# ## extensions\_install()
-#
-# Installs the given extensions.
-#
-# ### Input Parameters
-#
-# One or more extension names.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# The named extensions will be installed to the filesystem in the BDSM
-# extensions directory.
-#
-# ### Return Codes
-#
-# 0 for success
-#
-# ### Failure Scenarios
-#
-# Fails if no extensions are passed in to install.
-#
-# ### Usage Examples
-#
-#     user$ extensions_install libevent tmux
-#
-extensions_install()
-{
-  local _extension _extensions=("$@") _installed=() _failed=()
-
-  if array_is_nonempty _extensions
-  then
-    # We need to ensure that the extensions directory already exists before calling
-    # install in parallel.
-    extension_fetch "${extension_uri:="${extensions_repository_url}"}"
-
-    for _extension in "${_extensions[@]}"
-    do
-      case "${_extension#\/}" in
-        ext|srv|pkg|core|mod)
-          continue # Skip core extensions.
-          ;;
-      esac
-
-      if [[ -z "${_extension}" ]]
-      then # Skip any empty extensions / 'artifact'.
-        continue
-      else
-        if ( extension_install "${_extension}") >/dev/null 2>&1
-        then
-          _installed+=("${_extension}")
-        else
-          _failed+=("${_extension}")
-        fi
-      fi
-    done
-    wait
-    if array_is_nonempty _installed
-    then
-      log "  Installed: ${_installed[*]}"
-    fi
-    if array_is_nonempty _failed
-    then
-      log "  Failed: ${_failed[*]}"
-    fi
-  else
-    fail "Cannot install extensions as no extensions were given to install."
-  fi
-}
-
 #
 # ## extension\_install()
 #
-# Installs the given extension.
+# Installs the given external extension.
 #
 # ### Input Parameters
 #
 # First parameter is the name of the extension to install
+# Second parameter is the src_path of the extension to install
 #
 # ### Stream Outputs
 #
@@ -987,7 +857,7 @@ extensions_install()
 # ### Environmental effects
 #
 # The named extension will be installed to the filesystem in the BDSM
-# extension directory.
+# external extension directory.
 #
 # ### Return Codes
 #
@@ -999,7 +869,7 @@ extensions_install()
 #
 # ### Usage Examples
 #
-#     user$ extension_install redis
+#     user$ extension_install backup mpapis_bdsm_backup
 #
 extension_install()
 {
@@ -1008,7 +878,7 @@ extension_install()
 
   if variable_is_nonempty _extension
   then
-    if extension_is_valid "${extension_src_path}/${_src}"
+    if extension_is_valid "${extensions_src_path}/${_src}"
     then
       log " - ${_extension}"
       if path_exists "${bdsm_path}/extensions/${_extension}"
@@ -1016,7 +886,7 @@ extension_install()
         remove_paths "${bdsm_path}/extensions/${_extension}"
       fi
 
-      copy_directory "${extension_src_path}/${_src}" \
+      copy_directory "${extensions_src_path}/${_src}" \
         to "${bdsm_path}/extensions/${_extension}"
 
       log "${extension_uri}" to "${bdsm_path}/extensions/${_extension}/.uri"
@@ -1025,43 +895,11 @@ extension_install()
       # TODO: Process extension dependencies...
       #
     else
-      error "${extension_src_path}/${_src} is not a valid extension"\
+      error "${extensions_src_path}/${_src} is not a valid extension"\
         "as it is missing VERSION and/or actions/help files."
     fi
   else
     fail "Cannot install an extension as no extension name was given."
-  fi
-}
-
-extension_fetch_and_install()
-{
-  local _extension="${1:-}"
-
-  if variable_is_nonempty _extension
-  then
-    extension_fetch "${extension_uri:="${extensions_repository_url}"}"
-    extension_install "${_extension}"
-  else
-    fail "Cannot fetch and install an extension as no extension name was given."
-  fi
-}
-
-extension_fetch()
-{
-  local _url="${1:-"$extension_uri"}" _identifier repo_path
-  _identifier="${_url//\//_}" # Convert '/' to an invalid url component '_'
-  repo_path="${repos_path}/${_identifier}"
-
-  if variable_is_nonempty _url
-  then
-     # TODO: scm fetch vs tarball fetch
-    scm_fetch "${_url}"
-
-    scm_update "${_url}"
-
-    extension_src_path="${repo_path}"
-  else
-    fail "Cannot fetch an extension from a url as no url was given"
   fi
 }
 

@@ -54,7 +54,7 @@ export bdsm_path install_path modules_path
 source "${PWD}/modules/shell/core/dsl"
 
 # Load fundamental Module DSL's
-for module in variables modules logging trace filesystem core
+for module in variables modules logging trace filesystem core vcs
 do
   for file in dsl initialize
   do
@@ -63,9 +63,8 @@ do
 done
 
 source_files \
-  "${PWD}/extensions/core/modules/shell/dsl" \
-  "${PWD}/extensions/core/modules/shell/initialize" \
-  "${PWD}/extensions/core/modules/shell/cli"
+  "${PWD}/extensions/builtin/core/modules/shell/dsl" \
+  "${PWD}/extensions/builtin/core/modules/shell/initialize" \
+  "${PWD}/extensions/builtin/core/modules/shell/cli"
 
-source "${PWD}/extensions/core/actions/install"
-
+source "${PWD}/extensions/builtin/core/actions/install"

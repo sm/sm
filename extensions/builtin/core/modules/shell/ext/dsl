@@ -36,43 +36,6 @@ md5_match()
   fi
 }
 
-fetch_extensions_git_repository()
-{
-  local initial_pwd="$PWD" _identifier _url="${1:-${extensions_repository_url}}"
-
-  # Convert '/' to an invalid url component '_'
-  _identifier="${_url//\//_}"
-
-  if path_exists "$extensions_src_path/${_identifier}/.git"
-  then
-    log "# Updating repository from ${_url}"
-    if scm_update "${_url}"
-    then
-      if path_exists "${extensions_src_path}/${_identifier}"
-      then
-        remove_paths "${extensions_src_path}/${_identifier}"
-      fi
-      copy_paths "${repos_path}/${_identifier}/" \
-        to "${extensions_src_path}"
-    else
-      error "There was an error updating the repository."
-    fi
-  else
-    log "Cloning $extension repository from ${_url}"
-
-    scm_fetch "${_url}"
-
-    if path_exists "${extensions_src_path}/${_identifier}"
-    then
-      remove_paths "${extensions_src_path}/${_identifier}"
-    fi
-    copy_paths "${repos_path}/${_identifier}/" \
-      to "${extensions_src_path}"
-  fi
-
-  enter "$initial_pwd"
-}
-
 fetch_tarball()
 {
   curl \
