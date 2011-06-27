@@ -58,7 +58,7 @@ package_extension()
 {
   local sha1="" version
 
-  extension_path="${extensions_path}/${extension}"
+  extension_path="${parent_extensions_path}/${extension}"
 
   if !read -r version < "$extension_path/VERSION"
   then
@@ -209,37 +209,6 @@ get_version()
   source "$modules_path/hook"
 }
 
-get_branch()
-{
-  local clone=1
-  (
-  if path_exists "${extensions_src_path}/bdsm/.git"
-  then
-    enter "${extensions_src_path}/bdsm"
-    git fetch ${remote}
-    if git pull --rebase --force ${remote} ${branch}
-    then
-      clone=0
-    else
-      enter "${extensions_src_path}"
-      remove_paths "${extensions_src_path}/bdsm"
-    fi
-  else
-    (
-    if ! git clone --depth 1 ${extensions_repository_url}
-    then # reattempt replacing the url scheme.
-      git clone ${extensions_repository_url/git:\/\//https://}
-    fi
-    )
-    enter "bdsm"
-  fi
-
-  chmod_files 0755 "install"
-
-  ./install
-  )
-}
-
 extension_cli()
 {
   local _ignored_args=() _string
@@ -269,7 +238,9 @@ extension_cli()
         extension_modules=(${_string//,/ })
         ;;
       --help)
-        extension_action "ext" "help"
+        #TODO: to late, can not call 2nd time
+        extension_args=( "ext" "help" )
+        extension_action
         exit 0
         ;;
       --trace)

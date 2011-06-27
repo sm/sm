@@ -19,31 +19,22 @@ Actions:
 
 list_installed()
 {
-  extensions=($(extensions_installed))
+  for ext_path in $(extensions_search_paths)
+  do
+    extensions=($(extensions_installed $ext_path))
 
-  if array_is_nonempty extensions
-  then
-    log "${extensions[*]}"
-  else
-    log "# No extensions currently installed."
-  fi
+    if array_is_nonempty extensions
+    then
+      log "Extensions installed in $ext_path:\n  ${extensions[*]}\n"
+    else
+      log "# No $ext_path extensions currently installed."
+    fi
+  done
 }
 
 list_available()
 {
-  if ! path_exists "${extensions_src_path}"
-  then
-    fetch_extensions_git_repository
-  fi
-
-  extensions=($(extensions_available))
-
-  if array_is_nonempty extensions
-  then
-    log "${extensions[*]}"
-  else
-    log "No extensions found (in '${extensions_src_path}'). Run 'bdsm ext update repository' to make them available. "
-  fi
+  NIY "available external extensions repo"
 }
 
 modules extensions

@@ -65,7 +65,7 @@ then
 fi
 modules_path="${bdsm_path}/modules"
 
-export prefix_path bdsm_path modules_path initial_pwd
+export prefix_path bdsm_path modules_path initial_pwd extension_action_calls=0
 
 # Load BDSM shell DSL and initialize for BDSM core itself manually.
 # Ensure that backtrace and logging are defined first as everything depends on them.
@@ -80,6 +80,4 @@ then
 fi
 
 disable_backtrace
-
 extension_action
-

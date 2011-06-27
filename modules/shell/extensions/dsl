@@ -246,11 +246,15 @@ extension_run()
   return $result
 }
 
+extensions_search_paths()
+{
+  printf "${parent_extensions_path}/external ${parent_extensions_path}/internal ${parent_extensions_path}/builtin"
+}
+
 detect_action_in_paths()
 {
-  local _extensions_path="${extensions_path}"
-  local search_paths=( "${_extensions_path}/external" "${_extensions_path}/internal" "${_extensions_path}/builtin" )
-  local builtin_path="${_extensions_path}/builtin"
+  local search_paths=( $(extensions_search_paths) )
+  local builtin_path="${parent_extensions_path}/builtin"
   local builtin_extensions=( $(cd "${builtin_path}" ; echo -n * ) )
 
   for path in "${search_paths[@]}"
@@ -315,10 +319,14 @@ detect_action_in_paths()
 #
 extension_action()
 {
+  [[ extension_action_calls -gt 0 ]] && fail "can not call 2nd time\n  extension_action ${extension_args[@]}"
+  extension_action_calls+=1
   unset extension action
 
-  if ! detect_action_in_paths
+  if detect_action_in_paths
   then
+    debug "detected path:$action_path, action:$action, params:${extension_args[@]}."
+  else
     fail "Usage: \n  bdsm ${extension} [namespace] [action]\nActions:\n   $(extension_actions "${extension}")"
   fi
 
@@ -561,7 +569,7 @@ extension_license()
 #
 extensions_installed()
 {
-  extensions_in "${extensions_path}"
+  extensions_in "$1"
 }
 
 #
@@ -705,16 +713,7 @@ extensions_in()
     do
       extension_source_path="${_file/%\/VERSION}"
       extension_name="${extension_source_path//*\/}"
-
-      case ${extension_name} in
-        (core|ext|mod|pkg|srv|svc|[[=.=]]*)
-          true # Ignore core extensions, they are updated with BDSM itself.
-          ;;
-
-        (*)
-          extensions[${#extensions[@]}]="${extension_name//*\//}"
-          ;;
-      esac
+      extensions[${#extensions[@]}]="${extension_name//*\//}"
     done
 
     extensions="${extensions[@]}"

@@ -54,7 +54,7 @@ git_get()
       git pull --rebase origin $branch >/dev/null 2>&1
       )
     then
-      error "Git pull failed."
+      fail "Git pull failed."
     fi
   else
     ensure_paths_exist "${_target}"
@@ -62,7 +62,13 @@ git_get()
     then
       echo "${_url}" > "${_target}/.uri"
     else
-      error "There was an error while cloning the repository from the url '${_url}'"
+      local _url_https="${_url/git:\/\//https:\/\/}"
+      if git clone --depth 1 ${_url_https} "${_target}" >/dev/null 2>&1
+      then
+        echo "${_url_https}" > "${_target}/.uri"
+      else
+        fail "There was an error while cloning the repository from the url '${_url}'"
+      fi
     fi
   fi
   enter "$initial_pwd"
@@ -100,6 +106,7 @@ github_get()
 # Code Walkthrough
 scm_get()
 {
+  log "    scm_get $1 -> $2"
   # check for pattern user/repository from github
   if is_github_url "$1"
   then

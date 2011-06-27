@@ -11,9 +11,9 @@ then
       error "Extension '${extension}' already exists "\
         "at ${target_path}/${extension}."
     else
-      if path_exists "${extensions_path}/core/templates/ext/${language:-shell}"
+      if path_exists "${parent_extensions_path}/core/templates/ext/${language:-shell}"
       then
-        enter "${extensions_path}/core/templates/ext/${language:-shell}"
+        enter "${parent_extensions_path}/core/templates/ext/${language:-shell}"
 
         _path="${target_path}/${extension}"
 

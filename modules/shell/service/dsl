@@ -1049,7 +1049,7 @@ service_install_init_d()
       else
         # Use core srv init.d template
         install_template "init.d" \
-          from "${extensions_path}/srv/templates" \
+          from "${parent_extensions_path}/srv/templates" \
           to "${init_scripts_path}/${_service}" mode 0755
 
         seed_template "${init_scripts_path}/${_service}" \
