@@ -264,11 +264,13 @@ prepare_for_installation()
   log "  Removing target directories"
   remove_paths "${directories[@]}"
   ensure_paths_exist "${directories[@]}" extensions
-  enter "${install_path}/extensions"
 
   log "  Removing core and old extensions, if they exist"
+  enter "${install_path}/extensions"
   remove_paths "${extensions_old[@]}"
   ensure_paths_exist "${extensions_paths[@]}"
+  enter "${install_path}/extensions/builtin"
+  remove_paths "${extensions_old[@]}"
   # || fail "Could not create installation target"
 
   enter "${initial_pwd}"

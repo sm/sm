@@ -257,3 +257,40 @@ extension_cli()
     extension_args=( "${_ignored_args[@]}" )
   fi
 }
+
+list_help()
+{
+  log "
+
+Usage:
+
+  bdsm extension list <action>
+
+Actions:
+
+  installed - List installed extensions
+  available - List available extensions
+  help      - Show this help text
+
+"
+}
+
+list_installed()
+{
+  for ext_path in $(extensions_search_paths)
+  do
+    extensions=($(extensions_installed $ext_path))
+
+    if array_is_nonempty extensions
+    then
+      log "Extensions installed in $ext_path:\n  ${extensions[*]}\n"
+    else
+      log "# No $ext_path extensions currently installed."
+    fi
+  done
+}
+
+list_available()
+{
+  NIY "available external extensions repo"
+}

@@ -12,15 +12,23 @@ detect_action()
 
   local _params=("$@")
 
-  while (( ${#_params[@]} > 0 ))
+  #loop when params or .actions exists
+  while [[ ${#_params[@]} -gt 0 ]] || file_exists "$(path_join "${_action_path[@]}" .actions)"
   do
     array_shift _params token
 
+    # Detect function
+    if  variable_is_nonempty token &&
+      match "$token" "*\(\)"
+    then
+      _params=( "${token}" "${_params[@]}" )
+      break
+
     # Detect a namespace
-    if path_exists "$(path_join "${_action_path[@]}" $token)"
+    elif variable_is_nonempty token &&
+      path_exists "$(path_join "${_action_path[@]}" $token)"
     then
       _action_path+=("${token}")
-      continue
 
     # Detect mapping in .actions
     elif file_exists "$(path_join "${_action_path[@]}" .actions)" &&
@@ -28,7 +36,7 @@ detect_action()
     then
       _array=( $(hash_file "$(path_join "${_action_path[@]}" .actions)" ${token}) )
       _params=( "${_array[@]}" "${_params[@]}" )
-      continue
+      [[ "${_array[@]}" == "$token" ]] && break #break if detected 2nd time the same
 
     # Detect default mapping in .actions
     elif file_exists "$(path_join "${_action_path[@]}" .actions)" &&
@@ -36,7 +44,15 @@ detect_action()
     then
       _array=( $(hash_file "$(path_join "${_action_path[@]}" .actions)" default) )
       _params=( "${_array[@]}" "${_params[@]}" )
-      continue
+      [[ "${_array[@]}" == "$token" ]] && break #break if detected 2nd time the same
+
+    # Detect help mapping in .actions
+    elif file_exists "$(path_join "${_action_path[@]}" .actions)" &&
+         file_contains "$(path_join "${_action_path[@]}" .actions)" "^help="
+    then
+      _array=( $(hash_file "$(path_join "${_action_path[@]}" .actions)" help) )
+      _params=( "${_array[@]}" "${_params[@]}" )
+      [[ "${_array[@]}" == "$token" ]] && break #break if detected 2nd time the same
 
     # finish searching path
     else
@@ -47,20 +63,22 @@ detect_action()
 
   if array_is_empty _params
   then
-    token="default"
+    token=""
   else
     array_shift _params token
   fi
 
   # Detect function
-  if match "${token}" "*\(\)"
+  if variable_is_nonempty token &&
+    match "${token}" "*\(\)"
   then
     action_path=$(path_join "${_action_path[@]}")
     action="$token"
     extension_args=( "${_params[@]}" )
 
   # Detect a file
-  elif file_is_executable "$(path_join "${_action_path[@]}" ${token})"
+  elif variable_is_nonempty token &&
+    file_is_executable "$(path_join "${_action_path[@]}" ${token})"
   then
     action_path=$(path_join "${_action_path[@]}")
     action="$token"
@@ -78,7 +96,7 @@ detect_action()
   then
     action_path=$(path_join "${_action_path[@]}")
     action="help"
-    [[ "$token" != "default" ]] && extension_args=("$token") || extension_args=()
+    [[ "$token" != "" ]] && extension_args=("$token") || extension_args=()
     extension_args+=( "${_params[@]}" )
 
   else
