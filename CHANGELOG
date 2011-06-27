@@ -1,4 +1,7 @@
-0.8.0 - support for extesnions search path
+0.8.0
+- support for extesnions search path
+- support fot github scm urls (user/name)
+- replaced scm_fetch/update with scm_get
 0.7.1 - support for namespaces/actions
 0.2.1 - bdsm get head and bdsm get latest functional
 0.2.0 - Framework is now based on modules and sporting a DSL
