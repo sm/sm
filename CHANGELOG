@@ -1,4 +1,3 @@
-0.8.0
 - support for extesnions search path
 - support fot github scm urls (user/name)
 - replaced scm_fetch/update with scm_get
