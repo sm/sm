@@ -106,7 +106,7 @@ github_get()
 # Code Walkthrough
 scm_get()
 {
-  log "    scm_get $1 -> $2"
+  log "${log_prefix}scm_get $1 -> $2"
   # check for pattern user/repository from github
   if is_github_url "$1"
   then
