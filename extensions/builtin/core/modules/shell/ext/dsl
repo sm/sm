@@ -56,9 +56,16 @@ fetch_tarball()
 #
 package_extension()
 {
-  local sha1="" version
+  local sha1="" version _path
 
-  extension_path="${parent_extensions_path}/${extension}"
+  for _path in $(extensions_search_paths)
+  do
+    if path_exists "${_path}/${extension}"
+    then
+      extension_path="${_path}/${extension}"
+      break
+    fi
+  done
 
   if !read -r version < "$extension_path/VERSION"
   then
