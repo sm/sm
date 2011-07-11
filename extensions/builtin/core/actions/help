@@ -8,9 +8,8 @@ action "bdsmrc" "Install bdsmrc template file into ~/.bdsmrc or /etc/bdsmrc"
 action "get latest" "Fetch and install the latest BDSM release"
 action "get head" "Fetch and install the latest BDSM development version"
 action "version" "Display the curently installed BDSM version"
-action "extend {name}" "Fetches and extends BDSM with the {name} extension"
+action "extend {uri} {name}" "Fetches and extends BDSM with the {name} extension from {url}"
 action "create {name}" "Creates extension {name} in the extensions development dir, or extensions path if development path is not set in bdsmrc."
-action "edit {name}" "Opens extension {name} in the editor."
 
 notes="
 

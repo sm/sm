@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+#
+# # Hash in file Module
+#
+# Allows manipulation of multiline values and kesy containing - and \.
+#
+
+# Read keys from given file($1)
+hash_keys()
+{
+  local valid_keys='^[^ ^=]+'
+  echo -n $(grep -E "${valid_keys}=" $1 | grep -Eo "${valid_keys}")
+}
+
+# Read value from given file($1) and for given key($2)
+hash_read()
+{
+  awk -v key="^$2=" -v valid_keys='^[^ ^=]+=' '{if ($0 ~ valid_keys) found=0; if ($1 ~ key) {found=1; gsub(key,"");}; if (found == 1) print $0 }' $1
+}

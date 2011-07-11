@@ -7,7 +7,7 @@ while (( $# > 0 ))
 do
   token="$1"
   shift
-  case "$token" in # TODO: extension detection "did you mean"
+  case "$token" in
 
     --help)
       extension_args=("core" "help" "$@")
@@ -38,7 +38,7 @@ do
       error "Unknown flag '${token}'"
       ;;
     *)
-      extension_args=("${token:-core} $@")
+      extension_args=("${token:-core}" "$@")
       break
       ;;
   esac

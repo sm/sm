@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-
-#
-# user$ bdsm extend tarball <local ext name> "$PWD/<ext name>-<version>.tar.bz2"
-#
-# user$ bdsm extend tarball <local ext name> https://.....tar.bz2
-#
-
-NIY "extend from tarball"
