@@ -3,124 +3,134 @@
 #
 # # VCS (SCM) Module
 #
-:
-# ## scm\_fetch()
+
+# ## scm\_identifier()
 #
 #
 #
 # Code Walkthrough
-scm_fetch()
+scm_identifier()
 {
-  local _url="${1:-${extension_url:-}}" _identifier repo_path
-
-  if variable_is_nonempty _url
-  then
-    _identifier="${_url//\//_}" # Convert '/' to an invalid url component '_'
-    repo_path="${repos_path}/${_identifier}"
-
-    ensure_paths_exist "${repos_path}"
-
-    case "${_url}" in
-      *git*)
-        if path_exists "${repo_path}/.git"
-        then
-          true # already fetched!
-        else
-          if path_exists "${repo_path}"
-          then
-            remove_paths "${repo_path}"
-          fi
-
-          if ! git clone --depth 1 ${_url} "${repo_path}" >/dev/null 2>&1
-          then
-            error "There was an error while cloning the repository from the url '${_url}'"
-          fi
-        fi
-        ;;
-      *svn*)
-        NIY
-        ;;
-      *hg*)
-        NIY
-        ;;
-      *fossil*)
-        NIY
-        ;;
-      *)
-        ;;
-    esac
-  else
-    fail "Cannot fetch an extension from a url as no url was given"
-  fi
+  local _url=$1
+  variables_must_be_nonempty _url
+  printf "${_url//\//_}"
 }
 
-# ## scm\_update()
+# ## git\_get()
 #
 #
 #
 # Code Walkthrough
-scm_update()
+git_get()
 {
-  local _url initial_pwd _identifier repo_path
+  local initial_pwd="$PWD" _url=$1 _target=$2 branch=${3:-master} remote=${4:-origin}
+  variables_must_be_nonempty _url _target
 
-  _url="${1:-${extension_url:-}}"
-  initial_pwd="$PWD"
-
-  if variable_is_nonempty _url
+  if path_exists "$_target/.git"
   then
-    _identifier="${_url//\//_}" # Convert '/' to an invalid url component '_'
-    repo_path="${repos_path}/${_identifier}"
+    enter "${_target}"
+    if [[ -z "$(git branch | awk "/${branch}$/" 2>/dev/null)" ]]
+    then
+      if ! (
+        builtin cd  "${repo_path}"
+        git checkout -b "${branch}" --track "${remote}/${branch}" >/dev/null 2>&1
+        )
+      then
+        error "$remote $branch remote branch not found."
+      fi
+    elif [[ -z "$(git branch | awk "/\* $branch$/{print \$2}" 2>/dev/null)" ]]
+    then
+      if ! (
+        builtin cd "${repo_path}"
+        git checkout $branch >/dev/null 2>&1
+        )
+      then
+        error "Unable to checkout $branch."
+      fi
+    fi
 
-    enter "${repo_path}"
-
-    case "${_url}" in
-      *git*)
-        # TODO: Use git cli instead of awking it :)
-        if [[ -z "$(git branch | awk "/${branch:=master}$/" 2>/dev/null)" ]]
-        then
-          if ! (
-            builtin cd  "${repo_path}"
-            git checkout -b "$branch" --track "$remote/$branch" >/dev/null 2>&1
-            )
-          then
-            error "$remote $branch remote branch not found. Halting."
-          fi
-        elif [[ -z "$(git branch | awk "/\* $branch$/{print \$2}" 2>/dev/null)" ]]
-        then
-          if ! (
-            builtin cd "${repo_path}"
-            git checkout $branch >/dev/null 2>&1
-            )
-          then
-            error "Unable to checkout $branch.\nCould not get head. Halting."
-          fi
-        fi
-
-        if ! (
-          builtin cd "${repo_path}"
-          git pull --rebase origin $branch >/dev/null 2>&1
-          )
-        then
-          error "Git pull failed. Halting."
-        fi
-        ;;
-      *svn*)
-        NIY "Subversion scm_update"
-        ;;
-      *hg*)
-        NIY "hg scm_update"
-        ;;
-      *fossil*)
-        NIY "fossil scm_update"
-        ;;
-      *)
-        error "Unknownn SCM for url '${_url}'"
-        ;;
-    esac
-
-    enter "$initial_pwd"
+    if ! (
+      builtin cd "${repo_path}"
+      git pull --rebase origin $branch >/dev/null 2>&1
+      )
+    then
+      fail "Git pull failed."
+    fi
   else
-    fail "Cannot fetch an extension from a url as no url was given"
+    ensure_paths_exist "${_target}"
+    if git clone --depth 1 ${_url} "${_target}" >/dev/null 2>&1
+    then
+      echo "${_url}" > "${_target}/.uri"
+    else
+      local _url_https="${_url/git:\/\//https:\/\/}"
+      if git clone --depth 1 ${_url_https} "${_target}" >/dev/null 2>&1
+      then
+        echo "${_url_https}" > "${_target}/.uri"
+      else
+        fail "There was an error while cloning the repository from the url '${_url}'"
+      fi
+    fi
   fi
+  enter "$initial_pwd"
 }
 
+# ## is\_github\_url()
+#
+#
+#
+# Code Walkthrough
+is_github_url()
+{
+  #TODO: add validation that given repository exists on github
+  ematch "$1" "^[[:alnum:]_-]+\/[[:alnum:]_-]+$"
+}
+
+# ## github\_get()
+#
+#
+#
+# Code Walkthrough
+github_get()
+{
+  local _url="$1" _target="$2"
+  # use git for fetching github repo
+  git_get "git://github.com/${_url}.git" "${_target}"
+  # and overwrite repo uri
+  echo "${_url}" > "${_target}/.uri"
+}
+
+# ## scm\_get()
+#
+#
+#
+# Code Walkthrough
+scm_get()
+{
+  log "${log_prefix}scm_get $1 -> $2"
+  # check for pattern user/repository from github
+  if is_github_url "$1"
+  then
+    github_get "$@"
+    return $?
+  fi
+  case "$1" in
+    (/*)
+      NIY "filesystem scm_update"
+      ;;
+    (*git|git*)
+      git_get "$@"
+      ;;
+    (*svn*)
+      NIY "Subversion scm_update"
+      ;;
+    (*hg*)
+      NIY "hg scm_update"
+      ;;
+    (*fossil*)
+      NIY "fossil scm_update"
+      ;;
+    (*)
+      error "Unknownn SCM for url '${_url}'"
+      ;;
+  esac
+}

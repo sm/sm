@@ -109,7 +109,7 @@ last()
 #
 # ### Input Parameters
 #
-# Positional Parameter listing and descriptions.
+# Positional Parameter value and regexp.
 #
 # ### Stream Outputs
 #
@@ -167,6 +167,86 @@ match()
           ;;
         (*)
           return 1
+          ;;
+      esac
+    else
+      # Otherwise no regex parameter was passed in, this is a programming error.
+      # Send a failure message which also triggers a backtrace enabling the
+      # developer to quickly pinpoint and fix their error.
+      fail "A regex must be specified in order to match ${_value} against it."
+    fi
+  else
+    # Otherwise no parameters were passed in, this is a programming error.
+    # Send a failure message which also triggers a backtrace enabling the
+    # developer to quickly pinpoint and fix their error.
+    fail "A value and regex must be specified in order to match."
+  fi
+}
+
+#
+# ## ematch()
+#
+# Tests to see if a value matches a given extended regex.
+#
+# ### Input Parameters
+#
+# Positional Parameter value and regexp.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 if the value matches the regex (shell extended glob pattern)
+# 1 if the value does not match the regex (shell extended glob pattern)
+#
+# ### Failure Scenarios
+#
+# Fails if no value is given
+# Fails if no regex is given
+#
+# ### Usage Examples
+#
+#     user$ ematch "The quick brown fox jumped over the lazy dog." "fox.*jumped"
+#     user$ echo $?
+#     0
+#
+#     user$ ematch "The quick brown fox jumped over the lazy dog." "^fox"
+#     user$ echo $?
+#     1
+#
+ematch()
+{
+  # Store the first parameter into the value variable.
+  local _value="$1"
+
+  # If the varable is nonempty
+  if variable_is_nonempty _value
+  then
+    # then remove the value from the parameters list and set the regex variable
+    # to the next parameter
+    shift
+    local _regex="$1"
+
+    # if the regex variable is nonempty
+    if variable_is_nonempty _regex
+    then
+      # Use grep for extended regexp
+      echo "$1" | grep -qE "$2"
+      local result=$?
+      case $result in
+        0|1)
+          # 0 & 1 are correct results
+          return $result
+          ;;
+        *)
+          # any other result means error in grep
+          fail "grep returned unknown code $result"
           ;;
       esac
     else
@@ -301,14 +381,7 @@ variable_is_nonempty()
   if [[ -n "${_variable}" ]]
   then
     # if the evaluation of a nonempty test with the variable name used
-    if eval "[[ -n \"\${${_variable}:-}\" ]]"
-    then
-      # is true then return true, 0
-      return 0
-    else
-      # otherwise return false, 1
-      return 1
-    fi
+    eval "[[ -n \"\${${_variable}:-}\" ]]"
   else
     # Otherwise no parameters were passed in, this is a programming error.
     # Send a failure message which also triggers a backtrace enabling the

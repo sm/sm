@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-#
-# user$ bdsm extend rsync <local ext name> <rsync url>
-#
-
-NIY "extend from rsync dirctory url"

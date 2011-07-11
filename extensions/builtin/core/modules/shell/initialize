@@ -2,14 +2,21 @@
 
 # Ensure that default values are set, prefix_path should be set at this point so
 # this is also a failsafe.
+#TODO: update repository_url to "wayneeseguin/bdsm"
 true \
   "${prefix_path:="/usr/local"}" \
   "${bin_path:="${prefix_path}/bin"}" \
   "${source_path:="${prefix_path}/src"}" \
   "${archive_format:=tar.gz}" \
   "${package_name:=${extension}}" \
-  "${repository_url:="git://github.com/wayneeseguin/bdsm"}" \
-  "${releases_url:=$(hash_file "${bdsm_path}/extensions/core/config/defaults" "releases_url")}"
+  "${repository_url:="git://github.com/wayneeseguin/bdsm"}"
+for config in "${bdsm_path}/extensions/core/config/defaults" "${bdsm_path}/extensions/core/config/defaults"
+do
+  if file_exists "$config"
+  then
+    true "${releases_url:=$(hash_file "${config}" "releases_url")}"
+  fi
+done
 
 # Load the BDSM framework version.
 bdsm_version
@@ -18,5 +25,5 @@ user="$USER"
 
 export prefix_path bin_path source_path
 
-modules system time templates
+modules system time templates vcs
 

@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-#
-# user$ bdsm extend git <local ext name> <scp url>
-#
-
-NIY "extend from scp tarball url"
