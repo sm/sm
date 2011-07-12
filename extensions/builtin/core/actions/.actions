@@ -2,7 +2,6 @@ extension=ext
 extend=ext extend
 ls=ext list
 list=ext list
-install=ext extend_and package install
 edit=ext edit
 open=ext open
 update=ext update

@@ -1203,10 +1203,8 @@ copy_file()
         if variable_is_nonempty _mode
         then
           # then set the filesystem mode of the target to the given mode
-          if chmod "${_mode}" "${_target}"
+          if ! chmod "${_mode}" "${_target}"
           then
-            true
-          else
             # Failed to change filesystem mode of the target
             # This indicates either a a system or programming error.
             # Fail giving a message with a backtrace that can be used to debug.
@@ -1218,10 +1216,8 @@ copy_file()
         if variable_is_nonempty _owner
         then
           # then set the filesystem owner of the target to the given mode
-          if chown "${_owner}" "${_target}"
+          if ! chown "${_owner}" "${_target}"
           then
-            true
-          else
             # Failed to change filesystem ownership of the target
             # This indicates either a a system or programming error.
             # Fail giving a message with a backtrace that can be used to debug.
@@ -2411,12 +2407,7 @@ file_is_executable()
 
   if [[ -n "${_file}" ]]
   then
-    if [[ -x "${_file}" ]]
-    then
-      return 0
-    else
-      return 1
-    fi
+    [[ -r "${_file}" && -x "${_file}" ]]
   else
     fail "Cannot check if a file is executable as no file path/name was given"
   fi
@@ -2463,12 +2454,7 @@ file_exists()
   local _file="${1:-}"
   if [[ -n "${_file}" ]]
   then
-    if [[ -f "${_file}" ]]
-    then
-      return 0
-    else
-      return 1
-    fi
+    [[ -f "${_file}" ]]
   else
     fail "Cannot check to see if a file exists as no file name/path was given"
   fi
@@ -2515,12 +2501,7 @@ file_does_not_exist()
   local _file="${1:-}"
   if [[ -n "${_file}" ]]
   then
-    if [[ -f "${_file}" ]]
-    then
-      return 0
-    else
-      return 1
-    fi
+    [[ ! -f "${_file}" ]]
   else
     fail "Cannot check to see if a file exists as no file name/path was given"
   fi
@@ -2572,12 +2553,7 @@ file_is_nonempty()
     then
       error "When checking whether the file '${_file}' is nonempty, a directory was found in its place."
     else
-      if [[ -s "${_file}" ]]
-      then
-        return 0
-      else
-        return 1
-      fi
+      [[ -s "${_file}" ]]
     fi
   else
     fail "Cannot check if file is nonempty as no file path/name was given"
@@ -2626,12 +2602,7 @@ file_is_empty()
 
   if [[ -n "${_file}" ]]
   then
-    if [[ -f "${_file}" && ! -s "${_file}" ]]
-    then
-      return 0
-    else
-      return 1
-    fi
+    [[ -f "${_file}" && ! -s "${_file}" ]]
   else
     fail "Cannot check if a file is empty as no file path/name was given"
   fi
@@ -2679,12 +2650,7 @@ file_is_missing()
 
   if [[ -n "${_file}" ]]
   then
-    if [[ ! -f "${_file}" ]]
-    then
-      return 0
-    else
-      return 1
-    fi
+    [[ ! -f "${_file}" ]]
   else
     fail "Cannot check if file is missing as no file path/name was given"
   fi
@@ -2732,12 +2698,7 @@ file_is_empty_or_missing()
 
   if [[ -n "${_file}" ]]
   then
-    if [[ ! -f "${_file}" || ! -s "${_file}" ]]
-    then
-      return 0
-    else
-      return 1
-    fi
+    [[ ! -f "${_file}" || ! -s "${_file}" ]]
   else
     fail "Cannot check if file is empty or missing as no file path/name was given"
   fi
@@ -2800,12 +2761,7 @@ file_contains()
     then
       if [[ -f "${_file}" ]]
       then
-        if grep "${_pattern}" "${_file}" >/dev/null 2>&1
-        then
-          return 0
-        else
-          return 1
-        fi
+        grep "${_pattern}" "${_file}" >/dev/null 2>&1
       else
         _message=(
         "First parameter must be a file, '${_file}'"
@@ -2863,12 +2819,7 @@ symlink_exists()
 
   if [[ -n "${_file}" ]]
   then
-    if [[ -L "${_file}" ]]
-    then
-      return 0
-    else
-      return 1
-    fi
+    [[ -L "${_file}" ]]
   else
     fail "Cannot check if symlink exists as no path/name was given"
   fi
@@ -2916,12 +2867,7 @@ path_exists()
 
   if [[ -n "${_directory}" ]]
   then
-    if [[ -d "$_directory" ]]
-    then
-      return 0
-    else
-      return 1
-    fi
+    [[ -d "$_directory" ]]
   else
     fail "Cannot check if directory exists as no name/path was given"
   fi
@@ -2977,12 +2923,7 @@ directories_in()
   then
     if [[ -d "${_path}" ]]
     then
-      if find "${_path}" -mindepth 1 -maxdepth 1 -type d
-      then
-        return 0
-      else
-        return 1
-      fi
+      find "${_path}" -mindepth 1 -maxdepth 1 -type d
     else
       fail "'${_path}' is not a directory!"
     fi
@@ -3005,12 +2946,7 @@ directories_in_matching()
     then
       if [[ -n "${_pattern}" ]]
       then
-        if find "${_path}" -mindepth 1 -maxdepth 1 -type d
-        then
-          return 0
-        else
-          return 1
-        fi
+        find "${_path}" -mindepth 1 -maxdepth 1 -type d
       else
         fail "'${_path}' is not a directory!"
       fi
@@ -3034,12 +2970,7 @@ directories_under()
   then
     if [[ -d "${_path}" ]]
     then
-      if find "${_path}" -mindepth 1 -type d
-      then
-        return 0
-      else
-        return 1
-      fi
+      find "${_path}" -mindepth 1 -type d
     else
       fail "'${_path}' is not a directory!"
     fi
@@ -3064,12 +2995,7 @@ directories_under_matching()
     then
       if [[ -n "${_pattern}" ]]
       then
-        if find "${_path}" -mindepth 1 -iname "${_pattern}" -type d
-        then
-          return 0
-        else
-          return 1
-        fi
+        find "${_path}" -mindepth 1 -iname "${_pattern}" -type d
       else
         fail "'${_path}' is not a directory!"
       fi
@@ -3120,12 +3046,7 @@ files_in()
   then
     if [[ -d "${_path}" ]]
     then
-      if find "${_path}" -mindepth 1 -maxdepth 1 -type f
-      then
-        return 0
-      else
-        return 1
-      fi
+      find "${_path}" -mindepth 1 -maxdepth 1 -type f
     else
       fail "'${_path}' is not a directory!"
     fi
@@ -3173,12 +3094,7 @@ files_under()
   then
     if [[ -d "${_path}" ]]
     then
-      if find "${_path}" -mindepth 1 -type f
-      then
-        return 0
-      else
-        return 1
-      fi
+      find "${_path}" -mindepth 1 -type f
     else
       fail "'${_path}' is not a directory!"
     fi
@@ -3231,12 +3147,7 @@ files_in_path_matching()
       shift
       if [[ -n "${_pattern}" ]]
       then
-        if find "${_path}" -mindepth 1 -iname "${_pattern}" -type f
-        then
-          return 0
-        else
-          return 1
-        fi
+        find "${_path}" -mindepth 1 -iname "${_pattern}" -type f
       else
         fail "Cannot find files as a filename or pattern was not given."
       fi
@@ -3325,12 +3236,7 @@ replace_content()
       then
         if [[ -f "${_file:-}" ]]
         then
-          if sed -i -e "s#${_pattern//\#/\\#}#${_content//\#/\\#}#g" "${_file}"
-          then
-            return 0
-          else
-            return 1
-          fi
+          sed -i -e "s#${_pattern//\#/\\#}#${_content//\#/\\#}#g" "${_file}"
         else
           fail "Can not replace file content as the file does not exist."
         fi
@@ -3401,12 +3307,7 @@ file_matches_md5()
       then
         _file_md5="$(file_md5 "${_file}")"
 
-        if [[ "${_file_md5// *}" = "$_md5" ]]
-        then
-          return 0
-        else
-          return 1
-        fi
+        [[ "${_file_md5// *}" = "$_md5" ]]
       else
         return 1
       fi

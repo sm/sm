@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+description "install BDSM extension"
+
+action "extend update internal" \
+  "Update internal bdsm extensions"
+
+action "extend <uri> <name>" \
+  "Extend given extension from uri to name"
+
+show_help usage

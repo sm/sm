@@ -1,0 +1,7 @@
+default=list_installed()
+installed=list_installed()
+
+available=list_available()
+
+help=list_help()
+usage=list_help()

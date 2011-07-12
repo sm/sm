@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+#TODO: unused?
 bdsm_development_setup()
 {
   local _component _separator _string
@@ -228,46 +229,19 @@ Halting the installation.
 
 install_head()
 {
-  install_bdsm_git "bdsm" "wayneeseguin"
+  install_bdsm_scm "bdsm" "wayneeseguin"
 }
 
 install_remote()
 {
-  install_bdsm_git "bdsm-$1" "$1"
+  install_bdsm_scm "bdsm-$1" "$1"
 }
 
-install_bdsm_git()
+install_bdsm_scm()
 {
   local remote="origin" dir="${1}" owner="${2}"
 
-  if path_exists "${src_path}/${dir}/.git" ]]
-  then
-    enter "${src_path}/${dir}/"
-
-    if [[ -z "$(git branch | awk "/$branch$/")" ]]
-    then
-      if ! git checkout -b "$branch" --track "$remote/$branch" 2>/dev/null
-      then
-        fail "$remote $branch remote branch not found."
-      fi
-    elif [[ -z "$(git branch | awk "/\* $branch$/{print \$2}")" ]]
-    then
-      git checkout $branch 2>/dev/null ||
-        fail "Unable to checkout $branch.\nCould not get head. Sucks to be you... or rather... doesn't suck :-p"
-    fi
-
-    git pull --rebase origin $branch
-  else
-    enter "${src_path}"
-
-    if ! git clone --depth 1 "git://github.com/${owner}/bdsm.git" "${dir}"
-    then
-      if ! git clone "https://github.com/${owner}/bdsm.git" "${dir}"
-      then
-        fail "Unable to clone the ${owner} BDSM repository, attempted both git:// and https://\nCould not get head, terribly sorry about the blue balls :("
-      fi
-    fi
-  fi
+  scm_get "${owner}/bdsm" "${src_path}/${dir}"
 
   if (( ${sense_of_humor_flag:=0} == 1 ))
   then
@@ -290,10 +264,13 @@ prepare_for_installation()
   log "  Removing target directories"
   remove_paths "${directories[@]}"
   ensure_paths_exist "${directories[@]}" extensions
-  enter "${install_path}/extensions"
 
   log "  Removing core and old extensions, if they exist"
-  remove_paths "${extensions[@]}" extension bdsm
+  enter "${install_path}/extensions"
+  remove_paths "${extensions_old[@]}"
+  ensure_paths_exist "${extensions_paths[@]}"
+  enter "${install_path}/extensions/builtin"
+  remove_paths "${extensions_old[@]}"
   # || fail "Could not create installation target"
 
   enter "${initial_pwd}"
@@ -308,13 +285,57 @@ create_auxillary_paths()
   enter "${initial_pwd}"
 }
 
-install_core_extensions()
+install_builtin_extensions()
 {
   local initial_pwd="$PWD"
-  log "  Installing core extensions (${extensions[*]}) into ${install_path}/extensions"
-  ensure_paths_exist "${install_path}/extensions"
-  enter "extensions"
-  copy_paths to "${install_path}/extensions" "${extensions[@]}"
+  log "  Installing builtin extensions"
+  ensure_paths_exist "${install_path}/extensions/builtin"
+  enter "extensions/builtin"
+  copy_paths to "${install_path}/extensions/builtin" *
+  enter "${initial_pwd}"
+}
+
+# install internal bdsm extensions from the given user github account
+# default user is wayneeseguin
+install_internal_extensions()
+{
+  local initial_pwd="$PWD" _url="${1:-wayneeseguin}/bdsm-extensions"
+  local _identifier="$(scm_identifier "${_url}")"
+  log "  Installing internal extensions"
+  enter "${install_path}/extensions"
+  remove_paths "internal"
+  scm_get "${_url}" "${install_path}/src/${_identifier}"
+  copy_directory "${install_path}/src/${_identifier}" to "internal"
+  enter "${initial_pwd}"
+}
+
+migrate_external_extensions()
+{
+  local initial_pwd="$PWD"
+  log "  Migrating external extensions"
+  enter "${install_path}/extensions"
+  for extension in *
+  do
+    # skip new directories
+    case ${extension} in
+      builtin|internal|external)
+        continue
+        ;;
+    esac
+    if file_exists "${extension}/.uri" &&
+      file_contains "${extension}/.uri" "git://github.com/wayneeseguin/bdsm-extensions"
+    then
+      # internal extension
+      remove "${extension}"
+    else
+      # external extension
+      move_directory "${extension}" "external/${extension}"
+      if file_exists "external/${extension}/.uri"
+      then
+        sed -ie "s/git:\/\/github.com\/\(.*\)\.git/\1/" "external/${extension}/.uri"
+      fi
+    fi
+  done
   enter "${initial_pwd}"
 }
 
@@ -330,7 +351,10 @@ install_core()
 install_configuration_files()
 {
   log "  Ensuring that the configuration files (${configs[*]}) exist in ${config_path}"
-  ensure_files_exist "${install_path}/config/user"
+  for config_file in "${configs[@]}"
+  do
+    ensure_files_exist "${install_path}/config/${config_file}"
+  done
 }
 
 symlink_bdsm()
