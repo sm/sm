@@ -32,7 +32,7 @@ git_get()
     if [[ -z "$(git branch | awk "/${branch}$/" 2>/dev/null)" ]]
     then
       if ! (
-        builtin cd  "${repo_path}"
+        enter "${repo_path}"
         git checkout -b "${branch}" --track "${remote}/${branch}" >/dev/null 2>&1
         )
       then
@@ -41,7 +41,7 @@ git_get()
     elif [[ -z "$(git branch | awk "/\* $branch$/{print \$2}" 2>/dev/null)" ]]
     then
       if ! (
-        builtin cd "${repo_path}"
+        enter "${repo_path}"
         git checkout $branch >/dev/null 2>&1
         )
       then
@@ -50,7 +50,7 @@ git_get()
     fi
 
     if ! (
-      builtin cd "${repo_path}"
+      enter "${repo_path}"
       git pull --rebase origin $branch >/dev/null 2>&1
       )
     then

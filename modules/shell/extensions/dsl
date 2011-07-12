@@ -273,7 +273,7 @@ detect_action_in_paths()
 {
   local search_paths=( $(extensions_search_paths) )
   local builtin_path="${parent_extensions_path}/builtin"
-  local builtin_extensions=( $(cd "${builtin_path}" ; echo -n * ) )
+  local builtin_extensions=( $(enter "${builtin_path}" ; echo -n * ) )
 
   for path in "${search_paths[@]}"
   do

@@ -200,7 +200,7 @@ get_version()
   tar zxf "${path}/archives/bdsm-${version}.tar.gz" -C "$extensions_src_path/"
 
   (
-  cd "$src_path/bdsm-${version}"
+  builtin cd "$src_path/bdsm-${version}"
   chmod +x ./install
   ./install
   )
