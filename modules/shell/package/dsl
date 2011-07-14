@@ -1690,7 +1690,6 @@ package_dependencies()
       error "${extension} requires ${dependency}, please install the ${dependency} via bdsm package module and retry.
 Typically this would be done as follows:
 
-sudo bdsm extend ${dependency}
 sudo bdsm ${dependency} package install
 
       "
