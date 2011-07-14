@@ -3,9 +3,6 @@
 param="${extension_action:-$extension_args}"
 
 case "${param}" in
-  head)
-    install_head
-    ;;
 
   version) # x.y.z
     install_release
@@ -17,7 +14,7 @@ case "${param}" in
     ;;
 
   *)
-    install_remote "${param}"
+    install_remote "${param:-wayneeseguin}"
     ;;
 esac
 
