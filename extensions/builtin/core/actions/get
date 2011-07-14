@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-action="${extension_args[1]}"
+action="${extension_args[0]}"
 
 case "${action}" in
 
