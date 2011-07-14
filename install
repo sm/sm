@@ -67,7 +67,5 @@ source_files \
   "${PWD}/extensions/builtin/core/extensions/builtin/core/modules/shell/initialize" \
   "${PWD}/extensions/builtin/core/extensions/builtin/core/modules/shell/cli"
 
-trace on
-
 source "${PWD}/extensions/builtin/core/actions/install"
 
