@@ -28,11 +28,11 @@ git_get()
 
   if path_exists "$_target/.git"
   then
-    enter "${_target}"
+    builtin cd "${_target}"
     if [[ -z "$(git branch | awk "/${branch}$/" 2>/dev/null)" ]]
     then
       if ! (
-        builtin cd  "${repo_path}"
+        builtin cd "${repo_path}"
         git checkout -b "${branch}" --track "${remote}/${branch}" >/dev/null 2>&1
         )
       then

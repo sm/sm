@@ -2231,7 +2231,7 @@ enter()
     then
       # then change the calling environment's working directory into the
       # given path
-      if cd "${_path}"
+      if builtin cd "${_path}"
       then
         # return true, 0 for success
         return 0
