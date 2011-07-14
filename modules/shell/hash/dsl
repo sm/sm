@@ -9,12 +9,23 @@
 # Read keys from given file($1)
 hash_keys()
 {
-  local valid_keys='^[^ ^=]+'
-  echo -n $(grep -E "${valid_keys}=" $1 | grep -Eo "${valid_keys}")
+  local file=$1 valid_keys='^[^ ^=]+'
+  echo -n $(grep -E "${valid_keys}=" $file | grep -Eo "${valid_keys}")
 }
 
-# Read value from given file($1) and for given key($2)
+# Read value from given file($1) for given key($2) and assign it to a variable($3)
 hash_read()
 {
-  awk -v key="^$2=" -v valid_keys='^[^ ^=]+=' '{if ($0 ~ valid_keys) found=0; if ($1 ~ key) {found=1; gsub(key,"");}; if (found == 1) print $0 }' $1
+  local file=$1 key=$2 variable=$3 valid_keys='^[^ ^=]+'
+  eval "${variable}=$(
+    awk \
+      -v key="^${key}=" \
+      -v valid_keys="${valid_keys}=" \
+      '{
+        if ($0 ~ valid_keys) found=0;
+        if ($0 ~ key) {found=1; gsub(key,"");};
+        if (found == 1) print $0
+      }' \
+      $file
+  )"
 }
