@@ -180,11 +180,14 @@ extension_modules_load()
 {
   local _token _namespace=()
 
-  # Load the extensions's core module
-  source_files \
-    "${extension_modules_path}/shell/dsl" \
-    "${extension_modules_path}/shell/cli" \
-    "${extension_modules_path}/shell/initialize"
+  if [[ "${extension}" != "core" ]]
+  then # Core extension modules are loaded by default on startup.
+    # Load the extensions's core module
+    source_files \
+      "${extension_modules_path}/shell/dsl" \
+      "${extension_modules_path}/shell/cli" \
+      "${extension_modules_path}/shell/initialize"
+  fi
 
   while (( $# > 0 ))
   do
