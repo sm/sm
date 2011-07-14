@@ -103,15 +103,15 @@ bdsm_version()
 #
 #     user$ cat $HOME/test
 #     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/modules/shell/core/initialize" # Load BDSM framework core.
+#     source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # Load BDSM framework core.
 #     NIY
 #
 #     user$ $HOME/test
 #     ERROR: This feature has not yet been implemented.
 #     Backtrace:
 #        Trace   Line Function             File
-#           3.    262 fail()               /usr/local/bdsm/modules/shell/logging/dsl
-#           2.      5 NIY()                /usr/local/bdsm/modules/shell/extensions/dsl
+#           3.    262 fail()               /usr/local/bdsm/extensions/builtin/core/modules/shell/logging/dsl
+#           2.      5 NIY()                /usr/local/bdsm/extensions/builtin/core/modules/shell/extensions/dsl
 #           1.      5 main()               /Users/wayneeseguin/test
 #      > modules/shell/logging/dsl fail() 263 $ exit 1
 #
