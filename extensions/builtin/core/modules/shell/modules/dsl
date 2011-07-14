@@ -27,6 +27,12 @@
 #     user$ modules_loaded
 #     logging trace filesystem array system
 #
+#  modules x y z
+#
+#  if x,y or z do not contain a '/' then prefix core/
+#  if x contains a '/' then load directly
+#
+#
 modules()
 {
   #if (( trace_flag < 2 ))
@@ -49,7 +55,7 @@ modules()
 
         for _path in "${_bdsm}" "${_extension}"
         do
-          for _file in dsl initialize
+          for _file in dsl cli initialize
           do
             if [[ -s "${_path}/${_file}" ]]
             then
@@ -103,6 +109,7 @@ modules()
 #     user$ module_load zebra # This will load zebra into the current context
 #     Zebra!!!
 #
+# TODO: extension_module_load
 module_load()
 {
   local _file _files=("$@")
