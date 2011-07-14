@@ -4,6 +4,10 @@ action="${extension_args[0]}"
 
 case "${action}" in
 
+  head)
+    install_remote "wayneeseguin"
+    ;;
+
   version) # x.y.z
     install_release
     ;;
