@@ -183,8 +183,8 @@ extension_modules_load()
   # Load the extensions's core module
   source_files \
     "${extension_modules_path}/shell/dsl" \
-    "${extension_modules_path}/shell/initialize" \
-    "${extension_modules_path}/shell/cli"
+    "${extension_modules_path}/shell/cli" \
+    "${extension_modules_path}/shell/initialize"
 
   while (( $# > 0 ))
   do
@@ -195,8 +195,8 @@ extension_modules_load()
 
     source_files \
       "${extension_modules_path}/shell/${namespace}/dsl" \
-      "${extension_modules_path}/shell/${namespace}/initialize" \
-      "${extension_modules_path}/shell/${namespace}/cli"
+      "${extension_modules_path}/shell/${namespace}/cli" \
+      "${extension_modules_path}/shell/${namespace}/initialize"
   done
 }
 
