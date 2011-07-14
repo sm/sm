@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-case "${extension_action}" in
+action="${extension_args[0]}"
+case "${action}" in
 
   version) # x.y.z
     install_release
@@ -12,7 +13,7 @@ case "${extension_action}" in
     ;;
 
   *)
-    install_remote "${extension_action:-wayneeseguin}"
+    install_remote "${action:-wayneeseguin}"
     ;;
 esac
 
