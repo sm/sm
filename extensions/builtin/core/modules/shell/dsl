@@ -228,11 +228,6 @@ Halting the installation.
   ./install
 }
 
-install_head()
-{
-  install_bdsm_scm "bdsm" "wayneeseguin"
-}
-
 install_remote()
 {
   install_bdsm_scm "bdsm-$1" "$1"
@@ -240,7 +235,7 @@ install_remote()
 
 install_bdsm_scm()
 {
-  local remote="origin" dir="${1}" owner="${2}"
+  local remote="origin" dir="${1}" owner="${2:-wayneeseguin}"
 
   scm_get "${owner}/bdsm" "${src_path}/${dir}"
 
@@ -428,8 +423,8 @@ setup_profile_d()
   if ! file_exists "${profile_d_path}/bdsm.sh" ||
      ! file_contains "${profile_d_path}/bdsm.sh" "${packages_path}/active/bin"
   then
-    log "PATH=\"${packages_path}/active/bin:\${PATH}\"\n" \
-      append to "${profile_d_path}/bdsm.sh"
+    log "PATH=\"${packages_path}/active/bin:${packages_path}/active/sbin:\${PATH}\"\n" \
+      to "${profile_d_path}/bdsm.sh"
 
     chmod_files 0755 "${profile_d_path}/bdsm.sh"
   fi

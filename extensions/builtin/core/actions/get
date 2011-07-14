@@ -1,11 +1,8 @@
 #!/usr/bin/env bash
 
-param="${extension_action:-$extension_args}"
+action="${extension_args[0]}"
 
-case "${param}" in
-  head)
-    install_head
-    ;;
+case "${action}" in
 
   version) # x.y.z
     install_release
@@ -17,7 +14,7 @@ case "${param}" in
     ;;
 
   *)
-    install_remote "${param}"
+    install_remote "${action:-wayneeseguin}"
     ;;
 esac
 

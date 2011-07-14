@@ -74,7 +74,7 @@ true \
 
 if [[ -d "${active_path}/bin" ]]
 then
-  export PATH="${active_path}/bin:${PATH}"
+  export PATH="${active_path}/bin:${active_path}/sbin:${PATH}"
 fi
 
 # Load module() function and then load core modules.
