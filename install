@@ -46,25 +46,26 @@ fi
 
 install_path="${bdsm_path}"         # Path to install everything to
 bdsm_path="$PWD"                    # Path to load everything from
-modules_path="${bdsm_path}/modules"
+modules_path="${bdsm_path}/extensions/builtin/core/modules"
 
 export bdsm_path install_path modules_path
 
 # Load DSL and initialize BDSM core itself, manually.
-source "${PWD}/modules/shell/core/dsl"
+source "${PWD}/extensions/builtin/core/modules/shell/dsl"
 
 # Load fundamental Module DSL's
 for module in variables modules logging trace filesystem core vcs
 do
   for file in dsl initialize
   do
-    source "${PWD}/modules/shell/${module}/${file}"
+    source "${PWD}/extensions/builtin/core/modules/shell/${module}/${file}"
   done
 done
 
 source_files \
-  "${PWD}/extensions/builtin/core/modules/shell/dsl" \
-  "${PWD}/extensions/builtin/core/modules/shell/initialize" \
-  "${PWD}/extensions/builtin/core/modules/shell/cli"
+  "${PWD}/extensions/builtin/core/extensions/builtin/core/modules/shell/dsl" \
+  "${PWD}/extensions/builtin/core/extensions/builtin/core/modules/shell/initialize" \
+  "${PWD}/extensions/builtin/core/extensions/builtin/core/modules/shell/cli"
 
 source "${PWD}/extensions/builtin/core/actions/install"
+

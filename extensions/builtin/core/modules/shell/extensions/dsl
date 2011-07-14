@@ -327,7 +327,7 @@ detect_action_in_paths()
 #
 #     $ cat $HOME/test
 #     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/modules/shell/core/initialize" # Load BDSM framework core.
+#     source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # Load BDSM framework core.
 #     modules extensions
 #     extension_action ext list
 #
@@ -518,7 +518,7 @@ extension_version()
 #
 #     $ cat $HOME/test
 #     !/usr/bin/env bash
-#     source "/usr/local/bdsm/modules/shell/core/initialize" # Load BDSM framework core.
+#     source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # Load BDSM framework core.
 #     modules extensions
 #     extension_license postgresql
 #
@@ -578,7 +578,7 @@ extension_license()
 #
 #     $ cat $HOME/test
 #     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/modules/shell/core/initialize" # Load BDSM framework core.
+#     source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # Load BDSM framework core.
 #     modules extensions
 #     extensions_installed
 #
@@ -621,7 +621,7 @@ extensions_installed()
 #
 #      $ cat $HOME/test
 #      #!/usr/bin/env bash
-#      source "/usr/local/bdsm/modules/shell/core/initialize" # Load BDSM framework core.
+#      source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # Load BDSM framework core.
 #      modules extensions
 #      extensions_available
 
@@ -663,7 +663,7 @@ extensions_available()
 #
 #      $ cat $HOME/test
 #      #!/usr/bin/env bash
-#      source "/usr/local/bdsm/modules/shell/core/initialize" # Load BDSM framework core.
+#      source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # Load BDSM framework core.
 #      modules extensions
 #      extensions_in_development
 
@@ -708,7 +708,7 @@ extensions_in_development()
 #
 #     $ cat $HOME/test
 #     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/modules/shell/core/initialize" # Load BDSM framework core.
+#     source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # Load BDSM framework core.
 #     modules extensions
 #     extensions_in /usr/local/bdsm/extensions
 #
@@ -772,7 +772,7 @@ extensions_in()
 #
 #      $ cat $HOME/test
 #      #!/usr/bin/env bash
-#      source "/usr/local/bdsm/modules/shell/core/initialize" # Load BDSM framework core.
+#      source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # Load BDSM framework core.
 #      modules extensions
 #      extension_actions "postgresql"
 #
@@ -837,7 +837,7 @@ extension_actions()
 #
 #     $ cat $HOME/test
 #     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/modules/shell/core/initialize" # Load BDSM framework core.
+#     source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # Load BDSM framework core.
 #     modules extensions
 #     extensions_installed
 #     echo

@@ -29,7 +29,7 @@
 #
 #     user$ cat ./test
 #     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/modules/shell/core/initialize" # Load BDSM framework core.
+#     source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # Load BDSM framework core.
 #     modules trace time # Load the trace module.
 #
 #     timestamp_set
@@ -76,7 +76,7 @@ timestamp_set()
 #
 #     user$ cat ./test
 #     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/modules/shell/core/initialize" # Load BDSM framework core.
+#     source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # Load BDSM framework core.
 #     modules trace time # Load the trace module.
 #
 #     timestamp

@@ -28,9 +28,9 @@ then
           extension_module_add "${extension}" "${_module}" "${_path}"
 
           # Run the module's extension setup function, if it exists.
-          if file_exists "${bdsm_path}/modules/shell/${_module}/extensions"
+          if file_exists "${bdsm_path}/extensions/builtin/core/modules/shell/${_module}/extensions"
           then
-            source_files "${bdsm_path}/modules/shell/${_module}/extensions"
+            source_files "${bdsm_path}/extensions/builtin/core/modules/shell/${_module}/extensions"
             if command_exists "${_module}_extension_setup"
             then
               "${_module}_extension_setup" "${extension}" "${_module}" "${_path}"

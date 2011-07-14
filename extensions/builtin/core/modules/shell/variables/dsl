@@ -294,7 +294,7 @@ ematch()
 #
 #     user$ cat test
 #     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/modules/shell/core/initialize" # Load BDSM framework core.
+#     source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # Load BDSM framework core.
 #     modules trace variables # Load the trace module.
 #     unset HOME
 #     variables_must_be_nonempty HOME
@@ -304,8 +304,8 @@ ematch()
 #     ERROR: A command has returned an unhandled error code (nonzero return value).
 #     Backtrace:
 #        Trace   Line Function             File
-#           3.     37 fail()               /usr/local/bdsm/modules/shell/logging/dsl
-#           2.    192 variables_must_be_nonempty() /usr/local/bdsm/modules/shell/variables/dsl
+#           3.     37 fail()               /usr/local/bdsm/extensions/builtin/core/modules/shell/logging/dsl
+#           2.    192 variables_must_be_nonempty() /usr/local/bdsm/extensions/builtin/core/modules/shell/variables/dsl
 #           1.      6 main()               /Users/wayneeseguin/test
 #      > modules/shell/logging/dsl fail() 38 $ exit 1
 #
