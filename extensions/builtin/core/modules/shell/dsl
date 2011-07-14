@@ -228,11 +228,6 @@ Halting the installation.
   ./install
 }
 
-install_head()
-{
-  install_bdsm_scm "bdsm" "wayneeseguin"
-}
-
 install_remote()
 {
   install_bdsm_scm "bdsm-$1" "$1"
@@ -240,7 +235,7 @@ install_remote()
 
 install_bdsm_scm()
 {
-  local remote="origin" dir="${1}" owner="${2}"
+  local remote="origin" dir="${1}" owner="${2:-wayneeseguin}"
 
   scm_get "${owner}/bdsm" "${src_path}/${dir}"
 
