@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-action="${extension_args[0]}"
+action="${extension_args[1]}"
+
 case "${action}" in
 
   version) # x.y.z
