@@ -85,7 +85,7 @@ bdsm_development_update()
 fetch_version()
 {
   version=$(curl -s "${releases_url}/latest-version.txt" 2>/dev/null) ||
-    fail "Unable to fetch version from "
+    fail "Unable to fetch version from ${releases_url}/latest-version.txt"
 }
 
 md5_match()
@@ -106,11 +106,10 @@ md5_match()
       ;;
   esac
 
-  [[ "$archive_md5" == "$md5" ]]
+  [[ "${archive_md5}" == "${md5}" ]]
 
   return $?
 }
-
 
 fetch()
 { # TODO: Extract fetch dsl into it's own DSL module
