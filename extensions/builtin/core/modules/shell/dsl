@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-#TODO: unused?
 bdsm_development_setup()
 {
   local _component _separator _string
