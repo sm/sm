@@ -19,66 +19,20 @@
 
 # Load System then User Configuration, if exists.
 . /etc/profile
-
-unset prefix_path bdsm_path
-
-if [[ $MACHTYPE = *solaris* ]]
-then
-  export PATH="/usr/local/bin:/opt/local/bin:/usr/sfw/bin:/usr/sbin:/usr/bin"
-fi
-
-# Clean environment of all *_path variables.
-paths=(prefix_path $(env | awk -F= '/_path=/{print $1}' | sort))
-
-unset "${paths[@]}"
-
-for file in /etc/bdsmrc "$HOME/.bdsmrc"
-do
-  if [[ -s "${file}" ]]
-  then
-    . "${file}"
-  fi
-done
-
+bdsm_path="/usr/local/bdsm"
 # In case bdsm is being called from within a hook for example, we unset these:
 unset extension action
 
 initial_pwd="$PWD" # record this early on.
-
-# The default prefix is /usr/local,
-# this should be set to where BDSM is installed to in /etc/bdsmrc
-if (( UID == 0 ))
-then
-  true "${prefix_path:=/usr/local}"
-else
-  true "${prefix_path:="$HOME"}"
-fi
-
-if [[ -z "${bdsm_path:-}" ]]
-then
-  if [[ "$prefix_path" = "$HOME" ]]
-  then
-    bdsm_path="${prefix_path}.bdsm"
-  else
-    bdsm_path="${prefix_path}/bdsm"
-  fi
-fi
-
 modules_path="${bdsm_path}/extensions/builtin/core/modules"
+extension_args=("$@")
 
-export prefix_path bdsm_path modules_path initial_pwd extension_action_calls=0
+export extension_args bdsm_path initial_pwd extension_action_calls=0
 
 # Load BDSM shell DSL and initialize for BDSM core itself manually.
 # Ensure that backtrace and logging are defined first as everything depends on them.
 # Then load the main BDSM CLI
 . "${modules_path}/shell/core/dsl"
-. "${modules_path}/shell/core/initialize"
 . "${modules_path}/shell/core/cli"
+. "${modules_path}/shell/core/initialize"
 
-if [[ -n "${error_message}" ]]
-then
-  error "$error_message"
-fi
-
-disable_backtrace
-extension_action

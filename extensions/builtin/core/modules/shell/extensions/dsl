@@ -340,8 +340,13 @@ detect_action_in_paths()
 #
 extension_action()
 {
-  [[ extension_action_calls -gt 0 ]] && fail "can not call 2nd time\n  extension_action ${extension_args[@]}"
+  if (( extension_action_calls > 0 ))
+  then
+    fail "can not call 2nd time\n  extension_action ${extension_args[@]}"
+  fi
+
   extension_action_calls+=1
+
   unset extension action
 
   if detect_action_in_paths

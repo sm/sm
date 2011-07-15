@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 version_pattern="+([[:digit:]]).+([[:digit:]]).+([[:digit:]])"
+
 for (( index=0 ; index < ${#extension_args[@]} ; index++ ))
 do
   token="${extension_args[$index]}"

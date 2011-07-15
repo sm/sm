@@ -10,6 +10,7 @@ true \
   "${archive_format:=tar.gz}" \
   "${package_name:=${extension}}" \
   "${repository_url:="git://github.com/wayneeseguin/bdsm"}"
+
 for config in "${bdsm_path}/extensions/core/config/defaults" "${bdsm_path}/extensions/core/config/defaults"
 do
   if file_exists "$config"

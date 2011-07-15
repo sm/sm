@@ -228,6 +228,12 @@ Halting the installation.
   ./install
 }
 
+perform()
+{
+  enter "${initial_pwd}"
+  "$*"
+}
+
 install_remote()
 {
   install_bdsm_scm "bdsm-$1" "$1"
@@ -251,63 +257,40 @@ install_bdsm_scm()
 
 prepare_for_installation()
 {
-  local initial_pwd="$PWD"
+  local directory
 
   log "  Ensuring that install_path '${install_path}' exists"
   ensure_paths_exist "${install_path}"
   enter "${install_path}"
 
-  log "  Removing target directories"
-  remove_paths "${directories[@]}"
-  ensure_paths_exist "${directories[@]}" extensions
+  log "  Cleansing installation path"
+  for directory in "${cleanse_paths[@]}"
+  do
+    if path_exists "./${directory}"
+    then
+      rm -rf "./${directory}"
+    fi
+  done
 
-  log "  Removing core and old extensions, if they exist"
-  enter "${install_path}/extensions"
-  remove_paths "${extensions_old[@]}"
-  ensure_paths_exist "${extensions_paths[@]}"
-  enter "${install_path}/extensions/builtin"
-  remove_paths "${extensions_old[@]}"
-  # || fail "Could not create installation target"
-
-  enter "${initial_pwd}"
-}
-
-create_auxillary_paths()
-{
-  local initial_pwd="$PWD"
-  log "  Ensuring auxillary directories (${aux[*]}) exist in ${install_path}"
-  enter "${install_path}"
-  ensure_paths_exist "${install_path}/" "${aux[@]}"
-  enter "${initial_pwd}"
-}
-
-install_builtin_extensions()
-{
-  local initial_pwd="$PWD"
-  log "  Installing builtin extensions"
-  ensure_paths_exist "${install_path}/extensions/builtin"
-  enter "extensions/builtin"
-  copy_paths to "${install_path}/extensions/builtin" *
-  enter "${initial_pwd}"
+  log "  Creating installation paths"
+  ensure_paths_exist "${directories[@]}" "${aux_paths[@]}"
 }
 
 # install internal bdsm extensions from the given user github account
 # default user is wayneeseguin
 install_internal_extensions()
 {
-  local initial_pwd="$PWD" _url="${1:-wayneeseguin}/bdsm-extensions"
+  local _url="${1:-wayneeseguin}/bdsm-extensions"
   local _identifier="$(scm_identifier "${_url}")"
   log "  Installing internal extensions"
   enter "${install_path}/extensions"
   remove_paths "internal"
   scm_get "${_url}" "${install_path}/src/${_identifier}"
   copy_directory "${install_path}/src/${_identifier}" to "internal"
-  enter "${initial_pwd}"
 }
 
 migrate_external_extensions()
 {
-  local initial_pwd="$PWD"
   log "  Migrating external extensions"
   enter "${install_path}/extensions"
   for extension in *
@@ -332,16 +315,21 @@ migrate_external_extensions()
       fi
     fi
   done
-  enter "${initial_pwd}"
 }
 
 install_core()
 {
+  local _dir
   log "  Installing core directories (${directories[*]}) into ${install_path}"
-  copy_paths to "${install_path}" "${directories[@]}"
+
+  copy_paths --force to "${install_path}/" "${directories[@]}"
 
   log "  Installing core files (${files[*]}) into ${install_path}"
   copy_files to "${install_path}" ${files[@]}
+
+  log "  Installing builtin extensions"
+  copy_paths --force to "${install_path}/extensions/" "extensions/builtin"
+
 }
 
 install_configuration_files()
@@ -428,6 +416,20 @@ setup_profile_d()
 
     chmod_files 0755 "${profile_d_path}/bdsm.sh"
   fi
+}
+
+set_bdsm_path()
+{
+  local file
+  local files=(
+    "${install_path}/bin/bdsm"
+    "${install_path}/extensions/builtin/core/modules/shell/core/initialize"
+  )
+
+  for file in "${files[@]}"
+  do
+    replace_content "^bdsm_path=.*" with "bdsm_path=\"${install_path}\"" in "${file}"
+  done
 }
 
 setup_bdsmrc()
