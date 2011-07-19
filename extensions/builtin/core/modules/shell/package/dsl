@@ -328,6 +328,16 @@ package_install()
 }
 
 #
+# ## package\_update
+#
+package_update()
+{
+  # TODO: check if newer version exists, if so then...
+  package_install
+  package_activate ${package_name} ${package_version}
+}
+
+#
 # ## package\_fetch\_md5
 #
 # Fetches the package's md5 sum from the md5_url, if given.
