@@ -332,7 +332,7 @@ install_core()
 
 install_configuration_files()
 {
-  log "  Ensuring that the configuration files (${configs[*]}) exist in ${config_path}"
+  log "  Ensuring that the configuration files (${configs[*]}) exist in ${install_path}"
   for config_file in "${configs[@]}"
   do
     ensure_files_exist "${install_path}/config/${config_file}"
