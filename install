@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Bash Delectable Scripting Modules (BDSM) Framework
+# Badass Delectable Scripting Management (BDSM) Framework
 #
 # Copyright (c) 2009-2011 Wayne E. Seguin
 #
@@ -16,79 +16,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Load System BDSM Configuration, if it exists.
-for file in /etc/bdsmrc "$HOME/.bdsmrc"
-do
-  if [[ -s "${file}" ]]
-  then
-    source "${file}" || true # Continue if it fails.
-  fi
-done
+# record this early on.
+initial_pwd="$PWD"
 
 # The default prefix is /usr/local,
 # this should be set to where BDSM is installed to in /etc/bdsmrc
-if (( UID == 0 ))
-then
-  true "${prefix_path:=/usr/local}"
-else
-  true "${prefix_path:="$HOME"}"
-fi
-
 if [[ -z "${bdsm_path}" ]]
 then
-  if [[ "$prefix_path" = "$HOME" ]]
+  if (( UID == 0 ))
   then
-    bdsm_path="${prefix_path}/.bdsm"
+    bdsm_path="/usr/local/bdsm"
   else
-    bdsm_path="${prefix_path}/bdsm"
+    bdsm_path="$HOME/.bdsm"
   fi
 fi
 
-initial_pwd="$PWD"
+# set BDSM basic paths
 install_path="${bdsm_path}" # Path to install everything to
 bdsm_path="$PWD"            # Path to load everything from
 modules_path="${bdsm_path}/extensions/builtin/core/modules"
-extension_args=()
+export initial_pwd bdsm_path modules_path
 
-export bdsm_path install_path modules_path
-
-. "${modules_path}/shell/core/dsl"
+extension_args=(core install)
+# basic options parsing
 . "${modules_path}/shell/core/cli"
+# initialize BDSM
 . "${modules_path}/shell/core/initialize"
-. "${modules_path}/shell/dsl" # Installer specific dsl.
-
-cleanse_paths=(
-  extensions/core extensions/pkg extensions/srv extensions/ext extensions/mod
-  external completion modules bin extensions/builtin
-)
-directories=( bin completion )
-files=( LICENSE VERSION README.md )
-aux_paths=( log tmp src )
-configs=( user ) # TODO move this to /etc/bdsm/ and/or $HOME/.bdsm/
-
-modules vcs
-
-log "Installing BDSM Framework into ${install_path}\n"
-
-prepare_for_installation
-
-perform install_core
-
-perform set_bdsm_path
-
-perform install_internal_extensions
-
-perform migrate_external_extensions
-
-perform install_configuration_files
-
-perform symlink_bdsm
-
-perform setup_shell_completion
-
-perform setup_profile_d
-
-perform setup_bdsmrc
-
-succeed "\nInstallation of BDSM is complete\n"
-

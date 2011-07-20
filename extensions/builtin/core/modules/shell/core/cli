@@ -3,6 +3,11 @@
 set +o nounset
 set +o noclobber
 
+if (( $# == 0 )) && [[ -z "$extension_args" ]]
+then
+  extension_args=()
+fi
+
 while (( $# > 0 ))
 do
   token="$1"
@@ -21,12 +26,13 @@ do
 
     --trace)
       true ${trace_flag:=0} $(( trace_flag++ ))
-      enable_trace
+      PS4="# \${BASH_SOURCE##\${bdsm_path}\/extensions\/} \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO} $ "
+      export PS4
+      set -x
       ;;
 
     --debug)
       true ${debug_flag:=0} $(( debug_flag++ ))
-      enable_debug
       ;;
 
     --)
@@ -43,4 +49,3 @@ do
       ;;
   esac
 done
-

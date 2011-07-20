@@ -15,24 +15,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
 
-# Load System then User Configuration, if exists.
-. /etc/profile
+# record this early on.
+initial_pwd="$PWD"
+
+# set BDSM basic paths
 bdsm_path="/usr/local/bdsm"
-# In case bdsm is being called from within a hook for example, we unset these:
-unset extension action
-
-initial_pwd="$PWD" # record this early on.
 modules_path="${bdsm_path}/extensions/builtin/core/modules"
-extension_args=("$@")
+export initial_pwd bdsm_path modules_path
 
-export extension_args bdsm_path initial_pwd extension_action_calls=0
-
-# Load BDSM shell DSL and initialize for BDSM core itself manually.
-# Ensure that backtrace and logging are defined first as everything depends on them.
-# Then load the main BDSM CLI
-. "${modules_path}/shell/core/dsl"
+# basic options parsing
 . "${modules_path}/shell/core/cli"
+# initialize BDSM
 . "${modules_path}/shell/core/initialize"
-

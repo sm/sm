@@ -35,7 +35,7 @@ set_ps4()
   # Set the PS4 variable. Then export the PS4 variabel so that this script and
   # called bash scripts will display a more detailed and formatted trace output.
   # Finally return true, 0, for success.
-  PS4="# \${BASH_SOURCE##\${bdsm_path}\/} \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO} $ "
+  PS4="# \${BASH_SOURCE##\${bdsm_path}\/extensions\/} \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO} $ "
   export PS4
   return 0
 }

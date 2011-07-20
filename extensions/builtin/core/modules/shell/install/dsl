@@ -1,0 +1,290 @@
+#!/usr/bin/env bash
+
+fetch()
+{ # TODO: Extract fetch dsl into it's own DSL module
+  # TODO: allow either curl or wget, defaulting to curl...
+  if ! command_exists curl
+  then
+    fail "bdsm requires curl, which was not found in the PATH :(\nPlease install curl and try again."
+  fi
+
+  fetch_command="$fetch_command -O -L --create-dirs -C - " # -s for silent
+  (
+  enter "$archives_path"
+
+  if [[ -z "${1:-}" ]]
+  then
+    fail "BUG: $0 called without an argument :/"
+  fi
+
+  archive=$(basename "$1")
+  download=1
+
+  debug "Fetching $archive"
+
+  # Check first if we have the correct archive
+  if file_exists "$archive" && file_exists "$archive.md5"
+  then
+    debug "Found archive and its md5, testing correctness"
+
+    if (( $(md5sum --status -c "$archive.md5") > 0 ))
+    then
+      debug "Archive is bad, downloading"
+      download=1
+    else
+      debug "Archive is good, not downloading"
+      download=0
+      result=0
+    fi
+  else
+    debug "No '${archive}' does not exist or does not match md5, downloading"
+    download=1
+  fi
+
+  if (( download > 0 ))
+  then
+    if ! eval $fetch_command "$1"
+    then
+      retry=0
+      if (( result == 78 ))
+      then
+        error "The requested url does not exist: '$1'"
+      elif (( result == 18 ))
+      then
+        error "Only a part of the file was transferred. Removing and re-trying."
+        rm -f "$archive"
+        retry=1
+      elif (( result == 33 ))
+      then
+        debug "Remote server does not support 'range' command, removing '$archive'"
+        rm -f "$archive"
+        retry=1
+      else
+        error "There was an error, please check $log_path/*.error.log"
+      fi
+
+      if (( retry == 1 ))
+      then
+        if ! eval $fetch_command "$1"
+        then
+          error "There was an error, please check $log_path/*.error.log"
+        fi
+      fi
+    fi
+  fi
+  )
+
+  return $0
+}
+
+perform()
+{
+  enter "${initial_pwd}"
+  "$*"
+}
+
+prepare_for_installation()
+{
+  local directory
+
+  log "  Ensuring that install_path '${install_path}' exists"
+  ensure_paths_exist "${install_path}"
+  enter "${install_path}"
+
+  log "  Cleansing installation path"
+  for directory in "${cleanse_paths[@]}"
+  do
+    if path_exists "./${directory}"
+    then
+      rm -rf "./${directory}"
+    fi
+  done
+
+  log "  Creating installation paths"
+  ensure_paths_exist "${directories[@]}" "${aux_paths[@]}"
+}
+
+# install internal bdsm extensions from the given user github account
+# default user is wayneeseguin
+install_internal_extensions()
+{
+  local _url="${1:-wayneeseguin}/bdsm-extensions"
+  local _identifier="$(scm_identifier "${_url}")"
+  log "  Installing internal extensions"
+  enter "${install_path}/extensions"
+  remove_paths "internal"
+  scm_get "${_url}" "${install_path}/src/${_identifier}"
+  copy_directory "${install_path}/src/${_identifier}" to "internal"
+}
+
+migrate_external_extensions()
+{
+  log "  Migrating external extensions"
+  enter "${install_path}/extensions"
+  for extension in *
+  do
+    # skip new directories
+    case ${extension} in
+      builtin|internal|external)
+        continue
+        ;;
+    esac
+    if file_exists "${extension}/.uri" &&
+      file_contains "${extension}/.uri" "git://github.com/wayneeseguin/bdsm-extensions"
+    then
+      # internal extension
+      remove "${extension}"
+    else
+      # external extension
+      move_directory "${extension}" "external/${extension}"
+      if file_exists "external/${extension}/.uri"
+      then
+        sed -ie "s/git:\/\/github.com\/\(.*\)\.git/\1/" "external/${extension}/.uri"
+      fi
+    fi
+  done
+}
+
+install_core()
+{
+  local _dir
+  log "  Installing core directories (${directories[*]}) into ${install_path}"
+
+  copy_paths --force to "${install_path}/" "${directories[@]}"
+
+  log "  Installing core files (${files[*]}) into ${install_path}"
+  copy_files to "${install_path}" ${files[@]}
+
+  log "  Installing builtin extensions"
+  copy_paths --force to "${install_path}/extensions/" "extensions/builtin"
+
+}
+
+install_configuration_files()
+{
+  log "  Ensuring that the configuration files (${configs[*]}) exist in ${install_path}"
+  for config_file in "${configs[@]}"
+  do
+    ensure_files_exist "${install_path}/config/${config_file}"
+  done
+}
+
+symlink_bdsm()
+{
+  log "  Linking ${install_path}/bin/bdsm to ${prefix_path}/bin/bdsm"
+  link --force "${install_path}/bin/bdsm" to "${prefix_path}/bin/bdsm"
+
+  if path_exists "${prefix_path}/bin"
+  then
+    link --force "${install_path}/bin/bdsm" to "${prefix_path}/bin/bdsm"
+  fi
+}
+
+setup_shell_completion()
+{
+  if user_is_root
+  then
+    log "  Setting up bdsm shell completion."
+
+    if path_exists "/etc/bash_completion.d"
+    then
+      completion_prefix="/etc/bash_completion.d"
+    else
+      completion_prefix="/etc/profile.d"
+      ensure_paths_exist "/etc/profile.d/"
+    fi
+
+    copy_file from "${install_path}/completion/bdsm.bash" \
+      to "${completion_prefix}/bdsm-completion.sh" \
+      mode 0755 owner "root"
+  fi
+}
+
+setup_profile_d()
+{
+  ensure_paths_exist "${profile_d_path}"
+
+  if user_is_root
+  then
+    if os_is_darwin
+    then
+      if ! file_contains /etc/profile "${profile_d_path}"
+      then
+        log "\nif test -d '${profile_d_path}' ; then for profile in \"${profile_d_path}\"/*.sh ; do if test -x \"\$profile\" ; then . \"\$profile\" ; fi ; done ; unset profile ; fi\n" \
+          to /etc/profile
+      fi
+    fi
+  else
+    ensure_files_exist "$HOME/.profile" "$HOME/.bashrc" "$HOME/.bash_profile"
+
+    if ! file_contains "$HOME/.bashrc" "$HOME/.profile"
+    then
+      log "if test -s \"$HOME/.profile\" ; then . \"$HOME/.profile\" ; fi"\
+        append to "$HOME/.bashrc"
+    fi
+
+    if ! file_contains "$HOME/.bash_profile" "$HOME/.bashrc"
+    then
+      log "if test -s \"$HOME/.bashrc\" ; then . \"$HOME/.bashrc\" ; fi"\
+        append to "$HOME/.bash_profile"
+    fi
+
+    if ! file_contains "$HOME/.profile" "${profile_d_path}"
+    then
+      log "\nif test -d '${profile_d_path}' ; then for profile in \"${profile_d_path}\"/*.sh ; do if test -x \"\$profile\" ; then . \"\$profile\" ; fi ; done ; unset profile ; fi\n" \
+        append to "$HOME/.profile"
+    fi
+  fi
+
+  if ! file_exists "${profile_d_path}/bdsm.sh" ||
+     ! file_contains "${profile_d_path}/bdsm.sh" "${packages_path}/active/bin"
+  then
+    log "PATH=\"${packages_path}/active/bin:${packages_path}/active/sbin:\${PATH}\"\n" \
+      to "${profile_d_path}/bdsm.sh"
+
+    chmod_files 0755 "${profile_d_path}/bdsm.sh"
+  fi
+}
+
+set_bdsm_path()
+{
+  replace_content "^bdsm_path=.*" with "bdsm_path=\"${install_path}\"" in "${install_path}/bin/bdsm"
+  replace_content "^org_bdsm_path=.*" with "org_bdsm_path=\"\${bdsm_path:-${install_path}}\"" \
+    in "${install_path}/extensions/builtin/core/modules/shell/core/initialize"
+}
+
+install_bdsm()
+{
+  cleanse_paths=(
+    extensions/core extensions/pkg extensions/srv extensions/ext extensions/mod
+    external completion modules bin extensions/builtin
+  )
+  directories=( bin completion )
+  files=( LICENSE VERSION README.md )
+  aux_paths=( log tmp src )
+  configs=( user ) # TODO move this to /etc/bdsm/ and/or $HOME/.bdsm/
+
+  modules vcs
+
+  log "Installing BDSM Framework into ${install_path}\n"
+
+  prepare_for_installation
+
+  perform install_core
+
+  perform set_bdsm_path
+
+  perform install_internal_extensions
+
+  perform migrate_external_extensions
+
+  perform install_configuration_files
+
+  perform symlink_bdsm
+
+  perform setup_shell_completion
+
+  perform setup_profile_d
+
+  succeed "\nInstallation of BDSM is complete\n"
+}
