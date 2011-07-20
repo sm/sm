@@ -83,7 +83,7 @@ then
     array_shift extension_args extensions
     extensions=("${extensions//,/ }")
     PATH="${bdsm_path}/bin:${PATH}"
-    bdsm-ll -j $(os_cpu_count) bdsm {} ${extension_args[*]} ::: ${extensions[@]}
+    bdsm-ll --noswap -j $(os_cpu_count) bdsm {} ${extension_args[*]} ::: ${extensions[@]}
   else
     extension_action
   fi
