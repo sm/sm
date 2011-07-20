@@ -56,6 +56,9 @@ by reviewing patches
 
 # License
 
+All BDSM Core scripts and extensions themselves are are licensed under
+the Apache License v2.0
+
 Copyright (c) 2009-2011 Wayne E. Seguin
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -70,4 +73,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
+bin/bdsm-ll is GNU Parallel and is licensed under the GNU GPL v3 which can be
+read here: http://www.gnu.org/licenses/gpl.html
 
