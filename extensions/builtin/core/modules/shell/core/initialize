@@ -82,7 +82,7 @@ then
   then
     array_shift extension_args extensions
     extensions=("${extensions//,/ }")
-    exec "${bdsm_path}/bin/bdsm-ll {} ${extension_args[*]} ::: ${extensions[@]}"
+    exec "${bdsm_path}/bin/bdsm-ll" \{\} ${extension_args[*]} ::: ${extensions[@]}
   else
     extension_action
   fi
