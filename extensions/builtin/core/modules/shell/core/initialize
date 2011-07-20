@@ -78,11 +78,12 @@ disable_backtrace
 
 if [[ -n "${extension_args[*]}" ]]
 then
-  if match "${extension_args[0]}" *,*
+  if [[ "${extension_args[0]}" =~ , ]]
   then
     array_shift extension_args extensions
     extensions=("${extensions//,/ }")
-    exec "${bdsm_path}/bin/bdsm-ll" \{\} ${extension_args[*]} ::: ${extensions[@]}
+    PATH="${bdsm_path}/bin:${PATH}"
+    bdsm-ll -j $(os_cpu_count) bdsm {} ${extension_args[*]} ::: ${extensions[@]}
   else
     extension_action
   fi
