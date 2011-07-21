@@ -167,6 +167,6 @@ install_bdsm_scm()
 
   enter "${src_path}/${dir}/"
 
-  exec bash ./install
+  exec bash ./install "${trace_flag:+--trace}"
 }
 

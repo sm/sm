@@ -95,11 +95,6 @@ in_search_paths()
 #
 modules()
 {
-  #if (( trace_flag < 2 ))
-  #then
-  #  set +o xtrace
-  #fi
-
   local _module _bdsm _extension _path _file _modules=("$@")
 
   if (( ${#_modules[@]} > 0 ))
@@ -131,11 +126,6 @@ modules()
     done
   else
     fail "No modules specified to load."
-  fi
-
-  if (( trace_flag > 0 ))
-  then
-    set -o xtrace
   fi
 }
 
