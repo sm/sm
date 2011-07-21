@@ -10,3 +10,4 @@ activate=ext package activate
 enable=ext package activate
 deactivate=ext package deactivate
 disable=ext package deactivate
+call=ext call
