@@ -120,10 +120,11 @@ update_internal_extensions()
 # make a copy of provided bdsm internal extensions if there is none
 install_internal_extensions()
 {
-  if file_exists "${install_path}/extensions/internal/.uri" &&
-    file_contains "${install_path}/extensions/internal/.uri" "git://github.com/wayneeseguin/bdsm-extensions"
+  if path_exists "${install_path}/extensions/internal" &&
+    file_exists "${install_path}/extensions/internal/.uri" &&
+    file_contains "${install_path}/extensions/internal/.uri" "/bdsm-extensions"
   then
-    log "  To update internal extensions use 'bdsm internal update'"
+    log "\n  To update internal extensions use 'bdsm internal update'\n"
   else
     log "  Installing internal extensions"
     copy_directory "extensions/internal" to "${install_path}/extensions/internal"
