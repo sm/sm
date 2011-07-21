@@ -129,10 +129,6 @@ modules()
   fi
 }
 
-modules_test()
-{
-  modules "${extension_args[@]}"
-}
 #
 # ## module\_load()
 #
