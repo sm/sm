@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-modules variables
+modules core/variables
 
 if [[ -n "${ZSH_VERSION:-}" ]]
 then

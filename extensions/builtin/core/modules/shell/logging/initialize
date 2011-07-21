@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-modules time
+modules core/time
 
 if (( UID == 0 ))
 then

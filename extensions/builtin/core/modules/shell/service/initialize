@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-modules system array
+modules core/system core/array
 
 if variable_is_empty init_scripts_path
 then

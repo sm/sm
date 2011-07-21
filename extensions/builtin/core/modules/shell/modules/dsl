@@ -1,5 +1,65 @@
 #!/usr/bin/env bash
 
+build_module_path()
+{
+  local extensions_path=$1 extension=$2 IFS='/'
+  shift
+  shift
+  local _params=($extensions_path $extension modules shell $@)
+  echo -n "${_params[*]}"
+}
+
+detect_module()
+{
+  local extensions_path=$1 _params _module_path
+  shift
+  _params=( $(echo -n $@ | sed 's/\// /g' ) )
+  _module_path=( $(build_module_path $extensions_path ${_params[@]} ) )
+
+  if [[ -d "${_module_path}" ]] &&
+    [[ -s "${_module_path}/dsl" ]]
+  then
+    module_path=${_module_path}
+    return 0
+  else
+    return 1
+  fi
+}
+
+extensions_search_paths()
+{
+  printf "${parent_extensions_path}/external ${parent_extensions_path}/internal ${parent_extensions_path}/builtin"
+}
+
+in_search_paths()
+{
+  local callback=$1
+  shift
+  local args=( "$@" )
+
+  local search_paths=( $(extensions_search_paths) )
+  local builtin_path="${parent_extensions_path}/builtin"
+  local builtin_extensions=( $(builtin cd "${builtin_path}" ; echo -n * ) )
+
+  for path in "${search_paths[@]}"
+  do
+    if "${callback}" "${path}" "${args[@]}"
+    then
+      return 0
+    fi
+  done
+
+  for builtin_extension in "${builtin_extensions[@]}"
+  do
+    if "${callback}" "${builtin_path}" "${builtin_extension}" "${args[@]}"
+    then
+      return 0
+    fi
+  done
+
+  return 1
+}
+
 #
 # ## modules()
 #
@@ -50,20 +110,23 @@ modules()
       then
         continue # The module has already been loaded, continue to the next one.
       else
-        _bdsm="${modules_path}/shell/${_module}"
-        _extension="${extension_modules_path}/shell/${_module}"
-
-        for _path in "${_bdsm}" "${_extension}"
+        if in_search_paths detect_module "${_module}"
+        then
+          if (( ${debug_flag:=0} == 1 ))
+          then
+            printf "DEBUG: found module %-20s in ${module_path##${bdsm_path}\/extensions\/}.\n" "$_module"
+          fi
+          modules+=("${_module}")
+        else
+          fail "Could not find module path for ${_module}"
+        fi
+        for _file in dsl cli initialize
         do
-          for _file in dsl cli initialize
-          do
-            if [[ -s "${_path}/${_file}" ]]
-            then
-              source "${_path}/${_file}"
-            fi
-          done
+          if [[ -s "${module_path}/${_file}" ]]
+          then
+            source "${module_path}/${_file}"
+          fi
         done
-        modules+=("${_module}")
       fi
     done
   else
@@ -76,6 +139,10 @@ modules()
   fi
 }
 
+modules_test()
+{
+  modules "${extension_args[@]}"
+}
 #
 # ## module\_load()
 #

@@ -33,6 +33,8 @@ do
 
     --debug)
       true ${debug_flag:=0} $(( debug_flag++ ))
+      export debug_flag
+      #set -v
       ;;
 
     --)

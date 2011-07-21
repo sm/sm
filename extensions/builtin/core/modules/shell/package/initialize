@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-modules extensions filesystem system users templates environment defaults
+modules core/extensions core/filesystem core/system core/users core/templates core/environment core/defaults
 
 # Ensure that default values are set.
 fhs_dirs=(bin etc include lib libexec sbin share man)

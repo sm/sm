@@ -231,9 +231,7 @@ extension_run()
       enable_backtrace
       if [[ "${action##*/}" == help ]]
       then # Load the help module also.
-        modules core help
-      else
-        modules core
+        modules core/help
       fi
       _namespaces=${_path##${extension_actions_path}}
       extension_modules_load ${_namespaces//\// }
@@ -265,40 +263,6 @@ extension_run()
   esac || result=$?
 
   return $result
-}
-
-extensions_search_paths()
-{
-  printf "${parent_extensions_path}/external ${parent_extensions_path}/internal ${parent_extensions_path}/builtin"
-}
-
-in_search_paths()
-{
-  local callback=$1
-  shift
-  local args=( "$@" )
-
-  local search_paths=( $(extensions_search_paths) )
-  local builtin_path="${parent_extensions_path}/builtin"
-  local builtin_extensions=( $(enter "${builtin_path}" ; echo -n * ) )
-
-  for path in "${search_paths[@]}"
-  do
-    if "${callback}" "${path}" "${args[@]}"
-    then
-      return 0
-    fi
-  done
-
-  for builtin_extension in "${builtin_extensions[@]}"
-  do
-    if "${callback}" "${builtin_path}" "${builtin_extension}" "${args[@]}"
-    then
-      return 0
-    fi
-  done
-
-  return 1
 }
 
 #

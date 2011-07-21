@@ -64,8 +64,8 @@ source "${modules_path}/shell/core/dsl"
 source "${modules_path}/shell/modules/dsl"
 source "${modules_path}/shell/modules/initialize"
 
-modules variables trace array logging time environment filesystem system users \
-  extensions
+modules core/variables core/trace core/array core/logging core/time \
+ core/environment core/filesystem core/system core/users core/extensions
 
 if os_is_solaris
 then # custom compilations + g*

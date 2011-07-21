@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
 #core is loaded as BDSM starts
-modules=("core" "modules")
+modules=("core/core" "core/modules")

@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-modules variables system
+modules core/variables core/system
 
