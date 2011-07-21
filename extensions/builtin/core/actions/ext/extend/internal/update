@@ -8,7 +8,7 @@ action="${extension_args[0]}"
 case "${action}" in
 
   head)
-    install_internal_extensions "wayneeseguin"
+    update_internal_extensions "wayneeseguin"
     ;;
 
   version) # x.y.z
@@ -27,7 +27,7 @@ case "${action}" in
     then
       NYI #local file installation
     else
-      install_internal_extensions "${action:-wayneeseguin}"
+      update_internal_extensions "${action:-wayneeseguin}"
     fi
     ;;
 esac

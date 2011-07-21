@@ -104,9 +104,9 @@ prepare_for_installation()
   ensure_paths_exist "${directories[@]}" "${aux_paths[@]}"
 }
 
-# install internal bdsm extensions from the given user github account
+# update internal bdsm extensions from the given user github account
 # default user is wayneeseguin
-install_internal_extensions()
+update_internal_extensions()
 {
   local _url="${1:-wayneeseguin}/bdsm-extensions"
   local _identifier="$(scm_identifier "${_url}")"
@@ -115,6 +115,19 @@ install_internal_extensions()
   remove_paths "internal"
   scm_get "${_url}" "${install_path}/src/${_identifier}"
   copy_directory "${install_path}/src/${_identifier}" to "internal"
+}
+
+# make a copy of provided bdsm internal extensions if there is none
+install_internal_extensions()
+{
+  if file_exists "${install_path}/extensions/internal/.uri" &&
+    file_contains "${install_path}/extensions/internal/.uri" "git://github.com/wayneeseguin/bdsm-extensions"
+  then
+    log "  To update internal extensions use 'bdsm internal update'"
+  else
+    log "  Installing internal extensions"
+    copy_directory "extensions/internal" to "${install_path}/extensions/internal"
+  fi
 }
 
 migrate_external_extensions()
@@ -133,7 +146,7 @@ migrate_external_extensions()
     if file_exists "${extension}/.uri" &&
       file_contains "${extension}/.uri" "git://github.com/wayneeseguin/bdsm-extensions"
     then
-      # internal extension
+      # old internal extension
       remove "${extension}"
     else
       # external extension
