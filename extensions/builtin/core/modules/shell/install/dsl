@@ -128,6 +128,7 @@ install_internal_extensions()
   else
     log "  Installing internal extensions"
     copy_directory "extensions/internal" to "${install_path}/extensions/internal"
+    log "wayneeseguin/bdsm-extensions" to "${install_path}/extensions/internal/.uri"
   fi
 }
 
