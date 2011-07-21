@@ -249,7 +249,7 @@ setup_profile_d()
 set_bdsm_path()
 {
   replace_content "^bdsm_path=.*" with "bdsm_path=\"${install_path}\"" in "${install_path}/bin/bdsm"
-  replace_content "^org_bdsm_path=.*" with "org_bdsm_path=\"\${bdsm_path:-${install_path}}\"" \
+  replace_content "^saved_bdsm_path=.*" with "saved_bdsm_path=\"\${bdsm_path:-${install_path}}\"" \
     in "${install_path}/extensions/builtin/core/modules/shell/core/initialize"
 }
 

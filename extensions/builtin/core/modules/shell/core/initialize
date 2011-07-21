@@ -2,7 +2,7 @@
 
 shopt -s extglob # Extended globs must always be on for BDSM.
 
-org_bdsm_path="${bdsm_path:-/usr/local/bdsm}"
+saved_bdsm_path="${bdsm_path:-/usr/local/bdsm}"
 
 # Load System BDSM Configuration, if it exists.
 for file in /etc/bdsmrc "$HOME/.bdsmrc"
@@ -13,7 +13,7 @@ do
   fi
 done
 
-bdsm_path="${org_bdsm_path}"
+bdsm_path="${saved_bdsm_path}"
 
 if (( UID == 0 ))
 then # FHS
