@@ -284,13 +284,16 @@ Actions:
 
 list_installed()
 {
+  local ext_path extensions
   for ext_path in $(extensions_search_paths)
   do
-    extensions=($(extensions_installed $ext_path))
+    extensions=( $(extensions_installed $ext_path) )
 
     if array_is_nonempty extensions
     then
-      log "Extensions installed in $ext_path:\n  ${extensions[*]}\n"
+      log "Extensions installed in $ext_path:\n"
+      echo ${extensions[@]} | xargs -n 10 | xargs -I '{}' echo "  {}"
+      echo ""
     else
       log "# No $ext_path extensions currently installed."
     fi

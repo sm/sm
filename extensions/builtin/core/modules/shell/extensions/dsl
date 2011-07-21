@@ -694,12 +694,12 @@ extensions_in_development()
 #
 extensions_in()
 {
-  local _path="${1:-}"
+  local _path="${1:-}" _files extensions extension_name extension_source_path
 
   if path_exists "${_path}"
   then
     _files=($(
-    find "${_path}" -mindepth 2 -maxdepth 2 -name 'VERSION' -type f
+    find "${_path}" -mindepth 2 -maxdepth 2 -name 'VERSION' -type f | sort
     ))
     extensions=()
 
@@ -710,9 +710,7 @@ extensions_in()
       extensions[${#extensions[@]}]="${extension_name//*\//}"
     done
 
-    extensions="${extensions[@]}"
-
-    printf "${extensions}"
+    echo -n "${extensions[@]}"
   else
     fail "Cannot list extensions in '${_path}' as the directory does not exist."
   fi
