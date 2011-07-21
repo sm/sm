@@ -292,7 +292,8 @@ list_installed()
     if array_is_nonempty extensions
     then
       log "Extensions installed in $ext_path:\n"
-      echo ${extensions[@]} | xargs -n 10 | xargs -I '{}' echo "  {}"
+      #TODO: replace -s 76 with actual terminal width -2 (spaces from echo)
+      echo ${extensions[@]} | xargs -s 76 | xargs -I '{}' echo "  {}"
       echo ""
     else
       log "# No $ext_path extensions currently installed."
