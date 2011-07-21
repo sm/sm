@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+description "BDSM internal extensions management"
+
+action "internal help" \
+ "Show this help"
+
+action "internal update [head]" \
+ "Update internal bdsm extensions to latest Wayne E. Seguin github version"
+
+action "internal update <github_user_name>" \
+ "Update internal bdsm extensions to latest github version of the given user"
+
+action "internal update </path/to/file>" \
+ "NIY: Update internal bdsm extensions to the given binary package"
+
+show_help usage

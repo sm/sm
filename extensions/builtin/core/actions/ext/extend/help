@@ -2,7 +2,7 @@
 
 description "install BDSM extension"
 
-action "extend update internal" \
+action "extend internal update" \
   "Update internal bdsm extensions"
 
 action "extend <uri> <name>" \

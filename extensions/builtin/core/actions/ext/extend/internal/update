@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+install_path="${bdsm_path}"
+modules core/install
+
+action="${extension_args[0]}"
+
+case "${action}" in
+
+  head)
+    install_internal_extensions "wayneeseguin"
+    ;;
+
+  version) # x.y.z
+    NIY
+#    install_release
+    ;;
+
+  latest)
+    NIY
+#    fetch_version
+#    install_release
+    ;;
+
+  *)
+    if [[ -f "${action}" ]]
+    then
+      NYI #local file installation
+    else
+      install_internal_extensions "${action:-wayneeseguin}"
+    fi
+    ;;
+esac
+

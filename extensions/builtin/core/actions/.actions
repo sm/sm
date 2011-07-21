@@ -1,5 +1,6 @@
 extension=ext
 extend=ext extend
+internal=ext extend internal
 ls=ext list
 list=ext list
 edit=ext edit
