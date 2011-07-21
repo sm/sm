@@ -121,7 +121,7 @@ migrate_external_extensions()
 {
   log "  Migrating external extensions"
   enter "${install_path}/extensions"
-  ensure_path_exist external
+  mkdir external
   for extension in *
   do
     # skip new directories
