@@ -126,7 +126,16 @@ install_internal_extensions()
   then
     log "\n  To update internal extensions use 'bdsm internal update'\n"
   else
-    log "  Installing internal extensions"
+    if path_exists "extensions/internal" &&
+      file_exists "extensions/internal/README.md"
+    then
+      log "  Installing internal extensions"
+    else
+      log "  Downloading & installing internal extensions"
+      mkdir -p "extensions/internal"
+      git submodule init
+      git submodule update
+    fi
     copy_directory "extensions/internal" to "${install_path}/extensions/internal"
     log "wayneeseguin/bdsm-extensions" to "${install_path}/extensions/internal/.uri"
   fi
