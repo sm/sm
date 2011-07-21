@@ -28,7 +28,7 @@ detect_module()
 
 extensions_search_paths()
 {
-  printf "${parent_extensions_path}/external ${parent_extensions_path}/internal ${parent_extensions_path}/builtin"
+  printf "${bdsm_path}/extensions/external ${bdsm_path}/extensions/internal ${bdsm_path}/extensions/builtin"
 }
 
 in_search_paths()
@@ -38,7 +38,7 @@ in_search_paths()
   local args=( "$@" )
 
   local search_paths=( $(extensions_search_paths) )
-  local builtin_path="${parent_extensions_path}/builtin"
+  local builtin_path="${bdsm_path}/extensions/builtin"
   local builtin_extensions=( $(builtin cd "${builtin_path}" ; echo -n * ) )
 
   for path in "${search_paths[@]}"

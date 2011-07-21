@@ -32,7 +32,6 @@ fi
 
 true \
   "${modules_path:="${bdsm_path}/extensions/builtin/core/modules"}" \
-  "${parent_extensions_path:="${bdsm_path}/extensions"}" \
   "${templates_path:="${bdsm_path}/templates"}" \
   "${src_path:="${bdsm_path}/src"}" \
   "${tmp_path:="${bdsm_path}/tmp"}" \
@@ -47,7 +46,7 @@ true \
   "${keep_releases:=4}" \
   "${hooks_flag:=1}" \
   "${PAGER:="less"}" \
-  "${config_path:="${parent_extensions_path}/builtin/core/config"}" \
+  "${config_path:="${bdsm_path}/extensions/builtin/core/config"}" \
   "${packages_path:="${bdsm_path}/pkg"}" \
   "${active_path:="${packages_path}/active"}" \
   "${extension_args:=""}"
