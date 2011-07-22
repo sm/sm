@@ -145,8 +145,7 @@ install_template()
         shift
         ;;
       from)
-        _source="$1"
-        shift
+        fail 'install_template from is no more valid'
         ;;
       *)
         if variable_is_empty _name
@@ -165,7 +164,7 @@ install_template()
     _template="${template_path}"
     _name="$(basename "${_name}")"
   else
-    fail "No template was found matching '${template_path}'."
+    fail "No template was found matching '${_name}'."
   fi
 
   # Create the target path if it does not exist. and then copy the template file
