@@ -163,6 +163,7 @@ install_template()
   if in_search_paths detect_template "${_name}"
   then
     _template="${template_path}"
+    _name="$(basename "${_name}")"
   else
     fail "No template was found matching '${template_path}'."
   fi
