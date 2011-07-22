@@ -1,5 +1,30 @@
 #!/usr/bin/env bash
 
+build_template_path()
+{
+  local extensions_path=$1 extension=$2 IFS='/'
+  shift
+  shift
+  local _params=($extensions_path $extension templates $@)
+  echo -n "${_params[*]}"
+}
+
+detect_template()
+{
+  local extensions_path=$1 _params _module_path
+  shift
+  _params=( $(echo -n $@ | sed 's/\// /g' ) )
+  _template_path=( $(build_template_path $extensions_path ${_params[@]} ) )
+
+  if [[ -f "${_template_path}.template" ]]
+  then
+    template_path="${_template_path}.template"
+    return 0
+  else
+    return 1
+  fi
+}
+
 #
 # ## template_exists()
 #
@@ -31,28 +56,11 @@
 # ### Code Walkthrough
 template_exists()
 {
-  local _template_name="${1:-}"
-  if [[ -n "${_template_name}" ]]
+  if in_search_paths detect_template "$@"
   then
-    # Set the template file to be the full path to the current extensions
-    # templates directory and template name.template
-    local _template="${extension_templates_path}/${_template_name}.template"
-
-    # If the template exists and is nonempty
-    if [[ -s "${_template}" ]]
-    then
-      # then return true/success, 0
-      return 0
-    else
-      # otherwise return false/error, 1 (nonzero)
-      return 1
-    fi
+    debug "found template ${template_path##${bdsm_path}\/extensions\/}."
   else
-    # Fail yielding a backtrace as no template name was given this is a
-    # programming error and the developer will be able to debug with the
-    # backtrace.
-    fail "Cannot check if a template exists"\
-      "as no template name was given as the first parameter."
+    fail "Could not find template path for $@"
   fi
 }
 
