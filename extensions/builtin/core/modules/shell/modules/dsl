@@ -1,25 +1,44 @@
 #!/usr/bin/env bash
 
-build_module_path()
+log_search()
 {
-  local extensions_path=$1 extension=$2 IFS='/'
+  if (( ${debug_flag:=0} == 1 ))
+  then
+    local name=$1 value=$2
+    shift
+    shift
+    printf "DEBUG search: %8s %-20s in $*.\n" "$name" "$value"
+  fi
+}
+
+reorder_path()
+{
+  local part="$1" extensions_path="$2" extension="$3"
   shift
   shift
-  local _params=($extensions_path $extension modules shell $@)
-  echo -n "${_params[*]}"
+  shift
+  echo -n $extensions_path $extension $part $@ | sed 's/ /\//g'
+}
+
+rebuild_path()
+{
+  local part="$1" extensions_path="$2"
+  shift
+  shift
+  reorder_path "${part}" "${extensions_path}" $(echo -n $@ | sed 's/\// /g' )
 }
 
 detect_module()
 {
-  local extensions_path=$1 _params _module_path
+  local extensions_path=$1 _module_path
   shift
-  _params=( $(echo -n $@ | sed 's/\// /g' ) )
-  _module_path=( $(build_module_path $extensions_path ${_params[@]} ) )
+  _module_path=( $(rebuild_path "modules/shell" $extensions_path $@ ) )
 
   if [[ -d "${_module_path}" ]] &&
     [[ -s "${_module_path}/dsl" ]]
   then
     module_path=${_module_path}
+    module_name=$(echo -n $@ | sed 's/ /\//g' )
     return 0
   else
     return 1
@@ -107,11 +126,8 @@ modules()
       else
         if in_search_paths detect_module "${_module}"
         then
-          if (( ${debug_flag:=0} == 1 ))
-          then
-            printf "DEBUG: found module %-20s in ${module_path##${bdsm_path}\/extensions\/}.\n" "$_module"
-          fi
-          modules+=("${_module}")
+          log_search module "$module_name" "${module_path##${bdsm_path}\/extensions\/}"
+          modules+=("${module_name}")
         else
           fail "Could not find module path for ${_module}"
         fi

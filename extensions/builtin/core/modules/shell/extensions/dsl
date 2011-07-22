@@ -319,7 +319,7 @@ extension_action()
 
   if in_search_paths detect_action "${extension_args[@]}"
   then
-    debug "detected path:$action_path, action:$action, params:${extension_args[@]}."
+    log_search action "$action" "${action_path##${bdsm_path}\/extensions\/} params:${extension_args[@]}"
   else
     fail "Usage: \n  bdsm ${extension} [namespace] [action]\nActions:\n   $(extension_actions "${extension}")"
   fi
