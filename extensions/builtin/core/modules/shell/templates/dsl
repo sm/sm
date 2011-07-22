@@ -20,6 +20,10 @@ detect_template()
   then
     template_path="${_template_path}.template"
     return 0
+  elif [[ -f "${_template_path}" ]]
+  then
+    template_path="${_template_path}"
+    return 0
   else
     return 1
   fi
@@ -161,6 +165,7 @@ install_template()
 
   if in_search_paths detect_template "${_name}"
   then
+    debug "found template ${template_path##${bdsm_path}\/extensions\/}."
     _template="${template_path}"
     _name="$(basename "${_name}")"
   else
