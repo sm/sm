@@ -35,7 +35,7 @@ rvm_install()
   local _version=${1:-latest} _result=0 url
   url="https://rvm.beginrescueend.com/install/rvm"
   curl -L -sk "$url" -o rvm-installer
-  ensure_files_are_executable "rvm-installer"
+  chmod +x "rvm-installer"
   ./rvm-installer --version ${_version}
   remove_files "rvm-installer"
 }
