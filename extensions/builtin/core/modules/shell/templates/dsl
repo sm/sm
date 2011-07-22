@@ -158,32 +158,14 @@ install_template()
     esac
   done
 
-  # if the named file exists in the source (templates) directory on
-  # the filesystem then set the template variable to the name prefixed with the
-  # source (templates) directory
-  #
-  # otherwise if the named template inside of the templates directory postfixed
-  # with .template exists set the template variable to the named template inside
-  # of the templates directory postfixed with .template
-  #
-  # otherwise if the named file exists in the filesystem then set the template
-  # variable directly to the name
-  #
-  # otherwise the template was not found, we cannot install it. Most likely this
-  # is a programming error, template was not included with the package, etc...
+  # use temlate_path found by template_exists
   # fail yielding a backtrace for debugging.
-  if file_exists "${_source}/${_name}"
+  if variable_is_nonempty template_path &&
+    file_exists "${template_path}"
   then
-    _template="${_source}/${_name}"
-  elif file_exists "${_source}/${_name}.template"
-  then
-    _template="${_source}/${_name}.template"
-  elif file_exists "${_name}"
-  then
-    _template="${_name}"
+    _template="${template_path}"
   else
-    fail "No template was found matching '${_name}' either "\
-      "directly on the filesystem or in the '${_source}' directory."
+    fail "No template was found matching '${template_path}'."
   fi
 
   # Create the target path if it does not exist. and then copy the template file
