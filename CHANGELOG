@@ -1,3 +1,6 @@
+* extensions/internal 4ecd1a7...c769211 (1):
+  > fix template paths
+
 - support for extesnions search path
 - support fot github scm urls (user/name)
 - replaced scm_fetch/update with scm_get
