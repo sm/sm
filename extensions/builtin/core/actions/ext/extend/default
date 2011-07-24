@@ -2,11 +2,15 @@
 
 #
 # use default repository wayneeseguin/bdsm-extensions.
-# user$ bdsm extend default <uri> <local ext name>
+# user$ bdsm extend default <uri> [as] <local ext name>
 #
 
 extension_uri="${extension_args[0]}"
 name="${extension_args[1]}"
+if [[ "${name}" == "as" ]] && [[ -n "${extension_args[2]}" ]]
+then
+  name="${extension_args[2]}"
+fi
 extension_identifier="$(scm_identifier "${extension_uri}")"
 extension_src_path="${extensions_src_path}/${extension_identifier}"
 
