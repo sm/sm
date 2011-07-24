@@ -178,28 +178,21 @@ detect_action_type()
 
 extension_modules_load()
 {
-  local _token _namespace=()
+  local _token _namespace=() namespace
 
-    source_files \
-      "${extension_modules_path}/shell/dsl" \
-      "${extension_modules_path}/shell/cli" \
-      "${extension_modules_path}/shell/initialize"
+  module_name="${extension}"
+  module_path="${extension_modules_path}/shell"
+  module "$module_name" skip_path_detection
 
   while (( $# > 0 ))
   do
     _namespace+=("${1}")
     shift
-
     namespace="$(path_join ${_namespace[*]})"
 
-#    if [[ "${extension}" != "core" ]]
-#    then # Core extension modules are loaded by default on startup.
-         # Load the extensions's core module
-      source_files \
-        "${extension_modules_path}/shell/${namespace}/dsl" \
-        "${extension_modules_path}/shell/${namespace}/cli" \
-        "${extension_modules_path}/shell/${namespace}/initialize"
-#    fi
+    module_name="$(path_join "${extension}" ${_namespace[*]})"
+    module_path="$(path_join "${extension_modules_path}" "shell" ${_namespace[*]})"
+    module "$module_name" skip_path_detection
   done
 }
 

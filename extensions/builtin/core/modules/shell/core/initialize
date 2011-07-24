@@ -63,8 +63,10 @@ source "${modules_path}/shell/core/dsl"
 source "${modules_path}/shell/modules/dsl"
 source "${modules_path}/shell/modules/initialize"
 
-modules core/variables core/trace core/array core/logging core/time \
- core/environment core/filesystem core/system core/users core/extensions
+for module in variables trace array logging time environment filesystem system users extensions
+do
+  core_module "$module"
+done
 
 if os_is_solaris
 then # custom compilations + g*
