@@ -29,7 +29,7 @@ directory_get()
 
   if cp -r ${_source} "${_target}" >/dev/null 2>&1
   then
-    echo "${_source}" > "${_target}/.uri"
+    (cd "${_source}"; pwd) > "${_target}/.uri"
   else
     fail "There was an error copying '${_source}'"
   fi
