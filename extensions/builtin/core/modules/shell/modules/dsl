@@ -106,6 +106,15 @@ module()
   fi
 }
 
+# load module or show error msg if module not available
+module_or_error()
+{
+  if ! module "$1"
+  then
+    error "$2"
+  fi
+}
+
 #
 # ## modules()
 #
