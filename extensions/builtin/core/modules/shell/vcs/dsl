@@ -16,6 +16,25 @@ scm_identifier()
   printf "${_url//\//_}"
 }
 
+# ## directory\_get()
+#
+#
+#
+# Code Walkthrough
+directory_get()
+{
+  local initial_pwd="$PWD" _source=$1 _target=$2
+  variables_must_be_nonempty _source _target
+  rm -rf "${_target}" 2>&1 >/dev/null
+
+  if cp -r ${_source} "${_target}" >/dev/null 2>&1
+  then
+    echo "${_source}" > "${_target}/.uri"
+  else
+    fail "There was an error copying '${_source}'"
+  fi
+}
+
 # ## git\_get()
 #
 #
@@ -106,8 +125,14 @@ github_get()
 # Code Walkthrough
 scm_get()
 {
-  log "${log_prefix}  fetching $1 to $2"
+  log "${log_prefix}Fetching $1"
 
+  # check for directory
+  if path_exists "$1"
+  then
+    directory_get "$@"
+    return $?
+  fi
   # check for pattern user/repository from github
   if is_github_url "$1"
   then
