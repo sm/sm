@@ -76,7 +76,11 @@ bdsm_exports
 
 disable_backtrace
 
-if set | grep '^extension_args=(' >/dev/null
+if [[ -n $bdsm_script ]]
+then
+  # load script
+  . $bdsm_script
+elif set | grep '^extension_args=(' >/dev/null
 then
   if [[ "${extension_args[0]}" =~ , ]]
   then

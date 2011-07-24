@@ -24,19 +24,7 @@ bdsm_path="/usr/local/bdsm"
 modules_path="${bdsm_path}/extensions/builtin/core/modules"
 export initial_pwd bdsm_path modules_path
 
-# in case first param is a script
-if [[ -f "$1" ]]
-then
-  # initialize BDSM
-  . "${modules_path}/shell/core/initialize"
-  # take script out off params
-  bdsm_script=$1
-  shift
-  # load script
-  . $bdsm_script
-else
-  # basic options parsing
-  . "${modules_path}/shell/core/cli"
-  # initialize BDSM
-  . "${modules_path}/shell/core/initialize"
-fi
+# basic options parsing
+. "${modules_path}/shell/core/cli"
+# initialize BDSM
+. "${modules_path}/shell/core/initialize"

@@ -6,47 +6,52 @@ set +o noclobber
 if (( $# == 0 )) && [[ -z "$extension_args" ]]
 then
   extension_args=()
-fi
-
-while (( $# > 0 ))
-do
-  token="$1"
+elif [[ -f "$1" ]]
+then
+  # take script out off params
+  bdsm_script=$1
   shift
-  case "$token" in
+else
+  while (( $# > 0 ))
+  do
+    token="$1"
+    shift
+    case "$token" in
 
-    --help)
-      extension_args=("core" "help" "$@")
-      break
-      ;;
+      --help)
+        extension_args=("core" "help" "$@")
+        break
+        ;;
 
-    -v|--version)
-      extension_args=("core" "version" "$@")
-      break
-      ;;
+      -v|--version)
+        extension_args=("core" "version" "$@")
+        break
+        ;;
 
-    --trace)
-      true ${trace_flag:=0} $(( trace_flag++ ))
-      PS4="# \${BASH_SOURCE##\${bdsm_path}\/extensions\/} \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO} $ "
-      export PS4
-      set -x
-      ;;
+      --trace)
+        true ${trace_flag:=0} $(( trace_flag++ ))
+        PS4="# \${BASH_SOURCE##\${bdsm_path}\/extensions\/} \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO} $ "
+        export PS4
+        set -x
+        ;;
 
-    --debug)
-      true ${debug_flag:=0} $(( debug_flag++ ))
-      export debug_flag
-      ;;
+      --debug)
+        true ${debug_flag:=0} $(( debug_flag++ ))
+        export debug_flag
+        ;;
 
-    --)
-      extension_args=("$@") # Stop processing arguments.
-      break
-      ;;
+      --)
+        extension_args=("$@") # Stop processing arguments.
+        break
+        ;;
 
-    -*)
-      error "Unknown flag '${token}'"
-      ;;
-    *)
-      extension_args=("${token:-core}" "$@")
-      break
-      ;;
-  esac
-done
+      -*)
+        error "Unknown flag '${token}'"
+        ;;
+      *)
+        extension_args=("${token:-core}" "$@")
+        break
+        ;;
+    esac
+  done
+fi
