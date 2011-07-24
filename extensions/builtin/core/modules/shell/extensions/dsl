@@ -891,7 +891,7 @@ extension_install()
   then
     if extension_is_valid "${extensions_src_path}/${_src}"
     then
-      log " - ${_extension}"
+      log "Installing ${_extension}"
       if path_exists "${bdsm_path}/extensions/external/${_extension}"
       then
         remove_paths "${bdsm_path}/extensions/external/${_extension}"

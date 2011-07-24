@@ -13,7 +13,7 @@ extension_src_path="${extensions_src_path}/${extension_identifier}"
 if variable_is_empty name
 then
   fail "\"bdsm extend <name>\" is depracated, all bdsm-extensions are now available by default.\n\
-  Use \"bdsm extend update internal\" to update internal bdsm extensdions."
+  Use \"bdsm internal update\" to update internal bdsm extensdions."
 fi
 
 scm_get "${extension_uri}" "${extension_src_path}"
