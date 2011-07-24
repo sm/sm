@@ -1,0 +1,145 @@
+#!/usr/bin/env bash
+
+# bdsm extend update [internal|<ext name>]
+extend_update()
+{
+  case "${extension_args[0]}" in
+  internal)
+    extend_internal_update
+    ;;
+  all)
+    extend_update_all
+    ;;
+  *)
+    extend_update_name "${extension_args[0]}"
+    ;;
+  esac
+}
+
+# bdsm extend update <ext name>
+extend_update_name()
+{
+  name="$1"
+  if in_search_paths detect_uri ${name}
+  then
+    extension_uri="$(cat ${uri_path})"
+    log_search uri ${name} "${uri_path##${bdsm_path}\/extensions\/} including ${extension_uri}"
+  else
+    error "Could not find .uri for ${name}"
+  fi
+  extend_name_uri "${name}" "${extension_uri}"
+}
+
+# bdsm extend default <uri> [as] <local ext name>
+extend_install()
+{
+  extension_uri="${extension_args[0]}"
+  if [[ -z "${extension_uri}" ]]
+  then
+    extend_help
+    return $?
+  fi
+  name="${extension_args[1]}"
+  if [[ -z "${name}" ]]
+  then
+    fail "\"bdsm extend <name>\" is depracated, all bdsm-extensions are now available by default.\n\
+    Use \"bdsm internal update\" to update internal bdsm extensdions."
+  elif [[ "${name}" == "as" ]] && [[ -n "${extension_args[2]}" ]]
+  then
+    name="${extension_args[2]}"
+  fi
+  extend_name_uri "${name}" "${extension_uri}"
+}
+
+extend_name_uri()
+{
+  name="$1"
+  extension_uri="$2"
+  extension_identifier="$(scm_identifier "${extension_uri}")"
+  extension_src_path="${extensions_src_path}/${extension_identifier}"
+
+  scm_get "${extension_uri}" "${extension_src_path}"
+  extension_install "${name}" "${extension_identifier}"
+}
+
+extend_help()
+{
+  modules core/help
+
+  description "install BDSM extension"
+  
+  action "extend <uri> <name>" \
+    "Install given extension from uri to name"
+
+  action "extend update <name>" \
+    "Update given name extension using latest used uri"
+
+  action "extend update <name>" \
+    "Update given all external extensions using latest used uris"
+
+  action "extend update internal" \
+    "Update internal extensions using latest used uri"
+
+  show_help usage
+}
+
+extend_internal_update()
+{
+  action="${extension_args[0]}"
+
+  if [[ -z "${action}" ]]
+  then
+    update_internal_extensions "$(cat $bdsm_path/extensions/internal/.uri)"
+    return $?
+  fi
+
+  case "${action}" in
+
+  head)
+    update_internal_extensions "wayneeseguin/bdsm-extensions"
+    ;;
+
+  *)
+    if [[ -d "${action}" ]] || [[ -f "${action}" ]]
+    then
+      update_internal_extensions "${action}"
+    else
+      update_internal_extensions "${action:-wayneeseguin}/bdsm-extensions"
+    fi
+    ;;
+  esac
+}
+
+# update internal bdsm extensions from the given user github account
+# default user is wayneeseguin
+update_internal_extensions()
+{
+  local _url="$1"
+  local _identifier="$(scm_identifier "${_url}")"
+  enter "${bdsm_path}/extensions"
+  scm_get "${_url}" "${bdsm_path}/src/${_identifier}"
+  log "Installing internal extensions"
+  remove_paths "internal"
+  copy_directory "${bdsm_path}/src/${_identifier}" to "internal"
+}
+
+extend_internal_help()
+{
+  modules core/help
+
+  description "BDSM internal extensions management"
+
+  action "internal help" \
+   "Show this help"
+
+  action "internal update" \
+   "Update internal bdsm extensions to latest version in the stored uri"
+
+  action "internal update head" \
+   "Update internal bdsm extensions to latest Wayne E. Seguin github version"
+
+  action "internal update <github_user_name>" \
+   "Update internal bdsm extensions to latest github version of the given user"
+
+  show_help usage
+}

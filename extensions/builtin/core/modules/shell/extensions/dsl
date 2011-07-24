@@ -43,7 +43,7 @@ detect_action()
          file_contains "${_action_path}/.actions" "^default="
     then
       _array=( $(hash_file "${_action_path}/.actions" default) )
-      _params=( "${_array[@]}" "${_params[@]}" )
+      _params=( "${_array[@]}" "${token}" "${_params[@]}" )
       [[ "${_array[@]}" == "$token" ]] && break #break if detected 2nd time the same
 
     # Detect help mapping in .actions
@@ -51,7 +51,7 @@ detect_action()
          file_contains "${_action_path}/.actions" "^help="
     then
       _array=( $(hash_file "${_action_path}/.actions" help) )
-      _params=( "${_array[@]}" "${_params[@]}" )
+      _params=( "${_array[@]}" "${token}" "${_params[@]}" )
       [[ "${_array[@]}" == "$token" ]] && break #break if detected 2nd time the same
 
     # finish searching path

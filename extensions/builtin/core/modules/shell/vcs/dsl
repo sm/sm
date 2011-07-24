@@ -4,6 +4,26 @@
 # # VCS (SCM) Module
 #
 
+# ## detect\_uri()
+#
+#
+#
+# Code Walkthrough
+detect_uri()
+{
+  local extensions_path=$1 _uri_path
+  shift
+  _uri_path=( $(rebuild_path ".uri" $extensions_path $@ ) )
+
+  if [[ -s "${_uri_path}" ]]
+  then
+    uri_path=${_uri_path}
+    return 0
+  else
+    return 1
+  fi
+}
+
 # ## scm\_identifier()
 #
 #
@@ -127,24 +147,22 @@ scm_get()
 {
   log "${log_prefix}Fetching $1"
 
-  # check for directory
-  if path_exists "$1"
+  if path_exists "$1" # check for directory
   then
     directory_get "$@"
     return $?
-  fi
-  # check for pattern user/repository from github
-  if is_github_url "$1"
+  elif file_exists "$1" # check for packages
+  then
+    NIY "File scm_update"
+    return $?
+  elif is_github_url "$1" # check for pattern user/repository from github
   then
     github_get "$@"
     return $?
   fi
 
   case "$1" in
-    (/*)
-      NIY "filesystem scm_update"
-      ;;
-    (*git|git*)
+    (*git*)
       git_get "$@"
       ;;
     (*svn*)
@@ -160,4 +178,9 @@ scm_get()
       error "Unknownn SCM for url '${_url}'"
       ;;
   esac
+}
+
+scm_help()
+{
+  NIY "display help for scm"
 }
