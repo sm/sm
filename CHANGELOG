@@ -1,3 +1,6 @@
+* extensions/internal c769211...3535f9c (1):
+  > Interesting, go uses the src dir.
+
 * extensions/internal 4ecd1a7...c769211 (1):
   > fix template paths
 
