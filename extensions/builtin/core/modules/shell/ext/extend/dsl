@@ -3,17 +3,33 @@
 # bdsm extend update [internal|<ext name>]
 extend_update()
 {
-  case "${extension_args[0]}" in
-  internal)
-    extend_internal_update
-    ;;
+  name="${extension_args[0]}"
+  case "${name:-help}" in
   all)
     extend_update_all
     ;;
+  help)
+    extend_help
+    ;;
+  internal)
+    extend_internal_update
+    ;;
   *)
-    extend_update_name "${extension_args[0]}"
+    extend_update_name "${name}"
     ;;
   esac
+}
+
+# update all external extensions
+extend_update_all()
+{
+  extend_internal_update
+
+  extensions=( $(extensions_installed ${bdsm_path}/extensions/external) )
+  for name in ${extensions[@]}
+  do
+    extend_update_name "${name}"
+  done
 }
 
 # bdsm extend update <ext name>
@@ -80,6 +96,9 @@ extend_help()
   action "extend update internal" \
     "Update internal extensions using latest used uri"
 
+  action "extend update all" \
+    "Update internal and externall extensions using latest used uris"
+
   show_help usage
 }
 
@@ -87,13 +106,11 @@ extend_internal_update()
 {
   action="${extension_args[0]}"
 
-  if [[ -z "${action}" ]]
-  then
-    update_internal_extensions "$(cat $bdsm_path/extensions/internal/.uri)"
-    return $?
-  fi
+  case "${action:-uri}" in
 
-  case "${action}" in
+  all|uri)
+    update_internal_extensions "$(cat $bdsm_path/extensions/internal/.uri)"
+    ;;
 
   head)
     update_internal_extensions "wayneeseguin/bdsm-extensions"
