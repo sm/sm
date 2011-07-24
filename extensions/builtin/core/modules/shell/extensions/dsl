@@ -30,6 +30,13 @@ detect_action()
     then
       _action_path+="/${token}"
 
+    # Detect action
+    elif variable_is_nonempty token &&
+      file_is_executable "${_action_path}/${token}"
+    then
+      _params=( "${token}" "${_params[@]}" )
+      break
+
     # Detect mapping in .actions
     elif file_exists "${_action_path}/.actions" &&
          file_contains "${_action_path}/.actions" "^${token}="
