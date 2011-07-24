@@ -692,7 +692,7 @@ extensions_in()
   if path_exists "${_path}"
   then
     _files=($(
-    find "${_path}" -mindepth 2 -maxdepth 2 -name 'VERSION' -type f | sort
+      find "${_path}" -mindepth 2 -maxdepth 2 -name 'VERSION' -type f | sort
     ))
     extensions=()
 
@@ -700,7 +700,7 @@ extensions_in()
     do
       extension_source_path="${_file/%\/VERSION}"
       extension_name="${extension_source_path//*\/}"
-      extensions[${#extensions[@]}]="${extension_name//*\//}"
+      extensions+=( "${extension_name//*\//}" )
     done
 
     echo -n "${extensions[@]}"
