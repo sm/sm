@@ -126,16 +126,19 @@ module_or_error()
   fi
 }
 
-# load a core module or fail
-core_module()
+# load core modules or fail
+core_modules()
 {
-  module=$1
-  module_name="core/$module"
-  module_path="${modules_path}/shell/$module"
-  if ! module "$module_name" skip_path_detection
-  then
-    fail "core module '${module_name}' is missing!!!"
-  fi
+  local module
+  for module in $@
+  do
+    module_name="core/$module"
+    module_path="${modules_path}/shell/$module"
+    if ! module "$module_name" skip_path_detection
+    then
+      fail "core module '${module_name}' is missing!!!"
+    fi
+  done
 }
 
 #
