@@ -1,3 +1,4 @@
+0.7.7
 * extensions/internal 4ecd1a7...3535f9c (2):
   > Interesting, go uses the src dir.
   > fix template paths
@@ -8,4 +9,3 @@
 0.2.1 - bdsm get head and bdsm get latest functional
 0.2.0 - Framework is now based on modules and sporting a DSL
 0.0.6 - First official release
-0.7.7
