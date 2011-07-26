@@ -302,6 +302,8 @@ package_install()
   if command_exists "${package_name}_preinstall"
   then
     "${package_name}_preinstall"
+  else
+    package_preinstall
   fi
 
   if command_exists "${package_name}_install"
@@ -610,6 +612,44 @@ package_build()
 }
 
 #
+# ## package\_preinstall
+#
+# Link compilation dir to installation dir/src
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# none.
+#
+# ### Environmental effects
+#
+# Compilation dir will be available as src in installation directory
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# None
+#
+# ### Usage Examples
+#
+# Example Usage:
+#
+# user$ package_preinstall
+#
+# ### Notes
+#
+package_preinstall()
+{
+  link --force "${source_path}/${package_dir}" to "${install_path}/src"
+}
+
+#
 # ## package\_make\_install
 #
 # make install  the package source (eg. make)
@@ -732,15 +772,7 @@ package_activate()
       "as '${install_path}' does not exist."
   fi
 
-  if module_is_loaded "service"
-  then
-    service_activate "${_package}" "${_version}"
-  fi
-
-  if module_is_loaded "database"
-  then
-    database_activate "${_package}" "${_version}"
-  fi
+  package_setup "${_package}"
 }
 
 #
