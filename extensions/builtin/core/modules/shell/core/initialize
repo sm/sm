@@ -78,12 +78,16 @@ disable_backtrace
 
 if set | grep '^extension_args=(' >/dev/null
 then
-  if [[ "${extension_args[0]}" =~ , ]]
+  if [[ "${extension_args[0]}" =~ , ]] || [[ "${extension_args[0]}" =~ . ]]
   then
     array_shift extension_args extensions
-    extensions=("${extensions//,/ }")
-    PATH="${bdsm_path}/bin:${PATH}"
-    bdsm-ll --noswap -j $(os_cpu_count) bdsm {} ${extension_args[*]} ::: ${extensions[@]}
+    sequential=("${extensions//./ }")
+    for sequence in "${sequential[@]}"
+    do
+      parallel=("${sequence//,/ }")
+      PATH="${bdsm_path}/bin:${PATH}"
+      bdsm-ll --noswap -j $(os_cpu_count) bdsm {} ${extension_args[*]} ::: ${parallel[@]}
+    done
   else
     extension_action
   fi
