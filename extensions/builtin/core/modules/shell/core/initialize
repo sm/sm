@@ -84,7 +84,7 @@ then
   case "${extension_args[0]}" in
     *,*|*.*)
       array_shift extension_args extensions
-      sequential=("${extensions//\./ }")
+      sequential=(${extensions//\./ })
       for sequence in "${sequential[@]}"
       do
         parallel=("${sequence//,/ }")
