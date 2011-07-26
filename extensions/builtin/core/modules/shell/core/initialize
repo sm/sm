@@ -81,10 +81,10 @@ then
   . $bdsm_script
 elif set | grep '^extension_args=(' >/dev/null
 then
-  if [[ "${extension_args[0]}" =~ , ]] || [[ "${extension_args[0]}" =~ . ]]
+  if [[ "${extension_args[0]}" =~ , ]] || [[ "${extension_args[0]}" =~ \. ]]
   then
     array_shift extension_args extensions
-    sequential=("${extensions//./ }")
+    sequential=("${extensions//\./ }")
     for sequence in "${sequential[@]}"
     do
       parallel=("${sequence//,/ }")
