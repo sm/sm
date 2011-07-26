@@ -63,8 +63,7 @@ source "${modules_path}/shell/core/dsl"
 source "${modules_path}/shell/modules/dsl"
 source "${modules_path}/shell/modules/initialize"
 
-modules core/variables core/trace core/array core/logging core/time \
- core/environment core/filesystem core/system core/users core/extensions
+core_modules variables trace array time logging environment filesystem system users extensions
 
 if os_is_solaris
 then # custom compilations + g*
@@ -76,7 +75,11 @@ bdsm_exports
 
 disable_backtrace
 
-if set | grep '^extension_args=(' >/dev/null
+if [[ -n $bdsm_script ]]
+then
+  # load script
+  . $bdsm_script
+elif set | grep '^extension_args=(' >/dev/null
 then
   if [[ "${extension_args[0]}" =~ , ]] || [[ "${extension_args[0]}" =~ . ]]
   then

@@ -4,6 +4,26 @@
 # # VCS (SCM) Module
 #
 
+# ## detect\_uri()
+#
+#
+#
+# Code Walkthrough
+detect_uri()
+{
+  local extensions_path=$1 _uri_path
+  shift
+  _uri_path=( $(rebuild_path ".uri" $extensions_path $@ ) )
+
+  if [[ -s "${_uri_path}" ]]
+  then
+    uri_path=${_uri_path}
+    return 0
+  else
+    return 1
+  fi
+}
+
 # ## scm\_identifier()
 #
 #
@@ -14,6 +34,25 @@ scm_identifier()
   local _url=$1
   variables_must_be_nonempty _url
   printf "${_url//\//_}"
+}
+
+# ## directory\_get()
+#
+#
+#
+# Code Walkthrough
+directory_get()
+{
+  local initial_pwd="$PWD" _source=$1 _target=$2
+  variables_must_be_nonempty _source _target
+  rm -rf "${_target}" 2>&1 >/dev/null
+
+  if cp -r ${_source} "${_target}" >/dev/null 2>&1
+  then
+    (cd "${_source}"; pwd) > "${_target}/.uri"
+  else
+    fail "There was an error copying '${_source}'"
+  fi
 }
 
 # ## git\_get()
@@ -106,20 +145,24 @@ github_get()
 # Code Walkthrough
 scm_get()
 {
-  log "${log_prefix}  fetching $1 to $2"
+  log "${log_prefix}Fetching $1"
 
-  # check for pattern user/repository from github
-  if is_github_url "$1"
+  if path_exists "$1" # check for directory
+  then
+    directory_get "$@"
+    return $?
+  elif file_exists "$1" # check for packages
+  then
+    NIY "File scm_update"
+    return $?
+  elif is_github_url "$1" # check for pattern user/repository from github
   then
     github_get "$@"
     return $?
   fi
 
   case "$1" in
-    (/*)
-      NIY "filesystem scm_update"
-      ;;
-    (*git|git*)
+    (*git*)
       git_get "$@"
       ;;
     (*svn*)
@@ -135,4 +178,9 @@ scm_get()
       error "Unknownn SCM for url '${_url}'"
       ;;
   esac
+}
+
+scm_help()
+{
+  NIY "display help for scm"
 }

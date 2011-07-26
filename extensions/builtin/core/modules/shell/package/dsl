@@ -547,6 +547,7 @@ package_configure()
     file_is_executable "configure" || return 0
   fi
 
+  debug "package_configure: ${_command}"
   if ${_command} > configure.log 2>&1
   then
     return 0
@@ -599,6 +600,7 @@ package_build()
     _command="make ${make_flags[@]:-"-j$(os_cpu_count)"}"
   fi
 
+  debug "package_build: ${_command}"
   if eval "${_command}" > make.log 2>&1
   then
     return 0

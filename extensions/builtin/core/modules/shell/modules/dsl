@@ -1,25 +1,44 @@
 #!/usr/bin/env bash
 
-build_module_path()
+log_search()
 {
-  local extensions_path=$1 extension=$2 IFS='/'
+  if (( ${debug_flag:=0} == 1 ))
+  then
+    local name=$1 value=$2
+    shift
+    shift
+    printf "DEBUG search: %8s %-20s in $*.\n" "$name" "$value"
+  fi
+}
+
+reorder_path()
+{
+  local part="$1" extensions_path="$2" extension="$3"
   shift
   shift
-  local _params=($extensions_path $extension modules shell $@)
-  echo -n "${_params[*]}"
+  shift
+  echo -n $extensions_path $extension $part $@ | sed 's/ /\//g'
+}
+
+rebuild_path()
+{
+  local part="$1" extensions_path="$2"
+  shift
+  shift
+  reorder_path "${part}" "${extensions_path}" $(echo -n $@ | sed 's/\// /g' )
 }
 
 detect_module()
 {
-  local extensions_path=$1 _params _module_path
+  local extensions_path=$1 _module_path
   shift
-  _params=( $(echo -n $@ | sed 's/\// /g' ) )
-  _module_path=( $(build_module_path $extensions_path ${_params[@]} ) )
+  _module_path=( $(rebuild_path "modules/shell" $extensions_path $@ ) )
 
   if [[ -d "${_module_path}" ]] &&
     [[ -s "${_module_path}/dsl" ]]
   then
     module_path=${_module_path}
+    module_name=$(echo -n $@ | sed 's/ /\//g' )
     return 0
   else
     return 1
@@ -58,6 +77,68 @@ in_search_paths()
   done
 
   return 1
+}
+
+module()
+{
+  local _module=$1 _skip_path_detection=$2 _file
+
+  if module_is_loaded "${_module}"
+  then
+    return 0
+  fi
+  if [[ "${_skip_path_detection}" == "skip_path_detection" ]]
+  then
+    if [[ -d "${module_path}" ]] && [[ -f "${module_path}/dsl" ]]
+    then
+      log_search fast_mod "$module_name" "${module_path##${bdsm_path}\/extensions\/}"
+      modules+=("${module_name}")
+    else
+      log_search fast_mod "${_module}" "Not found !!! ${module_path}/dsl"
+      return 1
+    fi
+  else
+    if in_search_paths detect_module "${_module}"
+    then
+      log_search module "$module_name" "${module_path##${bdsm_path}\/extensions\/}"
+      modules+=("${module_name}")
+    else
+      log_search module "${_module}" "Not found !!!"
+      return 1
+    fi
+  fi
+  for _file in dsl cli initialize
+  do
+    if [[ -s "${module_path}/${_file}" ]]
+    then
+      source "${module_path}/${_file}"
+    fi
+  done
+  return 0
+}
+
+# load module or show error msg if module not available
+module_or_error()
+{
+  if ! module "$1"
+  then
+    error "$2"
+  fi
+}
+
+# load core modules or fail
+core_modules()
+{
+  local module
+  for module in $@
+  do
+    module_name="core/$module"
+    module_path="${modules_path}/shell/$module"
+    if ! module "$module_name" skip_path_detection
+    then
+      fail "core module '${module_name}' is missing!!!"
+    fi
+  done
 }
 
 #
@@ -101,27 +182,9 @@ modules()
   then
     for _module in "${_modules[@]}"
     do
-      if module_is_loaded "${_module}"
+      if ! module "${_module}"
       then
-        continue # The module has already been loaded, continue to the next one.
-      else
-        if in_search_paths detect_module "${_module}"
-        then
-          if (( ${debug_flag:=0} == 1 ))
-          then
-            printf "DEBUG: found module %-20s in ${module_path##${bdsm_path}\/extensions\/}.\n" "$_module"
-          fi
-          modules+=("${_module}")
-        else
-          fail "Could not find module path for ${_module}"
-        fi
-        for _file in dsl cli initialize
-        do
-          if [[ -s "${module_path}/${_file}" ]]
-          then
-            source "${module_path}/${_file}"
-          fi
-        done
+        fail "Could not find module path for ${_module}"
       fi
     done
   else

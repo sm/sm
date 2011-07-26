@@ -104,19 +104,6 @@ prepare_for_installation()
   ensure_paths_exist "${directories[@]}" "${aux_paths[@]}"
 }
 
-# update internal bdsm extensions from the given user github account
-# default user is wayneeseguin
-update_internal_extensions()
-{
-  local _url="${1:-wayneeseguin}/bdsm-extensions"
-  local _identifier="$(scm_identifier "${_url}")"
-  log "  Installing internal extensions"
-  enter "${install_path}/extensions"
-  remove_paths "internal"
-  scm_get "${_url}" "${install_path}/src/${_identifier}"
-  copy_directory "${install_path}/src/${_identifier}" to "internal"
-}
-
 # make a copy of provided bdsm internal extensions if there is none
 install_internal_extensions()
 {

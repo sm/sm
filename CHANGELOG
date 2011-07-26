@@ -1,5 +1,9 @@
-- support for extesnions search path
-- support fot github scm urls (user/name)
+0.7.7
+* extensions/internal 4ecd1a7...3535f9c (2):
+  > Interesting, go uses the src dir.
+  > fix template paths
+- support for extesnions, modules, templates, uris in_search_paths
+- support fot github scm urls (user/name) and directories
 - replaced scm_fetch/update with scm_get
 0.7.1 - support for namespaces/actions
 0.2.1 - bdsm get head and bdsm get latest functional

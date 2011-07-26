@@ -1,20 +1,10 @@
 #!/usr/bin/env bash
 
-build_template_path()
-{
-  local extensions_path=$1 extension=$2 IFS='/'
-  shift
-  shift
-  local _params=($extensions_path $extension templates $@)
-  echo -n "${_params[*]}"
-}
-
 detect_template()
 {
-  local extensions_path=$1 _params _module_path
+  local extensions_path=$1 _module_path
   shift
-  _params=( $(echo -n $@ | sed 's/\// /g' ) )
-  _template_path=( $(build_template_path $extensions_path ${_params[@]} ) )
+  _template_path=( $(rebuild_path "templates" $extensions_path $@ ) )
 
   if [[ -f "${_template_path}.template" ]]
   then
@@ -23,6 +13,7 @@ detect_template()
   elif [[ -f "${_template_path}" ]]
   then
     template_path="${_template_path}"
+    template_name=$(echo -n $@ | sed 's/ /\//g' )
     return 0
   else
     return 1
@@ -62,10 +53,9 @@ template_exists()
 {
   if in_search_paths detect_template "$@"
   then
-    debug "found template ${template_path##${bdsm_path}\/extensions\/}."
+    log_search "template" "$template_name" "${template_path##${bdsm_path}\/extensions\/}"
     return 0
   else
-    debug "Could not find template path for $@"
     return 1
   fi
 }
@@ -163,9 +153,8 @@ install_template()
     esac
   done
 
-  if in_search_paths detect_template "${_name}"
+  if template_exists "${_name}"
   then
-    debug "found template ${template_path##${bdsm_path}\/extensions\/}."
     _template="${template_path}"
     _name="$(basename "${_name}")"
   else

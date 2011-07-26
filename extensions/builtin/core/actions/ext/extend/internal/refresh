@@ -1,6 +1,18 @@
 #!/usr/bin/env bash
 
 enter $bdsm_path
+git submodule update extensions/internal
+internal_revision_old=$(git submodule extensions/internal | cut -c 2-8)
+enter $bdsm_path/extensions/internal/
+git pull origin master
+enter $bdsm_path
+internal_revision_new=$(git submodule extensions/internal | cut -c 2-8)
 
-git submodule init
-git submodule update
+if [[ "$internal_revision_old" != "$internal_revision_new" ]]
+then
+  touch CHANGELOG
+  git submodule summary | cat - CHANGELOG | tee CHANGELOG.new
+  mv CHANGELOG.new CHANGELOG
+  git add CHANGELOG extensions/internal
+  git commit -m "extensions/internal $internal_revision_new"
+fi

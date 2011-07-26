@@ -1,0 +1,2 @@
+update=extend_internal_update()
+help=extend_internal_help()

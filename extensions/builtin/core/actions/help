@@ -4,6 +4,7 @@ extension="<extension>"
 
 description "Bash Delectable Scripting Manager (BDSM) Framework - Core Extension"
 
+action "<file_name>" "Run the provided file with BDSM initialized"
 action "bdsmrc" "Install bdsmrc template file into ~/.bdsmrc or /etc/bdsmrc"
 action "get latest" "Fetch and install the latest BDSM release"
 action "get head" "Fetch and install the latest BDSM development version"
@@ -37,4 +38,3 @@ resource "http://bdsm.beginrescueend.com/"
 resource "https://www.pivotaltracker.com/projects/26822"
 
 show_help usage
-

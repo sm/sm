@@ -8,12 +8,12 @@ detect_action()
   extension="${1:-core}"
   shift
 
-  local token _word _action_path=("$extensions_path/$extension/actions")
+  local token _word _action_path="$extensions_path/$extension/actions"
 
   local _params=("$@")
 
   #loop when params or .actions exists
-  while [[ ${#_params[@]} -gt 0 ]] || file_exists "$(path_join "${_action_path[@]}" .actions)"
+  while [[ ${#_params[@]} -gt 0 ]] || file_exists "${_action_path}/.actions"
   do
     array_shift _params token
 
@@ -26,32 +26,39 @@ detect_action()
 
     # Detect a namespace
     elif variable_is_nonempty token &&
-      path_exists "$(path_join "${_action_path[@]}" $token)"
+      path_exists "${_action_path}/${token}"
     then
-      _action_path+=("${token}")
+      _action_path+="/${token}"
+
+    # Detect action
+    elif variable_is_nonempty token &&
+      file_is_executable "${_action_path}/${token}"
+    then
+      _params=( "${token}" "${_params[@]}" )
+      break
 
     # Detect mapping in .actions
-    elif file_exists "$(path_join "${_action_path[@]}" .actions)" &&
-         file_contains "$(path_join "${_action_path[@]}" .actions)" "^${token}="
+    elif file_exists "${_action_path}/.actions" &&
+         file_contains "${_action_path}/.actions" "^${token}="
     then
-      _array=( $(hash_file "$(path_join "${_action_path[@]}" .actions)" ${token}) )
+      _array=( $(hash_file "${_action_path}/.actions" ${token}) )
       _params=( "${_array[@]}" "${_params[@]}" )
       [[ "${_array[@]}" == "$token" ]] && break #break if detected 2nd time the same
 
     # Detect default mapping in .actions
-    elif file_exists "$(path_join "${_action_path[@]}" .actions)" &&
-         file_contains "$(path_join "${_action_path[@]}" .actions)" "^default="
+    elif file_exists "${_action_path}/.actions" &&
+         file_contains "${_action_path}/.actions" "^default="
     then
-      _array=( $(hash_file "$(path_join "${_action_path[@]}" .actions)" default) )
-      _params=( "${_array[@]}" "${_params[@]}" )
+      _array=( $(hash_file "${_action_path}/.actions" default) )
+      _params=( "${_array[@]}" "${token}" "${_params[@]}" )
       [[ "${_array[@]}" == "$token" ]] && break #break if detected 2nd time the same
 
     # Detect help mapping in .actions
-    elif file_exists "$(path_join "${_action_path[@]}" .actions)" &&
-         file_contains "$(path_join "${_action_path[@]}" .actions)" "^help="
+    elif file_exists "${_action_path}/.actions" &&
+         file_contains "${_action_path}/.actions" "^help="
     then
-      _array=( $(hash_file "$(path_join "${_action_path[@]}" .actions)" help) )
-      _params=( "${_array[@]}" "${_params[@]}" )
+      _array=( $(hash_file "${_action_path}/.actions" help) )
+      _params=( "${_array[@]}" "${token}" "${_params[@]}" )
       [[ "${_array[@]}" == "$token" ]] && break #break if detected 2nd time the same
 
     # finish searching path
@@ -72,29 +79,29 @@ detect_action()
   if variable_is_nonempty token &&
     match "${token}" "*\(\)"
   then
-    action_path=$(path_join "${_action_path[@]}")
+    action_path="${_action_path}"
     action="$token"
     extension_args=( "${_params[@]}" )
 
   # Detect a file
   elif variable_is_nonempty token &&
-    file_is_executable "$(path_join "${_action_path[@]}" ${token})"
+    file_is_executable "${_action_path}/${token}"
   then
-    action_path=$(path_join "${_action_path[@]}")
+    action_path="${_action_path}"
     action="$token"
     extension_args=( "${_params[@]}" )
 
   # Detect default if nothing else matches
-  elif file_exists "$(path_join "${_action_path[@]}" default)"
+  elif file_exists "${_action_path}/default"
   then
-    action_path=$(path_join "${_action_path[@]}")
+    action_path="${_action_path}"
     action="default"
     extension_args=( "$token" "${_params[@]}" )
 
   # Detect help if no default
-  elif file_exists "$(path_join "${_action_path[@]}" help)"
+  elif file_exists "${_action_path}/help"
   then
-    action_path=$(path_join "${_action_path[@]}")
+    action_path="${_action_path}"
     action="help"
     [[ "$token" != "" ]] && extension_args=("$token") || extension_args=()
     extension_args+=( "${_params[@]}" )
@@ -178,28 +185,21 @@ detect_action_type()
 
 extension_modules_load()
 {
-  local _token _namespace=()
+  local _token _namespace=() namespace
 
-    source_files \
-      "${extension_modules_path}/shell/dsl" \
-      "${extension_modules_path}/shell/cli" \
-      "${extension_modules_path}/shell/initialize"
+  module_name="${extension}"
+  module_path="${extension_modules_path}/shell"
+  module "$module_name" skip_path_detection
 
   while (( $# > 0 ))
   do
     _namespace+=("${1}")
     shift
-
     namespace="$(path_join ${_namespace[*]})"
 
-#    if [[ "${extension}" != "core" ]]
-#    then # Core extension modules are loaded by default on startup.
-         # Load the extensions's core module
-      source_files \
-        "${extension_modules_path}/shell/${namespace}/dsl" \
-        "${extension_modules_path}/shell/${namespace}/cli" \
-        "${extension_modules_path}/shell/${namespace}/initialize"
-#    fi
+    module_name="$(path_join "${extension}" ${_namespace[*]})"
+    module_path="$(path_join "${extension_modules_path}" "shell" ${_namespace[*]})"
+    module "$module_name" skip_path_detection
   done
 }
 
@@ -319,7 +319,7 @@ extension_action()
 
   if in_search_paths detect_action "${extension_args[@]}"
   then
-    debug "detected path:$action_path, action:$action, params:${extension_args[@]}."
+    log_search action "$action" "${action_path##${bdsm_path}\/extensions\/} params:${extension_args[@]}"
   else
     fail "Usage: \n  bdsm ${extension} [namespace] [action]\nActions:\n   $(extension_actions "${extension}")"
   fi
@@ -699,7 +699,7 @@ extensions_in()
   if path_exists "${_path}"
   then
     _files=($(
-    find "${_path}" -mindepth 2 -maxdepth 2 -name 'VERSION' -type f | sort
+      find "${_path}" -mindepth 2 -maxdepth 2 -name 'VERSION' -type f | sort
     ))
     extensions=()
 
@@ -707,7 +707,7 @@ extensions_in()
     do
       extension_source_path="${_file/%\/VERSION}"
       extension_name="${extension_source_path//*\/}"
-      extensions[${#extensions[@]}]="${extension_name//*\//}"
+      extensions+=( "${extension_name//*\//}" )
     done
 
     echo -n "${extensions[@]}"
@@ -891,7 +891,7 @@ extension_install()
   then
     if extension_is_valid "${extensions_src_path}/${_src}"
     then
-      log " - ${_extension}"
+      log "Installing ${_extension}"
       if path_exists "${bdsm_path}/extensions/external/${_extension}"
       then
         remove_paths "${bdsm_path}/extensions/external/${_extension}"

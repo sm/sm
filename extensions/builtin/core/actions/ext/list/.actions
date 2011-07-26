@@ -3,5 +3,7 @@ installed=list_installed()
 
 available=list_available()
 
+uris=list_uris()
+
 help=list_help()
 usage=list_help()

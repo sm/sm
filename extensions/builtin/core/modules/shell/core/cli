@@ -11,7 +11,6 @@ fi
 while (( $# > 0 ))
 do
   token="$1"
-  shift
   case "$token" in
 
     --help)
@@ -37,7 +36,8 @@ do
       ;;
 
     --)
-      extension_args=("$@") # Stop processing arguments.
+      shift #end of processing
+      extension_args=("$@")
       break
       ;;
 
@@ -45,8 +45,14 @@ do
       error "Unknown flag '${token}'"
       ;;
     *)
-      extension_args=("${token:-core}" "$@")
-      break
+      if [[ -f $token ]]
+      then
+        bdsm_script=$1
+      else
+        extension_args=("$@")
+        break
+      fi
       ;;
   esac
+  shift
 done
