@@ -456,7 +456,7 @@ sub get_options_from_array {
 sub parse_options {
     # Returns: N/A
     # Defaults:
-    $Global::version = 20110719;
+    $Global::version = 20110722;
     $Global::progname = 'parallel';
     $Global::infinity = 2**31;
     $Global::debug = 0;
@@ -2512,7 +2512,8 @@ sub no_of_cpus_aix {
     #   undef if not AIX
     my $no_of_cpus = 0;
     if(-x "/usr/sbin/lscfg") {
-	open(IN,"/usr/sbin/lscfg -vs |grep proc | wc -l|tr -d ' ' |") || return undef;
+	open(IN,"/usr/sbin/lscfg -vs |grep proc | wc -l|tr -d ' ' |")
+	    || return undef;
 	$no_of_cpus = <IN>;
 	chomp ($no_of_cpus);
 	close IN;
@@ -2556,7 +2557,7 @@ sub sshcommand_of_sshlogin {
     # 'user@server' -> ('ssh','user@server')
     # 'myssh user@server' -> ('myssh','user@server')
     # 'myssh -l user server' -> ('myssh -l user','server')
-    # '/usr/local/bin/myssh -l user server' -> ('/usr/local/bin/myssh -l user','server')
+    # '/usr/bin/myssh -l user server' -> ('/usr/bin/myssh -l user','server')
     # Returns:
     #   sshcommand - defaults to 'ssh'
     #   login@host
@@ -2572,8 +2573,6 @@ sub sshcommand_of_sshlogin {
             my $control_path = $self->control_path_dir()."/ssh-%r@%h:%p";
             $sshcmd = "ssh -S ".$control_path;
             $serverlogin = $self->{'string'};
-            #my $master = "ssh -MTS ".control_path_dir()."/ssh-%r@%h:%p ".$serverlogin;
-#           my $master = "ssh -MTS ".$self->control_path_dir()."/ssh-%r@%h:%p ".$serverlogin." sleep 1";
             my $master = "ssh -MTS $control_path $serverlogin sleep 1";
             if(not $self->{'control_path'}{$control_path}++) {
                 # Master is not running for this control_path
@@ -2604,8 +2603,9 @@ sub control_path_dir {
         -e $ENV{'HOME'}."/.parallel" or mkdir $ENV{'HOME'}."/.parallel";
         -e $ENV{'HOME'}."/.parallel/tmp" or mkdir $ENV{'HOME'}."/.parallel/tmp";
         $self->{'control_path_dir'} =
-            File::Temp::tempdir($ENV{'HOME'}."/.parallel/tmp/control_path_dir-XXXX",
-                    CLEANUP => 1);
+	    File::Temp::tempdir($ENV{'HOME'}
+				. "/.parallel/tmp/control_path_dir-XXXX",
+				CLEANUP => 1);
     }
     return $self->{'control_path_dir'};
 }
@@ -2655,7 +2655,8 @@ sub unget {
 
 sub empty {
     my $self = shift;
-    my $empty = (not @{$self->{'unget'}}) && $self->{'commandlinequeue'}->empty();
+    my $empty = (not @{$self->{'unget'}})
+	&& $self->{'commandlinequeue'}->empty();
     ::debug("JobQueue->empty $empty\n");
     return $empty;
 }
@@ -2694,12 +2695,13 @@ sub new {
     return bless {
         'commandline' => $commandline, # The commandline with no args
         'workdir' => undef, # --workdir
-        'stdin' => undef, # filehandle for stdin (used for --spreadstdin)
+        'stdin' => undef, # filehandle for stdin (used for --pipe)
         'stdout' => undef, # filehandle for stdout (used for --group)
-        'stdoutfilename' => undef, # filename for writing stdout to (used for --files)
+	# filename for writing stdout to (used for --files)
+        'stdoutfilename' => undef,
         'stderr' => undef, # filehandle for stderr (used for --group)
-        'remaining' => "", # remaining data not sent to stdin (used for --spreadstdin)
-	'datawritten' => 0, # amount of data sent via stdin (used for --spreadstdin)
+        'remaining' => "", # remaining data not sent to stdin (used for --pipe)
+	'datawritten' => 0, # amount of data sent via stdin (used for --pipe)
         'transfersize' => 0, # size of files using --transfer
         'returnsize' => 0, # size of files using --return
         'pid' => undef,
@@ -2939,19 +2941,25 @@ sub sshlogin_wrap {
 	    $post .= $self->sshcleanup();
 	    if($post) {
 		# We need to save the exit status of the job
-		$post = '_EXIT_status=$?; '.$post.' exit $_EXIT_status;';
+		$post = '_EXIT_status=$?; ' . $post . ' exit $_EXIT_status;';
 	    }
 	    # If the remote login shell is (t)csh then use 'setenv'
 	    # otherwise use 'export'
 	    my $parallel_env =
-		q{'eval `echo $SHELL | grep -E "/(t)?csh" > /dev/null && echo setenv PARALLEL_SEQ '$PARALLEL_SEQ'\; setenv PARALLEL_PID '$PARALLEL_PID' || echo PARALLEL_SEQ='$PARALLEL_SEQ'\;export PARALLEL_SEQ\;PARALLEL_PID='$PARALLEL_PID'\;export PARALLEL_PID` ;'};
+		q{'eval `echo $SHELL | grep -E "/(t)?csh" > /dev/null}
+	    . q{ && echo setenv PARALLEL_SEQ '$PARALLEL_SEQ'\;}
+	    . q{ setenv PARALLEL_PID '$PARALLEL_PID'}
+	    . q{ || echo PARALLEL_SEQ='$PARALLEL_SEQ'\;export PARALLEL_SEQ\;}
+	    . q{PARALLEL_PID='$PARALLEL_PID'\;export PARALLEL_PID` ;'};
 	    if($::opt_workdir) {
-		$self->{'sshlogin_wrap'} = ($pre . "$sshcmd $serverlogin $parallel_env "
-					    . ::shell_quote_scalar("cd ".$self->workdir()." && ")
-					    . ::shell_quote_scalar($next_command_line).";".$post);
+		$self->{'sshlogin_wrap'} =
+		    ($pre . "$sshcmd $serverlogin $parallel_env "
+		     . ::shell_quote_scalar("cd ".$self->workdir()." && ")
+		     . ::shell_quote_scalar($next_command_line).";".$post);
 	    } else {
-		$self->{'sshlogin_wrap'} = ($pre . "$sshcmd $serverlogin $parallel_env "
-					    .::shell_quote_scalar($next_command_line).";".$post);
+		$self->{'sshlogin_wrap'} =
+		    ($pre . "$sshcmd $serverlogin $parallel_env "
+		     . ::shell_quote_scalar($next_command_line).";".$post);
 	    }
 	}
     }
@@ -3005,11 +3013,14 @@ sub sshtransfer {
 	}
 	if(-r $file) {
 	    my $mkremote_workdir =
-		$remote_workdir eq "." ? "true" : "ssh $serverlogin mkdir -p $rsync_destdir";
-	    $pre .= "$mkremote_workdir; rsync $rsync_opt ".::shell_quote_scalar($file)." $serverlogin:$rsync_destdir;";
+		$remote_workdir eq "." ? "true" :
+		"ssh $serverlogin mkdir -p $rsync_destdir";
+	    $pre .= "$mkremote_workdir; rsync $rsync_opt "
+		. ::shell_quote_scalar($file)." $serverlogin:$rsync_destdir;";
 	} else {
 	    print $Global::original_stderr
-		"parallel: Warning: $file is not readable and will not be transferred\n";
+		"parallel: Warning: "
+		. $file . " is not readable and will not be transferred\n";
 	}
     }
     return $pre;
@@ -3021,7 +3032,8 @@ sub return {
     my $self = shift;
     my @return = ();
     for my $return (@{$self->{'commandline'}{'return_files'}}) {
-	CORE::push @return, $self->{'commandline'}->replace_placeholders($return,1);
+	CORE::push @return,
+	$self->{'commandline'}->replace_placeholders($return,1);
     }
     return @return;
 }
@@ -3055,8 +3067,8 @@ sub sshreturn {
 	my $rsync_destdir = ($relpath ? "./" : "/");
 	my $ret_file = $file;
 	my $remove = $::opt_cleanup ? "--remove-source-files" : "";
-	# If relative path: prepend workdir/./ to avoid problems if the dir contains ':'
-	# and to get the right relative return path
+	# If relative path: prepend workdir/./ to avoid problems
+	# if the dir contains ':' and to get the right relative return path
 	my $replaced = ($relpath ? $self->workdir()."/./" : "") . $file;
 	# --return
 	# Abs path: rsync -rlDzR server:/home/tange/dir/subdir/file.gz /
@@ -3084,11 +3096,13 @@ sub sshcleanup {
 	$file = ::shell_quote_scalar($file);
 	if(@subworkdirs) {
 	    $removeworkdir = "; rmdir 2>/dev/null ".
-		join(" ",map { ::shell_quote_scalar($workdir."/".$_) } @subworkdirs);
+		join(" ",map { ::shell_quote_scalar($workdir."/".$_) }
+		     @subworkdirs);
 	}
 	my $relpath = ($file !~ m:^/:); # Is the path relative?
 	my $cleandir = ($relpath ? $workdir."/" : "");
-	$cleancmd .= "$sshcmd $serverlogin rm -f ".::shell_quote_scalar($cleandir.$file.$removeworkdir).";";
+	$cleancmd .= "$sshcmd $serverlogin rm -f "
+	    . ::shell_quote_scalar($cleandir.$file.$removeworkdir).";";
     }
     return $cleancmd;
 }
@@ -3114,11 +3128,13 @@ sub workdir {
 	if(defined $::opt_workdir) {
 	    if($::opt_workdir ne "...") {
 		$workdir = $::opt_workdir;
-		$workdir =~ s:/\./:/:g; # Rsync treats /./ special. We dont want that
+		# Rsync treats /./ special. We dont want that
+		$workdir =~ s:/\./:/:g; # Remove /./
 		$workdir =~ s:/+$::; # Remove ending / if any
 		$workdir =~ s:^\./::g; # Remove starting ./ if any
 	    } else {
-		$workdir = ".parallel/tmp/".::hostname()."-".$$."-".$self->seq();
+		$workdir = ".parallel/tmp/" . ::hostname() . "-" . $$
+		    . "-" . $self->seq();
 	    }
 	} else {
 	    $workdir = ".";
@@ -3130,7 +3146,7 @@ sub workdir {
 
 sub parentdirs_of {
     # Return:
-    #   all parentdirs except . of this dir or file - sorted descending by length
+    #   all parentdirs except . of this dir or file - sorted desc by length
     my $d = shift;
     my @parents = ();
     while($d =~ s:/[^/]+$::) {
@@ -3198,7 +3214,8 @@ sub start {
     $Global::total_started++;
     $ENV{'PARALLEL_SEQ'} = $job->seq();
     $ENV{'PARALLEL_PID'} = $$;
-    ::debug("$Global::total_running processes. Starting (".$job->seq()."): $command\n");
+    ::debug("$Global::total_running processes. Starting ("
+	    . $job->seq() . "): $command\n");
     if($::opt_pipe) {
 	my ($in);
 	$pid = ::open3($in, ">&OUT", ">&ERR", $command) ||
@@ -3293,7 +3310,8 @@ sub print {
 	    # Verbose level > 1: Print the rsync and stuff
 	    print STDOUT $command,"\n";
 	}
-	# If STDOUT and STDERR are merged, we want the command to be printed first
+	# If STDOUT and STDERR are merged,
+	# we want the command to be printed first
 	# so flush to avoid STDOUT being buffered
 	flush STDOUT;
     }
@@ -3363,21 +3381,22 @@ sub new {
 	'{//}' => 0, # Total length of all {//} replaced with all args
 	'{.}' => 0, # Total length of all {.} replaced with all args
 	'{/.}' => 0, # Total length of all {/.} replaced with all args
-	'no_args' => undef, # Length of command with all replacement args removed
+	'no_args' => undef, # Length of command w/ all replacement args removed
 	'context' => undef, # Length of context of an additional arg
     };
     my($sum,%replacecount);
-    ($sum,$len->{'no_args'},$len->{'context'},$len->{'contextgroups'},%replacecount) =
-	number_of_replacements($command,$context_replace);
+    ($sum,$len->{'no_args'},$len->{'context'},$len->{'contextgroups'},
+     %replacecount) = number_of_replacements($command,$context_replace);
     if($sum == 0) {
 	if($command eq "") {
 	    $command = $Global::replace{'{}'};
 	} else {
-	    $command .=" ".$Global::replace{'{}'}; # Add {} to the command if there are no {...}'s
+	    # Add {} to the command if there are no {...}'s
+	    $command .=" ".$Global::replace{'{}'};
         }
     }
-    ($sum,$len->{'no_args'},$len->{'context'},$len->{'contextgroups'},%replacecount) =
-	number_of_replacements($command,$context_replace);
+    ($sum,$len->{'no_args'},$len->{'context'},$len->{'contextgroups'},
+     %replacecount) = number_of_replacements($command,$context_replace);
     my %positional_replace;
     my %multi_replace;
     for my $used (keys %replacecount) {
@@ -3425,7 +3444,6 @@ sub populate {
 	    next;
 	}
 	$self->push($next_arg);
-	#::debug("if(".$self->len()." >= ".Limits::Command::max_length().") ".length $self->replaced()."\n");
 	if($self->len() >= Limits::Command::max_length()) {
 	    # TODO stuff about -x opt_x
 	    if($self->number_of_args() > 1) {
@@ -3452,7 +3470,8 @@ sub populate {
 	    }
 	}
     }
-    if(($::opt_m or $::opt_X) and not $CommandLine::already_spread and $self->{'arg_queue'}->empty()) {
+    if(($::opt_m or $::opt_X) and not $CommandLine::already_spread
+       and $self->{'arg_queue'}->empty()) {
 	# -m or -X and EOF => Spread the arguments over all jobslots
 	# (unless they are already spread)
 	$CommandLine::already_spread++;
@@ -3482,9 +3501,12 @@ sub push {
 	if(defined $arg) {
 	    if($self->{'positional_replace'}{$arg_no}) {
 		for my $used (keys %{$self->{'replacecount'}}) {
-		    my $replacementfunction = $self->{'positional_replace'}{$arg_no}; # {} {/} {//} {.} or {/.}
+		    # {} {/} {//} {.} or {/.}
+		    my $replacementfunction =
+			$self->{'positional_replace'}{$arg_no};
 		    # Find the single replacements
-		    $self->{'len'}{$used} += length $arg->replace($replacementfunction);
+		    $self->{'len'}{$used} +=
+			length $arg->replace($replacementfunction);
 		}
 	    }
 	    for my $used (keys %{$self->{'multi_replace'}}) {
@@ -3502,7 +3524,8 @@ sub pop {
     for my $arg (@$record) {
 	if(defined $arg) {
 	    for my $replacement_string (keys %{$self->{'replacecount'}}) {
-		$self->{'len'}{$replacement_string} -= length $arg->replace($replacement_string);
+		$self->{'len'}{$replacement_string} -=
+		    length $arg->replace($replacement_string);
 	    }
 	}
     }
@@ -3536,7 +3559,8 @@ sub len {
 	$len += $self->number_of_args()*$self->{'len'}{'context'};
 	for my $replstring (keys %{$self->{'replacecount'}}) {
 	    if(defined $self->{'len'}{$replstring}) {
-		$len += $self->{'len'}{$replstring} * $self->{'replacecount'}{$replstring};
+		$len += $self->{'len'}{$replstring} *
+		    $self->{'replacecount'}{$replstring};
 	    }
 	}
 	$len += ($self->number_of_args()-1) * $self->{'len'}{'contextgroups'};
@@ -3551,8 +3575,10 @@ sub len {
 	    if($Global::replace{$replstring}) {
 		# This is a multi replacestring ({} {/} {//} {.} {/.})
 		# Add each space between two arguments
-		my $number_of_args = ($#{$self->{'arg_list'}[0]}+1)*$self->number_of_args();
-		$len += ($number_of_args-1) * $self->{'replacecount'}{$replstring};
+		my $number_of_args = ($#{$self->{'arg_list'}[0]}+1) *
+		    $self->number_of_args();
+		$len += ($number_of_args-1) *
+		    $self->{'replacecount'}{$replstring};
 	    }
 	}
     }
@@ -3581,7 +3607,8 @@ sub multi_regexp {
 
 sub number_of_replacements {
     # Returns:
-    #  sum_of_count, length_of_command_with_no_args, length_of_context { 'replacementstring' => count }
+    #  sum_of_count, length_of_command_with_no_args,
+    #  length_of_context { 'replacementstring' => count }
     my $command = shift;
     my $context_replace = shift;
     my %count = ();
@@ -3594,14 +3621,15 @@ sub number_of_replacements {
 	'|'.
 	join("|",map {$a=$_;$a=~s/(\W)/\\$1/g; $a} values %Global::replace).
 	")";
-    while($cmd =~ s/($replacement_regexp)/\0/o) {
-	# substitute with \0 to avoid {{}} being interpreted as two {}'s
-	if(defined $Global::replace_rev{$1}) {
-	    $count{$Global::replace_rev{$1}}++;
+    my %c = ();
+    $cmd =~ s/($replacement_regexp)/$c{$1}++;""/ogex;
+    for my $k (keys %c) {
+	if(defined $Global::replace_rev{$k}) {
+	    $count{$Global::replace_rev{$k}} = $c{$k};
 	} else {
-	    $count{$1}++;
+	    $count{$k} = $c{$k};
 	}
-	$sum++;
+	$sum += $c{$k};
     }
 
     my $number_of_context_groups = 0;
@@ -3637,15 +3665,27 @@ sub replaced {
     my $self = shift;
     if(not defined $self->{'replaced'}) {
 	$self->{'replaced'} = $self->replace_placeholders($self->{'command'},0);
+	if($self->{'replaced'} =~ /^\s*(-\S+)/) {
+	    # Is this really a command in $PATH starting with '-'?
+	    my $cmd = $1;
+	    if(not grep { -e $_."/".$cmd } split(":",$ENV{'PATH'})) {
+		print STDERR "parallel: Error:"
+		    . " Command ($cmd) starts with '-'."
+		    . " Is this a wrong option?\n";
+		::wait_and_exit(255);
+	    }
+	}
 	if($::opt_nice) {
 	    # Prepend nice -n19 bash -c
 	    # and quote
-	    $self->{'replaced'} = "nice -n".$::opt_nice." bash -c ".::shell_quote_scalar($self->{'replaced'});
+	    $self->{'replaced'} = "nice -n" . $::opt_nice
+		. " bash -c " . ::shell_quote_scalar($self->{'replaced'});
 	}
     }
     if($::oodebug and length($self->{'replaced'}) != ($self->len())) {
 	::my_dump($self);
-	Carp::cluck("replaced len=".length($self->{'replaced'})." computed=".($self->len()));
+	Carp::cluck("replaced len=" . length($self->{'replaced'})
+		    . " computed=" . ($self->len()));
     }
     return $self->{'replaced'};
 }
