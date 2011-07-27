@@ -1709,3 +1709,65 @@ sudo bdsm ${dependency} package install
   done
 }
 
+
+#
+# ## package\_info
+#
+# Displays package information.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# Steps performed are logged to STDOUT of the calling environment.
+#
+# ### Environmental effects
+#
+# Package installation artifacts are created in the system and source directories.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# Fails if any of the constituant components fail.
+#
+# ### Usage Examples
+#
+# Example Usage:
+#
+# user$ package_info "bash"
+#
+# default_version: "4.2"
+# base_url "ftp.gnu.org/gnu/bash/"
+# ...
+#
+# user$ package_info
+#
+# ### Notes
+#
+package_info()
+{
+  log "versions:"
+  log "  installed: $(cd "${packages_path}/${package_name}"; find . -type d -mindepth 1 -maxdepth 1 | sed -e 's#./##g' -e 's# #,#g')"
+  log "  default: ${package_version}"
+
+  if [[ -L "${_path}/active" ]]
+  then
+    log "  active: $(readlink "${_path}/active")"
+  else
+    log "  active: none"
+  fi
+
+  log "base_url: ${package_base_url}"
+
+  if array_is_nonempty package_dependencies
+  then
+    log "  dependencies: ${package_dependencies[*]}"
+  fi
+}
+
+
