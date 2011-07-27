@@ -24,6 +24,16 @@ else
 fi
 
 extension_patches_path="${extension_path}/patches"
+case "${package_name}" in
+  *=*) # exact version specifier
+    package_version="${package_name##*=}"
+    package_name="${package_name%%=*}"
+    ;;
+  *:*) # minimum version specifier
+    # TODO: concept of 'minimum' ;)
+    package_version="${package_name##*:}"
+    ;;
+esac
 
 # Ensure that package_version is set at this point
 if variable_is_empty package_version
