@@ -321,6 +321,7 @@ extension_action()
     *=*|*:*) # exact version specifier
       package_name="${extension_args[0]}"
       export package_version="${package_name##*=}"
+      export package_name="${package_name%%=*}"
       export extension="${package_name}"
       extension_args[0]="${extension}"
       ;;
