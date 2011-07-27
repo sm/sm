@@ -93,16 +93,7 @@ then
       done
       ;;
     *)
-      case "${extension_args[0]}" in
-        *=*|*:*) # exact version specifier
-          package="${extension_args[0]}"
-          extension_action "${package%%=*}"
-          ;;
-        *)
-          extension_action
-          ;;
-      esac
-      ;;
+      extension_action
   esac
 fi
 
