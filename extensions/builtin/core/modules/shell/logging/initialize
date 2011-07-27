@@ -1,11 +1,7 @@
 #!/usr/bin/env bash
 
-modules core/time
+set -o errtrace
 
-if (( UID == 0 ))
-then
-  true "${log_path:="${bdsm_path}/log"}"
-else
-  true "${log_path:="$HOME/log"}"
-fi
+set_ps4
 
+enable_backtrace

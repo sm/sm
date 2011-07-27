@@ -1,0 +1,7 @@
+add=extend
+internal=extend internal
+ls=list
+activate=package activate
+enable=package activate
+deactivate=package deactivate
+disable=package deactivate

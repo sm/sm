@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+modules std/time
+
+if (( UID == 0 ))
+then
+  true "${log_path:="${bdsm_path}/log"}"
+else
+  true "${log_path:="$HOME/log"}"
+fi
+

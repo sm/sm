@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-if file_is_nonempty "$extension_templates_path/bdsmrc"
+modules std/templates std/time
+
+if template_exists "ext/bdsmrc"
 then
   if file_exists "$HOME/.bdsmrc"
   then
@@ -24,7 +26,7 @@ then
 
   true  "${repository_url:="git@github.com:username/repository.git"}"
 
-  install_template "bdsmrc" to "$HOME/.bdsmrc"
+  install_template "ext/bdsmrc" to "$HOME/.bdsmrc"
 
   seed_template "$HOME/.bdsmrc" \
     project "$project" \

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+modules core/variables core/array core/environment core/filesystem
+
 true \
   "${extensions_development_path:="${extensions_src_path}"}" \
   "${extension_uri:="${extensions_repository_url:-}"}"

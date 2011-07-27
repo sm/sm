@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-set -o errtrace
-
-set_ps4
-
-enable_backtrace

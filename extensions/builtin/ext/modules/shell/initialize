@@ -6,7 +6,7 @@ true \
   ${remote:="origin"} \
   ${branch:="master"}
 
-modules core/environment core/vcs core/time
+modules core/environment std/vcs
 
 extensions_src_path="${src_path}/extensions"
 

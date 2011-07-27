@@ -1,20 +1,33 @@
 #!/usr/bin/env bash
 
+log()
+{
+  printf "$*\n"
+}
+
+debug()
+{
+  if (( ${debug_flag:=0} >= 1 ))
+  then
+    printf "DEBUG: $*\n"
+  fi
+}
+
+fail()
+{
+  printf "FAIL: $*\n"
+}
+
 #
-# ## log()
+# ## set_ps4()
 #
-# Log arguments to the calling environments STDOUT.
+# Set the environmental PS4 variable for informative tracing.
 #
 # ### Input Parameters
 #
-# Strings to be logged.
+# None.
 #
 # ### Stream Outputs
-#
-# Prints arguments passed in to the calling environments STDOUT with a newline
-# character appended.
-#
-# ### Environmental effects
 #
 # None.
 #
@@ -24,105 +37,124 @@
 #
 # ### Failure Scenarios
 #
-# Fails if no arguments are given.
+# No failure scenarios currently.
 #
 # ### Usage Examples
 #
-#     user$ log "Hello there! "
-#     Hello there!
+#     user$ echo "'$PS4'"
+#     '+ '
+#     user$ set_ps4
+#     user$ echo "'$PS4'"
+#     ' > ${BASH_SOURCE##${bdsm_path}\/} ${FUNCNAME[0]:+${FUNCNAME[0]}()} ${LINENO} $ '
 #
-log()
+# ### Code Walkthrough
+set_ps4()
 {
-  local _token _file _message _append_flag=0
+  # Set the PS4 variable. Then export the PS4 variabel so that this script and
+  # called bash scripts will display a more detailed and formatted trace output.
+  # Finally return true, 0, for success.
+  PS4="# \${BASH_SOURCE##\${bdsm_path}\/extensions\/} \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO} $ "
+  export PS4
+  return 0
+}
 
-  while (( $# > 0 ))
-  do
-    _token="$1"
-    shift
+#
+# ## trace()
+#
+# Toggle tracing functionality on or off. If 'on' is triggered then every line
+# of code execution after the function returns will be displayed in the format
+# specified by the PS4 environment variable (see set_ps4).
+#
+# ### Input Parameters
+#
+# First parameter is either empty, 'on' or 'off'
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user$ trace on
+#     user$ echo "hi"
+#     >   1 $ echo hi
+#     user$ trace off
+#     >  trace() 1 $ local _option=off
+#     >  trace() 3 $ [[ off = \o\n ]]
+#     >  trace() 8 $ set +o xtrace
+#
+# ### Code Walkthrough
+trace()
+{
+  # Declare the option varibale and set it to the first parameter, if nonempty,
+  # and to 'on' if no parameters were given.
+  local _option="${1}"
 
-    case "${_token}" in
-      (append|--append)
-        _append_flag=1
-        ;;
-      (to)
-        _file="${1}"
-        shift
-        ;;
-      (*)
-        _message="${_token}"
-        ;;
-   esac
-  done
-
-  if variable_is_nonempty _message
+  # If the option is on (default) then Set the trace_flag to 1, export
+  # trace_flag and then turn on shell tracing.  Otherwise turn off shell
+  # tracing, set the trace_flag to 0 and export it.
+  if [[ "${_option}" = "on" ]]
   then
-    if variable_is_nonempty _file
-    then
-      if (( _append_flag == 1 ))
-      then
-        printf "${_message}\n" >> "${_file}"
-      else
-        printf "${_message}\n" > "${_file}"
-      fi
-    else
-        printf "${_message}\n"
-    fi
+    trace_flag=1
+    export trace_flag
+    set -o xtrace
   else
-    fail "Cannot log a message as no message was given."
+    set +o xtrace
+    trace_flag=0
+    export trace_flag
   fi
 }
 
 #
-# ## info()
+# ## enable_trace()
 #
-# Log arguments to the calling environments STDOUT preceeded by 'INFO .
+# Turns tracing on.
 #
 # ### Input Parameters
 #
-# Strings to be logged.
+# None.
 #
 # ### Stream Outputs
-#
-# Prints arguments passed in to the calling environments STDOUT with a newline
-# character appended and 'INFO ' prepended.
-#
-# ### Environmental effects
 #
 # None.
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
-# Fails if no arguments are given.
+# No failure scenarios currently.
 #
 # ### Usage Examples
 #
-#     user$ info "Hello there! "
-#     INFO Hello there!
+#     user$ enable_trace
 #
-info()
+# ### Code Walkthrough
+enable_trace()
 {
-  log "INFO: $*"
+  # Enable shell tracing
+  trace on
 }
 
 #
-# ## warn()
+# ## disable_trace()
 #
-# Log arguments to the calling environments STDOUT preceeded by 'WARNING .
+# Turns tracing off.
 #
 # ### Input Parameters
 #
-# Strings to be logged.
+# None.
 #
 # ### Stream Outputs
-#
-# Prints arguments passed in to the calling environments STDOUT with a newline
-# character appended and 'WARNING ' prepended.
-#
-# ### Environmental effects
 #
 # None.
 #
@@ -132,69 +164,30 @@ info()
 #
 # ### Failure Scenarios
 #
-# Fails if no arguments are given.
+# No current failure scenarios.
 #
 # ### Usage Examples
 #
-#     user$ info "Bad Monkeys are Typing! "
-#     WARNING: Bad Monkeys are Typing!
+#     user$ disable_trace
 #
-warn()
+# ### Code Walkthrough
+disable_trace()
 {
-  log "WARNING: $*"
-}
-
-#
-# ## note()
-#
-# Log arguments to the calling environments STDOUT preceeded by 'NOTE .
-#
-# ### Input Parameters
-#
-# Strings to be logged.
-#
-# ### Stream Outputs
-#
-# Prints arguments passed in to the calling environments STDOUT with a newline
-# character appended and 'NOTE ' prepended.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success
-#
-# ### Failure Scenarios
-#
-# Fails if no arguments are given.
-#
-# ### Usage Examples
-#
-#     user$ info "You are not Smurfette! "
-#     NOTE You are not Smurfette!
-#
-note()
-{
-  log "NOTE: $*"
+  # Disable shell tracing
+  trace off
 }
 
 #
 # ## debug()
 #
-# Log arguments to the calling environments STDOUT preceeded by 'DEBUG: .
+# Toggle verbose debugging functionality on or off. If 'on' is triggered then
+# every line of code execution after the function returns will be displayed.
 #
 # ### Input Parameters
 #
-# Strings to be logged.
+# First parameter is either empty, 'on' or 'off'
 #
 # ### Stream Outputs
-#
-# Prints arguments passed in to the calling environments STDOUT with a newline
-# character appended and 'DEBUG: ' prepended.
-#
-# ### Environmental effects
 #
 # None.
 #
@@ -204,79 +197,50 @@ note()
 #
 # ### Failure Scenarios
 #
-# Fails if no arguments are given.
+# No failure scenarios currently.
 #
 # ### Usage Examples
 #
-#     user$ debug "Hello there! "
-#     DEBUG: Hello there!
+#     user$ debug on
+#     user$ echo "hi"
+#     >   1 $ echo hi
+#     user$ debug off
+#     >  debug() 1 $ local _option=off
+#     >  debug() 3 $ [[ off = \o\n ]]
+#     >  debug() 8 $ set +o xdebug
 #
+# ### Code Walkthrough
 debug()
 {
-  if (( ${debug_flag:=0} == 1 ))
+  # Declare the option varibale and set it to the first parameter, if nonempty,
+  # and to 'on' if no parameters were given.
+  local _option="${1:-on}"
+
+  # If the option variable is set to on (the default) then set and export the
+  # debug_flag variable to 1 (enable) thus enabling verbose shell echoing
+  # (every code line is printed before execution). Otherwise disable verbose
+  # shell echoing, set debug_flag to 0 (disabled) and export
+  if [[ "${_option}" = "on" ]]
   then
-    log "DEBUG: $*"
+    export debug_flag=1
+    set -o verbose
   else
-    return 0
+    set +o verbose
+    debug_flag=0
+    export debug_flag
   fi
 }
 
 #
-# ## error()
+# ## enable_debug()
 #
-# Log arguments to the calling environments STDERR preceeded by 'ERROR '.
-# Exits with status code 1.
+# Enables verbose debugging output.
 #
 # ### Input Parameters
-#
-# Strings to be logged.
-#
-# ### Stream Outputs
-#
-# Prints arguments passed in to the calling environments STDOUT with a newline
-# character appended and 'ERROR ' prepended.
-#
-# ### Environmental effects
 #
 # None.
 #
-# ### Return Codes
-#
-# 1 for failure.
-#
-# ### Failure Scenarios
-#
-# Fails if no arguments are given.
-#
-# ### Usage Examples
-#
-#     user$ error "Hello there! "
-#     ERROR Hello there!
-#     *poof* shell closed...
-#
-error()
-{
-  set +o xtrace
-  log "\nERROR: $*" >&2
-  disable_backtrace
-  exit 1
-}
-
-#
-# ## succeed()
-#
-# Log arguments to the calling environments STDOUT. Exits with status code 0.
-#
-# ### Input Parameters
-#
-# Strings to be logged.
-#
 # ### Stream Outputs
-#
-# Prints arguments passed in to the calling environments STDOUT with a newline
-# character appended.
-#
-# ### Environmental effects
 #
 # None.
 #
@@ -286,216 +250,355 @@ error()
 #
 # ### Failure Scenarios
 #
-# Fails if no arguments are given.
+# No failure scenarios currently.
 #
 # ### Usage Examples
 #
-#     user$ succeed "Hello there! "
-#     Hello there!
-#     *poof* shell closed...
+#     user$ enable_debug
 #
-succeed() {
-  set +o xtrace
-  if [[ -n "$*" ]]
-  then
-    log "$*"
-  fi
-  exit 0
+# ### Code Walkthrough
+enable_debug()
+{
+  # Turn debugging on.
+  debug on
 }
 
 #
-# ## fail()
+# ## disable_debug()
 #
-# Log arguments to the calling environments STDERR preceeded by 'ERROR '.
-# Exits with status code 1.
+# Disables verbose debugging output.
 #
 # ### Input Parameters
 #
-# Strings to be logged.
+# None.
 #
 # ### Stream Outputs
-#
-# Prints arguments passed in to the calling environments STDOUT with a newline
-# character appended and 'ERROR ' prepended.
-#
-# ### Environmental effects
 #
 # None.
 #
 # ### Return Codes
 #
-# 1 for failure.
+# 0 for success
 #
 # ### Failure Scenarios
 #
-# Fails if no arguments are given.
+# No failure scenarios currently.
 #
 # ### Usage Examples
 #
-#     user$ error "Hello there! "
-#     ERROR Hello there!
-#     *poof* shell closed...
+#     user$ disable_debug
 #
-fail()
+# ### Code Walkthrough
+disable_debug()
 {
-  trace_flag=0
-  backtrace "$*"
-  exit 1
+  # Turn debugging off
+  debug off
 }
 
 #
-# ## verbose()
+# ## enable_backtrace()
 #
-# Log arguments to the calling environments STDERR preceeded by 'ERROR '.
-# Exits with status code 1.
+# Enables backtrace and program exit whenever a command returns a nonzero value
+# that is not handled.
 #
 # ### Input Parameters
 #
-# Strings to be logged.
+# First parameter is optional. If it is passed it is a message that will be
+# outputed when a command trigger the program to error exit.
 #
 # ### Stream Outputs
 #
-# Prints arguments passed in to the calling environments STDOUT with a newline
-# character appended and 'ERROR ' prepended.
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
 #
-# ### Environmental effects
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# No failure conditions currently.
+#
+# ### Usage Examples
+#
+#     user$ cat ./test
+#     #!/usr/bin/env bash
+#     source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # Load BDSM framework core.
+#     modules trace # Load the trace module.
+#     enable_backtrace
+#     echo "Error exit with backtrace is now off."
+#     false # Does not cause exiting with backtrace printing.
+#
+#     user$ $PWD/test
+#     Error exit with backtrace is on.
+#     ERROR: A command has returned an unhandled error code (nonzero return value).
+#     Error Backtrace:
+#        Trace   Function           Line  File
+#           1.   main()                7  /Users/wayneeseguin/test
+#
+# ### Code Walkthrough
+enable_backtrace()
+{
+  # Declare a message local variable and set it to the first parameter or empty
+  # string if the first paramter was not passed in.
+  local _message="${1:-}"
+
+  # If the message variable is not empty then enable the backtrace with the
+  # message attached to the backtrace call. Otherwise enable the backtrace with
+  # no message attached to the backtrace call.
+  # Then turn on shell exit on error option.
+  if [[ -n "${_message}" ]]
+  then
+    trap "backtrace \"${_message}\"" ERR
+  else
+    trap "backtrace \"A command has returned an unhandled error code (nonzero return value).\"" ERR
+  fi
+  set -o errexit
+}
+
+#
+# ## function_name()
+#
+# Function Description
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
 #
 # None.
 #
 # ### Return Codes
 #
-# 1 for verboseure.
+# 0 for success
 #
-# ### verboseure Scenarios
+# ### Failure Scenarios
 #
-# verboses if no arguments are given.
+# No failure conditions currently.
 #
 # ### Usage Examples
 #
-#     user$ verbose "w00t! "
-#     user$ verbose_flag=1
-#     user$ verbose "w00t! "
-#     w00t!
+#     user$ cat ./test
+#     #!/usr/bin/env bash
+#     source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # Load BDSM framework core.
+#     modules trace # Load the trace module.
+#     disable_backtrace
+#     echo "Error exit with backtrace is now off."
+#     false # Does not cause exiting with backtrace printing.
 #
-verbose()
+#     user$ ./test
+#     Error exit with backtrace is now off.
+#
+# ### Code Walkthrough
+disable_backtrace()
 {
-  if (( ${verbose_flag:=0} == 1 ))
-  then
-    log "$*"
-  else
-    return 0
-  fi
+  # Turn off shell error exit option and clear all ERR signal traps.
+  set +o errexit
+  trap - ERR
 }
 
-# ## logrotate()
 #
-# Strategically rotate a logfile minimizing data loss.
+# ## backtrace()
 #
-# This function uses a copy, tail and truncate strategy.
+# Display a backtrace of the current call stack to the point that backtrace was
+# called from. Currently trace is turned on as well so that execution after
+# calling backtrace is traced.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# The call stack up to the current point of execution is printed to STDOUT of
+# the calling environment.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
 #
 # ### Usage Examples
 #
-#     root# logrotate /var/log/my_logfile.log
+#     user$ cat ./test
+#     #!/usr/bin/env bash
+#     source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # Load BDSM framework core.
+#     modules trace # Load the trace module.
 #
-logrotate()
+#     functiona()
+#     {
+#       echo "function a"
+#       functionb
+#       echo "function a"
+#     }
+#
+#     functionb()
+#     {
+#       echo "function b"
+#       functionc
+#       echo "function b"
+#     }
+#
+#     functionc()
+#     {
+#       echo "function c"
+#       backtrace
+#       echo "function c"
+#     }
+#
+#     functiona
+#
+#     user$ $PWD/test
+#     function a
+#     function b
+#     function c
+#     Error Backtrace:
+#        Trace   Line Function             File
+#           4.     25 functionc()          /Users/wayneeseguin/test
+#           3.     18 functionb()          /Users/wayneeseguin/test
+#           2.     11 functiona()          /Users/wayneeseguin/test
+#           1.     29 main()               /Users/wayneeseguin/test
+#      > /Users/wayneeseguin/test functionc() 26 $ echo 'function c'
+#     function c
+#      > /Users/wayneeseguin/test functionb() 19 $ echo 'function b'
+#     function b
+#      > /Users/wayneeseguin/test functiona() 12 $ echo 'function a'
+#     function a
+#
+# ### Code Walkthrough
+backtrace()
 {
-  local _file="${1:-}"
-  if variable_is_nonempty _file
+  # Turn off shell tracing
+  set +o xtrace
+
+  # Declare separator and columns variables. Initialize columns to the terminal
+  local _separator _columns
+
+  # If setting the columns via tput does not work then default the columns to 80
+  if ! _columns=$(tput cols)
   then
-    timestamp_set
-
-    verbose "Tailing the file in a background process into a tail logfile."
-    ( tail -n 0 -f "${_file}" > ${file}.$$.log )&
-
-    local _tail_pid=$!
-
-    verbose "Copying the file's contentes into a new timestamped file."
-    cp "${_file}" "${_file}.${timestamp}"
-
-    verbose "Truncating the file."
-    cp /dev/null ${_file}
-
-    verbose "Signaling the tail background process to stop."
-    kill -QUIT ${_tail_pid}
-
-    verbose "Appending the tail logfile to the new timestamped logfile."
-    cat "${file}.$$.log" >> "${file}.${timestamp}"
-
-    verbose "Compressing the timestamped file (gzip)"
-    gzip -f -9 "${file}.${timestamp}"
-
-    verbose "Removing the tail logfile"
-    rm "${file}.$$.log"
-  else
-    fail "Cannot rotate a log file as no log file was given."
+    _columns=80
   fi
-}
 
-# ## log\_streams()
-#
-# Log streams to three files:
-#   - standard out
-#   - standard in
-#   - combined (what the user typically sees)
-#
-# ### Usage Examples
-#
-#     root# log_streams "make install" prefix make
-#     cat make.out.log
-#     root#
-#     ...
-#
-# Alternatively,
-#
-#     root# log_streams "make install" \
-#           out /path/to/out.log \
-#           err /path/to/err.log \
-#           mix /path/to/mix.log # both out & err as they occurred.
-#     root# cat /path/to/mix.log
-#     ...
-#
-log_streams()
-{
-  local _command="${1:-}" _prefix _err _out _mix
+  # Set the separator variable contents to the separator filled out to the
+  # number of columns.
+  printf -v _separator '%*s' "${_columns:-${COLUMNS:-80}}"
 
-  # TODO: allow specification of path, name prefix
-  while (( $# > 0 ))
+  # Store the passed in message, if given as the first parameter, in the
+  # message variable, default to empty string.
+  local _message="${1:-}"
+
+  # If a message was given print the message to the calling environment's STDERR
+  if variable_is_nonempty _message
+  then
+    printf "\n${_message}\n\n" >&2
+  fi
+
+  # Declare function local variables
+  local _source _function _line _index _largest _format _digits _longest
+
+  # Loop over the function names in the function array stack to determine
+  # which has the longest length.
+  # Note that we do not use array_largest here as we are in an error function.
+  for (( _index=0 ; _index < ${#FUNCNAME[@]} ; _index++ ))
   do
-    _token="${1}"
-    shift
-    case "${token}" in
-      prefix)
-        _prefix="${1}."
+    # For each function name in the stack if the function name is longer than
+    # the length of current largest then
+    if (( ${#FUNCNAME[${_index}]} > ${#_largest} ))
+    then
+      # set it as the new largest element
+      _largest=${FUNCNAME[${_index}]}
+    fi
+  done
+
+  # Loop over the bash source files array in order to determine
+  # which has the the longest length.
+  # Note that we do not use array_largest here as we are in an error function.
+  for (( _index=0 ; _index < ${#BASH_SOURCE[@]} ; _index++ ))
+  do
+    # For each source file in the source files array, if the file name/path
+    # is longer than the current longest then set it as the new longest element
+    if (( ${#BASH_SOURCE[${_index}]} > ${#_longest} ))
+    then
+      _longest=${BASH_SOURCE[${_index}]}
+    fi
+  done
+
+  for (( _index=0 ; _index < ${#BASH_LINENO[@]} ; _index++ ))
+  do
+    # For each line number in the line numbers array, if the number of digits
+    # is longer than the current longest digits then set it as the new largest
+    if (( ${#BASH_LINENO[${_index}]} > ${#_digits} ))
+    then
+      _digits=${BASH_LINENO[${_index}]}
+    fi
+  done
+
+  # Determine the format string output for the backtrace based on the users
+  # set editor. If an editor has not been set, default the editor variable to
+  # the pager or empty string.
+  case "${EDITOR:=${PAGER:-}}" in
+    (mvim*|mate*)
+      # Set the format based on GUI editing tools format for opening
+      # a file to a given line using a file URI.
+      _format="%-60s # %-$((${#_largest} + 2))s \n"
+      # Print the backtrace header to the calling environment's STDERR
+      printf "${_format}" "Source" "function()"  1>&2
+      ;;
+    (vi*|gvim*|emacs*|*)
+      # Set the format based on the console editing tools format for opening
+      # a file to a given line.
+      # _format="%-$((${#_largest} + 2))s $ %${#EDITOR}s +%-$((${#_digits}))s %-$((${#_longest} + 2))s %s\n"
+      _format="%${#EDITOR}s +%-$((${#_digits}))s %-$((${#_longest} + 2))s # %s %-$((${#_largest} + 2))s\n"
+      # Print the backtrace header to the calling environment's STDERR
+      printf "${_format}" ' ' "#" "source file" "function()"  1>&2
+      ;;
+  esac
+
+  # Print the backtrace separator line.
+  printf "${_separator// /=}\n" 1>&2
+
+  # Iterate over the functions array stack skipping this backtrace function [0]
+  for (( _index=1 ; _index < ${#FUNCNAME[@]} ; ++_index ))
+  do
+    _source="${BASH_SOURCE[${_index}]}"
+    _function="${FUNCNAME[${_index}]:+${FUNCNAME[${_index}]}()}"
+    _line=${BASH_LINENO[$(( _index - 1 ))]}
+
+    case "$_function" in
+      fail\(\)|error\(\)|command_not_found_handle\(\)|command_not_found\(\))
+        continue
         ;;
-      err)
-        _stderr="${1}"
-        shift
+    esac
+
+    # Determine the format string output for the backtrace based on the users
+    # set editor. Note that if an editor was not set then previously we have
+    # defualted it to the pager. If no pager is set we simply output a standard
+    # unix utility trace line.
+    case "${EDITOR:-}" in
+      # Print with the format and content for GUI editing tools a file to open a
+      # given line using a URI. print backtrace to calling environment's STDERR
+      (mvim*|mate*)
+        printf "${_format}" "open ${EDITOR// *}://open?url=file://${_source}&line=${_line}" "${_function}" 1>&2
         ;;
-      out)
-        _stdout="${1}"
-        shift
-        ;;
-      mix)
-        _stdmix="${1}"
-        shift
-        ;;
-      *)
-        _command="${1}"
-        shift
+      # Print with the format and content for console editing tools a to open a
+      # file to a given line print backtrace to calling environment's STDERR
+      (vi*|gvim*|emacs*|*)
+        printf "${_format}" "${EDITOR}" "${_line}" "${_source} " "${_function}" 1>&2
         ;;
     esac
   done
 
-  : \
-    "${_stdout="${2:-stdout.log}"}" \
-    "${_stderr="${3:-stderr.log}"}" \
-    "${_stdmix="${4:-stdmix.log}"}"
+  # Print the backtrace separator line and if the trace flag is nonnegative
+  # then turn tracing back on
+  printf "${_separator// /=}\n" 1>&2
 
-  # It's like fireworks~! :)
-  {
-    {
-      ${_command} 2>&1 1>&3 | tee "${_stderr}"
-    } 3>&1 1>&2 | tee "${_stdout}"
-  } > "${_stdmix}" 2>&1
+  if (( trace_flag > 0 ))
+  then
+    enable_trace
+  fi
 }
 

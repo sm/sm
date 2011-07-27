@@ -158,6 +158,8 @@ install_bdsm_scm()
 {
   local remote="origin" dir="${1}" owner="${2:-wayneeseguin}"
 
+  modules std/vcs
+
   scm_get "${owner}/bdsm" "${src_path}/${dir}"
 
   if (( ${sense_of_humor_flag:=0} == 1 ))

@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
 
-fetch_version()
-{
-  version=$(curl -B "${releases_url}/latest-version.txt" 2>/dev/null)
-}
-
 fetch_md5()
 {
   md5=$(curl -B "${releases_url}/bdsm-${version}.tar.gz.md5" 2>/dev/null)
