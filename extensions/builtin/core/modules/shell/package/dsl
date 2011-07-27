@@ -1809,8 +1809,9 @@ package_info()
     log "  active: none"
   fi
 
-  log "base_url: ${package_base_url}"
-  log "download_url: ${package_url}"
+  log "urls:"
+  log "  base: ${package_base_url}"
+  log "  download: ${package_url}"
   log "archive: ${package_file}"
   log "source_path: ${source_path}/${package_dir}"
 
