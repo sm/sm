@@ -339,7 +339,7 @@ extension_action()
   then
     log_search action "$action" "${action_path##${bdsm_path}\/extensions\/} params:${extension_args[@]}"
   else
-    fail "Usage: \n  bdsm ${extension} [namespace] [action]\nActions:\n   $(extension_actions "${extension}")"
+    error "Unknown action path: "${extension_args[@]}"\n\nUsage: \n  bdsm extension [namespace] [action]\n"
   fi
 
   extension_path="$extensions_path/$extension"

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-modules std/vcs std/user
+modules std/vcs std/users
 
 cleanse_paths=(
   extensions/core extensions/pkg extensions/srv extensions/ext extensions/mod
