@@ -2,3 +2,8 @@
 
 #core is loaded as BDSM starts
 modules=("core/core" "core/logging" "core/modules")
+
+for module_name in ${modules[@]}
+do
+  log_search preload "$module_name" "builtin/$(dirname $module_name)/modules/shell/$(basename $module_name)"
+done

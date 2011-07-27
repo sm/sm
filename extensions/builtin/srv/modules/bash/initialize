@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-modules core/service
+modules std/service
 

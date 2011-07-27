@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-modules core/variables core/environment core/array core/system

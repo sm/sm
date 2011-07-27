@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-modules std/templates std/time
+modules std/templates std/time project
 
-if template_exists "ext/bdsmrc"
+if template_exists "bdsm/bdsmrc"
 then
   if file_exists "$HOME/.bdsmrc"
   then
@@ -22,11 +22,10 @@ then
   # TODO: Read project, repository_url and environment from defaults file.
   #       ~/.bdsm/project/config/defaults
   #
-  modules project
 
   true  "${repository_url:="git@github.com:username/repository.git"}"
 
-  install_template "ext/bdsmrc" to "$HOME/.bdsmrc"
+  install_template "bdsm/bdsmrc" to "$HOME/.bdsmrc"
 
   seed_template "$HOME/.bdsmrc" \
     project "$project" \

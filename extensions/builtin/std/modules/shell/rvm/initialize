@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-modules core/array
+modules bdsm/array
 
 source_files "/etc/rvmrc" "$HOME/.rvmrc"
 

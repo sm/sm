@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-modules core/array
+modules bdsm/array
 
 declare -a help_descriptions
 declare -a help_action_names
