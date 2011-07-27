@@ -1,4 +1,5 @@
 0.7.8
+- Some minor bugfixes in core before we push a major refactoring release.
 0.7.7
 * extensions/internal 4ecd1a7...3535f9c (2):
   > Interesting, go uses the src dir.
