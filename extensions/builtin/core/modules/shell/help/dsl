@@ -622,19 +622,6 @@ usage()
     "help_${section}"
   done
 
-  case "${extension}" in
-    ext|extension|extend)
-      help_section "Installed Extensions"
-      printf "  "
-      extensions_installed
-      echo
-
-      help_section "Available Extensions"
-      printf "  "
-      extensions_available
-      echo
-      ;;
-  esac
-  echo
+  echo ""
 }
 

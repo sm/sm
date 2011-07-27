@@ -13,9 +13,14 @@ detect_action()
   local _params=("$@")
 
   #loop when params or .actions exists
-  while [[ ${#_params[@]} -gt 0 ]] || file_exists "${_action_path}/.actions"
+  while (( ${#_params[@]} > 0 )) || file_exists "${_action_path}/.actions"
   do
-    array_shift _params token
+    if (( ${#_params[@]} > 0 ))
+    then
+      array_shift _params token
+    else
+      # token="" <- do not clean token, it is needed to recognize .actions loop help=help
+    fi
 
     # Detect function
     if  variable_is_nonempty token &&
@@ -54,8 +59,9 @@ detect_action()
       [[ "${_array[@]}" == "$token" ]] && break #break if detected 2nd time the same
 
     # Detect help mapping in .actions
-    elif file_exists "${_action_path}/.actions" &&
-         file_contains "${_action_path}/.actions" "^help="
+    elif file_exists "${_action_path}/.actions" \
+    && file_contains "${_action_path}/.actions" "^help=" \
+    && (( ${#_params[@]} == 0 ))
     then
       _array=( $(hash_file "${_action_path}/.actions" help) )
       _params=( "${_array[@]}" "${token}" "${_params[@]}" )
@@ -99,7 +105,9 @@ detect_action()
     extension_args=( "$token" "${_params[@]}" )
 
   # Detect help if no default
-  elif file_exists "${_action_path}/help"
+  elif file_exists "${_action_path}/help" \
+  && (( ${#_params[@]} == 0 )) \
+  && [[ "$token" == "" ]]
   then
     action_path="${_action_path}"
     action="help"

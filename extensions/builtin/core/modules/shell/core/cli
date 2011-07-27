@@ -3,11 +3,6 @@
 set +o nounset
 set +o noclobber
 
-if (( $# == 0 )) && [[ -z "$extension_args" ]]
-then
-  extension_args=()
-fi
-
 while (( $# > 0 ))
 do
   token="$1"
@@ -56,3 +51,8 @@ do
   esac
   shift
 done
+
+if (( $# == 0 )) && [[ -z "$extension_args" ]]
+then
+  extension_args=()
+fi
