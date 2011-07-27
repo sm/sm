@@ -95,7 +95,7 @@ then
     *)
       case "${extension_args[0]}" in
         *=*|*:*) # exact version specifier
-          extension_action "${package_name%%=*}"
+          extension_action "${extension_args[0]}"
           ;;
         *)
           extension_action
