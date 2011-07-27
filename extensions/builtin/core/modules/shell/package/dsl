@@ -1784,6 +1784,10 @@ sudo bdsm ${dependency} package install
 package_info()
 {
   local _path="${packages_path}/${package_name}"
+  : \
+    "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
+    "${package_dir:="${package_name}-${package_version}"}" \
+    "${package_url:="${package_base_url}/${package_file}"}"
 
   log "versions:"
   if path_exists "${_path}"
@@ -1806,13 +1810,14 @@ package_info()
   fi
 
   log "base_url: ${package_base_url}"
+  log "download_url: ${package_url}"
+  log "file: ${package_file}"
+  log "dir: ${package_dir}"
 
   if array_is_nonempty package_dependencies
   then
-    log "  dependencies: ${package_dependencies[*]}"
+    log "dependencies: ${package_dependencies[*]}"
   fi
-  log "file: ${package_file}"
-  log "dir: ${package_dir}"
 }
 
 
