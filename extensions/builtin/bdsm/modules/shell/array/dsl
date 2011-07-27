@@ -360,7 +360,7 @@ array_push()
       then
         for _element in "${_elements[@]}"
         do
-          eval "${_array_name}+=(\${_element})"
+          eval "${_array_name}+=(\"\${_element}\")"
         done
       else
         fail "Cannot push elements onto array as no elements were given."
@@ -430,7 +430,7 @@ array_append()
     then
       for _element in "${_elements[@]}"
       do
-        eval "${_array_name}+=(\${_element})}"
+        eval "${_array_name}+=(\"\${_element}\")}"
       done
     else
       fail "Cannot push elements onto array as no elements were given."
@@ -498,7 +498,7 @@ array_shift()
     eval "
     for (( index=1; index < \${#${_array_name}[@]}; index++ ))
     do
-      temp_array+=(\${${_array_name}[\${index}]})
+      temp_array+=(\"\${${_array_name}[\${index}]}\")
     done
     "
     eval "${_array_name}=(\"\${temp_array[@]}\") "
