@@ -18,7 +18,7 @@ detect_action()
     if (( ${#_params[@]} > 0 ))
     then
       array_shift _params token
-    else
+    #else
       # token="" <- do not clean token, it is needed to recognize .actions loop help=help
     fi
 
