@@ -1811,8 +1811,8 @@ package_info()
 
   log "base_url: ${package_base_url}"
   log "download_url: ${package_url}"
-  log "file: ${package_file}"
-  log "dir: ${package_dir}"
+  log "archive: ${package_file}"
+  log "source_path: ${source_path}/${package_dir}"
 
   if array_is_nonempty package_dependencies
   then
