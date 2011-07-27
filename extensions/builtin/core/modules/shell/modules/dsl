@@ -50,6 +50,51 @@ extensions_search_paths()
   printf "${bdsm_path}/extensions/external ${bdsm_path}/extensions/internal ${bdsm_path}/extensions/builtin"
 }
 
+#
+# ## extensions\_in()
+#
+# Lists the extensions in a given directory.
+#
+# ### Input Parameters
+#
+# First parameter is a full path a BDSM extensions directory.
+#   (example: /usr/local/bdsm/extensions)
+#
+# ### Stream Outputs
+#
+# The names of the extensions in the given directory are printed to the
+# calling environment's STDOUT, separated by newlines.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     $ bdsm call extensions_in /usr/local/bdsm/extensions/external
+#     backup
+#
+extensions_in()
+{
+  local _path="$1"
+
+  if [[ -d "${_path}" ]]
+  then
+    find "${_path}" -maxdepth 2 -mindepth 2 -name modules -or -name actions | \
+      xargs -n 1 dirname | sort -u | xargs -n 1 basename
+  else
+    fail "Cannot list extensions in '${_path}' as the directory does not exist."
+  fi
+}
+
 in_search_paths()
 {
   local callback=$1
@@ -58,7 +103,7 @@ in_search_paths()
 
   local search_paths=( $(extensions_search_paths) )
   local builtin_path="${bdsm_path}/extensions/builtin"
-  local builtin_extensions=( $(builtin cd "${builtin_path}" ; echo -n * ) )
+  local builtin_extensions=( $(extensions_in "${builtin_path}" ) )
 
   for path in "${search_paths[@]}"
   do

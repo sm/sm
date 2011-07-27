@@ -632,7 +632,7 @@ extensions_installed()
 #
 extensions_available()
 {
-  extensions_in "${extensions_src_path}"
+  NIY
 }
 
 #
@@ -677,69 +677,6 @@ extensions_in_development()
   true "${extensions_development_path:="${extensions_src_path}"}"
 
   list_extensions_in "${extensions_development_path}"
-}
-
-#
-# ## extensions\_in()
-#
-# Lists the extensions in a given directory.
-#
-# ### Input Parameters
-#
-# First parameter is a full path a BDSM extensions directory.
-#   (example: /usr/local/bdsm/extensions)
-#
-# ### Stream Outputs
-#
-# The names of the extensions in the given directory are printed to the
-# calling environment's STDOUT.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# No failure scenarios currently.
-#
-# ### Usage Examples
-#
-#     $ cat $HOME/test
-#     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # Load BDSM framework core.
-#     modules extensions
-#     extensions_in /usr/local/bdsm/extensions
-#
-#     $  $HOME/test
-#     bash fossil git libevent nginx p7zip postgresql rails redis tig tmux zeromq zlib
-#
-#
-extensions_in()
-{
-  local _path="${1:-}" _files extensions extension_name extension_source_path
-
-  if path_exists "${_path}"
-  then
-    _files=($(
-      find "${_path}" -mindepth 2 -maxdepth 2 -name 'VERSION' -type f | sort
-    ))
-    extensions=()
-
-    for _file in "${_files[@]}"
-    do
-      extension_source_path="${_file/%\/VERSION}"
-      extension_name="${extension_source_path//*\/}"
-      extensions+=( "${extension_name//*\//}" )
-    done
-
-    echo -n "${extensions[@]}"
-  else
-    fail "Cannot list extensions in '${_path}' as the directory does not exist."
-  fi
 }
 
 #
@@ -942,17 +879,12 @@ extension_install()
 
 extension_is_valid()
 {
-  local _path="${1:-}"
+  local _path="$1"
 
-  if variable_is_nonempty _path
+  if [[ -n "${_path}" ]]
   then
     # TODO: Add all extension requirement checks here.
-    if [[ -s "${_path}/VERSION" && -x "${_path}/actions/help" ]]
-    then
-      return 0
-    else
-      return 1
-    fi
+    [[ -d "${_path}/actions" ]] || [[ -d "${_path}/modules" ]]
   else
     fail "Cannot determine if an extension is valid as the path to the extension was not given."
   fi
