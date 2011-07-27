@@ -1811,6 +1811,8 @@ package_info()
   then
     log "  dependencies: ${package_dependencies[*]}"
   fi
+  log "file: ${package_file}"
+  log "dir: ${package_dir}"
 }
 
 
