@@ -1789,7 +1789,7 @@ package_info()
   find . -mindepth 1 -maxdepth 1 -type d | sed -e 's#./##g' -e 's# #,#g'
   ))
   log "versions:"
-  log "  installed: ${_installed[*]// /, }"
+  log "  installed: ${_installed[*]}"
   log "  default: ${package_version}"
 
   if [[ -L "${_path}/active" ]]
