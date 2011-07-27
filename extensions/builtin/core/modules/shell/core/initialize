@@ -93,7 +93,7 @@ then
       done
       ;;
     *)
-      modules extensions
+      modules bdsm/extensions
       extension_action
   esac
 fi

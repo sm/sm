@@ -15,12 +15,7 @@ detect_action()
   #loop when params or .actions exists
   while (( ${#_params[@]} > 0 )) || file_exists "${_action_path}/.actions"
   do
-    if (( ${#_params[@]} > 0 ))
-    then
-      array_shift _params token
-    #else
-      # token="" <- do not clean token, it is needed to recognize .actions loop help=help
-    fi
+    array_shift _params token
 
     # Detect function
     if  variable_is_nonempty token &&
