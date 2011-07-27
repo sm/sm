@@ -251,6 +251,7 @@ setup_profile_d()
   if ! file_exists "${profile_d_path}/bdsm.sh" ||
      ! file_contains "${profile_d_path}/bdsm.sh" "${packages_path}/active/bin"
   then
+    # To prepend or postpend??? Good discussion here...
     log "PATH=\"${packages_path}/active/bin:${packages_path}/active/sbin:\${PATH}\"\n" \
       to "${profile_d_path}/bdsm.sh"
 
