@@ -318,10 +318,17 @@ extension_action()
   unset extension action
 
   case "${extension_args[0]}" in
-    *=*|*:*) # exact version specifier
+    *=*) # exact version specifier
       package_name="${extension_args[0]}"
       export package_version="${package_name##*=}"
       export package_name="${package_name%%=*}"
+      export extension="${package_name}"
+      extension_args[0]="${extension}"
+      ;;
+    *:*)
+      package_name="${extension_args[0]}"
+      export package_version="${package_name##*:}"
+      export package_name="${package_name%%:*}"
       export extension="${package_name}"
       extension_args[0]="${extension}"
       ;;
