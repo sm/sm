@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+# ## string\_contains()
+# Validate if second string is part of first string
+# return 0 if found
+string_contains()
+{
+  [[ " $1 " =~ " $2 " ]]
+}
+
+# ## string\_append()
+# Append second string to first string if not already present
+# Prints new string
+string_append()
+{
+  printf "$1"                    # always use string
+  if ! string_contains "$1" "$2" # if non existing
+  then
+    printf " $2"                 # then append
+  fi
+}
+
+# ## string\_remove()
+# Removes second string from first string if present
+# Prints new string
+string_remove()
+{
+  local string=" $1 "        #wrap with spaces
+  string="${string// $2 / }" #remove second string
+  string="${string## }"      #remove spaces from beginning
+  string="${string%% }"      #remove spaces from end
+  printf "${string}"
+}
+
+options_check()
+{
+  string_contains "$1" "$2" ||
+  (
+    string_contains "$1" "all" &&
+    ! string_contains "$1" "-$2"
+  )
+}

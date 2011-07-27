@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #core is loaded as BDSM starts
-modules=("core/core" "core/logging" "core/modules")
+modules=("core/core" "core/string" "core/logging" "core/modules")
 
 for module_name in ${modules[@]}
 do
