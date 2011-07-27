@@ -4,19 +4,277 @@ log()
 {
   printf "$*\n"
 }
+#
+# ## info()
+#
+# Log arguments to the calling environments STDOUT preceeded by 'INFO .
+#
+# ### Input Parameters
+#
+# Strings to be logged.
+#
+# ### Stream Outputs
+#
+# Prints arguments passed in to the calling environments STDOUT with a newline
+# character appended and 'INFO ' prepended.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# Fails if no arguments are given.
+#
+# ### Usage Examples
+#
+# user$ info "Hello there! "
+# INFO Hello there!
+#
+info()
+{
+  printf "INFO: $*\n"
+}
 
+#
+# ## warn()
+#
+# Log arguments to the calling environments STDOUT preceeded by 'WARNING .
+#
+# ### Input Parameters
+#
+# Strings to be logged.
+#
+# ### Stream Outputs
+#
+# Prints arguments passed in to the calling environments STDOUT with a newline
+# character appended and 'WARNING ' prepended.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# Fails if no arguments are given.
+#
+# ### Usage Examples
+#
+# user$ info "Bad Monkeys are Typing! "
+# WARNING: Bad Monkeys are Typing!
+#
+warn()
+{
+  printf "WARNING: $*\n"
+}
+
+#
+# ## note()
+#
+# Log arguments to the calling environments STDOUT preceeded by 'NOTE .
+#
+# ### Input Parameters
+#
+# Strings to be logged.
+#
+# ### Stream Outputs
+#
+# Prints arguments passed in to the calling environments STDOUT with a newline
+# character appended and 'NOTE ' prepended.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# Fails if no arguments are given.
+#
+# ### Usage Examples
+#
+# user$ info "You are not Smurfette! "
+# NOTE You are not Smurfette!
+#
+note()
+{
+  printf "NOTE: $*\n"
+}
+
+#
+# ## debug()
+#
+# Log arguments to the calling environments STDOUT preceeded by 'DEBUG: .
+#
+# ### Input Parameters
+#
+# Strings to be logged.
+#
+# ### Stream Outputs
+#
+# Prints arguments passed in to the calling environments STDOUT with a newline
+# character appended and 'DEBUG: ' prepended.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# Fails if no arguments are given.
+#
+# ### Usage Examples
+#
+# user$ debug "Hello there! "
+# DEBUG: Hello there!
+#
 debug()
 {
-  if (( ${debug_flag:=0} >= 1 ))
+  if (( ${debug_flag:=0} == 1 ))
   then
     printf "DEBUG: $*\n"
+  else
+    return 0
   fi
 }
 
+#
+# ## error()
+#
+# Log arguments to the calling environments STDERR preceeded by 'ERROR '.
+# Exits with status code 1.
+#
+# ### Input Parameters
+#
+# Strings to be logged.
+#
+# ### Stream Outputs
+#
+# Prints arguments passed in to the calling environments STDOUT with a newline
+# character appended and 'ERROR ' prepended.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 1 for failure.
+#
+# ### Failure Scenarios
+#
+# Fails if no arguments are given.
+#
+# ### Usage Examples
+#
+# user$ error "Hello there! "
+# ERROR Hello there!
+# *poof* shell closed...
+#
+error()
+{
+  set +o xtrace
+  printf "\nERROR: $*\n" >&2
+  disable_backtrace
+  exit 1
+}
+
+#
+# ## succeed()
+#
+# Log arguments to the calling environments STDOUT. Exits with status code 0.
+#
+# ### Input Parameters
+#
+# Strings to be logged.
+#
+# ### Stream Outputs
+#
+# Prints arguments passed in to the calling environments STDOUT with a newline
+# character appended.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# Fails if no arguments are given.
+#
+# ### Usage Examples
+#
+# user$ succeed "Hello there! "
+# Hello there!
+# *poof* shell closed...
+#
+succeed() {
+  set +o xtrace
+  if [[ -n "$*" ]]
+  then
+    printf "$*\n"
+  fi
+  exit 0
+}
+
+#
+# ## fail()
+#
+# Log arguments to the calling environments STDERR preceeded by 'ERROR '.
+# Exits with status code 1.
+#
+# ### Input Parameters
+#
+# Strings to be logged.
+#
+# ### Stream Outputs
+#
+# Prints arguments passed in to the calling environments STDOUT with a newline
+# character appended and 'ERROR ' prepended.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 1 for failure.
+#
+# ### Failure Scenarios
+#
+# Fails if no arguments are given.
+#
+# ### Usage Examples
+#
+# user$ error "Hello there! "
+# ERROR Hello there!
+# *poof* shell closed...
+#
 fail()
 {
-  printf "FAIL: $*\n"
+  trace_flag=0
+  backtrace "$*"
+  exit 1
 }
+
 
 #
 # ## set_ps4()
