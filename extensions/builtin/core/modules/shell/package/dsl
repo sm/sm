@@ -1783,8 +1783,9 @@ sudo bdsm ${dependency} package install
 #
 package_info()
 {
+  local _path="${packages_path}/${package_name}"
   local _installed=($(
-  enter "${packages_path}/${package_name}"
+  enter "${_path}"
   find . -mindepth 1 -maxdepth 1 -type d | sed -e 's#./##g' -e 's# #,#g'
   ))
   log "versions:"
