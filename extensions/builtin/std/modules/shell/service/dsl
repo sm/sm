@@ -1062,10 +1062,10 @@ service_install_init_d()
       service_activate "${service}" "${package_version}"
 
       # TODO: Replace this with install_template + seed_template
-      log "%s\n" "[ -d \"${prefix_path}/${_service}/active/bin\" ] && " \
+      write "%s\n" "[ -d \"${prefix_path}/${_service}/active/bin\" ] && " \
         to "/etc/profile.d/${_service}.sh"
 
-      log "%s\n" "PATH=\"\$PATH:${prefix_path}/${_service}/active/bin\" ; export PATH; " \
+      write "%s\n" "PATH=\"\$PATH:${prefix_path}/${_service}/active/bin\" ; export PATH; " \
         append to "/etc/profile.d/${_service}.sh"
 
       chmod_files 0755 "/etc/profile.d/${_service}.sh"
@@ -1684,7 +1684,7 @@ service_deactivate()
         if file_exists "/etc/rc.local" &&
           ! file_contains "/etc/rc.local" "${service} start"
         then
-          log "${init_scripts_path}/${service} start" \
+          write "${init_scripts_path}/${service} start" \
             append to /etc/rc.local
         fi
       fi

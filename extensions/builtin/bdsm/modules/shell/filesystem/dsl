@@ -3411,3 +3411,74 @@ file_md5()
   fi
 }
 
+#
+# ## write()
+#
+# Write arguments to the given file.
+#
+# ### Input Parameters
+#
+# Strings to be written.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# Fails if no arguments are given.
+#
+# ### Usage Examples
+#
+# user$ write "Hello there! " to /some/file
+# user$ cat /some/file
+# Hello there!
+#
+write()
+{
+  local _token _file _message _append_flag=0
+
+  while (( $# > 0 ))
+  do
+    _token="$1"
+    shift
+
+    case "${_token}" in
+      (append|--append)
+        _append_flag=1
+        ;;
+      (to)
+        _file="${1}"
+        shift
+        ;;
+      (*)
+        _message="${_token}"
+        ;;
+    esac
+  done
+
+  if variable_is_nonempty _message
+  then
+    if variable_is_nonempty _file
+    then
+      if (( _append_flag == 1 ))
+      then
+        printf "${_message}\n" >> "${_file}"
+      else
+        printf "${_message}\n" > "${_file}"
+      fi
+    else
+      printf "${_message}\n"
+    fi
+  else
+    fail "Cannot log a message as no message was given."
+  fi
+}

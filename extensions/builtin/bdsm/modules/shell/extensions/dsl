@@ -188,7 +188,7 @@ detect_action_type()
 
 extension_modules_load()
 {
-  local _token _namespace=() namespace
+  local _token _namespace=()
 
   module_name="${extension}"
   module_path="${extension_modules_path}/shell"
@@ -196,9 +196,8 @@ extension_modules_load()
 
   while (( $# > 0 ))
   do
-    _namespace+=("${1}")
+    _namespace+=( "$1" )
     shift
-    namespace="$(path_join ${_namespace[*]})"
 
     module_name="$(path_join "${extension}" ${_namespace[*]})"
     module_path="$(path_join "${extension_modules_path}" "shell" ${_namespace[*]})"
@@ -858,7 +857,7 @@ extension_install()
       copy_directory "${extensions_src_path}/${_src}" \
         to "${bdsm_path}/extensions/external/${_extension}"
 
-      log "${extension_uri}" to "${bdsm_path}/extensions/external/${_extension}/.uri"
+      write "${extension_uri}" to "${bdsm_path}/extensions/external/${_extension}/.uri"
 
       #
       # TODO: Process extension dependencies...
@@ -918,7 +917,7 @@ extension_package()
         for file in "${_name}-${_version}".tar.*
         do
           log "  - ${file}"
-          log "$( file_md5 "${file}" )" to "${file}.md5"
+          write "$( file_md5 "${file}" )" to "${file}.md5"
           log "  - ${file}.md5"
           move_files --force "${file}" "${file}.md5" \
             to "${_path}/pkg" from "${_path}"
@@ -1004,6 +1003,6 @@ extension_module_add()
         "when trying to add module '${_module}'"
     fi
   else
-    log "modules ${_module}\n" append to "${_path}/modules/shell/initialize"
+    write "modules ${_module}\n" append to "${_path}/modules/shell/initialize"
   fi
 }

@@ -49,7 +49,7 @@ directory_get()
 
   if cp -r ${_source} "${_target}" >/dev/null 2>&1
   then
-    (cd "${_source}"; pwd) > "${_target}/.uri"
+    write "$(cd "${_source}"; pwd)" to "${_target}/.uri"
   else
     fail "There was an error copying '${_source}'"
   fi
@@ -104,7 +104,7 @@ git_get()
       local _url_https="${_url/git:\/\//https:\/\/}"
       if git clone --depth 1 ${_url_https} "${_target}" >/dev/null 2>&1
       then
-        echo "${_url_https}" > "${_target}/.uri"
+        write "${_url_https}" to "${_target}/.uri"
       else
         fail "There was an error while cloning the repository from the url '${_url}'"
       fi
@@ -135,7 +135,7 @@ github_get()
   # use git for fetching github repo
   git_get "git://github.com/${_url}.git" "${_target}"
   # and overwrite repo uri
-  echo "${_url}" > "${_target}/.uri"
+  write "${_url}" to "${_target}/.uri"
 }
 
 # ## scm\_get()

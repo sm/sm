@@ -10,15 +10,15 @@ service_extension_setup()
 
   for file in dsl initialize cli
   do
-    log '#!/usr/bin/env bash' to "modules/${language}/${module}/${file}"
+    write '#!/usr/bin/env bash' to "modules/${language}/${module}/${file}"
   done
 
-  log "\n${module}_cli\n" append to "modules/${language}/${module}/cli"
+  write "\n${module}_cli\n" append to "modules/${language}/${module}/cli"
 
-  log '#!/usr/bin/env bash' to "actions/${module}/help"
+  write '#!/usr/bin/env bash' to "actions/${module}/help"
   chmod_files 0755 "actions/${module}/help"
 
-  log "
+  write "
 description \"Extension for managing ${extension} (${website_url}).\"
 
 action \"service start\" \"Starts ${extension} service.\"
@@ -32,7 +32,7 @@ show_help usage
 
   for action in start stop restart status
   do
-    log "${action}=${module}_${action}()" append to "actions/${module}/.actions"
+    write "${action}=${module}_${action}()" append to "actions/${module}/.actions"
   done
   chmod_files 0755 "actions/${module}/.actions"
 }

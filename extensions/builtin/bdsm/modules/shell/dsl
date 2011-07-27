@@ -16,7 +16,7 @@ bdsm_development_setup()
   then
     log "  * projects_path is already set in $HOME/.bash_profile."
   else
-    log 'export projects_path="$HOME/projects"' \
+    write 'export projects_path="$HOME/projects"' \
       append to "$HOME/.bash_profile"
 
     log "  * Setting projects_path in $HOME/.bash_profile."
@@ -28,7 +28,7 @@ bdsm_development_setup()
   else
     log "  * project functions are now setup in $HOME/.bash_profile."
 
-    log "[[ -s \"${modules_path}/shell/project/interactive\" ]] && source \"${modules_path}/shell/project/interactive\""  \
+    write "[[ -s \"${modules_path}/shell/project/interactive\" ]] && source \"${modules_path}/shell/project/interactive\""  \
       append to "$HOME/.bash_profile"
   fi
 
@@ -45,7 +45,7 @@ bdsm_development_setup()
     then
       log "  * ${_component}_development_path is already set in .bdsmrc"
     else
-      log "export ${_component}_development_path=\"${projects_path}/bdsm/${_component}\"" \
+      write "export ${_component}_development_path=\"${projects_path}/bdsm/${_component}\"" \
         append to "$HOME/.bdsmrc"
       log "Setting ${_component}_development_path in .bdsmrc"
     fi

@@ -11,19 +11,19 @@ database_extension_setup()
   # Setup modules/shell/package/{dsl,initialize,cli}
   for file in dsl initialize cli
   do
-    log '#!/usr/bin/env bash' to "modules/${language}/${module}/${file}"
+    write '#!/usr/bin/env bash' to "modules/${language}/${module}/${file}"
   done
 
-  log "\n${module}_cli\n" append to "modules/${language}/${module}/cli"
+  write "\n${module}_cli\n" append to "modules/${language}/${module}/cli"
 
   # setup actions/package/{...}
   for action in help initialize
   do
-    log '#!/usr/bin/env bash' to "actions/${module}/${action}"
+    write '#!/usr/bin/env bash' to "actions/${module}/${action}"
     chmod_files 0755 "actions/${module}/${action}"
   done
 
-  log "
+  write "
 description \"Extension for managing ${extension} (${website_url}).\"
 
 action \"initialize\" \"Initialize ${extension} database.\"
@@ -33,6 +33,6 @@ show_help usage
 
   for action in initialize
   do
-    log "\n${module}_${action}\n" append to "actions/${module}/${action}"
+    write "\n${module}_${action}\n" append to "actions/${module}/${action}"
   done
 }

@@ -124,7 +124,7 @@ install_internal_extensions()
       git submodule update
     fi
     copy_directory "extensions/internal" to "${install_path}/extensions/internal"
-    log "wayneeseguin/bdsm-extensions" to "${install_path}/extensions/internal/.uri"
+    write "wayneeseguin/bdsm-extensions" to "${install_path}/extensions/internal/.uri"
   fi
 }
 
@@ -222,7 +222,7 @@ setup_profile_d()
     then
       if ! file_contains /etc/profile "${profile_d_path}"
       then
-        log "\nif test -d '${profile_d_path}' ; then for profile in \"${profile_d_path}\"/*.sh ; do if test -x \"\$profile\" ; then . \"\$profile\" ; fi ; done ; unset profile ; fi\n" \
+        write "\nif test -d '${profile_d_path}' ; then for profile in \"${profile_d_path}\"/*.sh ; do if test -x \"\$profile\" ; then . \"\$profile\" ; fi ; done ; unset profile ; fi\n" \
           to /etc/profile
       fi
     fi
@@ -231,19 +231,19 @@ setup_profile_d()
 
     if ! file_contains "$HOME/.bashrc" "$HOME/.profile"
     then
-      log "if test -s \"$HOME/.profile\" ; then . \"$HOME/.profile\" ; fi"\
+      write "if test -s \"$HOME/.profile\" ; then . \"$HOME/.profile\" ; fi"\
         append to "$HOME/.bashrc"
     fi
 
     if ! file_contains "$HOME/.bash_profile" "$HOME/.bashrc"
     then
-      log "if test -s \"$HOME/.bashrc\" ; then . \"$HOME/.bashrc\" ; fi"\
+      write "if test -s \"$HOME/.bashrc\" ; then . \"$HOME/.bashrc\" ; fi"\
         append to "$HOME/.bash_profile"
     fi
 
     if ! file_contains "$HOME/.profile" "${profile_d_path}"
     then
-      log "\nif test -d '${profile_d_path}' ; then for profile in \"${profile_d_path}\"/*.sh ; do if test -x \"\$profile\" ; then . \"\$profile\" ; fi ; done ; unset profile ; fi\n" \
+      write "\nif test -d '${profile_d_path}' ; then for profile in \"${profile_d_path}\"/*.sh ; do if test -x \"\$profile\" ; then . \"\$profile\" ; fi ; done ; unset profile ; fi\n" \
         append to "$HOME/.profile"
     fi
   fi
@@ -251,7 +251,7 @@ setup_profile_d()
   if ! file_exists "${profile_d_path}/bdsm.sh" ||
      ! file_contains "${profile_d_path}/bdsm.sh" "${packages_path}/active/bin"
   then
-    log "PATH=\"${packages_path}/active/bin:${packages_path}/active/sbin:\${PATH}\"\n" \
+    write "PATH=\"${packages_path}/active/bin:${packages_path}/active/sbin:\${PATH}\"\n" \
       to "${profile_d_path}/bdsm.sh"
 
     chmod_files 0755 "${profile_d_path}/bdsm.sh"
