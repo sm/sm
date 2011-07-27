@@ -82,12 +82,12 @@ then
 elif set | grep '^extension_args=(' >/dev/null
 then
   case "${extension_args[0]}" in
-    *,*|*.*)
+    */*|*,*)
       array_shift extension_args extensions
-      sequential=(${extensions//\./ })
+      sequential=(${extensions//,/ })
       for sequence in "${sequential[@]}"
       do
-        parallel=("${sequence//,/ }")
+        parallel=("${sequence//\// }")
         PATH="${bdsm_path}/bin:${PATH}"
         bdsm-ll --noswap -j $(os_cpu_count) bdsm {} ${extension_args[*]} ::: ${parallel[@]}
       done
@@ -95,7 +95,6 @@ then
     *)
       modules extensions
       extension_action
-      ;;
   esac
 fi
 

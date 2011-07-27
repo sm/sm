@@ -1784,31 +1784,40 @@ sudo bdsm ${dependency} package install
 package_info()
 {
   local _path="${packages_path}/${package_name}"
+  : \
+    "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
+    "${package_dir:="${package_name}-${package_version}"}" \
+    "${package_url:="${package_base_url}/${package_file}"}"
+
+  log "versions:"
   if path_exists "${_path}"
   then
     local _installed=($(
     enter "${_path}"
     find . -mindepth 1 -maxdepth 1 -type d | sed -e 's#./##g' -e 's# #,#g'
     ))
-    log "versions:"
     log "  installed: ${_installed[*]}"
-    log "  default: ${package_version}"
-
-    if [[ -L "${_path}/active" ]]
-    then
-      log "  active: $(readlink "${_path}/active")"
-    else
-      log "  active: none"
-    fi
-
-    log "base_url: ${package_base_url}"
-
-    if array_is_nonempty package_dependencies
-    then
-      log "  dependencies: ${package_dependencies[*]}"
-    fi
   else
-    log "No ${package_name} versions installed."
+    log "  installed: none"
+  fi
+  log "  default: ${package_version}"
+
+  if [[ -d "${_path}" ]] && [[ -L "${_path}/active" ]]
+  then
+    log "  active: $(readlink "${_path}/active")"
+  else
+    log "  active: none"
+  fi
+
+  log "urls:"
+  log "  base: ${package_base_url}"
+  log "  download: ${package_url}"
+  log "archive: ${package_file}"
+  log "source_path: ${source_path}/${package_dir}"
+
+  if array_is_nonempty package_dependencies
+  then
+    log "dependencies: ${package_dependencies[*]}"
   fi
 }
 
