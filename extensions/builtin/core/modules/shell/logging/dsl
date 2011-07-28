@@ -107,8 +107,14 @@ warn()
 #
 # ### Usage Examples
 #
-# user$ debug "Hello there! "
-# DEBUG: Hello there!
+# The following will show when bdsm is called with --debug=[welcome|all]
+# or if debug_flags set to welcome|all.
+# Code:
+#
+# debug welcome "Hello there! "
+# Output:
+#
+# DEBUG welcome: Hello there!
 #
 core_debug()
 {
