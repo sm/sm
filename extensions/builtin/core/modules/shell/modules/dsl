@@ -73,12 +73,17 @@ extensions_search_paths()
 #
 extensions_in()
 {
-  local _path="$1"
+  local _path="$1" _extension
 
   if [[ -d "${_path}" ]]
   then
-    find "${_path}" -maxdepth 2 -mindepth 2 -name modules -or -name actions | \
-      xargs -r -n 1 dirname | sort -u | xargs -r -n 1 basename
+    for _extension in $( ls -1 "${_path}" )
+    do
+      if [[ -d "${_path}/${_extension}/acions" || -d "${_path}/${_extension}/modules" ]]
+      then
+        printf "${_extension}\n"
+      fi
+    done
   else
     fail "Cannot list extensions in '${_path}' as the directory does not exist."
   fi
