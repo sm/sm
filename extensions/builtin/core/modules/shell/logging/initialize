@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-: ${debug_flags:=""} ${debug_flag:=0} ${trace_flags:=""} ${trace_flag:=0}
+: ${debug_flags:=""} ${debug_flag:=0} ${trace_flags:="-backtrace"} ${trace_flag:=0}
+
+trace_filter_stack=()
 
 set -o errtrace
 
 set_ps4
-
-trace_filter
 
 enable_backtrace

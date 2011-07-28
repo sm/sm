@@ -139,7 +139,9 @@ detect_modules_paths()
 # search for extension that modules dependency providing matching [namespace...] action
 detect_modules_action()
 {
+  trap trace_filter RETURN
   trace_filter modules_action
+
   extensions_path=$1
   shift
   extension="${1:-core}"
@@ -160,7 +162,6 @@ detect_modules_action()
       do
         if in_search_paths detect_module "${_module_name}"
         then
-          trace_filter modules_action
           if [[ -s "${module_path}/actions" ]]
           then
             local _params="" _action="${_module_params}" _read_action
@@ -174,7 +175,6 @@ detect_modules_action()
                   action="$_read_action"
                   action_path="$( path_join $extensions_path $extension actions ${_module_path})"
                   extension_args=( $_params )
-                  trace_filter
                   return 0
                 fi
               fi
@@ -190,7 +190,6 @@ detect_modules_action()
       done
     fi
   done
-  trace_filter
   return 1
 }
 

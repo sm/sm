@@ -3,7 +3,7 @@
 set +o nounset
 set +o noclobber
 
-: ${debug_flags:="-search"} ${debug_flag:=0} ${trace_flags:="-search"} ${trace_flag:=0}
+: ${debug_flags:="-search"} ${debug_flag:=0} ${trace_flags:="-search -backtrace"} ${trace_flag:=0}
 
 while (( $# > 0 ))
 do

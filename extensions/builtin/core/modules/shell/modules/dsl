@@ -86,6 +86,7 @@ extensions_in()
 
 in_search_paths()
 {
+  trap trace_filter RETURN
   trace_filter search
   local callback=$1
   shift
@@ -99,7 +100,6 @@ in_search_paths()
   do
     if "${callback}" "${path}" "${args[@]}"
     then
-      trace_filter
       return 0
     fi
   done
@@ -108,12 +108,10 @@ in_search_paths()
   do
     if "${callback}" "${builtin_path}" "${builtin_extension}" "${args[@]}"
     then
-      trace_filter
       return 0
     fi
   done
 
-  trace_filter
   return 1
 }
 

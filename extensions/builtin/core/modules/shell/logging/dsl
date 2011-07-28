@@ -436,24 +436,47 @@ set_ps4()
 #     trace_filter
 #
 # ### Code Walkthrough
-trace_filter()
+core_trace_filter()
 {
-  if [[ -n "$1" ]]
+  local _action="$1"
+  shift
+  case "${_action}" in
+    start)
+      filter="$1"
+      trace_filter_stack=( "$filter" "${trace_filter_stack[@]}" )
+      ;;
+    stop)
+      shift || true
+      trace_filter_stack=( "$@" )
+      filter="${trace_filter_stack[0]}"
+      ;;
+    *)
+      fail "Unknown action ${_action}"
+      ;;
+  esac
+
+  if [[ -n "$filter" ]]
   then
     if options_check "$trace_flags" "$1"
     then
       set -o xtrace
-    else
-      set +o xtrace
     fi
   else
     # No param, restore default state
     if (( trace_flag != 0 ))
     then
       set -o xtrace
-    else
-      set +o xtrace
     fi
+  fi
+}
+trace_filter()
+{
+  set +o xtrace
+  if [[ -n "$1" ]]
+  then
+    core_trace_filter start $1
+  else
+    core_trace_filter stop "${trace_filter_stack[@]}"
   fi
 }
 
@@ -634,7 +657,8 @@ disable_backtrace()
 backtrace()
 {
   # Turn off shell tracing
-  set +o xtrace
+  trap trace_filter RETURN
+  trace_filter backtrace #backtrace is disabled by default
 
   # Declare separator and columns variables. Initialize columns to the terminal
   local _separator _columns
@@ -757,7 +781,4 @@ backtrace()
   # Print the backtrace separator line and if the trace flag is nonnegative
   # then turn tracing back on
   printf "${_separator// /=}\n" 1>&2
-
-  trace_filter #restore logging state
 }
-
