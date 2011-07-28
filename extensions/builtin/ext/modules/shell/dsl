@@ -211,6 +211,7 @@ get_version()
   source "$modules_path/hook"
 }
 
+#TODO: this code should be distributed to proper places
 extension_cli()
 {
   local _ignored_args=() _string
@@ -238,12 +239,6 @@ extension_cli()
       --modules)
         _string="${extension_args[$((++index))]}"
         extension_modules=(${_string//,/ })
-        ;;
-      --help)
-        #TODO: to late, can not call 2nd time
-        extension_args=( "ext" "help" )
-        extension_action
-        exit 0
         ;;
       --trace)
         set -o xtrace

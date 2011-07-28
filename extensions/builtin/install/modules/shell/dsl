@@ -20,24 +20,24 @@ fetch()
   archive=$(basename "$1")
   download=1
 
-  debug "Fetching $archive"
+  debug vcs "Fetching $archive"
 
   # Check first if we have the correct archive
   if file_exists "$archive" && file_exists "$archive.md5"
   then
-    debug "Found archive and its md5, testing correctness"
+    debug vcs "Found archive and its md5, testing correctness"
 
     if (( $(md5sum --status -c "$archive.md5") > 0 ))
     then
-      debug "Archive is bad, downloading"
+      debug vcs "Archive is bad, downloading"
       download=1
     else
-      debug "Archive is good, not downloading"
+      debug vcs "Archive is good, not downloading"
       download=0
       result=0
     fi
   else
-    debug "No '${archive}' does not exist or does not match md5, downloading"
+    debug vcs "No '${archive}' does not exist or does not match md5, downloading"
     download=1
   fi
 
@@ -56,7 +56,7 @@ fetch()
         retry=1
       elif (( result == 33 ))
       then
-        debug "Remote server does not support 'range' command, removing '$archive'"
+        debug vcs "Remote server does not support 'range' command, removing '$archive'"
         rm -f "$archive"
         retry=1
       else

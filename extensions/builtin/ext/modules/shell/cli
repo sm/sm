@@ -1,5 +1,3 @@
 #!/usr/bin/env bash
 
-debug "WTF!!! move code to actions"
 extension_cli
-

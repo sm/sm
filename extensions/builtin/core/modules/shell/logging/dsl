@@ -119,7 +119,7 @@ note()
 #
 # ### Input Parameters
 #
-# Strings to be logged.
+# Debug type, Strings to be logged.
 #
 # ### Stream Outputs
 #
@@ -145,9 +145,57 @@ note()
 #
 debug()
 {
-  if (( ${debug_flag:=0} == 1 ))
+  local type="$1"
+  shift
+
+  if (( debug_flag == 1 )) && options_check "$debug_flags" "$type"
   then
-    printf "DEBUG: $*\n"
+    printf "DEBUG $type: $*\n"
+  else
+    return 0
+  fi
+}
+
+#
+# ## log_search()
+#
+# Log arguments to the calling environments STDOUT preceeded by 'DEBUG: .
+#
+# ### Input Parameters
+#
+# Search type, Search result, Strings to be logged.
+#
+# ### Stream Outputs
+#
+# Prints arguments passed in to the calling environments STDOUT with a newline
+# character appended and 'DEBUG: ' prepended.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# Fails if no arguments are given.
+#
+# ### Usage Examples
+#
+# user$ ./install --debug=search help
+# DEBUG search:   module bdsm/help            in builtin/bdsm/modules/shell/help.
+#
+log_search()
+{
+  local name=$1 value=$2
+  shift
+  shift
+
+  if (( debug_flag == 1 )) && options_check "$debug_flags" "search"
+  then
+    printf "DEBUG search: %8s %-20s in $*.\n" "$name" "$value"
   else
     return 0
   fi
@@ -433,124 +481,6 @@ disable_trace()
 {
   # Disable shell tracing
   trace off
-}
-
-#
-# ## debug()
-#
-# Toggle verbose debugging functionality on or off. If 'on' is triggered then
-# every line of code execution after the function returns will be displayed.
-#
-# ### Input Parameters
-#
-# First parameter is either empty, 'on' or 'off'
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success
-#
-# ### Failure Scenarios
-#
-# No failure scenarios currently.
-#
-# ### Usage Examples
-#
-#     user$ debug on
-#     user$ echo "hi"
-#     >   1 $ echo hi
-#     user$ debug off
-#     >  debug() 1 $ local _option=off
-#     >  debug() 3 $ [[ off = \o\n ]]
-#     >  debug() 8 $ set +o xdebug
-#
-# ### Code Walkthrough
-debug()
-{
-  # Declare the option varibale and set it to the first parameter, if nonempty,
-  # and to 'on' if no parameters were given.
-  local _option="${1:-on}"
-
-  # If the option variable is set to on (the default) then set and export the
-  # debug_flag variable to 1 (enable) thus enabling verbose shell echoing
-  # (every code line is printed before execution). Otherwise disable verbose
-  # shell echoing, set debug_flag to 0 (disabled) and export
-  if [[ "${_option}" = "on" ]]
-  then
-    export debug_flag=1
-    set -o verbose
-  else
-    set +o verbose
-    debug_flag=0
-    export debug_flag
-  fi
-}
-
-#
-# ## enable_debug()
-#
-# Enables verbose debugging output.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success
-#
-# ### Failure Scenarios
-#
-# No failure scenarios currently.
-#
-# ### Usage Examples
-#
-#     user$ enable_debug
-#
-# ### Code Walkthrough
-enable_debug()
-{
-  # Turn debugging on.
-  debug on
-}
-
-#
-# ## disable_debug()
-#
-# Disables verbose debugging output.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success
-#
-# ### Failure Scenarios
-#
-# No failure scenarios currently.
-#
-# ### Usage Examples
-#
-#     user$ disable_debug
-#
-# ### Code Walkthrough
-disable_debug()
-{
-  # Turn debugging off
-  debug off
 }
 
 #
