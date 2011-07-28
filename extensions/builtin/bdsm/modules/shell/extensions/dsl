@@ -981,28 +981,8 @@ extension_module_add()
   local _extension="${1}" _module="${2}" _path
   _path="${3:-"${extensions_development_path}/${_extension}"}"
 
-  timestamp_set
-
-  if file_contains "${_path}/modules/shell/initialize" "modules "
+  if ! file_contains "${_path}/modules/shell/modules" "${_module}"
   then
-    if awk "/modules /{printf \$0; print \" ${_module}\"}
-      ! /modules/{print \$0}" "${_path}/modules/shell/initialize" \
-        >> "${_path}/modules/shell/initialize.${timestamp}"
-    then
-      if move_file "${_path}/modules/shell/initialize.${timestamp}"\
-        to "${_path}/modules/shell/initialize"
-      then
-        return 0
-      else
-        fail "Failed to move ${_path}/modules/shell/initialize.${timestamp}"\
-          "to ${_path}/modules/shell"\
-          "while adding module '${_module}'"
-      fi
-    else
-      fail "Failed to modify ${_path}/modules/shell/initialize" \
-        "when trying to add module '${_module}'"
-    fi
-  else
-    write "modules ${_module}\n" append to "${_path}/modules/shell/initialize"
+    write "\n${_module}" append to "${_path}/modules/shell/modules"
   fi
 }

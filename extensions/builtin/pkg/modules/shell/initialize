@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
 
-modules std/package
-
 package_name="${extension_args[0]}"
 

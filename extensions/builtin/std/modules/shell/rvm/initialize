@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-modules bdsm/array
-
 source_files "/etc/rvmrc" "$HOME/.rvmrc"
 
 rvm_files=(

@@ -6,7 +6,4 @@ true \
   ${remote:="origin"} \
   ${branch:="master"}
 
-modules bdsm/environment std/vcs
-
 extensions_src_path="${src_path}/extensions"
-

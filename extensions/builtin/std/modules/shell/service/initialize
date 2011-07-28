@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-modules bdsm/system bdsm/array
-
 if variable_is_empty init_scripts_path
 then
   init_scripts_path="$(init_scripts_path)"

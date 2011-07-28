@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-modules bdsm/extensions bdsm/filesystem bdsm/system std/users std/templates bdsm/environment std/defaults
-
 # Ensure that default values are set.
 fhs_dirs=(bin etc include lib libexec sbin share man)
 

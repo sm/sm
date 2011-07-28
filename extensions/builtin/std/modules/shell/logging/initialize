@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
-modules std/time
-
-if (( UID == 0 ))
+if user_is_root
 then
   true "${log_path:="${bdsm_path}/log"}"
 else

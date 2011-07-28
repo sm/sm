@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-
-modules bdsm/variables bdsm/system
-
