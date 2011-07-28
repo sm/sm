@@ -65,12 +65,14 @@ then
   extension_args=()
 fi
 
-if [[ " $trace_flags " =~ " all " ]]
-then
-  trace_flag=1
-  set -x
-fi
+case " ${trace_flags} " in
+  (" all ")
+    trace_flag=1
+    set -x
+    ;;
+esac
 
 debug_flags="${debug_flags## }"
 trace_flags="${trace_flags## }"
+
 export debug_flag debug_flags trace_flag trace_flags extension_args bdsm_script
