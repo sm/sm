@@ -1,9 +1,16 @@
 #!/usr/bin/env bash
 
 #core is loaded as BDSM starts
-modules=("core/core" "core/string" "core/logging" "core/modules")
+modules=(
+  "core/core=builtin/core/modules/shell/core"
+  "core/string=builtin/core/modules/shell/string"
+  "core/logging=builtin/core/modules/shell/logging"
+  "core/modules=builtin/core/modules/shell/modules"
+)
 
-for module_name in ${modules[@]}
+for module_def in ${modules[@]}
 do
-  log_search preload "$module_name" "builtin/$(dirname $module_name)/modules/shell/$(basename $module_name)"
+  module_name="${module_def//=*}"
+  module_path="${module_def//*=}"
+  log_search preload "$module_name" "${module_path}"
 done

@@ -78,7 +78,7 @@ extensions_in()
   if [[ -d "${_path}" ]]
   then
     find "${_path}" -maxdepth 2 -mindepth 2 -name modules -or -name actions | \
-      xargs -n 1 dirname | sort -u | xargs -n 1 basename
+      xargs -r -n 1 dirname | sort -u | xargs -r -n 1 basename
   else
     fail "Cannot list extensions in '${_path}' as the directory does not exist."
   fi
@@ -89,7 +89,7 @@ in_search_paths()
   trace_filter search
   local callback=$1
   shift
-  local args=( "$@" )
+  local args=( "$@" ) path
 
   local search_paths=( $(extensions_search_paths) )
   local builtin_path="${bdsm_path}/extensions/builtin"
@@ -131,7 +131,7 @@ module()
   if in_search_paths detect_module "${_module}"
   then
     log_search module "$module_name" "${module_path##${bdsm_path}\/extensions\/}"
-    modules+=("${module_name}")
+    modules+=("${module_name}=${module_path##${bdsm_path}\/extensions\/}")
   else
     log_search module "${_module}" "Not found !!!"
     return 1
@@ -170,21 +170,6 @@ module_or_error()
   then
     error "$2"
   fi
-}
-
-# load core modules or fail
-core_modules()
-{
-  local module
-  for module in $@
-  do
-    module_name="core/$module"
-    module_path="${modules_path}/shell/$module"
-    if ! module "$module_name" skip_path_detection
-    then
-      fail "core module '${module_name}' is missing!!!"
-    fi
-  done
 }
 
 #
@@ -365,7 +350,7 @@ module_is_loaded()
   if [[ -n "${_name:-}" ]]
   then
     case " ${modules[*]} " in
-      (*[[:space:]]${_name}[[:space:]]*)
+      (*[[:space:]]${_name}=*)
         return 0
         ;;
       (*)
@@ -406,7 +391,17 @@ module_is_loaded()
 #
 modules_loaded()
 {
-  printf "${modules[@]}\n"
+  printf "${modules[*]}\n"
+}
+
+modules_loaded_names()
+{
+  local names=() _module_def
+  for _module_def in "${modules[@]}"
+  do
+    names+=( "${_module_def//=*}" )
+  done
+  printf "${names[*]}\n"
 }
 
 # Print out a list of all installed modules.
