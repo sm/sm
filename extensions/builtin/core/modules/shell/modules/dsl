@@ -119,39 +119,49 @@ in_search_paths()
 
 module()
 {
-  local _module=$1 _skip_path_detection=$2 _file
+  local _module=$1 _skip_path_detection=$2 _file _module_dependency _module_path
 
+  # Check if module already loaded
   if module_is_loaded "${_module}"
   then
+    log_search module "$module_name" "Already loaded !!!"
     return 0
   fi
-  if [[ "${_skip_path_detection}" == "skip_path_detection" ]]
+
+  # Search for module
+  if in_search_paths detect_module "${_module}"
   then
-    if [[ -d "${module_path}" ]] && [[ -f "${module_path}/dsl" ]]
-    then
-      log_search fast_mod "$module_name" "${module_path##${bdsm_path}\/extensions\/}"
-      modules+=("${module_name}")
-    else
-      log_search fast_mod "${_module}" "Not found !!! ${module_path}/dsl"
-      return 1
-    fi
+    log_search module "$module_name" "${module_path##${bdsm_path}\/extensions\/}"
+    modules+=("${module_name}")
   else
-    if in_search_paths detect_module "${_module}"
-    then
-      log_search module "$module_name" "${module_path##${bdsm_path}\/extensions\/}"
-      modules+=("${module_name}")
-    else
-      log_search module "${_module}" "Not found !!!"
-      return 1
-    fi
+    log_search module "${_module}" "Not found !!!"
+    return 1
   fi
+
+  # store path so dependencies do not overwrite it
+  _module_path="${module_path}"
+
+  # Load module dependencies
+  if [[ -s "${module_path}/modules" ]]
+  then
+    for _module_dependency in $( cat ${module_path}/modules )
+    do
+      debug search "${_module} -> ${_module_dependency}"
+      module_or_error "${_module_dependency}" \
+        "Could not find module dependency '${_module_dependency}' from '"${module_path##${bdsm_path}\/extensions\/}/modules"'"
+    done
+  fi
+
+  # Load module
   for _file in dsl cli initialize
   do
-    if [[ -s "${module_path}/${_file}" ]]
+    if [[ -s "${_module_path}/${_file}" ]]
     then
-      source "${module_path}/${_file}"
+      #TODO: should we check for errors here ?!?!?!
+      source "${_module_path}/${_file}"
     fi
   done
+
   return 0
 }
 

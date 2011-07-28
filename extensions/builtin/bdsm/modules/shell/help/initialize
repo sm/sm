@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-modules bdsm/array
-
 declare -a help_descriptions
 declare -a help_action_names
 declare -a help_action_descriptions

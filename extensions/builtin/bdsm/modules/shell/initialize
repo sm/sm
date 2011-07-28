@@ -25,6 +25,3 @@ bdsm_version
 user="$USER"
 
 export prefix_path bin_path source_path
-
-modules bdsm/system #std/templates std/vcs
-

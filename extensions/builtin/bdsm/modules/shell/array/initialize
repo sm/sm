@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-modules bdsm/variables
-
 if [[ -n "${ZSH_VERSION:-}" ]]
 then
   __array_start=1

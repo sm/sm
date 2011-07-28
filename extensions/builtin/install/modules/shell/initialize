@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-modules std/vcs std/users
-
 cleanse_paths=(
   extensions/core extensions/pkg extensions/srv extensions/ext extensions/mod
   external completion modules bin extensions/builtin

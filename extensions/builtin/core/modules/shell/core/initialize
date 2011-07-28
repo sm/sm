@@ -87,6 +87,7 @@ elif set | grep '^extension_args=(' >/dev/null
 then
   case "${extension_args[0]}" in
     */*|*,*)
+      modules bdsm/array bdsm/system
       array_shift extension_args extensions
       sequential=(${extensions//,/ })
       for sequence in "${sequential[@]}"

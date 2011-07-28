@@ -65,12 +65,11 @@ then
   extension_args=()
 fi
 
-case " ${trace_flags} " in
-  (" all ")
-    trace_flag=1
-    set -x
-    ;;
-esac
+if [[ " ${trace_flags} " =~ " all " ]]
+then
+  trace_flag=1
+  set -x
+fi
 
 debug_flags="${debug_flags## }"
 trace_flags="${trace_flags## }"
