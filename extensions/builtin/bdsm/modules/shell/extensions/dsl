@@ -118,6 +118,82 @@ detect_action()
   return 0
 }
 
+# find modules on path
+detect_modules_paths()
+{
+  local root="$1" path="" IFS='/'
+  shift
+  while (( $# > 0 ))
+  do
+    if [[ -s "${root}${path}/dsl" ]]
+    then
+      printf "${path##\/}=$*\n"
+    else
+      break
+    fi
+    path+="/$1"
+    shift
+  done
+}
+
+# search for extension that modules dependency providing matching [namespace...] action
+detect_modules_action()
+{
+  trace_filter modules_action
+  extensions_path=$1
+  shift
+  extension="${1:-core}"
+  shift
+
+  local token _word _modules_path="$extensions_path/$extension/modules/shell"
+
+  local _params=("$@") _module_path _module_params _module_name
+
+  # iterate modules from longest path
+  for _module_definition in $(detect_modules_paths ${_modules_path} "$@" | sort -r)
+  do
+    _module_path="${_module_definition//=*}"
+    _module_params="${_module_definition//*=}"
+    if [[ -s "${_modules_path}/${_module_path}/modules" ]]
+    then
+      for _module_name in $( cat "${_modules_path}/${_module_path}/modules" )
+      do
+        if in_search_paths detect_module "${_module_name}"
+        then
+          trace_filter modules_action
+          if [[ -s "${module_path}/actions" ]]
+          then
+            local _params="" _action="${_module_params}" _read_action
+            while [[ -n "_action" ]]
+            do
+              if file_contains "${module_path}/actions" "${_action}="
+              then
+                _read_action=$( hash_file "${module_path}/actions" "${_action//\//\/}" )
+                if [[ -n "$_read_action" ]]
+                then
+                  action="$_read_action"
+                  action_path="$( path_join $extensions_path $extension actions ${_module_path})"
+                  extension_args=( $_params )
+                  trace_filter
+                  return 0
+                fi
+              fi
+              _params="$(basename $_action) $_params"
+              _action="$(dirname $_action)"
+              if [[ "$_action" =~ "." || "$_action" =~ "/" ]]
+              then
+                break
+              fi
+            done
+          fi
+        fi
+      done
+    fi
+  done
+  trace_filter
+  return 1
+}
+
 detect_action_type()
 {
   local _path="${action_path:-}"
@@ -337,10 +413,16 @@ extension_action()
       ;;
   esac
 
-
+  # Search in extensions actions
   if in_search_paths detect_action "${extension_args[@]}"
   then
     log_search action "$action" "${action_path##${bdsm_path}\/extensions\/} params:${extension_args[@]}"
+
+  # Search in loaded modules actions
+  elif in_search_paths detect_modules_action "${extension_args[@]}"
+  then
+    log_search action "$action" "${action_path##${bdsm_path}\/extensions\/} params:${extension_args[@]}"
+
   else
     error "Unknown action path: "${extension_args[@]}"\n\nUsage: \n  bdsm extension [namespace] [action]\n"
   fi
