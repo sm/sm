@@ -183,6 +183,54 @@ log_search()
 }
 
 #
+# ## log_todo()
+#
+# Log arguments to the calling environments STDOUT preceeded by 'DEBUG: and caller file:line.
+#
+# ### Input Parameters
+#
+# Search type, Search result, Strings to be logged.
+#
+# ### Stream Outputs
+#
+# Prints arguments passed in to the calling environments STDOUT with a newline
+# character appended and 'DEBUG: caller_file:line' prepended.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# Fails if no arguments are given.
+#
+# ### Usage Examples
+#
+# user$ ./install --debug=search help
+# DEBUG search:   module bdsm/help            in builtin/bdsm/modules/shell/help.
+#
+core_log_todo()
+{
+  if (( debug_flag == 1 )) && options_check "$debug_flags" "todo"
+  then
+    local file="${BASH_SOURCE[2]}" line="${BASH_LINENO[1]}"
+    printf "DEBUG todo: ${file##${bdsm_path}\/extensions\/}:${line}:\n"
+    printf "$*" | xargs -s 72 | xargs -I {} printf "DEBUG todo: # {}\n"
+  else
+    return 0
+  fi
+}
+
+log_todo()
+{
+  core_log_todo "$@"
+}
+
+#
 # ## error()
 #
 # Log arguments to the calling environments STDERR preceeded by 'ERROR '.
