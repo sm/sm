@@ -6,4 +6,6 @@ set -o errtrace
 
 set_ps4
 
+trace_filter
+
 enable_backtrace

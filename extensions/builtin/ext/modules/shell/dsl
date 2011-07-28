@@ -240,9 +240,6 @@ extension_cli()
         _string="${extension_args[$((++index))]}"
         extension_modules=(${_string//,/ })
         ;;
-      --trace)
-        set -o xtrace
-        ;;
       *)
         _ignored_args+=("${token}")
         ;;

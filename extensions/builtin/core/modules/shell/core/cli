@@ -3,7 +3,7 @@
 set +o nounset
 set +o noclobber
 
-: ${debug_flags:="-search"} ${debug_flag:=0} ${trace_flags:=""} ${trace_flag:=0}
+: ${debug_flags:="-search"} ${debug_flag:=0} ${trace_flags:="-search"} ${trace_flag:=0}
 
 while (( $# > 0 ))
 do
@@ -22,14 +22,10 @@ do
 
     --trace)
       trace_flags+=" all"
-      trace_flag=1
-      set -x
       ;;
 
     --trace=*)
       trace_flags+=" ${token##--trace=}"
-      trace_flag=1
-      set -x
       ;;
 
     --debug)
@@ -67,6 +63,12 @@ done
 if (( $# == 0 )) && [[ -z "$extension_args" ]]
 then
   extension_args=()
+fi
+
+if [[ " $trace_flags " =~ " all " ]]
+then
+  trace_flag=1
+  set -x
 fi
 
 debug_flags="${debug_flags## }"

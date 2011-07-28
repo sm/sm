@@ -1,13 +1,9 @@
 #!/usr/bin/env bash
 
-log()
-{
-  printf "$*\n"
-}
 #
-# ## info()
+# ## log()
 #
-# Log arguments to the calling environments STDOUT preceeded by 'INFO .
+# Log arguments to the calling environments STDOUT.
 #
 # ### Input Parameters
 #
@@ -16,7 +12,7 @@ log()
 # ### Stream Outputs
 #
 # Prints arguments passed in to the calling environments STDOUT with a newline
-# character appended and 'INFO ' prepended.
+# character appended.
 #
 # ### Environmental effects
 #
@@ -28,16 +24,20 @@ log()
 #
 # ### Failure Scenarios
 #
-# Fails if no arguments are given.
+# none.
 #
 # ### Usage Examples
 #
-# user$ info "Hello there! "
-# INFO Hello there!
+# user$ log "Hello there! "
+# Hello there!
 #
-info()
+core_log()
 {
-  printf "INFO: $*\n"
+  printf "$*\n"
+}
+log()
+{
+  core_log "$@"
 }
 
 #
@@ -64,54 +64,21 @@ info()
 #
 # ### Failure Scenarios
 #
-# Fails if no arguments are given.
+# none.
 #
 # ### Usage Examples
 #
 # user$ info "Bad Monkeys are Typing! "
 # WARNING: Bad Monkeys are Typing!
 #
-warn()
+core_warn()
 {
   printf "WARNING: $*\n"
 }
-
-#
-# ## note()
-#
-# Log arguments to the calling environments STDOUT preceeded by 'NOTE .
-#
-# ### Input Parameters
-#
-# Strings to be logged.
-#
-# ### Stream Outputs
-#
-# Prints arguments passed in to the calling environments STDOUT with a newline
-# character appended and 'NOTE ' prepended.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success
-#
-# ### Failure Scenarios
-#
-# Fails if no arguments are given.
-#
-# ### Usage Examples
-#
-# user$ info "You are not Smurfette! "
-# NOTE You are not Smurfette!
-#
-note()
+warn()
 {
-  printf "NOTE: $*\n"
+  core_warn "$@"
 }
-
 #
 # ## debug()
 #
@@ -143,7 +110,7 @@ note()
 # user$ debug "Hello there! "
 # DEBUG: Hello there!
 #
-debug()
+core_debug()
 {
   local type="$1"
   shift
@@ -154,6 +121,10 @@ debug()
   else
     return 0
   fi
+}
+debug()
+{
+  core_debug "$@"
 }
 
 #
@@ -187,7 +158,7 @@ debug()
 # user$ ./install --debug=search help
 # DEBUG search:   module bdsm/help            in builtin/bdsm/modules/shell/help.
 #
-log_search()
+core_log_search()
 {
   local name=$1 value=$2
   shift
@@ -199,6 +170,10 @@ log_search()
   else
     return 0
   fi
+}
+log_search()
+{
+  core_log_search "$@"
 }
 
 #
@@ -234,12 +209,16 @@ log_search()
 # ERROR Hello there!
 # *poof* shell closed...
 #
-error()
+core_error()
 {
   set +o xtrace
   printf "\nERROR: $*\n" >&2
   disable_backtrace
   exit 1
+}
+error()
+{
+  core_error "$@"
 }
 
 #
@@ -274,13 +253,17 @@ error()
 # Hello there!
 # *poof* shell closed...
 #
-succeed() {
+core_succeed() {
   set +o xtrace
   if [[ -n "$*" ]]
   then
     printf "$*\n"
   fi
   exit 0
+}
+succeed()
+{
+  core_succeed "$@"
 }
 
 #
@@ -316,13 +299,16 @@ succeed() {
 # ERROR Hello there!
 # *poof* shell closed...
 #
-fail()
+core_fail()
 {
   trace_flag=0
   backtrace "$*"
   exit 1
 }
-
+fail()
+{
+  core_fail "$@"
+}
 
 #
 # ## set_ps4()
@@ -365,68 +351,17 @@ set_ps4()
 }
 
 #
-# ## trace()
+# ## trace_filter()
 #
-# Toggle tracing functionality on or off. If 'on' is triggered then every line
-# of code execution after the function returns will be displayed in the format
-# specified by the PS4 environment variable (see set_ps4).
-#
-# ### Input Parameters
-#
-# First parameter is either empty, 'on' or 'off'
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success
-#
-# ### Failure Scenarios
-#
-# No failure scenarios currently.
-#
-# ### Usage Examples
-#
-#     user$ trace on
-#     user$ echo "hi"
-#     >   1 $ echo hi
-#     user$ trace off
-#     >  trace() 1 $ local _option=off
-#     >  trace() 3 $ [[ off = \o\n ]]
-#     >  trace() 8 $ set +o xtrace
-#
-# ### Code Walkthrough
-trace()
-{
-  # Declare the option varibale and set it to the first parameter, if nonempty,
-  # and to 'on' if no parameters were given.
-  local _option="${1}"
-
-  # If the option is on (default) then Set the trace_flag to 1, export
-  # trace_flag and then turn on shell tracing.  Otherwise turn off shell
-  # tracing, set the trace_flag to 0 and export it.
-  if [[ "${_option}" = "on" ]]
-  then
-    trace_flag=1
-    export trace_flag
-    set -o xtrace
-  else
-    set +o xtrace
-    trace_flag=0
-    export trace_flag
-  fi
-}
-
-#
-# ## enable_trace()
-#
-# Turns tracing on.
+# Enables tracing depending on the filter
+# If enabled  then every line of code execution after the function returns
+# will be displayed in the format specified by the PS4 environment variable
+# (see set_ps4).
 #
 # ### Input Parameters
 #
-# None.
+# type of trace to filter
+# if none given restores default state
 #
 # ### Stream Outputs
 #
@@ -442,45 +377,30 @@ trace()
 #
 # ### Usage Examples
 #
-#     user$ enable_trace
+#     trace_filter search
+#     <search code>
+#     trace_filter
 #
 # ### Code Walkthrough
-enable_trace()
+trace_filter()
 {
-  # Enable shell tracing
-  trace on
-}
-
-#
-# ## disable_trace()
-#
-# Turns tracing off.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success
-#
-# ### Failure Scenarios
-#
-# No current failure scenarios.
-#
-# ### Usage Examples
-#
-#     user$ disable_trace
-#
-# ### Code Walkthrough
-disable_trace()
-{
-  # Disable shell tracing
-  trace off
+  if [[ -n "$1" ]]
+  then
+    if options_check "$trace_flags" "$1"
+    then
+      set -o xtrace
+    else
+      set +o xtrace
+    fi
+  else
+    # No param, restore default state
+    if (( trace_flag != 0 ))
+    then
+      set -o xtrace
+    else
+      set +o xtrace
+    fi
+  fi
 }
 
 #
@@ -784,9 +704,6 @@ backtrace()
   # then turn tracing back on
   printf "${_separator// /=}\n" 1>&2
 
-  if (( trace_flag > 0 ))
-  then
-    enable_trace
-  fi
+  trace_filter #restore logging state
 }
 
