@@ -49,7 +49,7 @@
 #
 read_default()
 {
-  local key variable token value prefix _file _files _temp
+  local key variable token value prefix _file _temp
 
   key="${1:-}"
 
@@ -87,13 +87,7 @@ read_default()
       fi
     fi
 
-    _files=(
-      "/etc/bdsm/${extension}/defaults"
-      "$HOME/.bdsm/${extension}/defaults"
-      "${extension_config_path}/defaults"
-    )
-
-    for _file in "${_files[@]}"
+    for _file in  $( settings_search ${extension} defaults )
     do
       if file_is_nonempty "${_file}"
       then
@@ -114,6 +108,9 @@ read_default()
 
 settings_search()
 {
+  trap trace_filter RETURN
+  trace_filter settings_search
+
   local extension=$1 setting=$2 path paths
 
   # Standard paths
