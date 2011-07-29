@@ -87,6 +87,9 @@ read_default()
       fi
     fi
 
+    # Run search in the same process to initialize cache variables
+    settings_search ${extension} defaults > /dev/null
+
     for _file in  $( settings_search ${extension} defaults )
     do
       if file_is_nonempty "${_file}"
@@ -116,6 +119,7 @@ settings_search()
   # Standard paths
   paths=( "/etc/bdsm/${extension}" "$HOME/.bdsm/${extension}" )
 
+  # Extension path
   if extension_path "${extension}"
   then
     paths+=( "${extension_path}/config" )
@@ -124,6 +128,7 @@ settings_search()
   # Additional paths
   for path in "${settings_search_path_append[@]}"
   do
+    settings_search_path_update "${path}"
     paths+=( "${path}/${extension}" )
   done
 
@@ -136,4 +141,17 @@ settings_search()
       printf "${path}/${setting}\n"
     fi
   done
+}
+
+settings_search_path_update()
+{
+  local path=$1
+  if ! string_contains "${settings_search_path_cache[*]}" "${path}"
+  then
+    if file_exists "${path}/.uri"
+    then
+      scm_get "$(cat "${path}/.uri")" "${path}" >&2
+    fi
+    settings_search_path_cache+=( "${path}" )
+  fi
 }
