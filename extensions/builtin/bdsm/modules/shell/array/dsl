@@ -442,6 +442,68 @@ array_append()
 }
 
 #
+# ## array\_pop()
+#
+# Removes the last element of the array and assigns it to variable.
+#
+# ### Input Parameters
+#
+#   The first parameter is the name of the array variable.
+#   The second parameter is the name of variable to assign.
+#
+# ### Stream Outputs
+#
+#   none.
+#
+# ### Usage Examples
+#
+#     user$ cat $HOME/test
+#     #!/usr/bin/env bdsm
+#
+#     modules array
+#
+#     my_array=(1 2 3 4)
+#     echo ${my_array[@]}
+#     array_pop my_array my_var
+#     echo :$my_var:${my_array[@]}:
+#
+#     user$ $HOME/test
+#     1 2 3 4
+#     :4:1 2 3:
+#
+# ### Code Walkthrough
+array_pop()
+{
+  # Store the array name into a local variable, set to the empty string if it
+  # was not passed in.
+  local _array_name="${1:-}" temp_array=() index _variable="${2:-}"
+
+  # if the array name variable is not empty then remove the array name from the
+  # parameters list. If a variable was specified, assign the first element of
+  # the named array into the variable before shifting. Store the value of the
+  # first element of the named array. Then shift the array contents over by one
+  # using a temporary array. Finally  reassign the shifted temp array contents
+  # to the original named variable.
+  # Otherwise if the array name variable was not passed in. This is a
+  # programming error and as such we call the fail function which yields a
+  # message and a backtrace thus enabling quick debugging.
+  if variable_is_empty _array_name
+  then
+    fail "Cannot pop from array as an array name was not given."
+  fi
+  if eval "(( \${#${_array_name}[@]} == 0 ))"
+  then
+    fail "Cannot pop from array as array '${_array_name}' was empty."
+  fi
+  if variable_is_nonempty _variable
+  then
+    eval "${_variable}=\${${_array_name}[\${#${_array_name}[@]}-1]}"
+  fi
+  eval "unset ${_array_name}[\${#${_array_name}[@]}-1]"
+  eval "${_array_name}=( \"\${${_array_name}[@]}\" ) "
+}
+
+#
 # ## array\_shift()
 #
 # Removes the first element of the array and prints it.
@@ -490,18 +552,12 @@ array_shift()
   # message and a backtrace thus enabling quick debugging.
   if variable_is_nonempty _array_name
   then
-    shift
     if variable_is_nonempty _variable
     then
       eval "${_variable}=\${${_array_name}[0]}"
     fi
-    eval "
-    for (( index=1; index < \${#${_array_name}[@]}; index++ ))
-    do
-      temp_array+=(\"\${${_array_name}[\${index}]}\")
-    done
-    "
-    eval "${_array_name}=(\"\${temp_array[@]}\") "
+    unset "${_array_name}[0]"
+    eval "${_array_name}=( \"\${${_array_name}[@]}\" ) "
   else
     fail "Cannot shift from array as an array name was not given."
   fi
