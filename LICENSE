@@ -14,3 +14,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
+= License Exceptions
+
+bin/bdsm-ll is GNU parallel (http://www.gnu.org/s/parallel/) and is licensed
+under the GPLv3, see LICENSE.gplv3 for a copy of the GNU parallel license.
+
