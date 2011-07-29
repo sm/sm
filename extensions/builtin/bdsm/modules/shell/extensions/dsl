@@ -442,6 +442,20 @@ extension_action()
   extension_run
 }
 
+extension_path()
+{
+  local path extension=$1
+  for path in $(extensions_search_paths)
+  do
+    if [[ -d "${path}/${extension}/actions" || -d "${path}/${extension}/modules" ]]
+    then
+      extension_path="${path}/${extension}"
+      return 0
+    fi
+  done
+  return 1
+}
+
 #
 # ## extension\_reload()
 #

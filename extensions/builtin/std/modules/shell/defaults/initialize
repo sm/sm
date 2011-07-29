@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+settings_search_path_append=()

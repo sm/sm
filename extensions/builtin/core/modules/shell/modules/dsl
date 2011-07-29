@@ -95,13 +95,10 @@ in_search_paths()
   trace_filter search
   local callback=$1
   shift
-  local args=( "$@" ) path
-
-  local search_paths=( $(extensions_search_paths) )
+  local args=( "$@" ) path builtin_extension
   local builtin_path="${bdsm_path}/extensions/builtin"
-  local builtin_extensions=( $(extensions_in "${builtin_path}" ) )
 
-  for path in "${search_paths[@]}"
+  for path in $(extensions_search_paths)
   do
     if "${callback}" "${path}" "${args[@]}"
     then
@@ -109,7 +106,7 @@ in_search_paths()
     fi
   done
 
-  for builtin_extension in "${builtin_extensions[@]}"
+  for builtin_extension in $(extensions_in "${builtin_path}" )
   do
     if "${callback}" "${builtin_path}" "${builtin_extension}" "${args[@]}"
     then
