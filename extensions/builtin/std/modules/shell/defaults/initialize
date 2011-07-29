@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
 settings_search_path_cache=()
-settings_search_path_append=()
+#settings_search_path_append=()
