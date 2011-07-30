@@ -145,6 +145,9 @@ github_get()
 # Code Walkthrough
 scm_get()
 {
+  trap trace_filter RETURN
+  trace_filter vcs
+
   log "${log_prefix}Fetching $1"
 
   if path_exists "$1" # check for directory

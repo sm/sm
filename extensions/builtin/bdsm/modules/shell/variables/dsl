@@ -237,7 +237,7 @@ ematch()
     if variable_is_nonempty _regex
     then
       # Use grep for extended regexp
-      echo "$1" | grep -qE "$2"
+      echo "${_value}" | grep -qE "${_regex}"
       local result=$?
       case $result in
         0|1)
