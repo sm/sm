@@ -276,7 +276,7 @@ extension_modules_load()
 
     module_name="$(path_join "${extension}" ${_namespace[*]})"
     module_path="$(path_join "${extension_modules_path}" "shell" ${_namespace[*]})"
-    module "$module_name" skip_path_detection
+    module "$module_name" skip_path_detection || true
   done
 }
 
