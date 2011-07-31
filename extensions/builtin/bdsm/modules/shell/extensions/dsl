@@ -287,8 +287,6 @@ extension_run()
   # Now based on the determined _type we launch the extension.
   case "${_type}" in
     function)
-      (
-      enable_backtrace
       _namespaces=${_path##${extension_actions_path}}
       extension_modules_load ${_namespaces//\// }
 
@@ -298,14 +296,9 @@ extension_run()
       fi
 
       ${action%%(*}
-
-      ) || result=$?
-      return $result
       ;;
 
     shell)
-      (
-      enable_backtrace
       if [[ "${action##*/}" == help ]]
       then # Load the help module also.
         modules bdsm/help
@@ -313,8 +306,6 @@ extension_run()
       _namespaces=${_path##${extension_actions_path}}
       extension_modules_load ${_namespaces//\// }
       . "${_path}/${action}"
-      ) || result=$?
-      return $result
       ;;
 
     ruby)
@@ -337,9 +328,7 @@ extension_run()
     binary|*)
       "${_path}/${action}" ${extension_action} ${extension_args[*]}
       ;;
-  esac || result=$?
-
-  return $result
+  esac
 }
 
 #

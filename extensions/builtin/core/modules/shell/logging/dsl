@@ -267,7 +267,8 @@ core_error()
 {
   set +o xtrace
   printf "\nERROR: $*\n" >&2
-  disable_backtrace
+  set +o errtrace
+  trap - ERR
   exit 1
 }
 error()
@@ -481,108 +482,6 @@ trace_filter()
 }
 
 #
-# ## enable_backtrace()
-#
-# Enables backtrace and program exit whenever a command returns a nonzero value
-# that is not handled.
-#
-# ### Input Parameters
-#
-# First parameter is optional. If it is passed it is a message that will be
-# outputed when a command trigger the program to error exit.
-#
-# ### Stream Outputs
-#
-# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
-#
-# ### Return Codes
-#
-# 0 for success
-#
-# ### Failure Scenarios
-#
-# No failure conditions currently.
-#
-# ### Usage Examples
-#
-#     user$ cat ./test
-#     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # Load BDSM framework core.
-#     modules trace # Load the trace module.
-#     enable_backtrace
-#     echo "Error exit with backtrace is now off."
-#     false # Does not cause exiting with backtrace printing.
-#
-#     user$ $PWD/test
-#     Error exit with backtrace is on.
-#     ERROR: A command has returned an unhandled error code (nonzero return value).
-#     Error Backtrace:
-#        Trace   Function           Line  File
-#           1.   main()                7  /Users/wayneeseguin/test
-#
-# ### Code Walkthrough
-enable_backtrace()
-{
-  # Declare a message local variable and set it to the first parameter or empty
-  # string if the first paramter was not passed in.
-  local _message="${1:-}"
-
-  # If the message variable is not empty then enable the backtrace with the
-  # message attached to the backtrace call. Otherwise enable the backtrace with
-  # no message attached to the backtrace call.
-  # Then turn on shell exit on error option.
-  if [[ -n "${_message}" ]]
-  then
-    trap "backtrace \"${_message}\"" ERR
-  else
-    trap "backtrace \"A command has returned an unhandled error code (nonzero return value).\"" ERR
-  fi
-  set -o errexit
-}
-
-#
-# ## function_name()
-#
-# Function Description
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success
-#
-# ### Failure Scenarios
-#
-# No failure conditions currently.
-#
-# ### Usage Examples
-#
-#     user$ cat ./test
-#     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # Load BDSM framework core.
-#     modules trace # Load the trace module.
-#     disable_backtrace
-#     echo "Error exit with backtrace is now off."
-#     false # Does not cause exiting with backtrace printing.
-#
-#     user$ ./test
-#     Error exit with backtrace is now off.
-#
-# ### Code Walkthrough
-disable_backtrace()
-{
-  # Turn off shell error exit option and clear all ERR signal traps.
-  set +o errexit
-  trap - ERR
-}
-
-#
 # ## backtrace()
 #
 # Display a backtrace of the current call stack to the point that backtrace was
@@ -675,7 +574,7 @@ backtrace()
 
   # Store the passed in message, if given as the first parameter, in the
   # message variable, default to empty string.
-  local _message="${1:-}"
+  local _message="${1:-}" _flag="$2"
 
   # If a message was given print the message to the calling environment's STDERR
   if variable_is_nonempty _message
@@ -781,4 +680,9 @@ backtrace()
   # Print the backtrace separator line and if the trace flag is nonnegative
   # then turn tracing back on
   printf "${_separator// /=}\n" 1>&2
+
+  if [[ "${_flag}" != "no_exit" ]]
+  then
+    kill -s USR2 $APP_PID #to exit application not current subshell
+  fi
 }

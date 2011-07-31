@@ -1602,8 +1602,6 @@ service_init_action()
 #
 service_init_d()
 {
-  enable_backtrace # Enable backtrace on script error.
-
   service_load_conf_d # Load the configuration file.
 
   # Sanity checks go here.

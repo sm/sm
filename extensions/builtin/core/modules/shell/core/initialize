@@ -77,8 +77,6 @@ fi
 # Ensure variables desired to be exported to extensions actually are.
 bdsm_exports
 
-disable_backtrace
-
 if [[ -n $bdsm_script ]]
 then
   # load script
@@ -102,4 +100,3 @@ then
       extension_action
   esac
 fi
-

@@ -4,8 +4,19 @@
 
 trace_filter_stack=()
 
-set -o errtrace
-
 set_ps4
 
-enable_backtrace
+# Do not exit on error
+set +o errexit
+# Persist error handler
+set -o errtrace
+# Call backtrace on error
+trap "backtrace \"A command has returned an unhandled error code (nonzero return value).\"" ERR
+# Exit on USR2 (send by backtrace to $APP_PID)
+trap 'exit 1' USR2
+# Store process pid for closing from backtrace
+export APP_PID=$$
+
+# Those two break error handling
+unset command_not_found
+unset command_not_found_handle
