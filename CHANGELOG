@@ -1,3 +1,31 @@
+* extensions/internal 3535f9c...bb7eea5 (26):
+  > LOL!!!
+  > Do not allow remove paths to trigger the revert.
+  > revert is more indicative.
+  > Minor tweaking.
+  > output handle 3 for easy writing to log file
+  > cleaning code, moved to std/vcs
+  > step by step
+  > informative error, fix rollback action mapping
+  > remove testing false
+  > error handling, improved error recovery
+  > add [after_]fail_stage support, improved error handling
+  > Merge branch 'master' of github.com:wayneeseguin/bdsm-extensions
+  > logging and error handling
+  > compact code
+  > move modules loading to modules file
+  > mysql uses dependent module actions
+  > replace 'log ... to ...' with 'write ... to ...'
+  > apply {core -> bdsm} modules change
+  > turn off openssl in nginx :(
+  > Merge branch 'master' of github.com:wayneeseguin/bdsm-extensions
+  > apply {core -> std} modules change
+  > make nginx working again
+  > enable utf8 in pcre
+  > Removed no longer necessary extend, instead we do: # bdsm internal update $PWD as root from within the cloned extensions repository.
+  > Merge branch 'master' of github.com:wayneeseguin/bdsm-extensions
+  > elasticsearch 0.17.1
+
 0.7.8
 - Some minor bugfixes in core before we push a major refactoring release.
 0.7.7
