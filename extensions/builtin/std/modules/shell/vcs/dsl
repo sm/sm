@@ -68,6 +68,9 @@ git_get()
   if path_exists "$_target/.git"
   then
     builtin cd "${_target}"
+    git checkout master -f -q 2>&1 >/dev/null
+    git reset --hard HEAD 2>&1  >/dev/null
+    git fetch ${remote} 2>&1 >/dev/null
     if [[ -z "$(git branch | awk "/${branch}$/" 2>/dev/null)" ]]
     then
       if ! (
@@ -113,6 +116,20 @@ git_get()
   enter "$initial_pwd"
 }
 
+hg_get()
+{
+  local initial_pwd="$PWD" _url=$1 _target=$2
+  builtin cd "${_target}"
+  hg pull
+}
+
+svn_get()
+{
+  local initial_pwd="$PWD" _url=$1 _target=$2
+  builtin cd "${_target}"
+  svn update
+}
+
 # ## is\_github\_url()
 #
 #
@@ -149,32 +166,42 @@ scm_get()
   trace_filter vcs
 
   log "${log_prefix}Fetching $1"
+  unset scm_type
 
   if path_exists "$1" # check for directory
   then
+    scm_type='directory'
     directory_get "$@"
     return $?
   elif file_exists "$1" # check for packages
   then
+    scm_type='package'
     NIY "File scm_update"
     return $?
   elif is_github_url "$1" # check for pattern user/repository from github
   then
+    scm_type='github'
     github_get "$@"
     return $?
   fi
 
   case "$1" in
     (*git*)
+      scm_type='git'
       git_get "$@"
       ;;
     (*svn*)
+      scm_type='svn'
       NIY "Subversion scm_update"
+      svn_get
       ;;
     (*hg*)
+      scm_type='hg'
       NIY "hg scm_update"
+      hg_get
       ;;
     (*fossil*)
+      scm_type='fossil'
       NIY "fossil scm_update"
       ;;
     (*)
