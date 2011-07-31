@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+builtin cd "${initial_pwd}"
+
 if [[ ${#extension_args[@]} -eq 0 ]]
 then
   log 'usage:\n  bdsm call function_name [function_args...]'
