@@ -15,9 +15,6 @@ done
 
 bdsm_path="${saved_bdsm_path}"
 
-PS4="# \${BASH_SOURCE##\${bdsm_path}\/extensions\/} \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO} $ "
-export PS4
-
 if (( UID == 0 ))
 then # FHS
   true \
@@ -98,5 +95,7 @@ then
     *)
       modules bdsm/extensions
       extension_action
+      detect_action_type
+      extension_run
   esac
 fi

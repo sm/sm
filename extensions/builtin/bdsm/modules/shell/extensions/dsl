@@ -427,8 +427,6 @@ extension_action()
 
   enter "${extension_path}"
   bdsm_exports
-  detect_action_type
-  extension_run
 }
 
 extension_path()

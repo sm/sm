@@ -65,6 +65,9 @@ then
   extension_args=()
 fi
 
+PS4="# \${BASH_SOURCE##\${bdsm_path}\/extensions\/} \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO} $ "
+export PS4
+
 if [[ " ${trace_flags} " =~ " all " ]]
 then
   trace_flag=1
