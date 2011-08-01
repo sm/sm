@@ -273,7 +273,7 @@ seed_template()
   if variable_is_nonempty _template
   then
     shift
-    local _hash=("$@") _strings=()
+    local _hash=("$@") _strings=() temporary=${_template}.${timestamp}.$$
 
     if file_exists "${_template}"
     then
@@ -286,14 +286,14 @@ seed_template()
             _strings+=(-e "s#{{${_hash[${index}]}}}#${_hash[$((++index))]}#g")
           done
 
-          if sed "${_strings[@]}" ${_template} >> ${_template}.${timestamp}
+          if sed "${_strings[@]}" ${_template} > ${temporary}
           then
-            if file_exists "${_template}.${timestamp}"
+            if file_exists "${temporary}"
             then
-              move_file "${_template}.${timestamp}" "${_template}"
+              move_file "${temporary}" "${_template}"
             else
               fail "Something went horribly wrong, the template intermediate file "\
-                "'${_template}.${timestamp}' does not exist."
+                "'${temporary}' does not exist."
             fi
           else
             error "There was an error (?) seeding the template '${_template}'" \
