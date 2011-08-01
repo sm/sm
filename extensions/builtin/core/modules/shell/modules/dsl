@@ -17,14 +17,20 @@ rebuild_path()
   reorder_path "${part}" "${extensions_path}" $(echo -n $@ | sed 's/\// /g' )
 }
 
+is_module()
+{
+  local _module_path=$1
+  [[ -s "${_module_path}/dsl"     && ! -d "${_module_path}/dsl"     ]] || 
+  [[ -s "${_module_path}/modules" && ! -d "${_module_path}/modules" ]]
+}
+
 detect_module()
 {
   local extensions_path=$1 _module_path
   shift
   _module_path=( $(rebuild_path "modules/shell" $extensions_path $@ ) )
 
-  if [[ -s "${_module_path}/dsl" ]] \
-  || [[ -s "${_module_path}/modules" ]]
+  if is_module "${_module_path}"
   then
     module_path=${_module_path}
     module_name=$(echo -n $@ | sed 's/ /\//g' )

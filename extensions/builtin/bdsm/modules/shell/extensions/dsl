@@ -125,8 +125,7 @@ detect_modules_paths()
   shift
   while (( $# > 0 ))
   do
-    if [[ -s "${root}${path}/dsl" ]] \
-    || [[ -s "${root}${path}/modules" ]]
+    if is_module "${root}${path}"
     then
       printf "${path##\/}=$*\n"
     else
