@@ -1,3 +1,4 @@
 bdsm/variables
 bdsm/array
 bdsm/filesystem
+ext/hash

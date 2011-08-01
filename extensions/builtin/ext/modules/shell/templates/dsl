@@ -314,3 +314,184 @@ seed_template()
   fi
 }
 
+templates_help()
+{
+  echo "
+Usage:
+
+  bdsm templates list                        #show available templates
+  bdsm templates list  all                   #show available templates with targets
+  bdsm templates list  [template name]       #show generated files for given template
+  bdsm templates apply [target file name...] #apply template on the given files
+  bdsm templates apply [template]            #apply template on all targets
+  bdsm templates diff  [target file name...] #diff template on the given files
+  bdsm templates diff  [template]            #diff template on all targets
+
+Template name shopuld contain '_' before last '.' example:
+
+  my_app_nginx_.conf
+
+Settings files is template name + .settings:
+
+  my_app_nginx_.conf.settings
+
+The content of settings file is consists of file names and replacements for them:
+
+  my_app_nginx_dev.conf=(
+    host_name my.host.name
+    port 8080
+  )
+  my_app_nginx_prod.conf=(
+    host_name my.host.name
+    port 80
+  )
+
+"
+}
+
+templates_targets()
+{
+  local target
+
+  if [[ $# -lt 1 ]]
+  then
+    error "Please provide template name!"
+  fi
+
+  if [[ "$1" == "${1/_*./_.}" && -f "$1" ]]
+  then
+    for target in $(hash_keys $1.settings)
+    do
+      if [[ -f $target ]]
+      then
+        log "  $target -> exists"
+      else
+        log "  $target -> missing"
+      fi
+    done
+  else
+    error "Not a template name!"
+  fi
+}
+
+templates_list() {
+  local template="$1"
+  local settings="$template.settings"
+  log "Template: $template"
+  if [[ -f $settings ]]
+  then
+    log "Template settings: $template.settings"
+  else
+    log "Template settings are missing: $template.settings"
+  fi
+  if [[ "$2" == "all" ]]
+  then
+    templates_targets $1
+  fi
+}
+
+templates_list_all() {
+  local template search all
+  case "x${extension_args[0]}" in
+    xall)
+      search=*_.*
+      all="all"
+      ;;
+    x)
+      search=*_.*
+      all=""
+      ;;
+    *)
+      search="${extension_args[0]}"
+      all="all"
+      ;;
+  esac
+  for template in $search
+  do
+    if [[ ! "$template" =~ ".settings" ]]
+    then
+      templates_list "$template" "$all"
+    fi
+  done
+}
+
+templates_apply_one()
+{
+  local target="${extension_args[0]}" target_new="${extension_args[0]}.$$" key="${extension_args[0]}"
+  local template="${target/_*./_.}" settings="${template}.settings" replacements
+
+  cp -f $template $target_new
+  hash_read $settings $key replacements
+  seed_template $target_new "${replacements[@]}" | grep -v "WARNING: Template Seeding (replacing defaults) has not yet fully implemented." || true
+
+  if [[ ! -f $target ]] || ! diff -q $target_new $target > /dev/null
+  then
+    mv $target_new $target
+    return $?
+  else
+    rm $target_new
+    return 1
+  fi
+}
+
+templates_apply_all()
+{
+  local list template first="${extension_args[0]}"
+
+  if [[ $# -lt 1 ]]
+  then
+    error "please provide template or target name!"
+  fi
+
+  if [[ "$first" == "${first/_*./_.}" && -f "$first" ]]
+  then
+    list=( $(hash_keys ${first}.settings) )
+  else
+    list=( ${extension_args[@]} )
+  fi
+
+  for template in "${list[@]}"
+  do
+    if templates_apply_one $template
+    then
+      log "  $template -> changed"
+    else
+      log "  $template"
+    fi
+  done
+}
+
+templates_apply_diff()
+{
+  local target="${extension_args[0]}" target_new="${extension_args[0]}.new" key="${extension_args[0]}"
+  local template="${target/_*./_.}" settings="${template}.settings" replacements
+
+  cp -f $template $target_new
+  hash_read $settings $key replacements
+  seed_template $target_new "${replacements[@]}" | grep -v "WARNING: Template Seeding (replacing defaults) has not yet fully implemented." || true
+
+  diff -u $target $target_new || true
+  rm -rf $target_new
+}
+
+templates_apply_diffs()
+{
+  local list template first="${extension_args[0]}"
+
+  if (( ${#extension_args[0]} == 0 ))
+  then
+    error "Please provide template or target name!"
+  fi
+
+  if [[ "$first" == "${first/_*./_.}" && -f "$first" ]]
+  then
+    list=( $(hash_keys ${first}.settings) )
+  else
+    list=( ${extension_args[@]} )
+  fi
+
+  for template in "${list[@]}"
+  do
+    templates_apply_diff $template
+  done
+}

@@ -1,0 +1,5 @@
+list=templates_list_all()
+apply=templates_apply_all()
+diff=templates_apply_diffs()
+help=templates_help()
+default=templates_help()
