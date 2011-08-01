@@ -238,6 +238,8 @@ package_install()
     package_dependencies
   fi
 
+  enter "${archives_path}"
+
   if command_exists "${package_name}_download"
   then
     "${package_name}_download"
@@ -385,10 +387,10 @@ package_fetch_md5()
 
   if [[ -z "${package_md5}" && -n "${package_md5_url}" ]]
   then
-    curl -L "${packge_md5_url}" -o "${package_file}.md5" 2>/dev/null ||
+    curl -L "${packge_md5_url}" -o "${archives_path}/${package_file}.md5" 2>/dev/null ||
       error "Fetching md5 from '${package_md5_url}' failed."
 
-    package_md5=$(cat "${package_file}.md5")
+    package_md5=$(cat "${archives_path}/${package_file}.md5")
   fi
 }
 
@@ -435,31 +437,16 @@ package_fetch()
 
   package_fetch_md5
 
-  if variable_is_nonempty package_md5
+  if file_exists "${archives_path}/${package_file}" &&
+    file_matches_md5 "${archives_path}/${package_file}" "${package_md5:-#}"
   then
-    if file_matches_md5 "${package_file}" "${package_md5}"
-    then
-      return 0
-    else
-      log "${package_file} does not match md5 ${package_md5}, removing and downloading."
-
-      remove_files "${package_file}"
-
-      if curl -L "${package_url}" -o "${package_file}"
-      then
-        return 0
-      else
-        fail "Downloading ${package_name} from '${package_url}' to '${package_file}' failed "
-      fi
-    fi
+    return 0
   else
-    if curl -L "${package_url}" -o "${package_file}"
-    then
-      return 0
-    else
-      fail "Downloading ${package_name} from '${package_url}' to '${package_file}' failed "
-    fi
+    log "${package_file} does not match md5 ${package_md5}, removing and downloading."
+    remove_files "${archives_path}/${package_file}"
   fi
+
+  fetch_uri "${package_url}" "${archives_path}/${package_file}"
 }
 
 #
@@ -498,7 +485,8 @@ package_fetch()
 #
 package_extract()
 {
-  extract_archive "${package_file}" "${source_path}"
+  enter "${source_path}"
+  extract_archive "${archives_path}/${package_file}" "${source_path}"
 }
 
 #

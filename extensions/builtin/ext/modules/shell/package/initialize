@@ -7,6 +7,7 @@ declare -a package_dependencies
 
 true "${package_name:=${extension}}" \
   "${source_path:="${bdsm_path}/src"}" \
+  "${archives_path:="${bdsm_path}/archives"}" \
   "${install_base_path:="${packages_path}/${package_name}"}" \
   ${static_flag:=0}
 

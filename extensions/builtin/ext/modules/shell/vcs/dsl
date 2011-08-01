@@ -166,12 +166,34 @@ github_get()
   write "${_url}" to "${_target}/.uri"
 }
 
-# ## scm\_get()
+archive_get() {
+  local _url="$1" _target="$2"
+  shift
+  shift
+  if curl -L "${_url}" -o "${_target}"
+  then
+    return 0
+  else
+    log "Downloading ${package_name} from '${package_url}' to '${package_file}' failed "
+    return 1
+  fi
+}
+
+is_archive_uri() {
+  case "$1" in
+    *.tar*|*.tgz*|*.txz*|*.xz*|*.bz2*|*.gz*|*.zip*)
+      return 0
+      ;;
+  esac
+  [[ -f "$1" ]]
+}
+
+# ## fetch\_uri()
 #
 #
 #
 # Code Walkthrough
-scm_get()
+fetch_uri()
 {
   trap trace_filter RETURN
   trace_filter vcs
@@ -184,11 +206,13 @@ scm_get()
     scm_type='directory'
     directory_get "$@"
     return $?
-  elif file_exists "$1" # check for packages
+
+  elif is_archive_uri "$1" # check for packages
   then
     scm_type='package'
-    NIY "File scm_update"
+    archive_get "$@"
     return $?
+
   elif is_github_url "$1" # check for pattern user/repository from github
   then
     scm_type='github'

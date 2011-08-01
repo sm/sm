@@ -4,7 +4,7 @@ cleanse_paths=(
   extensions/core extensions/pkg extensions/srv extensions/ext extensions/mod
   external completion modules bin extensions/builtin
 )
-directories=( bin completion )
+directories=( bin )
 files=( LICENSE VERSION README.md )
 aux_paths=( log tmp src )
 configs=( user ) # TODO move this to /etc/bdsm/ and/or $HOME/.bdsm/

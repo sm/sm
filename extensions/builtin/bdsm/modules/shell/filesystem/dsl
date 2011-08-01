@@ -3338,26 +3338,26 @@ extract_archive()
 
     case "${_archive}" in
       *.tar.gz|*.tgz) # gzip
-        if ! tar zxf "${_archive}"
+        if ! tar zxf - < "${_archive}"
         then
           error "There was an error while extracting the archive '${_archive}'"
         fi
         ;;
       *tar.xz) # LZMA
         # TODO: if 'xz' command exists, use that, otherwise use tar J
-        if ! tar Jxf "${_archive}"
+        if ! tar Jxf - < "${_archive}"
         then
           error "There was an error while extracting the archive '${_archive}'"
         fi
         ;;
       *.tar.bz2) # bzip
-        if ! tar jxf "${_archive}"
+        if ! tar jxf - < "${_archive}"
         then
           error "There was an error while extracting the archive '${_archive}'"
         fi
         ;;
       *.zip)
-        if ! unzip "${_archive}" -d "${_path:-}"
+        if ! unzip "${_archive}" -d "${source_path:-}"
         then
           error "There was an error while extracting the archive '${_archive}'"
         fi
@@ -3369,7 +3369,6 @@ extract_archive()
   else
     fail "Cannot extract an archive to target location as no archive was given."
   fi
-
 }
 
 #

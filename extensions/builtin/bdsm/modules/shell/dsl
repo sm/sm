@@ -160,7 +160,8 @@ install_bdsm_scm()
 
   modules ext/vcs
 
-  scm_get "${owner}/bdsm" "${src_path}/${dir}"
+  # TODO: This should update to/from repos path and/or archives path...
+  fetch_uri "${owner}/bdsm" "${src_path}/${dir}"
 
   if (( ${sense_of_humor_flag:=0} == 1 ))
   then
