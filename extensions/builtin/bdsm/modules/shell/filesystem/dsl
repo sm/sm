@@ -966,6 +966,9 @@ move_directory()
 # ### Code Walkthrough
 move_file()
 {
+  trap trace_filter RETURN
+  trace_filter move_file
+
   # Declare the source, target, mode, owner and token local variables.
   local _source _target _mode _owner token
 
@@ -3480,5 +3483,56 @@ write()
     fi
   else
     fail "Cannot log a message as no message was given."
+  fi
+}
+
+#
+# ## full_path()
+#
+# return full path to given directory.
+#
+# ### Input Parameters
+#
+# path.
+#
+# ### Stream Outputs
+#
+# full path
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success
+#
+# ### Failure Scenarios
+#
+# Fails if no arguments are given.
+# Fails if given path does not exists
+#
+# ### Usage Examples
+#
+# user$ cd ; bdsm call full_path test
+# /home/user/test
+#
+full_path()
+{
+  local _path="$1"
+
+  if variable_is_nonempty _path
+  then
+    if path_exists "${_path}"
+    then
+      (
+        builtin cd "${_path}"
+        pwd
+      )
+    else
+      fail "Path '${_path}' does not seam to be a valid path"
+    fi
+  else
+    fail "Can not go to path as no path was given"
   fi
 }
