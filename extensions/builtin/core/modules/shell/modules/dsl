@@ -24,7 +24,8 @@ detect_module()
   _module_path=( $(rebuild_path "modules/shell" $extensions_path $@ ) )
 
   if [[ -d "${_module_path}" ]] &&
-    [[ -s "${_module_path}/dsl" ]]
+    ( [[ -s "${_module_path}/dsl" ]] || [[ -s "${_module_path}/modules" ]] )
+  fi
   then
     module_path=${_module_path}
     module_name=$(echo -n $@ | sed 's/ /\//g' )
