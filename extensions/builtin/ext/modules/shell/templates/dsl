@@ -407,9 +407,10 @@ templates_list_all() {
       ;;
   esac
   if (( ${#templates[@]} == 0 ))
+  then
     log "No templates found"
     templates_help
-  then
+  fi
   for template in ${templates[@]}
   do
     if [[ ! "$template" =~ ".settings" ]]
