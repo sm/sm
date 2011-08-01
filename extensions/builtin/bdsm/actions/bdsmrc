@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-modules std/templates std/time project
+modules ext/templates ext/time project
 
 if template_exists "bdsm/bdsmrc"
 then

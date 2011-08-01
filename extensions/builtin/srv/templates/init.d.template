@@ -22,7 +22,7 @@ source "{{modules_path}}/shell/core/initialize"
 # Set the service extension name
 export service="{{service}}"
 
-modules std/service # Load the service module.
+modules ext/service # Load the service module.
 
 service_init_d
 
