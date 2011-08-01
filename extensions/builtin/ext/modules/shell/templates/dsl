@@ -392,24 +392,23 @@ templates_list() {
 
 templates_list_all() {
   local template templates all
-  case "x${extension_args[0]}" in
+  case "x$1" in
     xall)
-      templates=( $( ls *_.* ) )
+      templates=( $( ls *_.* 2>/dev/null || true ) )
       all="all"
       ;;
     x)
-      templates=( $( ls *_.* ) )
+      templates=( $( ls *_.* 2>/dev/null || true ) )
       all=""
       ;;
     *)
-      templates=( $( ls "${extension_args[@]}" ) )
+      templates=( $( ls "$@" 2>/dev/null || true ) )
       all="all"
       ;;
   esac
   if (( ${#templates[@]} == 0 ))
   then
-    log "No templates found"
-    templates_help
+    error "No templates found\n"
   fi
   for template in ${templates[@]}
   do
@@ -422,8 +421,8 @@ templates_list_all() {
 
 templates_apply_one()
 {
-  local target="${extension_args[0]}" target_new="${extension_args[0]}.$$"
-  local key="${extension_args[0]}" template="${target/_*./_.}"
+  local target="$1" target_new="$1.$$"
+  local key="$1" template="${1/_*./_.}"
   local settings="${template}.settings" replacements
 
   cp -f $template $target_new
@@ -442,7 +441,7 @@ templates_apply_one()
 
 templates_apply_all()
 {
-  local list template first="${extension_args[0]}"
+  local list template first="$1"
 
   if [[ $# -lt 1 ]]
   then
@@ -453,7 +452,7 @@ templates_apply_all()
   then
     list=( $(hash_keys ${first}.settings) )
   else
-    list=( ${extension_args[@]} )
+    list=( $@ )
   fi
 
   for template in "${list[@]}"
@@ -469,8 +468,8 @@ templates_apply_all()
 
 templates_apply_diff()
 {
-  local target="${extension_args[0]}" target_new="${extension_args[0]}.new"
-  local key="${extension_args[0]}" template="${target/_*./_.}"
+  local target="$1" target_new="$1.new"
+  local key="$1" template="${target/_*./_.}"
   local settings="${template}.settings" replacements
 
   cp -f $template $target_new
@@ -483,18 +482,18 @@ templates_apply_diff()
 
 templates_apply_diffs()
 {
-  local list template first="${extension_args[0]}"
+  local list template
 
-  if (( ${#extension_args[0]} == 0 ))
+  if (( $# <= 1 ))
   then
     error "Please provide template or target name!"
   fi
 
-  if [[ "$first" == "${first/_*./_.}" && -f "$first" ]]
+  if [[ "$1" == "${1/_*./_.}" && -f "$1" ]]
   then
-    list=( $(hash_keys ${first}.settings) )
+    list=( $(hash_keys $1.settings) )
   else
-    list=( ${extension_args[@]} )
+    list=( $@ )
   fi
 
   for template in "${list[@]}"
