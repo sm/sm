@@ -33,3 +33,6 @@ branch="master"
 
 # The tag of your application, if any.
 # tag="v1.0.0"
+
+# Temporary scm_get path
+export scm_path=~/shared/scm

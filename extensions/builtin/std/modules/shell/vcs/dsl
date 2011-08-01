@@ -62,8 +62,10 @@ directory_get()
 # Code Walkthrough
 git_get()
 {
-  local initial_pwd="$PWD" _url=$1 _target=$2 branch=${3:-master} remote=${4:-origin}
-  variables_must_be_nonempty _url _target
+  local initial_pwd="$PWD" _url=$1 _final_target=$2 branch=${3:-master} remote=${4:-origin}
+  variables_must_be_nonempty _url _final_target
+
+  local _target="${scm_path}/$( scm_identifier "${_url}" )"
 
   if path_exists "$_target/.git"
   then
@@ -75,7 +77,7 @@ git_get()
     then
       if ! (
         builtin cd "${repo_path}"
-        git checkout -b "${branch}" --track "${remote}/${branch}" >/dev/null 2>&1
+        git checkout -b "${branch}" --track "${remote}/${branch}" 2>&1 >/dev/null
         )
       then
         error "$remote $branch remote branch not found."
@@ -93,19 +95,19 @@ git_get()
 
     if ! (
       builtin cd "${repo_path}"
-      git pull --rebase origin $branch >/dev/null 2>&1
+      git pull --rebase origin $branch 2>&1 >/dev/null
       )
     then
       fail "Git pull failed."
     fi
   else
     ensure_paths_exist "${_target}"
-    if git clone --depth 1 ${_url} "${_target}" >/dev/null 2>&1
+    if git clone --depth 1 ${_url} "${_target}" 2>&1 >/dev/null
     then
       echo "${_url}" > "${_target}/.uri"
     else
       local _url_https="${_url/git:\/\//https:\/\/}"
-      if git clone --depth 1 ${_url_https} "${_target}" >/dev/null 2>&1
+      if git clone --depth 1 ${_url_https} "${_target}" 2>&1 >/dev/null
       then
         write "${_url_https}" to "${_target}/.uri"
       else
@@ -113,6 +115,13 @@ git_get()
       fi
     fi
   fi
+  rm -rf "${_final_target}" 2>&1 >/dev/null
+
+  if ! cp -r "${_target}" "${_final_target}" 2>&1 >/dev/null
+  then
+    fail "There was an error copying '${_target}' -> '${_final_target}'"
+  fi
+
   enter "$initial_pwd"
 }
 
