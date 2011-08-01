@@ -394,15 +394,15 @@ templates_list_all() {
   local template templates all
   case "x$1" in
     xall)
-      templates=( $( ls *_.* 2>/dev/null || true ) )
+      templates=( $( ls -1d *_.* 2>/dev/null || true ) )
       all="all"
       ;;
     x)
-      templates=( $( ls *_.* 2>/dev/null || true ) )
+      templates=( $( ls -1d *_.* 2>/dev/null || true ) )
       all=""
       ;;
     *)
-      templates=( $( ls "$@" 2>/dev/null || true ) )
+      templates=( $( ls -1d "$@" 2>/dev/null || true ) )
       all="all"
       ;;
   esac
@@ -443,7 +443,7 @@ templates_apply_all()
 {
   local list template first="$1"
 
-  if [[ $# -lt 1 ]]
+  if (( $# < 1 ))
   then
     error "please provide template or target name!"
   fi
@@ -452,7 +452,7 @@ templates_apply_all()
   then
     list=( $(hash_keys ${first}.settings) )
   else
-    list=( $@ )
+    list=( $( ls -1d $@ ) )
   fi
 
   for template in "${list[@]}"
@@ -484,7 +484,7 @@ templates_apply_diffs()
 {
   local list template
 
-  if (( $# <= 1 ))
+  if (( $# < 1 ))
   then
     error "Please provide template or target name!"
   fi
@@ -493,7 +493,7 @@ templates_apply_diffs()
   then
     list=( $(hash_keys $1.settings) )
   else
-    list=( $@ )
+    list=( $( ls -1d $@ ) )
   fi
 
   for template in "${list[@]}"
