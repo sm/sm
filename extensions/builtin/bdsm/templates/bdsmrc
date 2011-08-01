@@ -25,6 +25,7 @@ export RAILS_ENV="$environment"
 export project="{{project}}"
 
 # The repository URL that is used to retrieve the code.
+# For Github use shortcut: user/repository
 repository_url="{{repository_url}}"
 
 # The branch of your application

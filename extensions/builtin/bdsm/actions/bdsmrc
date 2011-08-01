@@ -23,7 +23,7 @@ then
   #       ~/.bdsm/project/config/defaults
   #
 
-  true  "${repository_url:="git@github.com:username/repository.git"}"
+  true  "${repository_url:="username/repository"}"
 
   install_template "bdsm/bdsmrc" to "$HOME/.bdsmrc"
 
@@ -32,5 +32,5 @@ then
     repository_url "$repository_url" \
     environment "$environment"
 else
-  fail "The template file $extension_templates_path/bdsmrc is missing."
+  fail "The template bdsm/bdsmrc is missing."
 fi
