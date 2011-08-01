@@ -74,7 +74,8 @@ extend_name_uri()
   extension_identifier="$(scm_identifier "${extension_uri}")"
   extension_src_path="${extensions_src_path}/${extension_identifier}"
 
-  scm_get "${extension_uri}" "${extension_src_path}"
+  # TODO: This should update to/from repos path and/or archives path...
+  fetch_uri "${extension_uri}" "${extension_src_path}"
   extension_install "${name}" "${extension_identifier}"
 }
 
@@ -83,7 +84,7 @@ extend_help()
   modules bdsm/help
 
   description "install BDSM extension"
-  
+
   action "extend <uri> <name>" \
     "Install given extension from uri to name"
 
@@ -134,7 +135,8 @@ update_internal_extensions()
   local _url="$1"
   local _identifier="$(scm_identifier "${_url}")"
   enter "${bdsm_path}/extensions"
-  scm_get "${_url}" "${bdsm_path}/src/${_identifier}"
+  # TODO: This should update to/from repos path and/or archives path...
+  fetch_uri "${_url}" "${bdsm_path}/src/${_identifier}"
   log "Installing internal extensions"
   remove_paths "internal"
   copy_directory "${bdsm_path}/src/${_identifier}" to "internal"

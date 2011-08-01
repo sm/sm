@@ -150,7 +150,7 @@ settings_search_path_update()
   then
     if file_exists "${path}/.uri"
     then
-      scm_get "$(cat "${path}/.uri")" "${path}" >&2
+      fetch_uri "$(cat "${path}/.uri")" "${path}" >&2
     fi
     settings_search_path_cache+=( "${path}" )
   fi
