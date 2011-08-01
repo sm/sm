@@ -422,8 +422,9 @@ templates_list_all() {
 
 templates_apply_one()
 {
-  local target="${extension_args[0]}" target_new="${extension_args[0]}.$$" key="${extension_args[0]}"
-  local template="${target/_*./_.}" settings="${template}.settings" replacements
+  local target="${extension_args[0]}" target_new="${extension_args[0]}.$$"
+  local key="${extension_args[0]}" template="${target/_*./_.}"
+  local settings="${template}.settings" replacements
 
   cp -f $template $target_new
   hash_read $settings $key replacements
@@ -468,8 +469,9 @@ templates_apply_all()
 
 templates_apply_diff()
 {
-  local target="${extension_args[0]}" target_new="${extension_args[0]}.new" key="${extension_args[0]}"
-  local template="${target/_*./_.}" settings="${template}.settings" replacements
+  local target="${extension_args[0]}" target_new="${extension_args[0]}.new"
+  local key="${extension_args[0]}" template="${target/_*./_.}"
+  local settings="${template}.settings" replacements
 
   cp -f $template $target_new
   hash_read $settings $key replacements
