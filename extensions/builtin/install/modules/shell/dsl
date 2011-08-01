@@ -206,7 +206,8 @@ setup_shell_completion()
       ensure_paths_exist "/etc/profile.d/"
     fi
 
-    copy_file from "${install_path}/completion/bdsm.bash" \
+    copy_file \
+      from "${install_path}/extensions/builtin/bdsm/modules/shell/completion/bash" \
       to "${completion_prefix}/bdsm-completion.sh" \
       mode 0755 owner "root"
   fi
