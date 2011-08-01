@@ -158,8 +158,10 @@ is_github_url()
 github_get()
 {
   local _url="$1" _target="$2"
+  shift
+  shift
   # use git for fetching github repo
-  git_get "git://github.com/${_url}.git" "${_target}"
+  git_get "git://github.com/${_url}.git" "${_target}" "$@"
   # and overwrite repo uri
   write "${_url}" to "${_target}/.uri"
 }
