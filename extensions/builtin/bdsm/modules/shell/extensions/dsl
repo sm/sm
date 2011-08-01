@@ -284,6 +284,8 @@ extension_run()
 {
   local _type="${action_type:-}" _path="${action_path:-}" _namespaces
 
+  builtin cd "${initial_pwd}"
+
   # Now based on the determined _type we launch the extension.
   case "${_type}" in
     function)
