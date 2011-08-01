@@ -989,6 +989,7 @@ extension_package()
         then
           if tar cf "${_name}-${_version}.tar" "${_name}/"
           then
+            # TODO: parallelize this.
             ${archiver} -f -9 "${_name}-${_version}.tar"
           else
             error "There was an error ($?) while trying to create a tar of the '${_name}' directory while packaging."

@@ -6,7 +6,9 @@
 true \
   "${prefix_path:="/usr/local"}" \
   "${bin_path:="${prefix_path}/bin"}" \
-  "${source_path:="${prefix_path}/src"}" \
+  "${src_path:="${bdsm_path}/src"}" \
+  "${md5_path:="${bdsm_path}/md5"}" \
+  "${archives_path:="${bdsm_path}/archives"}" \
   "${archive_format:=tar.gz}" \
   "${package_name:=${extension}}" \
   "${repository_url:="git://github.com/wayneeseguin/bdsm"}"

@@ -122,11 +122,12 @@ package_extension()
 
   enter "$releases_path"
 
-  tar zcvf "$release_name".tar.gz "$release_name/"
-  file_md5 "${release_name}.tar.gz" > "${release_name}.tar.gz.md5"
+  # TODO: sha1 also.
+  tar zcvf "${archives_path}/$release_name".tar.gz "$release_name/"
+  file_md5 "${archives_path}/${release_name}.tar.gz" > "${archives_path}/${release_name}.tar.gz.md5"
 
-  tar jcvf "$release_name".tar.bz2 "$release_name/"
-  file_md5 "${release_name}.tar.bz2" > "${release_name}.tar.bz2.md5"
+  tar jcvf "${archives_path}/$release_name".tar.bz2 "$release_name/"
+  file_md5 "${archives_path}/${release_name}.tar.bz2" > "${archives_path}/${release_name}.tar.bz2.md5"
 
   remove_paths "${release_name}/"
 
@@ -160,27 +161,24 @@ get_latest()
 
 get_version()
 {
-  version="$1"
+  local version="$1" releases_url="https://bdsm.beginrescueend.com/releases"
 
-  md5=$(
-  curl -B http://bdsm.beginrescueend.com/releases/bdsm-${version}.tar.gz.md5 \
-    2>/dev/null
-  )
+  md5=$( curl -B ${releases_url}/bdsm-${version}.tar.gz.md5 2>/dev/null )
 
   echo "bdsm-${version}"
 
   archive="$archives_path/bdsm-${version}.tar.gz"
 
-  curl -L "http://bdsm.beginrescueend.com/releases/bdsm-${version}.tar.gz" \
-    -o "$archive"
-  case "$(uname)" in
-    Darwin|FreeBSD)
+  curl -L "${releases_url}/bdsm-${version}.tar.gz" -o "$archive"
+
+  case "$OSTYPE" in
+    darwin*|*freebsd*)
       archive_md5="$(/sbin/md5 -q "${archive}")"
       ;;
-    OpenBSD)
+    *bsd*)
       archive_md5="$(/bin/md5 -q "${archive}")"
       ;;
-    Linux|*)
+    linux*|*)
       archive_md5="$(md5sum "${archive}" | awk '{print $1}')"
       ;;
   esac
@@ -192,7 +190,7 @@ get_version()
       "Aborting BDSM Installation."
   fi
 
-  tar zxf "${path}/archives/bdsm-${version}.tar.gz" -C "$extensions_src_path/"
+  tar zxf "${archives_path}/bdsm-${version}.tar.gz" -C "$extensions_src_path/"
 
   (
   builtin cd "$src_path/bdsm-${version}"
