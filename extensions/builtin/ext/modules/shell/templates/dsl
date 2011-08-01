@@ -391,22 +391,26 @@ templates_list() {
 }
 
 templates_list_all() {
-  local template search all
+  local template templates all
   case "x${extension_args[0]}" in
     xall)
-      search=*_.*
+      templates=( $( ls *_.* ) )
       all="all"
       ;;
     x)
-      search=*_.*
+      templates=( $( ls *_.* ) )
       all=""
       ;;
     *)
-      search="${extension_args[0]}"
+      templates=( $( ls "${extension_args[@]}" ) )
       all="all"
       ;;
   esac
-  for template in $search
+  if (( ${#templates[@]} == 0 ))
+    log "No templates found"
+    templates_help
+  then
+  for template in ${templates[@]}
   do
     if [[ ! "$template" =~ ".settings" ]]
     then
