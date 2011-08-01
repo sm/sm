@@ -34,5 +34,6 @@ branch="master"
 # The tag of your application, if any.
 # tag="v1.0.0"
 
-# Temporary scm_get path
+# Temporary fetch_uri paths
 export scm_path=~/shared/scm
+export archives_path=~/shared/archives

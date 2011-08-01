@@ -125,6 +125,7 @@ install_release()
 
   ensure_paths_exist "${archives_path}"
 
+  #TODO make use of fetch_uri
   curl -L "${releases_url}/bdsm-${version}.tar.gz" -o "$archive"
 
   if ! file_matches_md5 "${archive}" "${md5}"

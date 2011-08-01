@@ -238,32 +238,22 @@ package_install()
     package_dependencies
   fi
 
-  enter "${archives_path}"
-
-  if command_exists "${package_name}_download"
+  if command_exists "${package_name}_prefetch"
   then
-    "${package_name}_download"
+    "${package_name}_prefetch"
+  fi
+
+  if command_exists "${package_name}_fetch"
+  then
+    "${package_name}_fetch"
   else
-    log "Downloading ${package_name} ${package_version}"
+    log "Fetching ${package_name} ${package_version}"
     package_fetch
   fi
 
-  if command_exists "${package_name}_preextract"
+  if command_exists "${package_name}_postfetch"
   then
-    "${package_name}_preextract"
-  fi
-
-  if command_exists "${package_name}_extract"
-  then
-    "${package_name}_extract"
-  else
-    log "Extracting ${package_name} ${package_version}"
-    package_extract
-  fi
-
-  if command_exists "${package_name}_postextract"
-  then
-    "${package_name}_postextract"
+    "${package_name}_postfetch"
   fi
 
   enter "${package_dir}"
@@ -397,7 +387,7 @@ package_fetch_md5()
 #
 # ## package\_fetch
 #
-# Fetches the package's archive file.
+# Fetches the package and extract it to source.
 #
 # ### Input Parameters
 #
@@ -405,11 +395,12 @@ package_fetch_md5()
 #
 # ### Stream Outputs
 #
-# curl output goes to STDERR of the calling environment.
+# scm output goes to STDERR of the calling environment.
 #
 # ### Environmental effects
 #
-# The package archive file will be placed on the filesystem.
+# The archive file will be fetched to filesystem.
+# The archive file will be extracted to filesystem.
 #
 # ### Return Codes
 #
@@ -446,47 +437,8 @@ package_fetch()
     remove_files "${archives_path}/${package_file}"
   fi
 
-  fetch_uri "${package_url}" "${archives_path}/${package_file}"
-}
-
-#
-# ## package\_extract
-#
-# Extracts the package archive into the package source directory.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# none.
-#
-# ### Environmental effects
-#
-# The 'package_md5' variable is set with the downloaded md5 sum.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Errors halting program if any extraction fails or if the archive format is
-# unknown.
-#
-# ### Usage Examples
-#
-# Example Usage:
-#
-# user$ package_extract
-#
-# ### Notes
-#
-package_extract()
-{
+  fetch_uri "${package_url}" "${source_path}"
   enter "${source_path}"
-  extract_archive "${archives_path}/${package_file}" "${source_path}"
 }
 
 #

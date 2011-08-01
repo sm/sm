@@ -167,25 +167,68 @@ github_get()
 }
 
 archive_get() {
-  local _url="$1" _target="$2"
+  local _url="$1" _final_target="$2"
+  local _archive="${archives_path}/${_url##*/}"
   shift
   shift
-  if curl -L "${_url}" -o "${_target}"
+
+  if [[ -f "${_url}" ]]
   then
-    return 0
+    if copy_file --force "${_url}" to "${_archive}"
+    then
+      return 0
+    else
+      log "Copying from '${_url}' to '${_archive}' failed "
+      return 1
+    fi
   else
-    log "Downloading ${package_name} from '${package_url}' to '${package_file}' failed "
-    return 1
+    if curl -L "${_url}" -o "${_archive}"
+    then
+      return 0
+    else
+      log "Downloading from '${_url}' to '${_archive}' failed "
+      return 1
+    fi
+  fi
+
+  rm -rf "${_final_target}" || true
+  ensure_path_exists "${_final_target}"
+  enter "${_final_target}"
+
+  case "${_archive}" in
+    *.tar) # tar
+      tar xf "${_archive}" || error "There was an error while extracting the archive '${_archive}'"
+      ;;
+    *.tar.gz|*.tgz) # gzip
+      tar zxf "${_archive}" || error "There was an error while extracting the archive '${_archive}'"
+      ;;
+    *.tar.bz2|*.tbz2) # bzip
+      tar jxf "${_archive}" || error "There was an error while extracting the archive '${_archive}'"
+      ;;
+    *.tar.xz) # LZMA
+      # TODO: if 'xz' command exists, use that, otherwise use tar J
+      tar Jxf "${_archive}" || error "There was an error while extracting the archive '${_archive}'"
+      ;;
+    *.zip)
+      unzip "${_archive}" || error "There was an error while extracting the archive '${_archive}'"
+      ;;
+    *)
+      error "Unknown archive format for ${_archive}"
+      ;;
+  esac
+
+  if ! ls -d * &>/dev/null
+  then
+    error "Empty archive ${_archive}"
   fi
 }
 
 is_archive_uri() {
   case "$1" in
-    *.tar*|*.tgz*|*.txz*|*.xz*|*.bz2*|*.gz*|*.zip*)
+    *.tar|*.tgz|*.txz|*.tbz2|*.tar.xz|*.tar.bz2|*.tar.gz|*.zip)
       return 0
       ;;
   esac
-  [[ -f "$1" ]]
 }
 
 # ## fetch\_uri()
@@ -197,6 +240,8 @@ fetch_uri()
 {
   trap trace_filter RETURN
   trace_filter vcs
+
+  [[ $# -ge 2 ]] || fail "Missing params _uri _target"
 
   log "${log_prefix}Fetching $1"
   unset scm_type

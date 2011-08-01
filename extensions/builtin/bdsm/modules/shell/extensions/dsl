@@ -389,7 +389,7 @@ extension_action()
 
   unset extension action
 
-  log_todo "Should be moved to core/cli?"
+  #TODO: Should be moved to core/cli?
   case "${extension_args[0]}" in
     *=*) # exact version specifier
       package_name="${extension_args[0]}"

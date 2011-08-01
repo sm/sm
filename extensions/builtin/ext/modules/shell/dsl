@@ -31,21 +31,6 @@ md5_match()
   fi
 }
 
-fetch_tarball()
-{
-  curl \
-    -L "${releases_url}/${extension}-${extension_version}.tar.bz2" \
-    -o "${extensions_src_path}/${extension}-${extension_version}.tar.bz2"
-
-  # TODO: md5 check using fetch_md5() and md5_match()
-
-  tar \
-    xf "${extensions_src_path}/${extension_version}.tar.bz2" \
-    -C "${extensions_src_path}/extensions"
-
-  enter "${extensions_src_path}/${extension}-${extension_version}"
-}
-
 #
 # Package given extension.
 #
@@ -137,76 +122,6 @@ package_extension()
 get_help()
 {
   cat -v "$help_path/get"
-}
-
-#
-# TODO: There is a lot of redundency in the get_{X}(), reduce it.
-#
-get_latest()
-{
-  local version_url stable_version archive
-
-  version_url="${releases_url}/version.txt"
-
-  stable_version=$(curl -s $version_url)
-
-  ensure_paths_exist "$src_path/"
-
-  # NOTE: This is the content as in binmodules/bdsm-update-latest
-
-  version=$(curl -B $version_url 2>/dev/null)
-
-  get_version $stable_version
-}
-
-get_version()
-{
-  local version="$1" releases_url="https://bdsm.beginrescueend.com/releases"
-
-  md5=$( curl -B ${releases_url}/bdsm-${version}.tar.gz.md5 2>/dev/null )
-
-  echo "bdsm-${version}"
-
-  archive="$archives_path/bdsm-${version}.tar.gz"
-
-  curl -L "${releases_url}/bdsm-${version}.tar.gz" -o "$archive"
-
-  case "$OSTYPE" in
-    darwin*|*freebsd*)
-      archive_md5="$(/sbin/md5 -q "${archive}")"
-      ;;
-    *bsd*)
-      archive_md5="$(/bin/md5 -q "${archive}")"
-      ;;
-    linux*|*)
-      archive_md5="$(md5sum "${archive}" | awk '{print $1}')"
-      ;;
-  esac
-
-  if [[ "$archive_md5" != "$md5" ]]
-  then
-    error "Archive package bdsm-${version}.tar.gz downloaded does not "\
-      "match it's md5 checksum ${md5}." \
-      "Aborting BDSM Installation."
-  fi
-
-  tar zxf "${archives_path}/bdsm-${version}.tar.gz" -C "$extensions_src_path/"
-
-  (
-  builtin cd "$src_path/bdsm-${version}"
-  chmod +x ./install
-  ./install
-  )
-
-  log "Installed BDSM version:"
-  (
-  source $modules_path/bdsm
-  bdsm --version
-  )
-
-  hook="after_update"
-
-  source "$modules_path/hook"
 }
 
 #TODO: this code should be distributed to proper places
