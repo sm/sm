@@ -251,12 +251,12 @@ package_install()
     package_fetch
   fi
 
+  enter "${source_path}/${package_dir}"
+
   if command_exists "${package_name}_postfetch"
   then
     "${package_name}_postfetch"
   fi
-
-  enter "${package_dir}"
 
   if command_exists "${package_name}_patch"
   then
@@ -437,8 +437,7 @@ package_fetch()
     remove_files "${archives_path}/${package_file}"
   fi
 
-  fetch_uri "${package_url}" "${source_path}"
-  enter "${source_path}"
+  fetch_uri "${package_url}" "${source_path}/${package_dir}"
 }
 
 #

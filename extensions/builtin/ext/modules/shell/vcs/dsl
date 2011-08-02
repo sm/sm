@@ -174,26 +174,22 @@ archive_get() {
 
   if [[ -f "${_url}" ]]
   then
-    if copy_file --force "${_url}" to "${_archive}"
+    if ! copy_file --force "${_url}" to "${_archive}"
     then
-      return 0
-    else
       log "Copying from '${_url}' to '${_archive}' failed "
       return 1
     fi
   else
-    if curl -L "${_url}" -o "${_archive}"
+    if ! curl -L "${_url}" -o "${_archive}"
     then
-      return 0
-    else
       log "Downloading from '${_url}' to '${_archive}' failed "
       return 1
     fi
   fi
 
   rm -rf "${_final_target}" || true
-  ensure_path_exists "${_final_target}"
-  enter "${_final_target}"
+  mkdir -p "${_final_target}"
+  builtin cd "${_final_target}"
 
   case "${_archive}" in
     *.tar) # tar
