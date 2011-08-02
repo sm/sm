@@ -224,6 +224,18 @@ package_install()
 {
   variables_must_be_nonempty package_name package_version archive_format
 
+  if symlink_exists "${packages_path}/${package_name}/active" \
+  && [[ "$1" != "--force" ]]
+  then
+    log "
+Package ${package_name} ${package_version} already installed
+To force call:
+
+  bdsm ${package_name} package install --force
+"
+    exit 0
+  fi
+
   true "${package_dir:="${package_name}-${package_version}"}"
 
   ensure_paths_exist "${source_path}"
