@@ -38,6 +38,16 @@ do
       debug_flag=1
       ;;
 
+    --module=*)
+      preload_modules+=( ${token##--module=} )
+      ;;
+
+    --call=*)
+      call_action="${token##--call=}"
+      [[ "$call_action" =~ \/ ]] && preload_modules+=( ${call_action%/*} ) || true
+      call_action="${call_action##*/}"
+      ;;
+
     --)
       shift #end of processing
       extension_args=("$@")

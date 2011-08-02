@@ -14,3 +14,9 @@ do
   module_path="${module_def//*=}"
   log_search preload "$module_name" "${module_path}"
 done
+
+for module in ${preload_modules[@]}
+do
+  module_or_error ${module} \
+    "Can not load preload_module: ${module}"
+done

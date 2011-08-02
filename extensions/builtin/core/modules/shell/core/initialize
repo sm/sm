@@ -54,6 +54,9 @@ true \
   "${active_path:="${packages_path}/active"}" \
   "${extension_args:=""}"
 
+# Make sure preload_modules is an array
+export preload_modules=( ${preload_modules[@]} )
+
 if [[ -d "${active_path}/bin" ]]
 then
   export PATH="${active_path}/bin:${active_path}/sbin:${PATH}"
@@ -81,6 +84,16 @@ if [[ -n $bdsm_script ]]
 then
   # load script
   . $bdsm_script
+elif [[ -n "${call_action}" ]]
+then
+  if ! declare -F "${call_action}" >/dev/null
+  then
+    error "${call_action} is not a valid function name"
+  else
+    trace_filter action
+    "${call_action}" "${extension_args[@]}"
+    trace_filter
+  fi
 elif set | grep '^extension_args=(' >/dev/null
 then
   case "${extension_args[0]}" in

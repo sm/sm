@@ -49,7 +49,7 @@ directory_get()
 
   if cp -r ${_source} "${_target}" >/dev/null 2>&1
   then
-    write "$(cd "${_source}"; pwd)" to "${_target}/.uri"
+    echo "$(cd "${_source}"; pwd)" > "${_target}/.uri"
   else
     fail "There was an error copying '${_source}'"
   fi
@@ -67,7 +67,14 @@ git_get()
 
   local _target="${scm_path}/$( scm_identifier "${_url}" )"
 
-  if path_exists "$_target/.git"
+  _final_target=$(
+    builtin cd "${initial_pwd}"
+    mkdir -p "${_final_target}"
+    builtin cd "${_final_target}"
+    pwd
+  )
+
+  if [[ -d "$_target/.git" ]]
   then
     builtin cd "${_target}"
     git checkout master -f -q 2>&1 >/dev/null
@@ -101,7 +108,7 @@ git_get()
       fail "Git pull failed."
     fi
   else
-    ensure_paths_exist "${_target}"
+    mkdir -p "${_target}"
     if git clone --depth 1 ${_url} "${_target}" 2>&1 >/dev/null
     then
       echo "${_url}" > "${_target}/.uri"
@@ -109,20 +116,21 @@ git_get()
       local _url_https="${_url/git:\/\//https:\/\/}"
       if git clone --depth 1 ${_url_https} "${_target}" 2>&1 >/dev/null
       then
-        write "${_url_https}" to "${_target}/.uri"
+        echo "${_url_https}" > "${_target}/.uri"
       else
         fail "There was an error while cloning the repository from the url '${_url}'"
       fi
     fi
   fi
+
   rm -rf "${_final_target}" 2>&1 >/dev/null
 
-  if ! cp -r "${_target}" "${_final_target}" 2>&1 >/dev/null
+  if ! cp -frT "${_target}" "${_final_target}" 2>&1 >/dev/null
   then
     fail "There was an error copying '${_target}' -> '${_final_target}'"
   fi
 
-  enter "$initial_pwd"
+  builtin cd "$initial_pwd"
 }
 
 hg_get()
@@ -163,7 +171,7 @@ github_get()
   # use git for fetching github repo
   git_get "git://github.com/${_url}.git" "${_target}" "$@"
   # and overwrite repo uri
-  write "${_url}" to "${_target}/.uri"
+  echo "${_url}" > "${_target}/.uri"
 }
 
 archive_get() {
@@ -225,6 +233,7 @@ is_archive_uri() {
       return 0
       ;;
   esac
+  return 1
 }
 
 # ## fetch\_uri()
@@ -242,7 +251,7 @@ fetch_uri()
   log "${log_prefix}Fetching $1"
   unset scm_type
 
-  if path_exists "$1" # check for directory
+  if [[ -d "$1" ]] # check for directory
   then
     scm_type='directory'
     directory_get "$@"
@@ -284,6 +293,11 @@ fetch_uri()
       error "Unknownn SCM for url '${_url}'"
       ;;
   esac
+}
+
+fetch()
+{
+  fetch_uri "$@"
 }
 
 scm_help()

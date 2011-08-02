@@ -43,8 +43,7 @@ project_initialize()
     : \
       "${shared_path:=${project_path}/shared}" \
       "${release_path:=${project_path}/current}" \
-      "${environment:="production"}" \
-      "${vcs:=$(vcs "${shared_path}/${project}")}"
+      "${environment:="production"}"
 
     # Set the project log path into the shared path's log directory
     project_log_path="$shared_path/log"
@@ -63,75 +62,3 @@ project_initialize()
     source_files ".${project}rc"
   fi
 }
-
-#
-# ## vcs()
-#
-# Detect and set the vcs, if any, for the current project.
-#
-# ### Input Parameters
-#
-# First parameter must be the path to a repository for determining the VCS.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# The environment variable 'vcs' will be set to the VCS detected, or 'git' by
-# default.
-#
-# ### Return Codes
-#
-# 0 for success
-#
-# ### Failure Scenarios
-#
-# Fails if no repository path is given.
-#
-# ### Usage Examples
-#
-#     user$ vcs /home/appuser/shared/appuser
-#     user$ echo $vcs
-#     git
-#
-# ##### Code Walkthrough
-vcs()
-{
-  # Store the first parameter in the path variable. This is the path that we
-  # will check to see what vcs it contains.
-  local _path="$1"
-
-  # if the path variable is nonempty
-  if variable_is_nonempty _path
-  then
-    # and if there is a .git directory in the given path
-    if path_exists "${_path}/.git"
-    then
-      # Then set the vcs variable to git.
-      vcs="git"
-
-    # and if there is a .svn directory in the given path
-    elif path_exists "${_path}/.svn"
-    then
-      # Then set the vcs variable to svn.
-      vcs="svn"
-
-    # and if there is a .hg directory in the given path
-    elif path_exists "${_path}/.hg"
-    then
-      # Then set the vcs variable to hg.
-      vcs="hg"
-
-      # # TODO: detect when vcs="fossil"
-    else
-      # otherwise default the scm to git
-      vcs="git"
-    fi
-  else
-    # Programming error, no path was passed in in order to determine the vcs
-    fail "Repository path must be given in order to detect the VCS used."
-  fi
-}
-
