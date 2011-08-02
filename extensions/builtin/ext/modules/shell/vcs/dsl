@@ -47,7 +47,7 @@ directory_get()
   variables_must_be_nonempty _source _target
   rm -rf "${_target}" 2>&1 >/dev/null
 
-  if cp -r ${_source} "${_target}" >/dev/null 2>&1
+  if cp -fR ${_source} "${_target}" >/dev/null 2>&1
   then
     echo "$(cd "${_source}"; pwd)" > "${_target}/.uri"
   else
@@ -125,7 +125,7 @@ git_get()
 
   rm -rf "${_final_target}" 2>&1 >/dev/null
 
-  if ! cp -frT "${_target}" "${_final_target}" 2>&1 >/dev/null
+  if ! cp -fR "${_target}" "${_final_target}" 2>&1 >/dev/null
   then
     fail "There was an error copying '${_target}' -> '${_final_target}'"
   fi
