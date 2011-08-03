@@ -9,3 +9,6 @@ update=package_update()
 
 package/info=package_info()
 info=package_info()
+
+package/activate=package_activate_action()
+activate=package_activate_action()

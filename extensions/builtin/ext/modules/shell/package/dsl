@@ -727,6 +727,15 @@ package_activate()
   package_setup "${_package}"
 }
 
+package_activate_action()
+{
+  if [[ -z "${package_version}" ]]
+  then
+    error "You need to specify version to activate:\n  bdsm ${package_name}:<version> activate\n  bdsm ${package_name} activate --version <version>"
+  fi
+  package_activate ${package_name} ${package_version}
+}
+
 #
 # ## package\_setup
 #
