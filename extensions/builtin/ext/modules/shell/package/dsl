@@ -393,6 +393,8 @@ package_fetch_md5()
       error "Fetching md5 from '${package_md5_url}' failed."
 
     package_md5=$(cat "${archives_path}/${package_file}.md5")
+
+    rm "${archives_path}/${package_file}.md5"
   fi
 }
 
