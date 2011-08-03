@@ -451,6 +451,12 @@ package_fetch()
   fi
 
   fetch_uri "${package_url}" "${source_path}/${package_dir}"
+
+  if [[ -d "${source_path}/${package_dir}/${package_dir}" ]]
+  then
+    eval mv "${source_path}/${package_dir}/${package_dir}/*" "${source_path}/${package_dir}/"
+    rm -rf "${source_path}/${package_dir}/${package_dir}/"
+  fi
 }
 
 #
