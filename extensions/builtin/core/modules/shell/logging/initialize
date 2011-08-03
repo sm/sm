@@ -11,7 +11,7 @@ set +o errexit
 # Persist error handler
 set -o errtrace
 # Call backtrace on error
-trap "backtrace \"A command has returned an not handled error code (nonzero return value).\"" ERR
+trap "backtrace \"A command has returned an not handled error code (\$?).\"" ERR
 # Exit on USR2 (send by backtrace to $APP_PID)
 trap 'exit 1' USR2
 # Store process pid for closing from backtrace

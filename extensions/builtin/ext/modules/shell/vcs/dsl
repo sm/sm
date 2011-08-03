@@ -221,6 +221,12 @@ archive_get() {
       ;;
   esac
 
+  if [[ -d "${_final_target##*/}" ]]
+  then
+    eval mv "${_final_target##*/}/*" .
+    rm -rf "${_final_target##*/}/"
+  fi
+
   if ! ls -d * &>/dev/null
   then
     error "Empty archive ${_archive}"

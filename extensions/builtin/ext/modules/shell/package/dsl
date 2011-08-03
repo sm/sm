@@ -441,7 +441,8 @@ package_fetch()
   package_fetch_md5
 
   if file_exists "${archives_path}/${package_file}" &&
-    file_matches_md5 "${archives_path}/${package_file}" "${package_md5:-#}"
+    file_matches_md5 "${archives_path}/${package_file}" "${package_md5:-#}" &&
+    path_exists "${source_path}/${package_dir}"
   then
     return 0
   else
