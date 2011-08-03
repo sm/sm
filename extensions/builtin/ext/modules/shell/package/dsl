@@ -259,7 +259,7 @@ To force call:
   then
     "${package_name}_fetch"
   else
-    log "Fetching ${package_name} ${package_version}"
+    #log "Fetching ${package_name} ${package_version}"
     package_fetch
   fi
 
@@ -440,17 +440,7 @@ package_fetch()
 
   package_fetch_md5
 
-  if file_exists "${archives_path}/${package_file}" &&
-    file_matches_md5 "${archives_path}/${package_file}" "${package_md5:-#}" &&
-    path_exists "${source_path}/${package_dir}"
-  then
-    return 0
-  else
-    log "${package_file} does not match md5 ${package_md5}, removing and downloading."
-    remove_files "${archives_path}/${package_file}"
-  fi
-
-  fetch_uri "${package_url}" "${source_path}/${package_dir}"
+  fetch_uri "${package_url}" "${source_path}/${package_dir}" "${package_md5:-#}"
 
   if [[ -d "${source_path}/${package_dir}/${package_dir}" ]]
   then
