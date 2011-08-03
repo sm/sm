@@ -180,6 +180,7 @@ archive_get() {
   shift
   shift
 
+  mkdir -p "${archives_path}"
   if [[ -f "${_url}" ]]
   then
     if ! copy_file --force "${_url}" to "${_archive}"
