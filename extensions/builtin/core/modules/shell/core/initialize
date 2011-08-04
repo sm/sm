@@ -90,7 +90,7 @@ then
   then
     error "${call_action} is not a valid function name"
   else
-    action "${call_action}" "${extension_args[@]}"
+    action_call "${call_action}" "${extension_args[@]}"
   fi
 elif set | grep '^extension_args=(' >/dev/null
 then

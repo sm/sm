@@ -486,7 +486,7 @@ trace_filter()
   fi
 }
 
-action()
+action_call()
 {
   trace_filter action
   "$@"

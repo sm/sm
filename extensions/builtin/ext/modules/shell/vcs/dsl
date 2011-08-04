@@ -301,7 +301,7 @@ fetch_uri()
       NIY "fossil scm_update"
       ;;
     (*)
-      error "Unknownn SCM for url '${_url}'"
+      error "Unknownn SCM for url '$1'"
       ;;
   esac
 }

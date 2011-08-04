@@ -296,7 +296,7 @@ extension_run()
         "${action##_*}_cli"
       fi
 
-      action ${action%%(*} "${extension_args[@]}"
+      action_call ${action%%(*} "${extension_args[@]}"
       ;;
 
     shell)
