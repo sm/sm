@@ -1,4 +1,4 @@
-0.8.1
+0.8.2
 * extensions/internal 3535f9c...bb7eea5 (26):
   > Do not allow remove paths to trigger revert.
   > revert is more indicative.
@@ -9,18 +9,9 @@
   > error handling, improved error recovery
   > add [after_]fail_stage support, improved error handling
   > logging and error handling
-  > compact code
   > move modules loading to modules file
-  > mysql uses dependent module actions
-  > replace 'log ... to ...' with 'write ... to ...'
-  > apply {core -> bdsm} modules change
-  > turn off openssl in nginx :(
-  > apply {core -> std} modules change
-  > make nginx working again
-  > enable utf8 in pcre
-  > Removed no longer necessary extend, instead we do:
-	> # bdsm internal update $PWD
-	> as root from within the cloned extensions repository.
+
+0.8.1
 
 0.8.0
 
