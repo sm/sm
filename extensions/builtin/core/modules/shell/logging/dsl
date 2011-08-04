@@ -496,6 +496,7 @@ action_source()
 {
   local script="$1"
   shift
+  [[ -r "$script" ]] || fail "Could not find script to run: $script."
   trace_filter action
   source "$script"
 }
