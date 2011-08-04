@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+
+bdsmrc_install()
+{
+  if template_exists "bdsm/bdsmrc"
+  then
+    if file_exists "$HOME/.bdsmrc"
+    then
+      timestamp_set
+
+      log "An existing $HOME/.bdsmrc file was found."
+      log "Reinaming it as ${HOME}/.bdsmrc.${timestamp} in order to preserve it."
+      log "Please examine the file and if it is not needed, remove it."
+
+      move_file "$HOME/.bdsmrc" to "$HOME/.bdsmrc.$timestamp"
+    fi
+
+    # TODO: Read project, repository_url and environment from defaults file.
+    #       ~/.bdsm/project/config/defaults
+    : "${repository_url:="username/repository"}"
+
+    install_template "bdsm/bdsmrc" to "$HOME/.bdsmrc"
+
+    seed_template "$HOME/.bdsmrc" \
+      project "$project" \
+      repository_url "$repository_url" \
+      environment "$environment"
+  else
+    fail "The template bdsm/bdsmrc is missing."
+  fi
+}
+
+bdsmrc_update()
+{
+  if template_exists "bdsm/bdsmrc"
+  then
+    timestamp_set
+    local template="bdsm/bdsmrc" target="$HOME/.bdsmrc" \
+      backup="$HOME/.bdsmrc.$timestamp" incoming="$HOME/.bdsmrc.incoming.$$"
+
+    if ! file_exists "${target}"
+    then
+      log "File not found ${target}, installing new."
+      bdsmrc_install
+      return
+    fi
+
+    # TODO: Read project, repository_url and environment from defaults file.
+    #       ~/.bdsm/project/config/defaults
+    : "${repository_url:="username/repository"}"
+
+    update_seed_template "${template}" "${target}" "${incoming}" \
+      project "$project" \
+      repository_url "$repository_url" \
+      environment "$environment"
+
+    if [[ -s "${incoming}" ]]
+    then
+      log "Backup ${backup}."
+      copy_file "${target}" to "${backup}"
+      log "Incomming settings:"
+      printf "\n" >> "${target}"
+      tee -a "${target}" < "${incoming}"
+    else
+      log "No new settings."
+    fi
+    rm -f "${incoming}" || true
+  else
+    fail "The template bdsm/bdsmrc is missing."
+  fi
+}

@@ -314,6 +314,39 @@ seed_template()
   fi
 }
 
+update_seed_template()
+{
+  local _template="${1:-}" _target="${2:-}"
+  shift 2
+  local  _incoming="${1:-${_target}.incoming}"
+  shift || true
+  local _hash=("$@") _strings=() _variables="${_target}.var.$$"
+
+  if template_exists "${_template}"
+  then
+    _template="${template_path}"
+  else
+    fail "No template was found matching '${_name}'."
+  fi
+
+  for (( index=0 ; index < ${#_hash[@]} ; index++ ))
+  do
+    _strings+=(-e "s#{{${_hash[${index}]}}}#${_hash[$((++index))]}#g")
+  done
+
+  sed "${_strings[@]}" ${_template} | grep -E '^[^#]+=' > "${_variables}"
+
+  diff -wN --left-column \
+    <( grep -Eo '(^[^#]+=)' "${_target}" 2>/dev/null | sed 's/export //' | sort ) \
+    <( grep -Eo '(^[^#]+=)' "${_variables}" | sed 's/export //' | sort ) | \
+    awk -F '> ' '/^>/ {print$2}' | \
+    xargs -n 1 | \
+    xargs -I {} grep "^[^#]*{}" "${_variables}" > "${_incoming}"
+
+  rm "${_variables}"
+}
+
+# actions
 templates_help()
 {
   echo "

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+[[ -w $scm_path ]] || scm_path=$HOME/.bdsm/scm
+[[ -w $archives_path ]] || archives_path=$HOME/.bdsm/archives

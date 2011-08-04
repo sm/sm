@@ -439,7 +439,7 @@ set_ps4()
 # ### Code Walkthrough
 core_trace_filter()
 {
-  local _action="$1"
+  local _action="$1" old
   shift
   case "${_action}" in
     start)
@@ -447,18 +447,23 @@ core_trace_filter()
       trace_filter_stack=( "$filter" "${trace_filter_stack[@]}" )
       ;;
     stop)
-      shift || true
-      trace_filter_stack=( "$@" )
-      filter="${trace_filter_stack[0]}"
+      old="${trace_filter_stack[0]}"
+      old="${old%%=*}"
+      if [[ "${FUNCNAME[2]}" == "${old}" ]]
+      then
+        shift || true
+        trace_filter_stack=( "$@" )
+      fi
       ;;
     *)
       fail "Unknown action ${_action}"
       ;;
   esac
+  filter="${trace_filter_stack[0]}"
 
   if [[ -n "$filter" ]]
   then
-    if options_check "$trace_flags" "$1"
+    if options_check "$trace_flags" "${filter##*=}"
     then
       set -o xtrace
     fi
@@ -475,10 +480,16 @@ trace_filter()
   set +o xtrace
   if [[ -n "$1" ]]
   then
-    core_trace_filter start $1
+    core_trace_filter start $state "${FUNCNAME[1]}=$1"
   else
-    core_trace_filter stop "${trace_filter_stack[@]}"
+    core_trace_filter stop $state "${trace_filter_stack[@]}"
   fi
+}
+
+action()
+{
+  trace_filter action
+  "$@"
 }
 
 #
@@ -556,7 +567,6 @@ trace_filter()
 backtrace()
 {
   # Turn off shell tracing
-  trap trace_filter RETURN
   trace_filter backtrace #backtrace is disabled by default
 
   # Declare separator and columns variables. Initialize columns to the terminal
@@ -577,7 +587,7 @@ backtrace()
   local _message="${1:-}" _flag="$2"
 
   # If a message was given print the message to the calling environment's STDERR
-  if variable_is_nonempty _message
+  if [[ -n _message ]]
   then
     printf "\n${_message}\n\n" >&2
   fi

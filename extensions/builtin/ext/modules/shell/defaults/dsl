@@ -111,7 +111,6 @@ read_default()
 
 settings_search()
 {
-  trap trace_filter RETURN
   trace_filter settings_search
 
   local extension=$1 setting=$2 path paths

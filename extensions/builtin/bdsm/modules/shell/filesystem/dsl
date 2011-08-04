@@ -966,7 +966,6 @@ move_directory()
 # ### Code Walkthrough
 move_file()
 {
-  trap trace_filter RETURN
   trace_filter move_file
 
   # Declare the source, target, mode, owner and token local variables.

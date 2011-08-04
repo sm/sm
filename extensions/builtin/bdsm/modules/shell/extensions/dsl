@@ -139,7 +139,6 @@ detect_modules_paths()
 # search for extension that modules dependency providing matching [namespace...] action
 detect_modules_action()
 {
-  trap trace_filter RETURN
   trace_filter modules_action
 
   extensions_path=$1
@@ -297,9 +296,7 @@ extension_run()
         "${action##_*}_cli"
       fi
 
-      trace_filter action
-      ${action%%(*} "${extension_args[@]}"
-      trace_filter
+      action ${action%%(*} "${extension_args[@]}"
       ;;
 
     shell)
@@ -309,9 +306,7 @@ extension_run()
       fi
       _namespaces=${_path##${extension_actions_path}}
       extension_modules_load ${_namespaces//\// }
-      trace_filter action
-      . "${_path}/${action}"
-      trace_filter
+      action . "${_path}/${action}"
       ;;
 
     ruby)

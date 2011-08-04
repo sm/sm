@@ -175,23 +175,35 @@ github_get()
 }
 
 archive_get() {
-  local _url="$1" _final_target="$2"
+  local _url="$1" _final_target="$2" _package_md5="${3:-#}"
   local _archive="${archives_path}/${_url##*/}"
   shift
   shift
 
-  if [[ -f "${_url}" ]]
+  mkdir -p "${archives_path}"
+
+  if [[ -f "${_archive}" ]] \
+  && ! file_matches_md5 "${_archive}" "${_package_md5}"
   then
-    if ! copy_file --force "${_url}" to "${_archive}"
+    log "${_url##*/} does not match md5 ${_package_md5}, removing and downloading."
+    rm -f "${_archive}"
+  fi
+
+  if [[ ! -f "${_archive}" ]]
+  then
+    if [[ -f "${_url}" ]]
     then
-      log "Copying from '${_url}' to '${_archive}' failed "
-      return 1
-    fi
-  else
-    if ! curl -L "${_url}" -o "${_archive}"
-    then
-      log "Downloading from '${_url}' to '${_archive}' failed "
-      return 1
+      if ! copy_file --force "${_url}" to "${_archive}"
+      then
+        log "Copying from '${_url}' to '${_archive}' failed "
+        return 1
+      fi
+    else
+      if ! curl -L "${_url}" -o "${_archive}"
+      then
+        log "Downloading from '${_url}' to '${_archive}' failed "
+        return 1
+      fi
     fi
   fi
 
@@ -243,7 +255,6 @@ is_archive_uri() {
 # Code Walkthrough
 fetch_uri()
 {
-  trap trace_filter RETURN
   trace_filter vcs
 
   [[ $# -ge 2 ]] || fail "Missing params _uri _target"
