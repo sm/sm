@@ -21,7 +21,7 @@ trap "backtrace \"A command has returned an not handled error code (\$?).\"" ERR
 # Persist function RETURN & DEBUG handler
 set -o functrace
 # Call reset filter when getting out of function
-trap ': return $? - set +o xtrace - trace_filter' RETURN
+trap 'set +o xtrace "\$?=$?" ; trace_filter' RETURN
 
 # Those two break error handling
 #TODO: provide versions that do not break things ...
