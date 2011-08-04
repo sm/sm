@@ -35,5 +35,8 @@ branch="master"
 # tag="v1.0.0"
 
 # Temporary fetch_uri paths
-export scm_path=~/shared/scm
-export archives_path=~/shared/archives
+scm_path=~/.bdsm/scm
+archives_path=~/.bdsm/archives
+
+# Add here modules that should be always loaded with BDSM
+preload_modules+=( )

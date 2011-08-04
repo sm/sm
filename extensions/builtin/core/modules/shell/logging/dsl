@@ -461,8 +461,6 @@ core_trace_filter()
   esac
   filter="${trace_filter_stack[0]}"
 
-  debug trace "action:${_action}: filter:${filter}: stack:"${trace_filter_stack[@]}":" >&2
-
   if [[ -n "$filter" ]]
   then
     if options_check "$trace_flags" "${filter##*=}"

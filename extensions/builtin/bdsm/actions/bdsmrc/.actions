@@ -1,0 +1,3 @@
+default=bdsmrc_update()
+install=bdsmrc_install()
+update=bdsmrc_update()
