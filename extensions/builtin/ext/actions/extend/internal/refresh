@@ -13,6 +13,4 @@ then
   touch CHANGELOG
   git submodule summary | cat - CHANGELOG | tee CHANGELOG.new
   mv CHANGELOG.new CHANGELOG
-  git add CHANGELOG extensions/internal
-  git commit -m "extensions/internal $internal_revision_new"
 fi
