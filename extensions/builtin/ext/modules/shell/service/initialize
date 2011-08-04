@@ -68,6 +68,7 @@ else
   true "${service_user:="${package_user:-"$USER"}"}"
 fi
 
+local _path
 for _path in  "${install_path}/bin" "${install_path}/sbin"
 do
   if path_exists "$_path"
