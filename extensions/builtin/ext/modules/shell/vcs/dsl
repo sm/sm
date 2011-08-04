@@ -255,7 +255,6 @@ is_archive_uri() {
 # Code Walkthrough
 fetch_uri()
 {
-  trap trace_filter RETURN
   trace_filter vcs
 
   [[ $# -ge 2 ]] || fail "Missing params _uri _target"

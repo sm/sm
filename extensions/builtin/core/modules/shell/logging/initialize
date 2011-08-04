@@ -8,15 +8,22 @@ set_ps4
 
 # Do not exit on error
 set +o errexit
-# Persist error handler
-set -o errtrace
-# Call backtrace on error
-trap "backtrace \"A command has returned an not handled error code (\$?).\"" ERR
 # Exit on USR2 (send by backtrace to $APP_PID)
 trap 'exit 1' USR2
 # Store process pid for closing from backtrace
 export APP_PID=$$
 
+# Persist ERR handler
+set -o errtrace
+# Call backtrace on error
+trap "backtrace \"A command has returned an not handled error code (\$?).\"" ERR
+
+# Persist function RETURN & DEBUG handler
+set -o functrace
+# Call reset filter when getting out of function
+trap trace_filter RETURN
+
 # Those two break error handling
+#TODO: provide versions that do not break things ...
 unset command_not_found
 unset command_not_found_handle
