@@ -281,6 +281,7 @@ extension_modules_load()
 
 extension_run()
 {
+  trace_filter extension_run
   local _type="${action_type:-}" _path="${action_path:-}" _namespaces
 
   builtin cd "${initial_pwd}"
