@@ -492,6 +492,14 @@ action()
   "$@"
 }
 
+action_source()
+{
+  local script="$1"
+  shift
+  trace_filter action
+  source "$script"
+}
+
 #
 # ## backtrace()
 #

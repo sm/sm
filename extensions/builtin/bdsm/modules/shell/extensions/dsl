@@ -306,7 +306,7 @@ extension_run()
       fi
       _namespaces=${_path##${extension_actions_path}}
       extension_modules_load ${_namespaces//\// }
-      action . "${_path}/${action}"
+      action_source "${_path}/${action}" "${extension_args[@]}"
       ;;
 
     ruby)

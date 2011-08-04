@@ -83,7 +83,7 @@ bdsm_exports
 if [[ -n $bdsm_script ]]
 then
   # load script
-  . $bdsm_script
+  action_source $bdsm_script "${extension_args[@]}"
 elif [[ -n "${call_action}" ]]
 then
   if ! declare -F "${call_action}" >/dev/null

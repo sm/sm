@@ -1,22 +1,28 @@
 #!/usr/bin/env bash
 
-#core is loaded as BDSM starts
-modules=(
-  "core/core=builtin/core/modules/shell/core"
-  "core/string=builtin/core/modules/shell/string"
-  "core/logging=builtin/core/modules/shell/logging"
-  "core/modules=builtin/core/modules/shell/modules"
-)
+: ${modules_only_once:=0}
 
-for module_def in ${modules[@]}
-do
-  module_name="${module_def//=*}"
-  module_path="${module_def//*=}"
-  log_search preload "$module_name" "${module_path}"
-done
+if (( modules_only_once == 0 ))
+then
+  : $((modules_only_once++))
+  #core is loaded as BDSM starts
+  modules=(
+    "core/core=builtin/core/modules/shell/core"
+    "core/string=builtin/core/modules/shell/string"
+    "core/logging=builtin/core/modules/shell/logging"
+    "core/modules=builtin/core/modules/shell/modules"
+  )
 
-for module in ${preload_modules[@]}
-do
-  module_or_error ${module} \
-    "Can not load preload_module: ${module}"
-done
+  for module_def in ${modules[@]}
+  do
+    module_name="${module_def//=*}"
+    module_path="${module_def//*=}"
+    log_search preload "$module_name" "${module_path}"
+  done
+
+  for module in ${preload_modules[@]}
+  do
+    module_or_error ${module} \
+      "Can not load preload_module: ${module}"
+  done
+fi
