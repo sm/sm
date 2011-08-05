@@ -13,8 +13,9 @@ else # edit extension
     enter "${extensions_development_path}/${extension_args[0]}"
     exec ${EDITOR:-vi} .
   else
-    error "Failed to edit '${extension_args[0]}' as it appears to not be installed."\
-       "To se installed extensions run:\n  bdsm list"
+    error \
+      "Failed to edit '${extension_args[0]}' as it appears to not be installed."\
+      "To see installed extensions run:\n  bdsm list"
   fi
 fi
 
