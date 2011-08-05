@@ -16,7 +16,7 @@ do
       ;;
 
     -v|--version)
-      extension_args=("core" "version" "$@")
+      extension_args=("bdsm" "version" "$@")
       break
       ;;
 
