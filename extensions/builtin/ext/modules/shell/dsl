@@ -38,7 +38,7 @@ package_extension()
 {
   local sha1="" version _path
 
-  for _path in $(extensions_search_paths)
+  for _path in ${extensions_search_paths[@]}
   do
     if path_exists "${_path}/${extension}"
     then

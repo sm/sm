@@ -25,8 +25,8 @@ extend_update_all()
 {
   extend_internal_update
 
-  extensions=( $(extensions_installed ${bdsm_path}/extensions/external) )
-  for name in ${extensions[@]}
+  extensions_in ${bdsm_path}/extensions/external
+  for name in ${found_extensions[@]}
   do
     extend_update_name "${name}"
   done

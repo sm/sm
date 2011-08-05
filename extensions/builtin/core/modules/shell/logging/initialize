@@ -20,9 +20,7 @@ trap "backtrace \"A command has returned an not handled error code (\$?).\"" ERR
 
 # Persist function RETURN & DEBUG handler
 set -o functrace
-# Call reset filter when getting out of function
-# Do Not call it here, run it on only when starts tracing
-#trap 'set +o xtrace "\$?=$?" ; trace_filter' RETURN
+# Do not set RETURN here, set it on first -x
 
 # Those two break error handling
 #TODO: provide versions that do not break things ...

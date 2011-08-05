@@ -4,7 +4,8 @@ detect_template()
 {
   local extensions_path=$1 _module_path
   shift
-  _template_path=( $(rebuild_path "templates" $extensions_path $@ ) )
+  rebuild_path "templates" $extensions_path $@
+  _template_path="${rebuilded_path}"
 
   if [[ -f "${_template_path}.template" ]]
   then

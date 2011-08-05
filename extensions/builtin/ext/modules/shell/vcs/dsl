@@ -13,7 +13,8 @@ detect_uri()
 {
   local extensions_path=$1 _uri_path
   shift
-  _uri_path=( $(rebuild_path ".uri" $extensions_path $@ ) )
+  rebuild_path ".uri" $extensions_path $@
+  _uri_path="${rebuilded_path}"
 
   if [[ -s "${_uri_path}" ]]
   then

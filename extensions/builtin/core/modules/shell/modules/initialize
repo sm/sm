@@ -5,6 +5,10 @@
 if (( modules_only_once == 0 ))
 then
   : $((modules_only_once++))
+
+  #initialize search paths
+  init_extensions_search_paths
+
   #core is loaded as BDSM starts
   modules=(
     "core/core=builtin/core/modules/shell/core"

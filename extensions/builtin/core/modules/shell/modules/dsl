@@ -3,18 +3,17 @@
 reorder_path()
 {
   local part="$1" extensions_path="$2" extension="$3"
-  shift
-  shift
-  shift
-  echo -n $extensions_path $extension $part $@ | sed 's/ /\//g'
+  shift 3
+  local output="$extensions_path/$extension/$part/$*"
+  rebuilded_path="${output// /\/}"
 }
 
 rebuild_path()
 {
   local part="$1" extensions_path="$2"
-  shift
-  shift
-  reorder_path "${part}" "${extensions_path}" $(echo -n $@ | sed 's/\// /g' )
+  shift 2
+  local params="$*"
+  reorder_path "${part}" "${extensions_path}" ${params//\// }
 }
 
 is_module()
@@ -28,33 +27,39 @@ detect_module()
 {
   local extensions_path=$1 _module_path
   shift
-  _module_path=( $(rebuild_path "modules/shell" $extensions_path $@ ) )
+  rebuild_path "modules/shell" $extensions_path $@
+  _module_path=${rebuilded_path}
 
   if is_module "${_module_path}"
   then
     module_path=${_module_path}
-    module_name=$(echo -n $@ | sed 's/ /\//g' )
+    module_name="$*"
+    module_name="${module_name// /\/}"
     return 0
   else
     return 1
   fi
 }
 
-extensions_search_paths()
+init_extensions_search_paths()
 {
-  printf "${bdsm_path}/extensions/external "
-  for extension in ${bdsm_path}/extensions/*
-  do
-    case ${extension} in
-      (*/external|*/builtin)
-        continue
-        ;;
-      (*)
-        printf "${extension} "
-        ;;
-    esac
-  done
-  printf "${bdsm_path}/extensions/builtin "
+  if [[ -z "${extensions_search_paths[*]}" ]]
+  then
+    extensions_search_paths=( "${bdsm_path}/extensions/external" )
+    for extension in ${bdsm_path}/extensions/*
+    do
+      case ${extension} in
+        (*/external|*/builtin)
+          continue
+          ;;
+        (*)
+          extensions_search_paths+=( "${extension}" )
+          ;;
+      esac
+    done
+    extensions_search_paths+=( "${bdsm_path}/extensions/builtin" )
+  fi
+  export extensions_search_paths
 }
 
 #
@@ -69,12 +74,11 @@ extensions_search_paths()
 #
 # ### Stream Outputs
 #
-# The names of the extensions in the given directory are printed to the
-# calling environment's STDOUT, separated by newlines.
+# None.
 #
 # ### Environmental effects
 #
-# None.
+# The names of the extensions in the given directory are set in found_extensions
 #
 # ### Return Codes
 #
@@ -87,19 +91,19 @@ extensions_search_paths()
 # ### Usage Examples
 #
 #     $ bdsm call extensions_in /usr/local/bdsm/extensions/external
-#     backup
 #
 extensions_in()
 {
   local _path="$1" _extension
+  found_extensions=()
 
   if [[ -d "${_path}" ]]
   then
-    for _extension in $( ls -1 "${_path}" )
+    for _extension in ${_path}/*
     do
-      if [[ -d "${_path}/${_extension}/acions" || -d "${_path}/${_extension}/modules" ]]
+      if [[ -d "${_extension}/acions" || -d "${_extension}/modules" ]] #
       then
-        printf "${_extension}\n"
+        found_extensions+=( "${_extension##${_path}\/}" )
       fi
     done
   else
@@ -113,9 +117,8 @@ in_search_paths()
   local callback=$1
   shift
   local args=( "$@" ) path builtin_extension
-  local builtin_path="${bdsm_path}/extensions/builtin"
 
-  for path in $(extensions_search_paths)
+  for path in ${extensions_search_paths[@]}
   do
     if "${callback}" "${path}" "${args[@]}"
     then
@@ -123,7 +126,9 @@ in_search_paths()
     fi
   done
 
-  for builtin_extension in $(extensions_in "${builtin_path}" )
+  local builtin_path="${bdsm_path}/extensions/builtin"
+  extensions_in "${builtin_path}"
+  for builtin_extension in ${found_extensions[@]}
   do
     if "${callback}" "${builtin_path}" "${builtin_extension}" "${args[@]}"
     then

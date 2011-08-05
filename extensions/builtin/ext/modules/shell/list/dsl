@@ -20,9 +20,10 @@ Actions:
 list_installed()
 {
   local ext_path extensions
-  for ext_path in $(extensions_search_paths)
+  for ext_path in ${extensions_search_paths[@]}
   do
-    extensions=( $(extensions_installed $ext_path) )
+    extensions_in $ext_path
+    extensions=( ${found_extensions[@]} )
 
     if array_is_nonempty extensions
     then
@@ -39,7 +40,8 @@ list_uris()
 {
   log "BDSM: Not implemented yet" #$(cat $bdsm_path/.uri)"
   log "BDSM internal extensions: $(cat $bdsm_path/extensions/internal/.uri)"
-  for extension in $(extensions_installed $bdsm_path/extensions/external)
+  extensions_in $bdsm_path/extensions/external
+  for extension in ${found_extensions[@]}
   do
     log "BDSM external extension $extension: $(cat $bdsm_path/extensions/external/$extension/.uri)"
   done

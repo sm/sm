@@ -1,48 +1,41 @@
 #!/usr/bin/env bash
 
+NYI
+# What this code was intended to do ?
+
+#extension_action=${extension_args[0]}
 #
-# need to figure out the following items
-#  * Where extension will be stored (done)
-#    => ${extensions_src_path}/${extension}/${version:-head}
-#  * where to store metadata information, like extension repository url.
-#  * Where extension sources will be stored
-#  * How an extension will be updated
+#case "$extension_action" in
+#  repo|repository)
+#    fetch_extensions_git_repository
+#  ;;
 #
-
-extension_action=${extension_args[0]}
-
-case "$extension_action" in
-  repo|repository)
-    fetch_extensions_git_repository
-  ;;
-
-  help|usage)
-    log "\nUsage:\n\n  bdsm extensions update repository"
-  ;;
-
-  all)
-    extensions=($(extensions_installed))
-
-    # TODO: Updates for released extensions instead of only from repository.
-    if array_is_nonempty extension_args
-    then
-      fetch_extensions_git_repository
-
-      extensions_install "${extensions[@]}"
-    else
-      log "No extensions to update."
-    fi
-    ;;
-
-  *)
-    # TODO: Updates for released extensions instead of only from repository.
-    if variable_is_nonempty extension_action
-    then
-      fetch_extensions_git_repository
-      extensions_install "${extension_args[@]}"
-    else
-      log "\nUsage:\n\n  bdsm extensions update [extension [extension [...]]"
-    fi
-  ;;
-esac
-
+#  help|usage)
+#    log "\nUsage:\n\n  bdsm extensions update repository"
+#  ;;
+#
+#  all)
+#    extensions=($(extensions_in ...)) #missing path
+#
+#    # TODO: Updates for released extensions instead of only from repository.
+#    if array_is_nonempty extension_args
+#    then
+#      fetch_extensions_git_repository
+#
+#      extensions_install "${extensions[@]}"
+#    else
+#      log "No extensions to update."
+#    fi
+#    ;;
+#
+#  *)
+#    # TODO: Updates for released extensions instead of only from repository.
+#    if variable_is_nonempty extension_action
+#    then
+#      fetch_extensions_git_repository
+#      extensions_install "${extension_args[@]}"
+#    else
+#      log "\nUsage:\n\n  bdsm extensions update [extension [extension [...]]"
+#    fi
+#  ;;
+#esac
