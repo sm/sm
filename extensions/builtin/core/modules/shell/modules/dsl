@@ -42,7 +42,19 @@ detect_module()
 
 extensions_search_paths()
 {
-  printf "${bdsm_path}/extensions/external ${bdsm_path}/extensions/internal ${bdsm_path}/extensions/builtin"
+  printf "${bdsm_path}/extensions/external "
+  for extension in ${bdsm_path}/extensions/*
+  do
+    case ${extension} in
+      (*/external|*/builtin)
+        continue
+        ;;
+      (*)
+        printf "${extension} "
+        ;;
+    esac
+  done
+  printf "${bdsm_path}/extensions/builtin "
 }
 
 #
