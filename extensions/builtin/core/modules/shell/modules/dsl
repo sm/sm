@@ -399,16 +399,6 @@ modules_loaded()
   printf "${modules[*]}\n"
 }
 
-modules_loaded_names()
-{
-  local names=() _module_def
-  for _module_def in "${modules[@]}"
-  do
-    names+=( "${_module_def//=*}" )
-  done
-  printf "${names[*]}\n"
-}
-
 # Print out a list of all installed modules.
 # ## modules\_installed()
 modules_installed()
