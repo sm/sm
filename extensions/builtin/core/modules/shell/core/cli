@@ -58,7 +58,7 @@ do
       error "Unknown flag '${token}'"
       ;;
     *)
-      if [[ -f $token ]]
+      if [[ -f "$token" && -z "$bdsm_script" ]]
       then
         bdsm_script=$1
       else
