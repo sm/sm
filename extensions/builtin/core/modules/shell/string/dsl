@@ -34,9 +34,11 @@ string_remove()
 
 options_check()
 {
-  string_contains "$1" "$2" ||
-  (
-    string_contains "$1" "all" &&
-    ! string_contains "$1" "-$2"
-  )
+  # Do not use brackets, they slow down things a lot
+  if string_contains "$1" "$2"
+  then
+    return 0
+  else
+    string_contains "$1" "all" && ! string_contains "$1" "-$2"
+  fi
 }

@@ -443,8 +443,7 @@ core_trace_filter()
   shift
   case "${_action}" in
     start)
-      filter="$1"
-      trace_filter_stack=( "$filter" "${trace_filter_stack[@]}" )
+      trace_filter_stack=( "$1" "${trace_filter_stack[@]}" )
       ;;
     stop)
       old="${trace_filter_stack[0]}"
@@ -456,7 +455,7 @@ core_trace_filter()
       fi
       ;;
     *)
-      fail "Unknown action ${_action}"
+      fail "Unknown core_trace_filter action ${_action}."
       ;;
   esac
   filter="${trace_filter_stack[0]}"
@@ -465,12 +464,14 @@ core_trace_filter()
   then
     if options_check "$trace_flags" "${filter##*=}"
     then
+      trap 'set +o xtrace "\$?=$?" ; trace_filter' RETURN
       set -o xtrace
     fi
   else
     # No param, restore default state
     if (( trace_flag != 0 ))
     then
+      trap 'set +o xtrace "\$?=$?" ; trace_filter' RETURN
       set -o xtrace
     fi
   fi
