@@ -172,7 +172,7 @@ detect_modules_action()
                 if [[ -n "$_read_action" ]]
                 then
                   action="$_read_action"
-                  action_path="$( path_join $extensions_path $extension actions ${_module_path})"
+                  action_path="$extensions_path/$extension/actions/${_module_path// /\/}"
                   extension_args=( $_params )
                   return 0
                 fi
