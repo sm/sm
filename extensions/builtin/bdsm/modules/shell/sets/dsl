@@ -86,10 +86,13 @@ sets_install()
 
 sets_install_all()
 {
-  local _name
-  for _name in $( awk -F = '/^[^#]/ {print $1 }' < $bdsm_path/known_sets )
+  local _set _name _uri COLUMNS=80
+  for _set in $( awk '/^[^#]/' < $bdsm_path/known_sets )
   do
-    sets_install "${_name}"
+    _name="${_set%%=*}"
+    _uri="${_set##*=}"
+    sets_install "${_name}" "${_uri}"
+    separator
   done
 }
 
