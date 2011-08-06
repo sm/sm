@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-
-enter $bdsm_path
-
-git submodule init
-git submodule update

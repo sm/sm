@@ -1,0 +1,167 @@
+#!/usr/bin/env bash
+
+sets_help()
+{
+  modules ext/help
+
+  description "BDSM extension sets management"
+
+  action "sets" "List installed sets."
+  action "sets known" "List extension sets that can be installed."
+  action_separator
+  action "sets install all" "Install all extension sets found on the known list."
+  action "sets install {name}" "Install extension set {name} found on the known list."
+  action "sets install {name} {uri}" "Install extension set {name} from the given {uri}."
+  action "sets add" "shortcut for install"
+  action_separator
+  action "sets update all" "Update all extension sets using remembered uris."
+  action "sets update {name}" "Update extension set {name} using remembered uri."
+  action "sets up" "shortcut for update"
+  action_separator
+  action "sets uninstall {name}" "Remove extension set {name}."
+  action "sets del" "shortcut for uninstall"
+  action_separator
+  action "sets help" "Show this help."
+
+  show_help usage
+}
+
+sets_list()
+{
+  local ext_path extensions COLUMNS=80
+  separator
+  for ext_path in ${extensions_search_paths[@]}
+  do
+    extensions_in $ext_path
+    extensions=( ${found_extensions[@]} )
+
+    if array_is_nonempty extensions
+    then
+      log "Extensions installed in set: ${ext_path##$bdsm_path\/extensions\/}\n"
+      echo ${extensions[@]} | xargs -s ${COLUMNS} | xargs -I '{}' echo "  {}"
+    else
+      log "# No extensions currently installed in set: ${ext_path##$bdsm_path\/extensions\/}."
+    fi
+    separator
+  done
+}
+
+sets_list_known()
+{
+  local COLUMNS=80
+  separator
+  awk -F = '/^[^#]/ {printf "%20s | %s\n", $1, $2 }' <<<"Set name=Repository"
+  separator
+  awk -F = '/^[^#]/ {printf "%20s | %s\n", $1, $2 }' < $bdsm_path/known_sets
+  separator
+}
+
+sets_install()
+{
+  local _name="$1" _uri="$2"
+  if [[ -z "${_name}" ]]
+  then
+    error "Can not install extension sets without name."
+  fi
+  case "${_name}" in
+    external|builtin)
+      error "Extension set ${_name} can not be installed"
+      ;;
+  esac
+  if [[ -z "${_uri}" ]]
+  then
+    _uri=$( awk -F = "/^${_name}=/ {print \$2 }" < $bdsm_path/known_sets )
+    if [[ -z "${_uri}" ]]
+    then
+      error "Can not find ${_name} in known extension sets list."
+    fi
+  fi
+  local _identifier="$(scm_identifier "${_uri}")"
+  enter "${bdsm_path}/extensions"
+  fetch_uri "${_uri}" "${bdsm_path}/src/${_identifier}"
+  log "Installing extension set: ${_name}."
+  remove_paths "${_name}"
+  copy_directory "${bdsm_path}/src/${_identifier}" to "${_name}"
+}
+
+sets_install_all()
+{
+  local _name
+  for _name in $( awk -F = '/^[^#]/ {print $1 }' < $bdsm_path/known_sets )
+  do
+    sets_install "${_name}"
+  done
+}
+
+sets_update()
+{
+  local _name _uri
+  if [[ -z "$1" ]]
+  then
+    error "Can not update extension sets without name."
+  fi
+  for _name in "$@"
+  do
+    case "${_name}" in
+      external|builtin)
+        error "Extension set ${_name} can not be updated"
+        ;;
+    esac
+    if [[ ! -d "${bdsm_path}/extensions/${_name}" ]]
+    then
+      error "Extension set ${_name} does not exist."
+    fi
+    if [[ ! -s "${bdsm_path}/extensions/${_name}/.uri" ]]
+    then
+      log "Extension set ${_name} does not contain stored uri.\n"
+      continue
+    fi
+    _uri=$( cat "${bdsm_path}/extensions/${_name}/.uri" )
+    if [[ -z "${_uri}" ]]
+    then
+      log "Extension set ${_name} does not contain stored uri."
+    else
+      sets_install "${_name}" "${_uri}"
+    fi
+    printf "\n"
+  done
+}
+
+sets_update_all()
+{
+  local _name
+  for _name in ${extensions_search_paths[@]}
+  do
+    case "${_name##*/}" in
+      external|builtin)
+        # Skip those two
+        ;;
+      *)
+        sets_update "${_name##*/}"
+        ;;
+    esac
+  done
+}
+
+sets_uninstall()
+{
+  local _name="$1"
+  case "${_name}" in
+    */*|.|..)
+      error "Please specify valid extension name"
+      ;;
+    external|builtin)
+      error "Extension set ${_name} can not be removed"
+      ;;
+  esac
+  enter "${bdsm_path}/extensions"
+  if [[ ! -d "${_name}" ]]
+  then
+    error "Please specify valid extension name"
+  fi
+
+  #TODO: are you sure ?
+
+  log "Uninstalling extension set: ${_name}."
+  rm -rf "${_name}"
+}

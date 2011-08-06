@@ -503,6 +503,23 @@ action_source()
   source "$script"
 }
 
+separator()
+{
+  local _columns
+
+  if [[ -z "${COLUMNS}" ]]
+  then
+    if ! _columns=$(tput cols)
+    then
+      _columns=80
+    fi
+    export COLUMNS=${_columns}
+  fi
+
+  printf -v _separator '%*s' "${COLUMNS}"
+  printf "${_separator// /=}\n"
+}
+
 #
 # ## backtrace()
 #

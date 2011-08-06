@@ -1,0 +1,2 @@
+default=sets_install()
+all=sets_install_all()

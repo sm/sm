@@ -11,9 +11,6 @@ extend_update()
   help)
     extend_help
     ;;
-  internal)
-    extend_internal_update
-    ;;
   *)
     extend_update_name "${name}"
     ;;
@@ -94,71 +91,8 @@ extend_help()
   action "extend update <name>" \
     "Update given all external extensions using latest used uris"
 
-  action "extend update internal" \
-    "Update internal extensions using latest used uri"
-
   action "extend update all" \
     "Update internal and externall extensions using latest used uris"
-
-  show_help usage
-}
-
-extend_internal_update()
-{
-  action="${extension_args[0]}"
-
-  case "${action:-uri}" in
-
-  all|uri)
-    update_internal_extensions "$(cat $bdsm_path/extensions/internal/.uri)"
-    ;;
-
-  head)
-    update_internal_extensions "wayneeseguin/bdsm-extensions"
-    ;;
-
-  *)
-    if [[ -d "${action}" ]] || [[ -f "${action}" ]]
-    then
-      update_internal_extensions "${action}"
-    else
-      update_internal_extensions "${action:-wayneeseguin}/bdsm-extensions"
-    fi
-    ;;
-  esac
-}
-
-# update internal bdsm extensions from the given user github account
-# default user is wayneeseguin
-update_internal_extensions()
-{
-  local _url="$1"
-  local _identifier="$(scm_identifier "${_url}")"
-  enter "${bdsm_path}/extensions"
-  # TODO: This should update to/from repos path and/or archives path...
-  fetch_uri "${_url}" "${bdsm_path}/src/${_identifier}"
-  log "Installing internal extensions"
-  remove_paths "internal"
-  copy_directory "${bdsm_path}/src/${_identifier}" to "internal"
-}
-
-extend_internal_help()
-{
-  modules ext/help
-
-  description "BDSM internal extensions management"
-
-  action "internal help" \
-   "Show this help"
-
-  action "internal update" \
-   "Update internal bdsm extensions to latest version in the stored uri"
-
-  action "internal update head" \
-   "Update internal bdsm extensions to latest Wayne E. Seguin github version"
-
-  action "internal update <github_user_name>" \
-   "Update internal bdsm extensions to latest github version of the given user"
 
   show_help usage
 }

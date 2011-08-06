@@ -195,6 +195,12 @@ action()
   fi
 }
 
+action_separator()
+{
+  help_action_names+=( "" )
+  help_action_descriptions+=( "$1" )
+}
+
 #
 # ## note()
 #
@@ -358,8 +364,13 @@ help_actions()
 
     for (( _index=0 ; _index < ${#help_action_names[@]} ; _index++ ))
     do
-      printf "  %-$((_largest + 2))s - %s\n" \
-        "${help_action_names[${_index}]}" "${help_action_descriptions[${_index}]}"
+      if [[ -n "${help_action_names[${_index}]}" ]]
+      then
+        printf "  %-$((_largest + 2))s - %s\n" \
+          "${help_action_names[${_index}]}" "${help_action_descriptions[${_index}]}"
+      else
+        printf "%s\n" "${help_action_descriptions[${_index}]}"
+      fi
     done
   else
     log "# No help has been defined for ${extension} actions ."
@@ -615,7 +626,7 @@ usage()
   log "\nbdsm ${bdsm_version} https://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)"
 
   sections=(
-  usage description actions notes dependencies resources
+    usage description actions notes dependencies resources
   )
   for section in "${sections[@]}"
   do
