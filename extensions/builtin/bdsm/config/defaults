@@ -1,3 +1,4 @@
+#core
 releases_url=https://bdsm.beginrescueend.com/releases
 latest_version_url=https://bdsm.beginrescueend.com/releases/latest-version.txt
 extensions_url=https://extensions.beginrescueend.com
@@ -6,3 +7,7 @@ service_url=https://bdsm.beginrescueend.com/services
 bdsm_repo_url=git://github.com/wayneeseguin/bdsm
 service_repo_url=git://github.com/wayneeseguin/bdsm-services
 website_url=https://bdsm.beginrescueend.com/
+#pkg
+version=
+base_url=
+archive_format=tar.gz

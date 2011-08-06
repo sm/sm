@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-
-package_activate "${extension_args[@]}"
-
