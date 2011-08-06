@@ -1,5 +1,5 @@
-bdsm/variables
-bdsm/array
-bdsm/filesystem
+ext/variables
+ext/array
+ext/filesystem
 ext/hash
 ext/templates
