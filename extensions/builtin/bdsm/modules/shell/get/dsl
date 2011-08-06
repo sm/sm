@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+
+fetch_version()
+{
+  version=$(curl -s "${releases_url}/latest-version.txt" 2>/dev/null) ||
+    fail "Unable to fetch version from ${releases_url}/latest-version.txt"
+}
+
+md5_match()
+{ # TODO: switch this to using system module's os_* DSL
+  local archive="$1"
+
+  case "$(uname)" in
+    Darwin|FreeBSD)
+      archive_md5="$(/sbin/md5 -q "${archive}")"
+      ;;
+
+    OpenBSD)
+      archive_md5="$(/bin/md5 -q "${archive}")"
+      ;;
+
+    Linux|*)
+      archive_md5="$(md5sum "${archive}" | awk '{print $1}')"
+      ;;
+  esac
+
+  [[ "${archive_md5}" == "${md5}" ]]
+
+  return $?
+}
+
+install_latest()
+{
+  fetch_version
+  install_release
+}
+
+install_release()
+{
+  archive="$archives_path/bdsm-${version}.tar.gz"
+
+  md5=$(curl -s "${releases_url}/bdsm-${version}.tar.gz.md5" 2>/dev/null)
+
+  if file_exists "${archive}" && ! md5_match
+  then
+    # Remove old installs, if they exist and have incorrect md5.
+    file_exists "$archives_path/bdsm-${version}.tar.gz" &&
+      rm -f "$archives_path/bdsm-${version}.tar.gz"
+  fi
+
+  ensure_paths_exist "${archives_path}"
+
+  #TODO make use of fetch_uri
+  curl -L "${releases_url}/bdsm-${version}.tar.gz" -o "$archive"
+
+  if ! file_matches_md5 "${archive}" "${md5}"
+  then
+      fail "
+Archive package downloaded does not match it's calculated md5 checksum ${md5}:
+
+  $archives_path/bdsm-${version}.tar.gz
+
+Retry the installation and/or check your networking setup.
+
+Halting the installation.
+"
+  fi
+
+  tar zxf "${archives_path}/bdsm-${version}.tar.gz" -C "$src_path/"
+
+  enter "$src_path/bdsm-${version}"
+
+  ensure_files_are_executable "install"
+
+  ./install
+}
+
+install_remote()
+{
+  local remote="${1:-wayneeseguin}"
+  install_bdsm_scm "bdsm-$remote" "$remote"
+}
+
+install_bdsm_scm()
+{
+  local remote="origin" dir="${1}" owner="${2:-wayneeseguin}"
+
+  modules ext/vcs
+
+  # TODO: This should update to/from repos path and/or archives path...
+  fetch_uri "${owner}/bdsm" "${src_path}/${dir}"
+
+  if (( ${sense_of_humor_flag:=0} == 1 ))
+  then
+    log "Ahh... that's better...\nIt always feels so nice to get head.\nQuite a load this time eh?\nRemember to get head often!\n"
+  fi
+
+  enter "${src_path}/${dir}/"
+
+  exec bash ./install --trace="$trace_flags" --debug="$debug_flags"
+}

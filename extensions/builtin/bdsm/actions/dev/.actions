@@ -1,0 +1,2 @@
+setup=bdsm_development_setup()
+update=bdsm_development_update()
