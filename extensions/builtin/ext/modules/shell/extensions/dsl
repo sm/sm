@@ -141,10 +141,8 @@ detect_modules_action()
 {
   trace_filter modules_action
 
-  extensions_path=$1
-  shift
-  extension="${1:-core}"
-  shift
+  extensions_path=$1 extension="${2:-core}"
+  shift 2 # TODO: proper error handling here...
 
   local token _word _modules_path="$extensions_path/$extension/modules/shell"
 
@@ -177,8 +175,8 @@ detect_modules_action()
                   return 0
                 fi
               fi
-              _params="$(basename $_action) $_params"
-              _action="$(dirname $_action)"
+              _params="$(basename "$_action") $_params" #_params="${_action##*/} $_params"
+              _action="$(dirname "$_action")" #_action="${_action%/*}"
               if [[ "$_action" =~ "." || "$_action" =~ "/" ]]
               then
                 break
@@ -778,6 +776,7 @@ extension_package()
   then
     _path="${extensions_development_path:-"$extensions_src_path"}"
 
+    ensure_paths_exist "${_path}"
     enter "${_path}"
 
     if extension_is_valid "${_path}/${_name}"

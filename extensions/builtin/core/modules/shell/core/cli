@@ -50,6 +50,10 @@ do
       call_action="${call_action##*/}"
       ;;
 
+    --force)
+      export force_flag=1
+      ;;
+
     --)
       shift #end of processing
       extension_args=("$@")
