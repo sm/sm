@@ -126,15 +126,10 @@ in_search_paths()
     fi
   done
 
-  local builtin_path="${bdsm_path}/extensions/builtin"
-  extensions_in "${builtin_path}"
-  for builtin_extension in ${found_extensions[@]}
-  do
-    if "${callback}" "${builtin_path}" "${builtin_extension}" "${args[@]}"
-    then
-      return 0
-    fi
-  done
+  if "${callback}" "${bdsm_path}/extensions/builtin" "bdsm" "${args[@]}"
+  then
+    return 0
+  fi
 
   return 1
 }
