@@ -1912,7 +1912,7 @@ service_signal()
         then
           kill -${_signal} ${_pid}
         else
-          fail "Not sending signal ${_signal} to process as pid is 0 (process not found/running)"
+          log "Not sending signal ${_signal} to process as pid is 0 (process not found/running)"
         fi
         ;;
       *)
