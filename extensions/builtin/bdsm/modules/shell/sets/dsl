@@ -52,7 +52,7 @@ sets_list_known()
   separator
   awk -F = '/^[^#]/ {printf "%20s | %s\n", $1, $2 }' <<<"Set name=Repository"
   separator
-  awk -F = '/^[^#]/ {printf "%20s | %s\n", $1, $2 }' < $bdsm_path/known_sets
+  awk -F = '/^[^#]/ {printf "%20s   %s\n", $1, $2 }' < $bdsm_path/known_sets
   separator
 }
 
