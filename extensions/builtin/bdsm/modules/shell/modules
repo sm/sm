@@ -1,5 +1,5 @@
-bdsm/system
-bdsm/filesystem
-bdsm/module_utils
-bdsm/environment
+ext/system
+ext/filesystem
+ext/environment
 ext/vcs
+bdsm/module_utils

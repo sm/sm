@@ -1,7 +1,7 @@
-bdsm/environment
-bdsm/extensions
-bdsm/filesystem
-bdsm/system
+ext/environment
+ext/extensions
+ext/filesystem
+ext/system
 ext/defaults
 ext/templates
 ext/users
