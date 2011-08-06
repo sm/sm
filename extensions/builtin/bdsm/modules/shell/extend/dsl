@@ -81,7 +81,7 @@ extend_name_uri()
 
 extend_help()
 {
-  modules bdsm/help
+  modules ext/help
 
   description "install BDSM extension"
 
@@ -144,7 +144,7 @@ update_internal_extensions()
 
 extend_internal_help()
 {
-  modules bdsm/help
+  modules ext/help
 
   description "BDSM internal extensions management"
 
