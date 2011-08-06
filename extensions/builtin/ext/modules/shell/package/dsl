@@ -339,8 +339,13 @@ To force call:
 package_update()
 {
   # TODO: check if newer version exists, if so then...
-  package_install
-  package_activate ${package_name} ${package_version}
+  if package_installed | grep -q "${package_version}"
+  then
+    log "Package ${package_name} already installed in (latest) version ${package_version}"
+  else
+    package_install --force
+    package_activate ${package_name} ${package_version}
+  fi
 }
 
 #
@@ -1751,10 +1756,7 @@ package_info()
   log "versions:"
   if path_exists "${_path}"
   then
-    local _installed=($(
-    enter "${_path}"
-    find . -mindepth 1 -maxdepth 1 -type d | sed -e 's#./##g' -e 's# #,#g'
-    ))
+    local _installed=( $( package_installed ) )
     log "  installed: ${_installed[*]}"
   else
     log "  installed: none"
@@ -1780,4 +1782,11 @@ package_info()
   fi
 }
 
-
+package_installed()
+{
+  local _path="${packages_path}/${package_name}"
+  (
+    enter "${_path}"
+    find . -mindepth 1 -maxdepth 1 -type d | sed -e 's#./##g' -e 's# #,#g'
+  )
+}

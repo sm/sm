@@ -34,7 +34,7 @@ install_internal_extensions()
     file_exists "${install_path}/extensions/internal/.uri" &&
     file_contains "${install_path}/extensions/internal/.uri" "/bdsm-extensions"
   then
-    log "\n  To update internal extensions use 'bdsm internal update'\n"
+    log "\n  To update extension sets use 'bdsm sets update all'\n"
   else
     if path_exists "extensions/internal" &&
       file_exists "extensions/internal/README.md"
@@ -53,31 +53,9 @@ install_internal_extensions()
 
 migrate_external_extensions()
 {
-  log "  Migrating external extensions"
+  log "  Creating extension set for external extensions"
   enter "${install_path}/extensions"
   ensure_paths_exist external
-  for extension in *
-  do
-    # skip new directories
-    case ${extension} in
-      builtin|internal|external)
-        continue
-        ;;
-    esac
-    if file_exists "${extension}/.uri" &&
-      file_contains "${extension}/.uri" "git://github.com/wayneeseguin/bdsm-extensions"
-    then
-      # old internal extension
-      remove "${extension}"
-    else
-      # external extension
-      move_directory "${extension}" "external/${extension}"
-      if file_exists "external/${extension}/.uri"
-      then
-        sed -ie "s/git:\/\/github.com\/\(.*\)\.git/\1/" "external/${extension}/.uri"
-      fi
-    fi
-  done
 }
 
 install_core()
