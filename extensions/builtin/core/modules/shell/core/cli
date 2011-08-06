@@ -11,11 +11,13 @@ do
   case "$token" in
 
     --help)
-      extension_args=("core" "help" "$@")
+      shift #end of processing
+      extension_args=("bdsm" "help" "$@")
       break
       ;;
 
     -v|--version)
+      shift #end of processing
       extension_args=("bdsm" "version" "$@")
       break
       ;;
