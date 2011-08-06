@@ -1,3 +1,15 @@
-internal=wayneeseguin/bdsm-ineternal
-languages=wayneeseguin/bdsm-languages
 gnu=wayneeseguin/bdsm-gnu
+databases=wayneeseguin/bdsm-databases
+irc=wayneeseguin/bdsm-irc
+javascript=wayneeseguin/bdsm-javascript
+libraries=wayneeseguin/bdsm-libraries
+networking=wayneeseguin/bdsm-networking
+servers=wayneeseguin/bdsm-servers
+vcs=wayneeseguin/bdsm-vcs
+gnu=wayneeseguin/bdsm-gnu
+java=wayneeseguin/bdsm-java
+languages=wayneeseguin/bdsm-languages
+monitoring=wayneeseguin/bdsm-monitoring
+ruby=wayneeseguin/bdsm-ruby
+shells=wayneeseguin/bdsm-shells
+tools=wayneeseguin/bdsm-tools
