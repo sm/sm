@@ -1,3 +1,5 @@
 bdsm/system
 bdsm/filesystem
 bdsm/module_utils
+bdsm/environment
+ext/vcs

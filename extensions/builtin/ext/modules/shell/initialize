@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-
-true \
-  "${extensions_url:=$(hash_file "$config_path/defaults" "extensions_url")}" \
-  "${extensions_repository_url:=$(hash_file "$config_path/defaults" "extensions_repository_url")}" \
-  ${remote:="origin"} \
-  ${branch:="master"}
-
-extensions_src_path="${src_path}/extensions"

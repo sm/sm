@@ -2,6 +2,8 @@
 
 version_pattern="+([[:digit:]]).+([[:digit:]]).+([[:digit:]])"
 
+#TODO: merge this code to extension_cli
+
 for (( index=0 ; index < ${#extension_args[@]} ; index++ ))
 do
   token="${extension_args[$index]}"
@@ -28,3 +30,4 @@ do
   esac
 done
 
+extension_cli

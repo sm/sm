@@ -13,6 +13,12 @@ true \
   "${package_name:=${extension}}" \
   "${repository_url:="git://github.com/wayneeseguin/bdsm"}"
 
+true \
+  "${extensions_url:=$(hash_file "$config_path/defaults" "extensions_url")}" \
+  "${extensions_repository_url:=$(hash_file "$config_path/defaults" "extensions_repository_url")}" \
+  ${remote:="origin"} \
+  ${branch:="master"}
+
 for config in "${bdsm_path}/extensions/core/config/defaults" "${bdsm_path}/extensions/core/config/defaults"
 do
   if file_exists "$config"
@@ -25,5 +31,7 @@ done
 bdsm_version
 
 user="$USER"
+
+extensions_src_path="${src_path}/extensions"
 
 export prefix_path bin_path source_path
