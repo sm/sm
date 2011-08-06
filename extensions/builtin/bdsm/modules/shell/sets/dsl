@@ -168,3 +168,11 @@ sets_uninstall()
   log "Uninstalling extension set: ${_name}."
   rm -rf "${_name}"
 }
+
+sets_check_availability()
+{
+  awk -F = '/^[^#]/ {printf "%20s   %s\n", $1, $2 }' < $bdsm_path/known_sets |
+  "${bdsm_path}/bin/bdsm-ll" \
+    printf "%s: " {} \; curl -s --head https://github.com/wayneeseguin/bdsm-{} \| awk "'/Status/{print \$2}'"
+}
+
