@@ -35,6 +35,7 @@ core_log()
 {
   printf "$*\n"
 }
+
 log()
 {
   core_log "$@"
