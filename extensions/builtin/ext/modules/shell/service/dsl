@@ -1898,6 +1898,11 @@ service_status()
   else
     log "  status: not running"
   fi
+
+  if command_exists "${service}_status"
+  then # Run the service specific status function, if it exists
+    "${service}_status"
+  fi
 }
 
 service_signal()
