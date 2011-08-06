@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+scm_help()
+{
+  NIY "display help for scm"
+}

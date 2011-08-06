@@ -40,3 +40,44 @@ bdsm_version()
     bdsm_version="?.?.?"
   fi
 }
+
+#TODO: this code should be distributed to proper places
+extension_cli()
+{
+  local _ignored_args=() _string
+
+  number_of_args=${#extension_args[@]}
+
+  for (( index=0 ; index < $number_of_args ; index++ ))
+  do
+    token="${extension_args[$index]}"
+
+    case "$token" in
+      --uri|--url)
+        extension_uri="${extension_args[$((++index))]}"
+        ;;
+      --version)
+        extension_version="${extension_args[$((++index))]}"
+        ;;
+      --archive_format)
+        archive_format="${extension_args[$((++index))]}"
+        ;;
+      --licence)
+        extension_license
+        exit 0
+        ;;
+      --modules)
+        _string="${extension_args[$((++index))]}"
+        extension_modules=(${_string//,/ })
+        ;;
+      *)
+        _ignored_args+=("${token}")
+        ;;
+    esac
+  done
+
+  if array_is_nonempty _ignored_args
+  then
+    extension_args=( "${_ignored_args[@]}" )
+  fi
+}

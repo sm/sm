@@ -301,7 +301,7 @@ extension_run()
     shell)
       if [[ "${action##*/}" == help ]]
       then # Load the help module also.
-        modules bdsm/help
+        modules ext/help
       fi
       _namespaces=${_path##${extension_actions_path}}
       extension_modules_load ${_namespaces//\// }

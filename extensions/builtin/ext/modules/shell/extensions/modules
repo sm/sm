@@ -1,4 +1,4 @@
 ext/variables
+ext/array
+ext/environment
 ext/filesystem
-ext/extensions
-ext/vcs

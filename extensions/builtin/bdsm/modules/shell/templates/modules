@@ -2,3 +2,4 @@ ext/variables
 ext/array
 ext/filesystem
 ext/hash
+ext/templates

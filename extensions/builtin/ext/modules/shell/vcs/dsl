@@ -306,13 +306,3 @@ fetch_uri()
       ;;
   esac
 }
-
-fetch()
-{
-  fetch_uri "$@"
-}
-
-scm_help()
-{
-  NIY "display help for scm"
-}

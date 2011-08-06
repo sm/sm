@@ -827,7 +827,7 @@ os_open()
       # and if the uri is a file uri then open it up in the shell set editor
       # or less if the editor variable has not been set.
       # Otherwise the shell is non-interactive so for now print the uri.
-      modules bdsm/interactive
+      modules ext/interactive
       if shell_is_interactive
       then
         if [[ "${_uri}" == file* ]]
