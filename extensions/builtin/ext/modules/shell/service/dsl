@@ -1898,4 +1898,34 @@ service_status()
   else
     log "  status: not running"
   fi
+
+  if command_exists "${service}_status"
+  then # Run the service specific status function, if it exists
+    "${service}_status"
+  fi
+}
+
+service_signal()
+{
+  local _signal="${1}" _pid="${2:-0}"
+
+  if [[ -n "${_pid}" ]]
+  then
+    case "${_signal}" in
+      KILL|QUIT|TERM|USR1|USR2|TTIN|TTOU|WINCH|[[:digit]]*)
+        if (( _pid > 0 ))
+        then
+          kill -${_signal} ${_pid}
+        else
+          log "Not sending signal ${_signal} to process as pid is 0 (process not found/running)"
+        fi
+        ;;
+      *)
+        fail "The signal to send be passed in first and must be one of {KILL,QUIT,TERM,USR1,USR2,TTIN,TTOU,a digit})"
+        ;;
+    esac
+  else
+    fail "The pid to signal must be passed in as the second parameter, please check your code (see trace below.)"
+  fi
+
 }
