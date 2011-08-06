@@ -177,8 +177,8 @@ detect_modules_action()
                   return 0
                 fi
               fi
-              _params="$(basename $_action) $_params"
-              _action="$(dirname $_action)"
+              _params="${_action##*/} $_params"
+              _action="${_action%/*}"
               if [[ "$_action" =~ "." || "$_action" =~ "/" ]]
               then
                 break
