@@ -106,6 +106,8 @@ install_configuration_files()
 
 symlink_bdsm()
 {
+  chmod a+x "${prefix_path}/bin/bdsm" "${prefix_path}/bin/bdsm-ll"
+
   log "  Linking ${install_path}/bin/bdsm to ${prefix_path}/bin/bdsm"
   link --force "${install_path}/bin/bdsm" to "${prefix_path}/bin/bdsm"
 
