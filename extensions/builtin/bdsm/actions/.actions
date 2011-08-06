@@ -1,0 +1,5 @@
+mod=module_utils
+docgen=module_utils modules_docgen()
+docopen=module_utils modules_docopen()
+edit=module_utils edit
+src=module_utils src

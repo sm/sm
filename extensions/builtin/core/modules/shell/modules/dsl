@@ -139,6 +139,38 @@ in_search_paths()
   return 1
 }
 
+#
+# ## module()
+#
+# Loads given module and it's dependencies
+#
+# ### Input Parameters
+#
+# Module name to load
+#
+# ### Stream Outputs
+#
+# None,
+# except when '--debug=search' used - displays search result
+#
+# ### Return Codes
+#
+# 0 for success
+# 1 for module not found
+#
+# ### Failure Scenarios
+#
+# ERROR when dependent modules could not be loaded
+#
+# ### Usage Examples
+#
+#    if module backup
+#    then
+#       log "module backup found, please backup your system"
+#    else
+#       error "could not find backup module"
+#    fi
+#
 module()
 {
   local _module=$1 _skip_path_detection=$2 _file _module_dependency _module_path
@@ -168,7 +200,7 @@ module()
     for _module_dependency in $( cat ${module_path}/modules )
     do
       module_or_error "${_module_dependency}" \
-        "Could not find module dependency '${_module_dependency}' from '"${module_path##${bdsm_path}\/extensions\/}/modules"'"
+        "Could not find module dependency '${_module_dependency}' from '${_module_path##${bdsm_path}\/extensions\/}/modules'"
     done
   fi
 
@@ -218,8 +250,6 @@ module_or_error()
 # ### Usage Examples
 #
 #     user$ modules array system
-#     user$ modules_loaded
-#     logging trace filesystem array system
 #
 #  modules x y z
 #
@@ -242,55 +272,6 @@ modules()
     done
   else
     fail "No modules specified to load."
-  fi
-}
-
-#
-# ## module\_load()
-#
-# Function Description
-#
-# ### Input Parameters
-#
-# Positional Parameter listing and descriptions.
-#
-# ### Stream Outputs
-#
-# None, unless loading the module causes output to a stream.
-#
-# ### Return Codes
-#
-# 0 for success
-#
-# ### Failure Scenarios
-#
-# Fails if no extension module files names have been given.
-#
-# ### Usage Examples
-#
-#     user$ ls ${extension_modules_path}/shell/
-#     cli dsl initialize zebra
-#
-#     user$ cat ${extension_modules_path}/shell/zebra
-#     #!/usr/bin/env bash
-#     echo "Zebra!!! "
-#
-#     user$ module_load zebra # This will load zebra into the current context
-#     Zebra!!!
-#
-# TODO: extension_module_load
-module_load()
-{
-  local _file _files=("$@")
-
-  if array_is_nonempty _files
-  then
-    for _file in "${_files[@]}"
-    do
-      source_files "${extension_modules_path:-"$modules_path"}/shell/${_file}"
-    done
-  else
-    fail "Cannot load a module as no module was given."
   fi
 }
 
@@ -383,484 +364,3 @@ module_is_loaded()
     fail "Cannot determine if a module is loaded as no module was given."
   fi
 }
-
-#
-# ## modules\_loaded()
-#
-# Outputs a list of all modules that have been loaded.
-#
-# ### Input Parameters
-#
-# Positional Parameter listing and descriptions.
-#
-# ### Stream Outputs
-#
-# Prints a space separated list of all loaded modules to the STDOUT stream of
-# the calling environment.
-#
-# ### Return Codes
-#
-# 0 for success
-#
-# ### Failure Scenarios
-#
-# No failure scenarios.
-#
-# ### Usage Examples
-#
-#     user$ modules_loaded
-#     logging trace filesystem
-#
-modules_loaded()
-{
-  printf "${modules[*]}\n"
-}
-
-# Print out a list of all installed modules.
-# ## modules\_installed()
-modules_installed()
-{
-  local _module _module_type="${1:-"shell"}" _modules
-
-  _modules=($(
-  find "${modules_path}/${_module_type}" -mindepth 1 -maxdepth 1 -type d |
-  sed -e 's#.*/##g' -e '/\..*/d'
-  ))
-
-  for _module in ${_modules[@]}
-  do
-    printf "%s\n" "${_module}"
-  done
-}
-
-#
-# ## module\_dsl()
-#
-# Print out a list of all dsl for the given module.
-#
-# ### Input Parameters
-#
-# First parameter is the module name to print out the dsl for.
-#
-# ### Stream Outputs
-#
-# The named module's DSL function listing will is printed to the calling
-# environments STDOUT.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success
-#
-# ### Failure Scenarios
-#
-# Fails if no module name was given.
-#
-# ### Usage Examples
-#
-#     user$ module_dsl defaults
-#     read_default()
-#
-module_dsl()
-{
-  local _function _dsl _modules="${@:-}"
-
-  if array_is_nonempty _modules
-  then
-    local _path="${modules_path}/shell/${_module}"
-
-    _dsl=($(find "${_path}" -mindepth 1 -maxdepth 1 -name dsl -type f -print0 | xargs -0 grep '^[a-z_]*()$' 2>/dev/null || true))
-
-    for _function in "${_dsl[@]}"
-    do
-      _function="${_function##*modules\/shell\/}"
-      printf "%s\n" "${_function//*:}"
-    done
-  else
-    fail "Cannot print the DSL for module(s) as no module names were given."
-  fi
-}
-
-#
-# ## modules\_list()
-#
-# Lists dsl for all modules.
-#
-# ### Input Parameters
-#
-# First parameter is the module name to print out the dsl for.
-#
-# ### Stream Outputs
-#
-# DSL function listing for each module is printed to the STDOUT of the calling
-# environment.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success
-#
-# ### Failure Scenarios
-#
-# No failure scenarios currently.
-#
-# ### Usage Examples
-#
-#     user$ modules_list
-#     array
-#
-#       array_is_nonempty()
-#       array_length()
-#       array_last_element()
-#       array_first_element()
-#       array_push()
-#       array_append()
-#       array_shift()
-#       array_unshift()
-#       array_join()
-#     ... longish output ...
-#
-modules_list()
-{
-  local _module _modules _function _dsl
-
-  for language in shell ruby
-  do
-    _modules=($(modules_installed ${language}))
-    for _module in "${_modules[@]}"
-    do
-      printf "\n%s\n\n" "${_module}"
-      _dsl=($(module_dsl "${_module}"))
-      for _function in "${_dsl[@]}"
-      do
-        printf "%s\n" "  ${_function}"
-      done
-    done
-  done
-}
-
-#
-# ## modules\_docs()
-#
-# Output the module DSL documentation for a given module name.
-#
-# ### Input Parameters
-#
-# First parameter is the module name to print out the dsl documentation for.
-#
-# ### Stream Outputs
-#
-# DSL documentation for every function of the named module.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success
-#
-# ### Failure Scenarios
-#
-# Fails if no module name is given.
-#
-# ### Usage Examples
-#
-#     user$ module_docs defaults
-#
-#     # read_default
-#
-#     Reads default values from an extension's config/defaults file.
-#
-#     ### Input Parameters
-#
-#     First parameter is the defaults file key to read (key=value).
-#     Second parameter is the variable name to store the retrieved value in.
-#     Remaining parameters are parsed out as token, value and prefix
-#       into|as <variable name>
-#       prefix <name>
-#       <variable> # If no specifier.
-#
-#     ### Stream Outputs
-#
-#     None.
-#
-#     ### Environmental effects
-#
-#     A variable will be set to the value, if the value is nonempty. If no variable
-#     name is specified the variable will be assigned the same name as the key.
-#
-#     ### Return Codes
-#
-#     0 for success.
-#
-#     ### Failure Scenarios
-#
-#     Fails if no arguments are passed in, at least need to specify a key.
-#
-#     ### Usage Examples
-#
-#         user$ read_default "version" prefix "package" # extension is nginx for example
-#         user$ echo $package_version
-#         1.0.0
-#
-module_docs()
-{
-  local _function _dsl _module content_flag table_flag
-
-  while (( $# > 0 ))
-  do
-    token="$1"
-    shift
-    case "${token}" in
-      --content)
-        content_flag=1
-        ;;
-      --table)
-        table_flag=1
-        ;;
-      *)
-        _module="$token"
-    esac
-  done
-
-  if variable_is_nonempty _module
-  then
-    if command_exists shocco
-    then
-      if command_exists pygmentize
-      then
-        local _path="${core_development_path}/modules/shell/${_module}"
-        if (( content_flag == 1 ))
-        then
-          shocco "${_path}/dsl" |
-            awk '/<body>/{p=1;next;} /\/body>/{p=0;next;} {if (p == 1) print ; } '
-        elif (( table_flag == 1 ))
-        then
-          shocco "${_path}/dsl" |
-            awk '/<table/{p=1;} {if (p == 1) print ; } /\/table>/{p=0;} '
-        else
-          shocco "${_path}/dsl"
-        fi
-      else
-        fail "Cannot generate documentation for the '${_module}' module"\
-          " as the pygmentize command was not found in the PATH"
-      fi
-    else
-      fail "Cannot generate documentation for the '${_module}' module"\
-        " as the shocco command was not found in the PATH"
-    fi
-  else
-    fail "Cannot glean documentation for a module as no module name was given"
-  fi
-}
-
-#
-# ## modules\_docgen()
-#
-# Lists dsl for all modules.
-#
-# ### Input Parameters
-#
-# First parameter is the module name to print out the dsl for.
-#
-# ### Stream Outputs
-#
-# DSL function listing for each module is printed to the STDOUT of the calling
-# environment.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success
-#
-# ### Failure Scenarios
-#
-# No failure scenarios currently.
-#
-# ### Usage Examples
-#
-#     user$ modules_list
-#     array
-#
-#       array_is_nonempty()
-#       array_length()
-#       array_last_element()
-#       array_first_element()
-#       array_push()
-#       array_append()
-#       array_shift()
-#       array_unshift()
-#       array_join()
-#     ... longish output ...
-#
-modules_docgen()
-{
-  # TODO: Replace with,
-  # for file in modules/shell/*/dsl ; do (name=${file%%\/dsl}; shocco $file > html/${name//*\/}.html)& done ; wait
-
-  local _module _modules _function _dsl
-  local _prefix="${core_development_path}/html/modules"
-  local _path="${site_development_path}"
-
-  if variable_is_nonempty core_development_path &&
-     path_exists "${core_development_path}"
-  then
-    ensure_paths_exist "${_prefix}"
-
-    log "<html><body><h2>BDSM Module Documentation</h2><ul>" \
-      > "${_prefix}/index.html"
-
-    _modules=($(
-    find "${core_development_path}/modules/shell" -mindepth 1 -maxdepth 1 \
-      -type d | sed -e 's#.*/##g' -e '/\..*/d'
-    ))
-
-    ensure_paths_exist "${_prefix}"
-
-    for _module in "${_modules[@]}"
-    do
-      (
-      _base="${_prefix}/${_module}"
-      log "Generating ${_base}.html"
-      module_docs "${_module}" > "${_base}.html"
-
-      log "<li><a href=\"./${_module}.html\">${_module}</a></li>" \
-        >> "${_prefix}/index.html"
-
-      # Replace the shocco generated css url with a local filesystem css file
-      # so that a network request is not required in order to have styling when
-      # viewing the documentation offline.
-      replace_content "http://jashkenas.github.com/docco/resources/docco" \
-        with "../css/shocco" in "${_base}.html"
-      )&
-    done
-    wait
-
-    log "  </ul></body></html>" >> "${_prefix}/index.html"
-    log "Modules documentation content has been generated in ${_prefix}."
-  else
-    error "Set core_development_path in ~/.bdsmrc and clone the bdsm core "\
-      "repository into it in order to run docgen."\
-      "For more information see https://bdsm.beginrescueend.com/development/core"
-  fi
-}
-
-# ## modules_docopen()
-modules_docopen()
-{
-  # TODO: Replace with,
-  # for file in modules/shell/*/dsl ; do (name=${file%%\/dsl}; shocco $file > html/${name//*\/}.html)& done ; wait
-  if variable_is_nonempty core_development_path &&
-     path_exists "${core_development_path}"
-  then
-    if file_exists "${core_development_path}/html/modules/index.html"
-    then
-      os_open "${core_development_path}/html/modules/index.html"
-    else
-      error "Run '$ bdsm mod docgen' before trying docopen."
-    fi
-  else
-    error "Set core_development_path in ~/.bdsmrc and clone the bdsm core "\
-      "repository into it in order to run docopen."
-  fi
-}
-
-# ## modules_site_docopen()
-modules_site_docgen()
-{
-  # TODO: Replace with,
-  # for file in modules/shell/*/dsl ; do (name=${file%%\/dsl}; shocco $file > html/${name//*\/}.html)& done ; wait
-
-  local _module _modules _function _dsl
-  local _prefix="${core_development_path}/html/modules"
-  local _path="${site_development_path}"
-
-  if path_exists "${core_development_path}"
-  then
-    log "<html><body><h2>BDSM Module Documentation</h2><ul>" \
-      > "${_prefix}/index.html"
-
-    _modules=($(
-    find "${core_development_path}/modules/shell" -mindepth 1 -maxdepth 1 \
-      -type d | sed -e 's#.*/##g' -e '/\..*/d'
-    ))
-    for _module in "${_modules[@]}"
-    do
-      (
-      ensure_paths_exist "${_prefix}/${_module}"
-      _base="${_prefix}/${_module}"
-      log "Generating ${_base}.html"
-      module_docs "${_module}" > "${_base}.html"
-      log "<li><a href=\"./${_module}.html\">${_module}</a></li>" \
-        >> "${_prefix}/index.html"
-      )&
-    done
-    wait
-    log "  </ul></body></html>" >> "${_prefix}/index.html"
-    log "Modules documentation content has been generated in ${_prefix}."
-  else
-    fail "Set core_development_path in ~/.bdsmrc in order to run docgen."
-  fi
-
-  if path_exists "${site_development_path}"
-  then # TODO: Extract this section into a separate location.
-    # Copy the generated files into the proper site content dir.
-    files=($(
-    find "${_prefix}" -mindepth 1 -iname '*.haml'
-    ))
-    for file in "${files[@]}"
-    do
-      (
-      name=${file##*\/}
-      name=${name%.haml}
-
-      ensure_paths_exist "${site_development_path}/content/modules/shell/${name}"
-
-      log "Building ${name} dsl from generated docs."
-      cat > "${site_development_path}/content/modules/shell/${name}/dsl.haml" <<Header
-  .breadcrumbs
-    %a{ :href => "/" }
-      Documentation
-    &nbsp;>&nbsp;
-    %a{ :href => "/modules/" }
-      Modules
-    &nbsp;>&nbsp;
-    %a{ :href => "/modules/shell/" }
-      shell
-    &nbsp;>&nbsp;
-    %a{ :href => "/modules/shell/${name}/" }
-      ${name}
-    &nbsp;>&nbsp;
-    %a{ :href => "/modules/shell/${name}/dsl/" }
-      DSL API :: ${name}
-    %hr
-
-  %h1
-    Module ${name}
-
-Header
-      cat $file >> "${site_development_path}/content/modules/shell/${name}/dsl.haml"
-
-      html2haml "${_base}.html" \
-        >> "${site_development_path}/content/modules/shell/${name}/dsl.haml"
-      )&
-    done
-
-    wait
-
-    log "Module documentation has been generated from the source code path ${core_development_path} into the site development path ${site_development_path}"
-  else
-    fail "Set site_development_path in ~/.bdsmrc in order to run docgen."
-  fi
-}
-
