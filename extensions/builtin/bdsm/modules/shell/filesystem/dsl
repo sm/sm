@@ -3238,7 +3238,12 @@ replace_content()
       then
         if [[ -f "${_file:-}" ]]
         then
-          sed -i -e "s#${_pattern//\#/\\#}#${_content//\#/\\#}#g" "${_file}"
+          sed -i bak "s#${_pattern//\#/\\#}#${_content//\#/\\#}#g" "${_file}"
+
+          if [[ -f "${_file}.bak" ]]
+          then # cleanup, we use backup files to avoid possible FS corruption/race conditions
+            rm -f "${_file}.bak"
+          fi
         else
           fail "Can not replace file content as the file does not exist."
         fi
