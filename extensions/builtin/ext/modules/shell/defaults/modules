@@ -1,4 +1,4 @@
-bdsm/variables
-bdsm/filesystem
-bdsm/extensions
+ext/variables
+ext/filesystem
+ext/extensions
 ext/vcs
