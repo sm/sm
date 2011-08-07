@@ -5,6 +5,6 @@ cleanse_paths=(
   external completion modules bin extensions/builtin
 )
 directories=( bin )
-files=( LICENSE VERSION README.md known_sets )
+files=( LICENSE VERSION README.md )
 aux_paths=( log tmp src )
 configs=( user ) # TODO move this to /etc/bdsm/ and/or $HOME/.bdsm/
