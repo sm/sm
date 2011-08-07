@@ -27,27 +27,18 @@ prepare_for_installation()
   ensure_paths_exist "${directories[@]}" "${aux_paths[@]}"
 }
 
-# make a copy of provided bdsm internal extensions if there is none
-install_internal_extensions()
+# make a copy of provided bdsm dependencies extensions if there is none
+install_dependencies_extension_set()
 {
-  if path_exists "${install_path}/extensions/internal" &&
-    file_exists "${install_path}/extensions/internal/.uri" &&
-    file_contains "${install_path}/extensions/internal/.uri" "/bdsm-extensions"
-  then
-    log "\n  To update extension sets use 'bdsm sets update all'\n"
-  else
-    if path_exists "extensions/internal" &&
-      file_exists "extensions/internal/README.md"
-    then
-      log "  Installing internal extensions"
-    else
-      log "  Downloading & installing internal extensions"
-      mkdir -p "extensions/internal"
-      git submodule init
-      git submodule update
-    fi
-    copy_directory "extensions/internal" to "${install_path}/extensions/internal"
-    write "wayneeseguin/bdsm-extensions" to "${install_path}/extensions/internal/.uri"
+  if command_exists git
+  then # TODO: use tarball method for this and/or bundle it directly.
+    sets_install "dependencies" "wayneeseguin/bdsm-dependencies"
+    ensure_paths_exist "${install_path}/extensions/dependencies"
+
+    cp -Rf dependencies/ "${install_path}/extensions/"
+
+    write "git://github.com/wayneeseguin/bdsm-dependencies.git" \
+      to "${install_path}/extensions/dependencies/.uri"
   fi
 }
 
@@ -180,7 +171,7 @@ install_bdsm()
 
   perform set_bdsm_path
 
-  perform install_internal_extensions
+  perform install_dependencies_extension_set
 
   perform migrate_external_extensions
 
