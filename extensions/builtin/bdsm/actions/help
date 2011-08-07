@@ -6,13 +6,13 @@ description "Bash Delectable Scripting Manager (BDSM) Framework - Core Extension
 
 action "{file_name}" "Run the provided {file_name} with BDSM initialized"
 action "bdsmrc" "Install bdsmrc template file into ~/.bdsmrc"
-
+action_separator
 action "get head" "Fetch and install the latest BDSM development version"
 action "extend {uri} {name}" "Install extension {name} from {uri}"
 action "extend update {name}" "Update extension {name}"
 action "sets" "List all installed extension sets and their extensions."
 action "sets help" "Show available extension sets management operations help."
-
+action_separator
 action "version" "Display the curently installed BDSM version"
 action "help" "Display this help"
 
