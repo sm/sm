@@ -127,7 +127,7 @@ detect_modules_paths()
   do
     if is_module "${root}${path}"
     then
-      _module_definitions=( "${path##\/}=$*\n" ${_module_definitions[@]} )
+      _module_definitions=( "${path##\/}=$*" ${_module_definitions[@]} )
     else
       break
     fi
