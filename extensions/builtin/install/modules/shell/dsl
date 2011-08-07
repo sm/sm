@@ -33,12 +33,9 @@ install_dependencies_extension_set()
   if command_exists git
   then # TODO: use tarball method for this and/or bundle it directly.
     sets_install "dependencies" "wayneeseguin/bdsm-dependencies"
-    ensure_paths_exist "${install_path}/extensions/dependencies"
-
-    cp -Rf dependencies/ "${install_path}/extensions/"
 
     write "git://github.com/wayneeseguin/bdsm-dependencies.git" \
-      to "${install_path}/extensions/dependencies/.uri"
+      to "${extensions_path}/dependencies/.uri"
   fi
 }
 
