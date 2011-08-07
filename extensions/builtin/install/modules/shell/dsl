@@ -35,7 +35,7 @@ install_dependencies_extension_set()
     sets_install "dependencies" "wayneeseguin/bdsm-dependencies"
 
     write "git://github.com/wayneeseguin/bdsm-dependencies.git" \
-      to "${extensions_path}/dependencies/.uri"
+      to "${extension_sets_path}/dependencies/.uri"
   fi
 }
 

@@ -37,7 +37,7 @@ true \
   "${md5_path:="${bdsm_path}/md5"}" \
   "${archives_path:="${bdsm_path}/archives"}" \
   "${scm_path:="${bdsm_path}/scm"}" \
-  "${extensions_path:="${bdsm_path}/extensions"}" \
+  "${extension_sets_path:="${bdsm_path}/extensions"}" \
   "${tmp_path:="${bdsm_path}/tmp"}" \
   "${bin_path:="${bdsm_path}/bin"}" \
   "${repos_path:="${bdsm_path}/repos"}" \

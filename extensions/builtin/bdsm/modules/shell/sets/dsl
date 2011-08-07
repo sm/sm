@@ -77,7 +77,7 @@ sets_install()
     fi
   fi
   local _identifier="$(scm_identifier "${_uri}")"
-  enter "${extensions_path}"
+  enter "${extension_sets_path}"
   fetch_uri "${_uri}" "${src_path}/${_identifier}"
   log "Installing extension set: ${_name}."
   remove_paths "${_name}"
@@ -157,7 +157,7 @@ sets_uninstall()
       error "Extension set ${_name} can not be removed"
       ;;
   esac
-  enter "${extensions_path}"
+  enter "${extension_sets_path}"
   if [[ ! -d "${_name}" ]]
   then
     error "Please specify valid extension name"
