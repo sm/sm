@@ -10,3 +10,6 @@ activate=package activate
 enable=package activate
 deactivate=package deactivate
 disable=package deactivate
+package=dev package
+publish=dev publish
+create=dev create

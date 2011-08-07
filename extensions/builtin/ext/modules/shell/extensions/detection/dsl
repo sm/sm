@@ -1,0 +1,429 @@
+#!/usr/bin/env bash
+
+# detect_action $extension action extension_args "${extension_args[@]}"
+detect_action()
+{
+  extensions_path=$1
+  shift
+  extension="${1:-core}"
+  shift
+
+  local token _word _action_path="$extensions_path/$extension/actions"
+
+  local _params=("$@")
+
+  #loop when params or .actions exists
+  while (( ${#_params[@]} > 0 )) || file_exists "${_action_path}/.actions"
+  do
+    array_shift _params token
+
+    # Detect function
+    if  variable_is_nonempty token &&
+      match "$token" "*\(\)"
+    then
+      _params=( "${token}" "${_params[@]}" )
+      break
+
+    # Detect a namespace
+    elif variable_is_nonempty token &&
+      path_exists "${_action_path}/${token}"
+    then
+      _action_path+="/${token}"
+
+    # Detect action
+    elif variable_is_nonempty token &&
+      file_is_executable "${_action_path}/${token}"
+    then
+      _params=( "${token}" "${_params[@]}" )
+      break
+
+    # Detect mapping in .actions
+    elif file_exists "${_action_path}/.actions" &&
+         file_contains "${_action_path}/.actions" "^${token}="
+    then
+      _array=( $(hash_file "${_action_path}/.actions" ${token}) )
+      _params=( "${_array[@]}" "${_params[@]}" )
+      [[ "${_array[@]}" == "$token" ]] && break #break if detected 2nd time the same
+
+    # Detect default mapping in .actions
+    elif file_exists "${_action_path}/.actions" &&
+         file_contains "${_action_path}/.actions" "^default="
+    then
+      _array=( $(hash_file "${_action_path}/.actions" default) )
+      _params=( "${_array[@]}" "${token}" "${_params[@]}" )
+      [[ "${_array[@]}" == "$token" ]] && break #break if detected 2nd time the same
+
+    # Detect help mapping in .actions
+    elif file_exists "${_action_path}/.actions" \
+    && file_contains "${_action_path}/.actions" "^help=" \
+    && (( ${#_params[@]} == 0 ))
+    then
+      _array=( $(hash_file "${_action_path}/.actions" help) )
+      _params=( "${_array[@]}" "${token}" "${_params[@]}" )
+      [[ "${_array[@]}" == "$token" ]] && break #break if detected 2nd time the same
+
+    # finish searching path
+    else
+      _params=( "${token}" "${_params[@]}" )
+      break
+    fi
+  done
+
+  if array_is_empty _params
+  then
+    token=""
+  else
+    array_shift _params token
+  fi
+
+  # Detect function
+  if variable_is_nonempty token &&
+    match "${token}" "*\(\)"
+  then
+    action_path="${_action_path}"
+    action="$token"
+    extension_args=( "${_params[@]}" )
+
+  # Detect a file
+  elif variable_is_nonempty token &&
+    file_is_executable "${_action_path}/${token}"
+  then
+    action_path="${_action_path}"
+    action="$token"
+    extension_args=( "${_params[@]}" )
+
+  # Detect default if nothing else matches
+  elif file_exists "${_action_path}/default"
+  then
+    action_path="${_action_path}"
+    action="default"
+    extension_args=( "$token" "${_params[@]}" )
+
+  # Detect help if no default
+  elif file_exists "${_action_path}/help" \
+  && (( ${#_params[@]} == 0 )) \
+  && [[ "$token" == "" ]]
+  then
+    action_path="${_action_path}"
+    action="help"
+    [[ "$token" != "" ]] && extension_args=("$token") || extension_args=()
+    extension_args+=( "${_params[@]}" )
+
+  else
+    # Not found, error.
+    return 1
+  fi
+
+  # Found, OK
+  return 0
+}
+
+# find modules on path
+detect_modules_paths()
+{
+  local root="$1" path="" IFS='/'
+  shift
+  while (( $# > 0 ))
+  do
+    if is_module "${root}${path}"
+    then
+      printf "${path##\/}=$*\n"
+    else
+      break
+    fi
+    path+="/$1"
+    shift
+  done
+}
+
+# search for extension that modules dependency providing matching [namespace...] action
+detect_modules_action()
+{
+  trace_filter modules_action
+
+  extensions_path=$1 extension="${2:-core}"
+  shift 2 # TODO: proper error handling here...
+
+  local token _word _modules_path="$extensions_path/$extension/modules/shell"
+
+  local _params=("$@") _module_path _module_params _module_name
+
+  # iterate modules from longest path
+  for _module_definition in $(detect_modules_paths ${_modules_path} "$@" | sort -r)
+  do
+    _module_path="${_module_definition//=*}"
+    _module_params="${_module_definition//*=}"
+    if [[ -s "${_modules_path}/${_module_path}/modules" ]]
+    then
+      for _module_name in $( cat "${_modules_path}/${_module_path}/modules" )
+      do
+        if in_search_paths detect_module "${_module_name}"
+        then
+          if [[ -s "${module_path}/actions" ]]
+          then
+            local _params="" _action="${_module_params}" _read_action
+            while [[ -n "${_action}" ]]
+            do
+              if file_contains "${module_path}/actions" "${_action}="
+              then
+                _read_action=$( hash_file "${module_path}/actions" "${_action//\//\/}" )
+                if [[ -n "$_read_action" ]]
+                then
+                  action="$_read_action"
+                  action_path="$extensions_path/$extension/actions/${_module_path// /\/}"
+                  extension_args=( $_params )
+                  return 0
+                fi
+              fi
+              if [[ "$_action" =~ "/" ]]
+              then
+                _params="${_action##*/} $_params"
+                _action="${_action%/*}"
+              else
+                break
+              fi
+            done
+          fi
+        fi
+      done
+    fi
+  done
+  return 1
+}
+
+detect_action_type()
+{
+  local _path="${action_path:-}"
+
+  case "${action}" in
+    (*\(\))
+      action_type="function"
+      return 0
+      ;;
+    *)
+      _path_type="$(file "${_path}/${action}")"
+      ;;
+  esac
+
+  case "${_path_type}" in
+
+    *sh[[:space:]]script*|*POSIX[[:space:]]shell*|*Bourne-Again*)
+      action_type="shell"
+      ;;
+
+    *ASCII*)
+      # Launch with helper dsl, if possible.
+      extension="${_path//.}"
+
+      case "${extension}" in
+        shell|zsh|bash|sh)
+          action_type="shell"
+          #rb) action_type="ruby"   ;;
+          ;;
+        *)
+          read -r shebang < "${_path}"
+
+          case "${shebang}" in
+            *ruby|*rbx|*jruby|*macruby)
+              binary="${shebang##*(#|!)}"
+              binary="${binary##* }"
+              action_type="ruby"
+              ;;
+            *)
+              if [[ -x "${_path}" ]] ; then
+                action_type="binary"
+              else
+                action_type="not executable"
+              fi
+              ;;
+          esac
+          ;;
+      esac
+      result=$?
+      ;;
+
+    cannot[[:space:]]open)
+      action_type="dne"
+      ;;
+
+    *)
+      if file_is_executable "${_path}"
+      then
+        action_type="binary"
+      else
+        action_type="noexec"
+      fi
+      ;;
+  esac
+
+  return $?
+}
+
+extension_modules_load()
+{
+  local _token _namespace=""
+
+  module_name="${extension}"
+  module "$module_name"
+
+  while (( $# > 0 ))
+  do
+    _namespace+="/$1"
+    shift
+
+    module_name="${extension}${_namespace}"
+    module "$module_name" || true
+  done
+}
+
+extension_run()
+{
+  trace_filter extension_run
+  local _type="${action_type:-}" _path="${action_path:-}" _namespaces
+
+  builtin cd "${initial_pwd}"
+
+  # Now based on the determined _type we launch the extension.
+  case "${_type}" in
+    function)
+      _namespaces=${_path##${extension_actions_path}}
+      extension_modules_load ${_namespaces//\// }
+
+      if command_exists "${action##_*}_cli"
+      then
+        "${action##_*}_cli"
+      fi
+
+      action_call ${action%%(*} "${extension_args[@]}"
+      ;;
+
+    shell)
+      if [[ "${action##*/}" == help ]]
+      then # Load the help module also.
+        modules ext/help
+      fi
+      _namespaces=${_path##${extension_actions_path}}
+      extension_modules_load ${_namespaces//\// }
+      action_source "${_path}/${action}" "${extension_args[@]}"
+      ;;
+
+    ruby)
+      requires=()
+      for script in dsl initialize
+      do
+        requires+=( "-r${modules_path}/ruby/core/${script}.rb" )
+      done
+
+      "${binary:-ruby}" -I"${modules_path}/ruby" -I"${extension_modules_path}/ruby" \
+        ${requires[@]} "${_path}/${action}"
+      ;;
+    # python|lua|javascript)
+      #   ADD "${modules_path}/${_type}/" to the lib path so the script can require "bdsm"
+      #  "${_path}"
+      #  ;;
+    dne|noexec)
+      fail "Processing ${action} failed, file type is unknown, file does not exist or file is not executable."
+      ;;
+    binary|*)
+      "${_path}/${action}" ${extension_action} ${extension_args[*]}
+      ;;
+  esac
+}
+
+#
+# ## extension\_action()
+#
+# Load the environment for a given extension action and then call it.
+# This is the main function for BDSM.
+#
+# ### Input Parameters
+#
+# One or more extension names.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# The current extension's initialize file will be resourced into the current
+# environment.
+#
+# ### Return Codes
+#
+# 0 for success
+# 1 for failure
+#
+# ### Failure Scenarios
+#
+# Fails if no extension was given.
+# Fails if no action was given.
+#
+# ### Usage Examples
+#
+#     $ cat $HOME/test
+#     #!/usr/bin/env bash
+#     source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # Load BDSM framework core.
+#     modules extensions
+#     extension_action ext list
+#
+#     $  $HOME/test
+#     bash fossil git libevent nginx p7zip postgresql rails redis srv tig tmux zeromq zlib
+#
+#
+extension_action()
+{
+  if (( extension_action_calls > 0 ))
+  then
+    fail "can not call 2nd time\n  extension_action ${extension_args[@]}"
+  fi
+
+  extension_action_calls+=1
+
+  unset extension action
+
+  #TODO: Should be moved to core/cli?
+  case "${extension_args[0]}" in
+    *=*) # exact version specifier
+      package_name="${extension_args[0]}"
+      export package_version="${package_name##*=}"
+      export package_name="${package_name%%=*}"
+      export extension="${package_name}"
+      extension_args[0]="${extension}"
+      ;;
+    *:*)
+      package_name="${extension_args[0]}"
+      export package_version="${package_name##*:}"
+      export package_name="${package_name%%:*}"
+      export extension="${package_name}"
+      extension_args[0]="${extension}"
+      ;;
+  esac
+
+  # Search in extensions actions
+  if in_search_paths detect_action "${extension_args[@]}"
+  then
+    log_search action "$action" "${action_path##${bdsm_path}\/extensions\/} params:${extension_args[@]}"
+
+  # Search in loaded modules actions
+  elif in_search_paths detect_modules_action "${extension_args[@]}"
+  then
+    log_search action "$action" "${action_path##${bdsm_path}\/extensions\/} params:${extension_args[@]}"
+
+  else
+    error "Unknown action path: "${extension_args[@]}"\n\nUsage: \n  bdsm extension [namespace] [action]\n"
+  fi
+
+  extension_path="$extensions_path/$extension"
+  extension_config_path="$extension_path/config"
+  extension_templates_path="$extension_path/templates"
+  extension_modules_path="$extension_path/modules"
+  extension_actions_path="$extension_path/actions"
+  extension_log_path="$log_path/$extension"
+
+  paths=$(env | awk -F= -v ORS=' ' '/_path/{print $1}')
+  flags=$(env | awk -F= -v ORS=' ' '/_flag/{print $1}')
+
+  enter "${extension_path}"
+  bdsm_exports
+}

@@ -5,7 +5,7 @@ reorder_path()
   local part="$1" extensions_path="$2" extension="$3"
   shift 3
   local output="$extensions_path/$extension/$part/$*"
-  rebuilded_path="${output// /\/}"
+  rebuilded_path="${output// //}"
 }
 
 rebuild_path()
@@ -29,6 +29,8 @@ detect_module()
   shift
   rebuild_path "modules/shell" $extensions_path $@
   _module_path=${rebuilded_path}
+
+  debug search_module_path ":${_module_path}:"
 
   if is_module "${_module_path}"
   then
@@ -168,7 +170,7 @@ in_search_paths()
 #
 module()
 {
-  local _module=$1 _skip_path_detection=$2 _file _module_dependency _module_path
+  local _module=$1 _file _module_dependency _module_path
 
   # Check if module already loaded
   if module_is_loaded "${_module}"

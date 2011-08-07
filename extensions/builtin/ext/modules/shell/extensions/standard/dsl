@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+extension_path()
+{
+  local path extension=$1
+  for path in ${extensions_search_paths[@]}
+  do
+    if [[ -d "${path}/${extension}/actions" || -d "${path}/${extension}/modules" ]]
+    then
+      extension_path="${path}/${extension}"
+      return 0
+    fi
+  done
+  return 1
+}
+
+extension_is_valid()
+{
+  local _path="$1"
+
+  if [[ -n "${_path}" ]]
+  then
+    # TODO: Add all extension requirement checks here.
+    [[ -d "${_path}/actions" ]] || [[ -d "${_path}/modules" ]]
+  else
+    fail "Cannot determine if an extension is valid as the path to the extension was not given."
+  fi
+}

@@ -106,7 +106,7 @@ then
       done
       ;;
     *)
-      modules ext/extensions
+      modules ext/extensions/detection
       extension_action
       detect_action_type
       extension_run
