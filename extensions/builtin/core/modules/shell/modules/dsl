@@ -189,6 +189,13 @@ module()
   # store path so dependencies do not overwrite it
   _module_path="${module_path}"
 
+  # Load env before dependencies so they can use env settings
+  if [[ -s "${_module_path}/env" ]]
+  then
+    #TODO: should we check for errors here ?!?!?!
+    source "${_module_path}/env"
+  fi
+
   # Load module dependencies
   if [[ -s "${module_path}/modules" ]]
   then
@@ -200,7 +207,7 @@ module()
   fi
 
   # Load module
-  for _file in env dsl cli initialize
+  for _file in dsl cli initialize
   do
     if [[ -s "${_module_path}/${_file}" ]]
     then
