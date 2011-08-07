@@ -1,0 +1,2 @@
+default=ext_update()
+all=ext_update_all()

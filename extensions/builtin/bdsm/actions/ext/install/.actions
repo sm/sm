@@ -1,0 +1,2 @@
+default=ext_install()
+all=ext_install_all()

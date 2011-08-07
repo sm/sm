@@ -1,0 +1,7 @@
+help=ext_help()
+default=ext_list()
+known=ext_list_known()
+uninstall=ext_uninstall()
+add=install
+del=uninstall
+up=update

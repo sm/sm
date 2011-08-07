@@ -1,0 +1,175 @@
+#!/usr/bin/env bash
+
+ext_help()
+{
+  modules ext/help
+
+  description "BDSM extension ext management"
+
+  action "ext" "List installed ext."
+  action "ext known" "List extension ext that can be installed."
+  action_separator
+  action "ext install all" "Install all extension ext found on the known list."
+  action "ext install {name}" "Install extension {name} found on the known list."
+  action "ext install {name} {uri}" "Install extension {name} from the given {uri}."
+  action "ext add" "shortcut for install"
+  action_separator
+  action "ext update all" "Update all extension ext using remembered uris."
+  action "ext update {name}" "Update extension {name} using remembered uri."
+  action "ext up" "shortcut for update"
+  action_separator
+  action "ext uninstall {name}" "Remove extension {name}."
+  action "ext del" "shortcut for uninstall"
+  action_separator
+  action "ext help" "Show this help."
+
+  show_help usage
+}
+
+ext_list()
+{
+  local ext_path extensions COLUMNS=80
+  separator
+  extensions_in "${bdsm_path}/extensions/ext"
+  extensions=( ${found_extensions[@]} )
+
+  if array_is_nonempty extensions
+  then
+    log "Single extensions installed: ${ext_path##$bdsm_path\/extensions\/}\n"
+    echo ${extensions[@]} | xargs -s ${COLUMNS} | xargs -I '{}' echo "  {}"
+  else
+    log "# No single extensions currently installed: ${ext_path##$bdsm_path\/extensions\/}."
+  fi
+  separator
+}
+
+ext_list_known()
+{
+  local COLUMNS=80
+  separator
+  awk -F = '/^[^#]/ {printf "%20s | %s\n", $1, $2 }' <<<"Extension name=Repository"
+  separator
+  awk -F = '/^[^#]/ {printf "%20s   %s\n", $1, $2 }' < "${bdsm_path}/extensions/builtin/bdsm/config/known_ext"
+  separator
+}
+
+ext_install()
+{
+  local _name="$1" _uri="$2"
+  if [[ -z "${_name}" ]]
+  then
+    error "Can not install extension ext without name."
+  fi
+  case "${_name}" in
+    external|builtin)
+      error "Extension ${_name} can not be installed"
+      ;;
+  esac
+  if [[ -z "${_uri}" ]]
+  then
+    _uri=$( awk -F = "/^${_name}=/ {print \$2 }" < "${bdsm_path}/extensions/builtin/bdsm/config/known_ext" )
+    if [[ -z "${_uri}" ]]
+    then
+      error "Can not find ${_name} in known extension ext list."
+    fi
+  fi
+  local _identifier="$(scm_identifier "${_uri}")"
+  enter "${bdsm_path}/extensions/ext"
+  fetch_uri "${_uri}" "${src_path}/${_identifier}"
+  log "Installing extension: ${_name}."
+  remove_paths "${_name}"
+  copy_directory "${src_path}/${_identifier}" to "${_name}"
+}
+
+ext_install_all()
+{
+  local _set _name _uri COLUMNS=80
+  for _set in $( awk '/^[^#]/' < "${bdsm_path}/extensions/builtin/bdsm/config/known_ext" )
+  do
+    _name="${_set%%=*}"
+    _uri="${_set##*=}"
+    ext_install "${_name}" "${_uri}"
+    separator
+  done
+}
+
+ext_update()
+{
+  local _name _uri
+  if [[ -z "$1" ]]
+  then
+    error "Can not update extension ext without name."
+  fi
+  for _name in "$@"
+  do
+    case "${_name}" in
+      external|builtin)
+        error "Extension ${_name} can not be updated"
+        ;;
+    esac
+    if [[ ! -d "${bdsm_path}/extensions/ext/${_name}" ]]
+    then
+      error "Extension ${_name} does not exist."
+    fi
+    if [[ ! -s "${bdsm_path}/extensions/ext/${_name}/.uri" ]]
+    then
+      log "Extension ${_name} does not contain stored uri.\n"
+      continue
+    fi
+    _uri=$( cat "${bdsm_path}/extensions/ext/${_name}/.uri" )
+    if [[ -z "${_uri}" ]]
+    then
+      log "Extension ${_name} does not contain stored uri."
+    else
+      ext_install "${_name}" "${_uri}"
+    fi
+    printf "\n"
+  done
+}
+
+ext_update_all()
+{
+  local _name
+  for _name in ${extensions_search_paths[@]}
+  do
+    case "${_name##*/}" in
+      external|builtin)
+        # Skip those two
+        ;;
+      *)
+        ext_update "${_name##*/}"
+        ;;
+    esac
+  done
+}
+
+ext_uninstall()
+{
+  local _name="$1"
+  case "${_name}" in
+    */*|.|..)
+      error "Please specify valid extension name"
+      ;;
+    external|builtin)
+      error "Extension ${_name} can not be removed"
+      ;;
+  esac
+  enter "${bdsm_path}/extensions/ext"
+  if [[ ! -d "${_name}" ]]
+  then
+    error "Please specify valid extension name"
+  fi
+
+  #TODO: are you sure ?
+
+  log "Uninstalling extension: ${_name}."
+  rm -rf "${_name}"
+}
+
+ext_check_availability()
+{
+  awk -F = '/^[^#]/ {printf "%20s   %s\n", $1, $2 }' < "${bdsm_path}/extensions/builtin/bdsm/config/known_ext" |
+  "${bdsm_path}/bin/bdsm-ll" \
+    printf "%s: " {} \; curl -s --head https://github.com/wayneeseguin/bdsm-{} \| awk "'/Status/{print \$2}'"
+}
+
