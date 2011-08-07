@@ -29,7 +29,6 @@ ext_help()
 ext_list()
 {
   local ext_path extensions COLUMNS=80
-  separator
   extensions_in "${bdsm_path}/extensions/ext"
   extensions=( ${found_extensions[@]} )
 
@@ -40,17 +39,13 @@ ext_list()
   else
     log "# No single extensions currently installed: ${ext_path##$bdsm_path\/extensions\/}."
   fi
-  separator
 }
 
 ext_list_known()
 {
   local COLUMNS=80
-  separator
   awk -F = '/^[^#]/ {printf "%20s | %s\n", $1, $2 }' <<<"Extension name=Repository"
-  separator
   awk -F = '/^[^#]/ {printf "%20s   %s\n", $1, $2 }' < "${bdsm_path}/extensions/builtin/bdsm/config/known_ext"
-  separator
 }
 
 ext_install()
@@ -89,7 +84,6 @@ ext_install_all()
     _name="${_set%%=*}"
     _uri="${_set##*=}"
     ext_install "${_name}" "${_uri}"
-    separator
   done
 }
 

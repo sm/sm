@@ -29,7 +29,6 @@ sets_help()
 sets_list()
 {
   local ext_path extensions COLUMNS=80
-  separator
   for ext_path in ${extensions_search_paths[@]}
   do
     extensions_in $ext_path
@@ -42,18 +41,14 @@ sets_list()
     else
       log "# No extensions currently installed in set: ${ext_path##$bdsm_path\/extensions\/}."
     fi
-    separator
   done
 }
 
 sets_list_known()
 {
   local COLUMNS=80
-  separator
-  awk -F = '/^[^#]/ {printf "%20s | %s\n", $1, $2 }' <<<"Set name=Repository"
-  separator
+  awk -F = '/^[^#]/ {printf "#%19s | %s\n", $1, $2 }' <<<"Set name=Repository"
   awk -F = '/^[^#]/ {printf "%20s   %s\n", $1, $2 }' < "${bdsm_path}/extensions/builtin/bdsm/config/known_sets"
-  separator
 }
 
 sets_install()
@@ -92,7 +87,6 @@ sets_install_all()
     _name="${_set%%=*}"
     _uri="${_set##*=}"
     sets_install "${_name}" "${_uri}"
-    separator
   done
 }
 
