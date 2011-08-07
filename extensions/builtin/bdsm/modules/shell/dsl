@@ -1,46 +1,5 @@
 #!/usr/bin/env bash
 
-#
-# ## bdsm_version()
-#
-# Reads the currently installed bdsm version into the variable 'bdsm_version'.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# The variable 'bdsm_version' will be set after the function is executed.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# No failure scenarios currently.
-#
-# ### Usage Examples
-#
-#     user$ bdsm_version
-#     user$ echo $bdsm_version
-#     69.69.69
-#
-bdsm_version()
-{
-  if file_is_nonempty "$bdsm_path/VERSION"
-  then
-    read -r bdsm_version < "$bdsm_path/VERSION"
-  else
-    bdsm_version="?.?.?"
-  fi
-}
-
 #TODO: this code should be distributed to proper places
 extension_cli()
 {
