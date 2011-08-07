@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-if [[ -w $bdsm_path ]]
+if [[ ! -w $bdsm_path ]]
 then
-  mkdir -p $scm_path || true
-  mkdir -p $archives_path || true
+  scm_path="$HOME/.bdsm/scm"
+  archives_path="$HOME/.bdsm/archives"
 fi
+[[ -d "${scm_path}" ]]      || mkdir -p $scm_path
+[[ -d "${archives_path}" ]] || mkdir -p $archives_path
 
-[[ -w $scm_path ]] || scm_path=$HOME/.bdsm/scm
-[[ -w $archives_path ]] || archives_path=$HOME/.bdsm/archives

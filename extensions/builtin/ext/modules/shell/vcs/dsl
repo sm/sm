@@ -181,7 +181,10 @@ archive_get() {
   shift
   shift
 
-  mkdir -p "${archives_path}"
+  if [[ ! -d "${archives_path}" ]]
+  then
+    mkdir -p "${archives_path}"
+  fi
 
   if [[ -f "${_archive}" ]] \
   && ! file_matches_md5 "${_archive}" "${_package_md5}"
