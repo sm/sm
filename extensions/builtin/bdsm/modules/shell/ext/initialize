@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+ensure_paths_exist "${bdsm_path}/extensions/ext"
+
