@@ -27,27 +27,27 @@ prepare_for_installation()
   ensure_paths_exist "${directories[@]}" "${aux_paths[@]}"
 }
 
-# make a copy of provided bdsm internal extensions if there is none
-install_internal_extensions()
+# make a copy of provided bdsm dependencies extensions if there is none
+install_dependencies_extensions()
 {
-  if path_exists "${install_path}/extensions/internal" &&
-    file_exists "${install_path}/extensions/internal/.uri" &&
-    file_contains "${install_path}/extensions/internal/.uri" "/bdsm-extensions"
+  if path_exists "${install_path}/extensions/dependencies" &&
+    file_exists "${install_path}/extensions/dependencies/.uri" &&
+    file_contains "${install_path}/extensions/dependencies/.uri" "/bdsm-dependencies"
   then
     log "\n  To update extension sets use 'bdsm sets update all'\n"
   else
-    if path_exists "extensions/internal" &&
-      file_exists "extensions/internal/README.md"
+    if path_exists "extensions/dependencies" &&
+      file_exists "extensions/dependencies/README.md"
     then
-      log "  Installing internal extensions"
+      log "  Installing dependencies extension set"
     else
-      log "  Downloading & installing internal extensions"
-      mkdir -p "extensions/internal"
+      log "  Downloading & installing dependencies extension set"
+      mkdir -p "extensions/dependencies"
       git submodule init
       git submodule update
     fi
-    copy_directory "extensions/internal" to "${install_path}/extensions/internal"
-    write "wayneeseguin/bdsm-extensions" to "${install_path}/extensions/internal/.uri"
+    copy_directory "extensions/dependencies" to "${install_path}/extensions/dependencies"
+    write "wayneeseguin/bdsm-dependencies" to "${install_path}/extensions/dependencies/.uri"
   fi
 }
 
@@ -180,7 +180,7 @@ install_bdsm()
 
   perform set_bdsm_path
 
-  perform install_internal_extensions
+  perform install_dependencies_extensions
 
   perform migrate_external_extensions
 
