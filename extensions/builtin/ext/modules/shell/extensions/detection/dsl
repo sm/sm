@@ -127,7 +127,7 @@ detect_modules_paths()
   do
     if is_module "${root}${path}"
     then
-      printf "${path##\/}=$*\n"
+      _module_definitions=( "${path##\/}=$*\n" ${_module_definitions[@]} )
     else
       break
     fi
@@ -148,8 +148,10 @@ detect_modules_action()
 
   local _params=("$@") _module_path _module_params _module_name
 
-  # iterate modules from longest path
-  for _module_definition in $(detect_modules_paths ${_modules_path} "$@" | sort -r)
+  local _module_definition _module_definitions=()
+
+  detect_modules_paths ${_modules_path} "$@"
+  for _module_definition in ${_module_definitions[@]}
   do
     _module_path="${_module_definition//=*}"
     _module_params="${_module_definition//*=}"
