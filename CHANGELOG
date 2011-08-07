@@ -1,21 +1,3 @@
-0.8.3
-  > Do not allow remove paths to trigger revert.
-  > revert is more indicative.
-  > output handle 3 for easy writing to log file
-  > cleaning code, moved to std/vcs
-  > informative error, fix rollback action mapping
-  > remove testing false
-  > error handling, improved error recovery
-  > add [after_]fail_stage support, improved error handling
-  > logging and error handling
-  > move modules loading to modules file
-
-0.8.2
-
-0.8.1
-
-0.8.0
-
 0.7.8
 - Some minor bugfixes in core before we push a major refactoring release.
 0.7.7
