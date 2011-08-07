@@ -28,23 +28,24 @@ ext_help()
 
 ext_list()
 {
-  local ext_path extensions COLUMNS=80
+  local extensions COLUMNS=80
   extensions_in "${bdsm_path}/extensions/ext"
   extensions=( ${found_extensions[@]} )
 
   if array_is_nonempty extensions
   then
-    log "Single extensions installed: ${ext_path##$bdsm_path\/extensions\/}\n"
-    echo ${extensions[@]} | xargs -s ${COLUMNS} | xargs -I '{}' echo "  {}"
+    log "ext: "
+    echo ${extensions[@]} | xargs -s ${COLUMNS} | xargs -I '{}' echo "  - {}"
   else
-    log "# No single extensions currently installed: ${ext_path##$bdsm_path\/extensions\/}."
+    log "# No single extensions (ext) currently installed."
   fi
 }
 
 ext_list_known()
 {
   local COLUMNS=80
-  awk -F = '/^[^#]/ {printf "%20s | %s\n", $1, $2 }' <<<"Extension name=Repository"
+
+  awk -F = '/^[^#]/ {printf "# %18s | %s\n", $1, $2 }' <<<"Extension name=Repository"
   awk -F = '/^[^#]/ {printf "%20s   %s\n", $1, $2 }' < "${bdsm_path}/extensions/builtin/bdsm/config/known_ext"
 }
 
