@@ -1,3 +1,3 @@
-[submodule "extensions/internal"]
-	path = extensions/internal
-	url = git://github.com/wayneeseguin/bdsm-extensions.git
+[submodule "extensions/dependencies"]
+	path = extensions/dependencies
+	url = git://github.com/wayneeseguin/bdsm-dependencies.git
