@@ -30,7 +30,12 @@ prepare_for_installation()
 # make a copy of provided bdsm dependencies extensions if there is none
 install_dependencies_extension_set()
 {
-  sets_install "dependencies" "wayneeseguin/bdsm-dependencies"
+  if command_exists git
+  then # TODO: use tarball method for this and/or bundle it directly.
+    sets_install "dependencies" "wayneeseguin/bdsm-dependencies"
+    ensure_paths_exist "${install_path}/extensions/dependencies"
+    copy_paths --force to "${install_path}/extensions/dependencies/" "dependencies"
+  fi
 }
 
 migrate_external_extensions()
