@@ -35,6 +35,8 @@ install_dependencies_extension_set()
     sets_install "dependencies" "wayneeseguin/bdsm-dependencies"
     ensure_paths_exist "${install_path}/extensions/dependencies"
     copy_paths --force to "${install_path}/extensions/dependencies/" "dependencies"
+    write "git://github.com/wayneeseguin/bdsm-extensions.git" \
+      to "${install_path}/extensions/dependencies/.uri"
   fi
 }
 
