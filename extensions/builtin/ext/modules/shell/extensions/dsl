@@ -445,80 +445,6 @@ extension_path()
 }
 
 #
-# ## extension\_reload()
-#
-# Reloads (re-sources) the current extension's DSL and initialization files.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# The current extension's DSL and initialization files are re-sourced into the
-# calling environment.
-#
-# ### Return Codes
-#
-# 0 for success
-#
-# ### Failure Scenarios
-#
-# No current failure scenarios.
-#
-# ### Usage Examples
-#
-#     user$ extension_reload
-#
-extension_reload()
-{
-  local _path="${extension_modules_path}/shell"
-
-  source_files "${_path}/dsl" "${_path}/initialize"
-}
-
-#
-# ## extension\_reinitialize()
-#
-# Reinitializes the current extension.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# The current extension's initialize file will be resourced into the current
-# environment.
-#
-# ### Return Codes
-#
-# 0 for success
-#
-# ### Failure Scenarios
-#
-# No failure scenarios currently.
-#
-# ### Usage Examples
-#
-#     user$ extension_reinitialize
-#
-extension_reinitialize()
-{
-  local _path="${extension_modules_path}/shell"
-
-  source_files "${_path}/initialize"
-}
-
-#
 # ## extension\_version()
 #
 # Outputs the named extension's version
@@ -545,7 +471,7 @@ extension_reinitialize()
 #
 # ### Usage Examples
 #
-#     user$ extension_reinitialize
+#     user$ extension_version
 #
 extension_version()
 {
