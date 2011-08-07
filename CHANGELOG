@@ -1,5 +1,4 @@
-0.8.2
-* extensions/internal 3535f9c...bb7eea5 (26):
+0.8.3
   > Do not allow remove paths to trigger revert.
   > revert is more indicative.
   > output handle 3 for easy writing to log file
@@ -10,6 +9,8 @@
   > add [after_]fail_stage support, improved error handling
   > logging and error handling
   > move modules loading to modules file
+
+0.8.2
 
 0.8.1
 
