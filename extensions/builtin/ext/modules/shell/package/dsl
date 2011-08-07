@@ -339,7 +339,7 @@ To force call:
 package_update()
 {
   # TODO: check if newer version exists, if so then...
-  if package_installed | grep -q "${package_version}"
+  if package_installed | grep -q "${package_version}" && [[ "$1" != "--force" ]]
   then
     log "Package ${package_name} already installed in (latest) version ${package_version}"
   else
