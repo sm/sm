@@ -804,7 +804,7 @@ array_sort_desc()
   if variable_is_nonempty _array_name
   then
     eval "${_array_name}=(\$(
-    echo \"\${${_array_name}[@]}\" | tr ' ' \"\n\" | sort -r
+    echo \"\${${_array_name}[@]}\" | sed -e 's/\s/\n/g' | sort -r
     ))"
   else
     fail "Cannot sort an array in decending order as an array"\
