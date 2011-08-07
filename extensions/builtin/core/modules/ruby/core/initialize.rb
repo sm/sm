@@ -9,5 +9,5 @@ puts "Loading modules..." if ENV["trace_flag"]
 modules %w(trace logging time variables environment filesystem extensions)
 
 # Now load extension module code.
-extension_module_load "dsl", "initialize", "cli"
+extension_module_load "env", "dsl", "initialize", "cli"
 
