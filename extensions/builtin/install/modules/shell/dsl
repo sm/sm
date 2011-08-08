@@ -39,13 +39,6 @@ install_dependencies_extension_set()
   fi
 }
 
-migrate_external_extensions()
-{
-  log "  Creating extension set for external extensions"
-  enter "${install_path}/extensions"
-  ensure_paths_exist external
-}
-
 install_core()
 {
   local _dir
@@ -167,8 +160,6 @@ install_bdsm()
   perform set_bdsm_path
 
   perform install_dependencies_extension_set
-
-  perform migrate_external_extensions
 
   perform install_configuration_files
 
