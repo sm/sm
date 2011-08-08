@@ -54,25 +54,22 @@ sets_list_known()
 
 sets_install()
 {
-  local _name="$1" _uri="$2"
-  if [[ -z "${_name}" ]]
-  then
-    error "Can not install extension sets without name."
-  fi
-  case "${_name}" in
-    builtin)
-      error "Extension set ${_name} can not be installed"
-      ;;
-  esac
-  if [[ -z "${_uri}" ]]
-  then
+  local _name="${1:-}" _uri="${2:-}"
+
+  shift || fail "name must be given as the first parameter to sets_install()"
+  shift || fail "uri must be given as the second parameter to sets_install()"
+
+  [[ "${_name}" != "builtin" ]] ||
+    error "builtin extension set may not be (re-)installed except through updating BDSM core (bdsm get head)."
+
+  [[ -n "${_uri}" ]] ||
     _uri=$( awk -F = "/^${_name}=/ {print \$2 }" < "${bdsm_path}/extensions/builtin/bdsm/config/known_sets" )
-    if [[ -z "${_uri}" ]]
-    then
-      error "Can not find ${_name} in known extension sets list."
-    fi
-  fi
+
+  [[ -n "${_uri}" ]] ||
+    error "Can not find ${_name} in known extension sets list."
+
   local _identifier="$(scm_identifier "${_uri}")"
+
   enter "${extension_sets_path}"
   fetch_uri "${_uri}" "${src_path}/${_identifier}"
   log "Installing extension set: ${_name}."
@@ -83,6 +80,7 @@ sets_install()
 sets_install_all()
 {
   local _set _name _uri COLUMNS=80
+
   for _set in $( awk '/^[^#]/' < "${bdsm_path}/extensions/builtin/bdsm/config/known_sets" )
   do
     _name="${_set%%=*}"
@@ -94,10 +92,10 @@ sets_install_all()
 sets_update()
 {
   local _name _uri
-  if [[ -z "$1" ]]
-  then
-    error "Can not update extension sets without name."
-  fi
+
+  (( $# > 0 )) ||
+    error "Cannot update extension sets without giving their names! "
+
   for _name in "$@"
   do
     case "${_name}" in
@@ -105,22 +103,27 @@ sets_update()
         error "Extension set ${_name} can not be updated"
         ;;
     esac
+
     if [[ ! -d "${bdsm_path}/extensions/${_name}" ]]
     then
       error "Extension set ${_name} does not exist."
     fi
+
     if [[ ! -s "${bdsm_path}/extensions/${_name}/.uri" ]]
     then
       log "Extension set ${_name} does not contain stored uri.\n"
       continue
     fi
+
     _uri=$( cat "${bdsm_path}/extensions/${_name}/.uri" )
+
     if [[ -z "${_uri}" ]]
     then
       log "Extension set ${_name} does not contain stored uri."
     else
       sets_install "${_name}" "${_uri}"
     fi
+
     printf "\n"
   done
 }
@@ -166,6 +169,8 @@ sets_uninstall()
 
 sets_check_availability()
 {
+  # TODO: refactor this to take argument of uri to check instead.
+  #       provide check_known_sets_availability or some such to wrap this.
   awk -F = '/^[^#]/ {printf "%20s   %s\n", $1, $2 }' < "${bdsm_path}/extensions/builtin/bdsm/config/known_sets" |
   "${bdsm_path}/bin/bdsm-ll" \
     printf "%s: " {} \; curl -s --head https://github.com/wayneeseguin/bdsm-{} \| awk "'/Status/{print \$2}'"

@@ -80,6 +80,7 @@ git_get()
 
   local _target="${scm_path}/$( scm_identifier "${_url}" )"
 
+  # v v v this looks slightly freakish... ~ Wayne
   _final_target=$(
     builtin cd "${initial_pwd}"
     mkdir -p "${_final_target}"
@@ -91,9 +92,9 @@ git_get()
   if [[ -d "$_target/.git" ]]
   then
     builtin cd "${_target}"
-    git checkout master -f -q 2>&1 >/dev/null
-    git reset --hard HEAD 2>&1  >/dev/null
-    git fetch ${remote} 2>&1 >/dev/null
+    git checkout master -f -q >/dev/null 2>&1
+    git reset --hard HEAD >/dev/null 2>&1
+    git fetch ${remote} >/dev/null 2>&1
     if [[ -z "$(git branch | awk "/${branch}$/" 2>/dev/null)" ]]
     then
       if ! (
@@ -116,19 +117,19 @@ git_get()
 
     if ! (
       builtin cd "${repo_path}"
-      git pull --rebase origin $branch 2>&1 >/dev/null
+      git pull --rebase origin $branch >/dev/null 2>&1
       )
     then
       fail "Git pull failed."
     fi
   else
     mkdir -p "${_target}"
-    if git clone --depth 1 ${_url} "${_target}" 2>&1 >/dev/null
+    if git clone --depth 1 ${_url} "${_target}" >/dev/null 2>&1
     then
       echo "${_url}" > "${_target}/.uri"
     else
       local _url_https="${_url/git:\/\//https:\/\/}"
-      if git clone --depth 1 ${_url_https} "${_target}" 2>&1 >/dev/null
+      if git clone --depth 1 ${_url_https} "${_target}" >/dev/null 2>&1
       then
         echo "${_url_https}" > "${_target}/.uri"
       else
@@ -137,9 +138,9 @@ git_get()
     fi
   fi
 
-  rm -rf "${_final_target}" 2>&1 >/dev/null
+  [[ ! -d "${_final_target}" ]] || rm -rf "${_final_target}"
 
-  if ! cp -fR "${_target}" "${_final_target}" 2>&1 >/dev/null
+  if ! cp -fR "${_target}" "${_final_target}" >/dev/null 2>&1
   then
     fail "There was an error copying '${_target}' -> '${_final_target}'"
   fi
@@ -329,7 +330,7 @@ fetch_uri()
     esac
   done
 
-  log "${log_prefix}Fetching ${_uri}"
+  log "${log_prefix}  Fetching ${_uri}"
 
   unset scm_type
 
