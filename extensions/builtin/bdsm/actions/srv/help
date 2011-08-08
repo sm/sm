@@ -4,7 +4,7 @@ description "${extension} BDSM extension."
 
 actions "  list     - List services installed through BDSM extensions using the service module.
   active     - List active services versions.
-  activate   - Activate given package and version.
-  deactivate - Deactivate given package."
+  activate   - Activate a given service and version.
+  deactivate - Deactivate a given service."
 
 show_help usage

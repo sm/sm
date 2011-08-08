@@ -377,7 +377,7 @@ extension_action()
 {
   if (( extension_action_calls > 0 ))
   then
-    fail "can not call 2nd time\n  extension_action ${extension_args[@]}"
+    fail "Cannot call a 2nd time:\n  extension_action ${extension_args[@]}"
   fi
 
   extension_action_calls+=1

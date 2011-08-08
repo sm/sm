@@ -235,7 +235,7 @@ service_setup()
         chown_paths --recursively "${service_user}:${service_user}" "${_path}"
       else
         warn "While chowning paths it was discovered that '${_path}' is in"\
-          "fact nonexistant on the filesystem, this might indicate an error."
+          "fact nonexistent on the filesystem; this might indicate an error."
       fi
     fi
   done
@@ -344,7 +344,7 @@ service_start()
     # error and as such we call the fail function which yields a message and
     # a backtrace thus enabling the developer to pinpoint and fix the issue
     # quickly.
-    fail "In order to start a service the 'service' variable must be set."
+    fail "To start a service, you must set the 'service' variable."
   fi
 }
 
@@ -400,7 +400,7 @@ service_stop()
     # error and as such we call the fail function which yields a message and
     # a backtrace thus enabling the developer to pinpoint and fix the issue
     # quickly.
-    fail "In order to start a service the 'service' variable must be set."
+    fail "To start a service, you must set the 'service' variable."
   fi
 }
 
@@ -456,7 +456,7 @@ service_reload()
     # error and as such we call the fail function which yields a message and
     # a backtrace thus enabling the developer to pinpoint and fix the issue
     # quickly.
-    fail "In order to start a service the 'service' variable must be set."
+    fail "To start a service, you must set the 'service' variable."
   fi
 }
 
@@ -512,7 +512,7 @@ service_restart()
     # error and as such we call the fail function which yields a message and
     # a backtrace thus enabling the developer to pinpoint and fix the issue
     # quickly.
-    fail "In order to start a service the 'service' variable must be set."
+    fail "To start a service, you must set the 'service' variable."
   fi
 }
 
@@ -568,7 +568,7 @@ service_status()
     # error and as such we call the fail function which yields a message and
     # a backtrace thus enabling the developer to pinpoint and fix the issue
     # quickly.
-    fail "In order to start a service the 'service' variable must be set."
+    fail "To start a service, you must set the 'service' variable."
   fi
 }
 
@@ -624,7 +624,7 @@ service_logtail()
     # error and as such we call the fail function which yields a message and
     # a backtrace thus enabling the developer to pinpoint and fix the issue
     # quickly.
-    fail "In order to start a service the 'service' variable must be set."
+    fail "To start a service, you must set the 'service' variable."
   fi
 }
 
@@ -680,7 +680,7 @@ service_info()
     # error and as such we call the fail function which yields a message and
     # a backtrace thus enabling the developer to pinpoint and fix the issue
     # quickly.
-    fail "In order to get info of a service the 'service' variable must be set."
+    fail "In order to get info on a service, the 'service' variable must be set."
   fi
 }
 
@@ -736,7 +736,7 @@ service_configcheck()
     # error and as such we call the fail function which yields a message and
     # a backtrace thus enabling the developer to pinpoint and fix the issue
     # quickly.
-    fail "In order to configcheck a service the 'service' variable must be set."
+    fail "To configcheck a service, the 'service' variable must be set."
   fi
 }
 
@@ -1176,7 +1176,7 @@ service_init_start()
     then
       succeed "${service} successfully started."
     else
-      log "${service} failed to start, check ${service_log_file} for details:"
+      log "${service} failed to start; check ${service_log_file} for details:"
       exec tail -n 50 "${service_log_file}"
       error
     fi
@@ -1232,7 +1232,7 @@ service_init_stop()
       fi
     fi
   else
-    error "Service pid has not been set or is zero."
+    error "Service pid has not been set, or is zero."
   fi
 }
 
@@ -1613,7 +1613,7 @@ service_init_d()
 
     service_init_action "${service_action}"
   else
-    fail "Could not find ${service_binary} or ${service_binary} is not executable."
+    fail "Could not find ${service_binary}, or ${service_binary} is not executable."
   fi
 }
 
@@ -1653,7 +1653,7 @@ service_deactivate()
 
   if [[ -z "${_service}" ]]
   then
-    fail "a service name must be set or passed in in order to deactivate a service."
+    fail "a service name must be set or passed in to deactivate a service."
   fi
 
   if file_exists "${init_scripts_path}/${_service}"
@@ -1727,7 +1727,7 @@ service_activate()
 
   if [[ -z "${_service}" ]]
   then
-    fail "the service name must be set or passed in in order to activate a service."
+    fail "The service name must be set or passed in to activate a service."
   fi
 
   local _version="${2:-${package_version}}"
@@ -1786,7 +1786,7 @@ service_activate()
       fi
     fi
   else
-    log "Skipping activation of ${_service} ${_version} as '${install_path}' does not exist."
+    log "Skipping activation of ${_service} ${_version}, as '${install_path}' does not exist."
   fi
 }
 
@@ -1917,15 +1917,15 @@ service_signal()
         then
           kill -${_signal} ${_pid}
         else
-          log "Not sending signal ${_signal} to process as pid is 0 (process not found/running)"
+          log "Not sending signal ${_signal} to process, as pid is 0 (process not found/running)"
         fi
         ;;
       *)
-        fail "The signal to send be passed in first and must be one of {KILL,QUIT,TERM,USR1,USR2,TTIN,TTOU,a digit})"
+        fail "The signal to send must be passed in first, and must be one of: {KILL,QUIT,TERM,USR1,USR2,TTIN,TTOU,a digit})"
         ;;
     esac
   else
-    fail "The pid to signal must be passed in as the second parameter, please check your code (see trace below.)"
+    fail "The pid to signal must be passed in as the second parameter; please check your code (see trace below.)"
   fi
 
 }

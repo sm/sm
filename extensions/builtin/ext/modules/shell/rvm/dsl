@@ -117,7 +117,7 @@ install_gems() {
   local _gem _gems=("$@") _result=0
 
   (( ${#_gems[@]} > 0 )) ||
-    fail "Cannot install gems as no gem names were given!"
+    fail "Cannot install gems, as no gem names were given!"
 
   for _gem in "${_gems[@]}"
   do

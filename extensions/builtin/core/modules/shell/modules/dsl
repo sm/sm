@@ -69,7 +69,7 @@ init_extensions_search_paths()
 #
 # ### Input Parameters
 #
-# First parameter is a full path a BDSM extensions directory.
+# First parameter is a full path for a BDSM extensions directory.
 #   (example: /usr/local/bdsm/extensions)
 #
 # ### Stream Outputs
@@ -107,7 +107,7 @@ extensions_in()
       fi
     done
   else
-    debug "No extensions in '${_path}' as path does not exist."
+    debug "No extensions in '${_path}', as path does not exist."
   fi
 }
 
@@ -137,7 +137,7 @@ in_search_paths()
 #
 # ## module()
 #
-# Loads given module and it's dependencies
+# Loads given module, and its dependencies
 #
 # ### Input Parameters
 #
@@ -161,7 +161,7 @@ in_search_paths()
 #
 #    if module backup
 #    then
-#       log "module backup found, please backup your system"
+#       log "module backup found; please backup your system"
 #    else
 #       error "could not find backup module"
 #    fi
@@ -186,10 +186,10 @@ module()
     return 1
   fi
 
-  # store path so dependencies do not overwrite it
+  # store path, so dependencies do not overwrite it
   _module_path="${module_path}"
 
-  # Load env before dependencies so they can use env settings
+  # Load env before dependencies, so they can use env settings
   if [[ -s "${_module_path}/env" ]]
   then
     #TODO: should we check for errors here ?!?!?!
@@ -219,7 +219,7 @@ module()
   return 0
 }
 
-# load module or show error msg if module not available
+# load module; or show error msg if module is not available
 module_or_error()
 {
   if ! module "$1"
@@ -255,8 +255,8 @@ module_or_error()
 #
 #  modules x y z
 #
-#  if x,y or z do not contain a '/' then prefix core/
-#  if x contains a '/' then load directly
+#  if x,y or z do not contain a '/', then prefix core/.
+#  if x contains a '/', then load directly.
 #
 #
 modules()
@@ -313,14 +313,14 @@ modules_reinitialize()
       source_files "${modules_path}/shell/${_module}/initialize"
     done
   else
-    fail "Cannot load a module as no module was given."
+    fail "Cannot load a module, as no module was given."
   fi
 }
 
 #
 # ## module\_is\_loaded()
 #
-# Checks to see whether or not the named module has been loaded or not.
+# Checks to see whether or not the named module has been loaded.
 #
 # ### Input Parameters
 #
@@ -332,8 +332,8 @@ modules_reinitialize()
 #
 # ### Return Codes
 #
-# 0 if the module has already been loaded
-# 1 if the module has not already been loaded
+# 0 - if the module has already been loaded.
+# 1 - if the module has not already been loaded.
 #
 # ### Failure Scenarios
 #
@@ -363,6 +363,6 @@ module_is_loaded()
         ;;
     esac
   else
-    fail "Cannot determine if a module is loaded as no module was given."
+    fail "Cannot determine if a module is loaded, as no module was given."
   fi
 }

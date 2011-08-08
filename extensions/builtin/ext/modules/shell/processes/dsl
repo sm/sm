@@ -27,7 +27,7 @@ process_lockfile_lock()
     # a lockfile name/path was not passed in. This is programmer error,
     # so we fail which yields a backtrace allowing the developer to fix their
     # code.
-    fail "Cannot lock onto a lockfile"\
+    fail "Cannot lock onto a lockfile,"\
       "as no lockfile was specified as the first parameter."
   fi
 
@@ -51,7 +51,7 @@ process_lockfile_lock()
   else
     # Notify the user that another process owns the lockfile and
     # exit with error code 1
-    error "Another process already owns the lockfile, exiting."
+    error "Another process already owns the lockfile; exiting."
   fi
 }
 

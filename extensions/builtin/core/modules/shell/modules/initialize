@@ -27,6 +27,6 @@ then
   for module in ${preload_modules[@]}
   do
     module_or_error ${module} \
-      "Can not load preload_module: ${module}"
+      "Cannot load preload_module: ${module}"
   done
 fi

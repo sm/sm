@@ -148,7 +148,7 @@ user_create_if_missing()
         ;;
     esac
   else
-    fail "Users and groups may be manipulated only by the super user (root) via su or sudo."
+    fail "Users and groups may be manipulated only by the super-user (root), via su or sudo."
   fi
 }
 
@@ -277,7 +277,7 @@ user_delete()
     esac
     ) || true # Ignore failures with this for now...
   else
-    fail "Users and groups may be manipulated only by the super user (root) via su or sudo."
+    fail "Users and groups may be manipulated only by the super-user (root), via su or sudo."
   fi
 }
 
@@ -415,7 +415,7 @@ user_must_be_root()
   then
     return 0
   else
-    error "bdsm $extension $action must be run as a root and NOT as a user ($USER)."
+    error "bdsm $extension $action must be run as root, and NOT as a user ($USER)."
   fi
 }
 
@@ -457,7 +457,7 @@ user_must_not_be_root()
   then
     return 0
   else
-    fail "bdsm $extension $action must be run as a (project) user and NOT as root."
+    fail "bdsm $extension $action must be run as a (project) user, and NOT as root."
   fi
 }
 

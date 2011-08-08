@@ -595,17 +595,17 @@ os_cpu_count()
   # Warn the user that this function has not yet been implemented for solaris.
   elif os_is_solaris
   then
-    warn "CPU counting for solaris has not yet been implemented, returning 1."
+    warn "CPU counting for Solaris has not yet been implemented; returning 1."
 
   # Warn the user that this function has not yet been implemented for bsd.
   elif os_is_bsd
   then
-    warn "CPU counting for bsd has not yet been implemented, returning 1."
+    warn "CPU counting for BSD has not yet been implemented; returning 1."
 
   # Warn the user that this function has not yet been implemented for aix.
   elif os_is_aix
   then
-    warn "CPU counting for aix has not yet been implemented, returning 1."
+    warn "CPU counting for AIX has not yet been implemented; returning 1."
   fi
 
   printf '%d' ${_cpu_count}

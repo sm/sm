@@ -34,7 +34,7 @@ string_remove()
 
 options_check()
 {
-  # Do not use brackets, they slow down things a lot
+  # Do not use brackets; they slow things down a lot.
   if string_contains "$1" "$2"
   then
     return 0

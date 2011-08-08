@@ -64,7 +64,7 @@ module_dsl()
       printf "%s\n" "${_function//*:}"
     done
   else
-    fail "Cannot print the DSL for module(s) as no module names were given."
+    fail "Cannot print the DSL for module(s), as no module names were given."
   fi
 }
 
@@ -241,7 +241,7 @@ module_docs()
         " as the shocco command was not found in the PATH"
     fi
   else
-    fail "Cannot glean documentation for a module as no module name was given"
+    fail "Cannot glean documentation for a module, as no module name was given"
   fi
 }
 
@@ -331,11 +331,11 @@ modules_docgen()
     wait
 
     log "  </ul></body></html>" >> "${_prefix}/index.html"
-    log "Modules documentation content has been generated in ${_prefix}."
+    log "Modules documentation content generated in ${_prefix}."
   else
-    error "Set core_development_path in ~/.bdsmrc and clone the bdsm core "\
-      "repository into it in order to run docgen."\
-      "For more information see https://bdsm.beginrescueend.com/development/core"
+    error "Set core_development_path in ~/.bdsmrc, and clone the bdsm core "\
+      "repository into it, to run docgen."\
+      "For more information, see https://bdsm.beginrescueend.com/development/core"
   fi
 }
 
@@ -355,7 +355,7 @@ modules_docopen()
     fi
   else
     error "Set core_development_path in ~/.bdsmrc and clone the bdsm core "\
-      "repository into it in order to run docopen."
+      "repository into it, to run docopen."
   fi
 }
 
@@ -393,7 +393,7 @@ modules_site_docgen()
     log "  </ul></body></html>" >> "${_prefix}/index.html"
     log "Modules documentation content has been generated in ${_prefix}."
   else
-    fail "Set core_development_path in ~/.bdsmrc in order to run docgen."
+    fail "Set core_development_path in ~/.bdsmrc, to run docgen."
   fi
 
   if path_exists "${site_development_path}"
@@ -442,8 +442,8 @@ Header
 
     wait
 
-    log "Module documentation has been generated from the source code path ${core_development_path} into the site development path ${site_development_path}"
+    log "Module documentation generated from the source code path ${core_development_path} into the site development path ${site_development_path}"
   else
-    fail "Set site_development_path in ~/.bdsmrc in order to run docgen."
+    fail "Set site_development_path in ~/.bdsmrc, to run docgen."
   fi
 }

@@ -37,7 +37,7 @@ scm_identifier()
 {
   local _url="${1:-}"
 
-  shift || fail "url must be given as first parameter to scm_identifier()"
+  shift || fail "url must be the first parameter to scm_identifier()"
 
   printf "${_url//\//_}"
 }
@@ -51,8 +51,8 @@ directory_get()
 {
   local initial_pwd="$PWD" _source="${1:-}" _target="${2:-}"
 
-  shift || fail "source path must be given as first parameter to directory_get()"
-  shift || fail "target path must be given as second parameter to directory_get()"
+  shift || fail "source path must be the first parameter to directory_get()"
+  shift || fail "target path must be the second parameter to directory_get()"
 
   rm -rf "${_target}" 2>&1 >/dev/null
 
@@ -75,8 +75,8 @@ git_get()
     branch=${3:-${branch:-master}} remote=${4:-${remote:-origin}} \
     revision=${4:-${revision:-HEAD}}
 
-  shift || fail "url must be given as first parameter to git_get()"
-  shift || fail "target path must be given as second parameter to git_get()"
+  shift || fail "url must be the first parameter to git_get()"
+  shift || fail "target path must be the second parameter to git_get()"
 
   local _target="${scm_path}/$( scm_identifier "${_url}" )"
 

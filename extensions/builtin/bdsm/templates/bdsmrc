@@ -7,12 +7,12 @@
 # The items below will soon be moved into a project module config directory:
 #   ~/.bdsm/project/defaults
 #
-# This is the logical environment that we are operating in.
-# This is used in several path and file calculations.
+# This is the logical environment we are operating in.
+# It is used in several path and file calculations.
 export environment="{{environment}}"
 
 # For Rails projects, we need to set RAILS_ENV
-# be sure that config/environments/$environment.rb exists.
+# Be sure that config/environments/$environment.rb exists!
 # It should be safe to copy config/environments/production.rb to create it.
 export RAILS_ENV="$environment"
 
@@ -20,11 +20,11 @@ export RAILS_ENV="$environment"
 #  The below settings are for repository options.
 #
 
-# The name of the project, The repository is expected to be in ~/shared/$project
+# The name of the project (the repository is expected to be in ~/shared/$project)
 
 export project="{{project}}"
 
-# The repository URL that is used to retrieve the code.
+# The repository URL for retrieving the code.
 # For Github use shortcut: user/repository
 repository_url="{{repository_url}}"
 
@@ -38,5 +38,5 @@ branch="master"
 scm_path=~/.bdsm/scm
 archives_path=~/.bdsm/archives
 
-# Add here modules that should be always loaded with BDSM
+# Add here any modules that should be always loaded with BDSM
 preload_modules+=( )

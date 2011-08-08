@@ -21,7 +21,7 @@
 # ### Environmental effects
 #
 # A variable will be set to the value, if the value is nonempty. If no variable
-# name is specified the variable will be assigned the same name as the key.
+# name is specified, the variable will be assigned the same name as the key.
 #
 # ### Return Codes
 #

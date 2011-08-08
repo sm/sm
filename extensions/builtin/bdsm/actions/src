@@ -7,9 +7,9 @@ then
     printf "${extensions_development_path}/${extension_args[0]}"
   else
     printf "." # Stay put!
-    error "Failed to edit '${extension_args[0]}' as it appears to not be installed."
+    error "Failed to edit '${extension_args[0]}'; it appears to not be installed."
   fi
 else
-  fail "An extension name must be specified."
+  fail "You must specify at least one extension name."
 fi
 

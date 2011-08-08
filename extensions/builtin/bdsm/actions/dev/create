@@ -47,5 +47,5 @@ then
   done
   succeed "Created extensions ${extension_args[@]}"
 else
-  fail "At least one extension name must be specified."
+  fail "You must specify at least one extension name."
 fi

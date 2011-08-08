@@ -19,8 +19,8 @@
 #
 # ### return codes
 #
-# 0 if the command was found in the current environment
-# 1 if the command was not found in the current environment
+# 0 if the command was found in the current environment.
+# 1 if the command was not found in the current environment.
 #
 # ### failure scenarios
 #
@@ -49,7 +49,7 @@ command_exists()
       return 1
     fi
   else
-    fail "Cannot test if command exists as no command name was given."
+    fail "Cannot test if command exists, as no command name was given."
   fi
 }
 
@@ -106,7 +106,7 @@ is_a_function()
       return 1
     fi
   else
-    fail "Cannot test if function exists as no function name was given."
+    fail "Cannot test if function exists, as no function name was given."
   fi
 }
 

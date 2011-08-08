@@ -22,7 +22,7 @@ logrotate()
 
     local _tail_pid=$!
 
-    verbose "Copying the file's contentes into a new timestamped file."
+    verbose "Copying the file's contents into a new timestamped file."
     cp "${_file}" "${_file}.${timestamp}"
 
     verbose "Truncating the file."
@@ -40,7 +40,7 @@ logrotate()
     verbose "Removing the tail logfile"
     rm "${file}.$$.log"
   else
-    fail "Cannot rotate a log file as no log file was given."
+    fail "Cannot rotate a log file, as no log file was given."
   fi
 }
 

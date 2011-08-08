@@ -19,7 +19,7 @@ ext_help()
   action "ext up" "shortcut for update"
   action_separator
   action "ext uninstall {name}" "Remove extension {name}."
-  action "ext del" "shortcut for uninstall"
+  action "ext del" "Shortcut for uninstall"
   action_separator
   action "ext help" "Show this help."
 
@@ -37,7 +37,7 @@ ext_list()
     log "ext: "
     echo ${extensions[@]} | xargs -s ${COLUMNS} | xargs -I '{}' echo "  - {}"
   else
-    log "# No single extensions (ext) currently installed."
+    log "# No single extensions (ext) are currently installed."
   fi
 }
 
@@ -54,11 +54,11 @@ ext_install()
   local _name="$1" _uri="$2"
   if [[ -z "${_name}" ]]
   then
-    error "Can not install extension ext without name."
+    error "Cannot install extension ext without name."
   fi
   case "${_name}" in
     external|builtin)
-      error "Extension ${_name} can not be installed"
+      error "Extension ${_name} cannot be installed"
       ;;
   esac
   if [[ -z "${_uri}" ]]
@@ -66,7 +66,7 @@ ext_install()
     _uri=$( awk -F = "/^${_name}=/ {print \$2 }" < "${bdsm_path}/extensions/builtin/bdsm/config/known_ext" )
     if [[ -z "${_uri}" ]]
     then
-      error "Can not find ${_name} in known extension ext list."
+      error "Cannot find ${_name} in known extension ext list."
     fi
   fi
 
@@ -97,13 +97,13 @@ ext_update()
   local _name _uri
   if [[ -z "$1" ]]
   then
-    error "Can not update extension ext without name."
+    error "Cannot update extension ext without name."
   fi
   for _name in "$@"
   do
     case "${_name}" in
       external|builtin)
-        error "Extension ${_name} can not be updated"
+        error "Extension ${_name} cannot be updated"
         ;;
     esac
     if [[ ! -d "${bdsm_path}/extensions/ext/${_name}" ]]
@@ -146,16 +146,16 @@ ext_uninstall()
   local _name="$1"
   case "${_name}" in
     */*|.|..)
-      error "Please specify valid extension name"
+      error "Please specify a valid extension name"
       ;;
     external|builtin)
-      error "Extension ${_name} can not be removed"
+      error "Extension ${_name} cannot be removed"
       ;;
   esac
   enter "${bdsm_path}/extensions/ext"
   if [[ ! -d "${_name}" ]]
   then
-    error "Please specify valid extension name"
+    error "Please specify a valid extension name"
   fi
 
   #TODO: are you sure ?

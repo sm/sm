@@ -3,7 +3,7 @@
 #
 # ## log()
 #
-# Log arguments to the calling environments STDOUT.
+# Log arguments to the calling environment's STDOUT.
 #
 # ### Input Parameters
 #
@@ -11,7 +11,7 @@
 #
 # ### Stream Outputs
 #
-# Prints arguments passed in to the calling environments STDOUT with a newline
+# Prints arguments passed in to the calling environment's STDOUT, with a newline
 # character appended.
 #
 # ### Environmental effects
@@ -44,7 +44,7 @@ log()
 #
 # ## warn()
 #
-# Log arguments to the calling environments STDOUT preceeded by 'WARNING .
+# Log arguments to the calling environment's STDOUT, preceeded by 'WARNING .
 #
 # ### Input Parameters
 #
@@ -52,8 +52,8 @@ log()
 #
 # ### Stream Outputs
 #
-# Prints arguments passed in to the calling environments STDOUT with a newline
-# character appended and 'WARNING ' prepended.
+# Prints arguments passed in to the calling environment's STDOUT, with a newline
+# character appended, and 'WARNING ' prepended.
 #
 # ### Environmental effects
 #
@@ -69,8 +69,8 @@ log()
 #
 # ### Usage Examples
 #
-# user$ info "Bad Monkeys are Typing! "
-# WARNING: Bad Monkeys are Typing!
+# user$ info "Bad Monkeys Are Typing! "
+# WARNING: Bad Monkeys Are Typing!
 #
 core_warn()
 {
@@ -83,7 +83,7 @@ warn()
 #
 # ## debug()
 #
-# Log arguments to the calling environments STDOUT preceeded by 'DEBUG: .
+# Log arguments to the calling environment's STDOUT, preceeded by 'DEBUG: .
 #
 # ### Input Parameters
 #
@@ -91,8 +91,8 @@ warn()
 #
 # ### Stream Outputs
 #
-# Prints arguments passed in to the calling environments STDOUT with a newline
-# character appended and 'DEBUG: ' prepended.
+# Prints arguments passed in to the calling environment's STDOUT, with a newline
+# character appended, and 'DEBUG: ' prepended.
 #
 # ### Environmental effects
 #
@@ -108,8 +108,8 @@ warn()
 #
 # ### Usage Examples
 #
-# The following will show when bdsm is called with --debug=[welcome|all]
-# or if debug_flags set to welcome|all.
+# The following appears when bdsm is called with --debug=[welcome|all],
+# or if you set debug_flags to welcome|all.
 # Code:
 #
 # debug welcome "Hello there! "
@@ -137,7 +137,7 @@ debug()
 #
 # ## log_search()
 #
-# Log arguments to the calling environments STDOUT preceeded by 'DEBUG: .
+# Log arguments to the calling environment's STDOUT, preceeded by 'DEBUG: .
 #
 # ### Input Parameters
 #
@@ -145,8 +145,8 @@ debug()
 #
 # ### Stream Outputs
 #
-# Prints arguments passed in to the calling environments STDOUT with a newline
-# character appended and 'DEBUG: ' prepended.
+# Prints arguments passed in to the calling environment's STDOUT, with a newline
+# character appended, and 'DEBUG: ' prepended.
 #
 # ### Environmental effects
 #
@@ -186,7 +186,7 @@ log_search()
 #
 # ## log_todo()
 #
-# Log arguments to the calling environments STDOUT preceeded by 'DEBUG: and caller file:line.
+# Log arguments to the calling environment's STDOUT, preceeded by 'DEBUG: and caller file:line.
 #
 # ### Input Parameters
 #
@@ -194,8 +194,8 @@ log_search()
 #
 # ### Stream Outputs
 #
-# Prints arguments passed in to the calling environments STDOUT with a newline
-# character appended and 'DEBUG: caller_file:line' prepended.
+# Prints arguments passed in to the calling environment's STDOUT, with a newline
+# character appended, and 'DEBUG: caller_file:line' prepended.
 #
 # ### Environmental effects
 #
@@ -234,7 +234,7 @@ log_todo()
 #
 # ## error()
 #
-# Log arguments to the calling environments STDERR preceeded by 'ERROR '.
+# Log arguments to the calling environment's STDERR, preceeded by 'ERROR '.
 # Exits with status code 1.
 #
 # ### Input Parameters
@@ -243,8 +243,8 @@ log_todo()
 #
 # ### Stream Outputs
 #
-# Prints arguments passed in to the calling environments STDOUT with a newline
-# character appended and 'ERROR ' prepended.
+# Prints arguments passed in to the calling environment's STDOUT, with a newline
+# character appended, and 'ERROR ' prepended.
 #
 # ### Environmental effects
 #
@@ -280,7 +280,7 @@ error()
 #
 # ## succeed()
 #
-# Log arguments to the calling environments STDOUT. Exits with status code 0.
+# Log arguments to the calling environment's STDOUT. Exits with status code 0.
 #
 # ### Input Parameters
 #
@@ -288,7 +288,7 @@ error()
 #
 # ### Stream Outputs
 #
-# Prints arguments passed in to the calling environments STDOUT with a newline
+# Prints arguments passed in to the calling environment's STDOUT, with a newline
 # character appended.
 #
 # ### Environmental effects
@@ -325,7 +325,7 @@ succeed()
 #
 # ## fail()
 #
-# Log arguments to the calling environments STDERR preceeded by 'ERROR '.
+# Log arguments to the calling environment's STDERR, preceeded by 'ERROR '.
 # Exits with status code 1.
 #
 # ### Input Parameters
@@ -334,8 +334,8 @@ succeed()
 #
 # ### Stream Outputs
 #
-# Prints arguments passed in to the calling environments STDOUT with a newline
-# character appended and 'ERROR ' prepended.
+# Prints arguments passed in to the calling environment's STDOUT, with a newline
+# character appended, and 'ERROR ' prepended.
 #
 # ### Environmental effects
 #
@@ -398,9 +398,9 @@ fail()
 # ### Code Walkthrough
 set_ps4()
 {
-  # Set the PS4 variable. Then export the PS4 variabel so that this script and
-  # called bash scripts will display a more detailed and formatted trace output.
-  # Finally return true, 0, for success.
+  # Set the PS4 variable. Then export the PS4 variable, so that this script -- and
+  # called bash scripts -- will display a more detailed and formatted trace output.
+  # Finally, return true, 0, for success.
   PS4="# \${BASH_SOURCE##\${bdsm_path}\/extensions\/} \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO} $ "
   export PS4
   return 0
@@ -409,9 +409,9 @@ set_ps4()
 #
 # ## trace_filter()
 #
-# Enables tracing depending on the filter
-# If enabled  then every line of code execution after the function returns
-# will be displayed in the format specified by the PS4 environment variable
+# Enables tracing, depending on the filter
+# If enabled, then every line of code execution after the function returns
+# will be displayed, in the format specified by the PS4 environment variable
 # (see set_ps4).
 #
 # ### Input Parameters
@@ -523,9 +523,9 @@ separator()
 #
 # ## backtrace()
 #
-# Display a backtrace of the current call stack to the point that backtrace was
-# called from. Currently trace is turned on as well so that execution after
-# calling backtrace is traced.
+# Display a backtrace of the current call stack, to the point that backtrace was
+# called from. Currently, trace is turned on as well, so that execution after
+# calling backtrace is traced, too.
 #
 # ### Input Parameters
 #
@@ -533,7 +533,7 @@ separator()
 #
 # ### Stream Outputs
 #
-# The call stack up to the current point of execution is printed to STDOUT of
+# The call stack, up to the current point of execution, is printed to STDOUT of
 # the calling environment.
 #
 # ### Return Codes
@@ -595,12 +595,12 @@ separator()
 backtrace()
 {
   # Turn off shell tracing
-  trace_filter backtrace #backtrace is disabled by default
+  trace_filter backtrace #backtrace is disabled by default.
 
-  # Declare separator and columns variables. Initialize columns to the terminal
+  # Declare separator and columns variables. Initialize columns to the terminal.
   local _separator _columns
 
-  # If setting the columns via tput does not work then default the columns to 80
+  # If setting the columns via tput does not work, then default the columns to 80.
   if ! _columns=$(tput cols)
   then
     _columns=80
@@ -610,11 +610,11 @@ backtrace()
   # number of columns.
   printf -v _separator '%*s' "${_columns:-${COLUMNS:-80}}"
 
-  # Store the passed in message, if given as the first parameter, in the
-  # message variable, default to empty string.
+  # Store the passed-in message, if given as the first parameter, in the
+  # message variable. Default to empty string.
   local _message="${1:-}" _flag="$2"
 
-  # If a message was given print the message to the calling environment's STDERR
+  # If a message was given, print the message to the calling environment's STDERR.
   if [[ -n _message ]]
   then
     printf "\n${_message}\n\n" >&2
@@ -623,27 +623,27 @@ backtrace()
   # Declare function local variables
   local _source _function _line _index _largest _format _digits _longest
 
-  # Loop over the function names in the function array stack to determine
-  # which has the longest length.
-  # Note that we do not use array_largest here as we are in an error function.
+  # Loop over the function names in the function array stack, to determine
+  # which is longest.
+  # Note that we do not use array_largest here, as we are in an error function.
   for (( _index=0 ; _index < ${#FUNCNAME[@]} ; _index++ ))
   do
-    # For each function name in the stack if the function name is longer than
-    # the length of current largest then
+    # For each function name in the stack, if the function name is longer than
+    # the length of the current largest, then...
     if (( ${#FUNCNAME[${_index}]} > ${#_largest} ))
     then
-      # set it as the new largest element
+      # ...set it as the new largest element.
       _largest=${FUNCNAME[${_index}]}
     fi
   done
 
-  # Loop over the bash source files array in order to determine
-  # which has the the longest length.
-  # Note that we do not use array_largest here as we are in an error function.
+  # Loop over the bash source files array, to determine
+  # which is longest.
+  # Note that we do not use array_largest here, as we are in an error function.
   for (( _index=0 ; _index < ${#BASH_SOURCE[@]} ; _index++ ))
   do
     # For each source file in the source files array, if the file name/path
-    # is longer than the current longest then set it as the new longest element
+    # is longer than the current longest, then set it as the new longest element.
     if (( ${#BASH_SOURCE[${_index}]} > ${#_longest} ))
     then
       _longest=${BASH_SOURCE[${_index}]}
@@ -653,16 +653,16 @@ backtrace()
   for (( _index=0 ; _index < ${#BASH_LINENO[@]} ; _index++ ))
   do
     # For each line number in the line numbers array, if the number of digits
-    # is longer than the current longest digits then set it as the new largest
+    # is greater than the current longest digits, then set it as the new largest.
     if (( ${#BASH_LINENO[${_index}]} > ${#_digits} ))
     then
       _digits=${BASH_LINENO[${_index}]}
     fi
   done
 
-  # Determine the format string output for the backtrace based on the users
-  # set editor. If an editor has not been set, default the editor variable to
-  # the pager or empty string.
+  # Determine the format string output for the backtrace, based on your
+  # set editor. If you haven't set an editor, BDSM defaults the editor variable to
+  # the pager, or to empty string.
   case "${EDITOR:=${PAGER:-}}" in
     (mvim*|mate*)
       # Set the format based on GUI editing tools format for opening
@@ -676,7 +676,7 @@ backtrace()
       # a file to a given line.
       # _format="%-$((${#_largest} + 2))s $ %${#EDITOR}s +%-$((${#_digits}))s %-$((${#_longest} + 2))s %s\n"
       _format="%${#EDITOR}s +%-$((${#_digits}))s %-$((${#_longest} + 2))s # %s %-$((${#_largest} + 2))s\n"
-      # Print the backtrace header to the calling environment's STDERR
+      # Print the backtrace header to the calling environment's STDERR.
       printf "${_format}" ' ' "#" "source file" "function()"  1>&2
       ;;
   esac
@@ -684,7 +684,7 @@ backtrace()
   # Print the backtrace separator line.
   printf "${_separator// /=}\n" 1>&2
 
-  # Iterate over the functions array stack skipping this backtrace function [0]
+  # Iterate over the functions array stack, skipping this backtrace function [0]
   for (( _index=1 ; _index < ${#FUNCNAME[@]} ; ++_index ))
   do
     _source="${BASH_SOURCE[${_index}]}"
@@ -697,26 +697,26 @@ backtrace()
         ;;
     esac
 
-    # Determine the format string output for the backtrace based on the users
-    # set editor. Note that if an editor was not set then previously we have
-    # defualted it to the pager. If no pager is set we simply output a standard
-    # unix utility trace line.
+    # Determine the format string output for the backtrace, based on your
+    # set editor. Note that if you haven't set an editor, BDSM previously
+    # defaulted it to the pager. If no pager is set, BDSM simply outputs a standard
+    # Unix utility trace line.
     case "${EDITOR:-}" in
-      # Print with the format and content for GUI editing tools a file to open a
-      # given line using a URI. print backtrace to calling environment's STDERR
+      # Print a file with the format and content for GUI editing tools, to open a
+      # given line using a URI. Print a backtrace to calling environment's STDERR.
       (mvim*|mate*)
         printf "${_format}" "open ${EDITOR// *}://open?url=file://${_source}&line=${_line}" "${_function}" 1>&2
         ;;
-      # Print with the format and content for console editing tools a to open a
-      # file to a given line print backtrace to calling environment's STDERR
+      # Print a file with the format and content for console editing tools, to open a
+      # file to a given line. Print backtrace to calling environment's STDERR.
       (vi*|gvim*|emacs*|*)
         printf "${_format}" "${EDITOR}" "${_line}" "${_source} " "${_function}" 1>&2
         ;;
     esac
   done
 
-  # Print the backtrace separator line and if the trace flag is nonnegative
-  # then turn tracing back on
+  # Print the backtrace separator line, and if the trace flag is nonnegative,
+  # then turn tracing back on.
   printf "${_separator// /=}\n" 1>&2
 
   if [[ "${_flag}" != "no_exit" ]]

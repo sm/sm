@@ -2,7 +2,7 @@
 
 if (( ${#extension_args[@]} == 0 ))
 then
-  error "At least one extension name must be specified for packaging."
+  error "You must specify at least one extension name for packaging."
 fi
 
 for extension in "${extension_args[@]}"

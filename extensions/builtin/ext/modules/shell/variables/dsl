@@ -47,7 +47,7 @@ first()
   then
     printf "%s" "${_array[0]}"
   else
-    fail "No parameters given, cannot return the first one."
+    fail "No parameters given; cannot return the first one."
   fi
 }
 
@@ -98,7 +98,7 @@ last()
   then
     printf "%s" "${_array[$((${#_array[@]} - 1))]}"
   else
-    fail "No parameters given, cannot return the last one."
+    fail "No parameters given; cannot return the last one."
   fi
 }
 
@@ -246,7 +246,7 @@ ematch()
           ;;
         *)
           # any other result means error in grep
-          fail "grep returned unknown code $result"
+          fail "grep returned unknown code: $result"
           ;;
       esac
     else
@@ -331,7 +331,7 @@ variables_must_be_nonempty()
     # Otherwise no parameters were passed in, this is a programming error.
     # Send a failure message which also triggers a backtrace enabling the
     # developer to quickly pinpoint and fix their error.
-    fail "Cannot ensure variables are nonempty as no variables were given."
+    fail "Cannot ensure variables are nonempty, as no variables were given."
   fi
 }
 
@@ -386,7 +386,7 @@ variable_is_nonempty()
     # Otherwise no parameters were passed in, this is a programming error.
     # Send a failure message which also triggers a backtrace enabling the
     # developer to quickly pinpoint and fix their error.
-    fail "Cannot check if variable is nonempty, no variable was given."
+    fail "Cannot check if variable is nonempty; no variable was given."
   fi
 
 }
@@ -449,7 +449,7 @@ variable_is_empty()
     # Otherwise no parameters were passed in, this is a programming error.
     # Send a failure message which also triggers a backtrace enabling the
     # developer to quickly pinpoint and fix their error.
-    fail "Cannot check if variable is empty as no variable was given."
+    fail "Cannot check if variable is empty, as no variable was given."
   fi
 }
 

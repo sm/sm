@@ -140,7 +140,7 @@ install_template()
         shift
         ;;
       from)
-        fail 'install_template from is no more valid'
+        fail 'install_template is not valid.'
         ;;
       *)
         if variable_is_empty _name
@@ -179,8 +179,8 @@ install_template()
   then
     if path_exists "${_target}/${_name}"
     then
-      fail "Cannot install the template '${_template}' to ${_target}/${_name}"\
-        " as it is a directory"
+      fail "Cannot install the template '${_template}' to ${_target}/${_name},"\
+        " as it is a directory."
     else
       copy_file "${_template}" to "${_target}/${_name}"
 
@@ -293,25 +293,25 @@ seed_template()
             then
               move_file "${temporary}" "${_template}"
             else
-              fail "Something went horribly wrong, the template intermediate file "\
+              fail "Something went horribly wrong; the template intermediate file "\
                 "'${temporary}' does not exist."
             fi
           else
-            error "There was an error (?) seeding the template '${_template}'" \
+            error "There was an error (?) seeding the template '${_template}'." \
               "Most often this is due to filesystem permissions / disk full."
           fi
         else
           fail "Every replacement key must have a replacement value."
         fi
       else
-        fail "Cannot seed template '${_template}'"\
-          "as no replacement keys were specified"
+        fail "Cannot seed template '${_template}',"\
+          "as no replacement keys were specified."
       fi
     else
-      fail "Can not seed template template file '${_template}' does not exist."
+      fail "Can not seed template; template file '${_template}' does not exist."
     fi
   else
-    fail "Can not install template as no template was given."
+    fail "Can not install template, as no template was given."
   fi
 }
 

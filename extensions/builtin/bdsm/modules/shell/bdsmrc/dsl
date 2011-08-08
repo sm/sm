@@ -8,9 +8,9 @@ bdsmrc_install()
     then
       timestamp_set
 
-      log "An existing $HOME/.bdsmrc file was found."
-      log "Reinaming it as ${HOME}/.bdsmrc.${timestamp} in order to preserve it."
-      log "Please examine the file and if it is not needed, remove it."
+      log "You already have a $HOME/.bdsmrc file."
+      log "Renaming it as ${HOME}/.bdsmrc.${timestamp} to retain it."
+      log "Please examine the file, and if it is no longer needed, delete it."
 
       move_file "$HOME/.bdsmrc" to "$HOME/.bdsmrc.$timestamp"
     fi
@@ -40,7 +40,7 @@ bdsmrc_update()
 
     if ! file_exists "${target}"
     then
-      log "File not found ${target}, installing new."
+      log "File not found ${target}; installing new."
       bdsmrc_install
       return
     fi
@@ -58,7 +58,7 @@ bdsmrc_update()
     then
       log "Backup ${backup}."
       copy_file "${target}" to "${backup}"
-      log "Incomming settings:"
+      log "Incoming settings:"
       printf "\n" >> "${target}"
       tee -a "${target}" < "${incoming}"
     else

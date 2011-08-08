@@ -7,7 +7,7 @@
 #
 # ### Input Parameters
 #
-# String to be logged, an optional log file containing more details and
+# String to be logged; an optional log file containing more details and
 # an optional number of lines of the file to show (defaults to 25)
 #
 # ### Stream Outputs
@@ -47,7 +47,7 @@ package_error()
   local _message=$1
   if [[ -z "${_message}" ]]
   then
-    fail "Cannot print a package error as no message was provided."
+    fail "Cannot print a package error, as no message was provided."
   fi
   local _log=$2
 
@@ -1462,7 +1462,7 @@ package_is_active()
     fi
 
   else
-    fail "Can not query if a package is active as no package name was given or name is empty."
+    fail "Can not query if a package is active, as no package name was given or name is empty."
   fi
 }
 
@@ -1512,7 +1512,7 @@ package_must_be_active()
       error "Install/activate the node package extension before installing ${_name}."
     fi
   else
-    fail "Can not ensure that package is active as no package name was given or name is empty."
+    fail "Can not ensure that package is active, as no package name was given (or name is empty.)"
   fi
 }
 
@@ -1560,7 +1560,7 @@ packages_must_be_active()
       package_must_be_active "${_package}"
     done
   else
-    fail "Can not ensure that packages are active as no packages were given."
+    fail "Can not ensure that packages are active, as no packages were given."
   fi
 }
 
@@ -1695,8 +1695,8 @@ package_dependencies()
   do
     if ! package_is_active ${dependency/-/ }
     then
-      error "${extension} requires ${dependency}, please install the ${dependency} via bdsm package module and retry.
-Typically this would be done as follows:
+      error "${extension} requires ${dependency}; please install the ${dependency} via bdsm package module, and retry.
+Typically, this can be done as follows:
 
 sudo bdsm ${dependency} package install
 

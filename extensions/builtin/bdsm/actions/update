@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 NYI
-# What this code was intended to do ?
+# What is this code intended to do?
 
 #extension_action=${extension_args[0]}
 #

@@ -8,8 +8,8 @@ then
 
     os_open "$PWD"
   else
-    error "Failed to open '${extension_args[0]}' as it appears to not be installed."
+    error "Failed to open '${extension_args[0]}'; it appears to not be installed."
   fi
 else
-  fail "At least one extension name must be specified."
+  fail "You must specify at least one extension name."
 fi

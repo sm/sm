@@ -88,7 +88,7 @@ description()
   then
     help_descriptions+=("$*")
   else
-    fail "Cannot add description to help as no help description was given."
+    fail "Cannot add description to help, as no help description was given."
   fi
 }
 

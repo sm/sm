@@ -1668,7 +1668,7 @@ sub usage {
 	 "",
 	 "-S sshlogin    Example: foo\@server.example.com",
 	 "--trc {}.bar   Shorthand for --transfer --return {}.bar --cleanup",
-	 "--onall        Run the given command with argument on all sshlogins",
+	 "--onall        Run the given command with arguments on all sshlogins",
 	 "--nonall       Run the given command with no arguments on all sshlogins",
 	 "",
 	 "--pipe         Split stdin (standard input) to multiple jobs.",
@@ -1689,7 +1689,7 @@ sub die_bug {
 	 "* The command line being run\n",
 	 "* The files being read (put the files on a webserver if they are big)\n",
 	 "\n",
-	 "If you get the error on smaller/fewer files, please include those instead.\n");
+	 "If you can reproduce the error with smaller/fewer files, please include those instead.\n");
     ::wait_and_exit(255);
 }
 
@@ -2349,7 +2349,7 @@ sub ncpus {
             } else {
                 print $Global::original_stderr
                     ("parallel: Warning: Could not figure out ",
-                     "number of cpus on $serverlogin ($ncpu). Using 1\n");
+                     "number of CPUs on $serverlogin ($ncpu). Using 1\n");
                 $self->{'ncpus'} = 1;
             }
         }
