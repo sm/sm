@@ -729,7 +729,7 @@ log_step()
 {
   local _message="${1:-}" _status="${2:-}" _unicode=0
 
-  if [[ -z "${LANG:-}" || "${LANG}" = *UTF* ]]
+  if [[ -z "${LANG:-}" || "${LANG}" = *UTF* || "${LANG}" = *utf8* ]]
   then
     _unicode=1
   fi
