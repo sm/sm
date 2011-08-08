@@ -70,7 +70,7 @@ sets_install()
 
   local _identifier="$(scm_identifier "${_uri}")"
 
-  printf "%s" "extension set '${_name}'... "
+  printf "%s" "  - extension set '${_name}'... "
   enter "${extension_sets_path}"
   fetch_uri "${_uri}" "${src_path}/${_identifier}"
   remove_paths "${_name}"
