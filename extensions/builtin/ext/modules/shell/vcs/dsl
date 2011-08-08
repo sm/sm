@@ -259,53 +259,71 @@ is_archive_uri() {
 # Code Walkthrough
 fetch_uri()
 {
+  local _uri _target
+
   trace_filter vcs
 
-  [[ $# -ge 2 ]] || fail "Missing params _uri _target"
+  if [[ -n "$1" ]]
+  then
+    _uri="${1}"
+    shift
+  else
+    fail "A _uri must be specified as the first parameter."
+  fi
 
-  log "${log_prefix}Fetching $1"
+  if [[ -n "$1" ]]
+  then
+    _target="${1}"
+    shift
+  else
+    fail "A _target path must be specified as the second parameter."
+  fi
+
+  log "${log_prefix}Fetching ${_uri}"
+
   unset scm_type
 
-  if [[ -d "$1" ]] # check for directory
+  if [[ -d "${_uri}" ]] # check for directory
   then
-    scm_type='directory'
-    directory_get "$@"
+    scm_type="directory"
+    directory_get "${_target}" "$@"
     return $?
 
-  elif is_archive_uri "$1" # check for packages
+  elif is_archive_uri "${_uri}" # check for packages
   then
-    scm_type='package'
-    archive_get "$@"
+    scm_type="package"
+    archive_get "${_target}" "$@"
     return $?
 
-  elif is_github_url "$1" # check for pattern user/repository from github
+  elif is_github_url "${_uri}" # check for pattern user/repository from github
   then
-    scm_type='github'
-    github_get "$@"
+    scm_type="github"
+    github_get "${_target}" "$@"
     return $?
   fi
 
-  case "$1" in
+  case "${_uri}" in
     (*git*)
-      scm_type='git'
-      git_get "$@"
+      scm_type="git"
+      git_get "${_target}" "$@"
       ;;
     (*svn*)
-      scm_type='svn'
+      scm_type="svn"
       NIY "Subversion scm_update"
       svn_get
       ;;
     (*hg*)
-      scm_type='hg'
+      scm_type="hg"
       NIY "hg scm_update"
       hg_get
       ;;
     (*fossil*)
-      scm_type='fossil'
+      scm_type="fossil"
       NIY "fossil scm_update"
       ;;
     (*)
-      error "Unknown SCM for url '$1'"
+      error "Unknown SCM for url '${_uri}'"
       ;;
   esac
 }
+
