@@ -56,8 +56,7 @@ sets_install()
 {
   local _name="${1:-}" _uri="${2:-}"
 
-  shift || fail "name must be given as the first parameter to sets_install()"
-  shift || fail "uri must be given as the second parameter to sets_install()"
+  shift || fail "set name must be given to install"
 
   [[ "${_name}" != "builtin" ]] ||
     error "builtin extension set may not be (re-)installed except through updating BDSM core (bdsm get head)."
