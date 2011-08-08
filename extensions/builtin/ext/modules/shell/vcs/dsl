@@ -63,7 +63,10 @@ directory_get()
 # Code Walkthrough
 git_get()
 {
-  local initial_pwd="$PWD" _url=$1 _final_target=$2 branch=${3:-master} remote=${4:-origin}
+  local initial_pwd="$PWD" _url=$1 _final_target=$2 \
+    branch=${3:-${branch:-master}} remote=${4:-${remote:-origin}} \
+    revision=${4:-${revision:-HEAD}}
+
   variables_must_be_nonempty _url _final_target
 
   local _target="${scm_path}/$( scm_identifier "${_url}" )"
@@ -75,6 +78,7 @@ git_get()
     pwd
   )
 
+  # TODO: Account for revision
   if [[ -d "$_target/.git" ]]
   then
     builtin cd "${_target}"
@@ -167,8 +171,24 @@ is_github_url()
 github_get()
 {
   local _url="$1" _target="$2"
-  shift
-  shift
+
+  if [[ -n "$1" ]]
+  then
+    _uri="${1}"
+    shift
+  else
+    fail "A _uri must be specified as the first parameter."
+  fi
+
+  if [[ -n "$2" ]]
+  then
+    _target="${2}"
+    shift
+  else
+    fail "A _target path must be specified as the second parameter."
+  fi
+
+  # TODO: account for url.
   # use git for fetching github repo
   git_get "git://github.com/${_url}.git" "${_target}" "$@"
   # and overwrite repo uri
@@ -176,18 +196,15 @@ github_get()
 }
 
 archive_get() {
-  local _url="$1" _final_target="$2" _package_md5="${3:-#}"
-  local _archive="${archives_path}/${_url##*/}"
-  shift
-  shift
+  local _url="$1" _final_target="$2" _package_md5="${3:-#}" \
+    _archive="${archives_path}/${_url##*/}"
 
-  if [[ ! -d "${archives_path}" ]]
-  then
-    mkdir -p "${archives_path}"
-  fi
+  shift 2 # TODO: sanity checking here with real error messages.
 
-  if [[ -f "${_archive}" ]] \
-  && ! file_matches_md5 "${_archive}" "${_package_md5}"
+  [[ -d "${archives_path}" ]] || mkdir -p "${archives_path}"
+
+  if [[ -f "${_archive}" ]] &&
+    ! file_matches_md5 "${_archive}" "${_package_md5}"
   then
     log "${_url##*/} does not match md5 ${_package_md5}, removing and downloading."
     rm -f "${_archive}"
@@ -217,20 +234,25 @@ archive_get() {
 
   case "${_archive}" in
     *.tar) # tar
-      tar xf "${_archive}" || error "There was an error while extracting the archive '${_archive}'"
+      tar xf "${_archive}" ||
+        error "There was an error while extracting the archive '${_archive}'"
       ;;
     *.tar.gz|*.tgz) # gzip
-      tar zxf "${_archive}" || error "There was an error while extracting the archive '${_archive}'"
+      tar zxf "${_archive}" ||
+        error "There was an error while extracting the archive '${_archive}'"
       ;;
     *.tar.bz2|*.tbz2) # bzip
-      tar jxf "${_archive}" || error "There was an error while extracting the archive '${_archive}'"
+      tar jxf "${_archive}" ||
+        error "There was an error while extracting the archive '${_archive}'"
       ;;
     *.tar.xz) # LZMA
       # TODO: if 'xz' command exists, use that, otherwise use tar J
-      tar Jxf "${_archive}" || error "There was an error while extracting the archive '${_archive}'"
+      tar Jxf "${_archive}" ||
+        error "There was an error while extracting the archive '${_archive}'"
       ;;
     *.zip)
-      unzip "${_archive}" || error "There was an error while extracting the archive '${_archive}'"
+      unzip "${_archive}" ||
+        error "There was an error while extracting the archive '${_archive}'"
       ;;
     *)
       error "Unknown archive format for ${_archive}"
@@ -245,11 +267,13 @@ archive_get() {
 
 is_archive_uri() {
   case "$1" in
-    *.tar|*.tgz|*.txz|*.tbz2|*.tar.xz|*.tar.bz2|*.tar.gz|*.zip)
+    *.tar|*.tgz|*.txz|*.tbz2|*.xz|*.bz2|*.gz|*.zip|*.lzma)
       return 0
       ;;
+    *)
+      return 1
+      ;;
   esac
-  return 1
 }
 
 # ## fetch\_uri()
@@ -259,13 +283,15 @@ is_archive_uri() {
 # Code Walkthrough
 fetch_uri()
 {
-  local _uri _target
+  local _uri _target _args=()
 
   trace_filter vcs
 
   if [[ -n "$1" ]]
   then
     _uri="${1}"
+    shift
+    _args+=("${_uri}")
   else
     fail "A _uri must be specified as the first parameter."
   fi
@@ -273,9 +299,34 @@ fetch_uri()
   if [[ -n "$2" ]]
   then
     _target="${2}"
+    shift
+    _args+=("${_target}")
   else
     fail "A _target path must be specified as the second parameter."
   fi
+
+  while (( $# > 0 ))
+  do
+    token="$1"
+    shift
+    case "$token" in
+      *branch)
+        branch="${1}"
+        shift || error "branch must be specified after keyword 'branch'"
+        ;;
+      *remote)
+        remote="${1}"
+        shift || error "remote must be specified after keyword 'remote'"
+        ;;
+      *revision)
+        revision="${1}"
+        shift || error "revision must be specified after keyword 'revision'"
+        ;;
+      *) # Pass through any unknowns
+        _args+=("${token}")
+        ;;
+    esac
+  done
 
   log "${log_prefix}Fetching ${_uri}"
 
@@ -284,26 +335,26 @@ fetch_uri()
   if [[ -d "${_uri}" ]] # check for directory
   then
     scm_type="directory"
-    directory_get "$@"
+    directory_get "${args[@]}"
     return $?
 
   elif is_archive_uri "${_uri}" # check for packages
   then
     scm_type="package"
-    archive_get "$@"
+    archive_get "${args[@]}"
     return $?
 
   elif is_github_url "${_uri}" # check for pattern user/repository from github
   then
     scm_type="github"
-    github_get "$@"
+    github_get "${args[@]}"
     return $?
   fi
 
   case "${_uri}" in
     (*git*)
       scm_type="git"
-      git_get "$@"
+      git_get "${args[@]}"
       ;;
     (*svn*)
       scm_type="svn"
