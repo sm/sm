@@ -330,8 +330,6 @@ fetch_uri()
     esac
   done
 
-  log "${log_prefix}  Fetching ${_uri}"
-
   unset scm_type
 
   if [[ -d "${_uri}" ]] # check for directory
