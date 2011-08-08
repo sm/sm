@@ -9,9 +9,12 @@ for file in /etc/bdsmrc "$HOME/.bdsmrc"
 do
   if [[ -s "${file}" ]]
   then
+    previous_preload_modules=( "${preload_modules[@]}" )
     . "${file}"
+    preload_modules=( "${previous_preload_modules[@]}" "${preload_modules[@]}" )
   fi
 done
+unset previous_preload_modules
 
 bdsm_path="${saved_bdsm_path}"
 
