@@ -74,11 +74,9 @@ symlink_bdsm()
 {
   chmod a+x "${install_path}/bin/bdsm" "${install_path}/bin/bdsm-ll"
 
-  log "  Linking ${install_path}/bin/bdsm to ${prefix_path}/bin/bdsm"
-  link --force "${install_path}/bin/bdsm" to "${prefix_path}/bin/bdsm"
-
-  if path_exists "${prefix_path}/bin"
+  if variable_is_nonempty prefix_path && path_exists "${prefix_path}/bin"
   then
+    log "  Linking ${install_path}/bin/bdsm to ${prefix_path}/bin/bdsm"
     link --force "${install_path}/bin/bdsm" to "${prefix_path}/bin/bdsm"
   fi
 }
