@@ -296,9 +296,9 @@ fetch_uri()
     fail "A _uri must be specified as the first parameter."
   fi
 
-  if [[ -n "$2" ]]
+  if [[ -n "$1" ]]
   then
-    _target="${2}"
+    _target="${1}"
     shift
     _args+=("${_target}")
   else
