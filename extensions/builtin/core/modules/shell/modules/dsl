@@ -99,15 +99,15 @@ extensions_in()
 
   if [[ -d "${_path}" ]]
   then
-    for _extension in ${_path}/*
+    for _extension in "${_path}"/*
     do
-      if [[ -d "${_extension}/acions" || -d "${_extension}/modules" ]] #
+      if [[ -d "${_extension}/acions" || -d "${_extension}/modules" ]]
       then
         found_extensions+=( "${_extension##${_path}\/}" )
       fi
     done
   else
-    fail "Cannot list extensions in '${_path}' as the directory does not exist."
+    debug "No extensions in '${_path}' as path does not exist."
   fi
 }
 
@@ -118,7 +118,7 @@ in_search_paths()
   shift
   local args=( "$@" ) path builtin_extension
 
-  for path in ${extensions_search_paths[@]}
+  for path in "${extensions_search_paths[@]}"
   do
     if "${callback}" "${path}" "${args[@]}"
     then
