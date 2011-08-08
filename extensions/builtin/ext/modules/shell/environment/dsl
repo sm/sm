@@ -3,7 +3,7 @@
 #
 # ## command\_exists()
 #
-# Checks to see whether a command exists within the current environment and PATH
+# Checks to see whether a command exists within the current environment and PATH.
 #
 # ### Input Parameters
 #
@@ -49,14 +49,14 @@ command_exists()
       return 1
     fi
   else
-    fail "Cannot test if command exists, as no command name was given."
+    fail "Cannot test if command exists; no command name was given."
   fi
 }
 
 #
 # ## is\_a\_function()
 #
-# Checks to see whether a named function exists within the current environment
+# Checks to see whether a named function exists within the current environment.
 #
 # ### Input Parameters
 #

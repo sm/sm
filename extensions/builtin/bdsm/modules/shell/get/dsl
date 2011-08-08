@@ -41,7 +41,7 @@ install_release()
 
   if file_exists "${archive}" && ! md5_match
   then
-    # Remove old installs, if they exist and have incorrect md5.
+    # Remove old installs, if they exist and have incorrect MD5 checksums.
     file_exists "$archives_path/bdsm-${version}.tar.gz" &&
       rm -f "$archives_path/bdsm-${version}.tar.gz"
   fi
@@ -90,7 +90,7 @@ install_bdsm_scm()
 
   if (( ${sense_of_humor_flag:=0} == 1 ))
   then
-    log "Ahh... that's better...\nIt always feels so nice to get head.\nQuite a load this time, eh?\nRemember to get head often!\n"
+    log "Ahh... that's better...\nIt always feels so nice to get head.\nRemember to get head often!\n"
   fi
 
   enter "${src_path}/${dir}/"

@@ -11,7 +11,7 @@ step()
   shift
 
   if variable_is_empty name
-  then fail "step_start [name] #missing name"
+  then fail "step_start [name] #missing name."
   fi
 
   start_step "$name"

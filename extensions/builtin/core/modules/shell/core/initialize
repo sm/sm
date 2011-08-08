@@ -54,7 +54,7 @@ true \
   "${active_path:="${packages_path}/active"}" \
   "${extension_args:=""}"
 
-# Make sure preload_modules is an array
+# Make sure preload_modules is an array.
 export preload_modules=( ${preload_modules[@]} )
 
 if [[ -d "${active_path}/bin" ]]
@@ -64,7 +64,7 @@ fi
 
 export bdsm_path modules_path initial_pwd extension_action_calls=0
 
-# Load module() function and then load core modules.
+# Load module() function, then load core modules.
 source "${modules_path}/shell/core/dsl"
 source "${modules_path}/shell/string/dsl"
 source "${modules_path}/shell/logging/dsl"
@@ -77,7 +77,7 @@ then # custom compilations + g*
   export PATH="/usr/local/bin:/opt/local/bin:/usr/sfw/bin:/usr/sbin:/usr/bin"
 fi
 
-# Ensure that any variables you wish to have exported to extensions actually are exported.
+# Ensure that any variables you wish export to extensions actually *are* exported.
 bdsm_exports
 
 if [[ -n $bdsm_script ]]

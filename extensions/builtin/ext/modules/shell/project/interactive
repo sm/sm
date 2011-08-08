@@ -17,8 +17,7 @@ export projects_path
 #
 # Project function.
 #
-# Project function,
-# cd into the first directory matching the parameters passed in
+# cd into the first directory which matches the parameters passed in.
 #
 # Examples:
 #
@@ -70,11 +69,11 @@ p()
 # ## pe() -- Project Edit
 #
 # Changes directory to a project based on the parameters passed into the
-# function and then launches the editor on the given directory.
+# function, then launches the editor on the given directory.
 #
 pe()
 {
-  # Project edit function,
+  # Project edit function;
   # use the project switch function in addition to launching the editor.
   p $*
   ${EDITOR:-vim} .
@@ -84,11 +83,11 @@ pe()
 # ## po() -- Project Open
 #
 # Changes directory to a project based on the parameters passed into the
-# function and then opens the given directory in the operating system.
+# function, and then opens the given directory in the operating system.
 #
 po()
 {
-  # Project open function, use the project switch function in addition to
+  # Project open function; use the project switch function in addition to
   # opening the filesystem directory.
   p $*
   os_open

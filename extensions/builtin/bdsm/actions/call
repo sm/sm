@@ -5,7 +5,7 @@ then
   log 'usage:\n  bdsm call function_name [function_args...]'
 elif ! declare -F "${extension_args[0]}" >/dev/null
 then
-  error "${extension_args[0]} is not a valid function name"
+  error "${extension_args[0]} is not a valid function name."
 else
   "${extension_args[@]}"
 fi

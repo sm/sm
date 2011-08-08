@@ -5,10 +5,10 @@ into submission!
 
 # Goal
 
-BDSM delivers an extensible scripting framework providing a very robust
-DSL. A primary tenet of BDSM is that it must handle as much pain as possible, so you don't have to!
-With BDSM's DSL modules, you can quickly create your own high-quality extensions and
-expose their commands through BDSM's flexible command line interface (CLI).
+BDSM delivers an extensible scripting framework providing a very robust DSL.
+A primary tenet of BDSM is that it must handle as much pain as possible, so you don't have to!
+With BDSM's DSL modules, you can quickly create your own high-quality extensions,
+and expose their commands through BDSM's flexible command line interface (CLI).
 
 # Architecture
 
@@ -23,17 +23,17 @@ creative abilities of BDSM's energetic community of extension authors :)
 
 There are only a few requirements when creating your own BDSM extensions. 
 The extension must live in a dedicated directory. Within this directory are 
-(at least) the subdirectory bin/, containing at
-least one executable file called 'help'. 
-Additionally, in the root of the
-extension directory you must include a text file called VERSION, with a version
-number that follows semantic versioning convention (http://semver.org/); that is, 
-in the format of X.Y.Z, where X,Y and Z are positive integers. 
-An extension must also have a README file, in which you should explain about 
-your extension's primary purpose, and any special considerations to be kept in mind 
+(at least) the subdirectory bin/, containing at least one executable file called 'help'. 
+
+Additionally, in the root of the extension directory you must include a text file called VERSION,
+with a version number that follows semantic versioning convention (http://semver.org/);
+that is, in the format of X.Y.Z, where X,Y and Z are positive integers. 
+
+An extension must also have a README file, in which you should explain your
+extension's primary purpose, and any special considerations to be kept in mind 
 when using it.
 
-The contents of the bin directory can be *any* executable file.  This means, for
+The contents of the bin directory can be *any* executable file. This means, for
 example, that C-compiled binaries, Ruby Scripts, python, lua, etc... may all be
 used according to your requirements and preferences.  
 

@@ -6,19 +6,19 @@ templates_help()
   echo "
 Usage:
 
-  bdsm templates list                        #show available templates
-  bdsm templates list  all                   #show available templates with targets
-  bdsm templates list  [template name]       #show generated files for given template
-  bdsm templates apply [target file name...] #apply template on the given files
-  bdsm templates apply [template]            #apply template on all targets
-  bdsm templates diff  [target file name...] #diff template on the given files
-  bdsm templates diff  [template]            #diff template on all targets
+  bdsm templates list                        #show available templates.
+  bdsm templates list  all                   #show available templates with targets.
+  bdsm templates list  [template name]       #show generated files for given template.
+  bdsm templates apply [target file name...] #apply template on the given files.
+  bdsm templates apply [template]            #apply template on all targets.
+  bdsm templates diff  [target file name...] #diff template on the given files.
+  bdsm templates diff  [template]            #diff template on all targets.
 
 Template name should contain '_' before the final '.'. For example:
 
   my_app_nginx_.conf
 
-Settings filename pattern is template name + .settings:
+The settings filename pattern is template name + .settings:
 
   my_app_nginx_.conf.settings
 
@@ -95,7 +95,7 @@ templates_list_all() {
   esac
   if (( ${#templates[@]} == 0 ))
   then
-    error "No templates found\n"
+    error "No templates found.\n"
   fi
   for template in ${templates[@]}
   do

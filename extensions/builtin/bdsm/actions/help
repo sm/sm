@@ -4,32 +4,32 @@ extension="<extension>"
 
 description "Bash Delectable Scripting Manager (BDSM) Framework - Core Extension"
 
-action "{file_name}" "Run the provided {file_name}, with BDSM initialized"
-action "bdsmrc" "Install bdsmrc template file into ~/.bdsmrc"
+action "{file_name}" "Run the provided {file_name}, with BDSM initialized."
+action "bdsmrc" "Install bdsmrc template file into ~/.bdsmrc."
 action_separator
-action "get head" "Fetch and install the latest BDSM development version"
-action "ext install {name} {uri}" "Install extension {name} from {uri}"
-action "ext update {name}" "Update extension {name}"
+action "get head" "Fetch and install the latest BDSM development version."
+action "ext install {name} {uri}" "Install extension {name} from {uri}."
+action "ext update {name}" "Update extension {name}."
 action "sets" "List all installed extension sets and their extensions."
 action "sets help" "Show available extension sets help."
 action_separator
-action "version" "Display the curently installed BDSM version"
-action "help" "Display this help"
+action "version" "Display the curently installed BDSM version."
+action "help" "Display this help."
 
 notes="
 
   See website for extension documentation.
 
-  [extension] is required; you can set a default in ~/.bdsmrc
-  [action] is required as a command line parameter
+  [extension] is required; you can set a default in ~/.bdsmrc.
+  [action] is required as a command line parameter.
 
   [project] is required as an environment variable
-   - if non-root; otherwise it defaults to the current user-name
+   - if non-root; otherwise it defaults to the current user-name.
 
   [project|environment|repository|extension]
-   - may be exported as environment variables
-   - or set in the ~/.bdsmrc
-   - or specified as, for example, --project X
+   - may be exported as environment variables,
+   - or set in the ~/.bdsmrc,
+   - or specified as, for example, --project X.
 
   prerequisites:
    - git

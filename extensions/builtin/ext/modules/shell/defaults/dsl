@@ -29,11 +29,11 @@
 #
 # ### Failure Scenarios
 #
-# Fails if no arguments are passed in, at least need to specify a key.
+# Fails if no arguments are passed in; you must at least specify a key.
 #
 # ### Usage Examples
 #
-#     user$ read_default "version" prefix "package" # extension is nginx for example
+#     user$ read_default "version" prefix "package" # extension is nginx, for example.
 #     user$ echo $package_version
 #     1.0.0
 #
@@ -87,7 +87,7 @@ read_default()
       fi
     fi
 
-    # Run search in the same process to initialize cache variables
+    # Run search in the same process to initialize cache variables.
     settings_search ${extension} defaults > /dev/null
 
     for _file in  $( settings_search ${extension} defaults )
@@ -131,7 +131,7 @@ settings_search()
     paths+=( "${path}/${extension}" )
   done
 
-  # Print existing paths
+  # Print existing paths.
   for path in "${paths[@]}"
   do
     if path_exists "${path}" \

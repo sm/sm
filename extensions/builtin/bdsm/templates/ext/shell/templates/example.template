@@ -3,6 +3,6 @@
 # Templates are useful for many things, including:
 # init scripts for services, default configuation files, and more.
 # Variables to be replaced use the {{variable_name}} syntax.
-# You then use the template module's install_template, and seed_template dsl
+# You then use the template module's install_template, and seed_template DSL
 # functions, to manage the template's installation and content replacement.
 

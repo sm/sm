@@ -17,5 +17,5 @@ limitations under the License.
 = License Exceptions
 
 bin/bdsm-ll is GNU parallel (http://www.gnu.org/s/parallel/) and is licensed
-under the GPLv3, see LICENSE.gplv3 for a copy of the GNU parallel license.
+under the GPLv3. See LICENSE.gplv3 for a copy of the GNU parallel license.
 

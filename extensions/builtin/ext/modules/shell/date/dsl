@@ -39,7 +39,7 @@ date_range()
         then
           _end="${_token}"
         else
-          fail "Unknown token '${_token}' passed as a parameter.'"
+          fail "Unknown token '${_token}' passed as a parameter."
         fi
         ;;
     esac
@@ -72,18 +72,18 @@ date_range()
         _step=31556926
         ;;
       *)
-        fail "Unknown step token ${1:-}; valid steps are {minute,hour,day,week,month,year}"
+        fail "Unknown step token ${1:-}; valid steps are {minute,hour,day,week,month,year}."
         ;;
     esac
 
     if ! _start=$(date -j -f "${_format_in}" ${_start} "+%s")
     then
-      fail "Date error: Input format '${_format_in}' for start date '${_start}'"
+      fail "Date error: Input format '${_format_in}' for start date '${_start}'."
     fi
 
     if ! _end=$(date -j -f "${_format_in}" ${_end} "+%s")
     then
-      fail "Date error: Input format '${_format_in}' for end date '${_end}'"
+      fail "Date error: Input format '${_format_in}' for end date '${_end}'."
     fi
 
     while (( _start <= _end ))
@@ -94,7 +94,7 @@ date_range()
         _date=$(date -j -f "${_format_out}" ${_date} "+%s" 2>/dev/null)
         (( _start = _date + _step ))
       else
-        fail "Date error: Output format '${_format_out}' for date '${_start}'"
+        fail "Date error: Output format '${_format_out}' for date '${_start}'."
       fi
     done
   fi

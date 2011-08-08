@@ -12,38 +12,38 @@ detect_action()
 
   local _params=("$@")
 
-  #loop when params or .actions exists
+  # loop when params or .actions exists
   while (( ${#_params[@]} > 0 )) || file_exists "${_action_path}/.actions"
   do
     array_shift _params token
 
-    # Detect function
+    # Detect function.
     if  variable_is_nonempty token &&
       match "$token" "*\(\)"
     then
       _params=( "${token}" "${_params[@]}" )
       break
 
-    # Detect a namespace
+    # Detect a namespace.
     elif variable_is_nonempty token &&
       path_exists "${_action_path}/${token}"
     then
       _action_path+="/${token}"
 
-    # Detect action
+    # Detect action.
     elif variable_is_nonempty token &&
       file_is_executable "${_action_path}/${token}"
     then
       _params=( "${token}" "${_params[@]}" )
       break
 
-    # Detect mapping in .actions
+    # Detect mapping in .actions.
     elif file_exists "${_action_path}/.actions" &&
          file_contains "${_action_path}/.actions" "^${token}="
     then
       _array=( $(hash_file "${_action_path}/.actions" ${token}) )
       _params=( "${_array[@]}" "${_params[@]}" )
-      [[ "${_array[@]}" == "$token" ]] && break #break if detected 2nd time the same
+      [[ "${_array[@]}" == "$token" ]] && break # break if detected 2nd time the same
 
     # Detect default mapping in .actions
     elif file_exists "${_action_path}/.actions" &&
@@ -51,7 +51,7 @@ detect_action()
     then
       _array=( $(hash_file "${_action_path}/.actions" default) )
       _params=( "${_array[@]}" "${token}" "${_params[@]}" )
-      [[ "${_array[@]}" == "$token" ]] && break #break if detected 2nd time the same
+      [[ "${_array[@]}" == "$token" ]] && break # break if detected 2nd time the same
 
     # Detect help mapping in .actions
     elif file_exists "${_action_path}/.actions" \
@@ -60,9 +60,9 @@ detect_action()
     then
       _array=( $(hash_file "${_action_path}/.actions" help) )
       _params=( "${_array[@]}" "${token}" "${_params[@]}" )
-      [[ "${_array[@]}" == "$token" ]] && break #break if detected 2nd time the same
+      [[ "${_array[@]}" == "$token" ]] && break # break if detected 2nd time the same
 
-    # finish searching path
+    # Finish searching path.
     else
       _params=( "${token}" "${_params[@]}" )
       break
@@ -76,7 +76,7 @@ detect_action()
     array_shift _params token
   fi
 
-  # Detect function
+  # Detect function.
   if variable_is_nonempty token &&
     match "${token}" "*\(\)"
   then
@@ -84,7 +84,7 @@ detect_action()
     action="$token"
     extension_args=( "${_params[@]}" )
 
-  # Detect a file
+  # Detect a file.
   elif variable_is_nonempty token &&
     file_is_executable "${_action_path}/${token}"
   then
@@ -92,14 +92,14 @@ detect_action()
     action="$token"
     extension_args=( "${_params[@]}" )
 
-  # Detect default if nothing else matches
+  # Detect default, if nothing else matches.
   elif file_exists "${_action_path}/default"
   then
     action_path="${_action_path}"
     action="default"
     extension_args=( "$token" "${_params[@]}" )
 
-  # Detect help if no default
+  # Detect help, if no default.
   elif file_exists "${_action_path}/help" \
   && (( ${#_params[@]} == 0 )) \
   && [[ "$token" == "" ]]
@@ -110,11 +110,11 @@ detect_action()
     extension_args+=( "${_params[@]}" )
 
   else
-    # Not found, error.
+    # Not found; error.
     return 1
   fi
 
-  # Found, OK
+  # Found, OK.
   return 0
 }
 
@@ -136,7 +136,7 @@ detect_modules_paths()
   done
 }
 
-# search for extension that modules dependency providing matching [namespace...] action
+# Search for extension that modules dependency providing matching [namespace...] action.
 detect_modules_action()
 {
   trace_filter modules_action
@@ -214,7 +214,7 @@ detect_action_type()
       ;;
 
     *ASCII*)
-      # Launch with helper dsl, if possible.
+      # Launch with helper DSL, if possible.
       extension="${_path//.}"
 
       case "${extension}" in
@@ -285,7 +285,7 @@ extension_run()
 
   builtin cd "${initial_pwd}"
 
-  # Now based on the determined _type we launch the extension.
+  # Now launch the extension, based on the determined _type.
   case "${_type}" in
     function)
       _namespaces=${_path##${extension_actions_path}}
@@ -324,7 +324,7 @@ extension_run()
       #  "${_path}"
       #  ;;
     dne|noexec)
-      fail "Processing ${action} failed, file type is unknown, file does not exist or file is not executable."
+      fail "Processing ${action} failed; file type is unknown, file does not exist, or file is not executable."
       ;;
     binary|*)
       "${_path}/${action}" ${extension_action} ${extension_args[*]}
@@ -335,7 +335,7 @@ extension_run()
 #
 # ## extension\_action()
 #
-# Load the environment for a given extension action and then call it.
+# Load the environment for a given extension action, then call it.
 # This is the main function for BDSM.
 #
 # ### Input Parameters
@@ -353,7 +353,7 @@ extension_run()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 # 1 for failure
 #
 # ### Failure Scenarios
@@ -413,7 +413,7 @@ extension_action()
     log_search action "$action" "${action_path##${bdsm_path}\/extensions\/} params:${extension_args[@]}"
 
   else
-    error "Unknown action path: "${extension_args[@]}"\n\nUsage: \n  bdsm extension [namespace] [action]\n"
+    error "Unknown action path: "${extension_args[@]}"\n\nUsage: \n  bdsm extension [namespace] [action].\n"
   fi
 
   extension_path="$extensions_path/$extension"

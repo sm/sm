@@ -19,7 +19,7 @@
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -39,8 +39,8 @@ first()
   # Store the parameters in an array variable
   local _array=("$@")
 
-  # If the array is nonempty then print the first element out
-  # Otherwise no parameters were passed in, this is a programming error.
+  # If the array is nonempty, print the first element out.
+  # Otherwise no parameters were passed in; this is a programming error.
   # Send a failure message which also triggers a backtrace enabling the
   # developer to quickly pinpoint and fix their error.
   if (( ${#_array[@]} > 0 ))
@@ -70,7 +70,7 @@ first()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -90,8 +90,8 @@ last()
   # Store the parameters in an array variable
   local _array=("$@")
 
-  # If the parameters array is nonempty then print the last element of the array
-  # Otherwise no parameters were passed in, this is a programming error.
+  # If the parameters array is nonempty, print the last element of the array.
+  # Otherwise no parameters were passed in; this is a programming error.
   # Send a failure message which also triggers a backtrace enabling the
   # developer to quickly pinpoint and fix their error.
   if (( ${#_array[@]} > 0 ))
@@ -121,13 +121,13 @@ last()
 #
 # ### Return Codes
 #
-# 0 if the value matches the regex (shell extended glob pattern)
-# 1 if the value does not match the regex (shell extended glob pattern)
+# 0 if the value matches the regex (shell extended glob pattern).
+# 1 if the value does not match the regex (shell extended glob pattern).
 #
 # ### Failure Scenarios
 #
-# Fails if no value is given
-# Fails if no regex is given
+# Fails if no value is given.
+# Fails if no regex is given.
 #
 # ### Usage Examples
 #
@@ -147,20 +147,20 @@ match()
   # If the varable is nonempty
   if variable_is_nonempty _value
   then
-    # then remove the value from the parameters list and set the regex variable
-    # to the next parameter
+    # Remove the value from the parameters list and set the regex variable
+    # to the next parameter.
     shift
     local _regex="$1"
 
     # if the regex variable is nonempty
     if variable_is_nonempty _regex
     then
-      # Ensure that extended shell globbing (bash) is turned on
+      # Ensure that extended shell globbing (bash) is turned on.
       shopt -s extglob
-      # use a case statement for pattern matching the regex against the value
-      # If the value matches the given regex pattern then return true, 0
-      # otherwise the value does not match the given regex pattern so return
-      # false, 1
+      # Use a case statement for pattern matching the regex against the value.
+      # If the value matches the given regex pattern then return true, 0.
+      # Otherwise the value does not match the given regex pattern,
+      # so return false, 1.
       case "${_value}" in
         (${_regex})
           return 0
@@ -170,13 +170,13 @@ match()
           ;;
       esac
     else
-      # Otherwise no regex parameter was passed in, this is a programming error.
+      # Otherwise, no regex parameter was passed in; this is a programming error.
       # Send a failure message which also triggers a backtrace enabling the
       # developer to quickly pinpoint and fix their error.
       fail "A regex must be specified in order to match ${_value} against it."
     fi
   else
-    # Otherwise no parameters were passed in, this is a programming error.
+    # Otherwise no parameters were passed in; this is a programming error.
     # Send a failure message which also triggers a backtrace enabling the
     # developer to quickly pinpoint and fix their error.
     fail "A value and regex must be specified in order to match."
@@ -202,13 +202,13 @@ match()
 #
 # ### Return Codes
 #
-# 0 if the value matches the regex (shell extended glob pattern)
-# 1 if the value does not match the regex (shell extended glob pattern)
+# 0 if the value matches the regex (shell extended glob pattern).
+# 1 if the value does not match the regex (shell extended glob pattern).
 #
 # ### Failure Scenarios
 #
-# Fails if no value is given
-# Fails if no regex is given
+# Fails if no value is given.
+# Fails if no regex is given.
 #
 # ### Usage Examples
 #
@@ -225,38 +225,38 @@ ematch()
   # Store the first parameter into the value variable.
   local _value="$1"
 
-  # If the varable is nonempty
+  # If the variable is nonempty
   if variable_is_nonempty _value
   then
-    # then remove the value from the parameters list and set the regex variable
-    # to the next parameter
+    # Remove the value from the parameters list and set the regex variable
+    # to the next parameter.
     shift
     local _regex="$1"
 
-    # if the regex variable is nonempty
+    # If the regex variable is nonempty
     if variable_is_nonempty _regex
     then
-      # Use grep for extended regexp
+      # Use grep for extended regexp.
       echo "${_value}" | grep -qE "${_regex}"
       local result=$?
       case $result in
         0|1)
-          # 0 & 1 are correct results
+          # 0 & 1 are correct results.
           return $result
           ;;
         *)
-          # any other result means error in grep
+          # Any other result means an error in grep.
           fail "grep returned unknown code: $result"
           ;;
       esac
     else
-      # Otherwise no regex parameter was passed in, this is a programming error.
+      # Otherwise, no regex parameter was passed in; this is a programming error.
       # Send a failure message which also triggers a backtrace enabling the
       # developer to quickly pinpoint and fix their error.
       fail "A regex must be specified in order to match ${_value} against it."
     fi
   else
-    # Otherwise no parameters were passed in, this is a programming error.
+    # Otherwise, no parameters were passed in; this is a programming error.
     # Send a failure message which also triggers a backtrace enabling the
     # developer to quickly pinpoint and fix their error.
     fail "A value and regex must be specified in order to match."
@@ -275,7 +275,7 @@ ematch()
 #
 # ### Stream Outputs
 #
-# None if all are
+# None if all are [are what??].
 #
 # ### Environmental effects
 #
@@ -283,11 +283,11 @@ ematch()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
-# Fails if no varaible names were given.
+# Fails if no variable names were given.
 # Fails if any of the named variables are empty.
 #
 # ### Usage Examples
@@ -321,14 +321,14 @@ variables_must_be_nonempty()
       then
         continue
       else
-        # One of the variables was not set, this is a programming error.
+        # One of the variables was not set; this is a programming error.
         # Send a failure message which also triggers a backtrace enabling the
         # developer to quickly pinpoint and fix their error.
         fail "Required variable '$_variable' is not set."
       fi
     done
   else
-    # Otherwise no parameters were passed in, this is a programming error.
+    # Otherwise no parameters were passed in; this is a programming error.
     # Send a failure message which also triggers a backtrace enabling the
     # developer to quickly pinpoint and fix their error.
     fail "Cannot ensure variables are nonempty, as no variables were given."
@@ -380,10 +380,10 @@ variable_is_nonempty()
   # If the variable name is nonempty
   if [[ -n "${_variable}" ]]
   then
-    # if the evaluation of a nonempty test with the variable name used
+    # If the evaluation of a nonempty test with the variable name used [huh???]
     eval "[[ -n \"\${${_variable}:-}\" ]]"
   else
-    # Otherwise no parameters were passed in, this is a programming error.
+    # Otherwise no parameters were passed in; this is a programming error.
     # Send a failure message which also triggers a backtrace enabling the
     # developer to quickly pinpoint and fix their error.
     fail "Cannot check if variable is nonempty; no variable was given."
@@ -436,17 +436,17 @@ variable_is_empty()
   # If the variable name is nonempty
   if [[ -n "${_variable}" ]]
   then
-    # if the evaluation of an empty test with the variable name used
+    # If the evaluation of an empty test with the variable name used...
     if eval "[[ -z \"\${${_variable}:-}\" ]]"
     then
-      # is true then return true, 0
+      # ...is true, then return true, 0.
       return 0
     else
-      # is false then return false, 1
+      # ...is false, then return false, 1.
       return 1
     fi
   else
-    # Otherwise no parameters were passed in, this is a programming error.
+    # Otherwise no parameters were passed in; this is a programming error.
     # Send a failure message which also triggers a backtrace enabling the
     # developer to quickly pinpoint and fix their error.
     fail "Cannot check if variable is empty, as no variable was given."
@@ -499,21 +499,21 @@ variables_are_nonempty()
   # If the number of variable names passed in is nonzero
   if (( "${#_variables[@]}" > 0 ))
   then
-    # then for each variable in the passed in variable names
+    # For each variable passed in:
     for _variable in "${_variables}"
     do
-      # evaluate an is empty test using the variable name
+      # Evaluate an 'is empty' test using the variable name.
       if eval "[[ -z \"\${${_variable}:-}\" ]]"
       then
-        # If any single of the variables are empty, return false, 1
+        # If any of the variables are empty, return false, 1.
         return 1
       fi
     done
-    # If we get to this point, then all variables were set so return true, 0
+    # If we get to this point, then all variables were set; return true, 0
     # to the caller.
     return 0
   else
-    # Otherwise no parameters were passed in, this is a programming error.
+    # Otherwise, no parameters were passed in; this is a programming error.
     # Send a failure message which also triggers a backtrace enabling the
     # developer to quickly pinpoint and fix their error.
     fail "Cannot check if variables are nonempty as no variables were given."

@@ -3,7 +3,7 @@
 #
 # ## extension\_version()
 #
-# Outputs the named extension's version
+# Outputs the named extension's version.
 #
 # ### Input Parameters
 #
@@ -19,7 +19,7 @@
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -182,8 +182,8 @@ extension_actions()
 #
 # ### Input Parameters
 #
-# First parameter is the name of the extension to install
-# Second parameter is the src_path of the extension to install
+# First parameter is the name of the extension to install.
+# Second parameter is the src_path of the extension to install.
 #
 # ### Stream Outputs
 #
@@ -196,7 +196,7 @@ extension_actions()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #

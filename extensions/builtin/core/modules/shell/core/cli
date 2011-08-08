@@ -55,13 +55,13 @@ do
       ;;
 
     --)
-      shift #end of processing
+      shift # end of processing.
       extension_args=("$@")
       break
       ;;
 
     -*)
-      error "Unknown flag '${token}'"
+      error "Unknown flag: '${token}'."
       ;;
     *)
       if [[ -f "$token" && -z "$bdsm_script" ]]

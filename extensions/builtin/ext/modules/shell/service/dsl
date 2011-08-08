@@ -6,8 +6,8 @@
 #
 # ## services\_list()
 #
-# List installed services. These are extensions that have loaded the service
-# module.
+# List installed services. These are extensions that have
+# loaded the service module.
 #
 # ### Input Parameters
 #
@@ -24,7 +24,7 @@
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -43,8 +43,8 @@
 #
 # ## services\_list()
 #
-# List installed services. These are extensions that have loaded the service
-# module.
+# List installed services. These are extensions that have
+# loaded the service module.
 #
 # ### Input Parameters
 #
@@ -61,7 +61,7 @@
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -84,8 +84,8 @@ services_avilable()
 #
 # ## services\_installed()
 #
-# List installed services. These are extensions that have loaded the service
-# module.
+# List installed services. These are extensions that have
+# loaded the service module.
 #
 # ### Input Parameters
 #
@@ -102,7 +102,7 @@ services_avilable()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -123,7 +123,8 @@ services_installed()
 #
 # ## services\_available()
 #
-# List available services. These are extensions that load the service module.
+# List available services. These are extensions that
+# load the service module.
 #
 # ### Input Parameters
 #
@@ -140,7 +141,7 @@ services_installed()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -181,7 +182,7 @@ services_available()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -202,27 +203,27 @@ service_setup()
     source_files "${extension_path}/modules/${language:=shell}/${_file}"
   done
 
-  # Notify the user that we are now creating paths for the service/version
+  # Notify the user that we are now creating paths for the service/version.
   log "Ensuring paths for ${service} ${package_version} exist..."
 
   # If the user is root
   if user_is_root
   then
-    # then create the service_user on the system if it is missing with the
+    # Create the service_user on the system if it is missing, with the
     # same group as the name.
     # ##### TODO: create an 'user_exists' function and use it here.
     user_create_if_missing "${service_user}"\
       with group "${service_user}" >/dev/null 2>&1
 
-    # Create the paths for the service_root_paths if they do not exist
+    # Create the paths for the service_root_paths if they do not exist.
     ensure_paths_exist "${service_root_paths[@]}"
 
-    # then ensure that the service_user has ownership of the root serivce paths.
+    # Ensure that the service_user has ownership of the root serivce paths.
     chown_paths --recursively "${service_user}:${service_user}"\
       "${service_root_paths[@]}"
   fi
 
-  # Create the paths for the service/version if they do not exist
+  # Create the paths for the service/version if they do not exist.
   ensure_paths_exist "${service_paths[@]}" "${install_path}"
 
   # Ensure that the service_user has ownership of the serivce paths.
@@ -272,7 +273,7 @@ service_setup()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -287,8 +288,8 @@ service_setup()
 service_uninstall()
 {
   NIY "service_uninstall() has not yet been implemented."
-  # 1. Remove init scripts
-  # 2. Unload OS service hooks
+  # 1. Remove init scripts.
+  # 2. Unload OS service hooks.
   # 3. Deactivate database path.
 }
 
@@ -311,7 +312,7 @@ service_uninstall()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -326,24 +327,22 @@ service_uninstall()
 #
 service_start()
 {
-  # if the service variable is nonempty
+  # If the service variable is nonempty
   if variable_is_nonempty service
   then
-    # and if the service extension has defined a start method prefixed with the
+    # If the service extension has defined a start method prefixed with the
     # service's name
     if command_exists "${service}_start"
     then
-      # then call the extension defined service start function.
+      # Call the extension-defined service start function.
       "${service}_start"
     else
       # Start the service using the configuration defined in the extension.
       service_init_start
     fi
   else
-    # otherwise the service name variable was not set. This is a programming
-    # error and as such we call the fail function which yields a message and
-    # a backtrace thus enabling the developer to pinpoint and fix the issue
-    # quickly.
+    # Otherwise, the service name variable was not set. This is a programming
+    # error; fail with a message and a backtrace to help with debugging.
     fail "To start a service, you must set the 'service' variable."
   fi
 }
@@ -367,7 +366,7 @@ service_start()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -382,24 +381,22 @@ service_start()
 #
 service_stop()
 {
-  # if the service variable is nonempty
+  # If the service variable is nonempty
   if variable_is_nonempty service
   then
-    # and if the service extension has defined a start method prefixed with the
+    # If the service extension has defined a start method prefixed with the
     # service's name
     if command_exists "${service}_stop"
     then
-      # then call the extension defined service stop function.
+      # Call the extension-defined service stop function.
       "${service}_stop"
     else
-      # stop the service using the configuration defined in the extension.
+      # Stop the service using the configuration defined in the extension.
       service_init_stop
     fi
   else
-    # otherwise the service name variable was not set. This is a programming
-    # error and as such we call the fail function which yields a message and
-    # a backtrace thus enabling the developer to pinpoint and fix the issue
-    # quickly.
+    # Otherwise, the service name variable was not set. This is a programming
+    # error; fail with a message and a backtrace to help with debugging.
     fail "To start a service, you must set the 'service' variable."
   fi
 }
@@ -407,7 +404,7 @@ service_stop()
 #
 # ## service\_reload()
 #
-# reloads the given service using init scripts.
+# Reloads the given service using init scripts.
 #
 # ### Input Parameters
 #
@@ -423,7 +420,7 @@ service_stop()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -438,24 +435,22 @@ service_stop()
 #
 service_reload()
 {
-  # if the service variable is nonempty
+  # If the service variable is nonempty
   if variable_is_nonempty service
   then
-    # and if the service extension has defined a reload method prefixed with the
+    # If the service extension has defined a reload method prefixed with the
     # service's name
     if command_exists "${service}_reload"
     then
-      # then call the extension defined service reload function.
+      # Call the extension-defined service reload function.
       "${service}_reload"
     else
-      # reload the service using the configuration defined in the extension.
+      # Reload the service using the configuration defined in the extension.
       service_init_reload
     fi
   else
-    # otherwise the service name variable was not set. This is a programming
-    # error and as such we call the fail function which yields a message and
-    # a backtrace thus enabling the developer to pinpoint and fix the issue
-    # quickly.
+    # Otherwise the service name variable was not set. This is a programming
+    # error; fail with a message and a backtrace to help with debugging.
     fail "To start a service, you must set the 'service' variable."
   fi
 }
@@ -463,7 +458,7 @@ service_reload()
 #
 # ## service\_restart()
 #
-# restarts the given service using init scripts.
+# Restarts the given service using init scripts.
 #
 # ### Input Parameters
 #
@@ -479,7 +474,7 @@ service_reload()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -494,24 +489,22 @@ service_reload()
 #
 service_restart()
 {
-  # if the service variable is nonempty
+  # If the service variable is nonempty
   if variable_is_nonempty service
   then
-    # and if the service extension has defined a restart method prefixed with the
+    # If the service extension has defined a restart method prefixed with the
     # service's name
     if command_exists "${service}_restart"
     then
-      # then call the extension defined service restart function.
+      # Call the extension-defined service restart function.
       "${service}_restart"
     else
-      # restart the service using the configuration defined in the extension.
+      # Restart the service using the configuration defined in the extension.
       service_init_restart
     fi
   else
-    # otherwise the service name variable was not set. This is a programming
-    # error and as such we call the fail function which yields a message and
-    # a backtrace thus enabling the developer to pinpoint and fix the issue
-    # quickly.
+    # Otherwise the service name variable was not set. This is a programming
+    # error; fail with a message and a backtrace to help with debugging.
     fail "To start a service, you must set the 'service' variable."
   fi
 }
@@ -519,7 +512,7 @@ service_restart()
 #
 # ## service\_status()
 #
-# statuss the given service using init scripts.
+# Status of the given service using init scripts.
 #
 # ### Input Parameters
 #
@@ -535,7 +528,7 @@ service_restart()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -550,24 +543,22 @@ service_restart()
 #
 service_status()
 {
-  # if the service variable is nonempty
+  # If the service variable is nonempty
   if variable_is_nonempty service
   then
-    # and if the service extension has defined a status method prefixed with the
+    # If the service extension has defined a status method prefixed with the
     # service's name
     if command_exists "${service}_status"
     then
-      # then call the extension defined service status function.
+      # Call the extension-defined service status function.
       "${service}_status"
     else
-      # status the service using the configuration defined in the extension.
+      # Status the service using the configuration defined in the extension.
       service_init_status
     fi
   else
-    # otherwise the service name variable was not set. This is a programming
-    # error and as such we call the fail function which yields a message and
-    # a backtrace thus enabling the developer to pinpoint and fix the issue
-    # quickly.
+    # Otherwise, the service name variable was not set. This is a programming
+    # error; fail with a message and a backtrace to help with debugging.
     fail "To start a service, you must set the 'service' variable."
   fi
 }
@@ -591,7 +582,7 @@ service_status()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -606,24 +597,22 @@ service_status()
 #
 service_logtail()
 {
-  # if the service variable is nonempty
+  # If the service variable is nonempty
   if variable_is_nonempty service
   then
-    # and if the service extension has defined a logtail method prefixed with the
+    # If the service extension has defined a logtail method prefixed with the
     # service's name
     if command_exists "${service}_logtail"
     then
-      # then call the extension defined service logtail function.
+      # Call the extension-defined service logtail function.
       "${service}_logtail"
     else
       # logtail the service using the configuration defined in the extension.
       service_init_logtail
     fi
   else
-    # otherwise the service name variable was not set. This is a programming
-    # error and as such we call the fail function which yields a message and
-    # a backtrace thus enabling the developer to pinpoint and fix the issue
-    # quickly.
+    # Otherwise, the service name variable was not set. This is a programming
+    # error; fail with a message and a backtrace to help with debugging.
     fail "To start a service, you must set the 'service' variable."
   fi
 }
@@ -647,7 +636,7 @@ service_logtail()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -662,24 +651,22 @@ service_logtail()
 #
 service_info()
 {
-  # if the service variable is nonempty
+  # If the service variable is nonempty
   if variable_is_nonempty service
   then
-    # and if the service extension has defined a info method prefixed with the
+    # If the service extension has defined a info method prefixed with the
     # service's name
     if command_exists "${service}_info"
     then
-      # then call the extension defined service info function.
+      # Call the extension-defined service info function.
       "${service}_info"
     else
-      # info the service using the configuration defined in the extension.
+      # Info the service using the configuration defined in the extension.
       service_init_info
     fi
   else
-    # otherwise the service name variable was not set. This is a programming
-    # error and as such we call the fail function which yields a message and
-    # a backtrace thus enabling the developer to pinpoint and fix the issue
-    # quickly.
+    # Otherwise, the service name variable was not set. This is a programming
+    # error; fail with a message and a backtrace to help with debugging.
     fail "In order to get info on a service, the 'service' variable must be set."
   fi
 }
@@ -703,7 +690,7 @@ service_info()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -718,24 +705,22 @@ service_info()
 #
 service_configcheck()
 {
-  # if the service variable is nonempty
+  # If the service variable is nonempty
   if variable_is_nonempty service
   then
-    # and if the service extension has defined a configcheck method prefixed with the
+    # If the service extension has defined a configcheck method prefixed with the
     # service's name
     if command_exists "${service}_configcheck"
     then
-      # then call the extension defined service configcheck function.
+      # Call the extension-defined service configcheck function.
       "${service}_configcheck"
     else
       # configcheck the service using the configuration defined in the extension.
       service_init_configcheck
     fi
   else
-    # otherwise the service name variable was not set. This is a programming
-    # error and as such we call the fail function which yields a message and
-    # a backtrace thus enabling the developer to pinpoint and fix the issue
-    # quickly.
+    # Otherwise, the service name variable was not set. This is a programming
+    # error; fail with a message and a backtrace to help with debugging.
     fail "To configcheck a service, the 'service' variable must be set."
   fi
 }
@@ -759,7 +744,7 @@ service_configcheck()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -811,7 +796,7 @@ Options:
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -902,8 +887,8 @@ service_cli()
 #
 # ## service\_pid()
 #
-# List installed services. These are extensions that have loaded the service
-# module.
+# List installed services. These are extensions that have
+# loaded the service module.
 #
 # ### Input Parameters
 #
@@ -920,7 +905,7 @@ service_cli()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -978,7 +963,7 @@ service_pid()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -1016,7 +1001,7 @@ service_load_conf_d()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -1038,7 +1023,7 @@ service_install_init_d()
     then
       ensure_paths_exist "/etc/conf.d" "${init_scripts_path}"
 
-      log "Installing init scripts for ${_service}"
+      log "Installing init scripts for ${_service}."
 
       # TODO: Install the service init script...
 
@@ -1078,7 +1063,7 @@ service_install_init_d()
 #
 # ## service\_init\_path()
 #
-# Sets the PATH explicitely for purposes of the current service extension.
+# Sets the PATH explicitly for purposes of the current service extension.
 #
 # ### Input Parameters
 #
@@ -1094,7 +1079,7 @@ service_install_init_d()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -1128,7 +1113,7 @@ service_init_path()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -1202,7 +1187,7 @@ service_init_start()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -1255,7 +1240,7 @@ service_init_stop()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -1296,7 +1281,7 @@ service_init_status()
     then
       true
     else
-      error "failed check status of ${service}"
+      error "failed check status of ${service}."
     fi
   else
     if user_run_as "${service_user}" "${_command[*]}"
@@ -1304,7 +1289,7 @@ service_init_status()
       touch "$service_pid_file"
       succeed
     else
-      error "failed check status of ${service}"
+      error "failed check status of ${service}."
     fi
   fi
 }
@@ -1328,7 +1313,7 @@ service_init_status()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -1383,7 +1368,7 @@ service_init_reload()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -1417,7 +1402,7 @@ service_init_usage()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -1453,7 +1438,7 @@ service_init_logtail()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -1488,7 +1473,7 @@ service_init_info()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -1539,7 +1524,7 @@ service_conf_d()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -1589,7 +1574,7 @@ service_init_action()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -1620,7 +1605,7 @@ service_init_d()
 #
 # ## service\_deactivate()
 #
-# Deactivates the named service or
+# Deactivates the named service.
 #
 # ### Input Parameters
 #
@@ -1636,7 +1621,7 @@ service_init_d()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -1653,7 +1638,7 @@ service_deactivate()
 
   if [[ -z "${_service}" ]]
   then
-    fail "a service name must be set or passed in to deactivate a service."
+    fail "A service name must be set or passed in to deactivate a service."
   fi
 
   if file_exists "${init_scripts_path}/${_service}"
@@ -1694,7 +1679,7 @@ service_deactivate()
 #
 # ## service\_activate()
 #
-# Activates the named service or
+# Activates the named service.
 #
 # ### Input Parameters
 #
@@ -1710,7 +1695,7 @@ service_deactivate()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -1741,7 +1726,7 @@ service_activate()
 
   if path_exists "${service_db_path}/${_version}"
   then
-    log "Activating service ${_service} version ${_version}"
+    log "Activating service ${_service} version ${_version}."
 
     link --force "${service_db_path}/${_version}" to "${service_db_path}/active"
 
@@ -1896,7 +1881,7 @@ service_status()
       fi
     fi
   else
-    log "  status: not running"
+    log "  status: not running."
   fi
 
   if command_exists "${service}_status"
@@ -1917,11 +1902,11 @@ service_signal()
         then
           kill -${_signal} ${_pid}
         else
-          log "Not sending signal ${_signal} to process, as pid is 0 (process not found/running)"
+          log "Not sending signal ${_signal} to process, as pid is 0 (process not found/running)."
         fi
         ;;
       *)
-        fail "The signal to send must be passed in first, and must be one of: {KILL,QUIT,TERM,USR1,USR2,TTIN,TTOU,a digit})"
+        fail "The signal to send must be passed in first, and must be one of: {KILL,QUIT,TERM,USR1,USR2,TTIN,TTOU,a digit})."
         ;;
     esac
   else

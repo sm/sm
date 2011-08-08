@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 NYI
-# extension_is_installed removed as it was not working already
+# extension_is_installed removed, as it was not working already.
 
 if array_is_nonempty extension_args
 then
@@ -29,7 +29,7 @@ then
     esac
   done
 
-  # Sanity checks
+  # Sanity checks.
   if variable_is_nonempty _source
   then
     if variable_is_nonempty _target

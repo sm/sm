@@ -52,9 +52,9 @@ bdsm_development_setup()
 
     if path_exists "${_component}"
     then
-      log "  * Repository already exists at $PWD/${_component}/"
+      log "  * Repository already exists at $PWD/${_component}/."
     else
-      log "  * Cloning Core repository into $PWD/${_component}/"
+      log "  * Cloning Core repository into $PWD/${_component}/."
       case ${_component} in
         core)
           _url="https://github.com/wayneeseguin/bdsm"
@@ -66,9 +66,9 @@ bdsm_development_setup()
 
       if git clone ${_url} ${_component}
       then
-        log "  * ${_component} repository successfully cloned into $PWD/${_component}/"
+        log "  * ${_component} repository successfully cloned into $PWD/${_component}/."
       else
-        error "There was an error cloning ${_component} repository from ${_url} into ${PWD}/${_component}"
+        error "There was an error cloning ${_component} repository from ${_url} into ${PWD}/${_component}."
       fi
     fi
   done
@@ -107,7 +107,7 @@ extension_package()
             # TODO: parallelize this.
             ${archiver} -f -9 "${_name}-${_version}.tar"
           else
-            error "There was an error ($?) while trying to create a tar of the '${_name}' directory while packaging."
+            error "There was an error during packaging ($?) while trying to create a tar of the '${_name}' directory."
           fi
         fi
 
@@ -122,12 +122,12 @@ extension_package()
             to "${_path}/pkg" from "${_path}"
         done
       done
-      log "Packaging complete. (Packages are located in '${_path}/pkg' )"
+      log "Packaging complete! (Packages are located in '${_path}/pkg'.)"
     else
-      error "Cannot package extension '${_name}', as the extension is not valid."
+      error "Cannot package extension '${_name}'; the extension is not valid."
     fi
   else
-    fail "Cannot package an extension, as no extension name was given."
+    fail "Cannot package an extension; no extension name was given."
   fi
 }
 
@@ -168,10 +168,10 @@ extension_publish()
       done
       log "Packaging complete. (Packages are located in '${_path}/pkg' )"
     else
-      error "Cannot package extension '${_name}', as the extension is not valid."
+      error "Cannot package extension '${_name}'; the extension is not valid."
     fi
   else
-    fail "Cannot publish an extension, as no extension name was given."
+    fail "Cannot publish an extension; no extension name was given."
   fi
 }
 

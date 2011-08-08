@@ -20,7 +20,7 @@ action "open" \
   "Opens the modules directory in the filesystem browser."
 
 action "dsl" \
-  "Prints out a summary listing of dsl functions, by module."
+  "Prints out a summary listing of DSL functions, by module."
 
 resource "http://bdsm.beginrescueend.com/modules/"
 

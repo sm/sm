@@ -49,7 +49,7 @@ install_core()
   log "  Installing core files (${files[*]}) into ${install_path}."
   copy_files to "${install_path}" ${files[@]}
 
-  log "  Installing builtin extensions"
+  log "  Installing builtin extensions."
   copy_paths --force to "${install_path}/extensions/" "extensions/builtin"
 
 }

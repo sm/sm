@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Ensure that default values are set, prefix_path should be set at this point so
+# Ensure that default values are set; prefix_path should be set at this point, so
 # this is also a failsafe.
 #TODO: update repository_url to "wayneeseguin/bdsm"
 true \

@@ -25,7 +25,7 @@
 #
 # ### Failure Scenarios
 #
-# Fails if the array name, the first parameter, is not given.
+# Fails if the array name is not given as the first parameter.
 #
 # ### Usage Examples
 #
@@ -33,35 +33,35 @@
 #     the_array=(1 2 3 4 5)
 #     if array_is_nonempty the_array
 #     then
-#       log "the array is not empty"
+#       log "the array is not empty."
 #     else
-#       log "the array is empty"
+#       log "the array is empty."
 #     fi
 #
 #     the_array=()
 #     if array_is_nonempty the_array
 #     then
-#       log "the array is not empty"
+#       log "the array is not empty."
 #     else
-#       log "the array is empty"
+#       log "the array is empty."
 #     fi
 #
 #     user$ $HOME/test
-#     the array is not empty
-#     the array is empty
+#     the array is not empty.
+#     the array is empty.
 #
 # ### Code Walkthrough
 array_is_nonempty()
 {
-  # Store the array name into a local variable, set to the empty string if it
+  # Store the array name into a local variable; set to the empty string if it
   # was not passed in.
   local _array_name="${1:-}"
 
-  # if the array name variable is not empty, then if the length of the named
-  # array is greater than 0 then return true (0); otherwise, return false (1)
+  # If the array name variable is not empty, then if the length of the named
+  # array is greater than 0, return true (0); otherwise, return false (1)
   # if the array name variable was not passed in. This is a
   # programming error, so we call the fail function, which yields a
-  # message and a backtrace, to enable quick debugging.
+  # message and a backtrace to enable quick debugging.
   if variable_is_nonempty _array_name
   then
     if eval "(( \${#${_array_name}[@]} > 0 ))"
@@ -96,7 +96,7 @@ array_is_nonempty()
 #
 # ### Failure Scenarios
 #
-# Fails if the array name, the first parameter, is not given.
+# Fails if the array name is not given as the first parameter.
 #
 # ### Usage Examples
 #
@@ -118,7 +118,7 @@ array_is_empty()
   local _array_name="${1:-}"
 
   # If the array name variable is not empty, and if the length of the named array
-  # is zero, then return true, 0; otherwise, return false, 1
+  # is zero, then return true, 0; otherwise, return false, 1,
   # if the array name variable was not passed in. This is a
   # programming error, so we call the fail function, which yields a
   # message and a backtrace to enable quick debugging.
@@ -155,7 +155,7 @@ array_is_empty()
 #
 # ### Failure Scenarios
 #
-# Fails if the array name, first parameter, is not given.
+# Fails if the array name is not given as the first parameter.
 #
 # ### Usage Examples
 #
@@ -172,10 +172,9 @@ array_length()
 
   # If the array name variable is not empty, then record the length of the array
   # to the length variable. Print out the length of the array, and return true, 0.
-  # Otherwise, the array name variable was not passed in. This is a programming
+  # Otherwise, the array name variable was not passed in; this is a programming
   # error, so we call the fail function, which yields a message and
-  # a backtrace to enable you to pinpoint and fix the issue
-  # quickly.
+  # a backtrace to enable you to pinpoint and fix the issue quickly.
   if variable_is_nonempty _array_name
   then
     eval "_length=\${#${_array_name}[@]}"
@@ -202,7 +201,7 @@ array_length()
 #
 # ### Failure Scenarios
 #
-# Fails if the array name, first parameter, is not given.
+# Fails if the array name is not given as the first parameter.
 #
 # ### Return Codes
 #
@@ -226,7 +225,7 @@ array_last_element()
   # element. Print the element, at the index of the length of the named array, to
   # the calling environment's STDOUT stream.
   # Otherwise, if the array name variable was not passed in, this is a
-  # programming error; so we call the fail function, which yields a
+  # programming error; we call the fail function, which yields a
   # message and a backtrace for quick debugging.
   if variable_is_nonempty _array_name
   then
@@ -278,11 +277,11 @@ array_first_element()
   # If the array name variable is not empty, then determine the length of the
   # named array, and assign it into the array_length variable. If the array is
   # not empty, set the element variable to the value of the first element of the
-  # array.  Then print the element to the STDOUT of the calling environment.
+  # array, then print the element to the STDOUT of the calling environment.
   # Return false, 1 if the array is empty, and we cannot return an element.
   # Otherwise, if the array name variable was not passed in, this is a
-  # programming error, so we call the fail function, which yields a
-  # message and a backtrace for quick debugging
+  # programming error; so we call the fail function, which yields a
+  # message and a backtrace for quick debugging.
   if variable_is_nonempty _array_name
   then
     eval "_array_length=\"\${#${_array_name}[@]}\""
@@ -341,8 +340,8 @@ array_push()
   # If the array name variable is not empty, then remove the array name from the
   # parameters list.  If the array is nonempty, then set the elements array to
   # the remaining parameters, and declare an element variable.
-  # If the number of elements is nonzero, then for each element in the passed in
-  # elements, append the element to the named array.
+  # If the number of elements is nonzero, then for each of the elements passed in,
+  # append the element to the named array.
   # Otherwise, if no elements were passed in to push onto the array,
   # this is a programming error; so we call the fail function,
   # which yields a message and a backtrace for quick debugging.
@@ -408,10 +407,10 @@ array_append()
 
   # If the array name variable is not empty, then remove the array name from the
   # parameters list. Set the elements array to the remaining parameters, and
-  # declare an element variable.  If the number of elements is nonzero, then for
-  # each element, append the element to the named array.
-  # Otherwise, if no elements were passed in to push onto the array, this
-  # indicates a programming error; so we call the fail function, which
+  # declare an element variable. If the number of elements is nonzero, then
+  # append each element to the named array.
+  # Otherwise, if no elements were passed in to push onto the array, there
+  # is a programming error; so we call the fail function, which
   # yields a message and a backtrace to help pinpoint and
   # fix the code quickly.
   # Otherwise, if the array name variable was not passed in, this is also a
@@ -434,7 +433,7 @@ array_append()
     fi
 
   else
-    fail "Cannot push onto array, as an array name was not given."
+    fail "Cannot push elements onto array; no array name was given."
   fi
 }
 
@@ -478,7 +477,7 @@ array_pop()
   # If the array name variable is not empty, then remove the array name from the
   # parameters list. If a variable was specified, assign the first element of
   # the named array into the variable before shifting. Store the value of the
-  # first element of the named array. Then shift the array contents over by one,
+  # first element of the named array, ten shift the array contents over by one,
   # using a temporary array. Finally, reassign the shifted temp array contents
   # to the original named variable.
   # Otherwise, if the array name variable was not passed in, this is a
@@ -534,14 +533,14 @@ array_pop()
 # ### Code Walkthrough
 array_shift()
 {
-  # Store the array name into a local variable, set to the empty string if it
+  # Store the array name into a local variable; set to the empty string if it
   # was not passed in.
   local _array_name="${1:-}" temp_array=() index _variable="${2:-}"
 
   # If the array name variable is not empty, then remove the array name from the
   # parameters list. If a variable was specified, assign the first element of
   # the named array into the variable before shifting. Store the value of the
-  # first element of the named array. Then shift the array contents over by one,
+  # first element of the named array, then shift the array contents over by one,
   # using a temporary array. Finally, reassign the shifted temp array contents
   # to the original named variable.
   # Otherwise, if the array name variable was not passed in, this is a
@@ -623,7 +622,7 @@ array_unshift()
       fail "Cannot push elements onto array, as no elements were given."
     fi
   else
-    fail "Cannot push onto array, as an array name was not given."
+    fail "Cannot push onto array; no array name was given."
   fi
 }
 
@@ -724,7 +723,7 @@ array_largest()
   # If the array name variable is not empty, then loop over the array comparing
   # the size of each element with the currently known 'largest' element. If the
   # size of the element at each index is greater than the size of the current
-  # largest element, then replace the largest variable contents with the
+  # largest element, replace the largest variable contents with the
   # contents of the array at the current index.
   # Print out the value string of the largest array element that was found.
   # Otherwise the array name variable was not passed in; this is a programming
@@ -743,7 +742,7 @@ array_largest()
     "
     printf "%s" "${_largest}"
   else
-    fail "Cannot find largest element, as an array variable name was not given."
+    fail "Cannot find largest element; no array variable name was given."
   fi
 }
 
@@ -860,7 +859,7 @@ array_sort_asc()
     echo \"\${${_array_name}[@]}\" | tr ' ' \"\n\" | sort
     ))"
   else
-    fail "Cannot sort an array in ascending order as an array; "\
+    fail "Cannot sort an array in ascending order, as an array "\
       "variable name was not given."
   fi
 }
@@ -912,7 +911,7 @@ array_unique()
   # the largest element with awk.
   # Otherwise, the array name variable was not passed in; this is a programming
   # error; so we call the fail function which yields a message and
-  # a backtrace to help pinpoint and fix the issue quickly.
+  # a backtrace to help pinpoint the issue quickly.
   if variable_is_nonempty _array_name
   then
     eval "${_array_name}=(\$(
@@ -945,7 +944,7 @@ array_unique()
 #
 # ### Failure Scenarios
 #
-# Fails if the array name, the first parameter, is not given.
+# Fails if the array name is not given as the first parameter.
 #
 # ### Usage Examples
 #
@@ -958,43 +957,43 @@ array_unique()
 #     printf "($(array_join the_array))"
 #     if array_is_even the_array
 #     then
-#       echo " has an even number of elements"
+#       echo " has an even number of elements."
 #     else
-#       echo " has an odd number of elements"
+#       echo " has an odd number of elements."
 #     fi
 #
 #     the_array=(1)
 #     printf "($(array_join the_array))"
 #     if array_is_even the_array
 #     then
-#       echo " has an even number of elements"
+#       echo " has an even number of elements."
 #     else
-#       echo " has an odd number of elements"
+#       echo " has an odd number of elements."
 #     fi
 #
 #     the_array=(1 2 3 4)
 #     printf "($(array_join the_array))"
 #     if array_is_even the_array
 #     then
-#       echo " has an even number of elements"
+#       echo " has an even number of elements."
 #     else
-#       echo " has an odd number of elements"
+#       echo " has an odd number of elements."
 #     fi
 #
 #     the_array=(1 2 3 4 5)
 #     printf "($(array_join the_array))"
 #     if array_is_even the_array
 #     then
-#       echo " has an even number of elements"
+#       echo " has an even number of elements."
 #     else
-#       echo " has an odd number of elements"
+#       echo " has an odd number of elements."
 #     fi
 #
 #     user$ "$HOME/test"
-#     () has an even number of elements
-#     (1) has an odd number of elements
-#     (1 2 3 4) has an even number of elements
-#     (1 2 3 4 5) has an odd number of elements
+#     () has an even number of elements.
+#     (1) has an odd number of elements.
+#     (1 2 3 4) has an even number of elements.
+#     (1 2 3 4 5) has an odd number of elements.
 #
 # ### Code Walkthrough
 array_is_even()
@@ -1007,7 +1006,7 @@ array_is_even()
   # two is zero, then the array is even; return true, 0. If the length of the
   # array is odd, return false, 1.
   # If the array name was not passed in, this is a programming error; send a
-  # fail message, including a backtrace, allowing for quick debuging
+  # fail message, including a backtrace, allowing for quick debugging.
   if variable_is_nonempty _array_name
   then
     if eval "(( ( \${#${_array_name}[@]} % 2 ) == 0 ))"

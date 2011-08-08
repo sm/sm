@@ -31,7 +31,7 @@ database_cli()
     fi
   done
 
-  # explicitely reload the database module to pickup any CLI overrides.
+  # Explicitly reload the database module, to pickup any CLI overrides.
   modules_reinitialize database
 }
 
@@ -43,8 +43,8 @@ database_usage() {
 
   options:
 
-  --data)    - specify data directory
-  --help)    - view this usage information
+  --data)    - specify data directory.
+  --help)    - view this usage information.
 
   "
   return 0
@@ -72,7 +72,7 @@ database_setup()
 }
 
 # TODO: Should 'service_db_path' in service_{activate,deactivate} be moved into
-# here with database_activate / database_deactivate
+# here with database_activate / database_deactivate.
 database_activate()
 {
   true # NIY

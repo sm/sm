@@ -12,14 +12,14 @@ ext_help()
   action "ext install all" "Install all extension ext found on the known list."
   action "ext install {name}" "Install extension {name} found on the known list."
   action "ext install {name} {uri}" "Install extension {name} from the given {uri}."
-  action "ext add" "shortcut for install"
+  action "ext add" "Shortcut for install."
   action_separator
   action "ext update all" "Update all extension ext using remembered uris."
   action "ext update {name}" "Update extension {name} using remembered uri."
-  action "ext up" "shortcut for update"
+  action "ext up" "Shortcut for update."
   action_separator
   action "ext uninstall {name}" "Remove extension {name}."
-  action "ext del" "Shortcut for uninstall"
+  action "ext del" "Shortcut for uninstall."
   action_separator
   action "ext help" "Show this help."
 
@@ -58,7 +58,7 @@ ext_install()
   fi
   case "${_name}" in
     external|builtin)
-      error "Extension ${_name} cannot be installed"
+      error "Extension ${_name} cannot be installed."
       ;;
   esac
   if [[ -z "${_uri}" ]]
@@ -103,7 +103,7 @@ ext_update()
   do
     case "${_name}" in
       external|builtin)
-        error "Extension ${_name} cannot be updated"
+        error "Extension ${_name} cannot be updated."
         ;;
     esac
     if [[ ! -d "${bdsm_path}/extensions/ext/${_name}" ]]
@@ -146,16 +146,16 @@ ext_uninstall()
   local _name="$1"
   case "${_name}" in
     */*|.|..)
-      error "Please specify a valid extension name"
+      error "Please specify a valid extension name."
       ;;
     external|builtin)
-      error "Extension ${_name} cannot be removed"
+      error "Extension ${_name} cannot be removed."
       ;;
   esac
   enter "${bdsm_path}/extensions/ext"
   if [[ ! -d "${_name}" ]]
   then
-    error "Please specify a valid extension name"
+    error "Please specify a valid extension name."
   fi
 
   #TODO: are you sure ?

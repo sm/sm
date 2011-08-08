@@ -14,7 +14,7 @@
 #
 # ### Stream Outputs
 #
-# The system init scripts path is printed to the calling environments STDOUT.
+# The system init scripts path is printed to the calling environment's STDOUT.
 #
 # ### Environmental effects
 #
@@ -48,7 +48,7 @@ init_scripts_path()
         ;;
 
       *linux*|*)
-        # If the OS is Linux, then we test for the location of the init.d
+        # If the OS is Linux, test for the location of the init.d
         # scripts, either /etc/init.d (eg. CentOS) or /etc/rc.d (eg. ArchLinux)
         if [[ -d "/etc/init.d" ]]
         then
@@ -89,7 +89,7 @@ init_scripts_path()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -132,8 +132,8 @@ confd_path()
 #
 # ### Return Codes
 #
-# 0 if the operating system is linux
-# 1 if the operating system is not linux
+# 0 if the operating system is Linux.
+# 1 if the operating system is not Linux.
 #
 # ### Failure Scenarios
 #
@@ -177,8 +177,8 @@ os_is_linux()
 #
 # ### Return Codes
 #
-# 0 if the operating system is darwin
-# 1 if the operating system is not darwin
+# 0 if the operating system is darwin.
+# 1 if the operating system is not darwin.
 #
 # ### Failure Scenarios
 #
@@ -194,7 +194,7 @@ os_is_linux()
 os_is_darwin()
 {
   # If the machine type is darwin then return the code for true/success, 0
-  # otherwise return a nonzero error code, 1
+  # otherwise return a nonzero error code, 1.
   if [[ "$MACHTYPE" = *darwin* ]]
   then
     return 0
@@ -222,8 +222,8 @@ os_is_darwin()
 #
 # ### Return Codes
 #
-# 0 if the operating system is bsd
-# 1 if the operating system is not bsd
+# 0 if the operating system is bsd.
+# 1 if the operating system is not bsd.
 #
 # ### Failure Scenarios
 #
@@ -267,8 +267,8 @@ os_is_bsd()
 #
 # ### Return Codes
 #
-# 0 if the operating system is linux
-# 1 if the operating system is not linux
+# 0 if the operating system is linux.
+# 1 if the operating system is not linux.
 #
 # ### Failure Scenarios
 #
@@ -284,7 +284,7 @@ os_is_bsd()
 os_is_solaris()
 {
   # If the machine type is Solaris then return the code for true/success, 0
-  # otherwise return a nonzero error code, 1
+  # otherwise return a nonzero error code, 1.
   if [[ "$MACHTYPE" = *solaris* ]]
   then
     return 0
@@ -312,8 +312,8 @@ os_is_solaris()
 #
 # ### Return Codes
 #
-# 0 if the operating system is aix
-# 1 if the operating system is not aix
+# 0 if the operating system is aix.
+# 1 if the operating system is not aix.
 #
 # ### Failure Scenarios
 #
@@ -349,7 +349,7 @@ os_is_aix()
 #
 # ### Stream Outputs
 #
-# Prints the OS category/type to the calling environments STDOUT.
+# Prints the OS category/type to the calling environment's STDOUT.
 #
 # ### Environmental effects
 #
@@ -357,7 +357,7 @@ os_is_aix()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -434,16 +434,16 @@ os_arch_type()
 {
   # Print out the OS architecture type based on the detected machine type.
   case "${MACHTYPE//-*}" in
-    # The machine type is 32 bit
+    # The machine type is 32 bit.
     # Note that this accounts for Solaris 32 bit as well (i86pc).
     (i386|i686|i86pc)
       printf "%s" "i386"
       ;;
-    # The machine type is 64 bit
+    # The machine type is 64 bit.
     (*x86_64*)
       printf "%s" "x86_64"
       ;;
-    # The machine type is PowerPC
+    # The machine type is PowerPC.
     (*ppc*)
       printf "%s" "ppc"
       ;;
@@ -483,8 +483,8 @@ os_arch_type()
 # ### Code Walkthrough
 os_arch()
 {
-  # Print out the full OS machine type string which includes the architecture
-  # to the calling environments STDOUT stream.
+  # Print out the full OS machine type string, which includes the architecture,
+  # to the calling environment's STDOUT stream.
   printf '%s' "${MACHTYPE//-*}"
 }
 
@@ -507,8 +507,8 @@ os_arch()
 #
 # ### Return Codes
 #
-# 0 if the operating system is linux
-# 1 if the operating system is not linux
+# 0 if the operating system is linux.
+# 1 if the operating system is not linux.
 #
 # ### Failure Scenarios
 #
@@ -523,13 +523,13 @@ os_arch()
 os_arch_capable()
 {
   # If the operating system is 'darwin' (OSX)
-  # Otherwise return the default for the OS, defer to os_arch_type()
+  # Otherwise return the default for the OS, defer to os_arch_type().
   if os_is_darwin
   then
-    # Now determine whether the CPU has 64 bit capabilities, on OSX we use
-    # sysctl key hw.cpu64bit_capable key to find this out.  If the value is 1
-    # then the CPU is 64 bit capable, emit x86_64 to the calling environments
-    # STDOUT otherwise output either i386 or ppc, by derring to os_arch_type()
+    # Now determine whether the CPU has 64 bit capabilities. On OSX we use
+    # sysctl key hw.cpu64bit_capable key to find this out.  If the value is 1,
+    # then the CPU is 64 bit capable; emit x86_64 to the calling environment's
+    # STDOUT. Otherwise, output either i386 or ppc, by deferring to os_arch_type()
     local _string
     read -r _string < <(sysctl hw.cpu64bit_capable)
     if (( ${_string//* } == 1 ))
@@ -546,7 +546,7 @@ os_arch_capable()
 #
 # ## os\_cpu\_count()
 #
-# Print the number of cpu cores on the current system to STDOUT
+# Print the number of cpu cores on the current system to STDOUT.
 #
 # ### Input Parameters
 #
@@ -562,7 +562,7 @@ os_arch_capable()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -579,30 +579,30 @@ os_cpu_count()
   # Default the CPU count to 1
   local _cpu_count=1
 
-  # If the operating system is Darwin (OSX)
-  # Then read the CPU count using the sysctl key hw.ncpu, and trim off
+  # If the operating system is Darwin (OSX),
+  # then read the CPU count using the sysctl key hw.ncpu, and trim off
   # everything except the last space separated field.
   if os_is_darwin
   then
     read -r _cpu_count < <(sysctl hw.ncpu)
     _cpu_count="${_cpu_count//* }"
-  # If the operating system is Linux then gather the information directly from
-  # the proc filesystem
+  # If the operating system is Linux, gather the information directly from
+  # the proc filesystem.
   elif os_is_linux
   then
     _cpu_count=$(awk '/^processor/{count++} END{print count}' /proc/cpuinfo 2>&1)
 
-  # Warn the user that this function has not yet been implemented for solaris.
+  # Warn that this function has not yet been implemented for solaris.
   elif os_is_solaris
   then
     warn "CPU counting for Solaris has not yet been implemented; returning 1."
 
-  # Warn the user that this function has not yet been implemented for bsd.
+  # Warn that this function has not yet been implemented for bsd.
   elif os_is_bsd
   then
     warn "CPU counting for BSD has not yet been implemented; returning 1."
 
-  # Warn the user that this function has not yet been implemented for aix.
+  # Warn that this function has not yet been implemented for aix.
   elif os_is_aix
   then
     warn "CPU counting for AIX has not yet been implemented; returning 1."
@@ -631,7 +631,7 @@ os_cpu_count()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -648,7 +648,7 @@ os_cpu_count()
 # ### Code Walkthrough
 os_version()
 {
-  # Read the revisin string using the uname utility and strip off the rightmost
+  # Read the revision string using the uname utility, and strip off the rightmost
   # piece, which typically contains additional info. Then print the remaining
   # string to the STDOUT of the calling environment.
   read -r os_version < <(uname -r)
@@ -659,7 +659,7 @@ os_version()
 #
 # ## os\_version\_major()
 #
-# Prints the OS major version to STDOUT and sets the 'os_version_major' variable
+# Prints the OS major version to STDOUT and sets the 'os_version_major' variable.
 #
 # ### Input Parameters
 #
@@ -676,7 +676,7 @@ os_version()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -703,7 +703,7 @@ os_version_major()
 #
 # ## os\_version\_minor()
 #
-# Prints the OS minor version to STDOUT and sets the 'os_version_minor' variable
+# Prints the OS minor version to STDOUT and sets the 'os_version_minor' variable.
 #
 # ### Input Parameters
 #
@@ -720,7 +720,7 @@ os_version_major()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -749,7 +749,7 @@ os_version_minor()
 #
 # ## os\_version\_patch()
 #
-# Prints the OS patch version to STDOUT and sets the 'os_version_patch' variable
+# Prints the OS patch version to STDOUT and sets the 'os_version_patch' variable.
 #
 # ### Input Parameters
 #
@@ -766,7 +766,7 @@ os_version_minor()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -812,21 +812,21 @@ os_open()
     # and if the 'open' command exists on the system
     if command_exists open
     then
-      # then call open passing in the URI
+      # Call open, passing in the URI.
       open "${_uri}"
 
-    # otherwise if the 'xdg-open' command exists on the system
+    # Otherwise if the 'xdg-open' command exists on the system,
     elif command_exists xdg-open
     then
-      # then call xdg-open passing in the URI
+      # Call xdg-open, passing in the URI.
       xdg-open "${_uri}"
 
     # otherwise
     else
       # If the shell is interactive
-      # and if the uri is a file uri then open it up in the shell set editor
+      # and if the uri is a file uri then open it up in the shell set editor,
       # or less if the editor variable has not been set.
-      # Otherwise the shell is non-interactive so for now print the uri.
+      # Otherwise the shell is non-interactive, so for now print the uri.
       modules ext/interactive
       if shell_is_interactive
       then
@@ -841,10 +841,9 @@ os_open()
       fi
     fi
   else
-    # otherwise the uri was not passed in, this is a programming error
-    # so send a fail message which will send a backtrace allowing the developer
-    # to quickly debug where they are missing the URI.
-    fail "Cannot open URI as no uri was given."
+    # Otherwise the uri was not passed in; this is a programming error.
+    # Fail, with a backtrace to help with debugging.
+    fail "Cannot open URI; no uri was given."
   fi
 }
 

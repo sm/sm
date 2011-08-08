@@ -20,7 +20,7 @@
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -47,12 +47,12 @@ rvm_install()
 #
 # ### Input Parameters
 #
-# One or more gem names
+# One or more gem names.
 #
 # ### Stream Outputs
 #
 # The output of the gem install command will be printed to the calling
-# environments streams.
+# environment's streams.
 #
 # ### Environmental effects
 #
@@ -60,8 +60,8 @@ rvm_install()
 #
 # ### Return Codes
 #
-# 0 if gem install was successful
-# 1 if gem install was not successful
+# 0 if gem install was successful.
+# 1 if gem install was not successful.
 #
 # ### Failure Scenarios
 #
@@ -89,11 +89,11 @@ install_gem()
 #
 # ### Input Parameters
 #
-# One or more rubygems names
+# One or more rubygems names.
 #
 # ### Stream Outputs
 #
-# Output from underlying gem install will be printed to the calling environments
+# Output from underlying gem install will be printed to the calling environment's
 # streams.
 #
 # ### Environmental effects
@@ -102,8 +102,8 @@ install_gem()
 #
 # ### Return Codes
 #
-# 0 if all gem installs were successful
-# n where n is the number of unsuccessful gem installs otherwise.
+# 0, if all gem installs were successful.
+# n, where n is the number of unsuccessful gem installs.
 #
 # ### Failure Scenarios
 #

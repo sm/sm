@@ -11,7 +11,7 @@
 # It is used in several path and file calculations.
 export environment="{{environment}}"
 
-# For Rails projects, we need to set RAILS_ENV
+# For Rails projects, we need to set RAILS_ENV.
 # Be sure that config/environments/$environment.rb exists!
 # It should be safe to copy config/environments/production.rb to create it.
 export RAILS_ENV="$environment"
@@ -20,7 +20,7 @@ export RAILS_ENV="$environment"
 #  The below settings are for repository options.
 #
 
-# The name of the project (the repository is expected to be in ~/shared/$project)
+# The name of the project (the repository is expected to be in ~/shared/$project).
 
 export project="{{project}}"
 
@@ -28,7 +28,7 @@ export project="{{project}}"
 # For Github use shortcut: user/repository
 repository_url="{{repository_url}}"
 
-# The branch of your application
+# The branch of your application.
 branch="master"
 
 # The tag of your application, if any.
@@ -38,5 +38,5 @@ branch="master"
 scm_path=~/.bdsm/scm
 archives_path=~/.bdsm/archives
 
-# Add here any modules that should be always loaded with BDSM
+# Add here any modules that should always load with BDSM.
 preload_modules+=( )
