@@ -503,6 +503,43 @@ action_source()
   source "$script"
 }
 
+var_debug_callback()
+{
+  local _variable
+  for _variable in ${var_debug_flags}
+  do
+    eval "
+      if [[ \"\${${_variable}}\" != \"\${${_variable}_previous_value}\" ]]
+      then
+        if string_contains "$-" "xtrace"
+        then
+          log \"var debug '${_variable}' change from '\${${_variable}_previous_value}' to '\${${_variable}}'.\"
+        elif [[ \"${var_debug_type_flag}\" == \"short\" ]]
+        then
+          log \"var debug '${_variable}' change from '\${${_variable}_previous_value}' to '\${${_variable}}' function path: ${FUNCNAME[*]}\"
+        else
+          backtrace \"var debug '${_variable}' change from '\${${_variable}_previous_value}' to '\${${_variable}}'.\" no_exit
+        fi
+        ${_variable}_previous_value=\"\${${_variable}}\"
+      fi
+    "
+  done
+}
+
+var_debug_callback_initialize()
+{
+  local _variable
+  for _variable in ${var_debug_flags}
+  do
+    eval "
+      if [[ \"\${${_variable}}\" != \"\${${_variable}_previous_value}\" ]]
+      then
+        ${_variable}_previous_value=\"\${${_variable}}\"
+      fi
+    "
+  done
+}
+
 separator()
 {
   local _columns

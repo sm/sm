@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-: ${debug_flags:=""} ${debug_flag:=0} ${trace_flags:="-backtrace"} ${trace_flag:=0}
+: ${debug_flags:=""} ${debug_flag:=0} ${trace_flags:="-backtrace"} ${trace_flag:=0} ${var_debug:=""} ${var_debug_type_flag:="long"}
 
 trace_filter_stack=()
 
@@ -21,6 +21,12 @@ trap "backtrace \"A command has returned an not handled error code (\$?).\"" ERR
 # Persist function RETURN & DEBUG handler
 set -o functrace
 # Do not set RETURN here, set it on first -x
+
+if [[ -n "${var_debug_flags}" ]]
+then
+  var_debug_callback_initialize
+  trap var_debug_callback DEBUG
+fi
 
 # Those two break error handling
 #TODO: provide versions that do not break things ...

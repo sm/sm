@@ -10,7 +10,7 @@ do
   if [[ -s "${file}" ]]
   then
     previous_preload_modules=( "${preload_modules[@]}" )
-    . "${file}"
+    source "${file}"
     preload_modules=( "${previous_preload_modules[@]}" "${preload_modules[@]}" )
   fi
 done

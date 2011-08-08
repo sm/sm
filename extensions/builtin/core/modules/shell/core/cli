@@ -3,7 +3,7 @@
 set +o nounset
 set +o noclobber
 
-: ${debug_flags:="-search"} ${debug_flag:=0} ${trace_flags:="-search -backtrace"} ${trace_flag:=0}
+: ${debug_flags:="-search"} ${debug_flag:=0} ${trace_flags:="-search -backtrace"} ${trace_flag:=0} ${var_debug:=""} ${var_debug_type_flag:="long"}
 
 while (( $# > 0 ))
 do
@@ -38,6 +38,14 @@ do
     --debug=*)
       debug_flags+=" ${token##--debug=}"
       debug_flag=1
+      ;;
+
+    --var-debug=*)
+      var_debug_flags+=" ${token##--var-debug=}"
+      ;;
+
+    --var-debug-*)
+      var_debug_type_flag="${token##--var-debug-}"
       ;;
 
     --module=*)
@@ -93,4 +101,4 @@ fi
 debug_flags="${debug_flags## }"
 trace_flags="${trace_flags## }"
 
-export debug_flag debug_flags trace_flag trace_flags extension_args bdsm_script
+export debug_flag debug_flags trace_flag trace_flags extension_args bdsm_script var_debug_flags var_debug_type_flag
