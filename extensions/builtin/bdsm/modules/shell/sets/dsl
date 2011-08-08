@@ -60,7 +60,7 @@ sets_install()
     error "Can not install extension sets without name."
   fi
   case "${_name}" in
-    external|builtin)
+    builtin)
       error "Extension set ${_name} can not be installed"
       ;;
   esac
@@ -101,7 +101,7 @@ sets_update()
   for _name in "$@"
   do
     case "${_name}" in
-      external|builtin)
+      builtin)
         error "Extension set ${_name} can not be updated"
         ;;
     esac
@@ -131,7 +131,7 @@ sets_update_all()
   for _name in ${extensions_search_paths[@]}
   do
     case "${_name##*/}" in
-      external|builtin)
+      builtin)
         # Skip those two
         ;;
       *)
@@ -148,7 +148,7 @@ sets_uninstall()
     */*|.|..)
       error "Please specify valid extension name"
       ;;
-    external|builtin)
+    builtin)
       error "Extension set ${_name} can not be removed"
       ;;
   esac

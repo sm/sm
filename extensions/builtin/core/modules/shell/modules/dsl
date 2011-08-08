@@ -45,11 +45,11 @@ init_extensions_search_paths()
 {
   if [[ -z "${extensions_search_paths[*]}" ]]
   then
-    extensions_search_paths=( "${bdsm_path}/extensions/external" )
+    extensions_search_paths=( )
     for extension in ${bdsm_path}/extensions/*
     do
       case ${extension} in
-        (*/external|*/builtin)
+        (*/builtin)
           continue
           ;;
         (*)
@@ -90,7 +90,7 @@ init_extensions_search_paths()
 #
 # ### Usage Examples
 #
-#     $ bdsm call extensions_in /usr/local/bdsm/extensions/external
+#     $ bdsm call extensions_in /usr/local/bdsm/extensions/ext
 #
 extensions_in()
 {

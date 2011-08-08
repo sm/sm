@@ -1,3 +1,0 @@
-update=extend_update()
-default=extend_install()
-help=extend_help()

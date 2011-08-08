@@ -8,7 +8,7 @@ __bdsm_bash_completion()
   current_word="${COMP_WORDS[COMP_CWORD]}"
   previous="${COMP_WORDS[COMP_CWORD-1]}"
   extensions="$( bdsm list | tr "\n" ' ')"
-  commands="extend help get list version mod edit open website ${extensions}"
+  commands="ext sets help get list version mod edit open website ${extensions}"
   commands="${commands[@]}"
   flags="--trace"
   current_count=${#COMP_WORDS[@]}
@@ -24,8 +24,13 @@ __bdsm_bash_completion()
   then
     # Complete based on installed extensions.
     case "${previous}" in
-      extend)
-        available="$( bdsm list available)"
+      ext)
+        available="$( bdsm ext list installed)"
+        COMPREPLY=($(compgen -W "${available}" -- ${current_word}))
+        return 0
+        ;;
+      sets)
+        available="$( bdsm sets list installed)"
         COMPREPLY=($(compgen -W "${available}" -- ${current_word}))
         return 0
         ;;
