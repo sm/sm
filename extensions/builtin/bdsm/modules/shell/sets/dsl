@@ -70,21 +70,12 @@ sets_install()
 
   local _identifier="$(scm_identifier "${_uri}")"
 
-  printf "  [ ] %s" "bdsm-${_name}..."
+  log_step "bdsm-${_name}" # TODO: if fail, log_step failure
   enter "${extension_sets_path}"
   fetch_uri "${_uri}" "${src_path}/${_identifier}"
   remove_paths "${_name}"
   copy_directory "${src_path}/${_identifier}" to "${_name}"
-
-  case "${LANG}" in
-    *UTF-*)
-      printf "\r  [\033[32m\xE2\x9C\x93\033[0m] %s\n" "bdsm-${_name}     "
-      ;;
-    *)
-      printf "\r  [\033[32m\xE2\x9C\x93\033[0m] %s\n" "bdsm-${_name}     "
-      ;;
-  esac
-
+  log_step "bdsm-${_name}" success
 }
 
 sets_install_all()
