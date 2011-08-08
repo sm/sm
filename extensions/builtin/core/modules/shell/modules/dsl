@@ -34,7 +34,7 @@ detect_module()
   then
     module_path=${_module_path}
     module_name="$*"
-    module_name="${module_name// /\/}"
+    module_name="${module_name// //}"
     return 0
   else
     return 1
@@ -107,7 +107,8 @@ extensions_in()
       fi
     done
   else
-    debug "No extensions in '${_path}' as path does not exist."
+    debug search "No extensions in '${_path}' as path does not exist."
+    return 1
   fi
 }
 
