@@ -727,7 +727,7 @@ backtrace()
 
 log_step()
 {
-  local _message="${1:-}" _complete="${2:-0}"
+  local _message="${1:-}" _status="${2:-}"
 
   case "${_status}" in
     fail*)
