@@ -72,7 +72,7 @@ ext_install()
 
   local _identifier="$(scm_identifier "${_uri}")"
 
-  printf "%s" "  - extension '${_name}'... "
+  printf "%s" "  - bdsm_${_name}... "
   enter "${bdsm_path}/extensions/ext"
   fetch_uri "${_uri}" "${src_path}/${_identifier}"
   log "Installing extension: ${_name}."
@@ -122,7 +122,6 @@ ext_update()
     else
       ext_install "${_name}" "${_uri}"
     fi
-    printf "\n"
   done
 }
 
