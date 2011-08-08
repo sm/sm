@@ -150,11 +150,13 @@ detect_modules_action()
 
   local _module_definition _module_definitions=()
 
-  detect_modules_paths ${_modules_path} "$@"
-  for _module_definition in ${_module_definitions[@]}
+  detect_modules_paths "${_modules_path}" "$@"
+
+  for _module_definition in "${_module_definitions[@]}"
   do
     _module_path="${_module_definition//=*}"
     _module_params="${_module_definition//*=}"
+
     if [[ -s "${_modules_path}/${_module_path}/modules" ]]
     then
       for _module_name in $( cat "${_modules_path}/${_module_path}/modules" )
