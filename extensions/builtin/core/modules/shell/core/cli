@@ -16,6 +16,10 @@ do
       break
       ;;
 
+    -V)
+      log ${bdsm_version:-"?.?.?"}
+      ;;
+
     -v|--version)
       shift #end of processing
       extension_args=("bdsm" "version" "$@")
