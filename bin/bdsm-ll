@@ -4445,10 +4445,10 @@ sub trim_of {
 
 package Semaphore;
 
-# This package provides a counting semaphore
+# This package provides a counting semaphore.
 #
-# If a process dies without releasing the semaphore the next process
-# that needs that entry will clean up dead semaphores
+# If a process dies without releasing the semaphore, the next process
+# that needs that entry will clean up dead semaphores.
 #
 # The semaphores are stored in ~/.parallel/semaphores/id-<name> Each
 # file in ~/.parallel/semaphores/id-<name>/ is the process ID of the

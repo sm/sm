@@ -40,7 +40,7 @@ used according to your requirements and preferences.
 Of course, the extensions *I* write are generally in bash; but you can bring your 
 own implements of choice to the BDSM party ;) 
 
-Additionally, if you write your extensions in bash, a nice DSL is automatically loaded for you. 
+Additionally, if you write your extensions in bash, a nice DSL is automatically loaded for you.
 You can read more about the DSL in the online documentation.
 
   ~Wayne
