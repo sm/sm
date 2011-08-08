@@ -35,11 +35,11 @@ detect_uri()
 # Code Walkthrough
 scm_identifier()
 {
-  local _url="${1:-}"
+  local _uri="${1:-}"
 
   shift || fail "url must be given as first parameter to scm_identifier()"
 
-  printf "${_url//\//_}"
+  printf "${_uri//\//_}"
 }
 
 # ## directory\_get()
@@ -71,14 +71,14 @@ directory_get()
 # Code Walkthrough
 git_get()
 {
-  local initial_pwd="$PWD" _url="${1:-}" _final_target="${2:-}" \
+  local initial_pwd="$PWD" _uri="${1:-}" _final_target="${2:-}" \
     branch=${3:-${branch:-master}} remote=${4:-${remote:-origin}} \
     revision=${4:-${revision:-HEAD}}
 
   shift || fail "url must be given as first parameter to git_get()"
   shift || fail "target path must be given as second parameter to git_get()"
 
-  local _target="${scm_path}/$( scm_identifier "${_url}" )"
+  local _target="${scm_path}/$( scm_identifier "${_uri}" )"
 
   # v v v this looks slightly freakish... ~ Wayne
   _final_target=$(
@@ -124,16 +124,16 @@ git_get()
     fi
   else
     mkdir -p "${_target}"
-    if git clone --depth 1 ${_url} "${_target}" >/dev/null 2>&1
+    if git clone --depth 1 ${_uri} "${_target}" >/dev/null 2>&1
     then
-      echo "${_url}" > "${_target}/.uri"
+      echo "${_uri}" > "${_target}/.uri"
     else
-      local _url_https="${_url/git:\/\//https:\/\/}"
-      if git clone --depth 1 ${_url_https} "${_target}" >/dev/null 2>&1
+      local _uri_https="${_uri/git:\/\//https:\/\/}"
+      if git clone --depth 1 ${_uri_https} "${_target}" >/dev/null 2>&1
       then
-        echo "${_url_https}" > "${_target}/.uri"
+        echo "${_uri_https}" > "${_target}/.uri"
       else
-        fail "There was an error while cloning the repository from the url '${_url}'"
+        fail "There was an error while cloning the repository from the url '${_uri}'"
       fi
     fi
   fi
@@ -150,7 +150,7 @@ git_get()
 
 hg_get()
 {
-  local initial_pwd="$PWD" _url="${1:-}" _target="${2:-}"
+  local initial_pwd="$PWD" _uri="${1:-}" _target="${2:-}"
 
   shift || fail "url must be specified as the first parameter."
   shift || fail "target path must be specified as the second parameter."
@@ -160,13 +160,13 @@ hg_get()
     builtin cd "${_target}"
     hg pull
   else
-    hg clone "${_url}" "${_target}"
+    hg clone "${_uri}" "${_target}"
   fi
 }
 
 svn_get()
 {
-  local initial_pwd="$PWD" _url="${1:-}" _target="${2:-}"
+  local initial_pwd="$PWD" _uri="${1:-}" _target="${2:-}"
 
   shift || fail "url must be specified as the first parameter."
   shift || fail "target path must be specified as the second parameter."
@@ -176,16 +176,16 @@ svn_get()
     builtin cd "${_target}"
     svn update
   else
-    svn checkout "${_url}" "${_target}"
+    svn checkout "${_uri}" "${_target}"
   fi
 }
 
-# ## is\_github\_url()
+# ## is\_github\_uri()
 #
 #
 #
 # Code Walkthrough
-is_github_url()
+is_github_uri()
 {
   #TODO: add validation that given repository exists on github
   ematch "$1" "^[[:alnum:]_-]+\/[[:alnum:]_-]+$"
@@ -198,20 +198,20 @@ is_github_url()
 # Code Walkthrough
 github_get()
 {
-  local _url="${1:-}" _target="${2:-}"
+  local _uri="${1:-}" _target="${2:-}"
 
   shift || fail "uri must be specified as the first parameter."
   shift || fail "target path must be specified as the second parameter."
 
   # TODO: account for url.
-  git_get "git://github.com/${_url}.git" "${_target}" "$@"
+  git_get "git://github.com/${_uri}.git" "${_target}" "$@"
 
-  write "${_url}" to "${_target}/.uri"
+  write "${_uri}" to "${_target}/.uri"
 }
 
 archive_get() {
   local _uri="${1:-}" _final_target="${2:-}" _package_md5="${3:-#}" \
-    _archive="${archives_path}/${_url##*/}"
+    _archive="${archives_path}/${_uri##*/}"
 
   shift || fail "uri must be specified as the first parameter."
   shift || fail "target path must be specified as the second parameter."
@@ -221,23 +221,23 @@ archive_get() {
   if [[ -f "${_archive}" ]] &&
     ! file_matches_md5 "${_archive}" "${_package_md5}"
   then
-    log "${_url##*/} does not match md5 ${_package_md5}, removing and downloading."
+    log "${_uri##*/} does not match md5 ${_package_md5}, removing and downloading."
     rm -f "${_archive}"
   fi
 
   if [[ ! -f "${_archive}" ]]
   then
-    if [[ -f "${_url}" ]]
+    if [[ -f "${_uri}" ]]
     then
-      if ! copy_file --force "${_url}" to "${_archive}"
+      if ! copy_file --force "${_uri}" to "${_archive}"
       then
-        log "Copying from '${_url}' to '${_archive}' failed "
+        log "Copying from '${_uri}' to '${_archive}' failed "
         return 1
       fi
     else
-      if ! curl -L "${_url}" -o "${_archive}"
+      if ! curl -L "${_uri}" -o "${_archive}"
       then
-        log "Downloading from '${_url}' to '${_archive}' failed "
+        log "Downloading from '${_uri}' to '${_archive}' failed "
         return 1
       fi
     fi
@@ -344,7 +344,7 @@ fetch_uri()
     archive_get "${_args[@]}"
     return $?
 
-  elif is_github_url "${_uri}" # check for pattern user/repository from github
+  elif is_github_uri "${_uri}" # check for pattern user/repository from github
   then
     scm_type="github"
     github_get "${_args[@]}"
