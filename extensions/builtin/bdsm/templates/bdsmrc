@@ -39,4 +39,4 @@ scm_path=~/.bdsm/scm
 archives_path=~/.bdsm/archives
 
 # Add here modules that should be always loaded with BDSM
-preload_modules+=( )
+preload_modules=( )
