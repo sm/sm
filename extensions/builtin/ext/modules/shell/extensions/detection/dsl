@@ -218,8 +218,6 @@ detect_unique_2nd_level_action()
       done
     fi
 
-    debug search "candidates for '${_action}':${_found_actions[@]}:"
-
     if (( ${#_found_actions[@]} == 1 ))
     then
       action="${_found_actions##*/}"
@@ -237,9 +235,17 @@ detect_unique_2nd_level_action()
           printf "  bdsm ${extension} ${candidate} ${_action} $@\n"
         done | sort
       )\n"
+    else
+      debug search "no candidates for '${_action}'"
     fi
   fi
   return 1
+}
+
+detect_extension_existence()
+{
+  extensions_path=$1 extension=$2
+  extension_is_valid $extensions_path/$extension
 }
 
 detect_action_type()
@@ -460,7 +466,14 @@ extension_action()
   then
     log_search action "$action" "${action_path##${bdsm_path}\/extensions\/} params:${extension_args[@]}"
   else
-    error "Unknown action path: "${extension_args[@]}"\n\nUsage: \n  bdsm extension [namespace] [action]\n"
+    if in_search_paths detect_extension_existence "${extension_args[@]}" \
+    && [[ "${extension}" == "${extension_args}" ]]
+    then
+      log_search extension "$extension" "$extensions_path"
+      error "Unknown action path: "${extension_args[@]}"\n\nUsage: \n  bdsm extension [namespace] [action]\n"
+    else
+      error "Could not find extension: "${extension_args}"\n"
+    fi
   fi
 
   extension_path="$extensions_path/$extension"

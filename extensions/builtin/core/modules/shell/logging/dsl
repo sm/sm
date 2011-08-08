@@ -173,7 +173,7 @@ core_log_search()
 
   if (( debug_flag == 1 )) && options_check "$debug_flags" "search"
   then
-    printf "DEBUG search: %8s %-20s in $*.\n" "$name" "$value"
+    printf "DEBUG search: %9s %-25s in $*.\n" "$name" "$value"
   else
     return 0
   fi
