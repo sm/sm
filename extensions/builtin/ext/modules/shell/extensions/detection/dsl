@@ -199,12 +199,14 @@ detect_unique_2nd_level_action()
 {
   trace_filter detect_unique_2nd_level_action
   extensions_path=$1 extension=$2
-  local _action=$3 _actions_path _found_actions=() _found_actions_paths _found_action_path
+  local _action=$3 _actions_path _found_actions _found_actions_paths _found_action_path
   shift 3
   rebuild_path "actions" $extensions_path $extension
   _actions_path=${rebuilded_path}
   if [[ -d "${_actions_path}" ]]
   then
+    _found_actions=( $(find "${_actions_path}" -mindepth 2 -maxdepth 3 -executable -name "${_action}") )
+
     if _found_actions_paths=( $(find "${_actions_path}" -mindepth 2 -maxdepth 3 -name .actions) )
     then
       for _found_action_path in ${_found_actions_paths[@]}
@@ -215,15 +217,26 @@ detect_unique_2nd_level_action()
         fi
       done
     fi
-    if _found_actions+=( $(find "${_actions_path}" -mindepth 2 -maxdepth 3 -executable -name "${_action}") ) \
-    && (( ${#_found_actions[@]} == 1 ))
+
+    debug search "candidates for '${_action}':${_found_actions[@]}:"
+
+    if (( ${#_found_actions[@]} == 1 ))
     then
       action="${_found_actions##*/}"
       action_path="${_found_actions%/*}"
       extension_args=( "$@" )
       return 0
-    else
-      debug search "did not found single candidate for '${_action}'"
+    elif (( ${#_found_actions[@]} > 1 ))
+    then
+      error "More than one action found matching, please be more specific.\n\nDid you mean:\n$(
+        for candidate in "${_found_actions[@]}"
+        do
+          candidate="${candidate##${_actions_path}}"
+          candidate="${candidate%/*}"
+          candidate="${candidate//\// }"
+          printf "  bdsm ${extension} ${candidate} ${_action} $@\n"
+        done | sort
+      )\n"
     fi
   fi
   return 1
