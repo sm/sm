@@ -266,15 +266,13 @@ fetch_uri()
   if [[ -n "$1" ]]
   then
     _uri="${1}"
-    shift
   else
     fail "A _uri must be specified as the first parameter."
   fi
 
-  if [[ -n "$1" ]]
+  if [[ -n "$2" ]]
   then
-    _target="${1}"
-    shift
+    _target="${2}"
   else
     fail "A _target path must be specified as the second parameter."
   fi
@@ -286,26 +284,26 @@ fetch_uri()
   if [[ -d "${_uri}" ]] # check for directory
   then
     scm_type="directory"
-    directory_get "${_target}" "$@"
+    directory_get "$@"
     return $?
 
   elif is_archive_uri "${_uri}" # check for packages
   then
     scm_type="package"
-    archive_get "${_target}" "$@"
+    archive_get "$@"
     return $?
 
   elif is_github_url "${_uri}" # check for pattern user/repository from github
   then
     scm_type="github"
-    github_get "${_target}" "$@"
+    github_get "$@"
     return $?
   fi
 
   case "${_uri}" in
     (*git*)
       scm_type="git"
-      git_get "${_target}" "$@"
+      git_get "$@"
       ;;
     (*svn*)
       scm_type="svn"
