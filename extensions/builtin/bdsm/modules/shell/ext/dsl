@@ -51,30 +51,25 @@ ext_list_known()
 
 ext_install()
 {
-  local _name="$1" _uri="$2"
-  if [[ -z "${_name}" ]]
-  then
-    error "Can not install extension ext without name."
-  fi
-  case "${_name}" in
-    external|builtin)
-      error "Extension ${_name} can not be installed"
-      ;;
-  esac
-  if [[ -z "${_uri}" ]]
-  then
+  local _name="${1:-}" _uri="${2:-}"
+
+  shift || fail "extension name must be given to install"
+
+  [[ -n "${_uri}" ]] ||
     _uri=$( awk -F = "/^${_name}=/ {print \$2 }" < "${bdsm_path}/extensions/builtin/bdsm/config/known_ext" )
-    if [[ -z "${_uri}" ]]
-    then
-      error "Can not find ${_name} in known extension ext list."
-    fi
-  fi
+
+  [[ -n "${_uri}" ]] ||
+    error "Can not find ${_name} in known extension sets list."
+
+
   local _identifier="$(scm_identifier "${_uri}")"
+
+  log_step "bdsm_${_name}" # TODO: if fail, log_step failure
   enter "${bdsm_path}/extensions/ext"
   fetch_uri "${_uri}" "${src_path}/${_identifier}"
-  log "Installing extension: ${_name}."
   remove_paths "${_name}"
   copy_directory "${src_path}/${_identifier}" to "${_name}"
+  log_step "bdsm_${_name}" success
 }
 
 ext_install_all()
@@ -118,7 +113,6 @@ ext_update()
     else
       ext_install "${_name}" "${_uri}"
     fi
-    printf "\n"
   done
 }
 

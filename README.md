@@ -1,17 +1,22 @@
 # Bash Delectable Scripting Modules (BDSM) Framework
 
-The BDSM Framework is a... scripting management framework, with modules
-(go figure)!
+BDSM is a system scripting DSL & framework for beating software and systems
+into submission
 
 # Goal
 
-The goal is to create a framework for maintaining and sharing server side
-scripts while exposing them through a consistent command line interface (CLI).
+The goal is to create an extensible scripting framework providing a very robust
+DSL. A primary tennant of BDSM is that it must handles as much pain as possible
+so that users of the BDSM DSL modules can create high quality extensions and
+expose their commands through BDSM's flexible command line interface (CLI).
 
 # Architecture
 
-BDSM itself is a scripting framework. Users may write and/or install 'extensions'
-(think plugins) to the core framework in order to add CLI functionality to BDSM.
+BDSM itself is a scripting framework which provides very rich DSL sets known as
+modules. Users of BDSM may use the DSL to write 'extensions' which are
+essentially named sets of scripts (directories!). Users of BDSM may also easily
+install and manage a multitude of extensions and sets of extensions providing
+functionality only limited by the creative abilities of extension authors :)
 
 # Creating Extensions
 
@@ -36,6 +41,8 @@ Wayne E. Seguin
 wayneeseguin@gmail.com
 http://github.com/wayneeseguin
 http://twitter.com/wayneeseguin
+https://bdsm.beginrescueend.com/
+https://rvm.beginrescueend.com/
 
 # Contributing
 
@@ -46,13 +53,14 @@ Here are some ways you can contribute:
 by using the latest development and release versions
 by reporting bugs in #beginrescueend on irc.freenode.net
 by suggesting new features in #beginrescueend on irc.freenode.net
-by writing or editing documentation
-by translating documentation to a new language
+by writing or editing documentation, which is greatly appreciated
+by translating documentation to a new language, I speek tech and poor engrish
 by writing extensions
 by writing code (no patch is too small: fix typos, add comments, clean up inconsistent whitespace)
-by refactoring code
+by performing code reviews and assisting with refactoring
 by resolving issues
 by reviewing patches
+by donating, xoxo!
 
 # License
 
@@ -72,6 +80,8 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+
+License Exceptions:
 
 bin/bdsm-ll is GNU Parallel and is licensed under the GNU GPL v3 which can be
 read here: http://www.gnu.org/licenses/gpl.html

@@ -16,9 +16,9 @@ do
       break
       ;;
 
-    -v|--version)
+    -v|--version|-V)
       shift #end of processing
-      extension_args=("bdsm" "version" "$@")
+      extension_args=("bdsm" "version" "${token}" "$@")
       break
       ;;
 

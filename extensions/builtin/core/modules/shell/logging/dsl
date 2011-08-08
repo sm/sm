@@ -761,3 +761,37 @@ backtrace()
     kill -s USR2 $APP_PID #to exit application not current subshell
   fi
 }
+
+log_step()
+{
+  local _message="${1:-}" _status="${2:-}" _unicode=0
+
+  if [[ -z "${LANG:-}" || "${LANG}" = *UTF* || "${LANG}" = *utf8* ]]
+  then
+    _unicode=1
+  fi
+
+  case "${_status}" in
+    fail*)
+      if (( _unicode == 1 ))
+      then
+        printf "\r  [\033[32m✘\033[0m] %s\n" "${_message}     "
+      else
+        printf "\r  [\033[32mX\033[0m] %s\n" "${_message}     "
+      fi
+      ;;
+
+    succ*)
+      if (( _unicode == 1 ))
+      then
+        printf "\r  [\033[32m✔\033[0m] %s\n" "${_message}     "
+      else
+        printf "\r  [\033[32m@\033[0m] %s\n" "${_message}     "
+      fi
+      ;;
+
+    *)
+      printf "  [ ] %s" "${_message}..."
+      ;;
+  esac
+}

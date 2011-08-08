@@ -39,13 +39,6 @@ install_dependencies_extension_set()
   fi
 }
 
-migrate_external_extensions()
-{
-  log "  Creating extension set for external extensions"
-  enter "${install_path}/extensions"
-  ensure_paths_exist external
-}
-
 install_core()
 {
   local _dir
@@ -74,11 +67,9 @@ symlink_bdsm()
 {
   chmod a+x "${install_path}/bin/bdsm" "${install_path}/bin/bdsm-ll"
 
-  log "  Linking ${install_path}/bin/bdsm to ${prefix_path}/bin/bdsm"
-  link --force "${install_path}/bin/bdsm" to "${prefix_path}/bin/bdsm"
-
-  if path_exists "${prefix_path}/bin"
+  if variable_is_nonempty prefix_path && path_exists "${prefix_path}/bin"
   then
+    log "  Linking ${install_path}/bin/bdsm to ${prefix_path}/bin/bdsm"
     link --force "${install_path}/bin/bdsm" to "${prefix_path}/bin/bdsm"
   fi
 }
@@ -168,10 +159,6 @@ install_bdsm()
 
   perform set_bdsm_path
 
-  perform install_dependencies_extension_set
-
-  perform migrate_external_extensions
-
   perform install_configuration_files
 
   perform symlink_bdsm
@@ -179,6 +166,8 @@ install_bdsm()
   perform setup_shell_completion
 
   perform setup_profile_d
+
+  perform install_dependencies_extension_set
 
   succeed "\nInstallation of BDSM is complete\n"
 }

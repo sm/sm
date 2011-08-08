@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 
-cleanse_paths=(
-  extensions/core extensions/pkg extensions/srv extensions/ext extensions/mod
-  external completion modules bin extensions/builtin
-)
+cleanse_paths=( external completion modules bin extensions/builtin )
 directories=( bin )
 files=( LICENSE VERSION README.md )
 aux_paths=( log tmp src )

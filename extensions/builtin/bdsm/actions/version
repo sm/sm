@@ -2,5 +2,11 @@
 
 bdsm_version
 
-succeed "\nBDSM Framework ${bdsm_version:-"?.?.?"} https://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)\n"
-
+case "${extension_args[0]}" in
+  -v) # only echo version information.
+    succeed "${bdsm_version:-"?.?.?"}"
+    ;;
+  -V|--version) # GNU style extended version information.
+    succeed "\nBDSM Framework ${bdsm_version:-"?.?.?"} https://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)\n"
+    ;;
+esac
