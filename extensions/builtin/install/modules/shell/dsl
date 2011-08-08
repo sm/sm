@@ -159,8 +159,6 @@ install_bdsm()
 
   perform set_bdsm_path
 
-  perform install_dependencies_extension_set
-
   perform install_configuration_files
 
   perform symlink_bdsm
@@ -168,6 +166,8 @@ install_bdsm()
   perform setup_shell_completion
 
   perform setup_profile_d
+
+  perform install_dependencies_extension_set
 
   succeed "\nInstallation of BDSM is complete\n"
 }

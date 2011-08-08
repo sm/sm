@@ -70,12 +70,12 @@ sets_install()
 
   local _identifier="$(scm_identifier "${_uri}")"
 
-  printf "  %-60s" "bdsm-${_name}... "
+  printf "  %-30s" "bdsm-${_name}... "
   enter "${extension_sets_path}"
   fetch_uri "${_uri}" "${src_path}/${_identifier}"
   remove_paths "${_name}"
   copy_directory "${src_path}/${_identifier}" to "${_name}"
-  printf "%18s\n" 'success!'
+  printf "%10s\n" 'success!'
 }
 
 sets_install_all()
