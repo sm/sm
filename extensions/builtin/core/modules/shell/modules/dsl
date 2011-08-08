@@ -45,8 +45,7 @@ init_extensions_search_paths()
 {
   if [[ -z "${extensions_search_paths[*]}" ]]
   then
-    extensions_search_paths=( "${bdsm_path}/extensions/ext" )
-
+    extensions_search_paths=( )
     for extension in ${bdsm_path}/extensions/*
     do
       case ${extension} in
