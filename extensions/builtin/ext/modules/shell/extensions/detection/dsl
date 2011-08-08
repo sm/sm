@@ -195,6 +195,49 @@ detect_modules_action()
   return 1
 }
 
+detect_unique_2nd_level_action()
+{
+  trace_filter detect_unique_2nd_level_action
+  extensions_path=$1 extension=$2
+  local _action=$3 _actions_path _found_actions _found_action_path _found_actions_paths=() _found_actions_action
+  shift 3
+  rebuild_path "actions" $extensions_path $extension
+  _actions_path=${rebuilded_path}
+  if [[ -d "${_actions_path}" ]]
+  then
+    if _found_actions=( $(find "${_actions_path}" -mindepth 2 -maxdepth 3 -executable -name "${_action}") ) \
+    && (( ${#_found_actions[@]} == 1 ))
+    then
+      action="${_found_actions##*/}"
+      action_path="${_found_actions%/*}"
+      extension_args=( "$@" )
+      return 0
+    elif _found_actions=( $(find "${_actions_path}" -mindepth 2 -maxdepth 3 -name .actions) )
+    then
+      for _found_action_path in ${_found_actions[@]}
+      do
+        if file_contains "${_found_action_path}" "${_action}="
+        then
+          _found_actions_paths+=( "${_found_action_path}" )
+          _found_actions_action=$( hash_file "${_found_action_path}" "${_action}" )
+        fi
+      done
+      if (( ${#_found_actions_paths[@]} == 1 ))
+      then
+        action="${_found_actions_action}"
+        action_path="${_found_actions_paths%/*}"
+        extension_args=( "$@" )
+        return 0
+      else
+        debug search "did not found single candidate for '${_action}'"
+      fi
+    else
+      debug search "did not found single candidate for '${_action}'"
+    fi
+  fi
+  return 1
+}
+
 detect_action_type()
 {
   local _path="${action_path:-}"
@@ -405,15 +448,13 @@ extension_action()
   esac
 
   # Search in extensions actions
-  if in_search_paths detect_action "${extension_args[@]}"
-  then
-    log_search action "$action" "${action_path##${bdsm_path}\/extensions\/} params:${extension_args[@]}"
-
+  # Search in unique second level actions
   # Search in loaded modules actions
-  elif in_search_paths detect_modules_action "${extension_args[@]}"
+  if in_search_paths detect_action "${extension_args[@]}" \
+  || in_search_paths detect_unique_2nd_level_action "${extension_args[@]}" \
+  || in_search_paths detect_modules_action "${extension_args[@]}"
   then
     log_search action "$action" "${action_path##${bdsm_path}\/extensions\/} params:${extension_args[@]}"
-
   else
     error "Unknown action path: "${extension_args[@]}"\n\nUsage: \n  bdsm extension [namespace] [action]\n"
   fi
@@ -427,6 +468,17 @@ extension_action()
 
   paths=$(env | awk -F= -v ORS=' ' '/_path/{print $1}')
   flags=$(env | awk -F= -v ORS=' ' '/_flag/{print $1}')
+
+  debug search "environment:
+  action=${action}
+  action_path=${action_path}
+  extension_args=${extension_args}
+  extension_path=${extension_path}
+  extension_config_path=${extension_config_path}
+  extension_templates_path=${extension_templates_path}
+  extension_modules_path=${extension_modules_path}
+  extension_actions_path=${extension_actions_path}
+  extension_log_path=${extension_log_path}"
 
   enter "${extension_path}"
   bdsm_exports
