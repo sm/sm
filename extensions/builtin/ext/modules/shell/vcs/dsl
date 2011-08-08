@@ -335,26 +335,26 @@ fetch_uri()
   if [[ -d "${_uri}" ]] # check for directory
   then
     scm_type="directory"
-    directory_get "${args[@]}"
+    directory_get "${_args[@]}"
     return $?
 
   elif is_archive_uri "${_uri}" # check for packages
   then
     scm_type="package"
-    archive_get "${args[@]}"
+    archive_get "${_args[@]}"
     return $?
 
   elif is_github_url "${_uri}" # check for pattern user/repository from github
   then
     scm_type="github"
-    github_get "${args[@]}"
+    github_get "${_args[@]}"
     return $?
   fi
 
   case "${_uri}" in
     (*git*)
       scm_type="git"
-      git_get "${args[@]}"
+      git_get "${_args[@]}"
       ;;
     (*svn*)
       scm_type="svn"
