@@ -78,7 +78,15 @@ ext_install()
   log "Installing extension: ${_name}."
   remove_paths "${_name}"
   copy_directory "${src_path}/${_identifier}" to "${_name}"
-  printf "\r  [\033[32mx\033[0m] %s\n" "bdsm_${_name}   "
+
+  case "${LANG}" in
+    *UTF-*)
+      printf "\r  [\033[32m\xE2\x9C\x93\033[0m] %s\n" "bdsm_${_name}     "
+      ;;
+    *)
+      printf "\r  [\033[32m\xE2\x9C\x93\033[0m] %s\n" "bdsm_${_name}     "
+      ;;
+  esac
 }
 
 ext_install_all()
