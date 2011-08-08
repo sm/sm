@@ -75,7 +75,6 @@ ext_install()
   log_step "bdsm_${_name}" # TODO: if fail, log_step failure
   enter "${bdsm_path}/extensions/ext"
   fetch_uri "${_uri}" "${src_path}/${_identifier}"
-  log "Installing extension: ${_name}."
   remove_paths "${_name}"
   copy_directory "${src_path}/${_identifier}" to "${_name}"
   log_step "bdsm_${_name}" success
