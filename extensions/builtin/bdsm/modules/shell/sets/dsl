@@ -75,7 +75,7 @@ sets_install()
   fetch_uri "${_uri}" "${src_path}/${_identifier}"
   remove_paths "${_name}"
   copy_directory "${src_path}/${_identifier}" to "${_name}"
-  printf "\r  [x] %s\n" "bdsm-${_name}"
+  printf "\r  [\033[32mx\033[0m] %s\n" "bdsm-${_name}   "
 }
 
 sets_install_all()
