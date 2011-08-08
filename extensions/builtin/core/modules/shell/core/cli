@@ -18,13 +18,13 @@ do
 
     -V)
       echo ${bdsm_version:-"?.?.?"}
-      succeed # DONE.
+      exit 0 # DONE.
       ;;
 
     -v|--version)
       shift #end of processing
       extension_args=("bdsm" "version" "$@")
-      succeed # DONE.
+      exit 0 # DONE.
       ;;
 
     --trace)
