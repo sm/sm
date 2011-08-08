@@ -11,14 +11,17 @@
 # Code Walkthrough
 detect_uri()
 {
-  local extensions_path=$1 _uri_path
-  shift
+  local extensions_path="${1:-}" _uri_path
+
+  shift || fail "extensions_path must be specified as the first parameter."
+
   rebuild_path ".uri" $extensions_path $@
+
   _uri_path="${rebuilded_path}"
 
   if [[ -s "${_uri_path}" ]]
   then
-    uri_path=${_uri_path}
+    uri_path="${_uri_path}"
     return 0
   else
     return 1
@@ -32,8 +35,10 @@ detect_uri()
 # Code Walkthrough
 scm_identifier()
 {
-  local _url=$1
-  variables_must_be_nonempty _url
+  local _url="${1:-}"
+
+  shift || fail "url must be given as first parameter to scm_identifier()"
+
   printf "${_url//\//_}"
 }
 
@@ -44,8 +49,11 @@ scm_identifier()
 # Code Walkthrough
 directory_get()
 {
-  local initial_pwd="$PWD" _source=$1 _target=$2
-  variables_must_be_nonempty _source _target
+  local initial_pwd="$PWD" _source="${1:-}" _target="${2:-}"
+
+  shift || fail "source path must be given as first parameter to directory_get()"
+  shift || fail "target path must be given as second parameter to directory_get()"
+
   rm -rf "${_target}" 2>&1 >/dev/null
 
   if cp -fR ${_source} "${_target}" >/dev/null 2>&1
@@ -63,11 +71,12 @@ directory_get()
 # Code Walkthrough
 git_get()
 {
-  local initial_pwd="$PWD" _url=$1 _final_target=$2 \
+  local initial_pwd="$PWD" _url="${1:-}" _final_target="${2:-}" \
     branch=${3:-${branch:-master}} remote=${4:-${remote:-origin}} \
     revision=${4:-${revision:-HEAD}}
 
-  variables_must_be_nonempty _url _final_target
+  shift || fail "url must be given as first parameter to git_get()"
+  shift || fail "target path must be given as second parameter to git_get()"
 
   local _target="${scm_path}/$( scm_identifier "${_url}" )"
 
@@ -140,16 +149,34 @@ git_get()
 
 hg_get()
 {
-  local initial_pwd="$PWD" _url=$1 _target=$2
-  builtin cd "${_target}"
-  hg pull
+  local initial_pwd="$PWD" _url="${1:-}" _target="${2:-}"
+
+  shift || fail "url must be specified as the first parameter."
+  shift || fail "target path must be specified as the second parameter."
+
+  if [[ -d "${_target}" ]]
+  then # TODO: ensure this works...
+    builtin cd "${_target}"
+    hg pull
+  else
+    hg clone "${_url}" "${_target}"
+  fi
 }
 
 svn_get()
 {
-  local initial_pwd="$PWD" _url=$1 _target=$2
-  builtin cd "${_target}"
-  svn update
+  local initial_pwd="$PWD" _url="${1:-}" _target="${2:-}"
+
+  shift || fail "url must be specified as the first parameter."
+  shift || fail "target path must be specified as the second parameter."
+
+  if [[ -d "${_target}" ]]
+  then # TODO: ensure this works...
+    builtin cd "${_target}"
+    svn update
+  else
+    svn checkout "${_url}" "${_target}"
+  fi
 }
 
 # ## is\_github\_url()
@@ -170,36 +197,23 @@ is_github_url()
 # Code Walkthrough
 github_get()
 {
-  local _url="$1" _target="$2"
+  local _url="${1:-}" _target="${2:-}"
 
-  if [[ -n "$1" ]]
-  then
-    _uri="${1}"
-    shift
-  else
-    fail "A _uri must be specified as the first parameter."
-  fi
-
-  if [[ -n "$2" ]]
-  then
-    _target="${2}"
-    shift
-  else
-    fail "A _target path must be specified as the second parameter."
-  fi
+  shift || fail "uri must be specified as the first parameter."
+  shift || fail "target path must be specified as the second parameter."
 
   # TODO: account for url.
-  # use git for fetching github repo
   git_get "git://github.com/${_url}.git" "${_target}" "$@"
-  # and overwrite repo uri
-  echo "${_url}" > "${_target}/.uri"
+
+  write "${_url}" to "${_target}/.uri"
 }
 
 archive_get() {
-  local _url="$1" _final_target="$2" _package_md5="${3:-#}" \
+  local _uri="${1:-}" _final_target="${2:-}" _package_md5="${3:-#}" \
     _archive="${archives_path}/${_url##*/}"
 
-  shift 2 # TODO: sanity checking here with real error messages.
+  shift || fail "uri must be specified as the first parameter."
+  shift || fail "target path must be specified as the second parameter."
 
   [[ -d "${archives_path}" ]] || mkdir -p "${archives_path}"
 
@@ -283,27 +297,14 @@ is_archive_uri() {
 # Code Walkthrough
 fetch_uri()
 {
-  local _uri _target _args=()
+  local _uri="${1:-}" _target="${2:-}" _args=()
+
+  shift || fail "uri must be specified as the first parameter."
+  shift || fail "target path must be specified as the second parameter."
 
   trace_filter vcs
 
-  if [[ -n "$1" ]]
-  then
-    _uri="${1}"
-    shift
-    _args+=("${_uri}")
-  else
-    fail "A _uri must be specified as the first parameter."
-  fi
-
-  if [[ -n "$1" ]]
-  then
-    _target="${1}"
-    shift
-    _args+=("${_target}")
-  else
-    fail "A _target path must be specified as the second parameter."
-  fi
+  _args=("${_uri}" "${_target}")
 
   while (( $# > 0 ))
   do
