@@ -2,5 +2,9 @@
 
 bdsm_version
 
-succeed "\nBDSM Framework ${bdsm_version:-"?.?.?"} https://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)\n"
-
+if [[ ${extension_args[0]} == '-V' ]]
+then
+  succeed "${bdsm_version:-"?.?.?"}"
+else
+  succeed "\nBDSM Framework ${bdsm_version:-"?.?.?"} https://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)\n"
+fi

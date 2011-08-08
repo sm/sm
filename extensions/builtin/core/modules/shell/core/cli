@@ -16,15 +16,10 @@ do
       break
       ;;
 
-    -V)
-      echo ${bdsm_version:-"?.?.?"}
-      exit 0 # DONE.
-      ;;
-
-    -v|--version)
+    -v|--version|-V)
       shift #end of processing
-      extension_args=("bdsm" "version" "$@")
-      exit 0 # DONE.
+      extension_args=("bdsm" "version" "${token}" "$@")
+      break
       ;;
 
     --trace)
