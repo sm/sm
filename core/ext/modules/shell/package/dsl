@@ -240,93 +240,104 @@ To force, call:\n\tbdsm ${package_name} package install --force\n"
 
   if command_exists "${package_name}_dependencies"
   then
-    "${package_name}_dependencies"
+    log_step "Installing dependencies for ${package_name} ${package_version}." \
+      "${package_name}_dependencies"
   else
-    log_step "Installing dependencies for ${package_name} ${package_version}."
-    package_dependencies
-    log_step success
+    log_step "Installing dependencies for ${package_name} ${package_version}." \
+      package_dependencies
   fi
 
   if command_exists "${package_name}_prefetch"
   then
-    "${package_name}_prefetch"
+    log_step "Runing prefetch for ${package_name} ${package_version}." \
+      "${package_name}_prefetch"
   fi
 
   if command_exists "${package_name}_fetch"
   then
-    "${package_name}_fetch"
+    log_step "Downloading ${package_name} ${package_version}." \
+      "${package_name}_fetch"
   else
-    package_fetch
+    log_step "Downloading ${package_name} ${package_version}." \
+      package_fetch
   fi
 
   enter "${source_path}/${package_dir}"
 
   if command_exists "${package_name}_postfetch"
   then
-    "${package_name}_postfetch"
+    log_step "Running post download for ${package_name} ${package_version}." \
+      "${package_name}_postfetch"
   fi
 
   if command_exists "${package_name}_patch"
   then
-    "${package_name}_patch"
+    log_step "Patching ${package_name} ${package_version}." \
+      "${package_name}_patch"
   else
-    package_patch
+    log_step "Patching ${package_name} ${package_version}." \
+      package_patch
   fi
 
   if command_exists "${package_name}_preconfigure"
   then
-    "${package_name}_preconfigure"
+    log_step "Running preconfigure for ${package_name} ${package_version}." \
+      "${package_name}_preconfigure"
   fi
 
   if command_exists "${package_name}_configure"
   then
     "${package_name}_configure"
   else
-    log_step "Configuring ${package_name} ${package_version}."
-    package_configure
-    log_step success
+    log_step "Configuring ${package_name} ${package_version}." \
+      package_configure
   fi
 
   if command_exists "${package_name}_postconfigure"
   then
-    "${package_name}_postconfigure"
+    log_step "Running postconfigure for ${package_name} ${package_version}." \
+      "${package_name}_postconfigure"
   fi
 
   if command_exists "${package_name}_build"
   then
-    "${package_name}_build"
+    log_step "Building ${package_name} ${package_version}." \
+      "${package_name}_build"
   else
-    log_step "Building ${package_name} ${package_version}."
-    package_build
-    log_step success
+    log_step "Building ${package_name} ${package_version}." \
+      package_build
   fi
 
   if command_exists "${package_name}_preinstall"
   then
-    "${package_name}_preinstall"
+    log_step "Running preinstall for ${package_name} ${package_version}." \
+      "${package_name}_preinstall"
   else
-    package_preinstall
+    log_step "Running postinstall for ${package_name} ${package_version}." \
+      package_preinstall
   fi
 
   if command_exists "${package_name}_install"
   then
-    "${package_name}_install"
+    log_step "Installing ${package_name} ${package_version}." \
+      "${package_name}_install"
   else
-    log_step "Installing ${package_name} ${package_version}."
-    package_make_install
-    log_step success
+    log_step "Installing ${package_name} ${package_version}." \
+      package_make_install
   fi
 
   if command_exists "${package_name}_postinstall"
   then
-    "${package_name}_postinstall"
+    log_step "Running postinstall for ${package_name} ${package_version}." \
+      "${package_name}_postinstall"
   fi
 
   package_activate_if_first "${package_name}" "${package_version}"
 
   if command_exists "${package_name}_postactivate"
   then
-    "${package_name}_postactivate"
+    log_step "Running postactivate for ${package_name} ${package_version}." \
+      "${package_name}_postactivate"
   fi
 
   package_setup
@@ -733,10 +744,9 @@ package_activate()
 
 package_activate_action()
 {
-  if [[ -z "${package_version}" ]]
-  then
+  if [[ -n "${package_version}" ]] ||
     error "You need to specify a version to activate:\n  bdsm ${package_name}:<version> activate\n  bdsm ${package_name} activate --version <version>"
-  fi
+
   package_activate ${package_name} ${package_version}
 }
 
