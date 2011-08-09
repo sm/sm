@@ -189,5 +189,5 @@ install_bdsm()
 
   perform install_dependencies_extension_set
 
-  succeed "\nBDSM has been installed into '${install_path}'!\n"
+  succeed "\nFramework installed to ${install_path}!\n"
 }
