@@ -65,9 +65,21 @@ migrate_ext()
     local set
     for set in ${install_path}/extensions/*
     do
-      log_step "  Migrating extensions -> sets" \
-        mv ${set} ${extension_sets_home}/
+      case ${set} in
+        */dependencies)
+          log_step "  Removing old extensions/${set##*/}" \
+            rm -rf ${set}
+          ;;
+        */\*) # empty -> skip
+          ;;
+        *)
+          log_step "  Migrating extensions/${set##*/} -> sets/${set##*/}" \
+            mv ${set} ${extension_sets_home}/
+          ;;
+      esac
     done
+    log_step "  Removing old extensions directory" \
+      rm -rf ${install_path}/extensions
   fi
 }
 
