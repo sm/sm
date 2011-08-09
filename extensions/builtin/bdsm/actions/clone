@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 NYI
-# extension_is_installed removed as it was not working already
+# extension_is_installed removed, as it was not working already.
 
 if array_is_nonempty extension_args
 then
@@ -29,7 +29,7 @@ then
     esac
   done
 
-  # Sanity checks
+  # Sanity checks.
   if variable_is_nonempty _source
   then
     if variable_is_nonempty _target
@@ -38,7 +38,7 @@ then
       then
         if extension_is_installed "${_target}"
         then
-          error "The target extension '${_target}' already exists, "\
+          error "The target extension '${_target}' already exists; "\
             "cannot create it from ${_source}."
         else
           copy_directory \
@@ -47,7 +47,7 @@ then
 
         fi
       else
-        error "The extension '${_source}' was not found installed, "\
+        error "The extension '${_source}' was not found installed; "\
           "cannot create a new extension from it."
       fi
     else

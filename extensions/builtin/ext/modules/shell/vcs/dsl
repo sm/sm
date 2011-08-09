@@ -37,7 +37,7 @@ scm_identifier()
 {
   local _uri="${1:-}"
 
-  shift || fail "url must be given as first parameter to scm_identifier()"
+  shift || fail "url must be the first parameter to scm_identifier()."
 
   printf "${_uri//\//_}"
 }
@@ -51,8 +51,8 @@ directory_get()
 {
   local initial_pwd="$PWD" _source="${1:-}" _target="${2:-}"
 
-  shift || fail "source path must be given as first parameter to directory_get()"
-  shift || fail "target path must be given as second parameter to directory_get()"
+  shift || fail "source path must be the first parameter to directory_get()."
+  shift || fail "target path must be the second parameter to directory_get()."
 
   rm -rf "${_target}" 2>&1 >/dev/null
 
@@ -60,7 +60,7 @@ directory_get()
   then
     echo "$(cd "${_source}"; pwd)" > "${_target}/.uri"
   else
-    fail "There was an error copying '${_source}'"
+    fail "There was an error copying '${_source}'."
   fi
 }
 
@@ -75,8 +75,8 @@ git_get()
     branch=${3:-${branch:-master}} remote=${4:-${remote:-origin}} \
     revision=${4:-${revision:-HEAD}}
 
-  shift || fail "url must be given as first parameter to git_get()"
-  shift || fail "target path must be given as second parameter to git_get()"
+  shift || fail "url must be the first parameter to git_get()."
+  shift || fail "target path must be the second parameter to git_get()."
 
   local _target="${scm_path}/$( scm_identifier "${_uri}" )"
 
@@ -133,7 +133,7 @@ git_get()
       then
         echo "${_uri_https}" > "${_target}/.uri"
       else
-        fail "There was an error while cloning the repository from the url '${_uri}'"
+        fail "There was an error while cloning the repository from the url '${_uri}.'"
       fi
     fi
   fi
@@ -142,7 +142,7 @@ git_get()
 
   if ! cp -fR "${_target}" "${_final_target}" >/dev/null 2>&1
   then
-    fail "There was an error copying '${_target}' -> '${_final_target}'"
+    fail "There was an error copying '${_target}' -> '${_final_target}'."
   fi
 
   builtin cd "$initial_pwd"
@@ -221,7 +221,7 @@ archive_get() {
   if [[ -f "${_archive}" ]] &&
     ! file_matches_md5 "${_archive}" "${_package_md5}"
   then
-    log "${_uri##*/} does not match md5 ${_package_md5}, removing and downloading."
+    log "${_uri##*/} does not match MD5 checksum ${_package_md5}; removing and downloading."
     rm -f "${_archive}"
   fi
 
@@ -231,13 +231,13 @@ archive_get() {
     then
       if ! copy_file --force "${_uri}" to "${_archive}"
       then
-        log "Copying from '${_uri}' to '${_archive}' failed "
+        log "Copying from '${_uri}' to '${_archive}' failed."
         return 1
       fi
     else
       if ! curl -L "${_uri}" -o "${_archive}"
       then
-        log "Downloading from '${_uri}' to '${_archive}' failed "
+        log "Downloading from '${_uri}' to '${_archive}' failed."
         return 1
       fi
     fi
@@ -250,33 +250,33 @@ archive_get() {
   case "${_archive}" in
     *.tar) # tar
       tar xf "${_archive}" ||
-        error "There was an error while extracting the archive '${_archive}'"
+        error "There was an error while extracting the archive '${_archive}'."
       ;;
     *.tar.gz|*.tgz) # gzip
       tar zxf "${_archive}" ||
-        error "There was an error while extracting the archive '${_archive}'"
+        error "There was an error while extracting the archive '${_archive}'."
       ;;
     *.tar.bz2|*.tbz2) # bzip
       tar jxf "${_archive}" ||
-        error "There was an error while extracting the archive '${_archive}'"
+        error "There was an error while extracting the archive '${_archive}'."
       ;;
     *.tar.xz) # LZMA
       # TODO: if 'xz' command exists, use that, otherwise use tar J
       tar Jxf "${_archive}" ||
-        error "There was an error while extracting the archive '${_archive}'"
+        error "There was an error while extracting the archive '${_archive}'."
       ;;
     *.zip)
       unzip "${_archive}" ||
-        error "There was an error while extracting the archive '${_archive}'"
+        error "There was an error while extracting the archive '${_archive}'."
       ;;
     *)
-      error "Unknown archive format for ${_archive}"
+      error "Unknown archive format for ${_archive}."
       ;;
   esac
 
   if ! ls -d * &>/dev/null
   then
-    error "Empty archive ${_archive}"
+    error "Empty archive ${_archive}."
   fi
 }
 
@@ -314,15 +314,15 @@ fetch_uri()
     case "$token" in
       *branch)
         branch="${1}"
-        shift || error "branch must be specified after keyword 'branch'"
+        shift || error "branch must be specified after keyword 'branch'."
         ;;
       *remote)
         remote="${1}"
-        shift || error "remote must be specified after keyword 'remote'"
+        shift || error "remote must be specified after keyword 'remote'."
         ;;
       *revision)
         revision="${1}"
-        shift || error "revision must be specified after keyword 'revision'"
+        shift || error "revision must be specified after keyword 'revision'."
         ;;
       *) # Pass through any unknowns
         _args+=("${token}")
@@ -371,7 +371,7 @@ fetch_uri()
       NIY "fossil scm_update"
       ;;
     (*)
-      error "Unknown SCM for url '${_uri}'"
+      error "Unknown SCM for url '${_uri}'."
       ;;
   esac
 }

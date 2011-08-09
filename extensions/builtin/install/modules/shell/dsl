@@ -10,11 +10,11 @@ prepare_for_installation()
 {
   local directory
 
-  log "  Ensuring that install_path '${install_path}' exists"
+  log "  Ensuring that install_path '${install_path}' exists."
   ensure_paths_exist "${install_path}"
   enter "${install_path}"
 
-  log "  Cleansing installation path"
+  log "  Cleansing installation path."
   for directory in "${cleanse_paths[@]}"
   do
     if path_exists "./${directory}"
@@ -23,7 +23,7 @@ prepare_for_installation()
     fi
   done
 
-  log "  Creating installation paths"
+  log "  Creating installation paths."
   ensure_paths_exist "${directories[@]}" "${aux_paths[@]}"
 }
 
@@ -52,21 +52,21 @@ migrate_external_to_ext()
 install_core()
 {
   local _dir
-  log "  Installing core directories (${directories[*]}) into ${install_path}"
+  log "  Installing core directories (${directories[*]}) into ${install_path}."
 
   copy_paths --force to "${install_path}/" "${directories[@]}"
 
-  log "  Installing core files (${files[*]}) into ${install_path}"
+  log "  Installing core files (${files[*]}) into ${install_path}."
   copy_files to "${install_path}" ${files[@]}
 
-  log "  Installing builtin extensions"
+  log "  Installing builtin extensions."
   copy_paths --force to "${install_path}/extensions/" "extensions/builtin"
 
 }
 
 install_configuration_files()
 {
-  log "  Ensuring that the configuration files (${configs[*]}) exist in ${install_path}"
+  log "  Ensuring that the configuration files (${configs[*]}) exist in ${install_path}."
   for config_file in "${configs[@]}"
   do
     ensure_files_exist "${install_path}/config/${config_file}"
@@ -161,7 +161,7 @@ set_bdsm_path()
 
 install_bdsm()
 {
-  log "Installing BDSM Framework into ${install_path}\n"
+  log "Installing BDSM Framework into ${install_path}.\n"
 
   prepare_for_installation
 
@@ -181,5 +181,5 @@ install_bdsm()
 
   perform install_dependencies_extension_set
 
-  succeed "\nInstallation of BDSM is complete\n"
+  succeed "\nInstallation of BDSM is complete!\n"
 }

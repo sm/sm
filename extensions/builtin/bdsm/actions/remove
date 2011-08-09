@@ -2,7 +2,7 @@
 
 if (( ${#extension_args[@]} == 0 ))
 then
-  fail "At least one extension name must be specified."
+  fail "You must specify at least one extension name."
 fi
 
 for extension in "${extensions[@]}"

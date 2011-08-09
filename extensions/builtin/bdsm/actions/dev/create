@@ -38,14 +38,14 @@ then
             fi
           fi
         done
-        log "Extension created from template at ${target_path}/${extension}/"
+        log "Extension created from template at ${target_path}/${extension}/."
       else
-        fail "Extension template files for are missing from "\
+        fail "Extension template files are missing from "\
           "$target_path/core/templates/ext/${language:-shell}."
       fi
     fi
   done
-  succeed "Created extensions ${extension_args[@]}"
+  succeed "Created extensions ${extension_args[@]}."
 else
-  fail "At least one extension name must be specified."
+  fail "You must specify at least one extension name."
 fi

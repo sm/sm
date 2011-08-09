@@ -3,13 +3,13 @@
 #
 # ## process\_lockfile\_lock()
 #
-# If the current process is the first to write to the lockfile then the process
-# continues processing past the line calling lockfile_lock "{file path/name}"
+# If the current process is the first to write to the lockfile, then the process
+# continues processing past the line calling lockfile_lock "{file path/name}".
 #
 # Otherwise lockfile_lock causes the process to exit with a message and status
 # code 0.
 #
-# If the lock is obtained then lockfile_lock ensures that
+# If the lock is obtained then lockfile_lock ensures that.
 #
 # Usage Examples:
 #
@@ -18,16 +18,15 @@
 # ## Code Walkthrough.
 process_lockfile_lock()
 {
-  # Set the lockfile to the value of the first parameter passed into the function
+  # Set the lockfile to the value of the first parameter passed into the function,
   # or the empty string if no parameters were passed in.
   local _lockfile="${1:-}"
   # If the lockfile variable is empty, then
   if variable_is_empty _lockfile
   then
-    # a lockfile name/path was not passed in. This is programmer error,
-    # so we fail which yields a backtrace allowing the developer to fix their
-    # code.
-    fail "Cannot lock onto a lockfile"\
+    # a lockfile name/path was not passed in. This is a programming error,
+    # so we fail, which yields a backtrace to help with debugging.
+    fail "Cannot lock onto a lockfile,"\
       "as no lockfile was specified as the first parameter."
   fi
 
@@ -35,23 +34,23 @@ process_lockfile_lock()
   printf "$$" >> "${_lockfile}"
 
   # Now read in the first pidfile from the lockfile.  This means that the first
-  # instance that successfully writes it's pid to the lockfile obtains the lock.
+  # instance that successfully writes its pid to the lockfile obtains the lock.
   read -r _pid < "${_lockfile}"
 
   # If the pidfile read in matches the pid of the current process, then
   if [[ "${_pid}" == "$$" ]]
   then
-    # The currently running process has the lock, immediately add an on exit
-    # hook that removes the lockfile when the process exits thus relinquishing
-    # the filesystem level lock. This also preserves existing EXIT code.
+    # The currently running process has the lock; immediately add an on-exit
+    # hook that removes the lockfile when the process exits, thus relinquishing
+    # the filesystem-level lock. This also preserves existing EXIT code.
     on_exit "rm -f ${_lockfile}"
 
     # The lock has been obtained! Proceed with nefarious things!
     return 0
   else
-    # Notify the user that another process owns the lockfile and
-    # exit with error code 1
-    error "Another process already owns the lockfile, exiting."
+    # Notify the user that another process owns the lockfile, and
+    # exit with error code 1.
+    error "Another process already owns the lockfile; exiting."
   fi
 }
 
@@ -78,15 +77,15 @@ process_on_exit()
   )"
 
   # If the existing process exit code does not call the process_exit_commands()
-  # function then
+  # function, then
   if [[ "${_process_exit_code}" != *process_exit_commands* ]]
   then
-    # ensure that process_exit_commands() is called on exit while preserving
-    # any original on exit code.
+    # ensure that process_exit_commands() is called on exit, while preserving
+    # any original on-exit code.
     trap "process_exit_commands;${_process_exit_code}" EXIT
   fi
 
-  # Apend the code passed to process_on_exit() to the end of the
+  # Append the code passed to process_on_exit() to the end of the
   # on_exit_commands array variable.
   process_exit_commands+=( "${_code}" )
 }
@@ -104,16 +103,16 @@ process_exit_commands()
   # Grab the exit code of the last command run in the _result variable.
   local _result="$?" _command
 
-  # Loop over each command in the on_exit_commands array
+  # Loop over each command in the on_exit_commands array.
   for _command in "${on_exit_commands[@]}"
   do
     # Evaluate the command
     if eval "${_command}"
     then
-      # Continue processing the process exit commands array
+      # Continue processing the process exit commands array.
       continue
     else
-      # If the command failed warn the user and continue processing the
+      # If the command failed, warn the user and continue with the
       # process exit commands array.
       warn "process_on_exit() command failed > '${_command}'"
     fi

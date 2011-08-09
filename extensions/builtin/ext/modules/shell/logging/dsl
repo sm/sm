@@ -2,7 +2,7 @@
 
 # ## logrotate()
 #
-# Strategically rotate a logfile minimizing data loss.
+# Strategically rotate a logfile, minimizing data loss.
 #
 # This function uses a copy, tail and truncate strategy.
 #
@@ -22,7 +22,7 @@ logrotate()
 
     local _tail_pid=$!
 
-    verbose "Copying the file's contentes into a new timestamped file."
+    verbose "Copying the file's contents into a new timestamped file."
     cp "${_file}" "${_file}.${timestamp}"
 
     verbose "Truncating the file."
@@ -34,13 +34,13 @@ logrotate()
     verbose "Appending the tail logfile to the new timestamped logfile."
     cat "${file}.$$.log" >> "${file}.${timestamp}"
 
-    verbose "Compressing the timestamped file (gzip)"
+    verbose "Compressing the timestamped file with gzip."
     gzip -f -9 "${file}.${timestamp}"
 
-    verbose "Removing the tail logfile"
+    verbose "Removing the tail logfile."
     rm "${file}.$$.log"
   else
-    fail "Cannot rotate a log file as no log file was given."
+    fail "Cannot rotate a log file, as no log file was given."
   fi
 }
 

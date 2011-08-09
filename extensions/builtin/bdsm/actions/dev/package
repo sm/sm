@@ -7,5 +7,5 @@ then
     extension_package "${extension}"
   done
 else
-  error "At least one extension name must be specified for packaging."
+  error "You must specify at least one extension name for packaging."
 fi

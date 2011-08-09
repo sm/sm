@@ -3,7 +3,7 @@
 #
 # ## extension\_version()
 #
-# Outputs the named extension's version
+# Outputs the named extension's version.
 #
 # ### Input Parameters
 #
@@ -11,7 +11,7 @@
 #
 # ### Stream Outputs
 #
-# The extension-version string for the named extension.
+# The version string for the named extension.
 #
 # ### Environmental effects
 #
@@ -19,7 +19,7 @@
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -47,7 +47,7 @@ extension_version()
 
     log "${extension}-${extension_version}"
   else
-    fail "Can not retrieve extension version as no extension was given."
+    fail "Cannot retrieve extension version, as no extension was given."
   fi
 }
 
@@ -62,7 +62,7 @@ extension_version()
 #
 # ### Stream Outputs
 #
-# If the extension has a LICENSE file then it wil be printed to STDOUT.
+# If the extension has a LICENSE file, then it will be printed to STDOUT.
 #
 # ### Environmental effects
 #
@@ -106,7 +106,7 @@ extension_license()
   then
     cat -v "${extensions_path}/${_extension}/LICENSE"
   else
-    fail "Can not display extension license as an extension was not given."
+    fail "Cannot display extension license, as an extension was not given."
   fi
 }
 
@@ -171,7 +171,7 @@ extension_actions()
       return 0
     fi
   else
-    fail "Cannot list actions for extension as no extension was given."
+    fail "Cannot list actions for extension, as no extension was given."
   fi
 }
 
@@ -182,8 +182,8 @@ extension_actions()
 #
 # ### Input Parameters
 #
-# First parameter is the name of the extension to install
-# Second parameter is the src_path of the extension to install
+# First parameter is the name of the extension to install.
+# Second parameter is the src_path of the extension to install.
 #
 # ### Stream Outputs
 #
@@ -196,7 +196,7 @@ extension_actions()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -230,10 +230,10 @@ extension_install()
       # TODO: Process extension dependencies...
       #
     else
-      error "${extensions_src_path}/${_src} is not a valid extension"\
+      error "${extensions_src_path}/${_src} is not a valid extension,"\
         "as it is missing VERSION and/or actions/help files."
     fi
   else
-    fail "Cannot install an extension as no extension name was given."
+    fail "Cannot install an extension, as no extension name was given."
   fi
 }

@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 def modules(modules)
-  fail "No modules specified to load." if (modules.nil? || modules.empty?)
+  fail "No modules specified for loading." if (modules.nil? || modules.empty?)
 
   modules.to_a.each do |mod|
     puts "Loading Module #{mod}" if ENV["trace_flag"]

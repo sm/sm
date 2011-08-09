@@ -23,6 +23,6 @@ extension_is_valid()
     # TODO: Add all extension requirement checks here.
     [[ -d "${_path}/actions" ]] || [[ -d "${_path}/modules" ]]
   else
-    fail "Cannot determine if an extension is valid as the path to the extension was not given."
+    fail "Cannot determine if an extension is valid, as the path to the extension was not given."
   fi
 }

@@ -14,7 +14,7 @@ __bdsm_bash_completion()
   current_count=${#COMP_WORDS[@]}
   completed=${COMP_CWORD}
 
-  # Try to complete commands
+  # Try to complete commands.
   if (( current_count >= 1 )) && [[ "${previous}" != -* ]]
   then
     COMPREPLY=( $(compgen -W "${commands}" -- ${current_word}) )

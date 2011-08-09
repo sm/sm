@@ -20,16 +20,16 @@ modules_installed()
 #
 # ## module\_dsl()
 #
-# Print out a list of all dsl for the given module.
+# Print out a list of all DSL for the given module.
 #
 # ### Input Parameters
 #
-# First parameter is the module name to print out the dsl for.
+# First parameter is the module name to print out the DSL for.
 #
 # ### Stream Outputs
 #
-# The named module's DSL function listing will is printed to the calling
-# environments STDOUT.
+# The named module's DSL function listing is printed to the calling
+# environment's STDOUT.
 #
 # ### Environmental effects
 #
@@ -37,7 +37,7 @@ modules_installed()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -64,18 +64,18 @@ module_dsl()
       printf "%s\n" "${_function//*:}"
     done
   else
-    fail "Cannot print the DSL for module(s) as no module names were given."
+    fail "Cannot print the DSL for module(s), as no module names were given."
   fi
 }
 
 #
 # ## modules\_list()
 #
-# Lists dsl for all modules.
+# Lists DSL for all modules.
 #
 # ### Input Parameters
 #
-# First parameter is the module name to print out the dsl for.
+# First parameter is the module name to print out the DSL for.
 #
 # ### Stream Outputs
 #
@@ -88,7 +88,7 @@ module_dsl()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -136,7 +136,7 @@ modules_list()
 #
 # ### Input Parameters
 #
-# First parameter is the module name to print out the dsl documentation for.
+# First parameter is the module name to print out the DSL documentation for.
 #
 # ### Stream Outputs
 #
@@ -148,7 +148,7 @@ modules_list()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -178,7 +178,7 @@ modules_list()
 #     ### Environmental effects
 #
 #     A variable will be set to the value, if the value is nonempty. If no variable
-#     name is specified the variable will be assigned the same name as the key.
+#     name is specified, the variable will be assigned the same name as the key.
 #
 #     ### Return Codes
 #
@@ -186,11 +186,11 @@ modules_list()
 #
 #     ### Failure Scenarios
 #
-#     Fails if no arguments are passed in, at least need to specify a key.
+#     Fails if no arguments are passed in; you need to at least specify a key.
 #
 #     ### Usage Examples
 #
-#         user$ read_default "version" prefix "package" # extension is nginx for example
+#         user$ read_default "version" prefix "package" # extension is nginx, for example.
 #         user$ echo $package_version
 #         1.0.0
 #
@@ -233,26 +233,26 @@ module_docs()
           shocco "${_path}/dsl"
         fi
       else
-        fail "Cannot generate documentation for the '${_module}' module"\
-          " as the pygmentize command was not found in the PATH"
+        fail "Cannot generate documentation for the '${_module}' module,"\
+          " as the pygmentize command was not found in the PATH."
       fi
     else
-      fail "Cannot generate documentation for the '${_module}' module"\
-        " as the shocco command was not found in the PATH"
+      fail "Cannot generate documentation for the '${_module}' module,"\
+        " as the shocco command was not found in the PATH."
     fi
   else
-    fail "Cannot glean documentation for a module as no module name was given"
+    fail "Cannot glean documentation for a module, as no module name was given."
   fi
 }
 
 #
 # ## modules\_docgen()
 #
-# Lists dsl for all modules.
+# Lists DSL for all modules.
 #
 # ### Input Parameters
 #
-# First parameter is the module name to print out the dsl for.
+# First parameter is the module name to print out the DSL for.
 #
 # ### Stream Outputs
 #
@@ -265,7 +265,7 @@ module_docs()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -321,7 +321,7 @@ modules_docgen()
       log "<li><a href=\"./${_module}.html\">${_module}</a></li>" \
         >> "${_prefix}/index.html"
 
-      # Replace the shocco generated css url with a local filesystem css file
+      # Replace the shocco generated css url with a local filesystem css file,
       # so that a network request is not required in order to have styling when
       # viewing the documentation offline.
       replace_content "http://jashkenas.github.com/docco/resources/docco" \
@@ -331,11 +331,11 @@ modules_docgen()
     wait
 
     log "  </ul></body></html>" >> "${_prefix}/index.html"
-    log "Modules documentation content has been generated in ${_prefix}."
+    log "Modules documentation content generated in ${_prefix}."
   else
-    error "Set core_development_path in ~/.bdsmrc and clone the bdsm core "\
-      "repository into it in order to run docgen."\
-      "For more information see https://bdsm.beginrescueend.com/development/core"
+    error "Set core_development_path in ~/.bdsmrc, and clone the bdsm core "\
+      "repository into it, to run docgen."\
+      "For more information, see https://bdsm.beginrescueend.com/development/core."
   fi
 }
 
@@ -354,8 +354,8 @@ modules_docopen()
       error "Run '$ bdsm mod docgen' before trying docopen."
     fi
   else
-    error "Set core_development_path in ~/.bdsmrc and clone the bdsm core "\
-      "repository into it in order to run docopen."
+    error "To run docopen, set core_development_path in ~/.bdsmrc, and clone the bdsm core "\
+      "repository into it."
   fi
 }
 
@@ -393,7 +393,7 @@ modules_site_docgen()
     log "  </ul></body></html>" >> "${_prefix}/index.html"
     log "Modules documentation content has been generated in ${_prefix}."
   else
-    fail "Set core_development_path in ~/.bdsmrc in order to run docgen."
+    fail "Set core_development_path in ~/.bdsmrc, to run docgen."
   fi
 
   if path_exists "${site_development_path}"
@@ -410,7 +410,7 @@ modules_site_docgen()
 
       ensure_paths_exist "${site_development_path}/content/modules/shell/${name}"
 
-      log "Building ${name} dsl from generated docs."
+      log "Building ${name} DSL from generated docs."
       cat > "${site_development_path}/content/modules/shell/${name}/dsl.haml" <<Header
   .breadcrumbs
     %a{ :href => "/" }
@@ -442,8 +442,8 @@ Header
 
     wait
 
-    log "Module documentation has been generated from the source code path ${core_development_path} into the site development path ${site_development_path}"
+    log "Module documentation generated from the source code path ${core_development_path} into the site development path ${site_development_path}."
   else
-    fail "Set site_development_path in ~/.bdsmrc in order to run docgen."
+    fail "Set site_development_path in ~/.bdsmrc, to run docgen."
   fi
 }

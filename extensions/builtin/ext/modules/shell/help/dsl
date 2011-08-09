@@ -88,7 +88,7 @@ description()
   then
     help_descriptions+=("$*")
   else
-    fail "Cannot add description to help as no help description was given."
+    fail "Cannot add description to help, as no help description was given."
   fi
 }
 
@@ -191,7 +191,7 @@ action()
     help_action_names+=( "${_name}" )
     help_action_descriptions+=( "${_description}" )
   else
-    fail "An action and a description must be provided:\naction {name} {description}"
+    fail "An action and a description must be provided:\naction {name} {description}."
   fi
 }
 
@@ -256,7 +256,7 @@ note()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -291,7 +291,7 @@ dependencies()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -319,7 +319,7 @@ resource()
 # ### Stream Outputs
 #
 # Prints a formatted listing of the actions and their descriptions to the
-# calling environments STDOUT.
+# calling environment's STDOUT.
 #
 # ### Environmental effects
 #
@@ -327,7 +327,7 @@ resource()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -340,16 +340,16 @@ resource()
 #     source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # Load BDSM framework core.
 #     modules help
 #
-#     action "help" "Displays the help output for the ${extension} extension"
-#     action "install" "Installs Z redis package"
-#     action "uninstall" "Uninstalls Z redis package"
+#     action "help" "Displays the help output for the ${extension} extension."
+#     action "install" "Installs Z redis package."
+#     action "uninstall" "Uninstalls Z redis package."
 #
 #     help_actions
 #
 #     user$ "$HOME/test"
-#     help      - Displays the help output for the redis extension
-#     install   - Installs Z redis package
-#     uninstall - Uninstalls Z redis package
+#     help      - Displays the help output for the redis extension.
+#     install   - Installs Z redis package.
+#     uninstall - Uninstalls Z redis package.
 #
 help_actions()
 {
@@ -373,7 +373,7 @@ help_actions()
       fi
     done
   else
-    log "# No help has been defined for ${extension} actions ."
+    log "# No help has been defined for ${extension} actions."
   fi
 }
 
@@ -389,7 +389,7 @@ help_actions()
 #
 # ### Stream Outputs
 #
-# Prints a formatted listing of the notes to the calling environments STDOUT.
+# Prints a formatted listing of the notes to the calling environment's STDOUT.
 #
 # ### Environmental effects
 #
@@ -397,7 +397,7 @@ help_actions()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -445,8 +445,8 @@ help_notes()
 #
 # ### Stream Outputs
 #
-# Prints a formatted listing of the current extensions defined dependencies to
-# the calling environments STDOUT.
+# Prints a formatted listing of the current extension-defined dependencies to
+# the calling environment's STDOUT.
 #
 # ### Environmental effects
 #
@@ -454,7 +454,7 @@ help_notes()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -489,7 +489,7 @@ help_dependencies()
 # ### Stream Outputs
 #
 # Prints a formatted listing of the defined resources to the calling
-# environments STDOUT.
+# environment's STDOUT.
 #
 # ### Environmental effects
 #
@@ -497,7 +497,7 @@ help_dependencies()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -539,7 +539,7 @@ help_resources()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -573,7 +573,7 @@ help_section()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -609,7 +609,7 @@ help_usage()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #

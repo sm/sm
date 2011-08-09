@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-# The default prefix is /usr/local,
-# this should be set to where BDSM is installed to in /etc/bdsmrc
+# The default prefix is /usr/local;
+# this should be set in /etc/bdsmrc to wherever BDSM is installed.
 
 if [[ -z "${bdsm_path}" ]]
 then
@@ -14,7 +14,7 @@ then
 fi
 
 # set BDSM basic paths
-install_path="${bdsm_path}" # Path to install everything to
+install_path="${bdsm_path}" # Path to install everything to.
 archives_path="${bdsm_path}/archives"
 scm_path="${bdsm_path}/scm"
 src_path="${bdsm_path}/src"

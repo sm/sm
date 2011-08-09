@@ -12,14 +12,14 @@ ext_help()
   action "ext install all" "Install all extension ext found on the known list."
   action "ext install {name}" "Install extension {name} found on the known list."
   action "ext install {name} {uri}" "Install extension {name} from the given {uri}."
-  action "ext add" "shortcut for install"
+  action "ext add" "Shortcut for install."
   action_separator
   action "ext update all" "Update all extension ext using remembered uris."
   action "ext update {name}" "Update extension {name} using remembered uri."
-  action "ext up" "shortcut for update"
+  action "ext up" "Shortcut for update."
   action_separator
   action "ext uninstall {name}" "Remove extension {name}."
-  action "ext del" "shortcut for uninstall"
+  action "ext del" "Shortcut for uninstall."
   action_separator
   action "ext help" "Show this help."
 
@@ -37,7 +37,7 @@ ext_list()
     log "ext: "
     echo ${extensions[@]} | xargs -s ${COLUMNS} | xargs -I '{}' echo "  - {}"
   else
-    log "# No single extensions (ext) currently installed."
+    log "# No single extensions (ext) are currently installed."
   fi
 }
 
@@ -53,14 +53,12 @@ ext_install()
 {
   local _name="${1:-}" _uri="${2:-}"
 
-  shift || fail "extension name must be given to install"
-
+  shift || fail "Cannot install extension ext without name."
   [[ -n "${_uri}" ]] ||
     _uri=$( awk -F = "/^${_name}=/ {print \$2 }" < "${bdsm_path}/extensions/builtin/bdsm/config/known_ext" )
 
   [[ -n "${_uri}" ]] ||
-    error "Can not find ${_name} in known extension sets list."
-
+    error "Cannot find ${_name} in known extension ext list."
 
   local _identifier="$(scm_identifier "${_uri}")"
 
@@ -88,13 +86,13 @@ ext_update()
   local _name _uri
   if [[ -z "$1" ]]
   then
-    error "Can not update extension ext without name."
+    error "Cannot update extension ext without name."
   fi
   for _name in "$@"
   do
     case "${_name}" in
       external|builtin)
-        error "Extension ${_name} can not be updated"
+        error "Extension ${_name} cannot be updated."
         ;;
     esac
     if [[ ! -d "${bdsm_path}/extensions/ext/${_name}" ]]
@@ -137,16 +135,16 @@ ext_uninstall()
   local _name="$1"
   case "${_name}" in
     */*|.|..)
-      error "Please specify valid extension name"
+      error "Please specify a valid extension name."
       ;;
     external|builtin)
-      error "Extension ${_name} can not be removed"
+      error "Extension ${_name} cannot be removed."
       ;;
   esac
   enter "${bdsm_path}/extensions/ext"
   if [[ ! -d "${_name}" ]]
   then
-    error "Please specify valid extension name"
+    error "Please specify a valid extension name."
   fi
 
   #TODO: are you sure ?

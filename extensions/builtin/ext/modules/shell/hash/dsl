@@ -3,7 +3,7 @@
 #
 # # Hash in file Module
 #
-# Allows manipulation of multiline values and kesy containing - and \.
+# Allows manipulation of multiline values and keyss containing - and \.
 #
 
 # Read keys from given file($1)
@@ -13,7 +13,7 @@ hash_keys()
   echo -n $(grep -E "${valid_keys}=" $file | grep -Eo "${valid_keys}")
 }
 
-# Read value from given file($1) for given key($2) and assign it to a variable($3)
+# Read value from given file($1) for given key($2), and assign it to a variable($3).
 hash_read()
 {
   local file=$1 key=$2 variable=$3 valid_keys='^[^ ^=]+'

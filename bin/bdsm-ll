@@ -1633,7 +1633,7 @@ sub reaper {
 sub __USAGE__ {}
 
 sub wait_and_exit {
-    # If we do not wait, we sometimes get segfault
+    # If we do not wait, we sometimes get a segfault.
     # Returns: N/A
     for (keys %Global::unkilled_children) {
         kill 9, $_;
@@ -1659,37 +1659,37 @@ sub usage {
 	 "$Global::progname [options] [command [arguments]] (::: arguments|:::: argfile(s))...",
 	 "cat ... | $Global::progname --pipe [options] [command [arguments]]",
 	 "",
-	 "-j n           Run n jobs in parallel",
-	 "-k             Keep same order",
-	 "-X             Multiple arguments with context replace",
-	 "--colsep regexp      Split input on regexp for positional replacements",
-	 "{} {.} {/} {/.} {#}  Replacement strings",
-	 "{3} {3.} {3/} {3/.}  Positional replacement strings",
+	 "-j n           Run n jobs in parallel.",
+	 "-k             Keep same order.",
+	 "-X             Multiple arguments with context replace.",
+	 "--colsep regexp      Split input on regexp for positional replacements.",
+	 "{} {.} {/} {/.} {#}  Replacement strings.",
+	 "{3} {3.} {3/} {3/.}  Positional replacement strings.",
 	 "",
-	 "-S sshlogin    Example: foo\@server.example.com",
+	 "-S sshlogin    Example: foo\@server.example.com.",
 	 "--trc {}.bar   Shorthand for --transfer --return {}.bar --cleanup",
-	 "--onall        Run the given command with argument on all sshlogins",
-	 "--nonall       Run the given command with no arguments on all sshlogins",
+	 "--onall        Run the given command with arguments on all sshlogins.",
+	 "--nonall       Run the given command with no arguments on all sshlogins.",
 	 "",
 	 "--pipe         Split stdin (standard input) to multiple jobs.",
 	 "--recend str   Record end separator for --pipe.",
 	 "--recstart str Record start separator for --pipe.",
 	 "",
-	 "See 'man $Global::progname' for details",
+	 "See 'man $Global::progname' for details.",
 	 "");
 }
 
 sub die_bug {
     my $bugid = shift;
     print STDERR
-	("$Global::progname: This should not happen. You have found a bug.\n",
+	("$Global::progname: This should not happen. You have found a bug!\n",
 	 "Please contact <parallel\@gnu.org> and include:\n",
 	 "* The version number: $Global::version\n",
 	 "* The bugid: $bugid\n",
 	 "* The command line being run\n",
-	 "* The files being read (put the files on a webserver if they are big)\n",
+	 "* The files being read (put the files on a webserver if they are big).\n",
 	 "\n",
-	 "If you get the error on smaller/fewer files, please include those instead.\n");
+	 "If you can reproduce the error with smaller/fewer files, please include those instead.\n");
     ::wait_and_exit(255);
 }
 
@@ -1782,8 +1782,8 @@ sub my_dump {
         # Data::Dump not installed
         eval "use Data::Dumper;";
         if ($@) {
-            my $err =  "Neither Data::Dump nor Data::Dumper is installed\n".
-                "Not dumping output\n";
+            my $err =  "Neither Data::Dump nor Data::Dumper is installed.\n".
+                "Cannot dump output.\n";
             print $Global::original_stderr $err;
             return $err;
         } else {
@@ -2057,11 +2057,11 @@ sub compute_max_loadavg {
                 close IN;
                 $load = $self->compute_max_loadavg($opt_P_file);
             } else {
-                print $Global::original_stderr "Cannot open $loadspec\n";
+                print $Global::original_stderr "Cannot open $loadspec.\n";
                 exit(255);
             }
         } else {
-            print $Global::original_stderr "Parsing of --load failed\n";
+            print $Global::original_stderr "Parsing of --load failed.\n";
             ::die_usage();
         }
         if($load < 0.01) {
@@ -2240,9 +2240,9 @@ sub simultaneous_sshlogin_limit {
             ("parallel: Warning: ssh to $serverlogin only allows ",
              "for $ssh_limit simultaneous logins.\n",
              "You may raise this by changing ",
-             "/etc/ssh/sshd_config:MaxStartup on $serverlogin\n",
-             "Using only ",$ssh_limit-1," connections ",
-             "to avoid race conditions\n");
+             "/etc/ssh/sshd_config:MaxStartup on $serverlogin,\n",
+             "Use only ",$ssh_limit-1," connections ",
+             "to avoid race conditions.\n");
     }
     # Race condition can cause problem if using all sshs.
     if($ssh_limit > 1) { $ssh_limit -= 1; }
@@ -2311,11 +2311,11 @@ sub user_requested_processes {
                 close IN;
                 $processes = $self->user_requested_processes($opt_P_file);
             } else {
-                print $Global::original_stderr "Cannot open $opt_P\n";
+                print $Global::original_stderr "Cannot open $opt_P.\n";
                 exit(255);
             }
         } else {
-            print $Global::original_stderr "Parsing of --jobs/-j/--max-procs/-P failed\n";
+            print $Global::original_stderr "Parsing of --jobs/-j/--max-procs/-P failed.\n";
             ::die_usage();
         }
         if($processes < 1) {
@@ -2349,7 +2349,7 @@ sub ncpus {
             } else {
                 print $Global::original_stderr
                     ("parallel: Warning: Could not figure out ",
-                     "number of cpus on $serverlogin ($ncpu). Using 1\n");
+                     "number of CPUs on $serverlogin ($ncpu). Using 1 CPU.\n");
                 $self->{'ncpus'} = 1;
             }
         }
@@ -2370,7 +2370,7 @@ sub no_of_cpus {
     if($no_of_cpus) {
         return $no_of_cpus;
     } else {
-        warn("parallel: Cannot figure out number of cpus. Using 1");
+        warn("parallel: Cannot figure out number of cpus. Using 1 CPU.");
         return 1;
     }
 }
@@ -2388,7 +2388,7 @@ sub no_of_cores {
     if($no_of_cores) {
         return $no_of_cores;
     } else {
-        warn("parallel: Cannot figure out number of CPU cores. Using 1");
+        warn("parallel: Cannot figure out number of CPU cores. Using 1 CPU.");
         return 1;
     }
 }
@@ -3215,7 +3215,7 @@ sub start {
     $ENV{'PARALLEL_SEQ'} = $job->seq();
     $ENV{'PARALLEL_PID'} = $$;
     ::debug("$Global::total_running processes. Starting ("
-	    . $job->seq() . "): $command\n");
+	    . $job->seq() . "): $command.\n");
     if($::opt_pipe) {
 	my ($in);
 	$pid = ::open3($in, ">&OUT", ">&ERR", $command) ||
@@ -3256,7 +3256,7 @@ sub should_be_retried {
 	return 0;
     }
     if(not $self->exitstatus()) {
-	# Completed with success. If there is a recorded failure: forget it
+	# Completed with success. If there is a recorded failure: forget it.
 	$self->reset_failed_here();
 	return 0
     } else {
@@ -3311,8 +3311,8 @@ sub print {
 	    print STDOUT $command,"\n";
 	}
 	# If STDOUT and STDERR are merged,
-	# we want the command to be printed first
-	# so flush to avoid STDOUT being buffered
+	# we want the command to be printed first;
+	# so flush to avoid STDOUT being buffered.
 	flush STDOUT;
     }
     seek $err, 0, 0;
@@ -3550,10 +3550,10 @@ sub number_of_args {
 }
 
 sub len {
-    # The length of the command line with args substituted
+    # The length of the command line, with args substituted
     my $self = shift;
     my $len = 0;
-    # Add length of the original command with no args
+    # Add length of the original command, with no args
     $len += $self->{'len'}{'no_args'};
     if($self->{'context_replace'}) {
 	$len += $self->number_of_args()*$self->{'len'}{'context'};
@@ -3565,8 +3565,8 @@ sub len {
 	}
 	$len += ($self->number_of_args()-1) * $self->{'len'}{'contextgroups'};
     } else {
-	# Each replacement string may occur several times
-	# Add the length for each time
+	# Each replacement string may occur several times.
+	# Add the length for each time.
 	for my $replstring (keys %{$self->{'replacecount'}}) {
 	    if(defined $self->{'len'}{$replstring}) {
 		$len += $self->{'len'}{$replstring} *
@@ -3574,7 +3574,7 @@ sub len {
 	    }
 	    if($Global::replace{$replstring}) {
 		# This is a multi replacestring ({} {/} {//} {.} {/.})
-		# Add each space between two arguments
+		# Add each space between two arguments.
 		my $number_of_args = ($#{$self->{'arg_list'}[0]}+1) *
 		    $self->number_of_args();
 		$len += ($number_of_args-1) *
@@ -3583,7 +3583,7 @@ sub len {
 	}
     }
     if($::opt_nice) {
-	# Pessimistic length if --nice is set
+	# Pessimistic length if --nice is set.
 	# Worse than worst case: every char needs to be quoted with \
 	$len *= 2;
     }
@@ -3736,7 +3736,7 @@ sub context_replace_placeholders {
     # Normal replace strings
     my $rep_str_regexp = multi_regexp();
 
-    # Fish out the words that have replacement strings in them
+    # Fish out the words that have replacement strings in them.
     my $tt = $target;
     my %word;
     while($tt =~ s/(\S*(?:$rep_str_regexp|\{\d+$rep_inner_regexp\}|$rep_seq_regexp)\S*)/\0/o) {
@@ -3747,27 +3747,27 @@ sub context_replace_placeholders {
 	my @pos_replacements=();
 	my @replacements=();
 	my $w;
-	my $word = $origword; # Make a local modifyable copy
+	my $word = $origword; # Make a local modifyable copy.
 
 	# replace {#} if it exists
 	$word =~ s/\{\#\}/$self->seq()/geo;
 	if($word =~ m:\{\d+$rep_inner_regexp\}:o) {
-	    # There are positional replacement strings
+	    # There are positional replacement strings.
 	    my @argset;
 	    if($#{$self->{'arg_list'}->[0]} == 0) {
-		# Only one input source: Treat it as a set
+		# Only one input source: Treat it as a set.
 		@argset = [ @args ];
 	    } else {
 		@argset = @{$self->{'arg_list'}};
 	    }
-	    # Match 1..n where n = max args in a argset
+	    # Match 1..n where n = max args in an argset.
 	    my $pos_regexp = "(?:".join("|", 1 .. $#{$argset[0]}+1).")";
 	    for my $argset (@argset) {
 		# Replace all positional arguments - e.g. {7/.}
 		# with the replacement function - e.g. {/.}
 		# of that argument
 		if(defined $self->{'max_number_of_args'}) {
-		    # Fill up if we have a half completed line, so {n} will be empty
+		    # Fill up if we have a half completed line, so {n} will be empty.
 		    while($#$argset < $self->{'max_number_of_args'}-1) {
 			CORE::push @$argset, Arg->new("");
 		    }
@@ -3782,7 +3782,7 @@ sub context_replace_placeholders {
 	}
 
 	if($word =~ m:$rep_str_regexp:) {
-	    # There are normal replacement strings
+	    # There are normal replacement strings.
 	    for my $w (@pos_replacements) {
 		for my $arg (@args) {
 		    my $wmulti = $w;
@@ -3797,8 +3797,8 @@ sub context_replace_placeholders {
 	    CORE::push @{$replace{$origword}}, @pos_replacements;
 	}
     }
-    # Substitute the replace strings with the replacement values
-    # Must be sorted by length if a short word is a substring of a long word
+    # Substitute the replace strings with the replacement values.
+    # Must be sorted by length if a short word is a substring of a long word.
     my $regexp = join('|', map { $_=~s/(\W)/\\$1/g; $_}
 		      sort { length $b <=> length $a } keys %word);
     $target =~ s/($regexp)/join(" ",@{$replace{$1}})/ge;
@@ -3817,7 +3817,7 @@ sub simple_replace_placeholders {
     my %replace;
 
     for my $record (@{$self->{'arg_list'}}) {
-	# Merge arguments from records into args for easy access
+	# Merge arguments from records into args for easy access.
 	CORE::push @args, @$record;
     }
     # Which replace strings are used?
@@ -3833,11 +3833,11 @@ sub simple_replace_placeholders {
 	    my $positional = $1; # number if any
 	    my $replacementfunction = "{".::undef_as_empty($2)."}"; # {} {/} {//} {.} or {/.}
 	    if(defined $args[$positional-1]) {
-		# we have a matching argument for {n}
+		# we have a matching argument for {n}.
 		$replace{$used} = $args[$positional-1]->replace($replacementfunction);
 	    } else {
 		if($positional <= $self->{'max_number_of_args'}) {
-		    # Fill up if we have a half completed line
+		    # Fill up if we have a half-completed line.
 		    $replace{$used} = "";
 		}
 	    }
@@ -3849,12 +3849,12 @@ sub simple_replace_placeholders {
 	}
     }
 
-    # Substitute the replace strings with the replacement values
+    # Substitute the replace strings with the replacement values.
     my $regexp = join('|', map { $_=~s/(\W)/\\$1/g; $_} keys %replace);
     if($regexp) {
 	if($quoteall) {
 	    # This is for --return: The whole expression must be
-	    # quoted - not just the replacements
+	    # quoted - not just the replacements.
 	    %replace = map { $_ => ::shell_unquote($replace{$_}) } keys %replace;
 	    $target =~ s/($regexp)/$replace{$1}/g;
 	    $target = ::shell_quote_scalar($target);
@@ -3900,7 +3900,7 @@ sub set_seq {
 
 sub quote_args {
     my $self = shift;
-    # If there is not command emulate |bash
+    # If there is not command, emulate |bash.
     return $self->{'command'};
 }
 
@@ -3961,17 +3961,17 @@ sub size {
 
 package Limits::Command;
 
-# Maximal command line length (for -m and -X)
+# Maximal command line length (for -m and -X).
 sub max_length {
-    # Find the max_length of a command line
+    # Find the max_length of a command line.
     # Returns:
-    #   number of chars on the longest command line allowed
+    #   number of chars on the longest command line allowed.
     if(not $Limits::Command::line_max_len) {
 	if($::opt_s) {
 	    if(is_acceptable_command_line_length($::opt_s)) {
 		$Limits::Command::line_max_len = $::opt_s;
 	    } else {
-		# -s is too long: Find the correct
+		# -s is too long: Find the correct value.
 		$Limits::Command::line_max_len = binary_find_max_length(0,$::opt_s);
 	    }
 	    if($::opt_s <= $Limits::Command::line_max_len) {
@@ -3989,22 +3989,22 @@ sub max_length {
 
 sub real_max_length {
     # Returns:
-    #   The maximal command line length
-    # Use an upper bound of 8 MB if the shell allows for for infinite long lengths
+    #   The maximal command line length.
+    # Use an upper bound of 8 MB if the shell allows for for infinitely long lengths.
     my $upper = 8_000_000;
     my $len = 8;
     do {
 	if($len > $upper) { return $len };
 	$len *= 16;
     } while (is_acceptable_command_line_length($len));
-    # Then search for the actual max length between 0 and upper bound
+    # Then search for the actual max length, between 0 and upper bound.
     return binary_find_max_length(int($len/16),$len);
 }
 
 sub binary_find_max_length {
-    # Given a lower and upper bound find the max_length of a command line
+    # Given a lower and upper bound, find the max_length of a command line.
     # Returns:
-    #   number of chars on the longest command line allowed
+    #   number of chars on the longest command line allowed.
     my ($lower, $upper) = (@_);
     if($lower == $upper or $lower == $upper-1) { return $lower; }
     my $middle = int (($upper-$lower)/2 + $lower);
@@ -4017,7 +4017,7 @@ sub binary_find_max_length {
 }
 
 sub is_acceptable_command_line_length {
-    # Test if a command line of this length can run
+    # Test if a command line of this length can run.
     # Returns:
     #   0 if the command line length is too long
     #   1 otherwise
@@ -4042,10 +4042,10 @@ sub new {
     my @unget = ();
     my $arg_sub_queue;
     if($colsep) {
-	# Open one file with colsep
+	# Open one file with colsep.
 	$arg_sub_queue = RecordColQueue->new($fhs);
     } else {
-	# Open one or more files if multiple -a
+	# Open one or more files, if multiple -a
 	$arg_sub_queue = MultifileQueue->new($fhs);
     }
     return bless {
@@ -4057,7 +4057,7 @@ sub new {
 
 sub get {
     # Returns:
-    #   reference to array of Arg-objects
+    #   reference to array of Arg-objects.
     my $self = shift;
     if(@{$self->{'unget'}}) {
 	return shift @{$self->{'unget'}};
@@ -4066,7 +4066,7 @@ sub get {
     my $ret = $self->{'arg_sub_queue'}->get();
     if(defined $Global::max_number_of_args
        and $Global::max_number_of_args == 0) {
-	::debug("Read 1 but return 0 args\n");
+	::debug("Read 1 but return 0 args.\n");
 	return [Arg->new("")];
     } else {
 	return $ret;
@@ -4108,7 +4108,7 @@ sub new {
 
 sub get {
     # Returns:
-    #   reference to array of Arg-objects
+    #   reference to array of Arg-objects.
     my $self = shift;
     if(@{$self->{'unget'}}) {
 	return shift @{$self->{'unget'}};
@@ -4216,8 +4216,8 @@ sub nest_get {
     my $empty = 1;
     my $no_of_inputs = $#{$self->{'fhs'}} + 1;
     if(not $self->{'arg_matrix'}) {
-	# Initialize @arg_matrix with one arg from each file
-	# read one line from each file
+	# Initialize @arg_matrix with one arg from each file.
+	# Read one line from each file.
 	my @first_arg_set;
 	my $all_empty = 1;
 	for (my $fhno = 0; $fhno < $no_of_inputs ; $fhno++) {
@@ -4229,7 +4229,7 @@ sub nest_get {
 	    push @first_arg_set, $self->{'arg_matrix'}[$fhno][0];
 	}
 	if($all_empty) {
-	    # All filehandles were at eof or eof-string
+	    # All filehandles were at eof or eof-string.
 	    return undef;
 	}
 	return [@first_arg_set];
@@ -4238,9 +4238,9 @@ sub nest_get {
 	if(eof($self->{'fhs'}[$fhno])) {
 	    next;
 	} else {
-	    # read one
+	    # Read one.
 	    my $arg = read_arg_from_fh($self->{'fhs'}[$fhno]);
-	    defined($arg) || next; # If we just read an EOF string: Treat this as EOF
+	    defined($arg) || next; # If we just read an EOF string: Treat this as EOF.
 	    my $len = $#{$self->{'arg_matrix'}[$fhno]} + 1;
 	    $self->{'arg_matrix'}[$fhno][$len] = $arg;
 	    # make all new combinations
@@ -4248,8 +4248,8 @@ sub nest_get {
 	    for (my $fhn = 0; $fhn < $no_of_inputs; $fhn++) {
 		push @combarg, [0, $#{$self->{'arg_matrix'}[$fhn]}];
 	    }
-	    $combarg[$fhno] = [$len,$len]; # Find only combinations with this new entry
-	    # map combinations
+	    $combarg[$fhno] = [$len,$len]; # Find only combinations with this new entry.
+	    # Map combinations.
 	    # [ 1, 3, 7 ], [ 2, 4, 1 ]
 	    # =>
 	    # [ m[0][1], m[1][3], m[3][7] ], [ m[0][2], m[1][4], m[2][1] ]
@@ -4261,21 +4261,21 @@ sub nest_get {
 		}
 		push @mapped, [@a];
 	    }
-	    # append the mapped to the ungotten arguments
+	    # Append the mapped to the ungotten arguments.
 	    push @{$self->{'unget'}}, @mapped;
-	    # get the first
+	    # Get the first.
 	    return shift @{$self->{'unget'}};
 	}
     }
-    # all are eof or at EOF string; return from the unget queue
+    # All are eof or at EOF string; return from the unget queue.
     return shift @{$self->{'unget'}};
 }
 
 sub read_arg_from_fh {
-    # Read one Arg from filehandle
+    # Read one Arg from filehandle.
     # Returns:
-    #   Arg-object with one read line
-    #   undef if end of file
+    #   Arg-object with one read line.
+    #   undef, if end of file.
     my $fh = shift;
     my $prepend = undef;
     my $arg;
@@ -4289,11 +4289,11 @@ sub read_arg_from_fh {
 	}
 	$arg = <$fh>;
 	::debug("read $arg\n");
-	# Remove delimiter
+	# Remove delimiter.
 	$arg =~ s:$/$::;
 	if($Global::end_of_file_string and
 	   $arg eq $Global::end_of_file_string) {
-	    # Ignore the rest of input file
+	    # Ignore the rest of input file.
 	    while (<$fh>) {}
 	    ::debug("EOF-string $arg\n");
 	    if(defined $prepend) {
@@ -4303,12 +4303,12 @@ sub read_arg_from_fh {
 	    }
 	}
 	if(defined $prepend) {
-	    $arg = $prepend.$arg; # For line continuation
+	    $arg = $prepend.$arg; # For line continuation.
 	    $prepend = undef; #undef;
 	}
 	if($Global::ignore_empty) {
 	    if($arg =~ /^\s*$/) {
-		redo; # Try the next line
+		redo; # Try the next line.
 	    }
 	}
 	if($Global::max_lines) {
@@ -4318,7 +4318,7 @@ sub read_arg_from_fh {
 		redo;
 	    }
 	}
-    }} while (1 == 0); # Dummy loop for redo
+    }} while (1 == 0); # Dummy loop for redo.
     if(defined $arg) {
 	return Arg->new($arg);
     } else {
@@ -4336,7 +4336,7 @@ sub expand_combinations {
     my $xmax = $$minmax_ref[1];
     my @p;
     if(@_) {
-	# If there are more columns: Compute those recursively
+	# If there are more columns: Compute those recursively.
 	my @rest = expand_combinations(@_);
 	for(my $x = $xmin; $x <= $xmax; $x++) {
 	    push @p, map { [$x, @$_] } @rest;
@@ -4392,16 +4392,16 @@ sub replace {
 	if($replacement_string eq "{}") {
 	    # skip
 	} elsif($replacement_string eq "{.}") {
-	    $s =~ s:\.[^/\.]*$::; # Remove .ext from argument
+	    $s =~ s:\.[^/\.]*$::; # Remove .ext from argument.
 	} elsif($replacement_string eq "{/}") {
-	    $s =~ s:^.*/([^/]+)/?$:$1:; # Remove dir from argument. If ending in /, remove final /
+	    $s =~ s:^.*/([^/]+)/?$:$1:; # Remove dir from argument. If ending in /, remove final /.
 	} elsif($replacement_string eq "{//}") {
-	    # Only load File::Basename if actually needed
+	    # Only load File::Basename if actually needed.
 	    $Global::use{"File::Basename"} ||= eval "use File::Basename;";
 	    $s = dirname($s); # Keep dir from argument.
 	} elsif($replacement_string eq "{/.}") {
-	    $s =~ s:^.*/([^/]+)/?$:$1:; # Remove dir from argument. If ending in /, remove final /
-	    $s =~ s:\.[^/\.]*$::; # Remove .ext from argument
+	    $s =~ s:^.*/([^/]+)/?$:$1:; # Remove dir from argument. If ending in /, remove final /.
+	    $s =~ s:\.[^/\.]*$::; # Remove .ext from argument.
 	}
 	if($Global::JobQueue->quote_args()) {
 	    $s = ::shell_quote_scalar($s);
@@ -4423,7 +4423,7 @@ sub trim_of {
     # r = end
     # lr|rl = both
     # Returns:
-    #   string with white space removed as needed
+    #   string with white space removed as needed.
     my @strings = map { defined $_ ? $_ : "" } (@_);
     my $arg;
     if($Global::trim eq "n") {
@@ -4445,12 +4445,12 @@ sub trim_of {
 
 package Semaphore;
 
-# This package provides a counting semaphore
+# This package provides a counting semaphore.
 #
-# If a process dies without releasing the semaphore the next process
-# that needs that entry will clean up dead semaphores
+# If a process dies without releasing the semaphore, the next process
+# that needs that entry will clean up dead semaphores.
 #
-# The semaphores are stored in ~/.parallel/semaphores/id-<name> Each
+# The semaphores are stored in ~/.parallel/semaphores/id-<name>. Each
 # file in ~/.parallel/semaphores/id-<name>/ is the process ID of the
 # process holding the entry. If the process dies, the entry can be
 # taken by another process.
@@ -4459,8 +4459,8 @@ sub new {
     my $class = shift;
     my $id = shift;
     my $count = shift;
-    $id=~s/([^-_a-z0-9])/unpack("H*",$1)/ige; # Convert non-word chars to hex
-    $id="id-".$id; # To distinguish it from a process id
+    $id=~s/([^-_a-z0-9])/unpack("H*",$1)/ige; # Convert non-word chars to hex.
+    $id="id-".$id; # To distinguish it from a process id.
     my $parallel_dir = $ENV{'HOME'}."/.parallel";
     -d $parallel_dir or mkdir $parallel_dir;
     my $parallel_locks = $parallel_dir."/semaphores";
@@ -4476,7 +4476,7 @@ sub new {
 	'idfile' => $lockdir."/".$id,
 	'pid' => $$,
 	'pidfile' => $lockdir."/".$$.'@'.::hostname(),
-	'count' => $count + 1 # nlinks returns a link for the 'id-' as well
+	'count' => $count + 1 # nlinks returns a link for the 'id-' as well.
     }, ref($class) || $class;
 }
 
@@ -4500,11 +4500,11 @@ sub acquire {
 		}
 	    }
 	}
-	# try again
+	# Try again.
 	$self->atomic_link_if_count_less_than() and last;
-	# Retry slower and slower up to 1 second
+	# Retry slower and slower up to 1 second.
 	$sleep = ($sleep < 1000) ? ($sleep * 1.1) : ($sleep);
-	# Random to avoid every sleeping job waking up at the same time
+	# Randomize, to avoid every sleeping job waking up at the same time.
 	::usleep(rand()*$sleep);
 	# TODO if timeout: last
     }
@@ -4515,7 +4515,7 @@ sub release {
     my $self = shift;
     unlink $self->{'pidfile'};
     if($self->nlinks() == 1) {
-	# This is the last link, so atomic cleanup
+	# This is the last link, so atomic cleanup.
 	$self->lock();
 	if($self->nlinks() == 1) {
 	    unlink $self->{'idfile'};
@@ -4528,7 +4528,7 @@ sub release {
 
 
 sub atomic_link_if_count_less_than {
-    # Link $file1 to $file2 if nlinks to $file1 < $count
+    # Link $file1 to $file2 if nlinks to $file1 < $count.
     my $self = shift;
     my $retval = 0;
     $self->lock();
@@ -4562,13 +4562,13 @@ sub lock {
     my $sleep = 100; # 100 ms
     open $self->{'lockfh'}, ">", $self->{'lockfile'}
 	or ::die_bug("Can't open semaphore file $self->{'lockfile'}: $!");
-    chmod 0666, $self->{'lockfile'}; # assuming you want it a+rw
+    chmod 0666, $self->{'lockfile'}; # assuming you want it a+rw.
     $Global::use{"Fcntl"} ||= eval "use Fcntl qw(:DEFAULT :flock);";
     while(not flock $self->{'lockfh'}, LOCK_EX()|LOCK_NB()) {
 	::debug("Cannot lock $self->{'lockfile'}");
 	# TODO if timeout: last
 	$sleep = ($sleep < 1000) ? ($sleep * 1.1) : ($sleep);
-	# Random to avoid every sleeping job waking up at the same time
+	# Randomize, to avoid every sleeping job waking up at the same time.
 	::usleep(rand()*$sleep);
     }
     ::debug("locked $self->{'lockfile'}");

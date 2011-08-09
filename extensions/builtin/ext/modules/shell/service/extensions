@@ -25,7 +25,7 @@ action \"service start\" \"Starts ${extension} service.\"
 action \"service stop\" \"Stop ${extension} service.\"
 action \"service restart\" \"Restarts ${extension} service.\"
 action \"service status\" \"Display ${extension} status.\"
-action \"service list\" \"List ${extension} master and worker processes.\"
+action \"service list\" \"Lists ${extension} master and worker processes.\"
 
 show_help usage
 " append to "actions/${module}/help"

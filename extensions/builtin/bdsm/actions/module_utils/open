@@ -5,6 +5,6 @@ then
   enter "${extensions_development_path}/${extension_args[0]}/"
   os_open "$PWD"
 else
-  fail "At least one extension name must be specified."
+  fail "You must specify at least one extension name."
 fi
 

@@ -12,14 +12,14 @@ sets_help()
   action "sets install all" "Install all extension sets found on the known list."
   action "sets install {name}" "Install extension set {name} found on the known list."
   action "sets install {name} {uri}" "Install extension set {name} from the given {uri}."
-  action "sets add" "shortcut for install"
+  action "sets add" "Shortcut for install."
   action_separator
   action "sets update all" "Update all extension sets using remembered uris."
   action "sets update {name}" "Update extension set {name} using remembered uri."
-  action "sets up" "shortcut for update"
+  action "sets up" "Shortcut for update."
   action_separator
   action "sets uninstall {name}" "Remove extension set {name}."
-  action "sets del" "shortcut for uninstall"
+  action "sets del" "Shortcut for uninstall."
   action_separator
   action "sets help" "Show this help."
 
@@ -56,16 +56,16 @@ sets_install()
 {
   local _name="${1:-}" _uri="${2:-}"
 
-  shift || fail "set name must be given to install"
+  shift || fail "name must be the first parameter to sets_install()."
 
   [[ "${_name}" != "builtin" ]] ||
-    error "builtin extension set may not be (re-)installed except through updating BDSM core (bdsm get head)."
+    error "builtin extension set may not be (re-)installed, except by updating BDSM core (bdsm get head)."
 
   [[ -n "${_uri}" ]] ||
     _uri=$( awk -F = "/^${_name}=/ {print \$2 }" < "${bdsm_path}/extensions/builtin/bdsm/config/known_sets" )
 
   [[ -n "${_uri}" ]] ||
-    error "Can not find ${_name} in known extension sets list."
+    error "Cannot find ${_name} in known extension sets list."
 
   local _identifier="$(scm_identifier "${_uri}")"
 
@@ -100,7 +100,7 @@ sets_update()
   do
     case "${_name}" in
       builtin)
-        error "Extension set ${_name} can not be updated"
+        error "Extension set ${_name} cannot be updated."
         ;;
     esac
 
@@ -147,16 +147,16 @@ sets_uninstall()
   local _name="$1"
   case "${_name}" in
     */*|.|..)
-      error "Please specify valid extension name"
+      error "Please specify a valid extension name."
       ;;
     builtin)
-      error "Extension set ${_name} can not be removed"
+      error "Extension set ${_name} cannot be removed."
       ;;
   esac
   enter "${extension_sets_path}"
   if [[ ! -d "${_name}" ]]
   then
-    error "Please specify valid extension name"
+    error "Please specify a valid extension name."
   fi
 
   #TODO: are you sure ?

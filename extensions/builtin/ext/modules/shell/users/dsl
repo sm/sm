@@ -20,7 +20,7 @@
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -38,45 +38,45 @@ user_create_if_missing()
   # parse arguments
   while (( $# > 0 ))
   do
-    # Set the token to the first parameter
+    # Set the token to the first parameter.
     _token="$1"
-    # Remove the token from the parameters list
+    # Remove the token from the parameters list.
     shift
 
-    # Switched based on the value of the token
+    # Switch based on the value of the token.
     case "${_token}" in
-      # if the token is 'group' then set the group variable to the next prameter
-      # and remove the next parameter from the parameters list
+      # If the token is 'group', then set the group variable to the next prameter
+      # and remove the next parameter from the parameters list.
       group)
         _group="${1}"
         shift
         ;;
-      # if the token is 'with' then move on to processing the next token
+      # If the token is 'with', then move on to processing the next token
       # as this is syntactic sugar.
       with)
         continue
         ;;
-      # if the token is 'from' then set the source variable to the next parameter
-      # and remove the next parameter from the parameters list
+      # If the token is 'from', then set the source variable to the next parameter
+      # and remove the next parameter from the parameters list.
       from)
         _source="${1}"
         shift
         ;;
-      # if the token is '--force' then set the force_flag to 1
+      # If the token is '--force' then set the force_flag to 1.
       --force)
         _force_flag=1
         ;;
 
-      # if the token does not match any of the above then
+      # If the token does not match any of the above, then
       *)
-        # if the user variable has not yet been set then assign the token into
-        # the user variable
+        # If the user variable has not yet been set, then assign the token into
+        # the user variable.
         if variable_is_empty _user
         then
           _user="${_token}"
 
-        # otherwise if the group variable has not yet been set then assign
-        # the token into the group variable
+        # Otherwise, if the group variable has not yet been set, then assign
+        # the token into the group variable.
         elif variable_is_empty _group
         then
           _group="${_token}"
@@ -93,7 +93,7 @@ user_create_if_missing()
   # If the user is root (eg. id 0)
   if (( UID == 0 ))
   then
-    # then we switch based on the uname command ouptput for os type
+    # Switch based on the uname command ouptput for os type.
     # ##### TODO: Use the os_is_X functions here instead.
     case "$(uname)" in
       "OpenBSD")
@@ -148,7 +148,7 @@ user_create_if_missing()
         ;;
     esac
   else
-    fail "Users and groups may be manipulated only by the super user (root) via su or sudo."
+    fail "Users and groups may be manipulated only by the super-user (root), via su or sudo."
   fi
 }
 
@@ -171,7 +171,7 @@ user_create_if_missing()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -198,32 +198,32 @@ user_delete()
 
     # Switch on the token variable's contents
     case "${_token}" in
-      # if the token is 'user' then assign the next parameter to the user
-      # variable and remove the next parameter from the parameters list
+      # If the token is 'user', assign the next parameter to the user
+      # variable and remove the next parameter from the parameters list.
       user)
         _user="${1}"
         shift
         ;;
-      # if the token is 'with' then go on to processing the next token as this
+      # If the token is 'with', then go on to processing the next token as this
       # is syntactic sugar.
       with)
         continue
         ;;
-      # if the token is 'from' then assign the next parameter to the source
-      # variable and remove the next parameter from the parameters list
+      # If the token is 'from', assign the next parameter to the source
+      # variable and remove the next parameter from the parameters list.
       from)
         _source="${1}"
         shift
         ;;
-      # if the token is '--force' then then set the force_flag to 1
-      # (non-default value)
+      # If the token is '--force', set the force_flag to 1
+      # (non-default value).
       --force)
         _force_flag=1
         ;;
-      # if the token does not match any of the above then
+      # If the token does not match any of the above, then
       *)
-        # if the user variable is empty then assign the current token into the
-        # user variable and stop processing input parameters
+        # If the user variable is empty, assign the current token into the
+        # user variable and stop processing input parameters.
         if variable_is_empty _user
         then
           _user="${_token}"
@@ -237,8 +237,8 @@ user_delete()
   if (( UID == 0 ))
   then
     (
-    # Then we switch based on the os type
-    # TODO: Switch these to use the os_is_X system module dsl
+    # Switch based on the os type.
+    # TODO: Switch these to use the os_is_X system module DSL
     case "$(uname)" in
       "Linux")
         userdel "${package_user}"
@@ -253,9 +253,9 @@ user_delete()
         ;;
 
       "Darwin")
-        gid="501" #only gids > 500 show up in user preferences
+        gid="501" # only gids > 500 show up in user preferences.
 
-        #Find an open gid
+        # Find an open gid
         while true; do
           name=$(dscl . search /groups PrimaryGroupID $gid | cut -f1 -s)
           if [ -z "$name" ] ; then
@@ -264,7 +264,7 @@ user_delete()
           gid=$[$gid +1]
         done
 
-        #Create the group
+        # Create the group
         dscl . -delete "/Users/${package_user}" PrimaryGroupID "$gid" # UserShell /bin/bash
         dscl . -delete "/Groups/$package_user"
         dscl . -delete "/Groups/$package_user" gid "$gid"
@@ -277,7 +277,7 @@ user_delete()
     esac
     ) || true # Ignore failures with this for now...
   else
-    fail "Users and groups may be manipulated only by the super user (root) via su or sudo."
+    fail "Users and groups may be manipulated only by the super-user (root), via su or sudo."
   fi
 }
 
@@ -320,7 +320,7 @@ user_delete()
 # ### Code Walkthrough
 user_is_root()
 {
-  # If the user is root (id is 0) then return true, 0. otherwise return false, 1
+  # If the user is root (id is 0) then return true, 0; otherwise, return false, 1.
   if (( UID == 0 ))
   then
     return 0
@@ -332,7 +332,7 @@ user_is_root()
 #
 # ## user\_is\_not\_root()
 #
-# Tests if the user the current process is running as is not root.
+# Tests if the current process is running as root.
 #
 # ### Input Parameters
 #
@@ -348,8 +348,8 @@ user_is_root()
 #
 # ### Return Codes
 #
-# 0 if user is not root (eg UID is nonzero)
-# 1 if user is root (UID 0)
+# 0 if user is not root (eg UID is nonzero).
+# 1 if user is root (UID 0).
 #
 # ### Failure Scenarios
 #
@@ -396,11 +396,11 @@ user_is_not_root()
 #
 # ### Return Codes
 #
-# 0 if the user is root
+# 0 if the user is root.
 #
 # ### Failure Scenarios
 #
-# Fails if the program user running is not root.
+# Fails if the program's user is not root.
 #
 # ### Usage Examples
 #
@@ -409,13 +409,13 @@ user_is_not_root()
 #
 user_must_be_root()
 {
-  # if the user is root then return true, 0. otherwise send an error message
-  # informing the user that the script must be run as a root and not as user
+  # if the user is root then return true, 0. Otherwise send an error message
+  # informing the user that the script must be run with root privileges.
   if user_is_root
   then
     return 0
   else
-    error "bdsm $extension $action must be run as a root and NOT as a user ($USER)."
+    error "bdsm $extension $action must be run as root, and NOT as a user ($USER)."
   fi
 }
 
@@ -438,7 +438,7 @@ user_must_be_root()
 #
 # ### Return Codes
 #
-# 0 if the user is root
+# 0 if the user is root.
 #
 # ### Failure Scenarios
 #
@@ -451,13 +451,13 @@ user_must_be_root()
 #
 user_must_not_be_root()
 {
-  # if the user is not root then return true, 0. otherwise send an error message
-  # informing the user that the script must be run as a root and not as user.
+  # If the user is not root then return true, 0. Otherwise send an error message
+  # informing the user that the script must be run as root.
   if user_is_not_root
   then
     return 0
   else
-    fail "bdsm $extension $action must be run as a (project) user and NOT as root."
+    fail "bdsm $extension $action must be run as a (project) user, and NOT as root."
   fi
 }
 
@@ -480,7 +480,7 @@ user_must_not_be_root()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -501,9 +501,9 @@ user_run_as()
   if variable_is_nonempty _user
   then
     # Remove the user from the parameters list.
-    # Then run the given command as the user, with a nonlogin shell.
-    # If the command completed successfully then return true, 0. otherwise
-    # the command did not complete successfully so return false, 1
+    # Run the given command as the user, with a nonlogin shell.
+    # If the command completed successfully, return true, 0. Otherwise,
+    # the command did not complete successfully, so return false, 1.
     shift
     if su "${_user}" -c "$*"
     then
@@ -512,17 +512,17 @@ user_run_as()
       return 1
     fi
   else
-    # otherwise the user was not passed in. This is a programming error so we
+    # Otherwise, the user was not passed in. This is a programming error so we
     # send a fail message which includes a backtrace allowing the developer
-    # to quickly pinpoinnt and fix their error.
-    fail "Cannot run as user as no user or commands were given."
+    # to quickly pinpoint and fix their error.
+    fail "Cannot run as user, as no user or commands were given."
   fi
 }
 
 #
 # ## user\_run\_as\_login()
 #
-# Runs a command as a given user, in that users login shell.
+# Runs a command as a given user, in that user's login shell.
 #
 # ### Input Parameters
 #
@@ -538,7 +538,7 @@ user_run_as()
 #
 # ### Return Codes
 #
-# 0 for success
+# 0 for success.
 #
 # ### Failure Scenarios
 #
@@ -558,8 +558,8 @@ user_run_as_login()
   if variable_is_nonempty _user
   then
     # Then run the given command as the user, with a login shell.
-    # If the command completed successfully so return true, 0. Otherwise the
-    # command did not complete successfully so return false, 1
+    # If the command completed successfully, return true, 0. Otherwise the
+    # command did not complete successfully; return false, 1.
     if su - "${_user}" -c "$*"
     then
       return 0
@@ -567,9 +567,9 @@ user_run_as_login()
       return 1
     fi
   else
-    # otherwise the user was not passed in. This is a programming error so we
+    # Otherwise the user was not passed in. This is a programming error so we
     # send a fail message which includes a backtrace allowing the developer
     # to quickly pinpoinnt and fix their error.
-    fail "Cannot run as user as no user or commands were given."
+    fail "Cannot run as user, as no user or commands were given."
   fi
 }

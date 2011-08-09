@@ -1,39 +1,47 @@
 # Bash Delectable Scripting Modules (BDSM) Framework
 
 BDSM is a system scripting DSL & framework for beating software and systems
-into submission
+into submission!
 
 # Goal
 
-The goal is to create an extensible scripting framework providing a very robust
-DSL. A primary tennant of BDSM is that it must handles as much pain as possible
-so that users of the BDSM DSL modules can create high quality extensions and
-expose their commands through BDSM's flexible command line interface (CLI).
+BDSM delivers an extensible scripting framework providing a very robust DSL.
+A primary tenet of BDSM is that it must handle as much pain as possible, so you don't have to!
+With BDSM's DSL modules, you can quickly create your own high-quality extensions,
+and expose their commands through BDSM's flexible command line interface (CLI).
 
 # Architecture
 
-BDSM itself is a scripting framework which provides very rich DSL sets known as
-modules. Users of BDSM may use the DSL to write 'extensions' which are
-essentially named sets of scripts (directories!). Users of BDSM may also easily
-install and manage a multitude of extensions and sets of extensions providing
-functionality only limited by the creative abilities of extension authors :)
+BDSM itself is a scripting framework that enables very rich DSL sets known as
+modules. BDSM lets you use the DSL to painlessly write powerful 'extensions', which are
+essentially named sets of scripts (directories!). With BDSM, you'll find you can
+install and manage a multitude of extensions - and even entire sets of extensions - providing
+unprecedented levels of control and automation productivity that are unleashed by the 
+creative abilities of BDSM's energetic community of extension authors :)
 
 # Creating Extensions
 
-There are only a few requirements for the 'extensions'. The extension must be a
-directory. Within this directory are (at least) the subdirectory bin/ with at
-least one executable file called 'help'. Additionally in the root of the
-extension directory there must be a text file called VERSION with a version
-number that follows semantic versioning (http://semver.org/) in the format of
-X.Y.Z where X,Y and Z are positive integers. An extension must also have a
-README file in which you should explain about the extension.
+There are only a few requirements when creating your own BDSM extensions. 
+The extension must live in a dedicated directory. Within this directory are 
+(at least) the subdirectory bin/, containing at least one executable file called 'help'. 
 
-The contents of the bin directory can be *any* execuatble file.  This means for
-example that C compiled binaries, Ruby Scripts, python, lua, etc... may all be
-used according to requrements and/or user preferences.  Of course the extensions
-which *I* write will likely be in bash ;) Additionally if you write your
-extensions in bash a nice DSL is automatically loaded for you. Read more
-about the DSL in the online documentation.
+Additionally, in the root of the extension directory you must include a text file called VERSION,
+with a version number that follows semantic versioning convention (http://semver.org/);
+that is, in the format of X.Y.Z, where X,Y and Z are positive integers. 
+
+An extension must also have a README file, in which you should explain your
+extension's primary purpose, and any special considerations to be kept in mind 
+when using it.
+
+The contents of the bin directory can be *any* executable file. This means, for
+example, that C-compiled binaries, Ruby Scripts, python, lua, etc... may all be
+used according to your requirements and preferences.  
+
+Of course, the extensions *I* write are generally in bash; but you can bring your 
+own implements of choice to the BDSM party ;) 
+
+Additionally, if you write your extensions in bash, a nice DSL is automatically loaded for you.
+You can read more about the DSL in the online documentation.
 
   ~Wayne
 

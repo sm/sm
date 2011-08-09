@@ -2,18 +2,18 @@
 
 # ## package\_error
 #
-# Presents the user with a package related error message including the tail
+# Presents the user with a package-related error message, including the tail
 # of an optional log file.
 #
 # ### Input Parameters
 #
-# String to be logged, an optional log file containing more details and
-# an optional number of lines of the file to show (defaults to 25)
+# String to be logged; an optional log file containing more details, and
+# an optional number of lines of the file to show (defaults to 25).
 #
 # ### Stream Outputs
 #
-# Prints arguments passed in to the calling environments STDOUT with a newline
-# character appended and 'ERROR ' prepended.
+# Prints arguments passed in to the calling environment's STDOUT,
+# with a newline character appended, and 'ERROR ' prepended.
 #
 # ### Environmental effects
 #
@@ -47,7 +47,7 @@ package_error()
   local _message=$1
   if [[ -z "${_message}" ]]
   then
-    fail "Cannot print a package error as no message was provided."
+    fail "Cannot print a package error, as no message was provided."
   fi
   local _log=$2
 
@@ -99,8 +99,8 @@ package_error()
 #
 # ### Notes
 #
-# For readability it is recommended to split the line into "key value" lines by
-# ending the line with a singele backslash '\' character with no space afterwards.
+# For readability, it is recommended to split the line into "key value" lines by
+# ending the line with a single backslash '\' character, with no space afterwards.
 #
 package_definition()
 {
@@ -167,7 +167,7 @@ package_definition()
       #  eval "${key}=${value}"
       #  ;;
       *)
-        fail "Unknown key '${key}' (value: ${value})"
+        fail "Unknown key '${key}' (value: ${value})."
       ;;
     esac
   done
@@ -228,8 +228,8 @@ package_install()
   && [[ "$1" != "--force" ]]
   then
     log "
-Package ${package_name} ${package_version} already installed
-To force call:
+Package ${package_name} ${package_version} already installed.
+To force, call:
 
   bdsm ${package_name} package install --force
 "
@@ -246,7 +246,7 @@ To force call:
   then
     "${package_name}_dependencies"
   else
-    log "Installing dependencies for ${package_name} ${package_version}"
+    log "Installing dependencies for ${package_name} ${package_version}."
     package_dependencies
   fi
 
@@ -286,7 +286,7 @@ To force call:
   then
     "${package_name}_configure"
   else
-    log "Configuring ${package_name} ${package_version}"
+    log "Configuring ${package_name} ${package_version}."
     package_configure
   fi
 
@@ -299,7 +299,7 @@ To force call:
   then
     "${package_name}_build"
   else
-    log "Building ${package_name} ${package_version}"
+    log "Building ${package_name} ${package_version}."
     package_build
   fi
 
@@ -314,7 +314,7 @@ To force call:
   then
     "${package_name}_install"
   else
-    log "Installing ${package_name} ${package_version}"
+    log "Installing ${package_name} ${package_version}."
     package_make_install
   fi
 
@@ -341,7 +341,7 @@ package_update()
   # TODO: check if newer version exists, if so then...
   if package_installed | grep -q "${package_version}" && [[ "$1" != "--force" ]]
   then
-    log "Package ${package_name} already installed in (latest) version ${package_version}"
+    log "Package ${package_name} already installed in (latest) version ${package_version}."
   else
     package_install --force
     package_activate ${package_name} ${package_version}
@@ -395,7 +395,7 @@ package_fetch_md5()
   if [[ -z "${package_md5}" && -n "${package_md5_url}" ]]
   then
     curl -L "${packge_md5_url}" -o "${archives_path}/${package_file}.md5" 2>/dev/null ||
-      error "Fetching md5 from '${package_md5_url}' failed."
+      error "Fetching MD5 checksum from '${package_md5_url}' failed."
 
     package_md5=$(cat "${archives_path}/${package_file}.md5")
 
@@ -509,7 +509,7 @@ package_configure()
   then
     return 0
   else
-    package_error "Configuration of ${package_name} ${package_version} failed" "configure.log"
+    package_error "Configuration of ${package_name} ${package_version} failed." "configure.log"
   fi
 }
 
@@ -679,7 +679,7 @@ package_make_install()
 #
 # ### Failure Scenarios
 #
-# Errors halting program if activateing fails for any reason.
+# Errors halting program if activating fails for any reason.
 #
 # ### Usage Examples
 #
@@ -705,7 +705,7 @@ package_activate()
       package_deactivate "${_package}"
     fi
 
-    log "Activating ${_package} ${_version}"
+    log "Activating ${_package} ${_version}."
 
     _paths=($( find "${install_path}" -type d ))
     for _path in "${_paths[@]}"
@@ -723,7 +723,7 @@ package_activate()
     link --force "${install_path}" \
       to "${packages_path}/${_package}/active"
   else
-    warn "Skipping activation of ${_package} ${_version} "\
+    warn "Skipping activation of ${_package} ${_version}, "\
       "as '${install_path}' does not exist."
   fi
 
@@ -734,7 +734,7 @@ package_activate_action()
 {
   if [[ -z "${package_version}" ]]
   then
-    error "You need to specify version to activate:\n  bdsm ${package_name}:<version> activate\n  bdsm ${package_name} activate --version <version>"
+    error "You need to specify a version to activate:\n  bdsm ${package_name}:<version> activate\n  bdsm ${package_name} activate --version <version>"
   fi
   package_activate ${package_name} ${package_version}
 }
@@ -831,7 +831,7 @@ package_deactivate()
 
   variables_must_be_nonempty _package
 
-  log "Deactivating ${_package}"
+  log "Deactivating ${_package}."
 
   if symlink_exists "${packages_path}/${_package}/active"
   then
@@ -863,7 +863,7 @@ package_deactivate()
     fi
   done
 
-  log "${_package} deactivated"
+  log "${_package} deactivated."
 }
 
 #
@@ -912,7 +912,7 @@ package_activate_if_first()
     symlink_exists "${packages_path}/${_package}/active" ||
       package_activate "${_package}" "${_version}"
   else
-    log "'${install_path}' not found, skipping activation."
+    log "'${install_path}' not found; skipping activation."
   fi
 }
 
@@ -971,10 +971,10 @@ package_ldconfig()
         chmod_files 0644 "/etc/ld.so.conf.d/bdsm.conf"
       fi
 
-      log "Updating ldconfig for ${_package}"
+      log "Updating ldconfig for ${_package}."
       ldconfig
     elif os_is_darwin
-    then # Cluster Fuck.
+    then # Cluster Fuck!
       true
       # This should be handled by the profile.d?
       # _files=($(find "${packages_path}/${_package}/active" -mindepth 1 -maxdepth 1 -type d))
@@ -986,7 +986,7 @@ package_ldconfig()
 #
 # ## package\_profile\_d
 #
-# Sets up system level profile_d configuration for the package
+# Sets up system level profile_d configuration for the package.
 #
 # ### Input Parameters
 #
@@ -998,7 +998,7 @@ package_ldconfig()
 #
 # ### Environmental effects
 #
-# Updates profile_d configuration for the given package
+# Updates profile_d configuration for the given package.
 #
 # ### Return Codes
 #
@@ -1036,7 +1036,7 @@ package_profile_d()
 #
 # ## package\_uninstall
 #
-# Uninstalls the package
+# Uninstalls the package.
 #
 # ### Input Parameters
 #
@@ -1044,7 +1044,7 @@ package_profile_d()
 #
 # ### Stream Outputs
 #
-# none.
+# None.
 #
 # ### Environmental effects
 #
@@ -1096,7 +1096,7 @@ package_uninstall()
 #
 # ### Stream Outputs
 #
-# none.
+# None.
 #
 # ### Environmental effects
 #
@@ -1138,7 +1138,7 @@ package_patch()
     return 0
   fi
 
-  log "Applying patches for ${package_name} ${package_version}"
+  log "Applying patches for ${package_name} ${package_version}."
 
   package_apply_patches "${_patches[@]}"
 
@@ -1210,7 +1210,7 @@ package_apply_patches()
       log "TODO: patch application is NIY"
     done
   else
-    fail "Cannot apply patches as no patches were given."
+    fail "Cannot apply patches, as no patches were given."
   fi
 }
 
@@ -1229,7 +1229,7 @@ package_apply_patches()
 #
 # ### Environmental effects
 #
-# Updates usage configuration for the given package
+# Updates usage configuration for the given package.
 #
 # ### Return Codes
 #
@@ -1270,7 +1270,7 @@ package_usage() {
 #
 # ## package\_cli
 #
-# Parses package CLI arguments
+# Parses package CLI arguments.
 #
 # ### Input Parameters
 #
@@ -1282,7 +1282,7 @@ package_usage() {
 #
 # ### Environmental effects
 #
-# Updates cli configuration for the given package
+# Updates cli configuration for the given package.
 #
 # ### Return Codes
 #
@@ -1396,14 +1396,14 @@ package_cli()
   #  configure_flags+=( --enable-shared )
   #fi
 
-  # explicitely reload the package module to pickup any CLI overrides.
+  # Explicitly reload the package module to pickup any CLI overrides.
   modules_reinitialize package
 }
 
 #
 # ## package\_active
 #
-# Parses package active arguments
+# Parses package active arguments.
 #
 # ### Input Parameters
 #
@@ -1415,7 +1415,7 @@ package_cli()
 #
 # ### Environmental effects
 #
-# Updates active configuration for the given package
+# Updates active configuration for the given package.
 #
 # ### Return Codes
 #
@@ -1462,14 +1462,14 @@ package_is_active()
     fi
 
   else
-    fail "Can not query if a package is active as no package name was given or name is empty."
+    fail "Cannot query if a package is active, as no package name was given, or name is empty."
   fi
 }
 
 #
 # ## package\_must\_be\_active
 #
-# Parses package must be arguments
+# Parses package must be arguments.
 #
 # ### Input Parameters
 #
@@ -1481,7 +1481,7 @@ package_is_active()
 #
 # ### Environmental effects
 #
-# Updates must be configuration for the given package
+# Updates must be configuration for the given package.
 #
 # ### Return Codes
 #
@@ -1509,17 +1509,17 @@ package_must_be_active()
     then
       return 0
     else
-      error "Install/activate the node package extension before installing ${_name}."
+      error "Install/activate the node package extension, before installing ${_name}."
     fi
   else
-    fail "Can not ensure that package is active as no package name was given or name is empty."
+    fail "Cannot ensure that package is active, as no package name was given (or name is empty.)"
   fi
 }
 
 #
 # ## packages\_must\_be\_active
 #
-# Parses package must_be_active arguments
+# Parses package must_be_active arguments.
 #
 # ### Input Parameters
 #
@@ -1531,7 +1531,7 @@ package_must_be_active()
 #
 # ### Environmental effects
 #
-# Updates must_be_active configuration for the given package
+# Updates must_be_active configuration for the given package.
 #
 # ### Return Codes
 #
@@ -1560,15 +1560,15 @@ packages_must_be_active()
       package_must_be_active "${_package}"
     done
   else
-    fail "Can not ensure that packages are active as no packages were given."
+    fail "Cannot ensure that packages are active, as no packages were given."
   fi
 }
 
 #
 # ## package\_docs
 #
-# Opens package documentation website either in the web browser (if able) or via
-# curl through PAGER (defaulting to less).
+# Opens package documentation website, either in the web browser (if able),
+# or via curl through PAGER (defaulting to less).
 #
 # ### Input Parameters
 #
@@ -1576,11 +1576,11 @@ packages_must_be_active()
 #
 # ### Stream Outputs
 #
-# None if can open web browser or website docs in PAGER otherwise.
+# None, if can open web browser or website docs in PAGER otherwise.
 #
 # ### Environmental effects
 #
-# Web browser will open with documentation url if able.
+# Documentation opens in web browser or PAGER.
 #
 # ### Return Codes
 #
@@ -1600,7 +1600,7 @@ packages_must_be_active()
 #
 package_docs()
 {
-  # TODO: move this logic into a core dsl function.
+  # TODO: move this logic into a core DSL function.
   if os_is_darwin
   then
     open $package_docs_url
@@ -1626,7 +1626,7 @@ package_docs()
 #
 # ## package\_website
 #
-# Opens package documentation website either in the web browser (if able) or via
+# Opens package documentation website, either in the web browser (if able) or via
 # curl through PAGER (defaulting to less).
 #
 # ### Input Parameters
@@ -1659,7 +1659,7 @@ package_docs()
 #
 package_website()
 {
-  # TODO: move this logic into a core dsl function.
+  # TODO: move this logic into a core DSL function.
   if os_is_darwin
   then
     open $package_website_url
@@ -1695,8 +1695,8 @@ package_dependencies()
   do
     if ! package_is_active ${dependency/-/ }
     then
-      error "${extension} requires ${dependency}, please install the ${dependency} via bdsm package module and retry.
-Typically this would be done as follows:
+      error "${extension} requires ${dependency}; please install the ${dependency} via bdsm package module, and retry.
+Typically, this can be done as follows:
 
 sudo bdsm ${dependency} package install
 

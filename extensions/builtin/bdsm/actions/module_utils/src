@@ -4,6 +4,6 @@ if array_is_nonempty extension_args
 then
   printf "${extensions_development_path}/${extension_args[0]}/"
 else
-  fail "An extension name must be specified."
+  fail "You must specify at least one extension name."
 fi
 
