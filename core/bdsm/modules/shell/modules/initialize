@@ -11,10 +11,10 @@ then
 
   #core is loaded as BDSM starts
   modules=(
-    "core/core=builtin/core/modules/shell/core"
-    "core/string=builtin/core/modules/shell/string"
-    "core/logging=builtin/core/modules/shell/logging"
-    "core/modules=builtin/core/modules/shell/modules"
+    "bdsm/core=core/bdsm/modules/shell/core"
+    "bdsm/string=core/bdsm/modules/shell/string"
+    "bdsm/logging=core/bdsm/modules/shell/logging"
+    "bdsm/modules=core/bdsm/modules/shell/modules"
   )
 
   for module_def in ${modules[@]}

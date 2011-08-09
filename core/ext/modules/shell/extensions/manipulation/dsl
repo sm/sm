@@ -216,15 +216,15 @@ extension_install()
     if extension_is_valid "${extensions_src_path}/${_src}"
     then
       log "Installing ${_extension}"
-      if path_exists "${bdsm_path}/extensions/external/${_extension}"
+      if path_exists "${bdsm_path}/exts/${_extension}"
       then
-        remove_paths "${bdsm_path}/extensions/external/${_extension}"
+        remove_paths "${bdsm_path}/exts/${_extension}"
       fi
 
       copy_directory "${extensions_src_path}/${_src}" \
-        to "${bdsm_path}/extensions/external/${_extension}"
+        to "${bdsm_path}/exts/${_extension}"
 
-      write "${extension_uri}" to "${bdsm_path}/extensions/external/${_extension}/.uri"
+      write "${extension_uri}" to "${bdsm_path}/exts/${_extension}/.uri"
 
       #
       # TODO: Process extension dependencies...

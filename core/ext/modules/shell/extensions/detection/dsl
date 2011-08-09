@@ -467,7 +467,7 @@ extension_action()
   || in_search_paths detect_unique_2nd_level_action "${extension_args[@]}" \
   || in_search_paths detect_modules_action "${extension_args[@]}"
   then
-    log_search action "$action" "${action_path##${bdsm_path}\/extensions\/} params:${extension_args[@]}"
+    log_search action "$action" "${action_path##${bdsm_path}\/} params:${extension_args[@]}"
   else
     if in_search_paths detect_extension_existence "${extension_args[@]}" \
     && [[ "${extension}" == "${extension_args}" ]]

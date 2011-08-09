@@ -57,7 +57,7 @@ sets_list_known()
 {
   local COLUMNS=80
   awk -F = '/^[^#]/ {printf "# %18s | %s\n", $1, $2 }' <<<"Set name=Repository"
-  awk -F = '/^[^#]/ {printf "%20s   %s\n", $1, $2 }' < "${bdsm_path}/extensions/builtin/bdsm/config/known_sets"
+  awk -F = '/^[^#]/ {printf "%20s   %s\n", $1, $2 }' < "${bdsm_path}/core/cli/config/known_sets"
 }
 
 sets_install()
@@ -70,7 +70,7 @@ sets_install()
     error "builtin extension set may not be (re-)installed, except by updating BDSM core (bdsm get head)."
 
   [[ -n "${_uri}" ]] ||
-    _uri=$( awk -F = "/^${_name}=/ {print \$2 }" < "${bdsm_path}/extensions/builtin/bdsm/config/known_sets" )
+    _uri=$( awk -F = "/^${_name}=/ {print \$2 }" < "${bdsm_path}/core/cli/config/known_sets" )
 
   [[ -n "${_uri}" ]] ||
     error "Cannot find ${_name} in known extension sets list."
@@ -90,7 +90,7 @@ sets_install_all()
 {
   local _set _name _uri COLUMNS=80
 
-  for _set in $( awk '/^[^#]/' < "${bdsm_path}/extensions/builtin/bdsm/config/known_sets" )
+  for _set in $( awk '/^[^#]/' < "${bdsm_path}/core/cli/config/known_sets" )
   do
     _name="${_set%%=*}"
     _uri="${_set##*=}"
@@ -193,7 +193,7 @@ sets_check_availability()
 {
   # TODO: refactor this to take argument of uri to check instead.
   #       provide check_known_sets_availability or some such to wrap this.
-  awk -F = '/^[^#]/ {printf "%20s   %s\n", $1, $2 }' < "${bdsm_path}/extensions/builtin/bdsm/config/known_sets" |
+  awk -F = '/^[^#]/ {printf "%20s   %s\n", $1, $2 }' < "${bdsm_path}/core/cli/config/known_sets" |
   "${bdsm_path}/bin/bdsm-ll" \
     printf "%s: " {} \; curl -s --head https://github.com/wayneeseguin/bdsm-{} \| awk "'/Status/{print \$2}'"
 }

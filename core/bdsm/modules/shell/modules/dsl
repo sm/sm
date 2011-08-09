@@ -45,7 +45,8 @@ init_extensions_search_paths()
 {
   if [[ -z "${extensions_search_paths[*]}" ]]
   then
-    extensions_search_paths=( )
+    extensions_search_paths=( "${bdsm_path}/exts" )
+
     local extension
     for extension in ${extension_sets_path}/*
     do
@@ -68,9 +69,9 @@ init_extensions_search_paths()
     fi
   fi
 
-  if ! string_contains "${extensions_search_paths[*]}" "${bdsm_path}/extensions/builtin"
+  if ! string_contains "${extensions_search_paths[*]}" "${bdsm_path}/core"
   then
-    extensions_search_paths+=( "${bdsm_path}/extensions/builtin" )
+    extensions_search_paths+=( "${bdsm_path}/core" )
   fi
   export extensions_search_paths
 }
@@ -130,7 +131,7 @@ in_search_paths()
   trace_filter search
   local callback=$1
   shift
-  local args=( "$@" ) path builtin_extension
+  local args=( "$@" ) path
 
   for path in "${extensions_search_paths[@]}"
   do
@@ -140,7 +141,7 @@ in_search_paths()
     fi
   done
 
-  if "${callback}" "${bdsm_path}/extensions/builtin" "bdsm" "${args[@]}"
+  if "${callback}" "${bdsm_path}/core" "cli" "${args[@]}"
   then
     return 0
   fi
@@ -193,8 +194,8 @@ module()
   # Search for module.
   if in_search_paths detect_module "${_module}"
   then
-    log_search module "$module_name" "${module_path##${bdsm_path}\/extensions\/}"
-    modules+=("${module_name}=${module_path##${bdsm_path}\/extensions\/}")
+    log_search module "$module_name" "${module_path##${bdsm_path}\/}"
+    modules+=("${module_name}=${module_path##${bdsm_path}\/}")
   else
     log_search module "${_module}" "Not found !!!"
     return 1
@@ -213,10 +214,10 @@ module()
   # Load module dependencies.
   if [[ -s "${module_path}/modules" ]]
   then
-    for _module_dependency in $( cat ${module_path}/modules )
+    for _module_dependency in $( cat ${_module_path}/modules )
     do
       module_or_error "${_module_dependency}" \
-        "Could not find module dependency '${_module_dependency}' from '${_module_path##${bdsm_path}\/extensions\/}/modules'."
+        "Could not find module dependency '${_module_dependency}' from '${_module_path##${bdsm_path}\/}/modules'."
     done
   fi
 

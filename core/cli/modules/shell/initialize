@@ -19,7 +19,7 @@ true \
   ${remote:="origin"} \
   ${branch:="master"}
 
-for config in "${bdsm_path}/extensions/core/config/defaults" "${bdsm_path}/extensions/core/config/defaults"
+for config in "${bdsm_path}/core/bdsm/config/defaults" "${bdsm_path}/core/bdsm/config/defaults"
 do
   if file_exists "$config"
   then

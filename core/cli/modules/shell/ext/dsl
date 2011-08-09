@@ -29,7 +29,7 @@ ext_help()
 ext_list()
 {
   local extensions COLUMNS=80
-  extensions_in "${bdsm_path}/extensions/ext"
+  extensions_in "${bdsm_path}/exts"
   extensions=( ${found_extensions[@]} )
 
   if array_is_nonempty extensions
@@ -46,7 +46,7 @@ ext_list_known()
   local COLUMNS=80
 
   awk -F = '/^[^#]/ {printf "# %18s | %s\n", $1, $2 }' <<<"Extension name=Repository"
-  awk -F = '/^[^#]/ {printf "%20s   %s\n", $1, $2 }' < "${bdsm_path}/extensions/builtin/bdsm/config/known_ext"
+  awk -F = '/^[^#]/ {printf "%20s   %s\n", $1, $2 }' < "${bdsm_path}/core/cli/config/known_ext"
 }
 
 ext_install()
@@ -55,7 +55,7 @@ ext_install()
 
   shift || fail "Cannot install extension ext without name."
   [[ -n "${_uri}" ]] ||
-    _uri=$( awk -F = "/^${_name}=/ {print \$2 }" < "${bdsm_path}/extensions/builtin/bdsm/config/known_ext" )
+    _uri=$( awk -F = "/^${_name}=/ {print \$2 }" < "${bdsm_path}/core/cli/config/known_ext" )
 
   [[ -n "${_uri}" ]] ||
     error "Cannot find ${_name} in known extension ext list."
@@ -63,7 +63,7 @@ ext_install()
   local _identifier="$(scm_identifier "${_uri}")"
 
   log_step "bdsm_${_name}" # TODO: if fail, log_step failure
-  enter "${bdsm_path}/extensions/ext"
+  enter "${bdsm_path}/exts"
   fetch_uri "${_uri}" "${src_path}/${_identifier}"
   remove_paths "${_name}"
   copy_directory "${src_path}/${_identifier}" to "${_name}"
@@ -73,7 +73,7 @@ ext_install()
 ext_install_all()
 {
   local _set _name _uri COLUMNS=80
-  for _set in $( awk '/^[^#]/' < "${bdsm_path}/extensions/builtin/bdsm/config/known_ext" )
+  for _set in $( awk '/^[^#]/' < "${bdsm_path}/core/cli/config/known_ext" )
   do
     _name="${_set%%=*}"
     _uri="${_set##*=}"
@@ -95,16 +95,16 @@ ext_update()
         error "Extension ${_name} cannot be updated."
         ;;
     esac
-    if [[ ! -d "${bdsm_path}/extensions/ext/${_name}" ]]
+    if [[ ! -d "${bdsm_path}/exts/${_name}" ]]
     then
       error "Extension ${_name} does not exist."
     fi
-    if [[ ! -s "${bdsm_path}/extensions/ext/${_name}/.uri" ]]
+    if [[ ! -s "${bdsm_path}/exts/${_name}/.uri" ]]
     then
       log "Extension ${_name} does not contain stored uri.\n"
       continue
     fi
-    _uri=$( cat "${bdsm_path}/extensions/ext/${_name}/.uri" )
+    _uri=$( cat "${bdsm_path}/exts/${_name}/.uri" )
     if [[ -z "${_uri}" ]]
     then
       log "Extension ${_name} does not contain stored uri."
@@ -141,7 +141,7 @@ ext_uninstall()
       error "Extension ${_name} cannot be removed."
       ;;
   esac
-  enter "${bdsm_path}/extensions/ext"
+  enter "${bdsm_path}/exts"
   if [[ ! -d "${_name}" ]]
   then
     error "Please specify a valid extension name."
@@ -155,7 +155,7 @@ ext_uninstall()
 
 ext_check_availability()
 {
-  awk -F = '/^[^#]/ {printf "%20s   %s\n", $1, $2 }' < "${bdsm_path}/extensions/builtin/bdsm/config/known_ext" |
+  awk -F = '/^[^#]/ {printf "%20s   %s\n", $1, $2 }' < "${bdsm_path}/core/cli/config/known_ext" |
   "${bdsm_path}/bin/bdsm-ll" \
     printf "%s: " {} \; curl -s --head https://github.com/wayneeseguin/bdsm-{} \| awk "'/Status/{print \$2}'"
 }

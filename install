@@ -18,7 +18,7 @@ install_path="${bdsm_path}" # Path to install everything to.
 archives_path="${bdsm_path}/archives"
 scm_path="${bdsm_path}/scm"
 src_path="${bdsm_path}/src"
-extension_sets_home="${bdsm_path}/extensions"
+extension_sets_home="${bdsm_path}/sets"
 
 export install_path archives_path scm_path src_path extension_sets_home
 

@@ -54,7 +54,7 @@ template_exists()
 {
   if in_search_paths detect_template "$@"
   then
-    log_search "template" "$template_name" "${template_path##${bdsm_path}\/extensions\/}"
+    log_search "template" "$template_name" "${template_path##${bdsm_path}\/}"
     return 0
   else
     return 1

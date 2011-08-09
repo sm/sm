@@ -2,4 +2,4 @@ ext/system
 ext/filesystem
 ext/environment
 ext/vcs
-bdsm/module_utils
+cli/module_utils

@@ -1033,8 +1033,7 @@ service_install_init_d()
           mode 0755
       else
         # Use core srv init.d template
-        install_template "init.d" \
-          from "${bdsm_path}/extensions/builtin/srv/templates" \
+        install_template "cli/init.d" \
           to "${init_scripts_path}/${_service}" mode 0755
 
         seed_template "${init_scripts_path}/${_service}" \

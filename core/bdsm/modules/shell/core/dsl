@@ -64,7 +64,7 @@ bdsm_exports()
 #
 bdsm_version()
 {
-  if file_is_nonempty "$bdsm_path/VERSION"
+  if [[ -s "$bdsm_path/VERSION" ]]
   then
     read -r bdsm_version < "$bdsm_path/VERSION"
   else
