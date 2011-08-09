@@ -40,7 +40,7 @@ true \
   "${md5_path:="${bdsm_path}/md5"}" \
   "${archives_path:="${bdsm_path}/archives"}" \
   "${scm_path:="${bdsm_path}/scm"}" \
-  "${extension_sets_path:="${bdsm_path}/extensions"}" \
+  "${extensions_path:="${bdsm_path}/extensions"}" \
   "${extensions_src_path:="${src_path}/extensions"}" \
   "${tmp_path:="${bdsm_path}/tmp"}" \
   "${bin_path:="${bdsm_path}/bin"}" \

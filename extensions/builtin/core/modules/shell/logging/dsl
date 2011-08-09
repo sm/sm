@@ -763,34 +763,37 @@ backtrace()
 
 log_step()
 {
-  local _message="${1:-}" _status="${2:-}" _unicode=0
+  local _message="${1:-}" _unicode=0
 
   if [[ -z "${LANG:-}" || "${LANG}" = *UTF* || "${LANG}" = *utf8* ]]
   then
     _unicode=1
   fi
 
-  case "${_status}" in
+  case "${_message}" in
     fail*)
       if (( _unicode == 1 ))
       then
-        printf "\r  [\033[32m✘\033[0m] %s\n" "${_message}     "
+        printf "\r  [\033[32m✘\033[0m] %78s\n" "${log_step_message:-"done."}"
       else
-        printf "\r  [\033[32mX\033[0m] %s\n" "${_message}     "
+        printf "\r  [\033[32mX\033[0m] %78s\n" "${log_step_message:-"done."}"
       fi
+      unset log_step_message
       ;;
 
     succ*)
       if (( _unicode == 1 ))
       then
-        printf "\r  [\033[32m✔\033[0m] %s\n" "${_message}     "
+        printf "\r  [\033[32m✔\033[0m] %78s\n" "${log_step_message:-"done."}"
       else
-        printf "\r  [\033[32m@\033[0m] %s\n" "${_message}     "
+        printf "\r  [\033[32m@\033[0m] %78s\n" "${log_step_message:-"done."}"
       fi
+      unset log_step_message
       ;;
 
     *)
-      printf "  [ ] %s" "${_message}..."
+      log_step_message="${_message}"
+      printf "  [ ] %78s" "${log_step_message}..."
       ;;
   esac
 }

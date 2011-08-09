@@ -67,7 +67,7 @@ ext_install()
   fetch_uri "${_uri}" "${src_path}/${_identifier}"
   remove_paths "${_name}"
   copy_directory "${src_path}/${_identifier}" to "${_name}"
-  log_step "bdsm_${_name}" success
+  log_step success
 }
 
 ext_install_all()

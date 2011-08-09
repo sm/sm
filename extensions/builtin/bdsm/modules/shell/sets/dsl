@@ -70,11 +70,11 @@ sets_install()
   local _identifier="$(scm_identifier "${_uri}")"
 
   log_step "bdsm-${_name}" # TODO: if fail, log_step failure
-  enter "${extension_sets_path}"
+  enter "${extensions_path}"
   fetch_uri "${_uri}" "${src_path}/${_identifier}"
   remove_paths "${_name}"
   copy_directory "${src_path}/${_identifier}" to "${_name}"
-  log_step "bdsm-${_name}" success
+  log_step success
 }
 
 sets_install_all()
@@ -153,7 +153,7 @@ sets_uninstall()
       error "Extension set ${_name} cannot be removed."
       ;;
   esac
-  enter "${extension_sets_path}"
+  enter "${extensions_path}"
   if [[ ! -d "${_name}" ]]
   then
     error "Please specify a valid extension name."

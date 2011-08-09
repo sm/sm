@@ -18,8 +18,8 @@ install_path="${bdsm_path}" # Path to install everything to.
 archives_path="${bdsm_path}/archives"
 scm_path="${bdsm_path}/scm"
 src_path="${bdsm_path}/src"
-extension_sets_path="${bdsm_path}/extensions"
+extensions_path="${bdsm_path}/extensions"
 
-export install_path archives_path scm_path src_path extension_sets_path
+export install_path archives_path scm_path src_path extensions_path
 
 ./local --call=install/install_bdsm

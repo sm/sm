@@ -10,11 +10,13 @@ prepare_for_installation()
 {
   local directory
 
-  log "  Ensuring that install_path '${install_path}' exists."
+  log_step "Ensuring that install_path '${install_path}' exists."
   ensure_paths_exist "${install_path}"
+  log_step success
+
   enter "${install_path}"
 
-  log "  Cleansing installation path."
+  log_step "Creating installation paths."
   for directory in "${cleanse_paths[@]}"
   do
     if path_exists "./${directory}"
@@ -22,8 +24,8 @@ prepare_for_installation()
       rm -rf "./${directory}"
     fi
   done
+  log_step success
 
-  log "  Creating installation paths."
   ensure_paths_exist "${directories[@]}" "${aux_paths[@]}"
 }
 
@@ -35,32 +37,34 @@ install_dependencies_extension_set()
     sets_install "dependencies" "wayneeseguin/bdsm-dependencies"
 
     write "git://github.com/wayneeseguin/bdsm-dependencies.git" \
-      to "${extension_sets_path}/dependencies/.uri"
+      to "${extensions_path}/dependencies/.uri"
   fi
 }
 
 migrate_external_to_ext()
 {
-  if path_exists "${extension_sets_path}/external" \
-  && ! file_exists "${extension_sets_path}/external/.uri"
+  if path_exists "${extensions_path}/external" \
+  && ! file_exists "${extensions_path}/external/.uri"
   then
-    log "  Migrating external -> ext"
-    move_directory "${extension_sets_path}/external" "${extension_sets_path}/ext"
+    log_step "  Migrating external -> ext"
+    move_directory "${extensions_path}/external" "${extensions_path}/ext"
   fi
 }
 
 install_core()
 {
   local _dir
-  log "  Installing core directories (${directories[*]}) into ${install_path}."
-
+  log_step "  Installing core directories (${directories[*]}) into ${install_path}."
   copy_paths --force to "${install_path}/" "${directories[@]}"
+  log_step success
 
-  log "  Installing core files (${files[*]}) into ${install_path}."
+  log_step "  Installing core files (${files[*]}) into ${install_path}."
   copy_files to "${install_path}" ${files[@]}
+  log_step success
 
-  log "  Installing builtin extensions."
+  log_step "  Installing builtin extensions."
   copy_paths --force to "${install_path}/extensions/" "extensions/builtin"
+  log_step success
 
 }
 
