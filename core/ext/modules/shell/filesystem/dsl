@@ -3435,9 +3435,9 @@ write()
 
       if (( _append_flag == 1 ))
       then
-        ${_prefix} printf "${_message}\n" >> "${_file}"
+        printf "${_message}\n" | ${_prefix} tee -a "${_file}" >/dev/null
       else
-        ${_prefix} printf "${_message}\n" > "${_file}"
+        printf "${_message}\n" | ${_prefix} tee "${_file}" >/dev/null
       fi
     else
       printf "${_message}\n"
