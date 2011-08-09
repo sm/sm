@@ -7,6 +7,7 @@ if [[ -z "${bdsm_path}" ]]
 then
   if (( UID == 0 ))
   then
+    prefix_path="/usr/local"
     bdsm_path="/usr/local/bdsm"
   else
     bdsm_path="$HOME/.bdsm"
