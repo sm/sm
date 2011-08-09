@@ -60,6 +60,14 @@ true \
 
 user_shell=$(which $(ps -eo pid,comm | awk "{ if ($PPID == \$1) print \$2}") )
 
+case "${user_shell}" in
+  *sh)
+  ;;
+  *)
+  user_shell=$(which $(ps -eo pid,comm | awk "{ if ($$ == \$1) print \$2}") )
+  ;;
+esac
+
 if [[ -z "${extension_sets_home}" ]]
 then
   if [[ -w "${extension_sets_path}" ]]
