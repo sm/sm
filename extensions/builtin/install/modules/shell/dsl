@@ -169,7 +169,7 @@ set_bdsm_path()
 
 install_bdsm()
 {
-  log "\nInstalling BDSM Framework into ${install_path}.\n"
+  log "\nInstalling BDSM Framework to ${install_path}.\n"
 
   prepare_for_installation
 
@@ -189,5 +189,5 @@ install_bdsm()
 
   perform install_dependencies_extension_set
 
-  succeed "\nFramework installed to ${install_path}!\n"
+  succeed "\nFramework installed to ${install_path} !\n"
 }
