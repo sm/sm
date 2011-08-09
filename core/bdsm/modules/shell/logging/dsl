@@ -758,6 +758,8 @@ backtrace()
   if [[ "${_flag}" != "no_exit" ]]
   then
     kill -s USR2 $APP_PID # to exit application, not current subshell.
+  else
+    return 0
   fi
 }
 
