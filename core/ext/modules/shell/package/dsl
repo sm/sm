@@ -240,25 +240,25 @@ To force, call:\n\tbdsm ${package_name} package install --force\n"
 
   if command_exists "${package_name}_dependencies"
   then
-    log_step "Installing dependencies for ${package_name} ${package_version}." \
+    log_step "${package_name} ${package_version} ~ dependencies." \
       "${package_name}_dependencies"
   else
-    log_step "Installing dependencies for ${package_name} ${package_version}." \
+    log_step "${package_name} ${package_version} ~ dependencies." \
       package_dependencies
   fi
 
   if command_exists "${package_name}_prefetch"
   then
-    log_step "Runing prefetch for ${package_name} ${package_version}." \
+    log_step "${package_name} ${package_version} ~ prefetch." \
       "${package_name}_prefetch"
   fi
 
   if command_exists "${package_name}_fetch"
   then
-    log_step "Downloading ${package_name} ${package_version}." \
+    log_step "${package_name} ${package_version} ~ download." \
       "${package_name}_fetch"
   else
-    log_step "Downloading ${package_name} ${package_version}." \
+    log_step "${package_name} ${package_version} ~ download." \
       package_fetch
   fi
 
@@ -266,22 +266,22 @@ To force, call:\n\tbdsm ${package_name} package install --force\n"
 
   if command_exists "${package_name}_postfetch"
   then
-    log_step "Running post download for ${package_name} ${package_version}." \
+    log_step "${package_name} ${package_version} ~ postfetch." \
       "${package_name}_postfetch"
   fi
 
   if command_exists "${package_name}_patch"
   then
-    log_step "Patching ${package_name} ${package_version}." \
+    log_step "${package_name} ${package_version} ~ patch." \
       "${package_name}_patch"
   else
-    log_step "Patching ${package_name} ${package_version}." \
+    log_step "${package_name} ${package_version} ~ patch." \
       package_patch
   fi
 
   if command_exists "${package_name}_preconfigure"
   then
-    log_step "Running preconfigure for ${package_name} ${package_version}." \
+    log_step "${package_name} ${package_version} ~ preconfigure." \
       "${package_name}_preconfigure"
   fi
 
@@ -289,31 +289,31 @@ To force, call:\n\tbdsm ${package_name} package install --force\n"
   then
     "${package_name}_configure"
   else
-    log_step "Configuring ${package_name} ${package_version}." \
+    log_step "${package_name} ${package_version} ~ configure." \
       package_configure
   fi
 
   if command_exists "${package_name}_postconfigure"
   then
-    log_step "Running postconfigure for ${package_name} ${package_version}." \
+    log_step "${package_name} ${package_version} ~ postconfigure." \
       "${package_name}_postconfigure"
   fi
 
   if command_exists "${package_name}_build"
   then
-    log_step "Building ${package_name} ${package_version}." \
+    log_step "${package_name} ${package_version} ~ build." \
       "${package_name}_build"
   else
-    log_step "Building ${package_name} ${package_version}." \
+    log_step "${package_name} ${package_version} ~ build." \
       package_build
   fi
 
   if command_exists "${package_name}_preinstall"
   then
-    log_step "Running preinstall for ${package_name} ${package_version}." \
+    log_step "${package_name} ${package_version} ~ preinstall." \
       "${package_name}_preinstall"
   else
-    log_step "Running postinstall for ${package_name} ${package_version}." \
+    log_step "${package_name} ${package_version} ~ preinstall." \
       package_preinstall
   fi
 
@@ -328,7 +328,7 @@ To force, call:\n\tbdsm ${package_name} package install --force\n"
 
   if command_exists "${package_name}_postinstall"
   then
-    log_step "Running postinstall for ${package_name} ${package_version}." \
+    log_step "${package_name} ${package_version} ~ postinstall." \
       "${package_name}_postinstall"
   fi
 
@@ -336,7 +336,7 @@ To force, call:\n\tbdsm ${package_name} package install --force\n"
 
   if command_exists "${package_name}_postactivate"
   then
-    log_step "Running postactivate for ${package_name} ${package_version}." \
+    log_step "${package_name} ${package_version} ~ postactivate." \
       "${package_name}_postactivate"
   fi
 
@@ -715,7 +715,7 @@ package_activate()
       package_deactivate "${_package}"
     fi
 
-    log_step "Activating ${_package} ${_version}."
+    log_step "${package_name} ${package_version} ~ activate." \
 
     _paths=($( find "${install_path}" -type d ))
     for _path in "${_paths[@]}"
@@ -842,7 +842,7 @@ package_deactivate()
 
   variables_must_be_nonempty _package
 
-  log_step "Deactivating ${_package}."
+  log_step "${package_name} ${package_version} ~ deactivate." \
 
   if symlink_exists "${packages_path}/${_package}/active"
   then
@@ -982,9 +982,7 @@ package_ldconfig()
         chmod_files 0644 "/etc/ld.so.conf.d/bdsm.conf"
       fi
 
-      log_step "Updating ldconfig for ${_package}."
-      ldconfig
-      log_step success
+      log_step "${package_name} ${package_version} ~ ldconfig." ldconfig
     elif os_is_darwin
     then # Cluster Fuck!
       true
