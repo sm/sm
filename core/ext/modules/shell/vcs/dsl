@@ -247,7 +247,7 @@ archive_get() {
   mkdir -p "${_final_target}"
   builtin cd "${_final_target}"
 
-  case "${_archive}" in
+  case "${_uri}" in
     *.tar) # tar
       tar xf "${_archive}" ||
         error "There was an error while extracting the archive '${_archive}'."
@@ -255,6 +255,15 @@ archive_get() {
     *.tar.gz|*.tgz) # gzip
       tar zxf "${_archive}" ||
         error "There was an error while extracting the archive '${_archive}'."
+      ;;
+    *github.com/*/tarball/*)
+      tar zxf "${_archive}" ||
+        error "There was an error while extracting the archive '${_archive}'."
+      local name_pattern="${_uri#https://github.com/}"
+      name_pattern="${name_pattern%tarball/*}"
+      name_pattern="${name_pattern//\//-}"
+      mv ${name_pattern}*/* .
+      rm -rf ${name_pattern}*
       ;;
     *.tar.bz2|*.tbz2) # bzip
       tar jxf "${_archive}" ||
@@ -278,11 +287,13 @@ archive_get() {
   then
     error "Empty archive ${_archive}."
   fi
+
+  write "${_uri}" to "./.uri"
 }
 
 is_archive_uri() {
   case "$1" in
-    *.tar|*.tgz|*.txz|*.tbz2|*.xz|*.bz2|*.gz|*.zip|*.lzma)
+    *.tar|*.tgz|*.txz|*.tbz2|*.xz|*.bz2|*.gz|*.zip|*.lzma|*github.com/*/tarball/*)
       return 0
       ;;
     *)
