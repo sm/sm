@@ -169,7 +169,7 @@ set_bdsm_path()
 
 install_bdsm()
 {
-  log "Installing BDSM Framework into ${install_path}.\n"
+  log "\nInstalling BDSM Framework into ${install_path}.\n"
 
   prepare_for_installation
 
