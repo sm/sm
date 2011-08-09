@@ -235,7 +235,7 @@ archive_get() {
         return 1
       fi
     else
-      if ! curl -L "${_uri}" -o "${_archive}"
+      if ! curl -s -L "${_uri}" -o "${_archive}"
       then
         log "Downloading from '${_uri}' to '${_archive}' failed."
         return 1
