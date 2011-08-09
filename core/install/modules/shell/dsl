@@ -10,9 +10,8 @@ prepare_for_installation()
 {
   local directory
 
-  log_step "Ensuring that installation path exists."
-  ensure_paths_exist "${install_path}"
-  log_step success
+  log_step "Ensuring that installation path exists." \
+    ensure_paths_exist "${install_path}"
 
   enter "${install_path}"
 
@@ -48,45 +47,37 @@ migrate_ext()
     if path_exists "${install_path}/extensions/ext" \
     && ! file_exists "${install_path}/extensions/ext/.uri"
     then
-      log_step "  Migrating ext -> exts"
-      move_directory "${install_path}/extensions/ext" "${install_path}/exts"
-      log_step success
+      log_step "  Migrating ext -> exts" \
+        move_directory "${install_path}/extensions/ext" "${install_path}/exts"
     fi
     if path_exists "${install_path}/extensions/external" \
     && ! file_exists "${install_path}/extensions/external/.uri"
     then
-      log_step "  Migrating external -> exts"
-      move_directory "${install_path}/extensions/external" "${install_path}/exts"
-      log_step success
+      log_step "  Migrating external -> exts" \
+        move_directory "${install_path}/extensions/external" "${install_path}/exts"
     fi
     if path_exists "${install_path}/extensions/builtin" \
     && ! file_exists "${install_path}/extensions/builtin/.uri"
     then
-      log_step "  Removing old core(builtin)"
-      rm -rf "${install_path}/extensions/builtin"
-      log_step success
+      log_step "  Removing old core(builtin)" \
+        rm -rf "${install_path}/extensions/builtin"
     fi
-    log_step "  Migrating extensions -> sets"
-    move_directory "${install_path}/extensions" "${extension_sets_home}/"
-    log_step success
+    log_step "  Migrating extensions -> sets" \
+      move_directory "${install_path}/extensions" "${extension_sets_home}/"
   fi
 }
 
 install_core()
 {
   local _dir
-  log_step "Installing core directories."
-  copy_paths --force to "${install_path}/" "${directories[@]}"
-  log_step success
+  log_step "Installing core directories." \
+    copy_paths --force to "${install_path}/" "${directories[@]}"
 
-  log_step "Installing core files."
-  copy_files to "${install_path}" ${files[@]}
-  log_step success
+  log_step "Installing core files." \
+    copy_files to "${install_path}" ${files[@]}
 
-  log_step "Installing core extensions."
-  copy_paths --force to "${install_path}/" "core"
-  log_step success
-
+  log_step "Installing core extensions." \
+    copy_paths --force to "${install_path}/" "core"
 }
 
 install_configuration_files()
@@ -105,9 +96,8 @@ symlink_bdsm()
 
   if variable_is_nonempty prefix_path && path_exists "${prefix_path}/bin"
   then
-    log_step "Linking ${prefix_path}/bin/bdsm"
-    link --force "${install_path}/bin/bdsm" to "${prefix_path}/bin/bdsm"
-    log_step success
+    log_step "Linking ${prefix_path}/bin/bdsm" \
+      link --force "${install_path}/bin/bdsm" to "${prefix_path}/bin/bdsm"
   fi
 }
 
