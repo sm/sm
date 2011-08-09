@@ -30,7 +30,7 @@ module BDSM
 
 end
 
-namespace :bdsm do
+namespace :cli do
 
   @servers = {
     :production => %W(),

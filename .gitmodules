@@ -1,3 +1,3 @@
-[submodule "extensions/dependencies"]
-	path = extensions/dependencies
+[submodule "sets/dependencies"]
+	path = sets/dependencies
 	url = git://github.com/wayneeseguin/bdsm-dependencies.git
