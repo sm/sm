@@ -99,7 +99,7 @@ sets_update()
   for _name in "$@"
   do
     case "${_name}" in
-      builtin)
+      builtin|ext)
         error "Extension set ${_name} cannot be updated."
         ;;
     esac
@@ -149,7 +149,7 @@ sets_uninstall()
     */*|.|..)
       error "Please specify a valid extension name."
       ;;
-    builtin)
+    builtin|ext)
       error "Extension set ${_name} cannot be removed."
       ;;
   esac
