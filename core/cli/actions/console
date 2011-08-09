@@ -5,8 +5,8 @@ shell_version=( $( ${user_shell}  --version | head -n 1 ) )
 
 if [[ "${shell_version[1]}" == "bash," ]] && (( ${BASH_VERSINFO[0]} > 3 ))
 then
-  #trap - ERR
-  trap "backtrace \"A command has returned a 'not handled' error code (\$?).\" no_exit" ERR
+  trap - ERR
+  #trap "backtrace \"A command has returned a 'not handled' error code (\$?).\" no_exit" ERR
   ${user_shell} --rcfile <(echo "
     [[ -s ~/.bash_profile ]] && source ~/.bash_profile
     [[ -s ~/.profile ]] && source ~/.profile
@@ -24,7 +24,7 @@ then
     {
       builtin exit 0
     }
-    #trap \"backtrace \\\"A command has returned a 'not handled' error code (\\\$?).\\\" no_exit\" ERR
+    trap \"backtrace \\\"A command has returned a 'not handled' error code (\\\$?).\\\" no_exit\" ERR
     export PS1='(bdsm) [ret=\$?] \w > '
   ") -i
 else
