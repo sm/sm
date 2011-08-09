@@ -319,10 +319,10 @@ To force, call:\n\tbdsm ${package_name} package install --force\n"
 
   if command_exists "${package_name}_install"
   then
-    log_step "Installing ${package_name} ${package_version}." \
+    log_step "${package_name} ${package_version} ~ install." \
       "${package_name}_install"
   else
-    log_step "Installing ${package_name} ${package_version}." \
+    log_step "${package_name} ${package_version} ~ install." \
       package_make_install
   fi
 
