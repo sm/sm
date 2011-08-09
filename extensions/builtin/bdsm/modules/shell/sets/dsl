@@ -132,7 +132,7 @@ sets_update_all()
   for _name in ${extensions_search_paths[@]}
   do
     case "${_name##*/}" in
-      builtin)
+      builtin|ext)
         # Skip those two
         ;;
       *)

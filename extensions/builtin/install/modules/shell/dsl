@@ -39,6 +39,16 @@ install_dependencies_extension_set()
   fi
 }
 
+migrate_external_to_ext()
+{
+  if path_exists "${extension_sets_path}/external" \
+  && ! file_exists "${extension_sets_path}/external/.uri"
+  then
+    log "  Migrating external -> ext"
+    move_directory "${extension_sets_path}/external" "${extension_sets_path}/ext"
+  fi
+}
+
 install_core()
 {
   local _dir
@@ -166,6 +176,8 @@ install_bdsm()
   perform setup_shell_completion
 
   perform setup_profile_d
+
+  perform migrate_external_to_ext
 
   perform install_dependencies_extension_set
 
