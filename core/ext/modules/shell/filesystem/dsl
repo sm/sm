@@ -3396,7 +3396,7 @@ file_md5()
 #
 write()
 {
-  local _token _file _message _append_flag=0
+  local _token _file _message _append_flag=0 _user="" _prefix=""
 
   while (( $# > 0 ))
   do
@@ -3409,7 +3409,11 @@ write()
         ;;
       (to)
         _file="${1}"
-        shift
+        shift || fail "File to write to must be given after 'to'"
+        ;;
+      (as)
+        _user="${1}"
+        shift || fail "User to write as must be given after 'as'"
         ;;
       (*)
         _message="${_token}"
@@ -3421,11 +3425,19 @@ write()
   then
     if variable_is_nonempty _file
     then
+      if [[ "${_user}" == "root" ]]
+      then
+        _prefix="sudo"
+      elif [[ -n "${_user}" ]]
+      then
+        _prefix="sudo su ${_user}"
+      fi
+
       if (( _append_flag == 1 ))
       then
-        printf "${_message}\n" >> "${_file}"
+        ${_prefix} printf "${_message}\n" >> "${_file}"
       else
-        printf "${_message}\n" > "${_file}"
+        ${_prefix} printf "${_message}\n" > "${_file}"
       fi
     else
       printf "${_message}\n"
