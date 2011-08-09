@@ -744,10 +744,10 @@ package_activate()
 
 package_activate_action()
 {
-  if [[ -n "${package_version}" ]] ||
+  [[ -n "${package_version}" ]] ||
     error "You need to specify a version to activate:\n  bdsm ${package_name}:<version> activate\n  bdsm ${package_name} activate --version <version>"
 
-  package_activate ${package_name} ${package_version}
+  package_activate "${package_name}" "${package_version}"
 }
 
 #
