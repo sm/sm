@@ -54,15 +54,15 @@ migrate_external_to_ext()
 install_core()
 {
   local _dir
-  log_step "  Installing core directories (${directories[*]}) into ${install_path}."
+  log_step "Installing core directories (${directories[*]}) into ${install_path}."
   copy_paths --force to "${install_path}/" "${directories[@]}"
   log_step success
 
-  log_step "  Installing core files (${files[*]}) into ${install_path}."
+  log_step "Installing core files (${files[*]}) into ${install_path}."
   copy_files to "${install_path}" ${files[@]}
   log_step success
 
-  log_step "  Installing builtin extensions."
+  log_step "Installing builtin extensions."
   copy_paths --force to "${install_path}/extensions/" "extensions/builtin"
   log_step success
 

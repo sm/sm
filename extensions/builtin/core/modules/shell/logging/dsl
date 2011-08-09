@@ -772,28 +772,38 @@ log_step()
 
   case "${_message}" in
     fail*)
-      if (( _unicode == 1 ))
+      if [[ -t 1 ]]
       then
-        printf "\r  [\033[32m✘\033[0m] %-78s\n" "${log_step_message:-"done."}"
+        if (( _unicode == 1 ))
+        then
+          printf "\r  [\033[32m✘\033[0m] %-78s\n" "${log_step_message:-"done."}"
+        else
+          printf "\r  [\033[32mX\033[0m] %-78s\n" "${log_step_message:-"done."}"
+        fi
       else
-        printf "\r  [\033[32mX\033[0m] %-78s\n" "${log_step_message:-"done."}"
+        printf "  done.\n"
       fi
-      unset log_step_message
       ;;
 
     succ*)
-      if (( _unicode == 1 ))
+      if [[ -t 1 ]]
       then
-        printf "\r  [\033[32m✔\033[0m] %-78s\n" "${log_step_message:-"done."}"
+        if (( _unicode == 1 ))
+        then
+          printf "\r  [\033[32m✔\033[0m] %-78s\n" "${log_step_message:-"done."}"
+        else
+          printf "\r  [\033[32m@\033[0m] %-78s\n" "${log_step_message:-"done."}"
+        fi
       else
-        printf "\r  [\033[32m@\033[0m] %-78s\n" "${log_step_message:-"done."}"
+        printf "  done.\n"
       fi
-      unset log_step_message
       ;;
 
     *)
       log_step_message="${_message}"
       printf "  [ ] %78s" "${log_step_message}..."
+      return 0
       ;;
   esac
+  unset log_step_message
 }
