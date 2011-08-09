@@ -386,4 +386,7 @@ fetch_uri()
       ;;
   esac
 }
-
+fetch()
+{
+  fetch_uri "$@"
+}
