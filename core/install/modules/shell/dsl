@@ -41,13 +41,34 @@ install_dependencies_extension_set()
   fi
 }
 
-migrate_external_to_ext()
+migrate_ext()
 {
-  if path_exists "${extension_sets_home}/external" \
-  && ! file_exists "${extension_sets_home}/external/.uri"
+  if path_exists "${install_path}/extensions"
   then
-    log_step "  Migrating external -> ext"
-    move_directory "${extension_sets_home}/external" "${extension_sets_home}/ext"
+    if path_exists "${install_path}/extensions/ext" \
+    && ! file_exists "${install_path}/extensions/ext/.uri"
+    then
+      log_step "  Migrating ext -> exts"
+      move_directory "${install_path}/extensions/ext" "${install_path}/exts"
+      log_step success
+    fi
+    if path_exists "${install_path}/extensions/external" \
+    && ! file_exists "${install_path}/extensions/external/.uri"
+    then
+      log_step "  Migrating external -> exts"
+      move_directory "${install_path}/extensions/external" "${install_path}/exts"
+      log_step success
+    fi
+    if path_exists "${install_path}/extensions/builtin" \
+    && ! file_exists "${install_path}/extensions/builtin/.uri"
+    then
+      log_step "  Removing old core(builtin)"
+      rm -rf "${install_path}/extensions/builtin"
+      log_step success
+    fi
+    log_step "  Migrating extensions -> sets"
+    move_directory "${install_path}/extensions" "${extension_sets_home}/"
+    log_step success
   fi
 }
 
@@ -185,7 +206,7 @@ install_bdsm()
 
   perform setup_profile_d
 
-  perform migrate_external_to_ext
+  perform migrate_ext
 
   perform install_dependencies_extension_set
 
