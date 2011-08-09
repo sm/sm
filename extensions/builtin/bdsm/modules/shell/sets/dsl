@@ -37,10 +37,18 @@ sets_list()
 
     if array_is_nonempty extensions
     then
-      log "\n${_path##$bdsm_path\/extensions\/}:"
+      if [[ "${_path}" =~ "${extension_sets_path}" ]]
+      then
+        log "\n${_path##${extension_sets_path}\/}: # System set"
+      elif [[ "${_path}" =~ "${extension_sets_home}" ]]
+      then
+        log "\n${_path##${extension_sets_home}\/}: # User set"
+      else
+        log "\n${_path}:"
+      fi
       echo ${extensions[@]} | xargs -s ${COLUMNS} | xargs -I '{}' echo "  - {}"
     else
-      log "${_path##$bdsm_path\/extensions\/}:\n  # None"
+      log "${_path##$bdsm_path\/extensions\/}:\n  # No extensions in set"
     fi
   done
 }
@@ -70,7 +78,8 @@ sets_install()
   local _identifier="$(scm_identifier "${_uri}")"
 
   log_step "bdsm-${_name}" # TODO: if fail, log_step failure
-  enter "${extensions_path}"
+  ensure_paths_exist "${extension_sets_home}"
+  enter "${extension_sets_home}"
   fetch_uri "${_uri}" "${src_path}/${_identifier}"
   remove_paths "${_name}"
   copy_directory "${src_path}/${_identifier}" to "${_name}"
@@ -104,18 +113,24 @@ sets_update()
         ;;
     esac
 
-    if [[ ! -d "${bdsm_path}/extensions/${_name}" ]]
+    if [[ ! -d "${extension_sets_home}/${_name}" ]]
     then
-      error "Extension set ${_name} does not exist."
+      if in_search_paths detect_extension_existence "${_name}" \
+      && [[ "${extension}" == "${_name}" ]] #do not count finding fallback default extension: bdsm
+      then
+        error "Extension set ${_name} is installed system wide and can not be updated by user."
+      else
+        error "Extension set ${_name} does not exist."
+      fi
     fi
 
-    if [[ ! -s "${bdsm_path}/extensions/${_name}/.uri" ]]
+    if [[ ! -s "${extension_sets_home}/${_name}/.uri" ]]
     then
       log "Extension set ${_name} does not contain stored uri.\n"
       continue
     fi
 
-    _uri=$( cat "${bdsm_path}/extensions/${_name}/.uri" )
+    _uri=$( cat "${extension_sets_home}/${_name}/.uri" )
 
     if [[ -z "${_uri}" ]]
     then
@@ -129,11 +144,14 @@ sets_update()
 sets_update_all()
 {
   local _name
-  for _name in ${extensions_search_paths[@]}
+  for _name in ${extension_sets_home}/*
   do
     case "${_name##*/}" in
       builtin|ext)
         # Skip those two
+        ;;
+      \*)
+        log "No extension sets found for update."
         ;;
       *)
         sets_update "${_name##*/}"
@@ -153,10 +171,16 @@ sets_uninstall()
       error "Extension set ${_name} cannot be removed."
       ;;
   esac
-  enter "${extensions_path}"
+  enter "${extension_sets_home}"
   if [[ ! -d "${_name}" ]]
   then
-    error "Please specify a valid extension name."
+      if in_search_paths detect_extension_existence "${_name}" \
+      && [[ "${extension}" == "${_name}" ]] #do not count finding fallback default extension: bdsm
+      then
+        error "Extension set ${_name} is installed system wide and can not be uninstaled by user."
+      else
+        error "Extension set ${_name} does not exist."
+      fi
   fi
 
   #TODO: are you sure ?

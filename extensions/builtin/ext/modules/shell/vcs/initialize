@@ -2,9 +2,12 @@
 
 if [[ ! -w $bdsm_path ]]
 then
-  scm_path="$HOME/.bdsm/scm"
   archives_path="$HOME/.bdsm/archives"
+  scm_path="$HOME/.bdsm/scm"
+  src_path="$HOME/.bdsm/src"
 fi
-[[ -d "${scm_path}" ]]      || mkdir -p $scm_path
+
 [[ -d "${archives_path}" ]] || mkdir -p $archives_path
+[[ -d "${scm_path}" ]]      || mkdir -p $scm_path
+[[ -d "${src_path}" ]]      || mkdir -p $src_path
 

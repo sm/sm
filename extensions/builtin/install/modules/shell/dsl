@@ -37,17 +37,17 @@ install_dependencies_extension_set()
     sets_install "dependencies" "wayneeseguin/bdsm-dependencies"
 
     write "git://github.com/wayneeseguin/bdsm-dependencies.git" \
-      to "${extensions_path}/dependencies/.uri"
+      to "${extension_sets_home}/dependencies/.uri"
   fi
 }
 
 migrate_external_to_ext()
 {
-  if path_exists "${extensions_path}/external" \
-  && ! file_exists "${extensions_path}/external/.uri"
+  if path_exists "${extension_sets_home}/external" \
+  && ! file_exists "${extension_sets_home}/external/.uri"
   then
     log_step "  Migrating external -> ext"
-    move_directory "${extensions_path}/external" "${extensions_path}/ext"
+    move_directory "${extension_sets_home}/external" "${extension_sets_home}/ext"
   fi
 }
 

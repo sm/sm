@@ -46,7 +46,8 @@ init_extensions_search_paths()
   if [[ -z "${extensions_search_paths[*]}" ]]
   then
     extensions_search_paths=( )
-    for extension in ${bdsm_path}/extensions/*
+    local extension
+    for extension in ${extension_sets_path}/*
     do
       case ${extension} in
         (*/builtin)
@@ -57,6 +58,18 @@ init_extensions_search_paths()
           ;;
       esac
     done
+
+    if [[ "${extension_sets_path}" != "${extension_sets_home}" ]]
+    then
+      for extension in ${extension_sets_home}/*
+      do
+        extensions_search_paths+=( "${extension}" )
+      done
+    fi
+  fi
+
+  if ! string_contains "${extensions_search_paths[*]}" "${bdsm_path}/extensions/builtin"
+  then
     extensions_search_paths+=( "${bdsm_path}/extensions/builtin" )
   fi
   export extensions_search_paths

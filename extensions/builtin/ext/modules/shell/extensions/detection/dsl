@@ -251,12 +251,6 @@ detect_unique_2nd_level_action()
   return 1
 }
 
-detect_extension_existence()
-{
-  extensions_path=$1 extension=$2
-  extension_is_valid $extensions_path/$extension
-}
-
 detect_action_type()
 {
   local _path="${action_path:-}"

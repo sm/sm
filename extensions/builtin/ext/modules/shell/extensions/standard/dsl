@@ -26,3 +26,9 @@ extension_is_valid()
     fail "Cannot determine if an extension is valid, as the path to the extension was not given."
   fi
 }
+
+detect_extension_existence()
+{
+  extensions_path=$1 extension=$2
+  extension_is_valid $extensions_path/$extension
+}
