@@ -38,6 +38,9 @@ sets_list()
     elif [[ "${_path}" =~ "${extension_sets_home}" ]]
     then
       log "${_path##${extension_sets_home}\/}: # User set"
+    elif [[ "${_path}" == "${extension_exts_home}" ]]
+    then
+      log "${_path##*\/}: # User set"
     else
       log "${_path##$bdsm_path\/}:"
     fi

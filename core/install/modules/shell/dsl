@@ -62,8 +62,12 @@ migrate_ext()
       log_step "  Removing old core(builtin)" \
         rm -rf "${install_path}/extensions/builtin"
     fi
-    log_step "  Migrating extensions -> sets" \
-      move_directory "${install_path}/extensions" "${extension_sets_home}/"
+    local set
+    for set in ${install_path}/extensions/*
+    do
+      log_step "  Migrating extensions -> sets" \
+        mv ${set} ${extension_sets_home}/
+    done
   fi
 }
 
