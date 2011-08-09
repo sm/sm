@@ -774,9 +774,9 @@ log_step()
     fail*)
       if (( _unicode == 1 ))
       then
-        printf "\r  [\033[32m✘\033[0m] %78s\n" "${log_step_message:-"done."}"
+        printf "\r  [\033[32m✘\033[0m] %-78s\n" "${log_step_message:-"done."}"
       else
-        printf "\r  [\033[32mX\033[0m] %78s\n" "${log_step_message:-"done."}"
+        printf "\r  [\033[32mX\033[0m] %-78s\n" "${log_step_message:-"done."}"
       fi
       unset log_step_message
       ;;
@@ -784,9 +784,9 @@ log_step()
     succ*)
       if (( _unicode == 1 ))
       then
-        printf "\r  [\033[32m✔\033[0m] %78s\n" "${log_step_message:-"done."}"
+        printf "\r  [\033[32m✔\033[0m] %-78s\n" "${log_step_message:-"done."}"
       else
-        printf "\r  [\033[32m@\033[0m] %78s\n" "${log_step_message:-"done."}"
+        printf "\r  [\033[32m@\033[0m] %-78s\n" "${log_step_message:-"done."}"
       fi
       unset log_step_message
       ;;
