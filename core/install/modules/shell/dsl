@@ -10,7 +10,7 @@ prepare_for_installation()
 {
   local directory
 
-  log_step "Ensuring that ${install_path} exists."
+  log_step "Ensuring that installation path exists."
   ensure_paths_exist "${install_path}"
   log_step success
 
@@ -62,8 +62,8 @@ install_core()
   copy_files to "${install_path}" ${files[@]}
   log_step success
 
-  log_step "Installing builtin extensions."
-  copy_paths --force to "${install_path}/extensions/" "extensions/builtin"
+  log_step "Installing core extensions."
+  copy_paths --force to "${install_path}/" "core"
   log_step success
 
 }
@@ -105,7 +105,7 @@ setup_shell_completion()
     fi
 
     copy_file \
-      from "${install_path}/extensions/builtin/bdsm/modules/shell/completion/bash" \
+      from "${install_path}/core/cli/modules/shell/completion/bash" \
       to "${completion_prefix}/bdsm-completion.sh" \
       mode 0755 owner "root"
 
@@ -164,7 +164,7 @@ set_bdsm_path()
 {
   replace_content "^bdsm_path=.*" with "bdsm_path=\"${install_path}\"" in "${install_path}/bin/bdsm"
   replace_content "^saved_bdsm_path=.*" with "saved_bdsm_path=\"\${bdsm_path:-${install_path}}\"" \
-    in "${install_path}/extensions/builtin/core/modules/shell/core/initialize"
+    in "${install_path}/core/bdsm/modules/shell/core/initialize"
 }
 
 install_bdsm()

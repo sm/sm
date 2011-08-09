@@ -45,30 +45,33 @@ init_extensions_search_paths()
 {
   if [[ -z "${extensions_search_paths[*]}" ]]
   then
+    # Single extensions installed
     extensions_search_paths=( "${bdsm_path}/exts" )
 
-    local extension
-    for extension in ${extension_sets_path}/*
+    # System extension sets
+    local _extension_set_path
+    for _extension_set_path in ${extension_sets_path}/*
     do
-      case ${extension} in
-        (*/builtin)
-          continue
-          ;;
-        (*)
-          extensions_search_paths+=( "${extension}" )
-          ;;
-      esac
+      if [[ -d "${_extension_set_path}" ]]
+      then
+        extensions_search_paths+=( "${_extension_set_path}" )
+      fi
     done
 
+    # User extension sets
     if [[ "${extension_sets_path}" != "${extension_sets_home}" ]]
     then
-      for extension in ${extension_sets_home}/*
+      for _extension_set_path in ${extension_sets_home}/*
       do
-        extensions_search_paths+=( "${extension}" )
+        if [[ -d "${_extension_set_path}" ]]
+        then
+          extensions_search_paths+=( "${_extension_set_path}" )
+        fi
       done
     fi
   fi
 
+  # Core is required to run, add it if not found
   if ! string_contains "${extensions_search_paths[*]}" "${bdsm_path}/core"
   then
     extensions_search_paths+=( "${bdsm_path}/core" )
