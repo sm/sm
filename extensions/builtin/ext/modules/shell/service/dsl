@@ -1636,10 +1636,8 @@ service_deactivate()
 {
   local _service="${1:-"${service}"}"
 
-  if [[ -z "${_service}" ]]
-  then
+  [[ -n "${_service}" ]] ||
     fail "A service name must be set or passed in to deactivate a service."
-  fi
 
   if file_exists "${init_scripts_path}/${_service}"
   then
@@ -1710,10 +1708,8 @@ service_activate()
 {
   local _service="${1:-"${service}"}"
 
-  if [[ -z "${_service}" ]]
-  then
+  [[ -n "${_service}" ]] ||
     fail "The service name must be set or passed in to activate a service."
-  fi
 
   local _version="${2:-${package_version}}"
 

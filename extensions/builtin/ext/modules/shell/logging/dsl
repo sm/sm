@@ -100,9 +100,9 @@ log_streams()
   done
 
   : \
-    "${_stdout="${2:-stdout.log}"}" \
-    "${_stderr="${3:-stderr.log}"}" \
-    "${_stdmix="${4:-stdmix.log}"}"
+    "${_stdout="${2:-"stdout.log"}"}" \
+    "${_stderr="${3:-"stderr.log"}"}" \
+    "${_stdmix="${4:-"stdmix.log"}"}"
 
   # It's like fireworks~! :)
   {

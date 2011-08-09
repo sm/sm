@@ -259,7 +259,6 @@ To force, call:
   then
     "${package_name}_fetch"
   else
-    #log "Fetching ${package_name} ${package_version}"
     package_fetch
   fi
 
