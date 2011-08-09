@@ -781,7 +781,7 @@ log_step()
           printf "\r  [\033[32mX\033[0m] %-78s\n" "${log_step_message:-"done."}"
         fi
       else
-        printf "  done.\n"
+        printf "  failed.\n"
       fi
       ;;
 
@@ -805,7 +805,7 @@ log_step()
       then
         printf "  [ ] %78s" "${log_step_message}..."
       else
-        printf "  [ ] %-78s" "${log_step_message}..."
+        printf "  [ ] %s" "${log_step_message}..."
       fi
       return 0
       ;;
