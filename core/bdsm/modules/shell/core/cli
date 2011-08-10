@@ -12,13 +12,13 @@ do
 
     --help)
       shift #end of processing
-      extension_args=("bdsm" "help" "$@")
+      extension_args=("cli" "help" "$@")
       break
       ;;
 
     -v|--version|-V)
       shift #end of processing
-      extension_args=("bdsm" "version" "${token}" "$@")
+      extension_args=("cli" "version" "${token}" "$@")
       break
       ;;
 
