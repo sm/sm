@@ -74,7 +74,7 @@ sets_install()
     error "builtin extension set may not be (re-)installed, except by updating BDSM core (bdsm get head)."
 
   [[ -n "${_uri}" ]] ||
-    _uri=$( awk -F = "/^${_name}=/ {print \$2 }" < "${bdsm_path}/core/cli/config/known_sets" )
+    _uri=$( awk -F = "/^${_name}=/ {print \$2 }" < "${bdsm_path}/core/cli/config/known_sets" | tail -n 1 )
 
   [[ -n "${_uri}" ]] ||
     error "Cannot find ${_name} in known extension sets list."
