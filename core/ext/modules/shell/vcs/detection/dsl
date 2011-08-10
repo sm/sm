@@ -49,8 +49,17 @@ scm_identifier()
 # Code Walkthrough
 is_github_uri()
 {
-  #TODO: add validation that given repository exists on github
-  ematch "$1" "^[[:alnum:]_-]+\/[[:alnum:]_-]+$"
+  local _uri="${1:-}"
+  if ematch "${_uri}" "^[[:alnum:]_-]+\/[[:alnum:]_-]+$"
+  then
+    if curl -f -I -L "https://github.com/${_uri}" &>/dev/null
+    then
+      return 0
+    else
+      debug vcs "Uri '${_uri}' looks like github one, but gitbub claims it is not."
+    fi
+  fi
+  return 1
 }
 
 is_archive_uri() {
@@ -83,8 +92,9 @@ fetch_uri_detect_scm_type()
       (*hg*)     scm_type="hg"     ;;
       (*fossil*) scm_type="fossil" ;;
       (*)
-        error "Unknown SCM for url '${_uri}'."
+        return 1
         ;;
     esac
   fi
+  return 0
 }

@@ -29,33 +29,33 @@ fetch_error()
 
 fetch_error_default_handler()
 {
-  local _message=$1
+  local _message="$1"
   shift
 
   case "${_message}" in
-    unknown_scm)
-      _message="Unknown SCM ${scm_type} for url '${$_uri}'." ;;
-    copy_failed)
+    (unknown_scm)
+      _message="Unknown SCM type (${scm_type:-"not found"}) for url '${uri}'." ;;
+    (copy_failed)
       _message="Copying from '${from}' to '${to}' failed." ;;
-    download_failed)
+    (download_failed)
       _message="Downloading from '${from}' to '${to}' failed." ;;
-    extracting_archive_failed)
+    (extracting_archive_failed)
       _message="There was an error while extracting the archive '${_archive}'." ;;
-    unknown_archive_format)
+    (unknown_archive_format)
       _message="Unknown archive format for ${_archive}." ;;
-    empty_archive)
+    (empty_archive)
       _message="Empty archive ${_archive}." ;;
-    remote_branch_not_found)
+    (remote_branch_not_found)
       _message="$remote $branch remote branch not found." ;;
-    cannot_checkout_branch)
+    (cannot_checkout_branch)
       _message="Unable to checkout $branch." ;;
-    pull_failed)
+    (pull_failed)
       _message="${scm_type} pull failed." ;;
-    cannot_clone)
+    (cannot_clone)
       _message="There was an error while cloning the repository from the url '${_uri}.'" ;;
-    cannot_remove)
+    (cannot_remove)
       _message="Cannot remove ${path}." ;;
-    *)
+    (*)
       fail "VCS unknown error("${_message}") for params $*." ;;
   esac
 

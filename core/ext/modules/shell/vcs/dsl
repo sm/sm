@@ -50,7 +50,17 @@ fetch_uri()
   _args=("${_uri}" "${_target}")
   fetch_uri_parse_args "$@"
 
-  [[ -n "${scm_type}" ]] || fetch_uri_detect_scm_type "${_uri}"
+  if [[ -z "${scm_type}" ]]
+  then
+    if ! fetch_uri_detect_scm_type "${_uri}" \
+    || [[ -n "${__vcs_failed}" ]]
+    then
+      fetch_error unknown_scm "uri=${_uri}"
+      return $?
+    fi
+  fi
+
+  debug vcs "type ${scm_type}, params ${_args[@]}."
 
   case "${scm_type}" in
     (path|archive|github|git|svn|hg|fossil)
@@ -58,7 +68,7 @@ fetch_uri()
       "${scm_type}_get" "${_args[@]}"
       ;;
     (*)
-      fetch_error unknown_scm
+      fetch_error unknown_scm "uri=${_uri}"
       ;;
   esac
 }
