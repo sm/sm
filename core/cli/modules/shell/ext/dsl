@@ -63,21 +63,30 @@ ext_install()
   local _name="${1:-}" _uri="${2:-}"
 
   shift || fail "Cannot install extension ext without name."
-  [[ -n "${_uri}" ]] ||
+
+  if [[ -n "${_uri}" ]]
+  then
+    shift
+  else
     _uri=$( awk -F = "/^${_name}=/ {print \$2 }" < "${bdsm_path}/core/cli/config/known_ext" )
+  fi
 
   [[ -n "${_uri}" ]] ||
     error "Cannot find ${_name} in known extension ext list."
 
   local _identifier="$(scm_identifier "${_uri}")"
 
-  log_step "bdsm_${_name}" # TODO: if fail, log_step failure
+  log_step "bdsm_${_name}"
   ensure_paths_exist "${extension_exts_home}"
   enter "${extension_exts_home}"
-  fetch_uri "${_uri}" "${src_path}/${_identifier}"
-  remove_paths "${_name}"
-  copy_directory "${src_path}/${_identifier}" to "${_name}"
-  log_step success
+  if fetch_uri "${_uri}" "${src_path}/${_identifier}"
+  then
+    remove_paths "${_name}"
+    copy_directory "${src_path}/${_identifier}" to "${_name}"
+    log_step success
+  else
+    log_step failure
+  fi
 }
 
 ext_install_all()

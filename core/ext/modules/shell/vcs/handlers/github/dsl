@@ -15,5 +15,10 @@ github_get()
   # TODO: account for url.
   git_get "git://github.com/${_uri}.git" "${_target}" "$@"
 
-  [[ -z "${__vcs_failed}" ]] && echo "${_uri}" > "${_target}/.uri"
+  if [[ -z "${__vcs_failed}" ]]
+  then
+    echo "${_uri}" > "${_target}/.uri"
+  else
+    return 0
+  fi
 }

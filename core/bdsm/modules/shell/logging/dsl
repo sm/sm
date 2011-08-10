@@ -783,9 +783,9 @@ core_log_step()
       # then
         if (( _unicode == 1 ))
         then
-          printf "\r  [\033[31m✘\033[0m] %-78s\n" "${log_step_message:-"done."}"
+          printf "\r  [\033[31m✘\033[0m] %s\n" "${log_step_message:-"done."}"
         else
-          printf "\r  [\033[31mX\033[0m] %-78s\n" "${log_step_message:-"done."}"
+          printf "\r  [\033[31mX\033[0m] %s\n" "${log_step_message:-"done."}"
         fi
       # else
       #   printf "  failed.\n"
@@ -797,9 +797,9 @@ core_log_step()
       # then
         if (( _unicode == 1 ))
         then
-          printf "\r  [\033[32m✔\033[0m] %-78s\n" "${log_step_message:-"done."}"
+          printf "\r  [\033[32m✔\033[0m] %s\n" "${log_step_message:-"done."}"
         else
-          printf "\r  [\033[32m@\033[0m] %-78s\n" "${log_step_message:-"done."}"
+          printf "\r  [\033[32m@\033[0m] %s\n" "${log_step_message:-"done."}"
         fi
       # else
       #   printf "  done.\n"
@@ -810,7 +810,7 @@ core_log_step()
       log_step_message="${_message}"
       # if [[ -t 1 ]]
       # then
-        printf "  [ ] %-78s" "${log_step_message}..."
+        printf "  [ ] %s " "${log_step_message}..."
       # else
       #   printf "  %s" "${log_step_message}..."
       # fi

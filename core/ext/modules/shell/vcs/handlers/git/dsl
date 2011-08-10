@@ -50,6 +50,7 @@ git_get()
         fetch_error cannot_checkout_branch
       fi
     fi
+    [[ -z "${__vcs_failed}" ]] || return 0
 
     if ! (
       builtin cd "${repo_path}"

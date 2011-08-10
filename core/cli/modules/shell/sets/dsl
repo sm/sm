@@ -75,21 +75,29 @@ sets_install()
   [[ "${_name}" != "builtin" ]] ||
     error "builtin extension set may not be (re-)installed, except by updating BDSM core (bdsm get head)."
 
-  [[ -n "${_uri}" ]] ||
+  if [[ -n "${_uri}" ]]
+  then
+    shift
+  else
     _uri=$( awk -F = "/^${_name}=/ {print \$2 }" < "${bdsm_path}/core/cli/config/known_sets" | tail -n 1 )
+  fi
 
   [[ -n "${_uri}" ]] ||
     error "Cannot find ${_name} in known extension sets list."
 
   local _identifier="$(scm_identifier "${_uri}")"
 
-  log_step "bdsm-${_name}" # TODO: if fail, log_step failure
+  log_step "bdsm-${_name}"
   ensure_paths_exist "${extension_sets_home}"
   enter "${extension_sets_home}"
-  fetch_uri "${_uri}" "${src_path}/${_identifier}"
-  remove_paths "${_name}"
-  copy_directory "${src_path}/${_identifier}" to "${_name}"
-  log_step success
+  if fetch_uri "${_uri}" "${src_path}/${_identifier}" "$@"
+  then
+    remove_paths "${_name}"
+    copy_directory "${src_path}/${_identifier}" to "${_name}"
+    log_step success
+  else
+    log_step failure
+  fi
 }
 
 sets_install_all()

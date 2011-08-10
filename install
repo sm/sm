@@ -24,4 +24,4 @@ extension_exts_home="${bdsm_path}/exts"
 
 export install_path archives_path scm_path src_path extension_sets_home
 
-./local --call=install/install_bdsm
+./local --call=install/install_bdsm "$@"
