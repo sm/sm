@@ -32,6 +32,8 @@ sets_list()
 
   for _path in "${extensions_search_paths[@]}"
   do
+    [[ -d "${_path}"  ]] || continue
+
     if [[ "${_path}" =~ "${extension_sets_path}" ]]
     then
       log "${_path##${extension_sets_path}\/}:"
@@ -152,6 +154,8 @@ sets_update_all()
   local _name
   for _name in ${extension_sets_home}/*
   do
+    [[ -d "${_path}"  ]] || continue
+
     case "${_name##*/}" in
       builtin|ext)
         # Skip those two
