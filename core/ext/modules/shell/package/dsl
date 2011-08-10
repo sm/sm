@@ -560,19 +560,19 @@ package_build()
 {
   local _command
 
-  if [[ -n ${make_command:-} ]]
+  if [[ -n ${build_command:-} ]]
   then
-    _command="${make_command}"
+    _command="${build_command}"
   else
     _command="make ${make_flags[@]:-"-j$(os_cpu_count)"}"
   fi
 
   debug package "package_build: ${_command}"
-  if eval "${_command}" > make.log 2>&1
+  if eval "${_command}" > build.log 2>&1
   then
     return 0
   else
-    package_error "Compilation of ${package_name} ${package_version} failed! " "make.log"
+    package_error "Compilation of ${package_name} ${package_version} failed! " "build.log"
   fi
 }
 
@@ -651,9 +651,9 @@ package_make_install()
 {
   local _command
 
-  if [[ -n ${make_install_command:-} ]]
+  if [[ -n ${install_command:-} ]]
   then
-    _command="${make_install_command}"
+    _command="${install_command}"
   else
     _command="make ${make_install_flags[@]:-install}"
   fi
