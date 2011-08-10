@@ -14,4 +14,5 @@ package=dev package
 publish=dev publish
 create=dev create
 fetch=fetch_uri()
+fetch_update=fetch_update()
 shell=console

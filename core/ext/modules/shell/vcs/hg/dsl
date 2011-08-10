@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+# ## hg\_get()
+#
+#
+#
+# Code Walkthrough
+hg_get()
+{
+  NIY "hg scm_update"
+  local initial_pwd="$PWD" _uri="${1:-}" _target="${2:-}"
+
+  shift || fail "url must be specified as the first parameter."
+  shift || fail "target path must be specified as the second parameter."
+
+  if [[ -d "${_target}" ]]
+  then # TODO: ensure this works...
+    builtin cd "${_target}"
+    hg pull
+  else
+    hg clone "${_uri}" "${_target}"
+  fi
+}

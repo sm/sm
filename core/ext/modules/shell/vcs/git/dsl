@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+
+# ## git\_get()
+#
+#
+#
+# Code Walkthrough
+git_get()
+{
+  local initial_pwd="$PWD" _uri="${1:-}" _final_target="${2:-}" \
+    branch=${3:-${branch:-master}} remote=${4:-${remote:-origin}} \
+    revision=${4:-${revision:-HEAD}}
+
+  shift || fail "url must be the first parameter to git_get()."
+  shift || fail "target path must be the second parameter to git_get()."
+
+  local _target="${scm_path}/$( scm_identifier "${_uri}" )"
+
+  # v v v this looks slightly freakish... ~ Wayne
+  _final_target=$(
+    builtin cd "${initial_pwd}"
+    mkdir -p "${_final_target}"
+    builtin cd "${_final_target}"
+    pwd
+  )
+
+  # TODO: Account for revision
+  if [[ -d "$_target/.git" ]]
+  then
+    builtin cd "${_target}"
+    git checkout master -f -q >/dev/null 2>&1
+    git reset --hard HEAD >/dev/null 2>&1
+    git fetch ${remote} >/dev/null 2>&1
+    if [[ -z "$(git branch | awk "/${branch}$/" 2>/dev/null)" ]]
+    then
+      if ! (
+        builtin cd "${repo_path}"
+        git checkout -b "${branch}" --track "${remote}/${branch}" 2>&1 >/dev/null
+        )
+      then
+        error "$remote $branch remote branch not found."
+      fi
+    elif [[ -z "$(git branch | awk "/\* $branch$/{print \$2}" 2>/dev/null)" ]]
+    then
+      if ! (
+        builtin cd "${repo_path}"
+        git checkout $branch >/dev/null 2>&1
+        )
+      then
+        error "Unable to checkout $branch."
+      fi
+    fi
+
+    if ! (
+      builtin cd "${repo_path}"
+      git pull --rebase origin $branch >/dev/null 2>&1
+      )
+    then
+      fail "Git pull failed."
+    fi
+  else
+    mkdir -p "${_target}"
+    if git clone --depth 1 ${_uri} "${_target}" >/dev/null 2>&1
+    then
+      echo "${_uri}" > "${_target}/.uri"
+    else
+      local _uri_https="${_uri/git:\/\//https:\/\/}"
+      if git clone --depth 1 ${_uri_https} "${_target}" >/dev/null 2>&1
+      then
+        echo "${_uri_https}" > "${_target}/.uri"
+      else
+        fail "There was an error while cloning the repository from the url '${_uri}.'"
+      fi
+    fi
+  fi
+
+  [[ ! -d "${_final_target}" ]] || rm -rf "${_final_target}"
+
+  if ! cp -fR "${_target}" "${_final_target}" >/dev/null 2>&1
+  then
+    fail "There was an error copying '${_target}' -> '${_final_target}'."
+  fi
+
+  builtin cd "$initial_pwd"
+}
+

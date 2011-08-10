@@ -42,144 +42,6 @@ scm_identifier()
   printf "${_uri//\//_}"
 }
 
-# ## directory\_get()
-#
-#
-#
-# Code Walkthrough
-directory_get()
-{
-  local initial_pwd="$PWD" _source="${1:-}" _target="${2:-}"
-
-  shift || fail "source path must be the first parameter to directory_get()."
-  shift || fail "target path must be the second parameter to directory_get()."
-
-  rm -rf "${_target}" 2>&1 >/dev/null
-
-  if cp -fR ${_source} "${_target}" >/dev/null 2>&1
-  then
-    echo "$(cd "${_source}"; pwd)" > "${_target}/.uri"
-  else
-    fail "There was an error copying '${_source}'."
-  fi
-}
-
-# ## git\_get()
-#
-#
-#
-# Code Walkthrough
-git_get()
-{
-  local initial_pwd="$PWD" _uri="${1:-}" _final_target="${2:-}" \
-    branch=${3:-${branch:-master}} remote=${4:-${remote:-origin}} \
-    revision=${4:-${revision:-HEAD}}
-
-  shift || fail "url must be the first parameter to git_get()."
-  shift || fail "target path must be the second parameter to git_get()."
-
-  local _target="${scm_path}/$( scm_identifier "${_uri}" )"
-
-  # v v v this looks slightly freakish... ~ Wayne
-  _final_target=$(
-    builtin cd "${initial_pwd}"
-    mkdir -p "${_final_target}"
-    builtin cd "${_final_target}"
-    pwd
-  )
-
-  # TODO: Account for revision
-  if [[ -d "$_target/.git" ]]
-  then
-    builtin cd "${_target}"
-    git checkout master -f -q >/dev/null 2>&1
-    git reset --hard HEAD >/dev/null 2>&1
-    git fetch ${remote} >/dev/null 2>&1
-    if [[ -z "$(git branch | awk "/${branch}$/" 2>/dev/null)" ]]
-    then
-      if ! (
-        builtin cd "${repo_path}"
-        git checkout -b "${branch}" --track "${remote}/${branch}" 2>&1 >/dev/null
-        )
-      then
-        error "$remote $branch remote branch not found."
-      fi
-    elif [[ -z "$(git branch | awk "/\* $branch$/{print \$2}" 2>/dev/null)" ]]
-    then
-      if ! (
-        builtin cd "${repo_path}"
-        git checkout $branch >/dev/null 2>&1
-        )
-      then
-        error "Unable to checkout $branch."
-      fi
-    fi
-
-    if ! (
-      builtin cd "${repo_path}"
-      git pull --rebase origin $branch >/dev/null 2>&1
-      )
-    then
-      fail "Git pull failed."
-    fi
-  else
-    mkdir -p "${_target}"
-    if git clone --depth 1 ${_uri} "${_target}" >/dev/null 2>&1
-    then
-      echo "${_uri}" > "${_target}/.uri"
-    else
-      local _uri_https="${_uri/git:\/\//https:\/\/}"
-      if git clone --depth 1 ${_uri_https} "${_target}" >/dev/null 2>&1
-      then
-        echo "${_uri_https}" > "${_target}/.uri"
-      else
-        fail "There was an error while cloning the repository from the url '${_uri}.'"
-      fi
-    fi
-  fi
-
-  [[ ! -d "${_final_target}" ]] || rm -rf "${_final_target}"
-
-  if ! cp -fR "${_target}" "${_final_target}" >/dev/null 2>&1
-  then
-    fail "There was an error copying '${_target}' -> '${_final_target}'."
-  fi
-
-  builtin cd "$initial_pwd"
-}
-
-hg_get()
-{
-  local initial_pwd="$PWD" _uri="${1:-}" _target="${2:-}"
-
-  shift || fail "url must be specified as the first parameter."
-  shift || fail "target path must be specified as the second parameter."
-
-  if [[ -d "${_target}" ]]
-  then # TODO: ensure this works...
-    builtin cd "${_target}"
-    hg pull
-  else
-    hg clone "${_uri}" "${_target}"
-  fi
-}
-
-svn_get()
-{
-  local initial_pwd="$PWD" _uri="${1:-}" _target="${2:-}"
-
-  shift || fail "url must be specified as the first parameter."
-  shift || fail "target path must be specified as the second parameter."
-
-  if [[ -d "${_target}" ]]
-  then # TODO: ensure this works...
-    builtin cd "${_target}"
-    svn update
-  else
-    svn checkout "${_uri}" "${_target}"
-  fi
-}
-
 # ## is\_github\_uri()
 #
 #
@@ -189,106 +51,6 @@ is_github_uri()
 {
   #TODO: add validation that given repository exists on github
   ematch "$1" "^[[:alnum:]_-]+\/[[:alnum:]_-]+$"
-}
-
-# ## github\_get()
-#
-#
-#
-# Code Walkthrough
-github_get()
-{
-  local _uri="${1:-}" _target="${2:-}"
-
-  shift || fail "uri must be specified as the first parameter."
-  shift || fail "target path must be specified as the second parameter."
-
-  # TODO: account for url.
-  git_get "git://github.com/${_uri}.git" "${_target}" "$@"
-
-  write "${_uri}" to "${_target}/.uri"
-}
-
-archive_get() {
-  local _uri="${1:-}" _final_target="${2:-}" _package_md5="${3:-#}" \
-    _archive="${archives_path}/${_uri##*/}"
-
-  shift || fail "uri must be specified as the first parameter."
-  shift || fail "target path must be specified as the second parameter."
-
-  [[ -d "${archives_path}" ]] || mkdir -p "${archives_path}"
-
-  if [[ -f "${_archive}" ]] &&
-    ! file_matches_md5 "${_archive}" "${_package_md5}"
-  then
-    log "${_uri##*/} does not match MD5 checksum ${_package_md5}; removing and downloading."
-    rm -f "${_archive}"
-  fi
-
-  if [[ ! -f "${_archive}" ]]
-  then
-    if [[ -f "${_uri}" ]]
-    then
-      if ! copy_file --force "${_uri}" to "${_archive}"
-      then
-        log "Copying from '${_uri}' to '${_archive}' failed."
-        return 1
-      fi
-    else
-      if ! curl -s -L "${_uri}" -o "${_archive}"
-      then
-        log "Downloading from '${_uri}' to '${_archive}' failed."
-        return 1
-      fi
-    fi
-  fi
-
-  rm -rf "${_final_target}" || true
-  mkdir -p "${_final_target}"
-  builtin cd "${_final_target}"
-
-  case "${_uri}" in
-    *.tar) # tar
-      tar xf "${_archive}" ||
-        error "There was an error while extracting the archive '${_archive}'."
-      ;;
-    *.tar.gz|*.tgz) # gzip
-      tar zxf "${_archive}" ||
-        error "There was an error while extracting the archive '${_archive}'."
-      ;;
-    *github.com/*/tarball/*)
-      tar zxf "${_archive}" ||
-        error "There was an error while extracting the archive '${_archive}'."
-      local name_pattern="${_uri#https://github.com/}"
-      name_pattern="${name_pattern%tarball/*}"
-      name_pattern="${name_pattern//\//-}"
-      mv ${name_pattern}*/* .
-      rm -rf ${name_pattern}*
-      ;;
-    *.tar.bz2|*.tbz2) # bzip
-      tar jxf "${_archive}" ||
-        error "There was an error while extracting the archive '${_archive}'."
-      ;;
-    *.tar.xz) # LZMA
-      # TODO: if 'xz' command exists, use that, otherwise use tar J
-      tar Jxf "${_archive}" ||
-        error "There was an error while extracting the archive '${_archive}'."
-      ;;
-    *.zip)
-      unzip "${_archive}" ||
-        error "There was an error while extracting the archive '${_archive}'."
-      ;;
-    *)
-      error "Unknown archive format for ${_archive}."
-      ;;
-  esac
-
-  if ! ls -d * &>/dev/null
-  then
-    error "Empty archive ${_archive}."
-  fi
-
-  write "${_uri}" to "./.uri"
 }
 
 is_archive_uri() {
@@ -302,6 +64,52 @@ is_archive_uri() {
   esac
 }
 
+fetch_uri_parse_args()
+{
+  local _token _allowed_arg
+  while (( $# > 0 ))
+  do
+    _token="$1"
+    shift
+    for _allowed_arg in branch remote revision scm_type md5
+    do
+      case "${_token}" in
+        (*${_allowed_arg})
+          eval "${_allowed_arg}=\"${1}\""
+          shift || error "${_allowed_arg} must be specified after '${_token}'."
+          continue 2
+          ;;
+      esac
+    done
+    _args+=("${_token}")
+  done
+}
+
+fetch_uri_detect_scm_type()
+{
+  local _uri="${1:-}"
+  if [[ -d "${_uri}" ]] # check for directory
+  then
+    scm_type="path"
+  elif is_archive_uri "${_uri}" # check for packages
+  then
+    scm_type="archive"
+  elif is_github_uri "${_uri}" # check for pattern user/repository from github
+  then
+    scm_type="github"
+  else
+    case "${_uri}" in
+      (*git*)    scm_type="git" ;;
+      (*svn*)    scm_type="svn" ;;
+      (*hg*)     scm_type="hg"     ;;
+      (*fossil*) scm_type="fossil" ;;
+      (*)
+        error "Unknown SCM for url '${_uri}'."
+        ;;
+    esac
+  fi
+}
+
 # ## fetch\_uri()
 #
 #
@@ -309,84 +117,46 @@ is_archive_uri() {
 # Code Walkthrough
 fetch_uri()
 {
-  local _uri="${1:-}" _target="${2:-}" _args=()
+  trace_filter vcs
 
+  local _uri="${1:-}" _target="${2:-}" _args=()
   shift || fail "uri must be specified as the first parameter."
   shift || fail "target path must be specified as the second parameter."
 
-  trace_filter vcs
-
-  _args=("${_uri}" "${_target}")
-
-  while (( $# > 0 ))
-  do
-    token="$1"
-    shift
-    case "$token" in
-      *branch)
-        branch="${1}"
-        shift || error "branch must be specified after keyword 'branch'."
-        ;;
-      *remote)
-        remote="${1}"
-        shift || error "remote must be specified after keyword 'remote'."
-        ;;
-      *revision)
-        revision="${1}"
-        shift || error "revision must be specified after keyword 'revision'."
-        ;;
-      *) # Pass through any unknowns
-        _args+=("${token}")
-        ;;
-    esac
-  done
-
   unset scm_type
+  _args=("${_uri}" "${_target}")
+  fetch_uri_parse_args "$@"
 
-  if [[ -d "${_uri}" ]] # check for directory
-  then
-    scm_type="directory"
-    directory_get "${_args[@]}"
-    return $?
+  [[ -n "${scm_type}" ]] || fetch_uri_detect_scm_type "${_uri}"
 
-  elif is_archive_uri "${_uri}" # check for packages
-  then
-    scm_type="package"
-    archive_get "${_args[@]}"
-    return $?
-
-  elif is_github_uri "${_uri}" # check for pattern user/repository from github
-  then
-    scm_type="github"
-    github_get "${_args[@]}"
-    return $?
-  fi
-
-  case "${_uri}" in
-    (*git*)
-      scm_type="git"
-      git_get "${_args[@]}"
-      ;;
-    (*svn*)
-      scm_type="svn"
-      NIY "Subversion scm_update"
-      svn_get
-      ;;
-    (*hg*)
-      scm_type="hg"
-      NIY "hg scm_update"
-      hg_get
-      ;;
-    (*fossil*)
-      scm_type="fossil"
-      NIY "fossil scm_update"
+  case "${scm_type}" in
+    (path|archive|github|git|svn|hg|fossil)
+      module ext/vcs/${scm_type}
+      "${scm_type}_get" "${_args[@]}"
       ;;
     (*)
-      error "Unknown SCM for url '${_uri}'."
+      error "Unknown SCM("${scm_type}") for url '${_uri}'."
       ;;
   esac
 }
 fetch()
 {
   fetch_uri "$@"
+}
+
+fetch_update()
+{
+  local _uri _target="${1:-}"
+  shift || fail "target path must be specified as the second parameter."
+  if [[ -d "${_target}" ]] \
+  && [[ -s "${_target}/.uri" ]]
+  then
+    _uri=$( cat "${_target}/.uri" )
+    if [[ -n "${_uri}" ]]
+    then
+      fetch_uri "${_uri}" "${_target}" "$@"
+      return $?
+    fi
+  fi
+  return 1
 }

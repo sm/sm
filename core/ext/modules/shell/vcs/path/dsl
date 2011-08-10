@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+# ## directory\_get()
+#
+#
+#
+# Code Walkthrough
+path_get()
+{
+  local initial_pwd="$PWD" _source="${1:-}" _target="${2:-}"
+
+  shift || fail "source path must be the first parameter to path_get()."
+  shift || fail "target path must be the second parameter to path_get()."
+
+  rm -rf "${_target}" 2>&1 >/dev/null
+
+  if cp -fR ${_source} "${_target}" >/dev/null 2>&1
+  then
+    echo "$(cd "${_source}"; pwd)" > "${_target}/.uri"
+  else
+    fail "There was an error copying '${_source}'."
+  fi
+}

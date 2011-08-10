@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+# ## github\_get()
+#
+#
+#
+# Code Walkthrough
+github_get()
+{
+  local _uri="${1:-}" _target="${2:-}"
+
+  shift || fail "uri must be specified as the first parameter."
+  shift || fail "target path must be specified as the second parameter."
+
+  # TODO: account for url.
+  git_get "git://github.com/${_uri}.git" "${_target}" "$@"
+
+  write "${_uri}" to "${_target}/.uri"
+}

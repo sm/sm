@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+
+# ## archive\_get()
+#
+#
+#
+# Code Walkthrough
+archive_get() {
+  local _uri="${1:-}" _final_target="${2:-}" _package_md5="${3:-${md5:-#}}" \
+    _archive="${archives_path}/${_uri##*/}"
+
+  shift || fail "uri must be specified as the first parameter."
+  shift || fail "target path must be specified as the second parameter."
+
+  [[ -d "${archives_path}" ]] || mkdir -p "${archives_path}"
+
+  if [[ -f "${_archive}" ]] &&
+    ! file_matches_md5 "${_archive}" "${_package_md5}"
+  then
+    log "${_uri##*/} does not match MD5 checksum ${_package_md5}; removing and downloading."
+    rm -f "${_archive}"
+  fi
+
+  if [[ ! -f "${_archive}" ]]
+  then
+    if [[ -f "${_uri}" ]]
+    then
+      if ! copy_file --force "${_uri}" to "${_archive}"
+      then
+        log "Copying from '${_uri}' to '${_archive}' failed."
+        return 1
+      fi
+    else
+      if ! curl -s -L "${_uri}" -o "${_archive}"
+      then
+        log "Downloading from '${_uri}' to '${_archive}' failed."
+        return 1
+      fi
+    fi
+  fi
+
+  rm -rf "${_final_target}" || true
+  mkdir -p "${_final_target}"
+  builtin cd "${_final_target}"
+
+  case "${_uri}" in
+    *.tar) # tar
+      tar xf "${_archive}" ||
+        error "There was an error while extracting the archive '${_archive}'."
+      ;;
+    *.tar.gz|*.tgz) # gzip
+      tar zxf "${_archive}" ||
+        error "There was an error while extracting the archive '${_archive}'."
+      ;;
+    *github.com/*/tarball/*)
+      tar zxf "${_archive}" ||
+        error "There was an error while extracting the archive '${_archive}'."
+      local name_pattern="${_uri#https://github.com/}"
+      name_pattern="${name_pattern%tarball/*}"
+      name_pattern="${name_pattern//\//-}"
+      mv ${name_pattern}*/* .
+      rm -rf ${name_pattern}*
+      ;;
+    *.tar.bz2|*.tbz2) # bzip
+      tar jxf "${_archive}" ||
+        error "There was an error while extracting the archive '${_archive}'."
+      ;;
+    *.tar.xz) # LZMA
+      # TODO: if 'xz' command exists, use that, otherwise use tar J
+      tar Jxf "${_archive}" ||
+        error "There was an error while extracting the archive '${_archive}'."
+      ;;
+    *.zip)
+      unzip "${_archive}" ||
+        error "There was an error while extracting the archive '${_archive}'."
+      ;;
+    *)
+      #TODO: add detection based on $( file ${_archive} ) type
+      error "Unknown archive format for ${_archive}."
+      ;;
+  esac
+
+  if ! ls -d * &>/dev/null
+  then
+    error "Empty archive ${_archive}."
+  fi
+
+  write "${_uri}" to "./.uri"
+}
