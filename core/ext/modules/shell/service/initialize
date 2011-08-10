@@ -63,9 +63,14 @@ service_root_paths=(
 
 if user_is_root
 then
-  true "${service_user:="${package_user:-"${service}"}"}"
+  if os_is_darwin
+  then
+    true "${service_user:="_${service}"}"
+  else
+    true "${service_user:="${service}"}"
+  fi
 else
-  true "${service_user:="${package_user:-"$USER"}"}"
+  true "${service_user:="$USER"}"
 fi
 
 local _path
