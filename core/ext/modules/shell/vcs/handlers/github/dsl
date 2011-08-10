@@ -13,7 +13,8 @@ github_get()
   shift || fail "target path must be specified as the second parameter."
 
   # TODO: account for url.
-  git_get "git://github.com/${_uri}.git" "${_target}" "$@"
+  debug vcs "github -> https://github.com/${_uri}/tarball/master"
+  archive_get "https://github.com/${_uri}/tarball/master" "${_target}" "$@"
 
   if [[ -z "${__vcs_failed}" ]]
   then

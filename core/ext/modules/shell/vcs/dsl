@@ -42,7 +42,7 @@ fetch_uri()
   trace_filter vcs
   fetch_error_initialize "$@"
 
-  local _uri="${1:-}" _target="${2:-}" _args=()
+  local initial_pwd="$PWD" _uri="${1:-}" _target="${2:-}" _args=()
   shift || fail "uri must be specified as the first parameter."
   shift || fail "target path must be specified as the second parameter."
 
@@ -71,6 +71,8 @@ fetch_uri()
       fetch_error unknown_scm "uri=${_uri}"
       ;;
   esac
+
+  builtin cd "$initial_pwd"
 }
 
 fetch_update()

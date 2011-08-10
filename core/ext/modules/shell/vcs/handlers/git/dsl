@@ -81,7 +81,5 @@ git_get()
 
   cp -fR "${_target}" "${_final_target}" &>/dev/null || \
     fetch_error copy_failed from=${_target} to=${_final_target}
-
-  builtin cd "$initial_pwd"
 }
 
