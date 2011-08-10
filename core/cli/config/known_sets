@@ -6,6 +6,7 @@ tools=wayneeseguin/bdsm-tools
 languages=wayneeseguin/bdsm-languages
 databases=wayneeseguin/bdsm-databases
 servers=wayneeseguin/bdsm-servers
+backups=wayneeseguin/bdsm-backups
 gnu=wayneeseguin/bdsm-gnu
 javascript=wayneeseguin/bdsm-javascript
 networking=wayneeseguin/bdsm-networking
