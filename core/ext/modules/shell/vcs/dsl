@@ -4,66 +4,6 @@
 # # VCS (SCM) Module
 #
 
-# ## detect\_uri()
-#
-#
-#
-# Code Walkthrough
-detect_uri()
-{
-  local extensions_path="${1:-}" _uri_path
-
-  shift || fail "extensions_path must be specified as the first parameter."
-
-  rebuild_path ".uri" $extensions_path $@
-
-  _uri_path="${rebuilded_path}"
-
-  if [[ -s "${_uri_path}" ]]
-  then
-    uri_path="${_uri_path}"
-    return 0
-  else
-    return 1
-  fi
-}
-
-# ## scm\_identifier()
-#
-#
-#
-# Code Walkthrough
-scm_identifier()
-{
-  local _uri="${1:-}"
-
-  shift || fail "url must be the first parameter to scm_identifier()."
-
-  printf "${_uri//\//_}"
-}
-
-# ## is\_github\_uri()
-#
-#
-#
-# Code Walkthrough
-is_github_uri()
-{
-  #TODO: add validation that given repository exists on github
-  ematch "$1" "^[[:alnum:]_-]+\/[[:alnum:]_-]+$"
-}
-
-is_archive_uri() {
-  case "$1" in
-    *.tar|*.tgz|*.txz|*.tbz2|*.xz|*.bz2|*.gz|*.zip|*.lzma|*github.com/*/tarball/*)
-      return 0
-      ;;
-    *)
-      return 1
-      ;;
-  esac
-}
-
 fetch_uri_parse_args()
 {
   local _token _allowed_arg
@@ -83,31 +23,6 @@ fetch_uri_parse_args()
     done
     _args+=("${_token}")
   done
-}
-
-fetch_uri_detect_scm_type()
-{
-  local _uri="${1:-}"
-  if [[ -d "${_uri}" ]] # check for directory
-  then
-    scm_type="path"
-  elif is_archive_uri "${_uri}" # check for packages
-  then
-    scm_type="archive"
-  elif is_github_uri "${_uri}" # check for pattern user/repository from github
-  then
-    scm_type="github"
-  else
-    case "${_uri}" in
-      (*git*)    scm_type="git" ;;
-      (*svn*)    scm_type="svn" ;;
-      (*hg*)     scm_type="hg"     ;;
-      (*fossil*) scm_type="fossil" ;;
-      (*)
-        error "Unknown SCM for url '${_uri}'."
-        ;;
-    esac
-  fi
 }
 
 # ## fetch\_uri()
@@ -131,7 +46,7 @@ fetch_uri()
 
   case "${scm_type}" in
     (path|archive|github|git|svn|hg|fossil)
-      module ext/vcs/${scm_type}
+      module ext/vcs/handlers/${scm_type}
       "${scm_type}_get" "${_args[@]}"
       ;;
     (*)
@@ -139,6 +54,7 @@ fetch_uri()
       ;;
   esac
 }
+
 fetch()
 {
   fetch_uri "$@"
