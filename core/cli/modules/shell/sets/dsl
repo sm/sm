@@ -32,12 +32,17 @@ sets_list()
 
   for _path in "${extensions_search_paths[@]}"
   do
+    [[ -d "${_path}"  ]] || continue
+
     if [[ "${_path}" =~ "${extension_sets_path}" ]]
     then
       log "${_path##${extension_sets_path}\/}:"
     elif [[ "${_path}" =~ "${extension_sets_home}" ]]
     then
       log "${_path##${extension_sets_home}\/}: # User set"
+    elif [[ "${_path}" == "${extension_exts_home}" ]]
+    then
+      log "${_path##*\/}: # User set"
     else
       log "${_path##$bdsm_path\/}:"
     fi
@@ -71,7 +76,7 @@ sets_install()
     error "builtin extension set may not be (re-)installed, except by updating BDSM core (bdsm get head)."
 
   [[ -n "${_uri}" ]] ||
-    _uri=$( awk -F = "/^${_name}=/ {print \$2 }" < "${bdsm_path}/core/cli/config/known_sets" )
+    _uri=$( awk -F = "/^${_name}=/ {print \$2 }" < "${bdsm_path}/core/cli/config/known_sets" | tail -n 1 )
 
   [[ -n "${_uri}" ]] ||
     error "Cannot find ${_name} in known extension sets list."
@@ -149,6 +154,8 @@ sets_update_all()
   local _name
   for _name in ${extension_sets_home}/*
   do
+    [[ -d "${_name}"  ]] || continue
+
     case "${_name##*/}" in
       builtin|ext)
         # Skip those two

@@ -45,18 +45,16 @@ init_extensions_search_paths()
 {
   if [[ -z "${extensions_search_paths[*]}" ]]
   then
-    # Single extensions installed
-    extensions_search_paths=( "${bdsm_path}/exts" )
+    extensions_search_paths=( )
 
-    # System extension sets
-    local _extension_set_path
-    for _extension_set_path in ${extension_sets_path}/*
-    do
-      if [[ -d "${_extension_set_path}" ]]
-      then
-        extensions_search_paths+=( "${_extension_set_path}" )
-      fi
-    done
+    # Single user extensions
+    if [[ "${extension_exts_path}" != "${extension_exts_home}" ]]
+    then
+      extensions_search_paths+=( "${extension_exts_home}" )
+    fi
+
+    # Single system extensions
+    extensions_search_paths+=( "${extension_exts_path}" )
 
     # User extension sets
     if [[ "${extension_sets_path}" != "${extension_sets_home}" ]]
@@ -69,6 +67,17 @@ init_extensions_search_paths()
         fi
       done
     fi
+
+    # System extension sets
+    local _extension_set_path
+    for _extension_set_path in ${extension_sets_path}/*
+    do
+      if [[ -d "${_extension_set_path}" ]]
+      then
+        extensions_search_paths+=( "${_extension_set_path}" )
+      fi
+    done
+
   fi
 
   # Core is required to run, add it if not found
@@ -76,6 +85,7 @@ init_extensions_search_paths()
   then
     extensions_search_paths+=( "${bdsm_path}/core" )
   fi
+
   export extensions_search_paths
 }
 

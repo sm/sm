@@ -3,10 +3,10 @@
 bdsm_version
 
 case "${extension_args[0]}" in
-  -v) # Only echo version information.
+  -v|-V) # Only echo version information.
     succeed "${bdsm_version:-"?.?.?"}"
     ;;
-  -V|--version) # GNU-style extended version information.
+  *) # GNU-style extended version information.
     succeed "\nBDSM Framework ${bdsm_version:-"?.?.?"} https://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)\n"
     ;;
 esac

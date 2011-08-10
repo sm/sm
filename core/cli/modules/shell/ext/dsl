@@ -29,15 +29,24 @@ ext_help()
 ext_list()
 {
   local extensions COLUMNS=80
-  extensions_in "${bdsm_path}/exts"
-  extensions=( ${found_extensions[@]} )
 
-  if array_is_nonempty extensions
+  if extensions_in "${extension_exts_path}"
   then
-    log "ext: "
-    echo ${extensions[@]} | xargs -s ${COLUMNS} | xargs -I '{}' echo "  - {}"
+    log "exts: #system"
+    echo ${found_extensions[@]} | xargs -s ${COLUMNS} | xargs -I '{}' echo "  - {}"
   else
-    log "# No single extensions (ext) are currently installed."
+    log "# No single system extensions (exts) are currently installed."
+  fi
+
+  if [[ "${extension_exts_path}" != "${extension_exts_home}" ]]
+  then
+    if extensions_in "${extension_exts_home}"
+    then
+      log "exts: #user"
+      echo ${found_extensions[@]} | xargs -s ${COLUMNS} | xargs -I '{}' echo "  - {}"
+    else
+      log "# No single user extensions (exts) are currently installed."
+    fi
   fi
 }
 
@@ -63,7 +72,8 @@ ext_install()
   local _identifier="$(scm_identifier "${_uri}")"
 
   log_step "bdsm_${_name}" # TODO: if fail, log_step failure
-  enter "${bdsm_path}/exts"
+  ensure_paths_exist "${extension_exts_home}"
+  enter "${extension_exts_home}"
   fetch_uri "${_uri}" "${src_path}/${_identifier}"
   remove_paths "${_name}"
   copy_directory "${src_path}/${_identifier}" to "${_name}"
@@ -90,21 +100,21 @@ ext_update()
   fi
   for _name in "$@"
   do
-    case "${_name}" in
-      external|builtin)
-        error "Extension ${_name} cannot be updated."
-        ;;
-    esac
-    if [[ ! -d "${bdsm_path}/exts/${_name}" ]]
+    if [[ ! -d "${extension_exts_home}/${_name}" ]]
     then
-      error "Extension ${_name} does not exist."
+      if [[ -d "${extension_exts_path}/${_name}" ]]
+      then
+        error "Extension ${_name} is in system exts and cannot be updated."
+      else
+        error "Extension ${_name} does not exist."
+      fi
     fi
-    if [[ ! -s "${bdsm_path}/exts/${_name}/.uri" ]]
+    if [[ ! -s "${extension_exts_home}/${_name}/.uri" ]]
     then
       log "Extension ${_name} does not contain stored uri.\n"
       continue
     fi
-    _uri=$( cat "${bdsm_path}/exts/${_name}/.uri" )
+    _uri=$( cat "${extension_exts_home}/${_name}/.uri" )
     if [[ -z "${_uri}" ]]
     then
       log "Extension ${_name} does not contain stored uri."
@@ -117,12 +127,13 @@ ext_update()
 ext_update_all()
 {
   local _name
-  for _name in ${extensions_search_paths[@]}
+  for _name in ${extension_exts_home}/*
   do
     case "${_name##*/}" in
-      external|builtin)
-        # Skip those two
+      \*)
+        error "No extensions found for update."
         ;;
+
       *)
         ext_update "${_name##*/}"
         ;;
@@ -137,14 +148,16 @@ ext_uninstall()
     */*|.|..)
       error "Please specify a valid extension name."
       ;;
-    external|builtin)
-      error "Extension ${_name} cannot be removed."
-      ;;
   esac
-  enter "${bdsm_path}/exts"
+  enter "${extension_exts_home}"
   if [[ ! -d "${_name}" ]]
   then
-    error "Please specify a valid extension name."
+    if [[ -d "${extension_exts_path}/${_name}" ]]
+    then
+      error "Extension ${_name} is in system exts and cannot be uninstalled."
+    else
+      error "Extension ${_name} does not exist."
+    fi
   fi
 
   #TODO: are you sure ?

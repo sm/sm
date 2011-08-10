@@ -41,6 +41,7 @@ true \
   "${archives_path:="${bdsm_path}/archives"}" \
   "${scm_path:="${bdsm_path}/scm"}" \
   "${extension_sets_path:="${bdsm_path}/sets"}" \
+  "${extension_exts_path:="${bdsm_path}/exts"}" \
   "${extensions_src_path:="${src_path}/extensions"}" \
   "${tmp_path:="${bdsm_path}/tmp"}" \
   "${bin_path:="${bdsm_path}/bin"}" \
@@ -58,13 +59,13 @@ true \
   "${active_path:="${packages_path}/active"}" \
   "${extension_args:=""}"
 
-user_shell=$(which $(ps -eo pid,comm | awk "{ if ($PPID == \$1) print \$2}") )
+user_shell=$(which $(ps -eo pid,comm | awk "{ if ($PPID == \$1) print \$2}") 2>/dev/null )
 
 case "${user_shell}" in
   *sh)
   ;;
   *)
-  user_shell=$(which $(ps -eo pid,comm | awk "{ if ($$ == \$1) print \$2}") )
+  user_shell=$(which $(ps -eo pid,comm | awk "{ if ($$ == \$1) print \$2}") 2>/dev/null )
   ;;
 esac
 
@@ -75,6 +76,16 @@ then
     extension_sets_home="${extension_sets_path}"
   else
     extension_sets_home="${user_bdsm_path}/sets"
+  fi
+fi
+
+if [[ -z "${extension_exts_home}" ]]
+then
+  if [[ -w "${extension_exts_path}" ]]
+  then
+    extension_exts_home="${extension_exts_path}"
+  else
+    extension_exts_home="${user_bdsm_path}/exts"
   fi
 fi
 
