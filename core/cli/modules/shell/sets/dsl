@@ -154,7 +154,7 @@ sets_update_all()
   local _name
   for _name in ${extension_sets_home}/*
   do
-    [[ -d "${_path}"  ]] || continue
+    [[ -d "${_name}"  ]] || continue
 
     case "${_name##*/}" in
       builtin|ext)
