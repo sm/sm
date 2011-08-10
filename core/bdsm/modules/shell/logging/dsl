@@ -816,19 +816,26 @@ core_log_step()
 }
 log_step()
 {
-  local _message="$1" _output
+  local _message="$1" _output _log_file
   if (( $# > 1 ))
   then
     shift
     core_log_step "${_message}"
-    if _output="$("$@" 2>&1)"
+    _log_file="${TMP_PATH:-/tmp}/err_$$.log"
+    if "$@" &>${_log_file}
     then
       core_log_step "succ"
     else
       core_log_step "fail"
-      printf "${_output}\n"
+      cat ${_log_file} >&2
+      rm -rf ${_log_file}
     fi
   else
     core_log_step "${_message}"
   fi
+}
+
+clean_tmp_logs()
+{
+  rm -rf ${TMP_PATH:-/tmp}/err_*.log
 }
