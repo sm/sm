@@ -9,7 +9,7 @@ git_get()
 {
   local initial_pwd="$PWD" _uri="${1:-}" _final_target="${2:-}" \
     branch=${3:-${branch:-master}} remote=${4:-${remote:-origin}} \
-    revision=${4:-${revision:-HEAD}}
+    revision=${5:-${revision:-HEAD}}
 
   shift || fail "url must be the first parameter to git_get()."
   shift || fail "target path must be the second parameter to git_get()."
@@ -38,7 +38,7 @@ git_get()
         git checkout -b "${branch}" --track "${remote}/${branch}" 2>&1 >/dev/null
         )
       then
-        error "$remote $branch remote branch not found."
+        fetch_error remote_branch_not_found
       fi
     elif [[ -z "$(git branch | awk "/\* $branch$/{print \$2}" 2>/dev/null)" ]]
     then
@@ -47,7 +47,7 @@ git_get()
         git checkout $branch >/dev/null 2>&1
         )
       then
-        error "Unable to checkout $branch."
+        fetch_error cannot_checkout_branch
       fi
     fi
 
@@ -56,7 +56,7 @@ git_get()
       git pull --rebase origin $branch >/dev/null 2>&1
       )
     then
-      fail "Git pull failed."
+      fetch_error pull_failed
     fi
   else
     mkdir -p "${_target}"
@@ -69,17 +69,17 @@ git_get()
       then
         echo "${_uri_https}" > "${_target}/.uri"
       else
-        fail "There was an error while cloning the repository from the url '${_uri}.'"
+        fetch_error cannot_clone
       fi
     fi
   fi
+  [[ -z "${__vcs_failed}" ]] || return 0
 
-  [[ ! -d "${_final_target}" ]] || rm -rf "${_final_target}"
+  [[ ! -d "${_final_target}" ]] || rm -rf "${_final_target}" || \
+    fetch_error cannot_remove path=${_final_target}
 
-  if ! cp -fR "${_target}" "${_final_target}" >/dev/null 2>&1
-  then
-    fail "There was an error copying '${_target}' -> '${_final_target}'."
-  fi
+  cp -fR "${_target}" "${_final_target}" &>/dev/null || \
+    fetch_error copy_failed from=${_target} to=${_final_target}
 
   builtin cd "$initial_pwd"
 }

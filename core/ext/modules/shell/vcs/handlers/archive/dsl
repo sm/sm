@@ -14,10 +14,10 @@ archive_get() {
 
   [[ -d "${archives_path}" ]] || mkdir -p "${archives_path}"
 
-  if [[ -f "${_archive}" ]] &&
-    ! file_matches_md5 "${_archive}" "${_package_md5}"
+  if [[ -f "${_archive}" ]] \
+  && ! file_matches_md5 "${_archive}" "${_package_md5}"
   then
-    log "${_uri##*/} does not match MD5 checksum ${_package_md5}; removing and downloading."
+    debug vcs "${_uri##*/} does not match MD5 checksum ${_package_md5}; removing and downloading."
     rm -f "${_archive}"
   fi
 
@@ -25,19 +25,14 @@ archive_get() {
   then
     if [[ -f "${_uri}" ]]
     then
-      if ! copy_file --force "${_uri}" to "${_archive}"
-      then
-        log "Copying from '${_uri}' to '${_archive}' failed."
-        return 1
-      fi
+      copy_file --force "${_uri}" to "${_archive}" || \
+        fetch_error copy_failed from=${_uri} to=${_archive}
     else
-      if ! curl -s -L "${_uri}" -o "${_archive}"
-      then
-        log "Downloading from '${_uri}' to '${_archive}' failed."
-        return 1
-      fi
+      curl -s -L "${_uri}" -o "${_archive}" || \
+        fetch_error download_failed from=${_uri} to=${_archive}
     fi
   fi
+  [[ -z "${__vcs_failed}" ]] || return 0
 
   rm -rf "${_final_target}" || true
   mkdir -p "${_final_target}"
@@ -45,16 +40,13 @@ archive_get() {
 
   case "${_uri}" in
     *.tar) # tar
-      tar xf "${_archive}" ||
-        error "There was an error while extracting the archive '${_archive}'."
+      tar xf "${_archive}" || fetch_error extracting_archive_failed
       ;;
     *.tar.gz|*.tgz) # gzip
-      tar zxf "${_archive}" ||
-        error "There was an error while extracting the archive '${_archive}'."
+      tar zxf "${_archive}" || fetch_error extracting_archive_failed
       ;;
     *github.com/*/tarball/*)
-      tar zxf "${_archive}" ||
-        error "There was an error while extracting the archive '${_archive}'."
+      tar zxf "${_archive}" || fetch_error extracting_archive_failed
       local name_pattern="${_uri#https://github.com/}"
       name_pattern="${name_pattern%tarball/*}"
       name_pattern="${name_pattern//\//-}"
@@ -62,28 +54,23 @@ archive_get() {
       rm -rf ${name_pattern}*
       ;;
     *.tar.bz2|*.tbz2) # bzip
-      tar jxf "${_archive}" ||
-        error "There was an error while extracting the archive '${_archive}'."
+      tar jxf "${_archive}" || fetch_error extracting_archive_failed
       ;;
     *.tar.xz) # LZMA
       # TODO: if 'xz' command exists, use that, otherwise use tar J
-      tar Jxf "${_archive}" ||
-        error "There was an error while extracting the archive '${_archive}'."
+      tar Jxf "${_archive}" || fetch_error extracting_archive_failed
       ;;
     *.zip)
-      unzip "${_archive}" ||
-        error "There was an error while extracting the archive '${_archive}'."
+      unzip "${_archive}" || fetch_error extracting_archive_failed
       ;;
     *)
       #TODO: add detection based on $( file ${_archive} ) type
-      error "Unknown archive format for ${_archive}."
+      fetch_error unknown_archive_format
       ;;
   esac
+  [[ -z "${__vcs_failed}" ]] || return 0
 
-  if ! ls -d * &>/dev/null
-  then
-    error "Empty archive ${_archive}."
-  fi
+  ls -d * &>/dev/null || fetch_error empty_archive
 
-  write "${_uri}" to "./.uri"
+  echo "${_uri}" > "./.uri"
 }

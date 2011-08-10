@@ -15,5 +15,5 @@ github_get()
   # TODO: account for url.
   git_get "git://github.com/${_uri}.git" "${_target}" "$@"
 
-  write "${_uri}" to "${_target}/.uri"
+  [[ -z "${__vcs_failed}" ]] && echo "${_uri}" > "${_target}/.uri"
 }

@@ -12,12 +12,15 @@ path_get()
   shift || fail "source path must be the first parameter to path_get()."
   shift || fail "target path must be the second parameter to path_get()."
 
-  rm -rf "${_target}" 2>&1 >/dev/null
-
-  if cp -fR ${_source} "${_target}" >/dev/null 2>&1
+  if rm -rf "${_target}" &>/dev/null
   then
-    echo "$(cd "${_source}"; pwd)" > "${_target}/.uri"
+    if cp -fR ${_source} "${_target}" >/dev/null 2>&1
+    then
+      echo "$(cd "${_source}"; pwd)" > "${_target}/.uri"
+    else
+      fetch_error copy_failed from=${_source} to=${_target}
+    fi
   else
-    fail "There was an error copying '${_source}'."
+    fetch_error cannot_remove path=${_target}
   fi
 }

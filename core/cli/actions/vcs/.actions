@@ -1,4 +1,4 @@
 help=scm_help()
 default=scm_help()
-fetch=fetch_uri()
-scm_get=fetch_uri()
+fetch=cli_fetch()
+scm_get=cli_fetch()
