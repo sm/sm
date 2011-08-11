@@ -827,7 +827,7 @@ log_step()
     shift
     core_log_step "${_message}"
     _log_file="${TMP_PATH:-/tmp}/err_$$.log"
-    if "$@" &>${_log_file}
+    if "$@" >${_log_file} 2>&1
     then
       core_log_step "succ"
     else

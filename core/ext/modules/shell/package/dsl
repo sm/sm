@@ -568,6 +568,7 @@ package_build()
   fi
 
   debug package "package_build: ${_command}"
+
   if eval "${_command}" > build.log 2>&1
   then
     return 0
