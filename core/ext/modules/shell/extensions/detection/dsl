@@ -119,6 +119,7 @@ detect_action()
 }
 
 # find modules on path
+# return longest module path on top
 detect_modules_paths()
 {
   local root="$1" path="" IFS='/'
