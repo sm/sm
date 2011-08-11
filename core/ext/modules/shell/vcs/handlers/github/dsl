@@ -7,14 +7,14 @@
 # Code Walkthrough
 github_get()
 {
-  local _uri="${1:-}" _target="${2:-}"
+  local _uri="${1:-}" _target="${2:-}" branch=${3:-${branch:-master}}
 
   shift || fail "uri must be specified as the first parameter."
   shift || fail "target path must be specified as the second parameter."
 
   # TODO: account for url.
-  debug vcs "github -> https://github.com/${_uri}/tarball/master"
-  archive_get "https://github.com/${_uri}/tarball/master" "${_target}" "$@"
+  debug vcs "github -> https://github.com/${_uri}/tarball/${branch}"
+  archive_get "https://github.com/${_uri}/tarball/${branch}" "${_target}" "$@"
 
   if [[ -z "${__vcs_failed}" ]]
   then
