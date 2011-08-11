@@ -12,6 +12,16 @@ archive_get() {
   shift || fail "uri must be specified as the first parameter."
   shift || fail "target path must be specified as the second parameter."
 
+  case "${_uri}" in
+    # fix github archive names
+    *github.com/*/tarball/*)
+      _archive="${_uri#*github.com/}"
+      _archive="${_archive%/tarball*}"
+      _archive="${archives_path}/${_archive//\//_}_${_uri##*/}.tar.gz"
+      debug vcs "github tarball archive name ${_archive}."
+      ;;
+  esac
+
   [[ -d "${archives_path}" ]] || mkdir -p "${archives_path}"
 
   if [[ -f "${_archive}" ]] \
