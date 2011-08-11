@@ -608,6 +608,8 @@ os_cpu_count()
     warn "CPU counting for AIX has not yet been implemented; returning 1."
   fi
 
+  (( _cpu_count > 0 )) || _cpu_count=1 # Sanity Check
+
   printf '%d' ${_cpu_count}
 }
 
