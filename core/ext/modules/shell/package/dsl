@@ -987,9 +987,10 @@ package_ldconfig()
         chmod_files 0444 "/etc/ld.so.conf.d/bdsm.conf"
       fi
 
-      command_exists "${ldconfig}" || ldconfig="ldconfig"
+      command_exists "${_ldconfig}" || ldconfig="ldconfig"
 
-      log_step "${package_name} ${package_version} ~ ldconfig" ldconfig "${active_path}/lib"
+      log_step "${package_name} ${package_version} ~ ldconfig" \
+        "${_ldconfig}" "${active_path}/lib"
 
     elif os_is_darwin
     then # Cluster Fuck!
