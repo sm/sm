@@ -828,9 +828,10 @@ log_step()
   then
     shift
     core_log_step "${_message}"
+
     _log_file="${TMP_PATH:-/tmp}/$$.stderr.log"
 
-    if "$@" > "${_log_file}" 2>&1
+    if "$@" > "${_log_file}"
     then
       core_log_step "succ"
       return 0
