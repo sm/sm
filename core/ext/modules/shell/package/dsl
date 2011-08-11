@@ -574,7 +574,7 @@ package_build()
 
   debug package "package_build: ${_command}"
 
-  if "${_command}" > build.log 2>&1
+  if ${_command} > build.log 2>&1
   then
     return 0
   else
