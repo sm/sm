@@ -10,6 +10,7 @@ then
     prefix_path="/usr/local"
     bdsm_path="/usr/local/bdsm"
   else
+    prefix_path=""
     bdsm_path="$HOME/.bdsm"
   fi
 fi
@@ -22,6 +23,6 @@ src_path="${bdsm_path}/src"
 extension_sets_home="${bdsm_path}/sets"
 extension_exts_home="${bdsm_path}/exts"
 
-export install_path archives_path scm_path src_path extension_sets_home
+export install_path prefix_path archives_path scm_path src_path extension_sets_home
 
 ./local --call=install/install_bdsm "$@"
