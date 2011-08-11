@@ -8,21 +8,26 @@ fetch_version()
 
 md5_match()
 { # TODO: switch this to using system module's os_* DSL
-  local archive="$1"
+  local _archive="$1" _path
 
-  case "$(uname)" in
-    Darwin|FreeBSD)
-      archive_md5="$(/sbin/md5 -q "${archive}")"
-      ;;
-
-    OpenBSD)
-      archive_md5="$(/bin/md5 -q "${archive}")"
-      ;;
-
-    Linux|*)
-      archive_md5="$(md5sum "${archive}" | awk '{print $1}')"
-      ;;
-  esac
+  if command_exists md5
+  then
+    archive_md5=$(md5 -q "${_archive}")
+  elif command_exists md5sum
+  then
+    archive_md5=$(md5sum "${_archive}" | awk '{print $1')
+  else
+    for _path in /sbin /bin /usr/bin /usr/sbin
+    do
+      if [[ -x "${_path}/md5"]]
+      then
+        archive_md5=$(md5 -q "${_archive}")
+      elif [[ -x "${_path}/md5sum"]]
+      then
+        archive_md5=$(md5sum "${_archive}" | awk '{print $1')
+      fi
+    done
+  fi
 
   [[ "${archive_md5}" == "${md5}" ]]
 }
