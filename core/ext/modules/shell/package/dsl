@@ -457,12 +457,17 @@ package_fetch()
 
   package_fetch_md5
 
-  fetch_uri "${package_url}" "${source_path}/${package_dir}" "${package_md5:-#}"
-
-  if [[ -d "${source_path}/${package_dir}/${package_dir}" ]]
+  if fetch_uri "${package_url}" "${source_path}/${package_dir}" "${package_md5:-#}"
   then
-    eval mv "${source_path}/${package_dir}/${package_dir}/*" "${source_path}/${package_dir}/"
-    rm -rf "${source_path}/${package_dir}/${package_dir}/"
+    if [[ -d "${source_path}/${package_dir}/${package_dir}" ]]
+    then
+      eval mv "${source_path}/${package_dir}/${package_dir}/*" \
+        "${source_path}/${package_dir}/"
+      rm -rf "${source_path}/${package_dir}/${package_dir}/"
+    fi
+    return 0
+  else
+    return 1
   fi
 }
 
