@@ -206,21 +206,19 @@ detect_modules_action()
 
   # second level modules dependency
   local _found_modules_paths
-  if _found_modules_paths=( $(find "${_modules_path}" -mindepth 2 -maxdepth 3 -name modules 2>/dev/null) )
-  then
-    for _module_path in ${_found_modules_paths[@]}
-    do
-      _module_path="${_module_path##${_modules_path}\/}"
-      _module_path="${_module_path%\/modules}"
-      _module_params="${__params[*]}"
-      _module_params="${_module_params// //}"
-      if detect_module_modules_action \
-        "${_modules_path}" "${_module_path}" "${_module_params}"
-      then
-        return 0
-      fi
-    done
-  fi
+  _found_modules_paths=( $(find "${_modules_path}" -mindepth 2 -maxdepth 3 -name modules 2>/dev/null || true) )
+  for _module_path in ${_found_modules_paths[@]}
+  do
+    _module_path="${_module_path##${_modules_path}\/}"
+    _module_path="${_module_path%\/modules}"
+    _module_params="${__params[*]}"
+    _module_params="${_module_params// //}"
+    if detect_module_modules_action \
+      "${_modules_path}" "${_module_path}" "${_module_params}"
+    then
+      return 0
+    fi
+  done
 
   return 1
 }
