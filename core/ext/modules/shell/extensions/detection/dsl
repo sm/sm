@@ -124,6 +124,7 @@ detect_modules_paths()
 {
   local root="$1" path="" IFS='/'
   shift
+  _module_definitions=( )
   while (( $# > 0 ))
   do
     if is_module "${root}${path}"
@@ -137,6 +138,47 @@ detect_modules_paths()
   done
 }
 
+detect_module_modules_action()
+{
+  debug detect_module_modules_action "start:$*:"
+  local _modules_path="$1" _module_path="$2" _module_params="$3" _module_name module_path
+  if [[ -s "${_modules_path}/${_module_path}/modules" ]]
+  then
+    for _module_name in $( cat "${_modules_path}/${_module_path}/modules" )
+    do
+      if in_search_paths detect_module "${_module_name}"
+      then
+        if [[ -s "${module_path}/actions" ]]
+        then
+          local _params="" _action="${_module_params}" _read_action
+          while [[ -n "${_action}" ]]
+          do
+            if file_contains "${module_path}/actions" "${_action}="
+            then
+              _read_action=$( hash_file "${module_path}/actions" "${_action//\//\/}" )
+              if [[ -n "$_read_action" ]]
+              then
+                action="$_read_action"
+                action_path="$extensions_path/$extension/actions/${_module_path// /\/}"
+                extension_args=( $_params )
+                return 0
+              fi
+            fi
+            if [[ "$_action" =~ "/" ]]
+            then
+              _params="${_action##*/} $_params"
+              _action="${_action%/*}"
+            else
+              break
+            fi
+          done
+        fi
+      fi
+    done
+  fi
+  return 1
+}
+
 # Search for extension that modules dependency providing matching [namespace...] action.
 detect_modules_action()
 {
@@ -146,53 +188,40 @@ detect_modules_action()
   shift 2 # TODO: proper error handling here...
 
   local token _word _modules_path="$extensions_path/$extension/modules/shell"
+  local __params=("$@") _module_path _module_params _module_name
 
-  local _params=("$@") _module_path _module_params _module_name
-
+  # first level modules dependency
   local _module_definition _module_definitions=()
-
-  detect_modules_paths "${_modules_path}" "$@"
-
+  detect_modules_paths "${_modules_path}" "${__params[@]}"
   for _module_definition in "${_module_definitions[@]}"
   do
     _module_path="${_module_definition//=*}"
     _module_params="${_module_definition//*=}"
-
-    if [[ -s "${_modules_path}/${_module_path}/modules" ]]
+    if detect_module_modules_action \
+      "${_modules_path}" "${_module_path}" "${_module_params}"
     then
-      for _module_name in $( cat "${_modules_path}/${_module_path}/modules" )
-      do
-        if in_search_paths detect_module "${_module_name}"
-        then
-          if [[ -s "${module_path}/actions" ]]
-          then
-            local _params="" _action="${_module_params}" _read_action
-            while [[ -n "${_action}" ]]
-            do
-              if file_contains "${module_path}/actions" "${_action}="
-              then
-                _read_action=$( hash_file "${module_path}/actions" "${_action//\//\/}" )
-                if [[ -n "$_read_action" ]]
-                then
-                  action="$_read_action"
-                  action_path="$extensions_path/$extension/actions/${_module_path// /\/}"
-                  extension_args=( $_params )
-                  return 0
-                fi
-              fi
-              if [[ "$_action" =~ "/" ]]
-              then
-                _params="${_action##*/} $_params"
-                _action="${_action%/*}"
-              else
-                break
-              fi
-            done
-          fi
-        fi
-      done
+      return 0
     fi
   done
+
+  # second level modules dependency
+  local _found_modules_paths
+  if _found_modules_paths=( $(find "${_modules_path}" -mindepth 2 -maxdepth 3 -name modules 2>/dev/null) )
+  then
+    for _module_path in ${_found_modules_paths[@]}
+    do
+      _module_path="${_module_path##${_modules_path}\/}"
+      _module_path="${_module_path%\/modules}"
+      _module_params="${__params[*]}"
+      _module_params="${_module_params// //}"
+      if detect_module_modules_action \
+        "${_modules_path}" "${_module_path}" "${_module_params}"
+      then
+        return 0
+      fi
+    done
+  fi
+
   return 1
 }
 
@@ -202,8 +231,7 @@ detect_unique_2nd_level_action()
   extensions_path=$1 extension=$2
   local _action=$3 _actions_path _found_actions=() _found_actions_paths _found_action_path
   shift 3
-  rebuild_path "actions" $extensions_path $extension
-  _actions_path=${rebuilded_path}
+  _actions_path="$extensions_path/$extension/actions"
   if [[ -d "${_actions_path}" ]]
   then
     if _found_actions_paths=( $(find "${_actions_path}" -mindepth 2 -maxdepth 3 -name "${_action}") )
