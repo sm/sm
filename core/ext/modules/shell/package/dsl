@@ -978,7 +978,7 @@ package_ldconfig()
       if ! file_exists "/etc/ld.so.conf.d/bdsm.conf"
       then
         printf "%s\n" "${active_path}/lib" > "/etc/ld.so.conf.d/bdsm.conf"
-        chmod_files 0644 "/etc/ld.so.conf.d/bdsm.conf"
+        chmod_files 0444 "/etc/ld.so.conf.d/bdsm.conf"
       fi
 
       ! command_exists /sbin/ldconfig || ldconfig="/sbin/ldconfig"
