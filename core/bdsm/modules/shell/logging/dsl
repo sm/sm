@@ -822,21 +822,24 @@ core_log_step()
 
 log_step()
 {
-  local _message="$1" _output _log_file
+  local _message="$1" _output _log_file _status
 
   if (( $# > 1 ))
   then
     shift
     core_log_step "${_message}"
-    _log_file="${TMP_PATH:-/tmp}/err_$$.log"
+    _log_file="${TMP_PATH:-/tmp}/$$.stderr.log"
 
     if "$@" > "${_log_file}" 2>&1
     then
       core_log_step "succ"
+      return 0
     else
+      _status="$?"
       core_log_step "fail"
-      cat ${_log_file} >&2
-      rm -rf ${_log_file}
+      cat "${_log_file}" >&2
+      rm -rf "${_log_file}"
+      return "{_status}" # pass error return status code up !
     fi
   else
     core_log_step "${_message}"
