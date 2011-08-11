@@ -40,7 +40,7 @@ init_scripts_path()
   if (( UID == 0 ))
   then
     # then based on operating system type
-    case "$MACHTYPE" in
+    case "$OSTYPE" in
       *darwin*)
         # If the OS is darwin, there is no 'init.d path' so to speak, the
         # service module will create and use one at /etc/init.d.
@@ -150,12 +150,7 @@ os_is_linux()
 {
   # If the machine type is linux then return the code for true/success, 0
   # Otherwise return a nonzero error code, 1
-  if [[ "$MACHTYPE" = *linux* ]]
-  then
-    return 0
-  else
-    return 1
-  fi
+  [[ "$OSTYPE" = *linux* ]]
 }
 
 #
@@ -195,12 +190,7 @@ os_is_darwin()
 {
   # If the machine type is darwin then return the code for true/success, 0
   # otherwise return a nonzero error code, 1.
-  if [[ "$MACHTYPE" = *darwin* ]]
-  then
-    return 0
-  else
-    return 1
-  fi
+  [[ "$OSTYPE" = *darwin* ]]
 }
 
 #
@@ -240,12 +230,7 @@ os_is_bsd()
 {
   # If the machine type is BSD then return the code for true/success, 0
   # otherwise return a nonzero error code, 1
-  if [[ "$MACHTYPE" = *bsd* ]]
-  then
-    return 0
-  else
-    return 1
-  fi
+  [[ "$OSTYPE" = *bsd* ]]
 }
 
 #
@@ -285,12 +270,7 @@ os_is_solaris()
 {
   # If the machine type is Solaris then return the code for true/success, 0
   # otherwise return a nonzero error code, 1.
-  if [[ "$MACHTYPE" = *solaris* ]]
-  then
-    return 0
-  else
-    return 1
-  fi
+  [[ "$OSTYPE" = *solaris* ]]
 }
 
 #
@@ -330,12 +310,7 @@ os_is_aix()
 {
   # If the machine type is aix then return the code for true/success, 0
   # otherwise return a nonzero error code, 1
-  if [[ "$MACHTYPE" = *aix* ]]
-  then
-    return 0
-  else
-    return 1
-  fi
+  [[ "$OSTYPE" = *aix* ]]
 }
 
 #
@@ -375,7 +350,7 @@ os_is_aix()
 os_type()
 {
   # Print out the OS type based on the detected machine type.
-  case "$MACHTYPE" in
+  case "$OSTYPE" in
     (*linux*)
       printf "%s" "linux"
       ;;
@@ -393,7 +368,7 @@ os_type()
       ;;
     (*)
       # If the machine type is an unknown category then simply echo it.
-      printf "%s" "$MACHTYPE"
+      printf "%s" "$OSTYPE"
       ;;
   esac
 }
