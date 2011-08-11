@@ -19,10 +19,10 @@ md5_match()
   else
     for _path in /sbin /bin /usr/bin /usr/sbin
     do
-      if [[ -x "${_path}/md5"]]
+      if [[ -x "${_path}/md5" ]]
       then
         archive_md5=$(${_path}/md5 -q "${_archive}")
-      elif [[ -x "${_path}/md5sum"]]
+      elif [[ -x "${_path}/md5sum" ]]
       then
         archive_md5=$(${_path}/md5sum "${_archive}" | awk '{print $1')
       fi
