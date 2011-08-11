@@ -27,6 +27,11 @@ fetch_uri_parse_args()
         shift || fail "fetch error handler function must be specified after '--on-fail'."
         continue
         ;;
+      (--fallback-uri)
+        _uris+=( ${1//,/ } )
+        shift || fail "comma separated lit of uris must be specified after '--fallback-uri'."
+        continue
+        ;;
     esac
     _args+=("${_token}")
   done
@@ -60,7 +65,7 @@ fetch_uri()
     fi
   fi
 
-  debug vcs "type ${scm_type}, params ${_args[@]}."
+  debug vcs "type: ${scm_type}, params: ${_args[@]}."
 
   case "${scm_type}" in
     (path|archive|github|git|svn|hg|fossil)
@@ -73,6 +78,46 @@ fetch_uri()
   esac
 
   builtin cd "$initial_pwd"
+}
+
+# Example:
+#
+#  $ ./local --debug=vcs --call=ext/vcs/fetch_uris /root ~/tmp/test_uris --fallback-uri /root/test,mpapis/mpapis_test
+#
+#  DEBUG vcs: type: path, params: /root /home/mpapis/tmp/test_uris.
+#  DEBUG vcs: Copying from '/root' to '/home/mpapis/tmp/test_uris' failed.
+#  DEBUG vcs: Unknown SCM type (not found) for url '/root/test'.
+#  DEBUG vcs: type: github, params: mpapis/mpapis_test /home/mpapis/tmp/test_uris.
+#  DEBUG vcs: github -> https://github.com/mpapis/mpapis_test/tarball/master
+#  DEBUG vcs: github tarball archive name /home/mpapis/.bdsm/archives/mpapis_mpapis_test_master.tar.gz.
+#  DEBUG vcs: master does not match MD5 checksum #; removing and downloading.
+#
+fetch_uris()
+{
+  local _uris=( "${1}" ) _target="${2:-}" _args=() _uri
+  shift || fail "uri must be specified as the first parameter."
+  shift || fail "target path must be specified as the second parameter."
+
+  fetch_uri_parse_args "$@"
+  
+  for _uri in ${_uris[@]}
+  do
+    fetch_uri "${_uri}" "${_target}" --on-fail debug ${_args[@]} || true
+    case "${__vcs_failed}" in
+    (unknown_scm|copy_failed|download_failed|empty_archive|remote_branch_not_found|cannot_checkout_branch|pull_failed|cannot_clone|extracting_archive_failed)
+      # in this case continue with next uri
+      continue
+      ;;
+    ("")
+      # actually no error spawned, return ok
+      return 0
+      ;;
+    (*) # (unknown_archive_format|cannot_remove|all_uris_failed)
+      # those are not download related
+      return 1
+    esac
+  done
+  fetch_error all_uris_failed
 }
 
 fetch_update()
