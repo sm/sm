@@ -962,7 +962,7 @@ package_activate_if_first()
 #
 package_ldconfig()
 {
-  local _package="${1:-${package_name}}" _path _files _ldconfig="ldconfig"
+  local _package="${1:-${package_name}}" _path _files _ldconfig="/sbin/ldconfig"
   variables_must_be_nonempty _package
 
   path_exists "${packages_path}/${_package}/active/lib" ||
@@ -981,7 +981,7 @@ package_ldconfig()
         chmod_files 0444 "/etc/ld.so.conf.d/bdsm.conf"
       fi
 
-      ! command_exists /sbin/ldconfig || ldconfig="/sbin/ldconfig"
+      command_exists "${ldconfig}" || ldconfig="ldconfig"
 
       log_step "${package_name} ${package_version} ~ ldconfig" ldconfig "${active_path}/lib"
 
