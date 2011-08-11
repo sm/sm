@@ -848,8 +848,6 @@ package_deactivate()
 
   variables_must_be_nonempty _package
 
-  log_step "${package_name} ${package_version} ~ deactivate" \
-
   if symlink_exists "${packages_path}/${_package}/active"
   then
     _version=$(readlink "${packages_path}/${_package}/active")
@@ -857,6 +855,8 @@ package_deactivate()
   else
     return 0
   fi
+
+  log_step "${package_name} ${_version} ~ deactivate"
 
   true "${install_path:="${packages_path}/${_package}/${_version}"}"
 
