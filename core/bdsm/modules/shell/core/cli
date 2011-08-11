@@ -69,7 +69,7 @@ do
       ;;
 
     -*)
-      error "Unknown flag: '${token}'."
+      printf "ERROR: unknown flag: '${token}'.\n"
       ;;
     *)
       if [[ -f "$token" && -z "$bdsm_script" ]]
