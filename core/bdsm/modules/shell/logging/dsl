@@ -819,15 +819,18 @@ core_log_step()
   esac
   unset log_step_message
 }
+
 log_step()
 {
   local _message="$1" _output _log_file
+
   if (( $# > 1 ))
   then
     shift
     core_log_step "${_message}"
     _log_file="${TMP_PATH:-/tmp}/err_$$.log"
-    if "$@" >${_log_file} 2>&1
+
+    if "$@" > "${_log_file}" 2>&1
     then
       core_log_step "succ"
     else

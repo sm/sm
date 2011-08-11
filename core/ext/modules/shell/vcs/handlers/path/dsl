@@ -12,7 +12,7 @@ path_get()
   shift || fail "source path must be the first parameter to path_get()."
   shift || fail "target path must be the second parameter to path_get()."
 
-  if rm -rf "${_target}" &>/dev/null
+  if rm -rf "${_target}" > /dev/null 2>&1
   then
     if cp -fR ${_source} "${_target}" >/dev/null 2>&1
     then

@@ -79,7 +79,7 @@ git_get()
   [[ ! -d "${_final_target}" ]] || rm -rf "${_final_target}" || \
     fetch_error cannot_remove path=${_final_target}
 
-  cp -fR "${_target}" "${_final_target}" &>/dev/null || \
+  cp -fR "${_target}" "${_final_target}" >/dev/null 2>&1 || \
     fetch_error copy_failed from=${_target} to=${_final_target}
 }
 

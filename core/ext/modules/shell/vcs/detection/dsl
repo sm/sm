@@ -52,7 +52,7 @@ is_github_uri()
   local _uri="${1:-}"
   if ematch "${_uri}" "^[[:alnum:]_-]+\/[[:alnum:]_-]+$"
   then
-    if curl -f -I -L "https://github.com/${_uri}" &>/dev/null
+    if curl -f -I -L "https://github.com/${_uri}" >/dev/null 2>&1
     then
       return 0
     else

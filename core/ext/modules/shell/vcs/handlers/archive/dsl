@@ -70,7 +70,7 @@ archive_get() {
   esac
   [[ -z "${__vcs_failed}" ]] || return 0
 
-  ls -d * &>/dev/null || fetch_error empty_archive
+  ls -d * >/dev/null 2>&1 || fetch_error empty_archive
 
   echo "${_uri}" > "./.uri"
 }
