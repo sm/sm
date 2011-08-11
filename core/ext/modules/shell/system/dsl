@@ -559,7 +559,7 @@ os_cpu_count()
   # everything except the last space separated field.
   if os_is_darwin
   then
-    read -r _cpu_count < <(sysctl hw.ncpu)
+    read -r _cpu_count < <(/usr/sbin/sysctl hw.ncpu)
     _cpu_count="${_cpu_count//* }"
   # If the operating system is Linux, gather the information directly from
   # the proc filesystem.
