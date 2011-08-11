@@ -461,7 +461,7 @@ package_fetch()
   then
     if [[ -d "${source_path}/${package_dir}/${package_dir}" ]]
     then
-      eval mv "${source_path}/${package_dir}/${package_dir}/*" \
+      mv "${source_path}/${package_dir}/${package_dir}"/* \
         "${source_path}/${package_dir}/"
       rm -rf "${source_path}/${package_dir}/${package_dir}/"
     fi
@@ -574,7 +574,7 @@ package_build()
 
   debug package "package_build: ${_command}"
 
-  if eval "${_command}" > build.log 2>&1
+  if "${_command}" > build.log 2>&1
   then
     return 0
   else
