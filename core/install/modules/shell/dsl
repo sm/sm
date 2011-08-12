@@ -44,42 +44,7 @@ migrate_ext()
 {
   if path_exists "${install_path}/extensions"
   then
-    if path_exists "${install_path}/extensions/ext" \
-    && ! file_exists "${install_path}/extensions/ext/.uri"
-    then
-      log_step "  Migrating ext -> exts" \
-        move_directory "${install_path}/extensions/ext" "${install_path}/exts"
-    fi
-    if path_exists "${install_path}/extensions/external" \
-    && ! file_exists "${install_path}/extensions/external/.uri"
-    then
-      log_step "  Migrating external -> exts" \
-        move_directory "${install_path}/extensions/external" "${install_path}/exts"
-    fi
-    if path_exists "${install_path}/extensions/builtin" \
-    && ! file_exists "${install_path}/extensions/builtin/.uri"
-    then
-      log_step "  Removing old core(builtin)" \
-        rm -rf "${install_path}/extensions/builtin"
-    fi
-    local set
-    for set in ${install_path}/extensions/*
-    do
-      case ${set} in
-        */dependencies)
-          log_step "  Removing old extensions/${set##*/}" \
-            rm -rf ${set}
-          ;;
-        */\*) # empty -> skip
-          ;;
-        *)
-          log_step "  Migrating extensions/${set##*/} -> sets/${set##*/}" \
-            mv ${set} ${extension_sets_home}/
-          ;;
-      esac
-    done
-    log_step "  Removing old extensions directory" \
-      rm -rf ${install_path}/extensions
+    remove_paths "${install_path}/extensions"
   fi
 }
 
