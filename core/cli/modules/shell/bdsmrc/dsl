@@ -2,7 +2,7 @@
 
 bdsmrc_install()
 {
-  if template_exists "bdsm/bdsmrc"
+  if template_exists "cli/bdsmrc"
   then
     if file_exists "$HOME/.bdsmrc"
     then
@@ -19,23 +19,23 @@ bdsmrc_install()
     #       ~/.bdsm/project/config/defaults
     : "${repository_url:="username/repository"}"
 
-    install_template "bdsm/bdsmrc" to "$HOME/.bdsmrc"
+    install_template "cli/bdsmrc" to "$HOME/.bdsmrc"
 
     seed_template "$HOME/.bdsmrc" \
       project "$project" \
       repository_url "$repository_url" \
       environment "$environment"
   else
-    fail "The template bdsm/bdsmrc is missing."
+    fail "The template cli/bdsmrc is missing."
   fi
 }
 
 bdsmrc_update()
 {
-  if template_exists "bdsm/bdsmrc"
+  if template_exists "cli/bdsmrc"
   then
     timestamp_set
-    local template="bdsm/bdsmrc" target="$HOME/.bdsmrc" \
+    local template="cli/bdsmrc" target="$HOME/.bdsmrc" \
       backup="$HOME/.bdsmrc.$timestamp" incoming="$HOME/.bdsmrc.incoming.$$"
 
     if ! file_exists "${target}"
