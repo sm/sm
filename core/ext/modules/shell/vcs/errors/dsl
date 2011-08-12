@@ -32,6 +32,7 @@ fetch_error_default_handler()
   local _message="$1"
   shift
 
+   __vcs_failed="${_message}"
   case "${_message}" in
     (unknown_scm)
       _message="Unknown SCM type (${scm_type:-"not found"}) for url '${uri}'." ;;
@@ -55,6 +56,8 @@ fetch_error_default_handler()
       _message="There was an error while cloning the repository from the url '${_uri}.'" ;;
     (cannot_remove)
       _message="Cannot remove ${path}." ;;
+    (all_uris_failed)
+      _message="All given uris failed." ;;
     (*)
       fail "VCS unknown error("${_message}") for params $*." ;;
   esac
@@ -63,7 +66,6 @@ fetch_error_default_handler()
 
   case "${fetch_error_handler}" in
     true)
-      __vcs_failed=true
       return 0
       ;;
     *)

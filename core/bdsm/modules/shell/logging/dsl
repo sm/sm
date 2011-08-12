@@ -840,7 +840,7 @@ log_step()
       core_log_step "fail"
       cat "${_log_file}" >&2
       rm -rf "${_log_file}"
-      return "{_status}" # pass error return status code up !
+      return ${_status} # pass error return status code up !
     fi
   else
     core_log_step "${_message}"
