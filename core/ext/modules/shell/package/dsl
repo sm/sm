@@ -56,7 +56,6 @@ package_error()
     local _num_lines=${3:-25} # Default the number of lines to 25
     _message="${_message}\n\nTail of ${_log}:\n$( tail -n ${_num_lines} ${_log} )"
   fi
-
   error "${_message}"
 }
 
@@ -104,15 +103,18 @@ package_error()
 #
 package_definition()
 {
-  while (( $# > 0 )) ; do
-    key="$1" ; shift
-    if [[ -n "${1:-}" ]] ; then
-      value="$1" ; shift
-    else
-      if echo "$key" | grep '=' ; then
-        fail "Invalid key '${key}'\n => Guess: Most likely the '=' is supposed to be a ' '."
+  while (( $# > 0 ))
+  do
+    key="$1"
+    shift
+    value="$1"
+    if ! shift
+    then
+      if echo "$key" | grep '='
+      then
+        fail "Invalid key '${key}'; Most likely the '=' is supposed to be a space?"
       else
-        fail "Value not specified for key '${key}'\n => They tend to come in pairs :)"
+        fail "Value not specified for key '${key}'; They should be specified in key/value pairs :)"
       fi
     fi
 
@@ -1811,3 +1813,18 @@ package_installed()
     find . -mindepth 1 -maxdepth 1 -type d | sed -e 's#./##g' -e 's# #,#g'
   )
 }
+
+package_man()
+{
+  true "${package_path:="${packages_path}/${_package}/${_version}"}"
+
+  MANPATH="${package_path}/man"
+
+  if array_is_empty extension_actions
+  then
+    man ${package_name}
+  else
+    man ${extension_actions[@]}
+  fi
+}
+

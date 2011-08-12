@@ -12,3 +12,6 @@ info=package_info()
 
 package/activate=package_activate_action()
 activate=package_activate_action()
+
+package/man=package_man()
+man=package_man()
