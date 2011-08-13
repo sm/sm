@@ -2,9 +2,15 @@
 
 description "${extension} BDSM extension."
 
-actions "  list     - List packages installed through BDSM extensions, using the package module.
-  active     - List active package versions.
-  activate   - Activate a given package and version.
-  deactivate - Deactivate a given package."
+action "pkg list [installed]" "List packages installed via package module."
+action "pkg list active" "List packages installed via package module with version."
+action "pkg list available" "List all available package extensions installed."
+action "pkg info {package}" "Provides information about {package}"
+action "pkg active {packagea}[,{packageb}...]" "Prints active version for {packagea}, etc..."
+action "pkg activate {package} {version}" "Activate given package and version."
+action "pkg deactivate {package}" "Deactivates a given package, if active."
+action "pkg remove {package} [version]" "deactivates and removes {packge} active or version specified."
+action "pkg install {package} [version]" "installs {package} {version}."
+action "pkg update {package} [version]" "updates {package} {version}."
 
 show_help usage
