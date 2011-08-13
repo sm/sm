@@ -533,7 +533,9 @@ extension_action()
 
 extensions_installed()
 {
-  local _token _type _modules _paths=()
+  local _token _type _modules _paths=() _excludes=() _exclude
+
+  args="$*"
 
   while (( $# > 0 ))
   do
@@ -551,23 +553,33 @@ extensions_installed()
         _paths="${1}"
         shift || fail "$FUNCNAME(): A path must follow keyword 'in'"
         ;;
+      (exclude)
+        _exclude="${1}"
+        shift || fail "$FUNCNAME(): A string must follow keyword 'exclude'"
+        _excludes+=("${_exclude//,/ }")
+        ;;
       (*)
         fail "$FUNCNAME(): Unkown token ${_token} given"
         ;;
     esac
   done
 
-  [[ -n ${_paths:-}]] || _paths=("${bdsm_path}/sets" "${bdsm_path}/exts")
+  [[ -n ${_paths:-} ]] || {
+    _paths=( "${bdsm_path}/sets" "${bdsm_path}/exts" )
+    ensure_paths_exist "${_paths[@]}"
+  }
 
   _modules=($( find "${_paths[@]}" -mindepth 2 -name "modules" -type f ))
+
+  _excludes="${_excludes[*]:-'#'}"
 
   if [[ -n "${_type:-}" ]]
   then # Filter by type given
     "${bdsm_path}/bin/bdsm-ll" \
       if grep -q "'${_type}'" {} \; then echo {} \; fi ::: ${_modules[@]} |
         sed -e "s#${bdsm_path}/sets/##" -e "s#${bdsm_path}/exts/##" \
-          -e "s#/modules/shell/modules##"
+          -e "s#/modules/shell/modules##" | sort | awk '!'"/${_excludes// /|}/"
   else
-    echo ${_modules[@]}
+    echo ${_modules[@]} | awk '!'"/${_excludes// /|}/"
   fi
 }

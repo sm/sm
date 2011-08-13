@@ -221,7 +221,17 @@ package_definition()
 #
 package_install()
 {
-  variables_must_be_nonempty package_name package_version archive_format
+  package_name="${1:-${package_name:-}}"
+  [[ -n "${package_name}" ]] ||
+    fail "$FUNCNAME(): Package name must be given as first parameter.\n"
+
+  package_version="${2:-${package_version:-}}"
+
+  [[ -n "${package_version}" ]] ||
+    fail "$FUNCNAME(): Package version must be given as second parameter.\n"\
+    "(For example version=x.y.z set in extension's config/defaults file.)\n"
+
+  archive_format="${3:-${archive_format:-"tar.gz"}}"
 
   if symlink_exists "${packages_path}/${package_name}/active" \
   && [[ "$1" != "--force" ]]
@@ -347,12 +357,24 @@ To force, call:\n\tbdsm ${package_name} package install --force\n"
 #
 package_update()
 {
+  package_name="${1:-${package_name:-}}"
+  [[ -n "${package_name}" ]] ||
+    fail "$FUNCNAME(): Package name must be given as first parameter.\n"
+
+  package_version="${2:-${package_version:-}}"
+
+  [[ -n "${package_version}" ]] ||
+    fail "$FUNCNAME(): Package version must be given as second parameter.\n"\
+    "(For example version=x.y.z set in extension's config/defaults file.)\n"
+
+  archive_format="${3:-${archive_format:-"tar.gz"}}"
+
   # TODO: check if newer version exists, if so then...
   if package_installed | grep -q "${package_version}" && [[ "$1" != "--force" ]]
   then
     log "The latest version (${package_version}) of the ${package_name} package is already installed."
   else
-    package_install --force
+    package_install ${package_name} ${package_version:-} ${archive_format:-} --force
     package_activate ${package_name} ${package_version}
   fi
 }
@@ -450,7 +472,17 @@ package_fetch_md5()
 #
 package_fetch()
 {
-  variables_must_be_nonempty package_name package_version archive_format
+  package_name="${1:-${package_name:-}}"
+  [[ -n "${package_name}" ]] ||
+    fail "$FUNCNAME(): Package name must be given as first parameter.\n"
+
+  package_version="${2:-${package_version:-}}"
+
+  [[ -n "${package_version}" ]] ||
+    fail "$FUNCNAME(): Package version must be given as second parameter.\n"\
+    "(For example version=x.y.z set in extension's config/defaults file.)\n"
+
+  archive_format="${3:-${archive_format:-"tar.gz"}}"
 
   : \
     "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
@@ -459,7 +491,7 @@ package_fetch()
   package_fetch_md5
 
   fetch_uri "${package_url}" "${source_path}/${package_dir}" "${package_md5:-#}" ||
-    return 0
+    return 1
 
   [[ -d "${source_path}/${package_dir}/${package_dir}" ]] || return 0
 
@@ -694,10 +726,17 @@ package_make_install()
 #
 package_activate()
 {
-  # TODO: Switch package activation to
-  local _package="${1:-}" _version="${2:-}" _file _files=() _path _paths
+  package_name="${1:-${package_name:-}}"
+  [[ -n "${package_name}" ]] ||
+    fail "$FUNCNAME(): Package name must be given as first parameter.\n"
 
-  variables_must_be_nonempty _package _version
+  package_version="${2:-${package_version:-}}"
+
+  [[ -n "${package_version}" ]] ||
+    fail "$FUNCNAME(): Package version must be given as second parameter.\n"\
+    "(For example version=x.y.z set in extension's config/defaults file.)\n"
+
+  local _file _files=() _path _paths
 
   true "${install_path:="${packages_path}/${_package}/${_version}"}"
 
@@ -1076,7 +1115,17 @@ package_profile_d()
 #
 package_uninstall()
 {
-  variables_must_be_nonempty package_name package_version archive_format
+  package_name="${1:-${package_name:-}}"
+  [[ -n "${package_name}" ]] ||
+    fail "$FUNCNAME(): Package name must be given as first parameter.\n"
+
+  package_version="${2:-${package_version:-}}"
+
+  [[ -n "${package_version}" ]] ||
+    fail "$FUNCNAME(): Package version must be given as second parameter.\n"\
+    "(For example version=x.y.z set in extension's config/defaults file.)\n"
+
+  archive_format="${3:-${archive_format:-"tar.gz"}}"
 
   log_step "${package_name} ${package_version} ~ uninstall" \
 
@@ -1280,15 +1329,15 @@ package_usage() {
 #
 package_cli()
 {
-  local _ignored_args=()
+  local _ignored_args=() _token
 
   number_of_args=${#extension_args[@]}
 
   for (( index=0 ; index < $number_of_args ; index++ ))
   do
-    token="${extension_args[$index]}"
+    _token="${extension_args[$index]}"
 
-    case "$token" in
+    case "${_token}" in
       --prefix)
         packages_path="${extension_args[$((++index))]}"
         ;;
@@ -1353,22 +1402,19 @@ package_cli()
         succeed
         ;;
       --with*|--enable*|--disable*)
-        configure_flags+=("$token" "${extension_args[$((++index))]}")
+        configure_flags+=("${_token}" "${extension_args[$((++index))]}")
         ;;
       --trace)
         set -o xtrace
         ;;
       *)
-        _ignored_args+=("${token}")
+        _ignored_args+=("${_token}")
         ;;
     esac
 
-    if (( ${#_ignored_args[@]} > 0 ))
-    then
-      extension_args=( "${_ignored_args[@]}" )
-    fi
-
   done
+
+  [[ -z "${_ignored_args[0]:-}" ]] || extension_args=( "${_ignored_args[@]}" )
 
   # Explicitly reload the package module to pickup any CLI overrides.
   modules_reinitialize package
@@ -1505,8 +1551,8 @@ packages_must_be_active()
 {
   local _package _packages="$@"
 
-  array_is_nonempty _packages ||
-    fail "Cannot ensure that packages are active, as no packages were given."
+  array_is_nonempty _packages || fail "Cannot ensure that packages are active;"\
+    "No packages were given."
 
   for _package in "${_packages[@]}"
   do
@@ -1651,16 +1697,21 @@ package_dependencies()
 #
 package_info()
 {
+  package_name="${1:-${package_name:-}}"
+  [[ -n "${package_name}" ]] ||
+    fail "$FUNCNAME(): Package name must be given as first parameter.\n"
+
+  package_version="${2:-${package_version:-}}"
+
   local _path="${packages_path}/${package_name}"
   : \
-    "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
     "${package_dir:="${package_name}-${package_version}"}" \
     "${package_url:="${package_base_url}/${package_file}"}"
 
   log "versions:"
   if path_exists "${_path}"
   then
-    local _installed=( $( package_installed ) )
+    local _installed=($( package_installed ${package_name} ${package_version} ))
     log "  installed: ${_installed[*]}"
   else
     log "  installed: none"
@@ -1706,27 +1757,61 @@ package_man()
 # pkg functions
 packages_installed()
 {
-  local _path="${packages_path}"
-  find "${_path}" -mindepth 1 -maxdepth 1 -type d |
-  sed -e 's#./##g' -e 's# #,#g' -e "s#${_path}/##"
+  find "${bdsm_path}/pkg" -mindepth 2 -maxdepth 2 -type d |
+    awk -F'/' '! /\/active\//{print $(NF - 1)}'
 }
 
 packages_active()
 {
-  local _path="${packages_path}/${package_name}"
-  find "${_path}" -mindepth 1 -maxdepth 1 -type d |
-  sed -e 's#./##g' -e 's# #,#g' -e "s#${_path}/##"
+  local _found _package _packages=()
+
+  if [[ -z ${1:-} ]]
+  then
+    _found=($(
+    find "${bdsm_path}/pkg" -name active -mindepth 2 -maxdepth 2 -type l |
+    awk -F'/' '! /\/active\//{print $(NF - 1)}'
+    ))
+  else
+    _packages="${1//,/ }"
+
+    _found=($(
+    find "${bdsm_path}/pkg" -name active -mindepth 2 -maxdepth 2 -type l |
+    awk -F'/' '! /\/active\//{print $(NF - 1)}' | awk "/${_packages// /|}/"
+    ))
+  fi
+
+  for _package in "${_found[@]}"
+  do
+    if [[ -L "${bdsm_path}/pkg/${_package}/active" ]]
+    then
+      readlink "${bdsm_path}/pkg/${_package}/active" |
+        awk -F'/' '{print $(NF-1) ":" $NF}'
+    fi
+  done
 }
 
-package_extensions_installed()
+packages_available()
 {
-  local _path="${packages_path}/${package_name}" _type="ext/package"
-
-  extensions_installed module "ext/package"
-
-  "${bdsm_path}/bin/bdsm-ll" \
-    if grep -q "'${_type}'" {} \; then echo {} \; fi ::: ${_modules[@]} |
-    sed -e "s#${bdsm_path}/sets/##" -e "s#${bdsm_path}/exts/##" \
-      -e "s#/modules/shell/modules##"
+  extensions_installed module "ext/package" "$@"
 }
 
+packages_list()
+{
+  local _action="${1:-}" _args
+
+  [[ -z "${_action}" ]] || shift
+
+  case "${_action}" in
+    (active)
+      packages_active "$@"
+      ;;
+
+    (available)
+      packages_available "$@"
+      ;;
+
+    (installed|*)
+      packages_installed "$@"
+      ;;
+  esac
+}

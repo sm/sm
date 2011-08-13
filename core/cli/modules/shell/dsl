@@ -3,15 +3,15 @@
 #TODO: this code should be distributed to proper places
 extension_cli()
 {
-  local _ignored_args=() _string
+  local _ignored_args=() _string _token
 
   number_of_args=${#extension_args[@]}
 
   for (( index=0 ; index < $number_of_args ; index++ ))
   do
-    token="${extension_args[$index]}"
+    _token="${extension_args[$index]}"
 
-    case "$token" in
+    case "${_token}" in
       --uri|--url)
         extension_uri="${extension_args[$((++index))]}"
         ;;
@@ -30,13 +30,10 @@ extension_cli()
         extension_modules=(${_string//,/ })
         ;;
       *)
-        _ignored_args+=("${token}")
+        _ignored_args+=("${_token}")
         ;;
     esac
   done
 
-  if array_is_nonempty _ignored_args
-  then
-    extension_args=( "${_ignored_args[@]}" )
-  fi
+  [[ -z "${_ignored_args[0]:-}" ]] || extension_args=( "${_ignored_args[@]}" )
 }

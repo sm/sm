@@ -8,62 +8,43 @@ perform()
 
 prepare_for_installation()
 {
-  local directory
+  local directory _path
 
-  log_step "Ensuring that installation path exists." \
+  log_step "Ensuring that installation path exists" \
     ensure_paths_exist "${install_path}"
 
   enter "${install_path}"
 
-  log_step "Creating installation paths."
   for directory in "${cleanse_paths[@]}"
   do
-    if path_exists "./${directory}"
+    _path="${install_path}/${directory}"
+    if path_exists "${_path}"
     then
-      rm -rf "./${directory}"
+      log_step "Removing old bdsm component path ( ${_path} )" rm -rf "${_path}"
     fi
   done
-  log_step success
 
+  log_step "Prepairing install paths" \
   ensure_paths_exist "${directories[@]}" "${aux_paths[@]}"
-}
-
-# make a copy of provided bdsm dependencies extensions if there is none
-install_dependencies_extension_set()
-{
-  if command_exists git
-  then # TODO: use tarball method for this and/or bundle it directly.
-    sets_install "dependencies" "wayneeseguin/bdsm-dependencies"
-
-    write "git://github.com/wayneeseguin/bdsm-dependencies.git" \
-      to "${extension_sets_home}/dependencies/.uri"
-  fi
-}
-
-migrate_ext()
-{
-  if path_exists "${install_path}/extensions"
-  then
-    remove_paths "${install_path}/extensions"
-  fi
 }
 
 install_core()
 {
   local _dir
-  log_step "Installing core directories." \
+
+  log_step "Installing core directories" \
     copy_paths --force to "${install_path}/" "${directories[@]}"
 
-  log_step "Installing core files." \
+  log_step "Installing core files" \
     copy_files to "${install_path}" ${files[@]}
 
-  log_step "Installing core extensions." \
+  log_step "Installing core extensions" \
     copy_paths --force to "${install_path}/" "core"
 }
 
 install_configuration_files()
 {
-  log_step "Ensuring configuration files exist."
+  log_step "Ensuring configuration files exist"
   for config_file in "${configs[@]}"
   do
     ensure_files_exist "${install_path}/config/${config_file}"
@@ -84,25 +65,24 @@ symlink_bdsm()
 
 setup_shell_completion()
 {
-  if user_is_root
+  local _prefix="/etc"
+
+  log_step "Setting up bdsm shell completion"
+
+  if path_exists "${_prefix}/bash_completion.d"
   then
-    log_step "Setting up bdsm shell completion."
-
-    if path_exists "/etc/bash_completion.d"
-    then
-      completion_prefix="/etc/bash_completion.d"
-    else
-      completion_prefix="/etc/profile.d"
-      ensure_paths_exist "/etc/profile.d/"
-    fi
-
-    copy_file \
-      from "${install_path}/core/cli/modules/shell/completion/bash" \
-      to "${completion_prefix}/bdsm-completion.sh" \
-      mode 0755 owner "root"
-
-    log_step success
+    completion_prefix="${_prefix}/bash_completion.d"
+  else
+    completion_prefix="${_prefix}/profile.d"
+    ensure_paths_exist "${_prefix}/profile.d/"
   fi
+
+  copy_file \
+    from "${install_path}/core/cli/modules/shell/completion/bash" \
+    to "${completion_prefix}/bdsm-completion.sh" \
+    mode 0755 owner "root"
+
+  log_step success
 }
 
 setup_profile_d()
@@ -113,43 +93,35 @@ setup_profile_d()
   then
     if os_is_darwin
     then
-      if ! file_contains /etc/profile "${profile_d_path}"
-      then
+      file_contains /etc/profile "${profile_d_path}" ||
         write "\nif test -d '${profile_d_path}' ; then for profile in \"${profile_d_path}\"/*.sh ; do if test -x \"\$profile\" ; then . \"\$profile\" ; fi ; done ; unset profile ; fi\n" \
           to /etc/profile
-      fi
     fi
   else
     ensure_files_exist "$HOME/.profile" "$HOME/.bashrc" "$HOME/.bash_profile"
 
-    if ! file_contains "$HOME/.bashrc" "$HOME/.profile"
-    then
+    file_contains "$HOME/.bashrc" "$HOME/.profile" ||
       write "if test -s \"$HOME/.profile\" ; then . \"$HOME/.profile\" ; fi"\
         append to "$HOME/.bashrc"
-    fi
 
-    if ! file_contains "$HOME/.bash_profile" "$HOME/.bashrc"
-    then
+    file_contains "$HOME/.bash_profile" "$HOME/.bashrc" ||
       write "if test -s \"$HOME/.bashrc\" ; then . \"$HOME/.bashrc\" ; fi"\
         append to "$HOME/.bash_profile"
-    fi
 
-    if ! file_contains "$HOME/.profile" "${profile_d_path}"
-    then
+    file_contains "$HOME/.profile" "${profile_d_path}" ||
       write "\nif test -d '${profile_d_path}' ; then for profile in \"${profile_d_path}\"/*.sh ; do if test -x \"\$profile\" ; then . \"\$profile\" ; fi ; done ; unset profile ; fi\n" \
         append to "$HOME/.profile"
-    fi
   fi
 
-  if ! file_exists "${profile_d_path}/bdsm.sh" ||
-     ! file_contains "${profile_d_path}/bdsm.sh" "${packages_path}/active/bin"
-  then
-    # To prepend or postpend??? Good discussion here...
-    write "PATH=\"${packages_path}/active/bin:${packages_path}/active/sbin:\${PATH}\"\n" \
-      to "${profile_d_path}/bdsm.sh"
+  file_exists "${profile_d_path}/bdsm.sh" &&
+     file_contains "${profile_d_path}/bdsm.sh" "${packages_path}/active/bin" ||
+     {
+       # To prepend or postpend??? Good discussion here...
+       write "PATH=\"${packages_path}/active/bin:${packages_path}/active/sbin:\${PATH}\"\n" \
+         to "${profile_d_path}/bdsm.sh"
 
-    chmod_files 0755 "${profile_d_path}/bdsm.sh"
-  fi
+       chmod_files 0755 "${profile_d_path}/bdsm.sh"
+     }
 }
 
 set_bdsm_path()
@@ -171,15 +143,12 @@ install_bdsm()
 
   perform install_configuration_files
 
-  perform symlink_bdsm
-
-  perform setup_shell_completion
-
   perform setup_profile_d
 
-  perform migrate_ext
-
-  perform install_dependencies_extension_set
+  user_is_not_root || {
+    perform symlink_bdsm
+    perform setup_shell_completion
+  }
 
   succeed "\nFramework installed to ${install_path} !\n"
 }

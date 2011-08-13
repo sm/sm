@@ -874,12 +874,9 @@ service_cli()
         _ignored_args+=("${token}")
         ;;
     esac
-
-    if (( ${#_ignored_args[@]} > 0 ))
-    then
-      extension_args=( "${_ignored_args[@]}" )
-    fi
   done
+
+  [[ -z "${_ignored_args[0]:-}" ]] || extension_args=( "${_ignored_args[@]}" )
 
   service_init_path
 }
