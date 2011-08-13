@@ -44,12 +44,9 @@
 #
 package_error()
 {
-  local _message=$1
-  if [[ -z "${_message}" ]]
-  then
-    fail "Cannot print a package error, as no message was provided."
-  fi
-  local _log=$2
+  local _message=$1 _log
+  shift || fail "Cannot print a package error, as no message was provided."
+  _log=$1
 
   if [[ -n ${_log} ]] && file_exists ${_log}
   then # Append tail of error log to the error message.
@@ -412,6 +409,8 @@ package_fetch_md5()
     package_md5=$(cat "${archives_path}/${package_file}.md5")
 
     rm "${archives_path}/${package_file}.md5"
+  else
+    package_md5="" # not known.
   fi
 }
 
@@ -459,18 +458,15 @@ package_fetch()
 
   package_fetch_md5
 
-  if fetch_uri "${package_url}" "${source_path}/${package_dir}" "${package_md5:-#}"
-  then
-    if [[ -d "${source_path}/${package_dir}/${package_dir}" ]]
-    then
-      mv "${source_path}/${package_dir}/${package_dir}"/* \
-        "${source_path}/${package_dir}/"
-      rm -rf "${source_path}/${package_dir}/${package_dir}/"
-    fi
+  fetch_uri "${package_url}" "${source_path}/${package_dir}" "${package_md5:-#}" ||
     return 0
-  else
-    return 1
-  fi
+
+  [[ -d "${source_path}/${package_dir}/${package_dir}" ]] || return 0
+
+  mv "${source_path}/${package_dir}/${package_dir}"/* \
+    "${source_path}/${package_dir}/"
+
+  rm -rf "${source_path}/${package_dir}/${package_dir}/"
 }
 
 #
@@ -522,12 +518,9 @@ package_configure()
   fi
 
   debug package "package_configure: ${_command}"
-  if ${_command} > configure.log 2>&1
-  then
-    return 0
-  else
+
+  ${_command} > configure.log 2>&1 ||
     package_error "Configuration of ${package_name} ${package_version} failed." "configure.log"
-  fi
 }
 
 #
@@ -576,12 +569,8 @@ package_build()
 
   debug package "package_build: ${_command}"
 
-  if ${_command} > build.log 2>&1
-  then
-    return 0
-  else
+  ${_command} > build.log 2>&1 ||
     package_error "Compilation of ${package_name} ${package_version} failed! " "build.log"
-  fi
 }
 
 #
@@ -666,12 +655,8 @@ package_make_install()
     _command="make ${make_install_flags[@]:-install}"
   fi
 
-  if ${_command} > make.install.log 2>&1
-  then
-    return 0
-  else
+  ${_command} > make.install.log 2>&1 ||
     package_error "Installation of ${package_name} ${package_version} failed! " "make.install.log"
-  fi
 }
 
 #
@@ -985,7 +970,7 @@ package_ldconfig()
 
       if ! file_exists "/etc/ld.so.conf.d/bdsm.conf"
       then
-        printf "%s\n" "${active_path}/lib" > "/etc/ld.so.conf.d/bdsm.conf"
+        write "${active_path}/lib\n" to "/etc/ld.so.conf.d/bdsm.conf"
         chmod_files 0444 "/etc/ld.so.conf.d/bdsm.conf"
       fi
 
@@ -1145,48 +1130,21 @@ package_uninstall()
 #
 package_patch()
 {
-  local _patches _patch
+  local _patches _patch _path _paths
 
-  if ! path_exists "${extension_patches_path}"
-  then
-    return 0
-  fi
+  _paths=(
+  "${extension_patches_path}"
+  "${extension_patches_path}/$(os_type)"
+  "${extension_patches_path}/$(os_type)/${package_version}"
+  )
 
-  # TODO: Three level hierarchy based on patches/{OS}/{version},
-  #       root level as 'global' always installed.
-
-  # TODO: Test each dir for existence and skip if missing
-  _patches=($(find "${extension_patches_path}" -mindepth 1 -maxdepth 1 -iname '*.patch' -type f))
-
-  if (( ${#_patches[@]} == 0 ))
-  then
-    return 0
-  fi
-
-  package_apply_patches "${_patches[@]}"
-
-  if ! path_exists "${extension_patches_path}/$(os_type)"
-  then
-    return 0
-  fi
-
-  _patches=($(
-  find "${extension_patches_path}/$(os_type)" \
-    -mindepth 1 -maxdepth 1 -iname '*.patch' -type f
-  ))
-  package_apply_patches "${_patches[@]}"
-
-  if path_exists "${extension_patches_path}/$(os_type)/${package_version}"
-  then
-    _patches=($(
-    find "${extension_patches_path}/$(os_type)/${package_version}" \
-      -mindepth 1 -maxdepth 1 -iname '*.patch' -type f
-    ))
-
+  for _path in "${_paths[@]}"
+  do
+    path_exists "${_path}" || continue # No patch path
+    _patches=($(find "${_path}" -mindepth 1 -maxdepth 1 -iname '*.patch' -type f))
+    (( ${#_patches[@]} > 0 )) || continue # No patches
     package_apply_patches "${_patches[@]}"
-  else
-    return 0
-  fi
+  done
 }
 
 #
@@ -1226,15 +1184,13 @@ package_apply_patches()
 {
   local _patch _patches=("$@")
 
-  if array_is_nonempty _patches
-  then
-    for _patch in "${_patches[@]}"
-    do
-      log "TODO: patch application is NIY (see package_patch())"
-    done
-  else
+  array_is_nonempty _patches ||
     fail "Cannot apply patches, as no patches were given."
-  fi
+
+  for _patch in "${_patches[@]}"
+  do
+    log "TODO: patch application is NIY (see package_patch())"
+  done
 }
 
 #
@@ -1271,7 +1227,7 @@ package_apply_patches()
 # ### Notes
 #
 package_usage() {
-  printf "
+  log "
   Usage:
 
   $0 [options]
@@ -1287,7 +1243,6 @@ package_usage() {
   --help)    - view this usage information
 
   "
-  return 0
 }
 
 #
@@ -1356,7 +1311,12 @@ package_cli()
         package_file="${extension_args[$((++index))]}"
         ;;
       --static)
+        configure_flags+=( --static )
         static_flag=1
+        ;;
+      --shared)
+        shared_flag=1
+        configure_flags+=( --enable-shared )
         ;;
       --directory)
         package_directory="${extension_args[$((++index))]}"
@@ -1366,19 +1326,17 @@ package_cli()
         ;;
       --activate|activate)
         # TODO: Throw error if parameter is not specified.
-        if (( ${#extension_args[@]} > 0 ))
-        then
-          if [[ "${extension}" == "pkg" ]]
-          then
-            array_shift extension_args
-            package_activate "${extension_args[@]}"
-          else
-            package_activate "${extension}" "${extension_args[@]}"
-          fi
-          exit $?
-        else
+        (( ${#extension_args[@]} > 0 )) ||
           error "Cannot activate ${extension}, no version was given."
+
+        if [[ "${extension}" == "pkg" ]]
+        then
+          array_shift extension_args
+          package_activate "${extension_args[@]}"
+        else
+          package_activate "${extension}" "${extension_args[@]}"
         fi
+        exit $?
         ;;
       --deactivate|deactivate)
         package_deactivate "${extension}"
@@ -1388,11 +1346,11 @@ package_cli()
         ;;
       --licence)
         extension_license
-        exit 0
+        succeed
         ;;
       --help)
         package_usage
-        exit 0
+        succeed
         ;;
       --with*|--enable*|--disable*)
         configure_flags+=("$token" "${extension_args[$((++index))]}")
@@ -1411,13 +1369,6 @@ package_cli()
     fi
 
   done
-
-  #if (( static_flag = 1 ))
-  #then
-  #  configure_flags+=( --static ) # --disable-shared
-  #else
-  #  configure_flags+=( --enable-shared )
-  #fi
 
   # Explicitly reload the package module to pickup any CLI overrides.
   modules_reinitialize package
@@ -1458,34 +1409,18 @@ package_cli()
 #
 package_is_active()
 {
-  local _name="${1:-}"
-  local _version="${2:-}"
+  local _name="${1:-}" _version="${2:-}"
 
-  if variable_is_nonempty _name
-  then
-    shift
-    local _path="${packages_path}/${_name}"
+  shift || fail "Cannot query if a package is active;"\
+    " No package name was given, or name is empty."
 
-    if variable_is_nonempty _version
-    then
-      shift
-      if [[ -d "${_path}/${_version}" ]]
-      then
-        return 0
-      else
-        return 1
-      fi
-    else
-      if [[ -L "${_path}/active" && -d $(readlink "${_path}/active") ]]
-      then
-        return 0
-      else
-        return 1
-      fi
-    fi
+  local _path="${packages_path}/${_name}"
 
-  else
-    fail "Cannot query if a package is active, as no package name was given, or name is empty."
+  if shift
+  then # version was passed
+    [[ -d "${_path}/${_version}" ]]
+  else # version was not passed
+    [[ -L "${_path}/active" && -d $(readlink "${_path}/active") ]]
   fi
 }
 
@@ -1526,17 +1461,11 @@ package_must_be_active()
 {
   local _name="${1:-}"
 
-  if variable_is_nonempty _name
-  then
-    if package_is_active "${_name}"
-    then
-      return 0
-    else
-      error "Install/activate the node package extension, before installing ${_name}."
-    fi
-  else
-    fail "Cannot ensure that package is active, as no package name was given (or name is empty.)"
-  fi
+  shift || fail "Cannot ensure that package is active;"\
+    "No package name was given (or name is empty.)"
+
+  package_is_active "${_name}" ||
+    error "Install/activate the node package extension, before installing ${_name}."
 }
 
 #
@@ -1576,15 +1505,13 @@ packages_must_be_active()
 {
   local _package _packages="$@"
 
-  if array_is_nonempty _packages
-  then
-    for _package in "${_packages[@]}"
-    do
-      package_must_be_active "${_package}"
-    done
-  else
+  array_is_nonempty _packages ||
     fail "Cannot ensure that packages are active, as no packages were given."
-  fi
+
+  for _package in "${_packages[@]}"
+  do
+    package_must_be_active "${_package}"
+  done
 }
 
 #
@@ -1623,27 +1550,7 @@ packages_must_be_active()
 #
 package_docs()
 {
-  # TODO: move this logic into a core DSL function.
-  if os_is_darwin
-  then
-    open $package_docs_url
-
-  elif command_exists xdg-open
-  then
-    xdg-open $package_docs_url
-
-  elif command_exists lynx
-  then
-    lynx $package_docs_url
-
-  elif command_exists links
-  then
-    links $package_docs_url
-
-  else
-    curl -s -L $package_docs_url -o /tmp/${package_name}-${package_version}.docs
-    ${EDITOR:-/bin/less} /tmp/${package_name}-${package_version}.docs
-  fi
+  os_open "${package_docs_url}"
 }
 
 #
@@ -1682,29 +1589,7 @@ package_docs()
 #
 package_website()
 {
-  # TODO: move this logic into a core DSL function.
-  if os_is_darwin
-  then
-    open $package_website_url
-
-  elif command_exists xdg-open
-  then
-    xdg-open $package_website_url
-
-  elif command_exists lynx
-  then
-    lynx $package_website_url
-
-  elif command_exists links
-  then
-    links $package_website_url
-
-  else
-    curl -s -L $package_website_url \
-      -o /tmp/${package_name}-${package_version}.website
-
-    ${EDITOR:-/bin/less} /tmp/${package_name}-${package_version}.website
-  fi
+  os_open "${package_website_url}"
 }
 
 package_dependencies()
@@ -1716,15 +1601,11 @@ package_dependencies()
   # TODO: improve dependency management.
   for dependency in "${_dependencies[@]}"
   do
-    if ! package_is_active ${dependency/-/ }
-    then
-      error "${extension} requires ${dependency}; please install the ${dependency} via bdsm package module, and retry.
-Typically, this can be done as follows:
-
-sudo bdsm ${dependency} package install
-
-      "
-    fi
+    package_is_active ${dependency/-/ } ||
+      error "${extension} requires ${dependency}; "\
+      "Please install the ${dependency} via bdsm package module, and retry. "\
+      "Typically, this can be done as follows:\n"\
+      "\tbdsm ${dependency} package install\n"
   done
 }
 
@@ -1793,11 +1674,11 @@ package_info()
     log "  active: none"
   fi
 
-  log "urls:"
-  log "  base: ${package_base_url}"
-  log "  download: ${package_url}"
-  log "archive: ${package_file}"
-  log "source_path: ${source_path}/${package_dir}"
+  log "urls:\n"\
+  "  base: ${package_base_url}\n"\
+  "  download: ${package_url}\n"\
+  "archive: ${package_file}\n"\
+  "source_path: ${source_path}/${package_dir}"
 
   if array_is_nonempty package_dependencies
   then
@@ -1808,10 +1689,9 @@ package_info()
 package_installed()
 {
   local _path="${packages_path}/${package_name}"
-  (
-    enter "${_path}"
-    find . -mindepth 1 -maxdepth 1 -type d | sed -e 's#./##g' -e 's# #,#g'
-  )
+
+  find "${_path}" -mindepth 1 -maxdepth 1 -type d |
+  sed -e 's#./##g' -e 's# #,#g' -e "s#${_path}/##"
 }
 
 package_man()
@@ -1820,11 +1700,6 @@ package_man()
 
   MANPATH="${package_path}/man"
 
-  if array_is_empty extension_actions
-  then
-    man ${package_name}
-  else
-    man ${extension_actions[@]}
-  fi
+  man ${extension_actions[@]:-${package_name}}
 }
 
