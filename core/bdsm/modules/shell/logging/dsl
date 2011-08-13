@@ -33,7 +33,7 @@
 #
 core_log()
 {
-  printf "$*\n"
+  printf "%s\n" "$*"
 }
 
 log()
@@ -74,8 +74,9 @@ log()
 #
 core_warn()
 {
-  printf "WARNING: $*\n"
+  printf "WARNING: %s\n" "$*"
 }
+
 warn()
 {
   core_warn "$@"
@@ -119,16 +120,14 @@ warn()
 #
 core_debug()
 {
-  local type="$1"
+  local type="${1:-}"
   shift
 
-  if (( debug_flag == 1 )) && options_check "$debug_flags" "$type"
-  then
-    printf "DEBUG $type: $*\n"
-  else
-    return 0
-  fi
+  (( debug_flag == 1 )) && options_check "$debug_flags" "$type" || return 0
+
+  printf "DEBUG %s\n" "$type: $*"
 }
+
 debug()
 {
   core_debug "$@"
@@ -171,13 +170,11 @@ core_log_search()
   shift
   shift
 
-  if (( debug_flag == 1 )) && options_check "$debug_flags" "search"
-  then
-    printf "DEBUG search: %9s %-25s in $*.\n" "$name" "$value"
-  else
-    return 0
-  fi
+  (( debug_flag == 1 )) && options_check "$debug_flags" "search" || return 0
+
+  printf "DEBUG search: %9s %-25s in $*.\n" "$name" "$value"
 }
+
 log_search()
 {
   core_log_search "$@"
@@ -216,14 +213,12 @@ log_search()
 #
 core_log_todo()
 {
-  if (( debug_flag == 1 )) && options_check "$debug_flags" "todo"
-  then
-    local file="${BASH_SOURCE[2]}" line="${BASH_LINENO[1]}"
-    printf "DEBUG todo: ${file##${bdsm_path}\/}:${line}:\n"
-    printf "$*" | xargs -s 72 | xargs -I {} printf "DEBUG todo: # {}\n"
-  else
-    return 0
-  fi
+  (( debug_flag == 1 )) && options_check "$debug_flags" "todo" || return 0
+
+  local file="${BASH_SOURCE[2]}" line="${BASH_LINENO[1]}"
+
+  printf "DEBUG todo: ${file##${bdsm_path}\/}:${line}:\n"
+  printf "$*" | xargs -s 72 | xargs -I {} printf "DEBUG todo: # {}\n"
 }
 
 log_todo()
@@ -267,11 +262,12 @@ log_todo()
 core_error()
 {
   set +o xtrace
-  printf "\nERROR: $*\n" >&2
+  printf "\nERROR: %s\n" "$*" >&2
   set +o errtrace
   trap - ERR
   exit 1
 }
+
 error()
 {
   core_error "$@"
@@ -311,12 +307,10 @@ error()
 #
 core_succeed() {
   set +o xtrace
-  if [[ -n "$*" ]]
-  then
-    printf "$*\n"
-  fi
+  [[ -z "$*" ]] || printf "%s\n" "$*"
   exit 0
 }
+
 succeed()
 {
   core_succeed "$@"
@@ -361,6 +355,7 @@ core_fail()
   backtrace "$*"
   exit 1
 }
+
 fail()
 {
   core_fail "$@"
@@ -403,7 +398,6 @@ set_ps4()
   # Finally, return true, 0, for success.
   PS4="# \${BASH_SOURCE##\${bdsm_path}\/} \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO} $ "
   export PS4
-  return 0
 }
 
 #
@@ -477,6 +471,7 @@ core_trace_filter()
     fi
   fi
 }
+
 trace_filter()
 {
   set +o xtrace
@@ -546,10 +541,7 @@ separator()
 
   if [[ -z "${COLUMNS}" ]]
   then
-    if ! _columns=$(tput cols)
-    then
-      _columns=80
-    fi
+    _columns=$(tput cols) || _columns=80
     export COLUMNS=${_columns}
   fi
 
@@ -652,10 +644,7 @@ backtrace()
   local _message="${1:-}" _flag="$2"
 
   # If a message was given, print the message to the calling environment's STDERR.
-  if [[ -n _message ]]
-  then
-    printf "\n${_message}\n\n" >&2
-  fi
+  [[ -z _message ]] || printf "\n%s\n\n" "${_message}" >&2
 
   # Declare function local variables
   local _source _function _line _index _largest _format _digits _longest
@@ -667,11 +656,8 @@ backtrace()
   do
     # For each function name in the stack, if the function name is longer than
     # the current largest, then...
-    if (( ${#FUNCNAME[${_index}]} > ${#_largest} ))
-    then
-      # ...set it as the new largest element.
-      _largest=${FUNCNAME[${_index}]}
-    fi
+    (( ${#FUNCNAME[${_index}]} <= ${#_largest} )) ||
+      _largest=${FUNCNAME[${_index}]} # ...set it as the new largest element.
   done
 
   # Loop over the bash source files array, to find the longest element.
@@ -680,10 +666,8 @@ backtrace()
   do
     # For each source file in the source files array, if the file name/path
     # is longer than the current longest, then set it as the new longest element.
-    if (( ${#BASH_SOURCE[${_index}]} > ${#_longest} ))
-    then
+    (( ${#BASH_SOURCE[${_index}]} <= ${#_longest} )) ||
       _longest=${BASH_SOURCE[${_index}]}
-    fi
   done
 
   for (( _index=0 ; _index < ${#BASH_LINENO[@]} ; _index++ ))
@@ -755,12 +739,9 @@ backtrace()
   # then turn tracing back on.
   printf "${_separator// /=}\n" 1>&2
 
-  if [[ "${_flag}" != "no_exit" ]]
-  then
-    finish_app
-  else
-    return 0
-  fi
+  [[ "${_flag}" != "no_exit" ]] || return 0
+
+  finish_app
 }
 
 finish_app()
