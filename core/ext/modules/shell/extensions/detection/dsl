@@ -530,3 +530,44 @@ extension_action()
   enter "${extension_path}"
   bdsm_exports
 }
+
+extensions_installed()
+{
+  local _token _type _modules _paths=()
+
+  while (( $# > 0 ))
+  do
+    _token="$1"
+    shift
+    case "${_token}" in
+      (sets|exts)
+        _paths+=("${bdsm_path}/${_token}")
+        ;;
+      (module|type)
+        _type="$1"
+        shift || fail "$FUNCNAME(): An module type must follow the '${_token}' keyword"
+        ;;
+      (in)
+        _paths="${1}"
+        shift || fail "$FUNCNAME(): A path must follow keyword 'in'"
+        ;;
+      (*)
+        fail "$FUNCNAME(): Unkown token ${_token} given"
+        ;;
+    esac
+  done
+
+  [[ -n ${_paths:-}]] || _paths=("${bdsm_path}/sets" "${bdsm_path}/exts")
+
+  _modules=($( find "${_paths[@]}" -mindepth 2 -name "modules" -type f ))
+
+  if [[ -n "${_type:-}" ]]
+  then # Filter by type given
+    "${bdsm_path}/bin/bdsm-ll" \
+      if grep -q "'${_type}'" {} \; then echo {} \; fi ::: ${_modules[@]} |
+        sed -e "s#${bdsm_path}/sets/##" -e "s#${bdsm_path}/exts/##" \
+          -e "s#/modules/shell/modules##"
+  else
+    echo ${_modules[@]}
+  fi
+}

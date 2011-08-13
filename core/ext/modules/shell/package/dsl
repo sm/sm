@@ -1703,3 +1703,30 @@ package_man()
   man ${extension_actions[@]:-${package_name}}
 }
 
+# pkg functions
+packages_installed()
+{
+  local _path="${packages_path}"
+  find "${_path}" -mindepth 1 -maxdepth 1 -type d |
+  sed -e 's#./##g' -e 's# #,#g' -e "s#${_path}/##"
+}
+
+packages_active()
+{
+  local _path="${packages_path}/${package_name}"
+  find "${_path}" -mindepth 1 -maxdepth 1 -type d |
+  sed -e 's#./##g' -e 's# #,#g' -e "s#${_path}/##"
+}
+
+package_extensions_installed()
+{
+  local _path="${packages_path}/${package_name}" _type="ext/package"
+
+  extensions_installed module "ext/package"
+
+  "${bdsm_path}/bin/bdsm-ll" \
+    if grep -q "'${_type}'" {} \; then echo {} \; fi ::: ${_modules[@]} |
+    sed -e "s#${bdsm_path}/sets/##" -e "s#${bdsm_path}/exts/##" \
+      -e "s#/modules/shell/modules##"
+}
+
