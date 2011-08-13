@@ -71,7 +71,7 @@ esac
 
 if [[ -z "${extension_sets_home}" ]]
 then
-  if [[ -w "${extension_sets_path}" ]]
+  if [[ -w "${extension_sets_path}" ]] || (( UID == 0 ))
   then
     extension_sets_home="${extension_sets_path}"
   else
@@ -81,7 +81,7 @@ fi
 
 if [[ -z "${extension_exts_home}" ]]
 then
-  if [[ -w "${extension_exts_path}" ]]
+  if [[ -w "${extension_exts_path}" ]] || (( UID == 0 ))
   then
     extension_exts_home="${extension_exts_path}"
   else

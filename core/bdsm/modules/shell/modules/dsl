@@ -86,6 +86,9 @@ init_extensions_search_paths()
     extensions_search_paths+=( "${bdsm_path}/core" )
   fi
 
+  debug search "extension_sets_home:${extension_sets_home}:"
+  debug search "extension_exts_home:${extension_exts_home}:"
+  debug search "extensions_search_paths:${extensions_search_paths[*]}:"
   export extensions_search_paths
 }
 
