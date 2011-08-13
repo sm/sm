@@ -585,7 +585,7 @@ os_cpu_count()
 
   (( _cpu_count > 0 )) || _cpu_count=1 # Sanity Check
 
-  printf '%d' ${_cpu_count}
+  printf "%d" ${_cpu_count}
 }
 
 #
@@ -630,7 +630,7 @@ os_version()
   # string to the STDOUT of the calling environment.
   read -r os_version < <(uname -r)
   os_version=${os_version//-*}
-  printf '%s' "${os_version}"
+  printf "%s" "${os_version}"
 }
 
 #
@@ -783,44 +783,38 @@ os_open()
   # passed in.
   local _uri="${1:-}"
 
-  # If the URI variable is not empty
-  if variable_is_nonempty _uri
+  shift || fail "Cannot open URI; No uri was given."
+
+  # and if the 'open' command exists on the system
+  if command_exists open
   then
-    # and if the 'open' command exists on the system
-    if command_exists open
-    then
-      # Call open, passing in the URI.
-      open "${_uri}"
+    # Call open, passing in the URI.
+    open "${_uri}"
 
-    # Otherwise if the 'xdg-open' command exists on the system,
-    elif command_exists xdg-open
-    then
-      # Call xdg-open, passing in the URI.
-      xdg-open "${_uri}"
+  # Otherwise if the 'xdg-open' command exists on the system,
+  elif command_exists xdg-open
+  then
+    # Call xdg-open, passing in the URI.
+    xdg-open "${_uri}"
 
-    # otherwise
-    else
-      # If the shell is interactive
-      # and if the uri is a file uri then open it up in the shell set editor,
-      # or less if the editor variable has not been set.
-      # Otherwise the shell is non-interactive, so for now print the uri.
-      modules ext/interactive
-      if shell_is_interactive
-      then
-        if [[ "${_uri}" == file* ]]
-        then
-          ${EDITOR:-less} "${_uri}"
-        else
-          curl -s "${_uri}"
-        fi
-      else
-        echo "$_uri"
-      fi
-    fi
+  # otherwise
   else
-    # Otherwise the uri was not passed in; this is a programming error.
-    # Fail, with a backtrace to help with debugging.
-    fail "Cannot open URI; no uri was given."
+    # If the shell is interactive
+    # and if the uri is a file uri then open it up in the shell set editor,
+    # or less if the editor variable has not been set.
+    # Otherwise the shell is non-interactive, so for now print the uri.
+    modules ext/interactive
+    if shell_is_interactive
+    then
+      if [[ "${_uri}" == file* ]]
+      then
+        ${EDITOR:-less} "${_uri}"
+      else
+        curl -s "${_uri}"
+      fi
+    else
+      echo "$_uri"
+    fi
   fi
 }
 
