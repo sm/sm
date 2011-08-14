@@ -22,6 +22,8 @@ else
     "${package_user:="$USER"}"
 fi
 
+package_init
+
 extension_patches_path="${extension_path}/patches"
 
 ensure_paths_exist "${active_path}"
