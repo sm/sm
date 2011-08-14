@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# This file is where you call any cli processing for your extension
+# This file is optional and may be deleted.
+

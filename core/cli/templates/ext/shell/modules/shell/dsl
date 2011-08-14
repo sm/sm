@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+# This file is where you define any necessary functions that will be shared
+# between all of your actions. You may also make .actions files in the /actions/
+# path defining a mapping of cli items to function names, example:
+
+#install=myextension_install()
+
