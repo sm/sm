@@ -10,7 +10,7 @@ prepare_for_installation()
 {
   local directory _path
 
-  log_step "Ensuring that installation path exists" \
+  log_step "Ensuring that installation target path exists (${install_path})" \
     ensure_paths_exist "${install_path}"
 
   enter "${install_path}"
@@ -20,11 +20,11 @@ prepare_for_installation()
     _path="${install_path}/${directory}"
     if path_exists "${_path}"
     then
-      log_step "Removing old bdsm component path ( ${_path} )" rm -rf "${_path}"
+      log_step "Removing old bdsm component path (${_path})" rm -rf "${_path}"
     fi
   done
 
-  log_step "Prepairing install paths" \
+  log_step "Creating install path directories (${directories[*]} ${aux_paths[*]})" \
   ensure_paths_exist "${directories[@]}" "${aux_paths[@]}"
 }
 
@@ -32,19 +32,19 @@ install_core()
 {
   local _dir
 
-  log_step "Installing core directories" \
+  log_step "Installing core directories (${directories[*]})" \
     copy_paths --force to "${install_path}/" "${directories[@]}"
 
-  log_step "Installing core files" \
+  log_step "Installing core files (${files[*]})" \
     copy_files to "${install_path}" ${files[@]}
 
-  log_step "Installing core extensions" \
+  log_step "Installing core extension set (sets/core)" \
     copy_paths --force to "${install_path}/" "core"
 }
 
 install_configuration_files()
 {
-  log_step "Ensuring configuration files exist"
+  log_step "Ensuring configuration files exist (${configs[*]})"
   for config_file in "${configs[@]}"
   do
     ensure_files_exist "${install_path}/config/${config_file}"
@@ -54,11 +54,12 @@ install_configuration_files()
 
 symlink_bdsm()
 {
-  chmod a+x "${install_path}/bin/bdsm" "${install_path}/bin/bdsm-ll"
+  chmod 0755 "${install_path}/bin/bdsm"
+  chmod 0755 "${install_path}/bin/bdsm-ll"
 
   if variable_is_nonempty prefix_path && path_exists "${prefix_path}/bin"
   then
-    log_step "Linking ${prefix_path}/bin/bdsm" \
+    log_step "Linking bdsm binary (${install_path}/bin/bdsm => ${prefix_path}/bin/bdsm)" \
       link --force "${install_path}/bin/bdsm" to "${prefix_path}/bin/bdsm"
   fi
 }
@@ -66,8 +67,6 @@ symlink_bdsm()
 setup_shell_completion()
 {
   local _prefix="/etc"
-
-  log_step "Setting up bdsm shell completion"
 
   if path_exists "${_prefix}/bash_completion.d"
   then
@@ -77,12 +76,11 @@ setup_shell_completion()
     ensure_paths_exist "${_prefix}/profile.d/"
   fi
 
+  log_step "Setting up bdsm shell completion (${completion_prefix}/bdsm-completion.sh)" \
   copy_file \
     from "${install_path}/core/cli/modules/shell/completion/bash" \
     to "${completion_prefix}/bdsm-completion.sh" \
     mode 0755 owner "root"
-
-  log_step success
 }
 
 setup_profile_d()
@@ -94,7 +92,7 @@ setup_profile_d()
     if os_is_darwin
     then
       file_contains /etc/profile "${profile_d_path}" ||
-        write "\nif test -d '${profile_d_path}' ; then for profile in \"${profile_d_path}\"/*.sh ; do if test -x \"\$profile\" ; then . \"\$profile\" ; fi ; done ; unset profile ; fi\n" \
+        write "\nif test -d '${profile_d_path}' ; then for profile in \"${profile_d_path}\"/*.sh ; do if test -x \"\$profile\" ; then . \"\$profile\" ; fi ; done ; unset profile ; fi" \
           to /etc/profile
     fi
   else
@@ -109,7 +107,7 @@ setup_profile_d()
         append to "$HOME/.bash_profile"
 
     file_contains "$HOME/.profile" "${profile_d_path}" ||
-      write "\nif test -d '${profile_d_path}' ; then for profile in \"${profile_d_path}\"/*.sh ; do if test -x \"\$profile\" ; then . \"\$profile\" ; fi ; done ; unset profile ; fi\n" \
+      write "\nif test -d '${profile_d_path}' ; then for profile in \"${profile_d_path}\"/*.sh ; do if test -x \"\$profile\" ; then . \"\$profile\" ; fi ; done ; unset profile ; fi" \
         append to "$HOME/.profile"
   fi
 
@@ -117,7 +115,7 @@ setup_profile_d()
      file_contains "${profile_d_path}/bdsm.sh" "${packages_path}/active/bin" ||
      {
        # To prepend or postpend??? Good discussion here...
-       write "PATH=\"${packages_path}/active/bin:${packages_path}/active/sbin:\${PATH}\"\n" \
+       write "PATH=\"${packages_path}/active/bin:${packages_path}/active/sbin:\${PATH}\"" \
          to "${profile_d_path}/bdsm.sh"
 
        chmod_files 0755 "${profile_d_path}/bdsm.sh"
@@ -133,7 +131,7 @@ set_bdsm_path()
 
 install_bdsm()
 {
-  log "\nInstalling BDSM Framework to ${install_path}.\n"
+  log "BDSM Framework Installation:"
 
   prepare_for_installation
 
@@ -150,5 +148,5 @@ install_bdsm()
     perform setup_shell_completion
   }
 
-  succeed "\nFramework installed to ${install_path} !\n"
+  succeed "BDSM Framework installed."
 }

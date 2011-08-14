@@ -10,8 +10,8 @@ update=package_update()
 package/info=package_info()
 info=package_info()
 
-package/activate=package_activate_action()
-activate=package_activate_action()
+package/activate=package_activate()
+activate=package_activate()
 
 package/man=package_man()
 man=package_man()

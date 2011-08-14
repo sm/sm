@@ -221,21 +221,10 @@ package_definition()
 #
 package_install()
 {
-  true \
-    "${package_name:="${1}"}" \
-    "${package_version:="${2}"}"
-
-  [[ -n "${package_name}" ]] ||
-    fail "$FUNCNAME(): Package name must be given as first parameter.\n"
-
-  [[ -n "${package_version}" ]] ||
-    fail "$FUNCNAME(): Package version must be given as second parameter.\n"\
-    "(For example version=x.y.z set in extension's config/defaults file.)\n"
-
-  archive_format="${3:-${archive_format:-"tar.gz"}}"
+  (( $# == 0 )) || package_init $@
 
   if symlink_exists "${packages_path}/${package_name}/active" \
-  && [[ "$1" != "--force" ]]
+  && [[ "force_flag" != "1" ]]
   then
     log "The ${package_name} ${package_version} package is already installed.
 To force, call:\n\tbdsm ${package_name} package install --force\n"
@@ -358,18 +347,7 @@ To force, call:\n\tbdsm ${package_name} package install --force\n"
 #
 package_update()
 {
-  true \
-    "${package_name:="${1}"}" \
-    "${package_version:="${2}"}"
-
-  [[ -n "${package_name}" ]] ||
-    fail "$FUNCNAME(): Package name must be given as first parameter.\n"
-
-  [[ -n "${package_version}" ]] ||
-    fail "$FUNCNAME(): Package version must be given as second parameter.\n"\
-    "(For example version=x.y.z set in extension's config/defaults file.)\n"
-
-  archive_format="${3:-${archive_format:-"tar.gz"}}"
+  (( $# == 0 )) || package_init $@
 
   # TODO: check if newer version exists, if so then...
   if package_installed | grep -q "${package_version}" && [[ "$1" != "--force" ]]
@@ -416,7 +394,7 @@ package_update()
 #
 package_fetch_md5()
 {
-  variables_must_be_nonempty package_name package_version archive_format
+  (( $# == 0 )) || package_init $@
 
   local download_url
 
@@ -474,18 +452,7 @@ package_fetch_md5()
 #
 package_fetch()
 {
-  true \
-    "${package_name:="${1}"}" \
-    "${package_version:="${2}"}"
-
-  [[ -n "${package_name}" ]] ||
-    fail "$FUNCNAME(): Package name must be given as first parameter.\n"
-
-  [[ -n "${package_version}" ]] ||
-    fail "$FUNCNAME(): Package version must be given as second parameter.\n"\
-    "(For example version=x.y.z set in extension's config/defaults file.)\n"
-
-  archive_format="${3:-${archive_format:-"tar.gz"}}"
+  (( $# == 0 )) || package_init $@
 
   : \
     "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
@@ -729,24 +696,15 @@ package_make_install()
 #
 package_activate()
 {
-  true \
-    "${package_name:="${1}"}" \
-    "${package_version:="${2}"}"
-
-  [[ -n "${package_name}" ]] ||
-    fail "$FUNCNAME(): Package name must be given as first parameter.\n"
-
-  [[ -n "${package_version}" ]] ||
-    fail "$FUNCNAME(): Package version must be given as second parameter.\n"\
-    "(For example version=x.y.z set in extension's config/defaults file.)\n"
+  (( $# == 0 )) || package_init $@
 
   local _file _files=() _path _paths
 
-  true "${install_path:="${packages_path}/${_package}/${_version}"}"
+  true "${install_path:="${packages_path}/${package_name}/${package_version}"}"
 
   if path_exists "${install_path}"
   then
-    if symlink_exists "${packages_path}/${_package}/active"
+    if symlink_exists "${packages_path}/${package_name}/active"
     then
       package_deactivate "${_package}"
     fi
@@ -767,23 +725,15 @@ package_activate()
     done
 
     link --force "${install_path}" \
-      to "${packages_path}/${_package}/active"
+      to "${packages_path}/${package_name}/active"
 
     log_step success
   else
-    warn "Skipping activation of ${_package} ${_version}, "\
+    warn "Skipping activation of ${package_name} ${package_version}, "\
       "as '${install_path}' does not exist."
   fi
 
-  package_setup "${_package}"
-}
-
-package_activate_action()
-{
-  [[ -n "${package_version}" ]] ||
-    error "You need to specify a version to activate:\n  bdsm ${package_name}:<version> activate\n  bdsm ${package_name} activate --version <version>"
-
-  package_activate "${package_name}" "${package_version}"
+  package_setup "${package_name}"
 }
 
 #
@@ -874,7 +824,7 @@ package_setup()
 #
 package_deactivate()
 {
-  local _package="${1:-}" _file _files _version
+  local _package="${1:-"${package_name}"}" _file _files _version
 
   variables_must_be_nonempty _package
 
@@ -1119,18 +1069,7 @@ package_profile_d()
 #
 package_uninstall()
 {
-  true \
-    "${package_name:="${1}"}" \
-    "${package_version:="${2}"}"
-
-  [[ -n "${package_name}" ]] ||
-    fail "$FUNCNAME(): Package name must be given as first parameter.\n"
-
-  [[ -n "${package_version}" ]] ||
-    fail "$FUNCNAME(): Package version must be given as second parameter.\n"\
-    "(For example version=x.y.z set in extension's config/defaults file.)\n"
-
-  archive_format="${3:-${archive_format:-"tar.gz"}}"
+  (( $# == 0 )) || package_init $@
 
   log_step "${package_name} ${package_version} ~ uninstall" \
 
@@ -1364,6 +1303,9 @@ package_cli()
       --file)
         package_file="${extension_args[$((++index))]}"
         ;;
+      --force)
+        force_flag=1
+        ;;
       --static)
         configure_flags+=( --static )
         static_flag=1
@@ -1421,8 +1363,7 @@ package_cli()
 
   [[ -z "${_ignored_args[0]:-}" ]] || extension_args=( "${_ignored_args[@]}" )
 
-  # Explicitly reload the package module to pickup any CLI overrides.
-  modules_reinitialize ext/package
+  package_init "${extension_args[@]}"
 }
 
 #
@@ -1705,12 +1646,7 @@ Please install via bdsm package module, and retry. Typically, this can be done a
 #
 package_info()
 {
-  true \
-    "${package_name:="${1}"}" \
-    "${package_version:="${2}"}"
-
-  [[ -n "${package_name}" ]] ||
-    error "$FUNCNAME(): Package name must be given as first parameter.\n"
+  (( $# == 0 )) || package_init $@
 
   local _path="${packages_path}/${package_name}"
   : \
@@ -1734,11 +1670,11 @@ package_info()
     log "  active: none"
   fi
 
-  log "urls:\n"\
-  "  base: ${package_base_url}\n"\
-  "  download: ${package_url}\n"\
-  "archive: ${package_file}\n"\
-  "source_path: ${source_path}/${package_dir}"
+  log "urls:"
+  log "  base: ${package_base_url}"
+  log "  download: ${package_url}"
+  log "archive: ${package_file}"
+  log "source_path: ${source_path}/${package_dir}"
 
   if array_is_nonempty package_dependencies
   then
@@ -1756,15 +1692,7 @@ package_installed()
 
 package_man()
 {
-  true \
-    "${package_name:="${1}"}" \
-    "${package_version:="${2}"}"
-
-  [[ -n "${package_name}" ]] ||
-    error "Package name must be given as first parameter.\n"
-
-  [[ -n "${package_version}" ]] ||
-    error "Package version must be given as second parameter.\n"
+  (( $# == 0 )) || package_init $@
 
   true "${package_path:="${packages_path}/${package_name}/${package_version}"}"
 
@@ -1838,4 +1766,46 @@ packages_list()
       packages_installed "$@"
       ;;
   esac
+}
+
+package_init()
+{
+  package_name="${1:-${package_name:-${extension}}}"
+  [[ -n "${package_name}" ]] ||
+    fail "$FUNCNAME(): Package name must be given as first parameter.\n"
+
+  case "${package_name}" in
+    *=*) # exact version specifier
+      package_version="${package_name#*=}"
+      package_name="${package_name%%=*}"
+      ;;
+    *:*) # minimum version specifier
+      # TODO: concept of 'minimum' ;)
+      package_version="${package_name#*:}"
+      package_name="${package_name%%:*}"
+      ;;
+    *)
+      package_version="${2:-${package_version:-}}"
+      ;;
+  esac
+
+  archive_format="${3:-${archive_format:-"tar.gz"}}"
+
+  # Ensure that package_version is set at this point
+  variable_is_nonempty package_default_version || read_default version prefix package_default for ${package_name}
+  variable_is_nonempty package_version   || package_version="${package_default_version}"
+  variable_is_nonempty archive_format    || read_default archive_format             for ${package_name}
+  variable_is_nonempty package_base_url  || read_default base_url prefix package    for ${package_name}
+  variable_is_nonempty package_md5_url   || read_default md5_url  prefix package    for ${package_name}
+  variable_is_nonempty website_url       || read_default website_url prefix package for ${package_name}
+  variable_is_empty    package_version   || install_path="${install_base_path}/${package_version}"
+  variable_is_nonempty init_scripts_path || init_scripts_path="$(init_scripts_path)"
+
+  true "${archive_format:=tar.gz}"
+  true "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
+
+  [[ -n "${package_version}" ]] ||
+    fail "$FUNCNAME(): Package version must be specified.\n"\
+    "(For example version=x.y.z set in extension's config/defaults file.)\n"
+
 }

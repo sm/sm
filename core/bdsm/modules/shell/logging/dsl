@@ -852,3 +852,4 @@ clean_tmp_logs()
   rm -rf ${TMP_PATH:-/tmp}/err_*.log || \
     printf "Could not clean old logs, please clean by calling:\n  sudo rm -rf ${TMP_PATH:-/tmp}/err_*.log\n"
 }
+

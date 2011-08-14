@@ -142,7 +142,7 @@ sets_update()
 
     if [[ ! -s "${extension_sets_home}/${_name}/.uri" ]]
     then
-      log "Extension set ${_name} does not contain stored uri.\n"
+      log "Extension set ${_name} does not contain stored uri."
       continue
     fi
 

@@ -11,7 +11,8 @@ NYI
 #  ;;
 #
 #  help|usage)
-#    log "\nUsage:\n\n  bdsm extensions update repository"
+#    log "Usage:"
+#    log "bdsm extensions update repository"
 #  ;;
 #
 #  all)
@@ -35,7 +36,8 @@ NYI
 #      fetch_extensions_git_repository
 #      extensions_install "${extension_args[@]}"
 #    else
-#      log "\nUsage:\n\n  bdsm extensions update [extension [extension [...]]"
+#      log "Usage:"
+#      log "bdsm extensions update [extension [extension [...]]"
 #    fi
 #  ;;
 #esac

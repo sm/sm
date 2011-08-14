@@ -95,7 +95,9 @@ install_bdsm_scm()
 
   if (( ${sense_of_humor_flag:=0} == 1 ))
   then
-    log "Ahh... that's better...\nIt always feels so nice to get head.\nRemember to get head often!\n"
+    log "Ahh... that's better..."
+    log "It always feels so nice to get head."
+    log "Remember to get head often!"
   fi
 
   enter "${src_path}/${dir}/"

@@ -7,18 +7,6 @@ declare -a package_dependencies
 
 true "${package_name:="${extension}"}"
 
-case "${package_name}" in
-  *=*) # exact version specifier
-    package_version="${package_name#*=}"
-    package_name="${package_name%%=*}"
-    ;;
-  *:*) # minimum version specifier
-    # TODO: concept of 'minimum' ;)
-    package_version="${package_name#*:}"
-    package_name="${package_name%%:*}"
-    ;;
-esac
-
 true \
   "${source_path:="${bdsm_path}/src"}" \
   "${archives_path:="${bdsm_path}/archives"}" \
@@ -36,30 +24,20 @@ else
     "${package_user:="$USER"}"
 fi
 
+package_init
+
 extension_patches_path="${extension_path}/patches"
 
-# Ensure that package_version is set at this point
-variable_is_nonempty package_default_version || read_default version prefix package_default for ${package_name}
-variable_is_nonempty package_version   || package_version="${package_default_version}"
-variable_is_nonempty package_base_url  || read_default base_url prefix package for ${package_name}
-variable_is_nonempty package_md5_url   || read_default md5_url  prefix package for ${package_name}
-variable_is_nonempty archive_format    || read_default archive_format          for ${package_name}
-variable_is_nonempty init_scripts_path || init_scripts_path="$(init_scripts_path)"
-variable_is_empty    package_version   || install_path="${install_base_path}/${package_version}"
-
-true "${archive_format:=tar.gz}"
-
 ensure_paths_exist "${active_path}"
-(
-  enter "${active_path}"
-  ensure_paths_exist ${fhs_dirs}
-)
 
-# Not on OSX?
-# LDFLAGS="-L${active_path}/lib ${LDFLAGS:-}"
-# CFLAGS="-I${active_path}/include ${CFLAGS:-} "
+for dir in ${fhs_dirs}
+do
+  ensure_paths_exist "${active_path}/${fhs_dirs}"
+done
 
-export package_name package_version package_default_version packages_path archive_format package_file \
-  package_url package_md5_url packages_path bin_path source_path LDFLAGS CFLAGS
+LDFLAGS="-L${active_path}/lib ${LDFLAGS:-}"
+CFLAGS="-I${active_path}/include ${CFLAGS:-} "
 
-
+export package_name packages_path package_name package_version archive_format \
+  package_file package_url package_md5_url packages_path bin_path source_path \
+  LDFLAGS CFLAGS package_default_version

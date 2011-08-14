@@ -551,7 +551,9 @@ help_resources()
 #
 help_section()
 {
-  log "\n$*\n"
+  log ""
+  log "$*"
+  log ""
 }
 
 #
@@ -623,7 +625,7 @@ usage()
 {
   bdsm_version
 
-  log "\nbdsm ${bdsm_version} https://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)"
+  log "bdsm ${bdsm_version} https://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)"
 
   sections=(
     usage description actions notes dependencies resources
