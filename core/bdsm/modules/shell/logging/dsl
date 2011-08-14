@@ -112,10 +112,15 @@ warn()
 # or if you set debug_flags to welcome|all.
 # Code:
 #
-# debug welcome "Hello there! "
+# $ debug welcome "Hello there! "
 # Output:
 #
 # DEBUG welcome: Hello there!
+#
+#
+# $ echo test > >( debug vcs - )
+#
+# DEBUG vcs: test
 #
 core_debug()
 {
@@ -124,7 +129,14 @@ core_debug()
 
   if (( debug_flag == 1 )) && options_check "$debug_flags" "$type"
   then
-    printf "DEBUG $type: $*\n"
+    if [[ "$1" == "-" ]]
+    then
+      printf "DEBUG $type: "
+      cat -
+      printf "\n"
+    else
+      printf "DEBUG $type: $*\n"
+    fi
   else
     return 0
   fi
