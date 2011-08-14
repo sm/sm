@@ -1,11 +1,7 @@
 #!/usr/bin/env bash
 
-# Ensure that default values are set; prefix_path should be set at this point, so
-# this is also a failsafe.
 #TODO: update repository_url to "wayneeseguin/bdsm"
 true \
-  "${prefix_path:="/usr/local"}" \
-  "${bin_path:="${prefix_path}/bin"}" \
   "${src_path:="${sm_path}/src"}" \
   "${md5_path:="${sm_path}/md5"}" \
   "${archives_path:="${sm_path}/archives"}" \
@@ -34,4 +30,4 @@ user="$USER"
 
 extensions_src_path="${src_path}/extensions"
 
-export prefix_path bin_path source_path
+export source_path

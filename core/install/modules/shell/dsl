@@ -54,17 +54,19 @@ install_configuration_files()
 
 symlink_sm()
 {
-  if variable_is_nonempty prefix_path && path_exists "${prefix_path}/bin"
+  local _bin_path="${sm_path//sm/bin}"
+
+  if variable_is_nonempty sm_path && path_exists "${_bin_path}/bin"
   then
     local _binary
     for _binary in "${binaries[@]}"
     do
-      log_step "Linking binary (${install_path}/bin/${_binary} => ${prefix_path}/bin/${_binary})" \
-        link --force "${install_path}/bin/${_binary}" to "${prefix_path}/bin/${_binary}"
+      log_step "Linking binary (${install_path}/bin/${_binary} => ${_bin_path}/${_binary})" \
+        link --force "${install_path}/bin/${_binary}" to "${_bin_path}/${_binary}"
     done
 
-    log_step "Linking binary (${install_path}/bin/sm => ${prefix_path}/bin/sm)" \
-      link --force "${install_path}/bin/sm" to "${prefix_path}/bin/sm"
+    log_step "Linking binary (${install_path}/bin/sm => ${_bin_path}/sm)" \
+      link --force "${install_path}/bin/sm" to "${_bin_path}/sm"
   fi
 }
 

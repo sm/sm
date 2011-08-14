@@ -13,11 +13,9 @@ if [[ -z "${sm_path:-}" ]]
 then
   if (( UID == 0 ))
   then
-    prefix_path="/"
-    sm_path="/"
+    sm_path="${DESTROOT:-}/sm"
   else
-    prefix_path=""
-    sm_path="$HOME/.sm"
+    sm_path="${DESTROOT:-}$HOME/.sm"
   fi
 fi
 
@@ -29,7 +27,7 @@ src_path="${sm_path}/src"
 extension_sets_home="${sm_path}/sets"
 extension_exts_home="${sm_path}/exts"
 
-export install_path prefix_path archives_path scm_path src_path extension_sets_home
+export install_path archives_path scm_path src_path extension_sets_home
 
 exec "${PWD}/local" --call=install/install_sm "$@"
 
