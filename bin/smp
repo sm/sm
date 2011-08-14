@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+os_cpu_count()
+{
+  local _cpu_count
+
+  if [[ "$OSTYPE" = *darwin* ]]
+  then
+    read -r _cpu_count < <(/usr/sbin/sysctl hw.ncpu)
+    _cpu_count="${_cpu_count//* }"
+  elif [[ "$OSTYPE" = *linux* ]]
+  then
+    _cpu_count=$(awk '/^processor/{count++} END{print count}' /proc/cpuinfo 2>&1)
+  fi
+
+  (( _cpu_count > 0 )) || _cpu_count=1 # Sanity Check
+
+  printf "%d" ${_cpu_count}
+}
+
+bdsm-parallel()
+{
+  local _before=() _current _sequential _sequence _parallel
+
+  # Find parallel or sequential definition
+  while (( $# > 0 ))
+  do
+    _current="$1"
+    shift
+    case "${_current}" in
+      */*|*,*)
+        _sequential=( ${_current//,/ } )
+        break
+        ;;
+      *)
+        _before+=( "${_current}" )
+        ;;
+    esac
+  done
+
+  # Run with the found definition
+  for _sequence in "${_sequential[@]}"
+  do
+    _parallel=( ${_sequence//\// } )
+    if (( ${#_parallel[@]} > 1 ))
+    then
+      bdsm-ll --noswap -j $(os_cpu_count) bdsm "${_before[@]}" {} "$@" ::: ${_parallel[@]}
+    else
+      bdsm "${_before[@]}" ${_parallel} "$@"
+    fi
+  done
+}
+
+case "$*" in
+  */*|*,*)
+    bdsm-parallel "$@"
+    ;;
+  *)
+    bdsm "$@"
+esac
