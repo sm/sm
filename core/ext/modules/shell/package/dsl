@@ -559,10 +559,11 @@ package_fetch_md5()
 
   : \
     "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
-    "${packge_md5_url:="${package_base_url}/${package_file}.md5"}" \
-    "${package_md5:=$( hash_file "${extension_config_path}/md5" "${package_file}" )}"
+    "${packge_md5_url:="${package_base_url}/${package_file}.md5"}"
 
-  if [[ -z "${package_md5}" && -n "${package_md5_url}" ]]
+  [[ -n "${package_md5}" ]] || read_config "${package_name}" md5 "${package_file}" as package_md5
+
+  [[ -n "${package_md5}" ]] || if [[ -n "${package_md5_url}" ]]
   then
     curl -L "${packge_md5_url}" -o "${archives_path}/${package_file}.md5" 2>/dev/null ||
       error "Fetching MD5 checksum from '${package_md5_url}' failed."
@@ -1679,11 +1680,12 @@ package_info()
 {
   (( $# == 0 )) || package_cli $@
 
-  local _installed _path="${bdsm_path}/pkg/${package_name}"
+  local _installed _path="${bdsm_path}/pkg/${package_name}" package_md5
 
   : \
     "${package_dir:="${package_name}-${package_version}"}" \
     "${package_url:="${package_base_url}/${package_file}"}"
+  [[ -n "${package_md5}" ]] || read_config "${package_name}" md5 "${package_file}" as package_md5
 
   log "package_name: ${package_name}"
   if path_exists "${_path}"
@@ -1704,6 +1706,7 @@ package_info()
   log "  base_url: ${package_base_url}"
   log "  download_url: ${package_url}"
   log "  archive_format: ${package_file}"
+  log "  stored archive_md5: ${package_md5:-}"
   log "  source_path: ${source_path}/${package_dir}"
 
   [[ -z "${package_dependencies}" ]] ||
