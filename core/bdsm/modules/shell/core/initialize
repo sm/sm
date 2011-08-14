@@ -131,6 +131,7 @@ elif set | grep '^extension_args=(' >/dev/null
 then
   case "${extension_args[0]}" in
     */*|*,*)
+      #TODO: deprecated by SMP
       modules ext/array ext/system
       array_shift extension_args extensions
       sequential=(${extensions//,/ })
