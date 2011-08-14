@@ -1787,9 +1787,10 @@ package_init()
 
   # Ensure that package_version is set at this point
   variable_is_nonempty package_version   || read_default version prefix package
+  variable_is_nonempty archive_format    || read_default archive_format
   variable_is_nonempty package_base_url  || read_default base_url prefix package
   variable_is_nonempty package_md5_url   || read_default md5_url prefix package
-  variable_is_nonempty archive_format    || read_default archive_format
+  variable_is_nonempty website_url       || read_default website_url prefix package
   variable_is_empty    package_version   || install_path="${install_base_path}/${package_version}"
   variable_is_nonempty init_scripts_path || init_scripts_path="$(init_scripts_path)"
 
