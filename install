@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
 
-printf "Do not install from head until I am done refactoring\n"
-printf "For an install use the 0.8.6 release for now.\n"
-printf "  ~ Wayne\n"
-exit 1
-
 # TODO: --prefix=... parameter
 if [[ -z "${sm_path:-}" ]]
 then

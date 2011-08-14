@@ -1,7 +1,7 @@
-# Bash Delectable Scripting Modules (BDSM) Framework
+# Benevolent Delectable S{cripting,ystem} Manager (BDSM) Framework
 
-BDSM is a system scripting DSL & framework for beating software and systems
-into submission!
+BDSM is a system scripting and DSL & management framework for beating software
+and systems into submission!
 
 # Goal
 
@@ -16,29 +16,29 @@ BDSM itself is a scripting framework that enables very rich DSL sets known as
 modules. BDSM lets you use the DSL to painlessly write powerful 'extensions', which are
 essentially named sets of scripts (directories!). With BDSM, you'll find you can
 install and manage a multitude of extensions - and even entire sets of extensions - providing
-unprecedented levels of control and automation productivity that are unleashed by the 
+unprecedented levels of control and automation productivity that are unleashed by the
 creative abilities of BDSM's energetic community of extension authors :)
 
 # Creating Extensions
 
-There are only a few requirements when creating your own BDSM extensions. 
-The extension must live in a dedicated directory. Within this directory are 
-(at least) the subdirectory bin/, containing at least one executable file called 'help'. 
+There are only a few requirements when creating your own BDSM extensions.
+The extension must live in a dedicated directory. Within this directory are
+(at least) the subdirectory bin/, containing at least one executable file called 'help'.
 
 Additionally, in the root of the extension directory you must include a text file called VERSION,
 with a version number that follows semantic versioning convention (http://semver.org/);
-that is, in the format of X.Y.Z, where X,Y and Z are positive integers. 
+that is, in the format of X.Y.Z, where X,Y and Z are positive integers.
 
 An extension must also have a README file, in which you should explain your
-extension's primary purpose, and any special considerations to be kept in mind 
+extension's primary purpose, and any special considerations to be kept in mind
 when using it.
 
 The contents of the bin directory can be *any* executable file. This means, for
 example, that C-compiled binaries, Ruby Scripts, python, lua, etc... may all be
-used according to your requirements and preferences.  
+used according to your requirements and preferences.
 
-Of course, the extensions *I* write are generally in bash; but you can bring your 
-own implements of choice to the BDSM party ;) 
+Of course, the extensions *I* write are generally in bash; but you can bring your
+own implements of choice to the BDSM party ;)
 
 Additionally, if you write your extensions in bash, a nice DSL is automatically loaded for you.
 You can read more about the DSL in the online documentation.
