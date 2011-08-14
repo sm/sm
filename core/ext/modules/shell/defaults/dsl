@@ -49,68 +49,88 @@
 #
 read_default()
 {
-  local key variable token value prefix _file _temp _extension=${extension}
+  local key token _args=() _extension=${extension}
 
   key="${1:-}"
 
-  if variable_is_nonempty key
-  then
+  shift
+
+  while (( $# > 0 ))
+  do
+    token="$1"
     shift
-
-    while (( $# > 0 ))
-    do
-      token="$1"
-      shift
-      case "$token" in
-        into|as)
-          variable="$1"
-          shift
-          ;;
-        prefix)
-          prefix="$1"
-          shift
-          ;;
-        for)
-          _extension="$1"
-          shift
-          ;;
-        *)
-          variable="$token"
-          break
+    case "$token" in
+      for)
+        _extension="$1"
+        shift
         ;;
-      esac
-    done
+      *)
+        _args+=( "$token" )
+      ;;
+    esac
+  done
 
-    if variable_is_empty variable
+  read_config "${_extension}" defaults "${key}" "${_args[@]}"
+}
+
+read_config()
+{
+  local key variable token value prefix _file _temp
+
+  _extension="${1:-}"
+  _config_file="${2:-}"
+  key="${3:-}"
+  shift || fail "extension name is missing"
+  shift || fail "config file name is missing"
+  shift || fail "key name is missing"
+
+  while (( $# > 0 ))
+  do
+    token="$1"
+    shift
+    case "$token" in
+      into|as)
+        variable="$1"
+        shift
+        ;;
+      prefix)
+        prefix="$1"
+        shift
+        ;;
+      *)
+        variable="$token"
+        break
+      ;;
+    esac
+  done
+
+  if variable_is_empty variable
+  then
+    if variable_is_nonempty prefix
     then
-      if variable_is_nonempty prefix
+      true "${variable:="${prefix:-}_$key"}"
+    else
+      true "${variable:="$key"}"
+    fi
+  fi
+
+  # Run search in the same process to initialize cache variables.
+  settings_search ${_extension} "${_config_file}" > /dev/null
+
+  for _file in  $( settings_search ${_extension} "${_config_file}" )
+  do
+    if file_is_nonempty "${_file}"
+    then
+      _temp="$(hash_file "${_file}" "${key}")"
+
+      if [[ -n "${_temp}" ]]
       then
-        true "${variable:="${prefix:-}_$key"}"
-      else
-        true "${variable:="$key"}"
+        value="${_temp}"
       fi
     fi
+  done
 
-    # Run search in the same process to initialize cache variables.
-    settings_search ${_extension} defaults > /dev/null
-
-    for _file in  $( settings_search ${_extension} defaults )
-    do
-      if file_is_nonempty "${_file}"
-      then
-        _temp="$(hash_file "${_file}" "${key}")"
-
-        if [[ -n "${_temp}" ]]
-        then
-          value="${_temp}"
-        fi
-      fi
-    done
-
-    eval "${variable}=\"${value}\""
-  else
-    fail "$extension $action read_default() no arguments passed! "
-  fi
+  eval "${variable}=\"${value}\""
 }
 
 settings_search()
