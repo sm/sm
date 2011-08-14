@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 #
-# ## bdsm_exports()
+# ## sm_exports()
 #
-# Exports bdsm framework relevant environment variables for extension action
+# Exports relevant framework environment variables for extension action
 # processes.
 #
 # ### Input Parameters
@@ -24,17 +24,17 @@
 #
 # ### Usage Examples
 #
-#     user$ bdsm_exports
+#     user$ sm_exports
 #
-bdsm_exports()
+sm_exports()
 { # TODO: Filter this list of exports down.
-  export action archives_path bdsm_path branch config_path database database_name debug_flag environment error_message extension extension_action extension_args extension_actions_path extension_config_path extension_modules_path extension_path extension_templates_path flags framework head_flag hooks_flag keep_releases modules_path old_releases parse_break paths prefix_path previous_path project project_path release_path remote repository result revision shared_path src_path templates_path timestamp tmp_path trace_flag user extension_log_path packages_path
+  export action archives_path sm_path branch config_path database database_name debug_flag environment error_message extension extension_action extension_args extension_actions_path extension_config_path extension_modules_path extension_path extension_templates_path flags framework head_flag hooks_flag keep_releases modules_path old_releases parse_break paths prefix_path previous_path project project_path release_path remote repository result revision shared_path src_path templates_path timestamp tmp_path trace_flag user extension_log_path packages_path
 }
 
 #
-# ## bdsm_version()
+# ## sm_version()
 #
-# Reads the currently installed bdsm version into the variable 'bdsm_version'.
+# Reads the currently installed sm version into the variable 'sm_version'.
 #
 # ### Input Parameters
 #
@@ -46,7 +46,7 @@ bdsm_exports()
 #
 # ### Environmental effects
 #
-# The variable 'bdsm_version' will be set after the function is executed.
+# The variable 'sm_version' will be set after the function is executed.
 #
 # ### Return Codes
 #
@@ -58,17 +58,17 @@ bdsm_exports()
 #
 # ### Usage Examples
 #
-#     user$ bdsm_version
-#     user$ echo $bdsm_version
+#     user$ sm_version
+#     user$ echo $sm_version
 #     69.69.69
 #
-bdsm_version()
+sm_version()
 {
-  if [[ -s "$bdsm_path/VERSION" ]]
+  if [[ -s "$sm_path/VERSION" ]]
   then
-    read -r bdsm_version < "$bdsm_path/VERSION"
+    read -r sm_version < "$sm_path/VERSION"
   else
-    bdsm_version="?.?.?"
+    sm_version="?.?.?"
   fi
 }
 
@@ -102,16 +102,15 @@ bdsm_version()
 # ### Usage Examples
 #
 #     user$ cat $HOME/test
-#     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # Load BDSM framework core.
+#     #!/usr/bin/env sm
 #     NIY
 #
 #     user$ $HOME/test
 #     ERROR: This feature has not yet been implemented.
 #     Backtrace:
 #        Trace   Line Function             File
-#           3.    262 fail()               /usr/local/bdsm/extensions/builtin/core/modules/shell/logging/dsl
-#           2.      5 NIY()                /usr/local/bdsm/extensions/builtin/core/modules/shell/extensions/dsl
+#           3.    262 fail()               /usr/local/sm/extensions/builtin/core/modules/shell/logging/dsl
+#           2.      5 NIY()                /usr/local/sm/extensions/builtin/core/modules/shell/extensions/dsl
 #           1.      5 main()               /Users/wayneeseguin/test
 #      > modules/shell/logging/dsl fail() 263 $ exit 1
 #

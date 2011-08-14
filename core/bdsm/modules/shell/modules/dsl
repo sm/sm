@@ -81,9 +81,9 @@ init_extensions_search_paths()
   fi
 
   # Core is required to run, add it if not found
-  if ! string_contains "${extensions_search_paths[*]}" "${bdsm_path}/core"
+  if ! string_contains "${extensions_search_paths[*]}" "${sm_path}/core"
   then
-    extensions_search_paths+=( "${bdsm_path}/core" )
+    extensions_search_paths+=( "${sm_path}/core" )
   fi
 
   debug search "extension_sets_home:${extension_sets_home}:"
@@ -100,7 +100,7 @@ init_extensions_search_paths()
 # ### Input Parameters
 #
 # First parameter is a full path for a BDSM extensions directory.
-#   (example: /usr/local/bdsm/extensions)
+#   (example: /usr/local/sm/extensions)
 #
 # ### Stream Outputs
 #
@@ -120,7 +120,7 @@ init_extensions_search_paths()
 #
 # ### Usage Examples
 #
-#     $ bdsm call extensions_in /usr/local/bdsm/extensions/ext
+#     $ sm call extensions_in /usr/local/sm/extensions/ext
 #
 extensions_in()
 {
@@ -157,7 +157,7 @@ in_search_paths()
     fi
   done
 
-  if "${callback}" "${bdsm_path}/core" "cli" "${args[@]}"
+  if "${callback}" "${sm_path}/core" "cli" "${args[@]}"
   then
     return 0
   fi
@@ -210,8 +210,8 @@ module()
   # Search for module.
   if in_search_paths detect_module "${_module}"
   then
-    log_search module "$module_name" "${module_path##${bdsm_path}\/}"
-    modules+=("${module_name}=${module_path##${bdsm_path}\/}")
+    log_search module "$module_name" "${module_path##${sm_path}\/}"
+    modules+=("${module_name}=${module_path##${sm_path}\/}")
   else
     log_search module "${_module}" "Not found !!!"
     return 1
@@ -233,7 +233,7 @@ module()
     for _module_dependency in $( cat ${_module_path}/modules )
     do
       module_or_error "${_module_dependency}" \
-        "Could not find module dependency '${_module_dependency}' from '${_module_path##${bdsm_path}\/}/modules'."
+        "Could not find module dependency '${_module_dependency}' from '${_module_path##${sm_path}\/}/modules'."
     done
   fi
 
@@ -292,7 +292,7 @@ module_or_error()
 #
 modules()
 {
-  local _module _bdsm _extension _path _file _modules=("$@")
+  local _module _sm _extension _path _file _modules=("$@")
 
   if (( ${#_modules[@]} > 0 ))
   then
@@ -346,7 +346,7 @@ modules_reinitialize()
       _module_path="${_module_path%% *}"
       if [[ -n "${_module_path}" ]]
       then
-        _initialize_path="${bdsm_path}/${_module_path}/initialize"
+        _initialize_path="${sm_path}/${_module_path}/initialize"
         [[ ! -s "${_initialize_path}" ]] || source "${_initialize_path}"
       else
         fail "Can not reinitialize module as it was not yet loaded"

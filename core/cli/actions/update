@@ -12,7 +12,7 @@ NYI
 #
 #  help|usage)
 #    log "Usage:"
-#    log "bdsm extensions update repository"
+#    log "sm extensions update repository"
 #  ;;
 #
 #  all)
@@ -37,7 +37,7 @@ NYI
 #      extensions_install "${extension_args[@]}"
 #    else
 #      log "Usage:"
-#      log "bdsm extensions update [extension [extension [...]]"
+#      log "sm extensions update [extension [extension [...]]"
 #    fi
 #  ;;
 #esac

@@ -6,8 +6,8 @@ fhs_dirs=(bin etc include lib libexec sbin share man)
 declare -a package_dependencies
 
 true \
-  "${source_path:="${bdsm_path}/src"}" \
-  "${archives_path:="${bdsm_path}/archives"}" \
+  "${source_path:="${sm_path}/src"}" \
+  "${archives_path:="${sm_path}/archives"}" \
   ${static_flag:=0}
 
 ensure_paths_exist "${active_path}"

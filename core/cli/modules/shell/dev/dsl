@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-bdsm_development_setup()
+sm_development_setup()
 {
   local _component _separator _string
 
@@ -32,23 +32,23 @@ bdsm_development_setup()
       append to "$HOME/.bash_profile"
   fi
 
-  ensure_paths_exist "${projects_path}/bdsm"
+  ensure_paths_exist "${projects_path}/sm"
 
-  ensure_files_exist "${HOME}/.bdsmrc"
+  ensure_files_exist "${HOME}/.smrc"
 
-  enter "${projects_path}/bdsm"
+  enter "${projects_path}/sm"
 
   for _component in core extensions site
   do
     log "=> ${_component}"
     log "${_separator// /=}"
-    if file_contains "$HOME/.bdsmrc" "${_component}_development_path"
+    if file_contains "$HOME/.smrc" "${_component}_development_path"
     then
-      log "  * ${_component}_development_path is already set in .bdsmrc"
+      log "  * ${_component}_development_path is already set in .smrc"
     else
-      write "export ${_component}_development_path=\"${projects_path}/bdsm/${_component}\"" \
-        append to "$HOME/.bdsmrc"
-      log "Setting ${_component}_development_path in .bdsmrc"
+      write "export ${_component}_development_path=\"${projects_path}/sm/${_component}\"" \
+        append to "$HOME/.smrc"
+      log "Setting ${_component}_development_path in .smrc"
     fi
 
     if path_exists "${_component}"
@@ -58,10 +58,10 @@ bdsm_development_setup()
       log "  * Cloning Core repository into $PWD/${_component}/."
       case ${_component} in
         core)
-          _url="https://github.com/wayneeseguin/bdsm"
+          _url="https://github.com/wayneeseguin/sm"
           ;;
         *)
-          _url="https://github.com/wayneeseguin/bdsm-${_component}"
+          _url="https://github.com/wayneeseguin/sm-${_component}"
           ;;
       esac
 
@@ -77,7 +77,7 @@ bdsm_development_setup()
   log "BDSM development environment setup is complete."
 }
 
-bdsm_development_update()
+sm_development_update()
 {
   NIY
 }

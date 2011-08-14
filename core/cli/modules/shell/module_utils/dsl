@@ -333,7 +333,7 @@ modules_docgen()
     log "  </ul></body></html>" >> "${_prefix}/index.html"
     log "Modules documentation content generated in ${_prefix}."
   else
-    error "Set core_development_path in ~/.bdsmrc, and clone the bdsm core "\
+    error "Set core_development_path in ~/.smrc, and clone the sm core "\
       "repository into it, to run docgen."\
       "For more information, see https://bdsm.beginrescueend.com/development/core."
   fi
@@ -351,10 +351,10 @@ modules_docopen()
     then
       os_open "${core_development_path}/html/modules/index.html"
     else
-      error "Run '$ bdsm mod docgen' before trying docopen."
+      error "Run '$ sm mod docgen' before trying docopen."
     fi
   else
-    error "To run docopen, set core_development_path in ~/.bdsmrc, and clone the bdsm core "\
+    error "To run docopen, set core_development_path in ~/.smrc, and clone the sm core "\
       "repository into it."
   fi
 }
@@ -393,7 +393,7 @@ modules_site_docgen()
     log "  </ul></body></html>" >> "${_prefix}/index.html"
     log "Modules documentation content has been generated in ${_prefix}."
   else
-    fail "Set core_development_path in ~/.bdsmrc, to run docgen."
+    fail "Set core_development_path in ~/.smrc, to run docgen."
   fi
 
   if path_exists "${site_development_path}"
@@ -444,6 +444,6 @@ Header
 
     log "Module documentation generated from the source code path ${core_development_path} into the site development path ${site_development_path}."
   else
-    fail "Set site_development_path in ~/.bdsmrc, to run docgen."
+    fail "Set site_development_path in ~/.smrc, to run docgen."
   fi
 }

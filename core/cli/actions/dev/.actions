@@ -1,2 +1,2 @@
-setup=bdsm_development_setup()
-update=bdsm_development_update()
+setup=sm_development_setup()
+update=sm_development_update()

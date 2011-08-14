@@ -89,7 +89,7 @@ fetch_uri()
 #  DEBUG vcs: Unknown SCM type (not found) for url '/root/test'.
 #  DEBUG vcs: type: github, params: mpapis/mpapis_test /home/mpapis/tmp/test_uris.
 #  DEBUG vcs: github -> https://github.com/mpapis/mpapis_test/tarball/master
-#  DEBUG vcs: github tarball archive name /home/mpapis/.bdsm/archives/mpapis_mpapis_test_master.tar.gz.
+#  DEBUG vcs: github tarball archive name /home/mpapis/.sm/archives/mpapis_mpapis_test_master.tar.gz.
 #  DEBUG vcs: master does not match MD5 checksum #; removing and downloading.
 #
 fetch_uris()
@@ -99,7 +99,7 @@ fetch_uris()
   shift || fail "target path must be specified as the second parameter."
 
   fetch_uri_parse_args "$@"
-  
+
   for _uri in ${_uris[@]}
   do
     fetch_uri "${_uri}" "${_target}" --on-fail debug ${_args[@]} || true

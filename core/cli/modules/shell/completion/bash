@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-__bdsm_bash_completion()
+__sm_bash_completion()
 {
   local current_word previous flags commands extensions
 
   COMPREPLY=()
   current_word="${COMP_WORDS[COMP_CWORD]}"
   previous="${COMP_WORDS[COMP_CWORD-1]}"
-  extensions="$( bdsm list | tr "\n" ' ')"
+  extensions="$( sm list | tr "\n" ' ')"
   commands="ext sets help get list version mod edit open website ${extensions}"
   commands="${commands[@]}"
   flags="--trace"
@@ -25,12 +25,12 @@ __bdsm_bash_completion()
     # Complete based on installed extensions.
     case "${previous}" in
       ext)
-        available="$( bdsm ext list installed)"
+        available="$( sm ext list installed)"
         COMPREPLY=($(compgen -W "${available}" -- ${current_word}))
         return 0
         ;;
       sets)
-        available="$( bdsm sets list installed)"
+        available="$( sm sets list installed)"
         COMPREPLY=($(compgen -W "${available}" -- ${current_word}))
         return 0
         ;;
@@ -45,7 +45,7 @@ __bdsm_bash_completion()
       *)
         if [[ "${commands}" == *${previous}* ]]
         then
-          actions="$( bdsm "${previous}" | tail -1 )"
+          actions="$( sm "${previous}" | tail -1 )"
           COMPREPLY=( $(compgen -W "${actions}" -- ${current_word}) )
           return 0
         fi
@@ -58,7 +58,7 @@ __bdsm_bash_completion()
     if [[ ${current_word} == -* ]] ; then
       COMPREPLY=( $(compgen -W "${flags}" -- ${current_word}) )
     else
-      actions="$( bdsm "${previous}" | tail -1 )"
+      actions="$( sm "${previous}" | tail -1 )"
       COMPREPLY=( $(compgen -W "${actions}" -- ${current_word}) )
     fi
   fi
@@ -73,5 +73,5 @@ __bdsm_bash_completion()
   fi
 }
 
-complete -F __bdsm_bash_completion bdsm
+complete -F __sm_bash_completion sm
 

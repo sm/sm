@@ -20,9 +20,9 @@
 initial_pwd="$PWD"
 
 # set BDSM basic paths
-bdsm_path="/usr/local/bdsm"
-modules_path="${bdsm_path}/core/bdsm/modules"
-export initial_pwd bdsm_path modules_path
+sm_path="/usr/local/sm"
+modules_path="${sm_path}/core/sm/modules"
+export initial_pwd sm_path modules_path
 
 # basic options parsing
 . "${modules_path}/shell/core/cli"

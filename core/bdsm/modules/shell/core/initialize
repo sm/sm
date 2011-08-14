@@ -2,10 +2,10 @@
 
 shopt -s extglob # Extended globs must always be on for BDSM.
 
-saved_bdsm_path="${bdsm_path:-/usr/local/bdsm}"
+saved_sm_path="${sm_path:-/usr/local/sm}"
 
 # Load System BDSM Configuration, if it exists.
-for file in /etc/bdsmrc "$HOME/.bdsmrc"
+for file in /etc/smrc "$HOME/.smrc"
 do
   if [[ -s "${file}" ]]
   then
@@ -16,7 +16,7 @@ do
 done
 unset previous_preload_modules
 
-bdsm_path="${saved_bdsm_path}"
+sm_path="${saved_sm_path}"
 
 if (( UID == 0 ))
 then # FHS
@@ -27,35 +27,35 @@ then # FHS
     "${profile_d_path:="/etc/profile.d"}"
 else
   true \
-    "${var_path:="${bdsm_path}/var"}" \
+    "${var_path:="${sm_path}/var"}" \
     "${etc_path:="$HOME/.etc"}" \
     "${profile_path:="$HOME/.profile"}" \
     "${profile_d_path:="$HOME/.profile.d"}"
 fi
 
 true \
-  "${modules_path:="${bdsm_path}/core/bdsm/modules"}" \
-  "${templates_path:="${bdsm_path}/templates"}" \
-  "${src_path:="${bdsm_path}/src"}" \
-  "${md5_path:="${bdsm_path}/md5"}" \
-  "${archives_path:="${bdsm_path}/archives"}" \
-  "${scm_path:="${bdsm_path}/scm"}" \
-  "${extension_sets_path:="${bdsm_path}/sets"}" \
-  "${extension_exts_path:="${bdsm_path}/exts"}" \
+  "${modules_path:="${sm_path}/core/sm/modules"}" \
+  "${templates_path:="${sm_path}/templates"}" \
+  "${src_path:="${sm_path}/src"}" \
+  "${md5_path:="${sm_path}/md5"}" \
+  "${archives_path:="${sm_path}/archives"}" \
+  "${scm_path:="${sm_path}/scm"}" \
+  "${extension_sets_path:="${sm_path}/sets"}" \
+  "${extension_exts_path:="${sm_path}/exts"}" \
   "${extensions_src_path:="${src_path}/extensions"}" \
-  "${tmp_path:="${bdsm_path}/tmp"}" \
-  "${bin_path:="${bdsm_path}/bin"}" \
-  "${repos_path:="${bdsm_path}/repos"}" \
+  "${tmp_path:="${sm_path}/tmp"}" \
+  "${bin_path:="${sm_path}/bin"}" \
+  "${repos_path:="${sm_path}/repos"}" \
   "${remote:="origin"}" \
   "${branch:="master"}" \
   "${language:="shell"}" \
   "${user:=$USER}" \
-  "${user_bdsm_path:=$HOME/.bdsm}" \
+  "${user_sm_path:=$HOME/.sm}" \
   "${keep_releases:=4}" \
   "${hooks_flag:=1}" \
   "${PAGER:="less"}" \
-  "${config_path:="${bdsm_path}/core/bdsm/config"}" \
-  "${packages_path:="${bdsm_path}/pkg"}" \
+  "${config_path:="${sm_path}/core/sm/config"}" \
+  "${packages_path:="${sm_path}/pkg"}" \
   "${active_path:="${packages_path}/active"}" \
   "${extension_args:=""}"
 
@@ -75,7 +75,7 @@ then
   then
     extension_sets_home="${extension_sets_path}"
   else
-    extension_sets_home="${user_bdsm_path}/sets"
+    extension_sets_home="${user_sm_path}/sets"
   fi
 fi
 
@@ -85,7 +85,7 @@ then
   then
     extension_exts_home="${extension_exts_path}"
   else
-    extension_exts_home="${user_bdsm_path}/exts"
+    extension_exts_home="${user_sm_path}/exts"
   fi
 fi
 
@@ -97,7 +97,7 @@ then
   export PATH="${active_path}/bin:${active_path}/sbin:${PATH}"
 fi
 
-export bdsm_path modules_path initial_pwd extension_action_calls=0
+export sm_path modules_path initial_pwd extension_action_calls=0
 
 # Load module() function, then load core modules.
 source "${modules_path}/shell/core/dsl"
@@ -113,12 +113,12 @@ then # custom compilations + g*
 fi
 
 # Ensure that any variables you wish export to extensions actually *are* exported.
-bdsm_exports
+sm_exports
 
-if [[ -n $bdsm_script ]]
+if [[ -n $sm_script ]]
 then
   # load script
-  action_source $bdsm_script "${extension_args[@]}"
+  action_source $sm_script "${extension_args[@]}"
 elif [[ -n "${call_action}" ]]
 then
   if ! declare -F "${call_action}" >/dev/null
@@ -138,8 +138,8 @@ then
       for sequence in "${sequential[@]}"
       do
         parallel=("${sequence//\// }")
-        PATH="${bdsm_path}/bin:${PATH}"
-        bdsm-ll --noswap -j $(os_cpu_count) bdsm {} ${extension_args[*]} ::: ${parallel[@]}
+        PATH="${sm_path}/bin:${PATH}"
+        sm-ll --noswap -j $(os_cpu_count) sm {} ${extension_args[*]} ::: ${parallel[@]}
       done
       ;;
     *)

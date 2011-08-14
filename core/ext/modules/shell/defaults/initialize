@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
 settings_search_path_cache=()
-# This line needs to be commented to allow settings read from bdsmrc.
+# This line needs to be commented to allow settings read from smrc.
 #settings_search_path_append=()

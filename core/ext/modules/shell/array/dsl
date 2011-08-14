@@ -454,7 +454,7 @@ array_append()
 # ### Usage Examples
 #
 #     user$ cat $HOME/test
-#     #!/usr/bin/env bdsm
+#     #!/usr/bin/env sm
 #
 #     modules array
 #
@@ -516,9 +516,8 @@ array_pop()
 # ### Usage Examples
 #
 #     user$ cat $HOME/test
-#     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # Load BDSM framework.
-#     modules array
+#     #!/usr/bin/env sm
+#     modules ext/array
 #
 #     my_array=(1 2 3 4)
 #     echo ${my_array[@]}
@@ -770,9 +769,8 @@ array_largest()
 # ### Usage Examples
 #
 #     user$ cat $HOME/test
-#     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # BDSM framework
-#     modules array
+#     #!/usr/bin/env sm
+#     modules ext/array
 #
 #     arr=(c a d e f b h j i )
 #     array_sort_desc arr
@@ -829,9 +827,8 @@ array_sort_desc()
 # ### Usage Examples
 #
 #     user$ cat $HOME/test
-#     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # BDSM framework
-#     modules array
+#     #!/usr/bin/env sm
+#     modules ext/array
 #
 #     arr=(c a d e f b h j i )
 #     array_sort_asc arr
@@ -888,9 +885,8 @@ array_sort_asc()
 # ### Usage Examples
 #
 #     user$ cat $HOME/test
-#     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # BDSM framework
-#     modules array
+#     #!/usr/bin/env sm
+#     modules ext/array
 #
 #     arr=(a a a b b c c c c d d d d d d)
 #     array_unique arr
@@ -949,9 +945,8 @@ array_unique()
 # ### Usage Examples
 #
 #     user$ cat $HOME/test
-#     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # BDSM framework
-#     modules array
+#     #!/usr/bin/env sm
+#     modules ext/array
 #
 #     the_array=()
 #     printf "($(array_join the_array))"

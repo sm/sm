@@ -270,7 +270,7 @@ detect_unique_2nd_level_action()
           candidate="${candidate##${_actions_path}}"
           candidate="${candidate%/*}"
           candidate="${candidate//\// }"
-          printf "  bdsm ${extension} ${candidate} ${_action} $@\n"
+          printf "  sm ${extension} ${candidate} ${_action} $@\n"
         done | sort
       )\n"
     else
@@ -408,7 +408,7 @@ extension_run()
         ${requires[@]} "${_path}/${action}"
       ;;
     # python|lua|javascript)
-      #   ADD "${modules_path}/${_type}/" to the lib path so the script can require "bdsm"
+      #   ADD "${modules_path}/${_type}/" to the lib path so the script can require "sm"
       #  "${_path}"
       #  ;;
     dne|noexec)
@@ -452,9 +452,8 @@ extension_run()
 # ### Usage Examples
 #
 #     $ cat $HOME/test
-#     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # Load BDSM framework core.
-#     modules extensions
+#     #!/usr/bin/env sm
+#     modules ext/extensions
 #     extension_action ext list
 #
 #     $  $HOME/test
@@ -497,13 +496,13 @@ extension_action()
   || in_search_paths detect_unique_2nd_level_action "${extension_args[@]}" \
   || in_search_paths detect_modules_action "${extension_args[@]}"
   then
-    log_search action "$action" "${action_path##${bdsm_path}\/} params:${extension_args[@]}"
+    log_search action "$action" "${action_path##${sm_path}\/} params:${extension_args[@]}"
   else
     if in_search_paths detect_extension_existence "${extension_args[@]}" \
     && [[ "${extension}" == "${extension_args}" ]]
     then
       log_search extension "$extension" "$extensions_path"
-      error "Unknown action path: "${extension_args[@]}"\n\nUsage: \n  bdsm extension [namespace] [action].\n"
+      error "Unknown action path: "${extension_args[@]}"\n\nUsage: \n  sm extension [namespace] [action].\n"
     else
       error "Could not find extension: "${extension_args}"\n"
     fi
@@ -531,7 +530,7 @@ extension_action()
   extension_log_path=${extension_log_path}"
 
   enter "${extension_path}"
-  bdsm_exports
+  sm_exports
 }
 
 extensions_installed()
@@ -546,7 +545,7 @@ extensions_installed()
     shift
     case "${_token}" in
       (sets|exts)
-        _paths+=("${bdsm_path}/${_token}")
+        _paths+=("${sm_path}/${_token}")
         ;;
       (module|type)
         _type="$1"
@@ -568,7 +567,7 @@ extensions_installed()
   done
 
   [[ -n ${_paths:-} ]] || {
-    _paths=( "${bdsm_path}/sets" "${bdsm_path}/exts" )
+    _paths=( "${sm_path}/sets" "${sm_path}/exts" )
     ensure_paths_exist "${_paths[@]}"
   }
 
@@ -578,9 +577,9 @@ extensions_installed()
 
   if [[ -n "${_type:-}" ]]
   then # Filter by type given
-    "${bdsm_path}/bin/bdsm-ll" \
+    "${sm_path}/bin/sm-ll" \
       if grep -q "'${_type}'" {} \; then echo {} \; fi ::: ${_modules[@]} |
-        sed -e "s#${bdsm_path}/sets/##" -e "s#${bdsm_path}/exts/##" \
+        sed -e "s#${sm_path}/sets/##" -e "s#${sm_path}/exts/##" \
           -e "s#/modules/shell/modules##" | sort | awk '!'"/${_excludes// /|}/"
   else
     echo ${_modules[@]} | awk '!'"/${_excludes// /|}/"

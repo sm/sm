@@ -41,8 +41,8 @@
 #
 # read_default respects a tiered default file scheme,
 #
-#   "/etc/bdsm/${extension}/defaults"
-#   "$HOME/.bdsm/${extension}/defaults"
+#   "/etc/sm/${extension}/defaults"
+#   "$HOME/.sm/${extension}/defaults"
 #   "${extension_config_path}/defaults"
 #
 #
@@ -140,7 +140,7 @@ settings_search()
   local extension=$1 setting=$2 path paths
 
   # Standard paths
-  paths=( "/etc/bdsm/${extension}" "$HOME/.bdsm/${extension}" )
+  paths=( "/etc/sm/${extension}" "$HOME/.sm/${extension}" )
 
   # Extension path
   if extension_path "${extension}"

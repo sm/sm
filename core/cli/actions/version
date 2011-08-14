@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-bdsm_version
+sm_version
 
 case "${extension_args[0]}" in
   -v|-V) # Only echo version information.
-    succeed "${bdsm_version:-"?.?.?"}"
+    succeed "${sm_version:-"?.?.?"}"
     ;;
   *) # GNU-style extended version information.
-    succeed "\nBDSM Framework ${bdsm_version:-"?.?.?"} https://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)\n"
+    succeed "\nBDSM Framework ${sm_version:-"?.?.?"} https://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)\n"
     ;;
 esac

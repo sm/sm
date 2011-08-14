@@ -43,7 +43,7 @@ sets_list()
     then
       log "${_path##*\/}: # User set"
     else
-      log "${_path##$bdsm_path\/}:"
+      log "${_path##$sm_path\/}:"
     fi
 
     if extensions_in "$_path"
@@ -61,7 +61,7 @@ sets_list_known()
 {
   local COLUMNS=80
   awk -F = '/^[^#]/ {printf "# %18s | %s\n", $1, $2 }' <<<"Set name=Repository"
-  awk -F = '/^[^#]/ {printf "%20s   %s\n", $1, $2 }' < "${bdsm_path}/core/cli/config/known_sets"
+  awk -F = '/^[^#]/ {printf "%20s   %s\n", $1, $2 }' < "${sm_path}/core/cli/config/known_sets"
 }
 
 sets_install()
@@ -83,7 +83,7 @@ set_install()
   shift || fail "$FUNCNAME: Cannot install a set; No set name was given."
 
   local _uri="${1:-}"
-  shift || _uri=$( awk -F = "/^${_name}=/ {print \$2 }" < "${bdsm_path}/core/cli/config/known_sets" | tail -n 1 )
+  shift || _uri=$( awk -F = "/^${_name}=/ {print \$2 }" < "${sm_path}/core/cli/config/known_sets" | tail -n 1 )
 
   local _identifier="$(scm_identifier "${_uri}")"
 
@@ -103,7 +103,7 @@ sets_install_all()
 {
   local _set _name _uri COLUMNS=80
 
-  for _set in $( awk '/^[^#]/' < "${bdsm_path}/core/cli/config/known_sets" )
+  for _set in $( awk '/^[^#]/' < "${sm_path}/core/cli/config/known_sets" )
   do
     _name="${_set%%=*}"
     _uri="${_set##*=}"
@@ -129,7 +129,7 @@ sets_update()
     if [[ ! -d "${extension_sets_home}/${_name}" ]]
     then
       if in_search_paths detect_extension_existence "${_name}" \
-      && [[ "${extension}" == "${_name}" ]] #do not count finding fallback default extension: bdsm
+      && [[ "${extension}" == "${_name}" ]] # do not count finding fallback default extension: sm
       then
         error "Extension set ${_name} is installed system wide and can not be updated by user."
       else
@@ -194,7 +194,7 @@ sets_uninstall()
   if [[ ! -d "${_name}" ]]
   then
       if in_search_paths detect_extension_existence "${_name}" \
-      && [[ "${extension}" == "${_name}" ]] #do not count finding fallback default extension: bdsm
+      && [[ "${extension}" == "${_name}" ]] # do not count finding fallback default extension: sm
       then
         error "Extension set ${_name} is installed system wide and can not be uninstaled by user."
       else
@@ -209,8 +209,8 @@ sets_check_availability()
 {
   # TODO: refactor this to take argument of uri to check instead.
   #       provide check_known_sets_availability or some such to wrap this.
-  awk -F = '/^[^#]/ {printf "%20s   %s\n", $1, $2 }' < "${bdsm_path}/core/cli/config/known_sets" |
-  "${bdsm_path}/bin/bdsm-ll" \
-    printf "%s: " {} \; curl -s --head https://github.com/wayneeseguin/bdsm-{} \| awk "'/Status/{print \$2}'"
+  awk -F = '/^[^#]/ {printf "%20s   %s\n", $1, $2 }' < "${sm_path}/core/cli/config/known_sets" |
+  "${sm_path}/bin/sm-ll" \
+    printf "%s: " {} \; curl -s --head https://github.com/wayneeseguin/sm-{} \| awk "'/Status/{print \$2}'"
 }
 

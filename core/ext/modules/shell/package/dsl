@@ -391,7 +391,7 @@ package_install()
   && [[ "${force_flag}" != "1" ]]
   then
     log "The ${package_name} ${package_version} package is already installed.
-To force, call:\n\tbdsm ${package_name} package install --force\n"
+To force, call:\n\tsm ${package_name} package install --force\n"
     exit 0
   fi
 
@@ -1126,10 +1126,10 @@ package_ldconfig()
     then
       ensure_paths_exist "/etc/ld.so.conf.d"
 
-      if ! file_exists "/etc/ld.so.conf.d/bdsm.conf"
+      if ! file_exists "/etc/ld.so.conf.d/sm.conf"
       then
-        write "${active_path}/lib\n" to "/etc/ld.so.conf.d/bdsm.conf"
-        chmod_files 0444 "/etc/ld.so.conf.d/bdsm.conf"
+        write "${active_path}/lib\n" to "/etc/ld.so.conf.d/sm.conf"
+        chmod_files 0444 "/etc/ld.so.conf.d/sm.conf"
       fi
 
       command_exists "${_ldconfig}" || ldconfig="ldconfig"
@@ -1636,8 +1636,8 @@ package_dependencies()
   then
     local IFS=','
     error "${extension} requires ${_missing_dependencies[*]}.\n
-Please install via bdsm package module, and retry. Typically, this can be done as follows:\n
-\tbdsm ${_missing_dependencies[*]} package install\n"
+Please install via sm package module, and retry. Typically, this can be done as follows:\n
+\tsm ${_missing_dependencies[*]} package install\n"
   fi
 }
 
@@ -1685,7 +1685,7 @@ package_info()
 {
   (( $# == 0 )) || package_cli $@
 
-  local _installed _path="${bdsm_path}/pkg/${package_name}" package_md5
+  local _installed _path="${sm_path}/pkg/${package_name}" package_md5
 
   : \
     "${package_dir:="${package_name}-${package_version}"}" \
@@ -1743,7 +1743,7 @@ package_man()
 # pkg functions
 packages_installed()
 {
-  find "${bdsm_path}/pkg" -mindepth 2 -maxdepth 2 -type d |
+  find "${sm_path}/pkg" -mindepth 2 -maxdepth 2 -type d |
     awk -F'/' '! /\/active\//{print $(NF - 1)":"$(NF)}' | sort
 }
 
@@ -1754,23 +1754,23 @@ packages_active()
   if [[ -z ${1:-} ]]
   then
     _found=($(
-    find "${bdsm_path}/pkg" -mindepth 2 -maxdepth 2 -name active  -type l |
+    find "${sm_path}/pkg" -mindepth 2 -maxdepth 2 -name active  -type l |
     awk -F'/' '! /\/active\//{print $(NF - 1)}'
     ))
   else
     _packages="${1//,/ }"
 
     _found=($(
-    find "${bdsm_path}/pkg" -mindepth 2 -maxdepth 2 -name active -type l |
+    find "${sm_path}/pkg" -mindepth 2 -maxdepth 2 -name active -type l |
     awk -F'/' '! /\/active\//{print $(NF - 1)}' | awk "/${_packages// /|}/"
     ))
   fi
 
   for _package in "${_found[@]}"
   do
-    if [[ -L "${bdsm_path}/pkg/${_package}/active" ]]
+    if [[ -L "${sm_path}/pkg/${_package}/active" ]]
     then
-      readlink "${bdsm_path}/pkg/${_package}/active" |
+      readlink "${sm_path}/pkg/${_package}/active" |
         awk -F'/' '{print $(NF-1) ":" $NF}'
     fi
   done

@@ -405,7 +405,7 @@ user_is_not_root()
 # ### Usage Examples
 #
 #     user$ user_must_be_root
-#     ERROR: bdsm test test must be run as root and NOT as a user(user)
+#     ERROR: sm test test must be run as root and NOT as a user(user)
 #
 user_must_be_root()
 {
@@ -415,7 +415,7 @@ user_must_be_root()
   then
     return 0
   else
-    error "bdsm $extension $action must be run as root, and NOT as a user ($USER)."
+    error "sm $extension $action must be run as root, and NOT as a user ($USER)."
   fi
 }
 
@@ -447,7 +447,7 @@ user_must_be_root()
 # ### Usage Examples
 #
 #     user$ user_must_not_be_root
-#     ERROR: bdsm test test must be run as a (project) user and NOT as a root.
+#     ERROR: sm test test must be run as a (project) user and NOT as a root.
 #
 user_must_not_be_root()
 {
@@ -457,7 +457,7 @@ user_must_not_be_root()
   then
     return 0
   else
-    fail "bdsm $extension $action must be run as a (project) user, and NOT as root."
+    fail "sm $extension $action must be run as a (project) user, and NOT as root."
   fi
 }
 
@@ -546,7 +546,7 @@ user_run_as()
 #
 # ### Usage Examples
 #
-#     root# user_run_as_login "deploy" bdsm unicorn restart
+#     root# user_run_as_login "deploy" sm unicorn restart
 #     << unicorn restart output >>
 #
 user_run_as_login()

@@ -108,7 +108,7 @@ warn()
 #
 # ### Usage Examples
 #
-# The following appears when bdsm is called with --debug=[welcome|all],
+# The following appears when sm is called with --debug=[welcome|all],
 # or if you set debug_flags to welcome|all.
 # Code:
 #
@@ -175,7 +175,7 @@ debug()
 # ### Usage Examples
 #
 # user$ ./install --debug=search help
-# DEBUG search:   module bdsm/help            in builtin/bdsm/modules/shell/help.
+# DEBUG search:   module sm/help            in builtin/sm/modules/shell/help.
 #
 core_log_search()
 {
@@ -224,14 +224,14 @@ log_search()
 # ### Usage Examples
 #
 # user$ ./install --debug=search help
-# DEBUG search:   module bdsm/help            in builtin/bdsm/modules/shell/help.
+# DEBUG search:   module sm/help            in builtin/sm/modules/shell/help.
 #
 core_log_todo()
 {
   if (( debug_flag == 1 )) && options_check "$debug_flags" "todo"
   then
     local file="${BASH_SOURCE[2]}" line="${BASH_LINENO[1]}"
-    printf "DEBUG todo: ${file##${bdsm_path}\/}:${line}:\n"
+    printf "DEBUG todo: ${file##${sm_path}\/}:${line}:\n"
     printf "$*" | xargs -s 72 | xargs -I {} printf "DEBUG todo: # {}\n"
   else
     return 0
@@ -405,7 +405,7 @@ fail()
 #     '+ '
 #     user$ set_ps4
 #     user$ echo "'$PS4'"
-#     ' > ${BASH_SOURCE##${bdsm_path}\/} ${FUNCNAME[0]:+${FUNCNAME[0]}()} ${LINENO} $ '
+#     ' > ${BASH_SOURCE##${sm_path}\/} ${FUNCNAME[0]:+${FUNCNAME[0]}()} ${LINENO} $ '
 #
 # ### Code Walkthrough
 set_ps4()
@@ -413,7 +413,7 @@ set_ps4()
   # Set and export the PS4 variable, so that this script -- and called bash scripts --
   # will display more detailed and formatted trace output.
   # Finally, return true, 0, for success.
-  PS4="# \${BASH_SOURCE##\${bdsm_path}\/} \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO} $ "
+  PS4="# \${BASH_SOURCE##\${sm_path}\/} \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO} $ "
   export PS4
   return 0
 }
@@ -596,8 +596,7 @@ separator()
 # ### Usage Examples
 #
 #     user$ cat ./test
-#     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # Load BDSM framework core.
+#     #!/usr/bin/env sm
 #     modules trace # Load the trace module.
 #
 #     functiona()
@@ -709,7 +708,7 @@ backtrace()
   done
 
   # Determine the format string output for the backtrace, based on your
-  # set editor. If you haven't set an editor, BDSM defaults the editor variable to
+  # set editor. If you haven't set an editor, SM defaults the editor variable to
   # the pager, or to empty string.
   case "${EDITOR:=${PAGER:-}}" in
     (mvim*|mate*)

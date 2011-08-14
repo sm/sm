@@ -15,13 +15,9 @@ Features Roadmap
   * API for publishing extensions.
   * Interface for browsing published extensions.
 
-## Package (pkg) extension and module
-* Package activation and deactivation.
-  $ bdsm pkg {activate/deactivate} {package}
-
-## Service (srv) extension and module
+## Service (svc) extension and module
 * Overridable start/stop/restart/status actions, à la package_install.
 * Init scripts.
 * Activate/deactivate -- autostart on boot.
-  $ bdsm srv {activate/deactivate} {service}
+  $ sm svc {activate/deactivate} {service}
 

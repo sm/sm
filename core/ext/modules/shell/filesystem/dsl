@@ -110,7 +110,7 @@ source_files()
 # ### Usage Examples
 #
 #     user$ nonempty_files a $HOME/.bdmsrc c
-#     /Users/wayneeseguin/.bdsmrc
+#     /Users/wayneeseguin/.smrc
 #
 nonempty_files()
 {
@@ -2289,7 +2289,7 @@ enter()
 #
 # ### Usage Examples
 #
-#     user$ hash_file /usr/local/bdsm/extensions/core/config/defaults website_url
+#     user$ hash_file /usr/local/sm/extensions/core/config/defaults website_url
 #     https://bdsm.beginrescueend.com/
 #
 hash_file()
@@ -2737,12 +2737,11 @@ file_is_empty_or_missing()
 # ### Usage Examples
 #
 #     user$ cat "$HOME/test"
-#     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # Load BDSM framework core.
+#     #!/usr/bin/env sm
 #
-#     modules filesystem
+#     modules ext/filesystem
 #
-#     if file_contains "$HOME/.bdsmrc" ".*w00t.*"
+#     if file_contains "$HOME/.smrc" ".*w00t.*"
 #     then
 #       echo "w00t! "
 #     else
@@ -2806,7 +2805,7 @@ file_contains()
 #
 # ### Usage Examples
 #
-#     user$ symlink_exists /usr/local/bin/bdsm
+#     user$ symlink_exists /usr/local/bin/sm
 #     user$ echo $?
 #     0
 #
@@ -2854,7 +2853,7 @@ symlink_exists()
 #
 # ### Usage Examples
 #
-#     user$ path_exists /usr/local/bin/bdsm
+#     user$ path_exists /usr/local/bin/sm
 #     user$ echo $?
 #     0
 #
@@ -3475,7 +3474,7 @@ write()
 #
 # ### Usage Examples
 #
-# user$ cd ; bdsm call full_path test
+# user$ cd ; sm call full_path test
 # /home/user/test
 #
 full_path()

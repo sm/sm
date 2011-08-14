@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 #
-# In order to use the bdsm interactive project functions, the project module's
+# In order to use the sm interactive project functions, the project module's
 # interactive file must be sourced in your profile, such as ~/.bash_profile,
 #
 # The following example sources the file only if it exists and is nonempty:
 #
-#     if [[ -s "/usr/local/bdsm/extensions/builtin/core/modules/shell/project/interactive" ]]
+#     if [[ -s "/usr/local/sm/extensions/builtin/core/modules/shell/project/interactive" ]]
 #     then
-#       source "/usr/local/bdsm/extensions/builtin/core/modules/shell/project/interactive"
+#       source "/usr/local/sm/extensions/builtin/core/modules/shell/project/interactive"
 #     fi
 #
 true "${projects_path:="$HOME/projects"}"
@@ -21,12 +21,12 @@ export projects_path
 #
 # Examples:
 #
-# user ~ $ p bdsm core
-# user ~/projects/bdsm/core $
+# user ~ $ p sm core
+# user ~/projects/sm/core $
 #
 # Partial prefix completion is also supported,
 # user ~ $ p bd e
-# user ~/projects/bdsm/extensions $
+# user ~/projects/sm/extensions $
 #
 p()
 {
@@ -34,7 +34,7 @@ p()
 
   if [[ "$PS4" = "+ " ]]
   then
-    PS4="+ \${BASH_SOURCE##\${bdsm_path}} \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO} > "
+    PS4="+ \${BASH_SOURCE##\${sm_path}} \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO} > "
     export PS4
   fi
 

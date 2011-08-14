@@ -79,9 +79,8 @@ extension_version()
 # ### Usage Examples
 #
 #     $ cat $HOME/test
-#     !/usr/bin/env bash
-#     source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # Load BDSM framework core.
-#     modules extensions
+#     #!/usr/bin/env sm
+#     modules ext/extensions
 #     extension_license postgresql
 #
 #     $ $HOME/test
@@ -139,9 +138,8 @@ extension_license()
 # ### Usage Examples
 #
 #      $ cat $HOME/test
-#      #!/usr/bin/env bash
-#      source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # Load BDSM framework core.
-#      modules extensions
+#      #!/usr/bin/env sm
+#      modules ext/extensions
 #      extension_actions "postgresql"
 #
 #      $ $HOME/test
@@ -204,7 +202,7 @@ extension_actions()
 #
 # ### Usage Examples
 #
-#     user$ extension_install backup mpapis_bdsm_backup
+#     user$ extension_install backup mpapis_sm_backup
 #
 extension_install()
 {
@@ -216,15 +214,15 @@ extension_install()
     if extension_is_valid "${extensions_src_path}/${_src}"
     then
       log "Installing ${_extension}"
-      if path_exists "${bdsm_path}/exts/${_extension}"
+      if path_exists "${sm_path}/exts/${_extension}"
       then
-        remove_paths "${bdsm_path}/exts/${_extension}"
+        remove_paths "${sm_path}/exts/${_extension}"
       fi
 
       copy_directory "${extensions_src_path}/${_src}" \
-        to "${bdsm_path}/exts/${_extension}"
+        to "${sm_path}/exts/${_extension}"
 
-      write "${extension_uri}" to "${bdsm_path}/exts/${_extension}/.uri"
+      write "${extension_uri}" to "${sm_path}/exts/${_extension}/.uri"
 
       #
       # TODO: Process extension dependencies...

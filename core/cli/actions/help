@@ -5,7 +5,7 @@ extension="<extension>"
 description "Bash Delectable Scripting Manager (BDSM) Framework - Core Extension"
 
 action "{file_name}" "Run the provided {file_name}, with BDSM initialized."
-action "bdsmrc" "Install bdsmrc template file into ~/.bdsmrc."
+action "smrc" "Install smrc template file into ~/.smrc."
 action_separator
 action "get head" "Fetch and install the latest BDSM development version."
 action "ext install {name} {uri}" "Install extension {name} from {uri}."
@@ -20,7 +20,7 @@ notes="
 
   See website for extension documentation.
 
-  [extension] is required; you can set a default in ~/.bdsmrc.
+  [extension] is required; you can set a default in ~/.smrc.
   [action] is required as a command line parameter.
 
   [project] is required as an environment variable
@@ -28,7 +28,7 @@ notes="
 
   [project|environment|repository|extension]
    - may be exported as environment variables,
-   - or set in the ~/.bdsmrc,
+   - or set in the ~/.smrc,
    - or specified as, for example, --project X.
 
   prerequisites:

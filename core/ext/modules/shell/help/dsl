@@ -120,9 +120,8 @@ description()
 # ### Usage Examples
 #
 #     user$ cat $HOME/test
-#     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # Load BDSM framework core.
-#     modules help
+#     #!/usr/bin/env sm
+#     modules ext/help
 #
 #     description "This extension handles X Y and Z."
 #     description "It also handles A B and C."
@@ -336,9 +335,8 @@ resource()
 # ### Usage Examples
 #
 #     user$ cat $HOME/test
-#     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # Load BDSM framework core.
-#     modules help
+#     #!/usr/bin/env sm
+#     modules ext/help
 #
 #     action "help" "Displays the help output for the ${extension} extension."
 #     action "install" "Installs Z redis package."
@@ -406,9 +404,8 @@ help_actions()
 # ### Usage Examples
 #
 #     user$ cat $HOME/test
-#     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # Load BDSM framework core.
-#     modules help
+#     #!/usr/bin/env sm
+#     modules ext/help
 #
 #     note "Don't forget the milk! "
 #     note "... and cookies... mmm...."
@@ -584,7 +581,7 @@ help_section()
 # ### Usage Examples
 #
 #     user$ help_usage
-#     bdsm core {action} [arguments...]
+#     sm core {action} [arguments...]
 #
 help_usage()
 {
@@ -623,9 +620,9 @@ help_usage()
 #
 usage()
 {
-  bdsm_version
+  sm_version
 
-  log "bdsm ${bdsm_version} https://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)"
+  log "sm ${sm_version} https://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)"
 
   sections=(
     usage description actions notes dependencies resources

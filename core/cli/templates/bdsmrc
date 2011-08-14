@@ -5,7 +5,7 @@
 #
 # NOTE / WARNING
 # The items below will soon be moved into a project module config directory:
-#   ~/.bdsm/project/defaults
+#   ~/.sm/project/defaults
 #
 # This is the logical environment we are operating in.
 # It is used in several path and file calculations.

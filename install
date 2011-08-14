@@ -1,28 +1,29 @@
 #!/usr/bin/env bash
 
 # The default prefix is /usr/local;
-# this should be set in /etc/bdsmrc to wherever BDSM is installed.
+# this should be set in /etc/smrc to wherever BDSM is installed.
 
-if [[ -z "${bdsm_path}" ]]
+if [[ -z "${sm_path}" ]]
 then
   if (( UID == 0 ))
   then
     prefix_path="/usr/local"
-    bdsm_path="/usr/local/bdsm"
+    sm_path="/usr/local/sm"
   else
     prefix_path=""
-    bdsm_path="$HOME/.bdsm"
+    sm_path="$HOME/.sm"
   fi
 fi
 
 # set BDSM basic paths
-install_path="${bdsm_path}" # Path to install everything to.
-archives_path="${bdsm_path}/archives"
-scm_path="${bdsm_path}/scm"
-src_path="${bdsm_path}/src"
-extension_sets_home="${bdsm_path}/sets"
-extension_exts_home="${bdsm_path}/exts"
+install_path="${sm_path}" # Path to install everything to.
+archives_path="${sm_path}/archives"
+scm_path="${sm_path}/scm"
+src_path="${sm_path}/src"
+extension_sets_home="${sm_path}/sets"
+extension_exts_home="${sm_path}/exts"
 
 export install_path prefix_path archives_path scm_path src_path extension_sets_home
 
-"${PWD}/local" --call=install/install_bdsm "$@"
+exec "${PWD}/local" --call=install/install_sm "$@"
+

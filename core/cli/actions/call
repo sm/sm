@@ -2,7 +2,7 @@
 
 if [[ ${#extension_args[@]} -eq 0 ]]
 then
-  log 'usage:\n  bdsm call function_name [function_args...]'
+  log 'usage:\n  sm call function_name [function_args...]'
 elif ! declare -F "${extension_args[0]}" >/dev/null
 then
   error "${extension_args[0]} is not a valid function name."

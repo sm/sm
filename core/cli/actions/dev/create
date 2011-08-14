@@ -11,9 +11,9 @@ then
       error "Extension '${extension}' already exists "\
         "at ${target_path}/${extension}."
     else
-      if path_exists "${bdsm_path}/core/cli/templates/ext/${language:-shell}"
+      if path_exists "${sm_path}/core/cli/templates/ext/${language:-shell}"
       then
-        enter "${bdsm_path}/core/cli/templates/ext/${language:-shell}"
+        enter "${sm_path}/core/cli/templates/ext/${language:-shell}"
 
         _path="${target_path}/${extension}"
 
@@ -28,9 +28,9 @@ then
           extension_module_add "${extension}" "${_module}" "${_path}"
 
           # Run the module's extension setup function, if it exists.
-          if file_exists "${bdsm_path}/core/cli/modules/shell/${_module}/extensions"
+          if file_exists "${sm_path}/core/cli/modules/shell/${_module}/extensions"
           then
-            source_files "${bdsm_path}/core/cli/modules/shell/${_module}/extensions"
+            source_files "${sm_path}/core/cli/modules/shell/${_module}/extensions"
             if command_exists "${_module}_extension_setup"
             then
               "${_module}_extension_setup" "${extension}" "${_module}" "${_path}"

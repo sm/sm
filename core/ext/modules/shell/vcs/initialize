@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-if [[ ! -w $bdsm_path ]]
+if [[ ! -w $sm_path ]]
 then
-  archives_path="$HOME/.bdsm/archives"
-  scm_path="$HOME/.bdsm/scm"
-  src_path="$HOME/.bdsm/src"
+  archives_path="$HOME/.sm/archives"
+  scm_path="$HOME/.sm/scm"
+  src_path="$HOME/.sm/src"
 fi
 
 [[ -d "${archives_path}" ]] || mkdir -p $archives_path

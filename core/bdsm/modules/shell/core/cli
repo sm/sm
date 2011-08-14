@@ -73,9 +73,9 @@ do
       printf "ERROR: unknown flag: '${token}'.\n"
       ;;
     *)
-      if [[ -f "$token" && -z "$bdsm_script" ]]
+      if [[ -f "$token" && -z "$sm_script" ]]
       then
-        bdsm_script=$1
+        sm_script=$1
       else
         extension_args=("$@")
         break
@@ -90,7 +90,7 @@ then
   extension_args=()
 fi
 
-PS4="# \${BASH_SOURCE##\${bdsm_path}\/} \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO} $ "
+PS4="# \${BASH_SOURCE##\${sm_path}\/} \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO} $ "
 export PS4
 
 if [[ " ${trace_flags} " =~ " all " ]]
@@ -102,4 +102,4 @@ fi
 debug_flags="${debug_flags## }"
 trace_flags="${trace_flags## }"
 
-export debug_flag debug_flags trace_flag trace_flags extension_args bdsm_script var_debug_flags var_debug_type_flag
+export debug_flag debug_flags trace_flag trace_flags extension_args sm_script var_debug_flags var_debug_type_flag

@@ -1,30 +1,30 @@
 #!/usr/bin/env ruby
 
-module BDSM
+module SM
 
-  def bdsm(environment,command)
+  def sm(environment,command)
     @servers[environment.to_sym].each do |server|
-      %x{ssh #{server} "bash -l -c 'bdsm #{command}'"}
+      %x{ssh #{server} "bash -l -c 'sm #{command}'"}
     end
   end
 
   module Deploy
     task :deploy do
-      bdsm(@environment, :deploy)
+      sm(@environment, :deploy)
     end
     task :rollback do
-      bdsm(@environment, :rollback)
+      sm(@environment, :rollback)
     end
   end
 
   # TODO: allow dynamic action specification.
   module Unicorn
     namespace :unicorn do
-      task :start    do bdsm(@environment, :start)    ; end
-      task :stop     do bdsm(@environment, :stop)     ; end
-      task :restart  do bdsm(@environment, :restart)  ; end
-      task :increase do bdsm(@environment, :increase) ; end
-      task :decrease do bdsm(@environment, :decrease) ; end
+      task :start    do sm(@environment, :start)    ; end
+      task :stop     do sm(@environment, :stop)     ; end
+      task :restart  do sm(@environment, :restart)  ; end
+      task :increase do sm(@environment, :increase) ; end
+      task :decrease do sm(@environment, :decrease) ; end
     end
   end
 
@@ -43,30 +43,30 @@ namespace :cli do
 
     @environment = :production
 
-    include BDSM::Deploy
-    include BDSM::Unicorn
+    include SM::Deploy
+    include SM::Unicorn
 
   end
 
   namespace :staging do
     @environment = :staging
 
-    include BDSM::Deploy
-    include BDSM::Unicorn
+    include SM::Deploy
+    include SM::Unicorn
   end
 
   namespace :qa do
     @environment = :qa
 
-    include BDSM::Deploy
-    include BDSM::Unicorn
+    include SM::Deploy
+    include SM::Unicorn
   end
 
   namespace :ci do
     @environment = :ci
 
-    include BDSM::Deploy
-    include BDSM::Unicorn
+    include SM::Deploy
+    include SM::Unicorn
   end
 
 end

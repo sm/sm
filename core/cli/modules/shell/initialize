@@ -6,9 +6,9 @@
 true \
   "${prefix_path:="/usr/local"}" \
   "${bin_path:="${prefix_path}/bin"}" \
-  "${src_path:="${bdsm_path}/src"}" \
-  "${md5_path:="${bdsm_path}/md5"}" \
-  "${archives_path:="${bdsm_path}/archives"}" \
+  "${src_path:="${sm_path}/src"}" \
+  "${md5_path:="${sm_path}/md5"}" \
+  "${archives_path:="${sm_path}/archives"}" \
   "${archive_format:=tar.gz}" \
   "${package_name:=${extension}}" \
   "${repository_url:="git://github.com/wayneeseguin/bdsm"}"
@@ -19,7 +19,7 @@ true \
   ${remote:="origin"} \
   ${branch:="master"}
 
-for config in "${bdsm_path}/core/bdsm/config/defaults" "${bdsm_path}/core/bdsm/config/defaults"
+for config in "${sm_path}/core/sm/config/defaults" "${sm_path}/core/sm/config/defaults"
 do
   if file_exists "$config"
   then
@@ -28,7 +28,7 @@ do
 done
 
 # Load the BDSM framework version.
-bdsm_version
+sm_version
 
 user="$USER"
 

@@ -8,7 +8,7 @@ then
   ${user_shell} --rcfile <(echo "
     [[ -s ~/.bash_profile ]] && source ~/.bash_profile
     [[ -s ~/.profile ]] && source ~/.profile
-    source ${bdsm_path}/core/bdsm/modules/shell/core/initialize
+    source ${sm_path}/core/sm/modules/shell/core/initialize
     module ext/vcs
     fail()
     {
@@ -23,7 +23,7 @@ then
       builtin exit 0
     }
     trap \"backtrace \\\"A command has returned a 'not handled' error code (\\\$?).\\\" no_exit\" ERR
-    export PS1='(bdsm) [ret=\$?] \w > '
+    export PS1='(sm) [ret=\$?] \w > '
   ") -i
 else
   error "Unsuported shell:\n  ${shell_version[*]}\n\nUse bash 4 for console\n"

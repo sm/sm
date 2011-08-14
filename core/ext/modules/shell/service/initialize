@@ -26,7 +26,7 @@ fi
 : \
   "${service:="${extension}"}" \
   "${service_version:="${package_version}"}" \
-  "${prefix_path:="${bdsm_path}/active"}" \
+  "${prefix_path:="${sm_path}/active"}" \
   "${service_bin_path:="${active_path}/bin"}" \
   "${service_sbin_path:="${active_path}/sbin"}" \
   "${service_pid_path:="${var_path}/run/${service}"}" \

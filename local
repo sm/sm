@@ -20,10 +20,10 @@
 initial_pwd="$PWD"
 
 # Path to load everything from.
-bdsm_path="$PWD"
-modules_path="${bdsm_path}/core/bdsm/modules"
+sm_path="$PWD"
+modules_path="${sm_path}/core/sm/modules"
 
-export initial_pwd bdsm_path modules_path
+export initial_pwd sm_path modules_path
 
 # Basic options parsing.
 . "${modules_path}/shell/core/cli"

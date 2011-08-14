@@ -18,7 +18,7 @@ os_cpu_count()
   printf "%d" ${_cpu_count}
 }
 
-bdsm-parallel()
+sm-parallel()
 {
   local _before=() _current _sequential _sequence _parallel
 
@@ -44,17 +44,17 @@ bdsm-parallel()
     _parallel=( ${_sequence//\// } )
     if (( ${#_parallel[@]} > 1 ))
     then
-      bdsm-ll --noswap -j $(os_cpu_count) bdsm "${_before[@]}" {} "$@" ::: ${_parallel[@]}
+      sm-ll --noswap -j $(os_cpu_count) sm "${_before[@]}" {} "$@" ::: ${_parallel[@]}
     else
-      bdsm "${_before[@]}" ${_parallel} "$@"
+      sm "${_before[@]}" ${_parallel} "$@"
     fi
   done
 }
 
 case "$*" in
   */*|*,*)
-    bdsm-parallel "$@"
+    sm-parallel "$@"
     ;;
   *)
-    bdsm "$@"
+    sm "$@"
 esac

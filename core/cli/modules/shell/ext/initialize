@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-ensure_paths_exist "${bdsm_path}/exts"
+ensure_paths_exist "${sm_path}/exts"
 

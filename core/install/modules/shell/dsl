@@ -20,7 +20,7 @@ prepare_for_installation()
     _path="${install_path}/${directory}"
     if path_exists "${_path}"
     then
-      log_step "Removing old bdsm component path (${_path})" rm -rf "${_path}"
+      log_step "Removing old sm component path (${_path})" rm -rf "${_path}"
     fi
   done
 
@@ -52,7 +52,7 @@ install_configuration_files()
   log_step success
 }
 
-symlink_bdsm()
+symlink_sm()
 {
   if variable_is_nonempty prefix_path && path_exists "${prefix_path}/bin"
   then
@@ -63,8 +63,8 @@ symlink_bdsm()
         link --force "${install_path}/bin/${_binary}" to "${prefix_path}/bin/${_binary}"
     done
 
-    log_step "Linking binary (${install_path}/bin/bdsm => ${prefix_path}/bin/sm)" \
-      link --force "${install_path}/bin/bdsm" to "${prefix_path}/bin/sm"
+    log_step "Linking binary (${install_path}/bin/sm => ${prefix_path}/bin/sm)" \
+      link --force "${install_path}/bin/sm" to "${prefix_path}/bin/sm"
   fi
 }
 
@@ -80,10 +80,10 @@ setup_shell_completion()
     ensure_paths_exist "${_prefix}/profile.d/"
   fi
 
-  log_step "Setting up bdsm shell completion (${completion_prefix}/bdsm-completion.sh)" \
+  log_step "Setting up sm shell completion (${completion_prefix}/sm-completion.sh)" \
     copy_file \
       from "${install_path}/core/cli/modules/shell/completion/bash" \
-      to "${completion_prefix}/bdsm-completion.sh" \
+      to "${completion_prefix}/sm-completion.sh" \
       mode 0755 owner "root"
 }
 
@@ -115,27 +115,27 @@ setup_profile_d()
         append to "$HOME/.profile"
   fi
 
-  file_exists "${profile_d_path}/bdsm.sh" &&
-     file_contains "${profile_d_path}/bdsm.sh" "${install_path}/pkg/active/sbin\"" ||
+  file_exists "${profile_d_path}/sm.sh" &&
+     file_contains "${profile_d_path}/sm.sh" "${install_path}/pkg/active/sbin\"" ||
      {
        # To prepend or postpend??? Because of selinux issues prepend for now.
        write "PATH=\"\${PATH}:${install_path}/pkg/active/bin:${install_path}/pkg/active/sbin\"" \
-         to "${profile_d_path}/bdsm.sh"
+         to "${profile_d_path}/sm.sh"
 
-       chmod_files 0755 "${profile_d_path}/bdsm.sh"
+       chmod_files 0755 "${profile_d_path}/sm.sh"
      }
 }
 
-set_bdsm_path()
+set_sm_path()
 {
-  replace_content "^bdsm_path=.*" with "bdsm_path=\"${install_path}\"" \
-    in "${install_path}/bin/bdsm"
+  replace_content "^sm_path=.*" with "sm_path=\"${install_path}\"" \
+    in "${install_path}/bin/sm"
 
-  replace_content "^saved_bdsm_path=.*" with "saved_bdsm_path=\"\${bdsm_path:-${install_path}}\"" \
-    in "${install_path}/core/bdsm/modules/shell/core/initialize"
+  replace_content "^saved_sm_path=.*" with "saved_sm_path=\"\${sm_path:-${install_path}}\"" \
+    in "${install_path}/core/sm/modules/shell/core/initialize"
 }
 
-install_bdsm()
+install_sm()
 {
   log "BDSM Framework Installation:"
 
@@ -143,21 +143,21 @@ install_bdsm()
 
   perform install_core
 
-  perform set_bdsm_path
+  perform set_sm_path
 
   perform install_configuration_files
 
   perform setup_profile_d
 
   user_is_not_root || {
-    perform symlink_bdsm
+    perform symlink_sm
     perform setup_shell_completion
   }
 
   local _binary
   for _binary in "${binaries[@]}"
   do
-    log_step "Ensuring that BDSM binay is executable (${_binary})" \
+    log_step "Ensuring that binay is executable (${_binary})" \
       chmod_files 0755 "${install_path}/bin/${_binary}"
   done
 

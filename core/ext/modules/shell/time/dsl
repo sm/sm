@@ -28,9 +28,8 @@
 # ### Usage Examples
 #
 #     user$ cat ./test
-#     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # Load BDSM framework core.
-#     modules trace time # Load the trace module.
+#     #!/usr/bin/env sm
+#     modules ext/trace ext/time # Load the trace module.
 #
 #     timestamp_set
 #     echo $timestamp
@@ -76,7 +75,7 @@ timestamp_set()
 #
 #     user$ cat ./test
 #     #!/usr/bin/env bash
-#     source "/usr/local/bdsm/extensions/builtin/core/modules/shell/core/initialize" # Load BDSM framework core.
+#     source "/usr/local/sm/extensions/builtin/core/modules/shell/core/initialize" # Load BDSM framework core.
 #     modules trace time # Load the trace module.
 #
 #     timestamp
