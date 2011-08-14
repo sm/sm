@@ -74,10 +74,10 @@ setup_shell_completion()
   fi
 
   log_step "Setting up bdsm shell completion (${completion_prefix}/bdsm-completion.sh)" \
-  copy_file \
-    from "${install_path}/core/cli/modules/shell/completion/bash" \
-    to "${completion_prefix}/bdsm-completion.sh" \
-    mode 0755 owner "root"
+    copy_file \
+      from "${install_path}/core/cli/modules/shell/completion/bash" \
+      to "${completion_prefix}/bdsm-completion.sh" \
+      mode 0755 owner "root"
 }
 
 setup_profile_d()
@@ -111,8 +111,8 @@ setup_profile_d()
   file_exists "${profile_d_path}/bdsm.sh" &&
      file_contains "${profile_d_path}/bdsm.sh" "${packages_path}/active/bin" ||
      {
-       # To prepend or postpend??? Good discussion here...
-       write "PATH=\"${packages_path}/active/bin:${packages_path}/active/sbin:\${PATH}\"" \
+       # To prepend or postpend??? Because of selinux issues prepend for now.
+       write "PATH=\"\${PATH}\":${packages_path}/active/bin:${packages_path}/active/sbin" \
          to "${profile_d_path}/bdsm.sh"
 
        chmod_files 0755 "${profile_d_path}/bdsm.sh"
@@ -121,7 +121,9 @@ setup_profile_d()
 
 set_bdsm_path()
 {
-  replace_content "^bdsm_path=.*" with "bdsm_path=\"${install_path}\"" in "${install_path}/bin/bdsm"
+  replace_content "^bdsm_path=.*" with "bdsm_path=\"${install_path}\"" \
+    in "${install_path}/bin/bdsm"
+
   replace_content "^saved_bdsm_path=.*" with "saved_bdsm_path=\"\${bdsm_path:-${install_path}}\"" \
     in "${install_path}/core/bdsm/modules/shell/core/initialize"
 }
