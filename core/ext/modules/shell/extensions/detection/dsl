@@ -4,7 +4,8 @@
 detect_action()
 {
   extensions_path=$1
-  shift
+  shift || fail "$FUNCNAME: Cannot detect action; No extensions path was passed"
+
   extension="${1:-core}"
   shift
 
@@ -260,6 +261,7 @@ detect_unique_2nd_level_action()
       action_path="${_found_actions%/*}"
       extension_args=( "$@" )
       return 0
+
     elif (( ${#_found_actions[@]} > 1 ))
     then
       error "More than one action found matching, please be more specific.\n\nDid you mean:\n$(
