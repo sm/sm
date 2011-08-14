@@ -379,10 +379,10 @@ extension_run()
       action=${action%%(*}
       if command_exists "${action%%_*}_cli"
       then
-        "${action%%_*}_cli"
+        action_call "${action%%_*}_cli" "${extension_args[@]}"
       fi
 
-      action_call ${action} "${extension_args[@]}"
+      action_call "${action}" "${extension_args[@]}"
       ;;
 
     shell)

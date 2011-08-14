@@ -294,8 +294,8 @@ package_init()
       package_name="${package_name%%:*}"
       ;;
     *)
-      package_version="${2:-}"
-      archive_format="${3:-}"
+      : "${package_version:="${2:-}"}"
+      : "${archive_format:="${3:-}"}"
       ;;
   esac
 
