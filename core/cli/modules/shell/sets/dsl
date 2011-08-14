@@ -66,7 +66,7 @@ sets_list_known()
 
 sets_install()
 {
-  local _name _names="${1:-}" _uri="${2:-}"
+  local _name _names="${1:-}" _uri=${2:-}
   shift || fail "$FUNCNAME: Cannot install a set; No set name was given."
 
   _names=(${_names//,/ })
