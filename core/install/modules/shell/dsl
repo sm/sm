@@ -54,9 +54,6 @@ install_configuration_files()
 
 symlink_bdsm()
 {
-  chmod 0755 "${install_path}/bin/bdsm"
-  chmod 0755 "${install_path}/bin/bdsm-ll"
-
   if variable_is_nonempty prefix_path && path_exists "${prefix_path}/bin"
   then
     log_step "Linking bdsm binary (${install_path}/bin/bdsm => ${prefix_path}/bin/bdsm)" \
@@ -147,6 +144,9 @@ install_bdsm()
     perform symlink_bdsm
     perform setup_shell_completion
   }
+
+  log_step "Ensuring that BDSM binaries are executable" \
+    chmod_files 0755 "${install_path}"/bin/bdsm{,-ll}
 
   succeed "BDSM Framework installed."
 }
