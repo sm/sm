@@ -224,7 +224,7 @@ package_install()
   (( $# == 0 )) || package_init $@
 
   if symlink_exists "${packages_path}/${package_name}/active" \
-  && [[ "force_flag" != "1" ]]
+  && [[ "${force_flag}" != "1" ]]
   then
     log "The ${package_name} ${package_version} package is already installed.
 To force, call:\n\tbdsm ${package_name} package install --force\n"
@@ -1361,7 +1361,7 @@ package_cli()
 
   done
 
-  [[ -z "${_ignored_args[0]:-}" ]] || extension_args=( "${_ignored_args[@]}" )
+  extension_args=( "${_ignored_args[@]}" )
 
   package_init "${extension_args[@]}"
 }
@@ -1793,7 +1793,12 @@ package_init()
 
   # Ensure that package_version is set at this point
   variable_is_nonempty package_default_version || read_default version prefix package_default for ${package_name}
-  variable_is_nonempty package_version   || package_version="${package_default_version}"
+  variable_is_nonempty package_version         || package_version="${package_default_version}"
+
+  [[ -n "${package_version}" ]] ||
+    fail "$FUNCNAME(): Package version must be specified.\n"\
+    "(For example version=x.y.z set in extension's config/defaults file.)\n"
+
   variable_is_nonempty archive_format    || read_default archive_format             for ${package_name}
   variable_is_nonempty package_base_url  || read_default base_url prefix package    for ${package_name}
   variable_is_nonempty package_md5_url   || read_default md5_url  prefix package    for ${package_name}
@@ -1802,10 +1807,21 @@ package_init()
   variable_is_nonempty init_scripts_path || init_scripts_path="$(init_scripts_path)"
 
   true "${archive_format:=tar.gz}"
-  true "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
+  true \
+    "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
+    "${install_base_path:="${packages_path}/${package_name}"}"
 
-  [[ -n "${package_version}" ]] ||
-    fail "$FUNCNAME(): Package version must be specified.\n"\
-    "(For example version=x.y.z set in extension's config/defaults file.)\n"
+  if user_is_root
+  then
+    true \
+      "${log_path:="/var/log/${package_name}"}" \
+      "${package_user:="${package_name}"}"
+  else
+    true \
+      "${log_path:="${packages_path}/log"}" \
+      "${package_user:="$USER"}"
+  fi
+
+  extension_patches_path="${extension_path}/patches"
 
 }

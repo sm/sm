@@ -5,28 +5,10 @@ fhs_dirs=(bin etc include lib libexec sbin share man)
 
 declare -a package_dependencies
 
-true "${package_name:="${extension}"}"
-
 true \
   "${source_path:="${bdsm_path}/src"}" \
   "${archives_path:="${bdsm_path}/archives"}" \
-  "${install_base_path:="${packages_path}/${package_name}"}" \
   ${static_flag:=0}
-
-if user_is_root
-then
-  true \
-    "${log_path:="/var/log/${package_name}"}" \
-    "${package_user:="${package_name}"}"
-else
-  true \
-    "${log_path:="${packages_path}/log"}" \
-    "${package_user:="$USER"}"
-fi
-
-package_init
-
-extension_patches_path="${extension_path}/patches"
 
 ensure_paths_exist "${active_path}"
 
