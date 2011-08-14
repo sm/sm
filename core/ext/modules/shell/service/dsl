@@ -1029,7 +1029,7 @@ service_install_init_d()
         install_template "${_service}" to "${init_scripts_path}/${_service}" \
           mode 0755
       else
-        # Use core srv init.d template
+        # Use core svc init.d template
         install_template "cli/init.d" \
           to "${init_scripts_path}/${_service}" mode 0755
 

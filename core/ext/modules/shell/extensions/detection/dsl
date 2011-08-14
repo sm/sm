@@ -457,7 +457,7 @@ extension_run()
 #     extension_action ext list
 #
 #     $  $HOME/test
-#     bash fossil git libevent nginx p7zip postgresql rails redis srv tig tmux zeromq zlib
+#     bash fossil git libevent nginx p7zip postgresql rails redis svc tig tmux zeromq zlib
 #
 #
 extension_action()
