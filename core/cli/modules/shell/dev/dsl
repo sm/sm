@@ -8,9 +8,9 @@ bdsm_development_setup()
 
   true "${projects_path:="$HOME/projects"}"
 
-  log "\nBDSM development environment setup"
-
-  log "\n=> configuration\n${_separator// /=}"
+  log "BDSM development environment setup"
+  log "=> configuration"
+  log "${_separator// /=}"
 
   if file_contains "$HOME/.bash_profile" "projects_path="
   then
@@ -40,7 +40,8 @@ bdsm_development_setup()
 
   for _component in core extensions site
   do
-    log "\n=> ${_component}\n${_separator// /=}"
+    log "=> ${_component}"
+    log "${_separator// /=}"
     if file_contains "$HOME/.bdsmrc" "${_component}_development_path"
     then
       log "  * ${_component}_development_path is already set in .bdsmrc"
@@ -73,7 +74,7 @@ bdsm_development_setup()
     fi
   done
 
-  log "\nBDSM development environment setup is complete."
+  log "BDSM development environment setup is complete."
 }
 
 bdsm_development_update()

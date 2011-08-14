@@ -1376,7 +1376,8 @@ service_init_reload()
 #
 service_init_usage()
 {
-  log "Usage:\n\n  $0 {start|stop|restart|status|info|logtail}"
+  log "Usage:"
+  log "  $0 {start|stop|restart|status|info|logtail}"
 }
 
 #

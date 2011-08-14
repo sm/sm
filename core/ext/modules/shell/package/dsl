@@ -221,17 +221,7 @@ package_definition()
 #
 package_install()
 {
-  package_name="${1:-${package_name:-}}"
-  [[ -n "${package_name}" ]] ||
-    fail "$FUNCNAME(): Package name must be given as first parameter.\n"
-
-  package_version="${2:-${package_version:-}}"
-
-  [[ -n "${package_version}" ]] ||
-    fail "$FUNCNAME(): Package version must be given as second parameter.\n"\
-    "(For example version=x.y.z set in extension's config/defaults file.)\n"
-
-  archive_format="${3:-${archive_format:-"tar.gz"}}"
+  package_init $@
 
   if symlink_exists "${packages_path}/${package_name}/active" \
   && [[ "$1" != "--force" ]]
@@ -357,17 +347,7 @@ To force, call:\n\tbdsm ${package_name} package install --force\n"
 #
 package_update()
 {
-  package_name="${1:-${package_name:-}}"
-  [[ -n "${package_name}" ]] ||
-    fail "$FUNCNAME(): Package name must be given as first parameter.\n"
-
-  package_version="${2:-${package_version:-}}"
-
-  [[ -n "${package_version}" ]] ||
-    fail "$FUNCNAME(): Package version must be given as second parameter.\n"\
-    "(For example version=x.y.z set in extension's config/defaults file.)\n"
-
-  archive_format="${3:-${archive_format:-"tar.gz"}}"
+  package_init
 
   # TODO: check if newer version exists, if so then...
   if package_installed | grep -q "${package_version}" && [[ "$1" != "--force" ]]
@@ -414,7 +394,7 @@ package_update()
 #
 package_fetch_md5()
 {
-  variables_must_be_nonempty package_name package_version archive_format
+  package_init $@
 
   local download_url
 
@@ -472,17 +452,7 @@ package_fetch_md5()
 #
 package_fetch()
 {
-  package_name="${1:-${package_name:-}}"
-  [[ -n "${package_name}" ]] ||
-    fail "$FUNCNAME(): Package name must be given as first parameter.\n"
-
-  package_version="${2:-${package_version:-}}"
-
-  [[ -n "${package_version}" ]] ||
-    fail "$FUNCNAME(): Package version must be given as second parameter.\n"\
-    "(For example version=x.y.z set in extension's config/defaults file.)\n"
-
-  archive_format="${3:-${archive_format:-"tar.gz"}}"
+  package_init $@
 
   : \
     "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
@@ -726,15 +696,7 @@ package_make_install()
 #
 package_activate()
 {
-  package_name="${1:-${package_name:-}}"
-  [[ -n "${package_name}" ]] ||
-    fail "$FUNCNAME(): Package name must be given as first parameter.\n"
-
-  package_version="${2:-${package_version:-}}"
-
-  [[ -n "${package_version}" ]] ||
-    fail "$FUNCNAME(): Package version must be given as second parameter.\n"\
-    "(For example version=x.y.z set in extension's config/defaults file.)\n"
+  package_init $@
 
   local _file _files=() _path _paths
 
@@ -1115,17 +1077,7 @@ package_profile_d()
 #
 package_uninstall()
 {
-  package_name="${1:-${package_name:-}}"
-  [[ -n "${package_name}" ]] ||
-    fail "$FUNCNAME(): Package name must be given as first parameter.\n"
-
-  package_version="${2:-${package_version:-}}"
-
-  [[ -n "${package_version}" ]] ||
-    fail "$FUNCNAME(): Package version must be given as second parameter.\n"\
-    "(For example version=x.y.z set in extension's config/defaults file.)\n"
-
-  archive_format="${3:-${archive_format:-"tar.gz"}}"
+  package_init $@
 
   log_step "${package_name} ${package_version} ~ uninstall" \
 
@@ -1697,11 +1649,7 @@ package_dependencies()
 #
 package_info()
 {
-  package_name="${1:-${package_name:-}}"
-  [[ -n "${package_name}" ]] ||
-    fail "$FUNCNAME(): Package name must be given as first parameter.\n"
-
-  package_version="${2:-${package_version:-}}"
+  package_init $@
 
   local _path="${packages_path}/${package_name}"
   : \
@@ -1725,11 +1673,11 @@ package_info()
     log "  active: none"
   fi
 
-  log "urls:\n"\
-  "  base: ${package_base_url}\n"\
-  "  download: ${package_url}\n"\
-  "archive: ${package_file}\n"\
-  "source_path: ${source_path}/${package_dir}"
+  log "urls:"
+  log "  base: ${package_base_url}"
+  log "  download: ${package_url}"
+  log "archive: ${package_file}"
+  log "source_path: ${source_path}/${package_dir}"
 
   if array_is_nonempty package_dependencies
   then
@@ -1814,4 +1762,41 @@ packages_list()
       packages_installed "$@"
       ;;
   esac
+}
+
+package_init()
+{
+  package_name="${1:-${package_name:-}}"
+  [[ -n "${package_name}" ]] ||
+    fail "$FUNCNAME(): Package name must be given as first parameter.\n"
+
+  package_version="${2:-${package_version:-}}"
+
+  archive_format="${3:-${archive_format:-"tar.gz"}}"
+
+  case "${package_name}" in
+    *=*) # exact version specifier
+      package_version="${package_name##*=}"
+      package_name="${package_name%%=*}"
+      ;;
+    *:*) # minimum version specifier
+      # TODO: concept of 'minimum' ;)
+      package_version="${package_name##*:}"
+      ;;
+  esac
+
+  # Ensure that package_version is set at this point
+  variable_is_nonempty package_version   || read_default version prefix package
+  variable_is_nonempty package_base_url  || read_default base_url prefix package
+  variable_is_nonempty package_md5_url   || read_default md5_url prefix package
+  variable_is_nonempty archive_format    || read_default archive_format
+  variable_is_empty    package_version   || install_path="${install_base_path}/${package_version}"
+  variable_is_nonempty init_scripts_path || init_scripts_path="$(init_scripts_path)"
+
+  true "${archive_format:=tar.gz}"
+
+  [[ -n "${package_version}" ]] ||
+    fail "$FUNCNAME(): Package version must be specified.\n"\
+    "(For example version=x.y.z set in extension's config/defaults file.)\n"
+
 }

@@ -120,7 +120,7 @@ ext_update()
     fi
     if [[ ! -s "${extension_exts_home}/${_name}/.uri" ]]
     then
-      log "Extension ${_name} does not contain stored uri.\n"
+      log "Extension ${_name} does not contain stored uri."
       continue
     fi
     _uri=$( cat "${extension_exts_home}/${_name}/.uri" )
