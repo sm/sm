@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 
-package_cli "${extension_args[@]}"
+package_cli
+

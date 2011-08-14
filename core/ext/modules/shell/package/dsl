@@ -207,10 +207,16 @@ package_definition()
 #
 package_cli()
 {
-  local _ignored_args=() _package_args=( $@ ) _token
-  local number_of_args=${#_package_args[@]} index
+  local _ignored_args=() _package_args=( ) _token index
 
-  for (( index=0 ; index < $number_of_args ; index++ ))
+  if (( $# > 0 ))
+  then
+    _package_args=($@)
+  else
+    _package_args=(${extension_args[@]}) ## fall back on this.
+  fi
+
+  for (( index=0 ; index < ${#_package_args[@]}; index++ ))
   do
     _token="${_package_args[$index]}"
 
@@ -276,6 +282,8 @@ package_cli()
     esac
 
   done
+
+  (( $# > 0 )) || extension_args=("${_ignored_args[@]}")
 
   package_init "${_ignored_args[@]}"
 }
