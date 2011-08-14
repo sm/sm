@@ -3,7 +3,8 @@
 set +o nounset
 set +o noclobber
 
-: ${debug_flags:="-search"} ${debug_flag:=0} ${trace_flags:="-search -backtrace"} ${trace_flag:=0} ${var_debug:=""} ${var_debug_type_flag:="long"}
+: ${debug_flags:="-search"} ${debug_flag:=0} ${trace_flags:="-search -backtrace"} ${trace_flag:=0} ${var_debug_type_flag:="long"}
+declare -a var_debug_flags
 
 while (( $# > 0 ))
 do
@@ -41,7 +42,7 @@ do
       ;;
 
     --var-debug=*)
-      var_debug_flags+=" ${token##--var-debug=}"
+      var_debug_flags+=( "${token##--var-debug=}" )
       ;;
 
     --var-debug-*)

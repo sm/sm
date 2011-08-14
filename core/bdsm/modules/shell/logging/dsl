@@ -506,7 +506,7 @@ action_source()
 var_debug_callback()
 {
   local _variable
-  for _variable in ${var_debug_flags}
+  for _variable in ${var_debug_flags[@]}
   do
     eval "
       if [[ \"\${${_variable}}\" != \"\${${_variable}_previous_value}\" ]]
@@ -529,7 +529,7 @@ var_debug_callback()
 var_debug_callback_initialize()
 {
   local _variable
-  for _variable in ${var_debug_flags}
+  for _variable in "${var_debug_flags[@]}"
   do
     eval "
       if [[ \"\${${_variable}}\" != \"\${${_variable}_previous_value}\" ]]
