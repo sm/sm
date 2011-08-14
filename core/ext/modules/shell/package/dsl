@@ -1648,38 +1648,34 @@ package_info()
 {
   (( $# == 0 )) || package_init $@
 
-  local _path="${packages_path}/${package_name}"
+  local _installed _path="${bdsm_path}/pkg/${package_name}"
+
   : \
     "${package_dir:="${package_name}-${package_version}"}" \
     "${package_url:="${package_base_url}/${package_file}"}"
 
-  log "versions:"
   if path_exists "${_path}"
   then
     local _installed=($( package_installed_versions ${package_name} ${package_version} ))
-    log "  installed: ${_installed[*]}"
+    log "versions_installed: ${_installed[*]}"
   else
-    log "  installed: none"
+    log "versions_installed: none"
   fi
-  log "  default: ${package_default_version}"
+  log "default_version: ${package_default_version}"
 
   if [[ -d "${_path}" ]] && [[ -L "${_path}/active" ]]
   then
-    log "  active: $(readlink "${_path}/active")"
+    log "version_active: $(readlink "${_path}/active")"
   else
-    log "  active: none"
+    log "version_active: none"
   fi
-
-  log "urls:"
-  log "  base: ${package_base_url}"
-  log "  download: ${package_url}"
-  log "archive: ${package_file}"
+  log "base_url: ${package_base_url}"
+  log "download_url: ${package_url}"
+  log "archive_format: ${package_file}"
   log "source_path: ${source_path}/${package_dir}"
 
-  if array_is_nonempty package_dependencies
-  then
+  [[ -z "${package_dependencies}" ]] ||
     log "dependencies: ${package_dependencies[*]}"
-  fi
 }
 
 package_installed_versions()
