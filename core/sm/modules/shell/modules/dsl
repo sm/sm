@@ -100,7 +100,7 @@ init_extensions_search_paths()
 # ### Input Parameters
 #
 # First parameter is a full path for a BDSM extensions directory.
-#   (example: /usr/local/sm/extensions)
+#   (example: /sm/exts)
 #
 # ### Stream Outputs
 #
@@ -120,7 +120,7 @@ init_extensions_search_paths()
 #
 # ### Usage Examples
 #
-#     $ sm call extensions_in /usr/local/sm/extensions/ext
+#     $ sm call extensions_in /sm/sets/gnu
 #
 extensions_in()
 {

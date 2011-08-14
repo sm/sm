@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-# The default prefix is /usr/local;
-# this should be set in /etc/smrc to wherever BDSM is installed.
-
 printf "Do not install from head until I am done refactoring\n"
 printf "For an install use the 0.8.6 release for now.\n"
 printf "  ~ Wayne\n"
@@ -27,7 +24,7 @@ src_path="${sm_path}/src"
 extension_sets_home="${sm_path}/sets"
 extension_exts_home="${sm_path}/exts"
 
-export install_path archives_path scm_path src_path extension_sets_home
+export install_path archives_path scm_path src_path extension_sets_home DESTROOT
 
 exec "${PWD}/local" --call=install/install_sm "$@"
 

@@ -2,7 +2,7 @@
 
 shopt -s extglob # Extended globs must always be on for BDSM.
 
-saved_sm_path="${sm_path:-/usr/local/sm}"
+saved_sm_path="${sm_path:-"/sm"}"
 
 # Load System BDSM Configuration, if it exists.
 for file in /etc/smrc "$HOME/.smrc"
@@ -109,7 +109,7 @@ source "${modules_path}/shell/modules/initialize"
 
 if [[ "$MACHTYPE" = *solaris* ]]
 then # custom compilations + g*
-  export PATH="/usr/local/bin:/opt/local/bin:/usr/sfw/bin:/usr/sbin:/usr/bin"
+  export PATH="/bin:/opt/local/bin:/usr/sfw/bin:/usr/sbin:/usr/bin:${PATH}"
 fi
 
 # Ensure that any variables you wish export to extensions actually *are* exported.

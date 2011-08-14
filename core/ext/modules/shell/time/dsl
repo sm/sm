@@ -74,9 +74,8 @@ timestamp_set()
 # ### Usage Examples
 #
 #     user$ cat ./test
-#     #!/usr/bin/env bash
-#     source "/usr/local/sm/extensions/builtin/core/modules/shell/core/initialize" # Load BDSM framework core.
-#     modules trace time # Load the trace module.
+#     #!/bin/sm
+#     modules ext/trace ext/time # Load the trace module.
 #
 #     timestamp
 #     echo

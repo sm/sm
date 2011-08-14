@@ -20,7 +20,7 @@
 initial_pwd="$PWD"
 
 # set BDSM basic paths
-sm_path="/usr/local/sm"
+sm_path="${DESTROOT:-}/sm"
 modules_path="${sm_path}/core/sm/modules"
 export initial_pwd sm_path modules_path
 

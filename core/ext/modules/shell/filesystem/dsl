@@ -2289,7 +2289,7 @@ enter()
 #
 # ### Usage Examples
 #
-#     user$ hash_file /usr/local/sm/extensions/core/config/defaults website_url
+#     user$ hash_file /sm/extensions/core/config/defaults website_url
 #     https://bdsm.beginrescueend.com/
 #
 hash_file()
@@ -2805,7 +2805,7 @@ file_contains()
 #
 # ### Usage Examples
 #
-#     user$ symlink_exists /usr/local/bin/sm
+#     user$ symlink_exists /bin/sm
 #     user$ echo $?
 #     0
 #
@@ -2853,7 +2853,7 @@ symlink_exists()
 #
 # ### Usage Examples
 #
-#     user$ path_exists /usr/local/bin/sm
+#     user$ path_exists /bin/sm
 #     user$ echo $?
 #     0
 #
