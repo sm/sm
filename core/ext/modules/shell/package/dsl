@@ -1792,13 +1792,13 @@ package_init()
   archive_format="${3:-}"
 
   # Ensure that package_version is set at this point
+  [[ -n "${package_default_version}" ]] || read_default version prefix package_default for ${package_name}
+  [[ -n "${package_base_url}" ]] || read_default base_url    prefix package for ${package_name}
+  [[ -n "${package_md5_url}"  ]] || read_default md5_url     prefix package for ${package_name}
+  [[ -n "${website_url}"      ]] || read_default website_url prefix package for ${package_name}
+  [[ -n "${archive_format}"   ]] || read_default archive_format             for ${package_name}
   : \
-    "${package_default_version:="$(read_default version prefix package_default for ${package_name})"}" \
     "${package_version:="${package_default_version}"}" \
-    "${archive_format:="$(read_default archive_format            for ${package_name})"}" \
-    "${package_base_url:="$(read_default base_url prefix package for ${package_name})"}" \
-    "${package_md5_url:="$(read_default md5_url  prefix package  for ${package_name})"}" \
-    "${website_url:="$(read_default website_url prefix package   for ${package_name})"}" \
     "${init_scripts_path:="$(init_scripts_path)"}" \
     "${archive_format:=tar.gz}" \
     "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
