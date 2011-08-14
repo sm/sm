@@ -79,7 +79,7 @@ extension_version()
 # ### Usage Examples
 #
 #     $ cat $HOME/test
-#     #!/usr/bin/env sm
+#     #!/bin/sm
 #     modules ext/extensions
 #     extension_license postgresql
 #
@@ -138,7 +138,7 @@ extension_license()
 # ### Usage Examples
 #
 #      $ cat $HOME/test
-#      #!/usr/bin/env sm
+#      #!/bin/sm
 #      modules ext/extensions
 #      extension_actions "postgresql"
 #

@@ -2737,7 +2737,7 @@ file_is_empty_or_missing()
 # ### Usage Examples
 #
 #     user$ cat "$HOME/test"
-#     #!/usr/bin/env sm
+#     #!/bin/sm
 #
 #     modules ext/filesystem
 #

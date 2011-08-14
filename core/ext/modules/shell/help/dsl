@@ -120,7 +120,7 @@ description()
 # ### Usage Examples
 #
 #     user$ cat $HOME/test
-#     #!/usr/bin/env sm
+#     #!/bin/sm
 #     modules ext/help
 #
 #     description "This extension handles X Y and Z."
@@ -335,7 +335,7 @@ resource()
 # ### Usage Examples
 #
 #     user$ cat $HOME/test
-#     #!/usr/bin/env sm
+#     #!/bin/sm
 #     modules ext/help
 #
 #     action "help" "Displays the help output for the ${extension} extension."
@@ -404,7 +404,7 @@ help_actions()
 # ### Usage Examples
 #
 #     user$ cat $HOME/test
-#     #!/usr/bin/env sm
+#     #!/bin/sm
 #     modules ext/help
 #
 #     note "Don't forget the milk! "

@@ -596,8 +596,8 @@ separator()
 # ### Usage Examples
 #
 #     user$ cat ./test
-#     #!/usr/bin/env sm
-#     modules trace # Load the trace module.
+#     #!/bin/sm
+#     modules ext/trace # Load the trace module.
 #
 #     functiona()
 #     {

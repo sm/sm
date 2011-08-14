@@ -28,7 +28,7 @@
 # ### Usage Examples
 #
 #     user$ cat ./test
-#     #!/usr/bin/env sm
+#     #!/bin/sm
 #     modules ext/trace ext/time # Load the trace module.
 #
 #     timestamp_set

@@ -102,7 +102,7 @@ sm_version()
 # ### Usage Examples
 #
 #     user$ cat $HOME/test
-#     #!/usr/bin/env sm
+#     #!/bin/sm
 #     NIY
 #
 #     user$ $HOME/test

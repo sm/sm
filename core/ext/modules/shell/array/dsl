@@ -454,7 +454,7 @@ array_append()
 # ### Usage Examples
 #
 #     user$ cat $HOME/test
-#     #!/usr/bin/env sm
+#     #!/bin/sm
 #
 #     modules array
 #
@@ -516,7 +516,7 @@ array_pop()
 # ### Usage Examples
 #
 #     user$ cat $HOME/test
-#     #!/usr/bin/env sm
+#     #!/bin/sm
 #     modules ext/array
 #
 #     my_array=(1 2 3 4)
@@ -769,7 +769,7 @@ array_largest()
 # ### Usage Examples
 #
 #     user$ cat $HOME/test
-#     #!/usr/bin/env sm
+#     #!/bin/sm
 #     modules ext/array
 #
 #     arr=(c a d e f b h j i )
@@ -827,7 +827,7 @@ array_sort_desc()
 # ### Usage Examples
 #
 #     user$ cat $HOME/test
-#     #!/usr/bin/env sm
+#     #!/bin/sm
 #     modules ext/array
 #
 #     arr=(c a d e f b h j i )
@@ -885,7 +885,7 @@ array_sort_asc()
 # ### Usage Examples
 #
 #     user$ cat $HOME/test
-#     #!/usr/bin/env sm
+#     #!/bin/sm
 #     modules ext/array
 #
 #     arr=(a a a b b c c c c d d d d d d)
@@ -945,7 +945,7 @@ array_unique()
 # ### Usage Examples
 #
 #     user$ cat $HOME/test
-#     #!/usr/bin/env sm
+#     #!/bin/sm
 #     modules ext/array
 #
 #     the_array=()

@@ -452,7 +452,7 @@ extension_run()
 # ### Usage Examples
 #
 #     $ cat $HOME/test
-#     #!/usr/bin/env sm
+#     #!/bin/sm
 #     modules ext/extensions
 #     extension_action ext list
 #
