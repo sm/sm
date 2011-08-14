@@ -22,9 +22,11 @@ initial_pwd="$PWD"
 # Path to load everything from.
 bdsm_path="$PWD"
 modules_path="${bdsm_path}/core/bdsm/modules"
+
 export initial_pwd bdsm_path modules_path
 
 # Basic options parsing.
 . "${modules_path}/shell/core/cli"
+
 # Initialize BDSM.
 . "${modules_path}/shell/core/initialize"
