@@ -1230,12 +1230,12 @@ package_uninstall()
 {
   (( $# == 0 )) || package_cli $@
 
-  log_step "${package_name} ${package_version} ~ uninstall" \
-
   if package_is_active "${package_name}" "${package_version}"
   then # Deactivate the package if active.
-     package_deactivate "${package_name}"
+     package_deactivate "${package_name}" "${package_version}"
   fi
+
+  log_step "${package_name} ${package_version} ~ uninstall"
 
   remove_paths "${install_path}"
 
