@@ -38,9 +38,9 @@ unset command_not_found_handle
 
 #exec 1>&3        # log   output
 #exec 2>&4        # debug output
-exec 3>&1        # log   output
-exec 4>&2        # debug output
-exec 5>&2        # error output
-exec 6>&2        # fail  output
-exec 7>/dev/null # commands stdout
-exec 8>&2        # commands stderr
+#exec 3>&1        # log   output
+#exec 4>&2        # debug output
+#exec 5>&2        # error output
+#exec 6>&2        # fail  output
+#exec 7>/dev/null # commands stdout
+#exec 8>&2        # commands stderr
