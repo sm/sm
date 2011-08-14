@@ -54,7 +54,8 @@ install_configuration_files()
 
 symlink_bdsm()
 {
-  chmod a+x "${install_path}/bin/bdsm" "${install_path}/bin/bdsm-ll"
+  chmod 0755 "${install_path}/bin/bdsm"
+  chmod 0755 "${install_path}/bin/bdsm-ll"
 
   if variable_is_nonempty prefix_path && path_exists "${prefix_path}/bin"
   then
