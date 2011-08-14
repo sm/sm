@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+modules ext/package
+
+package_install "${extension_args[@]}"
