@@ -91,18 +91,11 @@ install_sm_scm()
   modules ext/vcs
 
   # TODO: This should update to/from repos path and/or archives path...
-  fetch_uri "${owner}/sm" "${src_path}/${dir}"
-
-  if (( ${sense_of_humor_flag:=0} == 1 ))
-  then
-    log "Ahh... that's better..."
-    log "It always feels so nice to get head."
-    log "Remember to get head often!"
-  fi
+  fetch_uri "${owner}/bdsm" "${src_path}/${dir}"
 
   enter "${src_path}/${dir}/"
 
-  chmod 0755 ./install ./bin/*
+  chmod 0755 ${PWD}/install ${PWD}/bin/*
 
-  exec bash ./install --trace="$trace_flags" --debug="$debug_flags"
+  exec bash ${PWD}/install --trace="$trace_flags" --debug="$debug_flags"
 }
