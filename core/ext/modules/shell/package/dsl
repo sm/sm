@@ -1803,13 +1803,14 @@ package_init()
   variable_is_nonempty package_base_url  || read_default base_url prefix package    for ${package_name}
   variable_is_nonempty package_md5_url   || read_default md5_url  prefix package    for ${package_name}
   variable_is_nonempty website_url       || read_default website_url prefix package for ${package_name}
-  variable_is_empty    package_version   || install_path="${install_base_path}/${package_version}"
   variable_is_nonempty init_scripts_path || init_scripts_path="$(init_scripts_path)"
 
   true "${archive_format:=tar.gz}"
   true \
     "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
     "${install_base_path:="${packages_path}/${package_name}"}"
+
+  variable_is_empty    package_version   || install_path="${install_base_path}/${package_version}"
 
   if user_is_root
   then
