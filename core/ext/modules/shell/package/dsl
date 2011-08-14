@@ -1720,14 +1720,14 @@ packages_active()
   if [[ -z ${1:-} ]]
   then
     _found=($(
-    find "${bdsm_path}/pkg" -name active -mindepth 2 -maxdepth 2 -type l |
+    find "${bdsm_path}/pkg" -mindepth 2 -maxdepth 2 -name active  -type l |
     awk -F'/' '! /\/active\//{print $(NF - 1)}'
     ))
   else
     _packages="${1//,/ }"
 
     _found=($(
-    find "${bdsm_path}/pkg" -name active -mindepth 2 -maxdepth 2 -type l |
+    find "${bdsm_path}/pkg" -mindepth 2 -maxdepth 2 -name active -type l |
     awk -F'/' '! /\/active\//{print $(NF - 1)}' | awk "/${_packages// /|}/"
     ))
   fi
