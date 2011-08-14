@@ -350,7 +350,7 @@ package_update()
   (( $# == 0 )) || package_init $@
 
   # TODO: check if newer version exists, if so then...
-  if package_installed | grep -q "${package_version}" && [[ "$1" != "--force" ]]
+  if package_installed_versions | grep -q "${package_version}" && [[ "$1" != "--force" ]]
   then
     log "The latest version (${package_version}) of the ${package_name} package is already installed."
   else
@@ -1656,7 +1656,7 @@ package_info()
   log "versions:"
   if path_exists "${_path}"
   then
-    local _installed=($( package_installed ${package_name} ${package_version} ))
+    local _installed=($( package_installed_versions ${package_name} ${package_version} ))
     log "  installed: ${_installed[*]}"
   else
     log "  installed: none"
@@ -1682,12 +1682,10 @@ package_info()
   fi
 }
 
-package_installed()
+package_installed_versions()
 {
   local _path="${packages_path}/${package_name}"
-
-  find "${_path}" -mindepth 1 -maxdepth 1 -type d |
-  sed -e 's#\./##g' -e 's# #,#g' -e "s#${_path}/##"
+  find "${_path}" -mindepth 1 -maxdepth 1 -type d | awk -F'/' '{print $NF}'
 }
 
 package_man()
