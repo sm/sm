@@ -109,10 +109,10 @@ setup_profile_d()
   fi
 
   file_exists "${profile_d_path}/bdsm.sh" &&
-     file_contains "${profile_d_path}/bdsm.sh" "${packages_path}/active/bin" ||
+     file_contains "${profile_d_path}/bdsm.sh" "${install_path}/pkg/active/sbin\"" ||
      {
        # To prepend or postpend??? Because of selinux issues prepend for now.
-       write "PATH=\"\${PATH}\":${packages_path}/active/bin:${packages_path}/active/sbin" \
+       write "PATH=\"\${PATH}:${install_path}/pkg/active/bin:${install_path}/pkg/active/sbin\"" \
          to "${profile_d_path}/bdsm.sh"
 
        chmod_files 0755 "${profile_d_path}/bdsm.sh"
