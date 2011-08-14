@@ -1,7 +1,8 @@
 help=sets_help()
 default=sets_list()
 known=sets_list_known()
-uninstall=sets_uninstall()
 add=install
-del=uninstall
 up=update
+uninstall=sets_uninstall()
+remove=uninstall
+del=uninstall
