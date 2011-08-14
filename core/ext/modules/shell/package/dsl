@@ -1805,9 +1805,10 @@ package_init()
     "${install_base_path:="${packages_path}/${package_name}"}" \
     "${install_path:="${install_base_path}/${package_version}"}"
 
-  [[ -n "${package_version}" ]] ||
-    fail "$FUNCNAME(): Package version must be specified.\n"\
-    "(For example version=x.y.z set in extension's config/defaults file.)\n"
+  # This check should only happen in places that require a version...
+  #[[ -n "${package_version}" ]] ||
+  #  fail "$FUNCNAME(): Package version must be specified.\n"\
+  #  "(For example version=x.y.z set in extension's config/defaults file.)\n"
 
   if user_is_root
   then
