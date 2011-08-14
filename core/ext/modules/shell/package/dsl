@@ -1736,7 +1736,7 @@ package_man()
 packages_installed()
 {
   find "${bdsm_path}/pkg" -mindepth 2 -maxdepth 2 -type d |
-    awk -F'/' '! /\/active\//{print $(NF - 1)}'
+    awk -F'/' '! /\/active\//{print $(NF - 1)":"$(NF)}' | sort
 }
 
 packages_active()
