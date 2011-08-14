@@ -221,11 +221,12 @@ package_definition()
 #
 package_install()
 {
-  package_name="${1:-${package_name:-}}"
+  true \
+    "${package_name:="${1}"}" \
+    "${package_version:="${2}"}"
+
   [[ -n "${package_name}" ]] ||
     fail "$FUNCNAME(): Package name must be given as first parameter.\n"
-
-  package_version="${2:-${package_version:-}}"
 
   [[ -n "${package_version}" ]] ||
     fail "$FUNCNAME(): Package version must be given as second parameter.\n"\
@@ -357,11 +358,12 @@ To force, call:\n\tbdsm ${package_name} package install --force\n"
 #
 package_update()
 {
-  package_name="${1:-${package_name:-}}"
+  true \
+    "${package_name:="${1}"}" \
+    "${package_version:="${2}"}"
+
   [[ -n "${package_name}" ]] ||
     fail "$FUNCNAME(): Package name must be given as first parameter.\n"
-
-  package_version="${2:-${package_version:-}}"
 
   [[ -n "${package_version}" ]] ||
     fail "$FUNCNAME(): Package version must be given as second parameter.\n"\
@@ -472,11 +474,12 @@ package_fetch_md5()
 #
 package_fetch()
 {
-  package_name="${1:-${package_name:-}}"
+  true \
+    "${package_name:="${1}"}" \
+    "${package_version:="${2}"}"
+
   [[ -n "${package_name}" ]] ||
     fail "$FUNCNAME(): Package name must be given as first parameter.\n"
-
-  package_version="${2:-${package_version:-}}"
 
   [[ -n "${package_version}" ]] ||
     fail "$FUNCNAME(): Package version must be given as second parameter.\n"\
@@ -726,11 +729,12 @@ package_make_install()
 #
 package_activate()
 {
-  package_name="${1:-${package_name:-}}"
+  true \
+    "${package_name:="${1}"}" \
+    "${package_version:="${2}"}"
+
   [[ -n "${package_name}" ]] ||
     fail "$FUNCNAME(): Package name must be given as first parameter.\n"
-
-  package_version="${2:-${package_version:-}}"
 
   [[ -n "${package_version}" ]] ||
     fail "$FUNCNAME(): Package version must be given as second parameter.\n"\
@@ -1115,11 +1119,12 @@ package_profile_d()
 #
 package_uninstall()
 {
-  package_name="${1:-${package_name:-}}"
+  true \
+    "${package_name:="${1}"}" \
+    "${package_version:="${2}"}"
+
   [[ -n "${package_name}" ]] ||
     fail "$FUNCNAME(): Package name must be given as first parameter.\n"
-
-  package_version="${2:-${package_version:-}}"
 
   [[ -n "${package_version}" ]] ||
     fail "$FUNCNAME(): Package version must be given as second parameter.\n"\
@@ -1417,7 +1422,7 @@ package_cli()
   [[ -z "${_ignored_args[0]:-}" ]] || extension_args=( "${_ignored_args[@]}" )
 
   # Explicitly reload the package module to pickup any CLI overrides.
-  modules_reinitialize package
+  modules_reinitialize ext/package
 }
 
 #
@@ -1640,19 +1645,22 @@ package_website()
 
 package_dependencies()
 {
-  local dependency _dependencies=(${package_dependencies[@]})
+  local dependency _dependencies=(${package_dependencies[@]}) _missing_dependencies=()
 
   unset package_dependencies
 
   # TODO: improve dependency management.
   for dependency in "${_dependencies[@]}"
   do
-    package_is_active ${dependency/-/ } ||
-      error "${extension} requires ${dependency}; "\
-      "Please install the ${dependency} via bdsm package module, and retry. "\
-      "Typically, this can be done as follows:\n"\
-      "\tbdsm ${dependency} package install\n"
+    package_is_active ${dependency/-/ } || _missing_dependencies+=( ${dependency} )
   done
+  if array_is_nonempty _missing_dependencies
+  then
+    local IFS=','
+    error "${extension} requires ${_missing_dependencies[*]}.\n
+Please install via bdsm package module, and retry. Typically, this can be done as follows:\n
+\tbdsm ${_missing_dependencies[*]} package install\n"
+  fi
 }
 
 
@@ -1697,11 +1705,12 @@ package_dependencies()
 #
 package_info()
 {
-  package_name="${1:-${package_name:-}}"
-  [[ -n "${package_name}" ]] ||
-    fail "$FUNCNAME(): Package name must be given as first parameter.\n"
+  true \
+    "${package_name:="${1}"}" \
+    "${package_version:="${2}"}"
 
-  package_version="${2:-${package_version:-}}"
+  [[ -n "${package_name}" ]] ||
+    error "$FUNCNAME(): Package name must be given as first parameter.\n"
 
   local _path="${packages_path}/${package_name}"
   : \
@@ -1716,7 +1725,7 @@ package_info()
   else
     log "  installed: none"
   fi
-  log "  default: ${package_version}"
+  log "  default: ${package_default_version}"
 
   if [[ -d "${_path}" ]] && [[ -L "${_path}/active" ]]
   then
@@ -1742,16 +1751,31 @@ package_installed()
   local _path="${packages_path}/${package_name}"
 
   find "${_path}" -mindepth 1 -maxdepth 1 -type d |
-  sed -e 's#./##g' -e 's# #,#g' -e "s#${_path}/##"
+  sed -e 's#\./##g' -e 's# #,#g' -e "s#${_path}/##"
 }
 
 package_man()
 {
-  true "${package_path:="${packages_path}/${_package}/${_version}"}"
+  true \
+    "${package_name:="${1}"}" \
+    "${package_version:="${2}"}"
+
+  [[ -n "${package_name}" ]] ||
+    error "Package name must be given as first parameter.\n"
+
+  [[ -n "${package_version}" ]] ||
+    error "Package version must be given as second parameter.\n"
+
+  true "${package_path:="${packages_path}/${package_name}/${package_version}"}"
 
   MANPATH="${package_path}/man"
 
-  man ${extension_actions[@]:-${package_name}}
+  if path_exists $MANPATH
+  then
+    man ${extension_actions[@]:-${package_name}} || true
+  else
+    error "No man page available for package ${package_name} ${package_version}"
+  fi
 }
 
 # pkg functions

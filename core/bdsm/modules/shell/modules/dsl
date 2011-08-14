@@ -335,13 +335,22 @@ modules()
 #
 modules_reinitialize()
 {
-  local _module _modules=("$@")
+  local _module _modules=("$@") _loaded_modules _module_path _initialize_path
 
   if array_is_nonempty _modules
   then
+    _loaded_modules=" ${modules[*]} "
     for _module in "${_modules[@]}"
     do
-      source_files "${modules_path}/shell/${_module}/initialize"
+      _module_path="${_loaded_modules##* ${_module}=}"
+      _module_path="${_module_path%% *}"
+      if [[ -n "${_module_path}" ]]
+      then
+        _initialize_path="${bdsm_path}/${_module_path}/initialize"
+        [[ ! -s "${_initialize_path}" ]] || source "${_initialize_path}"
+      else
+        fail "Can not reinitialize module as it was not yet loaded"
+      fi
     done
   else
     fail "Cannot load a module, as no module was given."

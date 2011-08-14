@@ -49,7 +49,7 @@
 #
 read_default()
 {
-  local key variable token value prefix _file _temp
+  local key variable token value prefix _file _temp _extension=${extension}
 
   key="${1:-}"
 
@@ -70,6 +70,10 @@ read_default()
           prefix="$1"
           shift
           ;;
+        for)
+          _extension="$1"
+          shift
+          ;;
         *)
           variable="$token"
           break
@@ -88,9 +92,9 @@ read_default()
     fi
 
     # Run search in the same process to initialize cache variables.
-    settings_search ${extension} defaults > /dev/null
+    settings_search ${_extension} defaults > /dev/null
 
-    for _file in  $( settings_search ${extension} defaults )
+    for _file in  $( settings_search ${_extension} defaults )
     do
       if file_is_nonempty "${_file}"
       then

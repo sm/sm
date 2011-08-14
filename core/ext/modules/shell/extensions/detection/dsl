@@ -376,12 +376,13 @@ extension_run()
       _namespaces=${_path##${extension_actions_path}}
       extension_modules_load ${_namespaces//\// }
 
-      if command_exists "${action%%(*}_cli"
+      action=${action%%(*}
+      if command_exists "${action%%_*}_cli"
       then
-        "${action%%(*}_cli"
+        "${action%%_*}_cli"
       fi
 
-      action_call ${action%%(*} "${extension_args[@]}"
+      action_call ${action} "${extension_args[@]}"
       ;;
 
     shell)
