@@ -1720,14 +1720,14 @@ packages_active()
   if [[ -z ${1:-} ]]
   then
     _found=($(
-    find "${bdsm_path}/pkg" -name active -mindepth 2 -maxdepth 2 -type l |
+    find "${bdsm_path}/pkg" -mindepth 2 -maxdepth 2 -name active  -type l |
     awk -F'/' '! /\/active\//{print $(NF - 1)}'
     ))
   else
     _packages="${1//,/ }"
 
     _found=($(
-    find "${bdsm_path}/pkg" -name active -mindepth 2 -maxdepth 2 -type l |
+    find "${bdsm_path}/pkg" -mindepth 2 -maxdepth 2 -name active -type l |
     awk -F'/' '! /\/active\//{print $(NF - 1)}' | awk "/${_packages// /|}/"
     ))
   fi
@@ -1785,32 +1785,30 @@ package_init()
       package_name="${package_name%%:*}"
       ;;
     *)
-      package_version="${2:-${package_version:-}}"
+      package_version="${2:-}"
       ;;
   esac
 
-  archive_format="${3:-${archive_format:-"tar.gz"}}"
+  archive_format="${3:-}"
 
   # Ensure that package_version is set at this point
-  variable_is_nonempty package_default_version || read_default version prefix package_default for ${package_name}
-  variable_is_nonempty package_version         || package_version="${package_default_version}"
-
-  [[ -n "${package_version}" ]] ||
-    fail "$FUNCNAME(): Package version must be specified.\n"\
-    "(For example version=x.y.z set in extension's config/defaults file.)\n"
-
-  variable_is_nonempty archive_format    || read_default archive_format             for ${package_name}
-  variable_is_nonempty package_base_url  || read_default base_url prefix package    for ${package_name}
-  variable_is_nonempty package_md5_url   || read_default md5_url  prefix package    for ${package_name}
-  variable_is_nonempty website_url       || read_default website_url prefix package for ${package_name}
-  variable_is_nonempty init_scripts_path || init_scripts_path="$(init_scripts_path)"
-
-  true "${archive_format:=tar.gz}"
-  true \
+  : \
+    "${package_default_version:="$(read_default version prefix package_default for ${package_name})"}" \
+    "${package_version:="${package_default_version}"}" \
+    "${archive_format:="$(read_default archive_format            for ${package_name})"}" \
+    "${package_base_url:="$(read_default base_url prefix package for ${package_name})"}" \
+    "${package_md5_url:="$(read_default md5_url  prefix package  for ${package_name})"}" \
+    "${website_url:="$(read_default website_url prefix package   for ${package_name})"}" \
+    "${init_scripts_path:="$(init_scripts_path)"}" \
+    "${archive_format:=tar.gz}" \
     "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
-    "${install_base_path:="${packages_path}/${package_name}"}"
+    "${install_base_path:="${packages_path}/${package_name}"}" \
+    "${install_path:="${install_base_path}/${package_version}"}"
 
-  variable_is_empty    package_version   || install_path="${install_base_path}/${package_version}"
+  # This check should only happen in places that require a version...
+  #[[ -n "${package_version}" ]] ||
+  #  fail "$FUNCNAME(): Package version must be specified.\n"\
+  #  "(For example version=x.y.z set in extension's config/defaults file.)\n"
 
   if user_is_root
   then
