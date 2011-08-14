@@ -5,4 +5,4 @@ add=install
 up=update
 uninstall=sets_uninstall()
 remove=uninstall
-del=uninstall
+rm=uninstall

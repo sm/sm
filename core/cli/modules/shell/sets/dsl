@@ -11,15 +11,14 @@ sets_help()
   action_separator
   action "sets install all" "Install all extension sets found on the known list."
   action "sets install {name}" "Install extension set {name} found on the known list."
-  action "sets install {name} {uri}" "Install extension set {name} from the given {uri}."
-  action "sets add" "Shortcut for install."
+  action "sets install {name} [uri]" "Install extension set {name}, from [uri] if given."
+  action "sets add {name} [uri]" "Shortcut for install."
   action_separator
   action "sets update all" "Update all extension sets using remembered uris."
   action "sets update {name}" "Update extension set {name} using remembered uri."
-  action "sets up" "Shortcut for update."
   action_separator
   action "sets uninstall {name}" "Remove extension set {name}."
-  action "sets del" "Shortcut for uninstall."
+  action "sets rm {name}" "Shortcut for uninstall."
   action_separator
   action "sets help" "Show this help."
 
@@ -52,10 +51,9 @@ sets_list()
       extensions=( ${found_extensions[@]} )
       echo ${extensions[@]} | xargs -s ${COLUMNS} | xargs -I '{}' echo "  - {}"
     else
-      echo "  # No extensions in set"
+      log "  # No extensions in set"
     fi
-
-    echo ""
+    log ""
   done
 }
 
@@ -165,13 +163,13 @@ sets_update_all()
     [[ -d "${_name}"  ]] || continue
 
     case "${_name##*/}" in
-      builtin|ext)
+      (builtin|ext)
         # Skip those two
         ;;
-      \*)
+      (\*)
         log "No extension sets found for update."
         ;;
-      *)
+      (*)
         sets_update "${_name##*/}"
         ;;
     esac
@@ -189,7 +187,9 @@ sets_uninstall()
       error "Extension set ${_name} cannot be removed."
       ;;
   esac
+
   enter "${extension_sets_home}"
+
   if [[ ! -d "${_name}" ]]
   then
       if in_search_paths detect_extension_existence "${_name}" \
