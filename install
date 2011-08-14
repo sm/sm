@@ -3,12 +3,13 @@
 # The default prefix is /usr/local;
 # this should be set in /etc/smrc to wherever BDSM is installed.
 
-if [[ -z "${sm_path}" ]]
+# TODO: --prefix=... parameter
+if [[ -z "${sm_path:-}" ]]
 then
   if (( UID == 0 ))
   then
-    prefix_path="/usr/local"
-    sm_path="/usr/local/sm"
+    prefix_path="/"
+    sm_path="/"
   else
     prefix_path=""
     sm_path="$HOME/.sm"
