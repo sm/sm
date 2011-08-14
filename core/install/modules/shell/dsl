@@ -10,6 +10,8 @@ prepare_for_installation()
 {
   local directory _path
 
+  chmod 0755 ./bin/bdsm* # ensure bdsm binaries are executable.
+
   log_step "Ensuring that installation target path exists (${install_path})" \
     ensure_paths_exist "${install_path}"
 
@@ -54,8 +56,7 @@ install_configuration_files()
 
 symlink_bdsm()
 {
-  chmod 0755 "${install_path}/bin/bdsm"
-  chmod 0755 "${install_path}/bin/bdsm-ll"
+  chmod 0755 "${install_path}/bin/bdsm"*
 
   if variable_is_nonempty prefix_path && path_exists "${prefix_path}/bin"
   then

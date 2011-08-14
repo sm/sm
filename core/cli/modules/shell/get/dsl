@@ -102,5 +102,7 @@ install_bdsm_scm()
 
   enter "${src_path}/${dir}/"
 
+  chmod 0755 ./install ./bin/*
+
   exec bash ./install --trace="$trace_flags" --debug="$debug_flags"
 }
