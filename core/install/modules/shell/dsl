@@ -64,9 +64,6 @@ symlink_sm()
       log_step "Linking binary (${install_path}/bin/${_binary} => ${_bin_path}/${_binary})" \
         link --force "${install_path}/bin/${_binary}" to "${_bin_path}/${_binary}"
     done
-
-    log_step "Linking binary (${install_path}/bin/sm => ${_bin_path}/sm)" \
-      link --force "${install_path}/bin/sm" to "${_bin_path}/sm"
   fi
 }
 
