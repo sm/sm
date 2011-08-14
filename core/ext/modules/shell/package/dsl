@@ -1785,11 +1785,11 @@ package_init()
       package_name="${package_name%%:*}"
       ;;
     *)
-      package_version="${2:-${package_version:-}}"
+      package_version="${2:-}"
       ;;
   esac
 
-  archive_format="${3:-${archive_format:-"tar.gz"}}"
+  archive_format="${3:-}"
 
   # Ensure that package_version is set at this point
   : \
