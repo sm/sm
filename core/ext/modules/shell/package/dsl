@@ -173,6 +173,165 @@ package_definition()
 }
 
 #
+# ## package\_cli
+#
+# Parses package CLI arguments.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# none.
+#
+# ### Environmental effects
+#
+# Updates cli configuration for the given package.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# Errors halting program if cli setup fails for any reason.
+#
+# ### Usage Examples
+#
+# Example Usage:
+#
+# user$ package_cli "${extension_args[@]}"
+#
+# ### Notes
+#
+package_cli()
+{
+  local _ignored_args=() _package_args=( $@ ) _token
+  local number_of_args=${#_package_args[@]} index
+
+  for (( index=0 ; index < $number_of_args ; index++ ))
+  do
+    _token="${_package_args[$index]}"
+
+    case "${_token}" in
+      --prefix)
+        packages_path="${_package_args[$((++index))]}"
+        ;;
+      --src)
+        src_path="${_package_args[$((++index))]}"
+        ;;
+      --data)
+        data_path="${_package_args[$((++index))]}"
+        ;;
+      --user)
+        package_user="${_package_args[$((++index))]}"
+        ;;
+      --version)
+        package_version="${_package_args[$((++index))]}"
+        ;;
+      --base_url)
+        package_base_url="${_package_args[$((++index))]}"
+        ;;
+      --file)
+        package_file="${_package_args[$((++index))]}"
+        ;;
+      --force)
+        force_flag=1
+        ;;
+      --static)
+        configure_flags+=( --static )
+        static_flag=1
+        ;;
+      --shared)
+        shared_flag=1
+        configure_flags+=( --enable-shared )
+        ;;
+      --directory)
+        package_directory="${_package_args[$((++index))]}"
+        ;;
+      --archive_format)
+        archive_format="${_package_args[$((++index))]}"
+        ;;
+      --md5)
+        package_md5="${_package_args[$((++index))]}"
+        ;;
+      --licence)
+        extension_license
+        succeed
+        ;;
+      --help)
+        package_usage
+        succeed
+        ;;
+      --with*|--enable*|--disable*)
+        configure_flags+=("${_token}" "${_package_args[$((++index))]}")
+        ;;
+      *)
+        _ignored_args+=("${_token}")
+        ;;
+    esac
+
+  done
+
+  package_init "${_ignored_args[@]}"
+}
+
+package_init()
+{
+  package_name="${1:-${package_name:-${extension}}}"
+  [[ -n "${package_name}" ]] ||
+    fail "$FUNCNAME(): Package name must be given as first parameter.\n"
+
+  case "${package_name}" in
+    *=*) # exact version specifier
+      package_version="${package_name#*=}"
+      package_name="${package_name%%=*}"
+      ;;
+    *:*) # minimum version specifier
+      # TODO: concept of 'minimum' ;)
+      package_version="${package_name#*:}"
+      package_name="${package_name%%:*}"
+      ;;
+    *)
+      package_version="${2:-}"
+      archive_format="${3:-}"
+      ;;
+  esac
+
+  # Ensure that package_version is set at this point
+  [[ -n "${package_default_version}" ]] || read_default version prefix package_default for ${package_name}
+  [[ -n "${package_base_url}" ]] || read_default base_url    prefix package for ${package_name}
+  [[ -n "${package_md5_url}"  ]] || read_default md5_url     prefix package for ${package_name}
+  [[ -n "${website_url}"      ]] || read_default website_url prefix package for ${package_name}
+  [[ -n "${archive_format}"   ]] || read_default archive_format             for ${package_name}
+  : "${package_version:="${package_default_version}"}"
+  : "${init_scripts_path:="$(init_scripts_path)"}"
+  : "${archive_format:=tar.gz}"
+  : "${package_file:="${package_name}-${package_version}.${archive_format}"}"
+  : "${install_base_path:="${packages_path}/${package_name}"}"
+  : "${install_path:="${install_base_path}/${package_version}"}"
+
+  # This check should only happen in places that require a version...
+  #[[ -n "${package_version}" ]] ||
+  #  fail "$FUNCNAME(): Package version must be specified.\n"\
+  #  "(For example version=x.y.z set in extension's config/defaults file.)\n"
+
+  if user_is_root
+  then
+    true \
+      "${log_path:="/var/log/${package_name}"}" \
+      "${package_user:="${package_name}"}"
+  else
+    true \
+      "${log_path:="${packages_path}/log"}" \
+      "${package_user:="$USER"}"
+  fi
+
+  extension_patches_path="${extension_path}/patches"
+}
+
+#
 # ## package\_install
 #
 # Performs all package installation steps:
@@ -221,7 +380,7 @@ package_definition()
 #
 package_install()
 {
-  (( $# == 0 )) || package_init $@
+  (( $# == 0 )) || package_cli $@
 
   if symlink_exists "${packages_path}/${package_name}/active" \
   && [[ "${force_flag}" != "1" ]]
@@ -347,7 +506,7 @@ To force, call:\n\tbdsm ${package_name} package install --force\n"
 #
 package_update()
 {
-  (( $# == 0 )) || package_init $@
+  (( $# == 0 )) || package_cli $@
 
   # TODO: check if newer version exists, if so then...
   if package_installed_versions | grep -q "${package_version}" && [[ "$1" != "--force" ]]
@@ -394,7 +553,7 @@ package_update()
 #
 package_fetch_md5()
 {
-  (( $# == 0 )) || package_init $@
+  (( $# == 0 )) || package_cli $@
 
   local download_url
 
@@ -452,7 +611,7 @@ package_fetch_md5()
 #
 package_fetch()
 {
-  (( $# == 0 )) || package_init $@
+  (( $# == 0 )) || package_cli $@
 
   : \
     "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
@@ -696,7 +855,7 @@ package_make_install()
 #
 package_activate()
 {
-  (( $# == 0 )) || package_init $@
+  (( $# == 0 )) || package_cli $@
 
   local _file _files=() _path _paths
 
@@ -1069,7 +1228,7 @@ package_profile_d()
 #
 package_uninstall()
 {
-  (( $# == 0 )) || package_init $@
+  (( $# == 0 )) || package_cli $@
 
   log_step "${package_name} ${package_version} ~ uninstall" \
 
@@ -1236,134 +1395,6 @@ package_usage() {
   --help)    - view this usage information
 
   "
-}
-
-#
-# ## package\_cli
-#
-# Parses package CLI arguments.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# none.
-#
-# ### Environmental effects
-#
-# Updates cli configuration for the given package.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Errors halting program if cli setup fails for any reason.
-#
-# ### Usage Examples
-#
-# Example Usage:
-#
-# user$ package_cli
-#
-# ### Notes
-#
-package_cli()
-{
-  local _ignored_args=() _token
-
-  number_of_args=${#extension_args[@]}
-
-  for (( index=0 ; index < $number_of_args ; index++ ))
-  do
-    _token="${extension_args[$index]}"
-
-    case "${_token}" in
-      --prefix)
-        packages_path="${extension_args[$((++index))]}"
-        ;;
-      --src)
-        src_path="${extension_args[$((++index))]}"
-        ;;
-      --data)
-        data_path="${extension_args[$((++index))]}"
-        ;;
-      --user)
-        package_user="${extension_args[$((++index))]}"
-        ;;
-      --version)
-        package_version="${extension_args[$((++index))]}"
-        ;;
-      --base_url)
-        package_base_url="${extension_args[$((++index))]}"
-        ;;
-      --file)
-        package_file="${extension_args[$((++index))]}"
-        ;;
-      --force)
-        force_flag=1
-        ;;
-      --static)
-        configure_flags+=( --static )
-        static_flag=1
-        ;;
-      --shared)
-        shared_flag=1
-        configure_flags+=( --enable-shared )
-        ;;
-      --directory)
-        package_directory="${extension_args[$((++index))]}"
-        ;;
-      --archive_format)
-        archive_format="${extension_args[$((++index))]}"
-        ;;
-      --activate|activate)
-        # TODO: Throw error if parameter is not specified.
-        (( ${#extension_args[@]} > 0 )) ||
-          error "Cannot activate ${extension}, no version was given."
-
-        if [[ "${extension}" == "pkg" ]]
-        then
-          array_shift extension_args
-          package_activate "${extension_args[@]}"
-        else
-          package_activate "${extension}" "${extension_args[@]}"
-        fi
-        exit $?
-        ;;
-      --deactivate|deactivate)
-        package_deactivate "${extension}"
-        ;;
-      --md5)
-        package_md5="${extension_args[$((++index))]}"
-        ;;
-      --licence)
-        extension_license
-        succeed
-        ;;
-      --help)
-        package_usage
-        succeed
-        ;;
-      --with*|--enable*|--disable*)
-        configure_flags+=("${_token}" "${extension_args[$((++index))]}")
-        ;;
-      --trace)
-        set -o xtrace
-        ;;
-      *)
-        _ignored_args+=("${_token}")
-        ;;
-    esac
-
-  done
-
-  extension_args=( "${_ignored_args[@]}" )
-
-  package_init "${extension_args[@]}"
 }
 
 #
@@ -1646,7 +1677,7 @@ Please install via bdsm package module, and retry. Typically, this can be done a
 #
 package_info()
 {
-  (( $# == 0 )) || package_init $@
+  (( $# == 0 )) || package_cli $@
 
   local _installed _path="${bdsm_path}/pkg/${package_name}"
 
@@ -1687,7 +1718,7 @@ package_installed_versions()
 
 package_man()
 {
-  (( $# == 0 )) || package_init $@
+  (( $# == 0 )) || package_cli $@
 
   true "${package_path:="${packages_path}/${package_name}/${package_version}"}"
 
@@ -1761,61 +1792,4 @@ packages_list()
       packages_installed "$@"
       ;;
   esac
-}
-
-package_init()
-{
-  package_name="${1:-${package_name:-${extension}}}"
-  [[ -n "${package_name}" ]] ||
-    fail "$FUNCNAME(): Package name must be given as first parameter.\n"
-
-  case "${package_name}" in
-    *=*) # exact version specifier
-      package_version="${package_name#*=}"
-      package_name="${package_name%%=*}"
-      ;;
-    *:*) # minimum version specifier
-      # TODO: concept of 'minimum' ;)
-      package_version="${package_name#*:}"
-      package_name="${package_name%%:*}"
-      ;;
-    *)
-      package_version="${2:-}"
-      ;;
-  esac
-
-  archive_format="${3:-}"
-
-  # Ensure that package_version is set at this point
-  [[ -n "${package_default_version}" ]] || read_default version prefix package_default for ${package_name}
-  [[ -n "${package_base_url}" ]] || read_default base_url    prefix package for ${package_name}
-  [[ -n "${package_md5_url}"  ]] || read_default md5_url     prefix package for ${package_name}
-  [[ -n "${website_url}"      ]] || read_default website_url prefix package for ${package_name}
-  [[ -n "${archive_format}"   ]] || read_default archive_format             for ${package_name}
-  : \
-    "${package_version:="${package_default_version}"}" \
-    "${init_scripts_path:="$(init_scripts_path)"}" \
-    "${archive_format:=tar.gz}" \
-    "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
-    "${install_base_path:="${packages_path}/${package_name}"}" \
-    "${install_path:="${install_base_path}/${package_version}"}"
-
-  # This check should only happen in places that require a version...
-  #[[ -n "${package_version}" ]] ||
-  #  fail "$FUNCNAME(): Package version must be specified.\n"\
-  #  "(For example version=x.y.z set in extension's config/defaults file.)\n"
-
-  if user_is_root
-  then
-    true \
-      "${log_path:="/var/log/${package_name}"}" \
-      "${package_user:="${package_name}"}"
-  else
-    true \
-      "${log_path:="${packages_path}/log"}" \
-      "${package_user:="$USER"}"
-  fi
-
-  extension_patches_path="${extension_path}/patches"
-
 }
