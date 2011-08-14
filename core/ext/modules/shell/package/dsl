@@ -264,6 +264,9 @@ package_cli()
         package_usage
         succeed
         ;;
+      --with*=)
+        configure_flags+=("${_token}")
+        ;;
       --with*|--enable*|--disable*)
         configure_flags+=("${_token}" "${_package_args[$((++index))]}")
         ;;
