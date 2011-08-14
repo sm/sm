@@ -56,7 +56,7 @@ symlink_sm()
 {
   local _bin_path="${install_path//sm/bin}"
 
-  if variable_is_nonempty sm_path && path_exists "${_bin_path}/bin"
+  if variable_is_nonempty sm_path && path_exists "${_bin_path}"
   then
     local _binary
     for _binary in "${binaries[@]}"
