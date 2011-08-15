@@ -16,15 +16,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# record this early on.
-initial_pwd="$PWD"
-
-# set BDSM basic paths
-sm_path="${DESTROOT:-}/sm"
+initial_pwd="$PWD"         # record where the script was run from right away.
+sm_path="${DESTROOT:-}/sm" # BDSM framework path
 modules_path="${sm_path}/core/sm/modules"
-export initial_pwd sm_path modules_path
 
-# basic options parsing
-. "${modules_path}/shell/core/cli"
-# initialize BDSM
-. "${modules_path}/shell/core/initialize"
+export initial_pwd sm_path modules_path initial_pwd
+
+. "${modules_path}/shell/core/cli"        # basic options parsing
+. "${modules_path}/shell/core/initialize" # initialize BDSM

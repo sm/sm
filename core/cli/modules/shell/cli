@@ -38,7 +38,7 @@ do
   esac
 done
 
-[[ -z "${_ignored_args[0]:-}" ]] || extension_args=( "${_ignored_args[@]}" )
+extension_args=( "${_ignored_args[@]}" )
 
 extension_cli
 
