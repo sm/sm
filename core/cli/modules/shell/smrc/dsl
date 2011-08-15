@@ -17,7 +17,8 @@ smrc_install()
 
     # TODO: Read project, repository_url and environment from defaults file.
     #       ~/.sm/project/config/defaults
-    : "${repository_url:="username/repository"}"
+    : \
+      "${repository_url:="username/repository"}"
 
     install_template "cli/smrc" to "$HOME/.smrc"
 
