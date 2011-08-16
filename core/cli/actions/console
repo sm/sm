@@ -22,7 +22,7 @@ then
     {
       builtin exit 0
     }
-    trap \"backtrace \\\"A command has returned a 'not handled' error code (\\\$?).\\\" no_exit\" ERR
+    trap \"backtrace \\\"A command has returned error code (\\\$?) without being handled.\\\" no_exit\" ERR
     export PS1='(sm) [ret=\$?] \w > '
   ") -i
 else
