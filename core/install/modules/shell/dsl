@@ -69,21 +69,25 @@ symlink_sm()
 
 setup_shell_completion()
 {
-  local _prefix="/etc"
+  local _prefix="/etc" _mode _name
 
   if path_exists "${_prefix}/bash_completion.d"
   then
     completion_prefix="${_prefix}/bash_completion.d"
+    _name="sm"
+    _mode=0755
   else
     completion_prefix="${_prefix}/profile.d"
     ensure_paths_exist "${_prefix}/profile.d/"
+    _name="sm-completion.sh"
+    _mode=0644
   fi
 
-  log_step "Setting up sm shell completion (${completion_prefix}/sm-completion.sh)" \
+  log_step "Setting up sm shell completion (${completion_prefix}/${_name})" \
     copy_file \
       from "${install_path}/core/cli/modules/shell/completion/bash" \
-      to "${completion_prefix}/sm-completion.sh" \
-      mode 0755 owner "root"
+      to "${completion_prefix}/${_name}" \
+      mode ${_mode} owner "root"
 }
 
 setup_profile_d()
