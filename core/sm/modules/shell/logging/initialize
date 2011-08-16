@@ -19,7 +19,7 @@ trap clean_tmp_logs EXIT
 # Persist ERR handler
 set -o errtrace
 # Call backtrace on error
-trap "backtrace \"A command has returned a 'not handled' error code (\$?).\"" ERR
+trap "backtrace \"A command has returned error code '(\$?)' without being handled.\"" ERR
 
 # Persist function RETURN & DEBUG handler
 set -o functrace
