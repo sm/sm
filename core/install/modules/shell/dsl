@@ -75,12 +75,12 @@ setup_shell_completion()
   then
     completion_prefix="${_prefix}/bash_completion.d"
     _name="sm"
-    _mode=0755
+    _mode=0644
   else
     completion_prefix="${_prefix}/profile.d"
     ensure_paths_exist "${_prefix}/profile.d/"
     _name="sm-completion.sh"
-    _mode=0644
+    _mode=0755
   fi
 
   log_step "Setting up sm shell completion (${completion_prefix}/${_name})" \
