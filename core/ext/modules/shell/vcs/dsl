@@ -47,9 +47,11 @@ fetch_uri()
   trace_filter vcs
   fetch_error_initialize "$@"
 
-  local initial_pwd="$PWD" _uri="${1:-}" _target="${2:-}" _args=()
+  local vcs_initial_pwd="$PWD" _uri="${1:-}" _target="${2:-}" _args=()
   shift || fail "uri must be specified as the first parameter."
   shift || fail "target path must be specified as the second parameter."
+
+  builtin cd "$initial_pwd"
 
   unset scm_type
   _args=("${_uri}" "${_target}")
@@ -77,7 +79,7 @@ fetch_uri()
       ;;
   esac
 
-  builtin cd "$initial_pwd"
+  builtin cd "$vcs_initial_pwd"
 }
 
 # Example:
