@@ -2,6 +2,9 @@
 # Environmental Settings. By default we assume that this will be a production environment.
 #
 
+# Set how deep one can search for projects in the project tree
+export p_search_path_depth="{{p_search_path_depth}}"
+
 #
 # NOTE / WARNING
 # The items below will soon be moved into a project module config directory:
