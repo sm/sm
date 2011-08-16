@@ -160,7 +160,7 @@ install_sm()
   local _binary
   for _binary in "${binaries[@]}"
   do
-    log_step "Ensuring that binay is executable (${_binary})" \
+    log_step "Ensuring that binary is executable (${_binary})" \
       chmod_files 0755 "${install_path}/bin/${_binary}"
   done
 
