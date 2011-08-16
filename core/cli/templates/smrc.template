@@ -3,7 +3,7 @@
 #
 
 # Set how deep one can search for projects in the project tree
-export p_search_path_depth="{p_search_path_depth}}"
+export p_search_path_depth="{{p_search_path_depth}}"
 
 #
 # NOTE / WARNING
