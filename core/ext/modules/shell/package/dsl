@@ -394,7 +394,7 @@ package_install()
 {
   (( $# == 0 )) || package_cli $@
 
-  if symlink_exists "${packages_path}/${package_name}/active" \
+  if package_installed_versions | grep -q "${package_version}" \
   && [[ "${force_flag}" != "1" ]]
   then
     log "The ${package_name} ${package_version} package is already installed.
@@ -502,7 +502,10 @@ To force, call:\n\tsm ${package_name} package install --force\n"
       "${package_name}_postinstall"
   fi
 
-  package_activate_if_first "${package_name}" "${package_version}"
+  if ! string_contains "${FUNCNAME[*]}" 'package_update'
+  then
+    package_activate_if_first "${package_name}" "${package_version}"
+  fi
 
   if command_exists "${package_name}_postactivate"
   then
@@ -521,7 +524,8 @@ package_update()
   (( $# == 0 )) || package_cli $@
 
   # TODO: check if newer version exists, if so then...
-  if package_installed_versions | grep -q "${package_version}" && [[ "$1" != "--force" ]]
+  if package_installed_versions | grep -q "${package_version}" \
+  && [[ "${force_flag}" != "1" ]]
   then
     log "The latest version (${package_version}) of the ${package_name} package is already installed."
   else
