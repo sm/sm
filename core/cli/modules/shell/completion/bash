@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+for file in $(find $bdsm_path -type f -name completion)
+do
+  #TODO: define convention for function names that will be called by completion function bellow
+  source "${file}"
+done
+
+#TODO: use actions cache
 __sm_bash_completion()
 {
   local current_word previous flags commands extensions
@@ -7,10 +14,10 @@ __sm_bash_completion()
   COMPREPLY=()
   current_word="${COMP_WORDS[COMP_CWORD]}"
   previous="${COMP_WORDS[COMP_CWORD-1]}"
-  extensions="$( sm list | tr "\n" ' ')"
-  commands="ext sets help get list version mod edit open website ${extensions}"
-  commands="${commands[@]}"
-  flags="--trace"
+  extensions="$( sm sets 2>/dev/null | \grep "^  -" | cut -c 4- | xargs -n 1 | sort -u )"
+  commands="${extensions}"
+  commands="${commands[*]}"
+  flags="--trace --debug --var-debug="
   current_count=${#COMP_WORDS[@]}
   completed=${COMP_CWORD}
 
@@ -25,12 +32,12 @@ __sm_bash_completion()
     # Complete based on installed extensions.
     case "${previous}" in
       ext)
-        available="$( sm ext list installed)"
+        available="$( sm ext 2>/dev/null | \grep "^  -" | cut -c 4- | xargs -n 1 | sort -u )"
         COMPREPLY=($(compgen -W "${available}" -- ${current_word}))
         return 0
         ;;
       sets)
-        available="$( sm sets list installed)"
+        available="$( sm sets 2>/dev/null | \grep "^  -" | cut -c 4- | xargs -n 1 | sort -u )"
         COMPREPLY=($(compgen -W "${available}" -- ${current_word}))
         return 0
         ;;
@@ -74,4 +81,3 @@ __sm_bash_completion()
 }
 
 complete -F __sm_bash_completion sm
-
