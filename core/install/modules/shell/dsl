@@ -52,18 +52,23 @@ install_configuration_files()
   log_step success
 }
 
+symlink_sm_binaries()
+{
+  local _binary
+  for _binary in "${binaries[@]}"
+  do
+    link --force "${install_path}/bin/${_binary}" to "${_bin_path}/${_binary}"
+  done
+}
+
 symlink_sm()
 {
   local _bin_path="${install_path//sm/bin}"
 
   if variable_is_nonempty sm_path && path_exists "${_bin_path}"
   then
-    local _binary
-    for _binary in "${binaries[@]}"
-    do
-      log_step "Linking binary (${install_path}/bin/${_binary} => ${_bin_path}/${_binary})" \
-        link --force "${install_path}/bin/${_binary}" to "${_bin_path}/${_binary}"
-    done
+    log_step "Linking binarires (${binaries[*]}) => ${_bin_path}/" \
+      symlink_sm_binaries
   fi
 }
 
@@ -138,6 +143,15 @@ set_sm_path()
     in "${install_path}/core/sm/modules/shell/core/initialize"
 }
 
+make_binaries_executable()
+{
+  local _binary
+  for _binary in "${binaries[@]}"
+  do
+    chmod_files 0755 "${install_path}/bin/${_binary}"
+  done
+}
+
 install_sm()
 {
   log "BDSM Framework Installation:"
@@ -157,12 +171,8 @@ install_sm()
     perform setup_shell_completion
   }
 
-  local _binary
-  for _binary in "${binaries[@]}"
-  do
-    log_step "Ensuring that binary is executable (${_binary})" \
-      chmod_files 0755 "${install_path}/bin/${_binary}"
-  done
+  log_step "Ensuring that binaries are executable" \
+    make_binaries_executable
 
   succeed "BDSM Framework installed."
 }
