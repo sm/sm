@@ -275,10 +275,10 @@ package_cli()
 
   done
 
-  package_init "${_ignored_args[@]}"
+  package_initialize "${_ignored_args[@]}"
 }
 
-package_init()
+package_initialize()
 {
   package_name="${1:-${package_name:-${extension}}}"
   [[ -n "${package_name}" ]] ||
@@ -332,6 +332,11 @@ package_init()
   fi
 
   extension_patches_path="${extension_path}/patches"
+
+  if command_exists "${extension}_initialize"
+  then
+    "${extension}_initialize"
+  fi
 }
 
 #
