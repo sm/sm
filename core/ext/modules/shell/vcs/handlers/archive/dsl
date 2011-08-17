@@ -77,10 +77,10 @@ archive_get() {
       tar Jxf "${_archive}" || fetch_error extracting_archive_failed
       ;;
     *.zip)
-      unzip "${_archive}" || fetch_error extracting_archive_failed
+      unzip -q "${_archive}" || fetch_error extracting_archive_failed
       ;;
     *github.com/*/zipball/*)
-      unzip "${_archive}" || fetch_error extracting_archive_failed
+      unzip -q "${_archive}" || fetch_error extracting_archive_failed
       local name_pattern="${_uri#https://github.com/}"
       name_pattern="${name_pattern%zipball/*}"
       name_pattern="${name_pattern//\//-}"
