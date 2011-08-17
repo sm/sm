@@ -20,6 +20,12 @@ archive_get() {
       _archive="${archives_path}/${_archive//\//_}_${_uri##*/}.tar.gz"
       debug vcs "github tarball archive name ${_archive}."
       ;;
+    *github.com/*/zipball/*)
+      _archive="${_uri#*github.com/}"
+      _archive="${_archive%/zipball*}"
+      _archive="${archives_path}/${_archive//\//_}_${_uri##*/}.zip"
+      debug vcs "github zipball archive name ${_archive}."
+      ;;
   esac
 
   [[ -d "${archives_path}" ]] || mkdir -p "${archives_path}"
@@ -72,6 +78,14 @@ archive_get() {
       ;;
     *.zip)
       unzip "${_archive}" || fetch_error extracting_archive_failed
+      ;;
+    *github.com/*/zipball/*)
+      unzip "${_archive}" || fetch_error extracting_archive_failed
+      local name_pattern="${_uri#https://github.com/}"
+      name_pattern="${name_pattern%zipball/*}"
+      name_pattern="${name_pattern//\//-}"
+      mv ${name_pattern}*/* .
+      rm -rf ${name_pattern}*
       ;;
     *)
       #TODO: add detection based on $( file ${_archive} ) type
