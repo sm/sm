@@ -64,7 +64,7 @@ is_github_uri()
 
 is_archive_uri() {
   case "$1" in
-    *.tar|*.tgz|*.txz|*.tbz2|*.xz|*.bz2|*.gz|*.zip|*.lzma|*github.com/*/tarball/*)
+    *.tar|*.tgz|*.txz|*.tbz2|*.xz|*.bz2|*.gz|*.zip|*.lzma|*github.com/*/*ball/*)
       return 0
       ;;
     *)
