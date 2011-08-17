@@ -905,6 +905,8 @@ package_activate()
       "as '${install_path}' does not exist."
   fi
 
+  package_ldconfig "${package_name}"
+
   package_setup "${package_name}"
 }
 
@@ -945,8 +947,6 @@ package_activate()
 package_setup()
 {
   local _package="${1:-${package_name}}"
-
-  package_ldconfig "${_package}"
 
   package_profile_d "${_package}"
 
