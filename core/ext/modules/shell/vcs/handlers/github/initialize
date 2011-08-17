@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+if [[ -z "${github_resolution_order[*]}" ]]
+then
+  github_resolution_order=( zip git tgz )
+fi

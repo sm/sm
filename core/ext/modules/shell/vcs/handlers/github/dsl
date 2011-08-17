@@ -12,14 +12,33 @@ github_get()
   shift || fail "uri must be specified as the first parameter."
   shift || fail "target path must be specified as the second parameter."
 
-  # TODO: account for url.
-  debug vcs "github -> https://github.com/${_uri}/tarball/${branch}"
-  archive_get "https://github.com/${_uri}/tarball/${branch}" "${_target}" "$@"
+  fetch_error_handler=true
 
-  if [[ -z "${__vcs_failed}" ]]
-  then
-    echo "${_uri}" > "${_target}/.uri"
-  else
-    return 0
-  fi
+
+  for _method in ${github_resolution_order[@]}
+  do
+    case "${_method}" in
+      (tgz)
+        debug vcs "github -> https://github.com/${_uri}/tarball/${branch}"
+        archive_get "https://github.com/${_uri}/tarball/${branch}" "${_target}" "$@"
+        ;;
+      (zip)
+        debug vcs "github -> https://github.com/${_uri}/zipball/${branch}"
+        archive_get "https://github.com/${_uri}/zipball/${branch}" "${_target}" "$@"
+        ;;
+      (git)
+        debug vcs "github -> git://github.com/${_uri}.git"
+        git_get "git://github.com/${_uri}.git" "${_target}" "$@"
+        ;;
+      (*)
+        fail "Unknonw github_resolution_order method: '${_method}'."
+    esac
+
+    if [[ -z "${__vcs_failed}" ]]
+    then
+      echo "${_uri}" > "${_target}/.uri"
+      return 0
+    fi
+  done
+  return 0 #TODO say what?
 }
