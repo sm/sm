@@ -9,6 +9,21 @@ detect_man()
   _man_name="${_man_name:-cli}"
   _man_name="${_man_name// /_}"
 
+  if [[ -n "${man_number}" ]]
+  then
+    _man_path="${_extensions_path}/${_extension}/man/man${man_number}/${_man_name}.${man_number}"
+    if [[ -f "${_man_path}" ]]
+    then
+      man_file="${_man_path}"
+      return 0
+    elif [[ -f "${_man_path}.gz" ]]
+    then
+      man_file="${_man_path}.gz"
+      return 0
+    fi
+    return 1
+  fi
+
   for _man_path in ${_extensions_path}/${_extension}/man/man*/${_man_name}*
   do
     _temp="${_man_path%/*}" #cut out file name - we know it already
@@ -27,7 +42,14 @@ detect_man()
 
 man_display()
 {
-  local man_path man_params
+  local man_path man_params man_number
+
+  if echo $1 | grep -E '^[0-9]+$' >/dev/null
+  then
+    man_number=$1
+    shift
+  fi
+
   if in_search_paths detect_man "$@"
   then
     if man $man_file
@@ -44,7 +66,10 @@ man_display()
       esac
     fi
   else
-    log "Could not find man page for $*"
+    local _man_name="$*"
+    _man_name="${_man_name:-cli}"
+    _man_name="${_man_name// /_}"
+    log "Could not find man page for ${_man_name}${man_number:+.${man_number}}"
   fi
 }
 
