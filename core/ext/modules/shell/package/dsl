@@ -996,6 +996,8 @@ package_setup()
 #
 package_deactivate()
 {
+  (( $# == 0 )) || package_cli $@
+
   local _package="${1:-"${package_name}"}" _file _files _version
 
   variables_must_be_nonempty _package
@@ -1033,6 +1035,11 @@ package_deactivate()
   done
 
   log_step success
+
+  if ! string_contains "${FUNCNAME[*]}" 'package_activate'
+  then
+    package_ldconfig "${_package}"
+  fi
 }
 
 #
@@ -1123,8 +1130,8 @@ package_ldconfig()
   local _package="${1:-${package_name}}" _path _files _ldconfig="/sbin/ldconfig"
   variables_must_be_nonempty _package
 
-  path_exists "${packages_path}/${_package}/active/lib" ||
-    return 0 # no lib/ directory for activated package, no need to update ldconfig
+#  path_exists "${packages_path}/${_package}/active/lib" ||
+#    return 0 # no lib/ directory for activated package, no need to update ldconfig
 
   # TODO: Figure out if solaris and freebsd have an analog to this?
   if user_is_root
