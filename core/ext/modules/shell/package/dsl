@@ -301,12 +301,14 @@ package_initialize()
   esac
 
   # Ensure that package_version is set at this point
+
   [[ -n "${package_default_version}" ]] || read_default version prefix package_default for ${package_name}
   [[ -n "${package_base_url}" ]] || read_default base_url    prefix package for ${package_name}
   [[ -n "${package_md5_url}"  ]] || read_default md5_url     prefix package for ${package_name}
   [[ -n "${package_user}"  ]]    || read_default user        prefix package for ${package_name}
   [[ -n "${website_url}"      ]] || read_default website_url prefix package for ${package_name}
   [[ -n "${archive_format}"   ]] || read_default archive_format             for ${package_name}
+
   : \
     "${package_version:="${package_default_version}"}" \
     "${init_scripts_path:="$(init_scripts_path)"}" \
@@ -314,6 +316,8 @@ package_initialize()
     "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
     "${install_base_path:="${packages_path}/${package_name}"}" \
     "${install_path:="${install_base_path}/${package_version}"}"
+
+  configure_flags=( --prefix="${install_path}" )
 
   # This check should only happen in places that require a version...
   #[[ -n "${package_version}" ]] ||
