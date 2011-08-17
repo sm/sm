@@ -878,7 +878,8 @@ package_activate()
   then
     if symlink_exists "${packages_path}/${package_name}/active"
     then
-      package_deactivate "${_package}"
+      local _version=$(readlink "${packages_path}/${package_name}/active")
+      package_deactivate "${package_name}" ${_version##*/}
     fi
 
     log_step "${package_name} ${package_version} ~ activate" \
@@ -998,7 +999,7 @@ package_deactivate()
 {
   (( $# == 0 )) || package_cli $@
 
-  local _package="${1:-"${package_name}"}" _file _files _version
+  local _package="${package_name}" _package_version="${2:-${package_version}}" _file _files _version
 
   variables_must_be_nonempty _package
 
@@ -1007,6 +1008,14 @@ package_deactivate()
     _version=$(readlink "${packages_path}/${_package}/active")
     _version=${_version##*/}
   else
+    debug package "No active version to deactivate."
+    return 0
+  fi
+
+  if [[ -n "${_package_version}" ]] \
+  && [[ "${_package_version}" != "${_version}" ]]
+  then
+    debug package "Another version activated - skipping deactivation."
     return 0
   fi
 
@@ -1014,10 +1023,10 @@ package_deactivate()
 
   true "${install_path:="${packages_path}/${_package}/${_version}"}"
 
-  _files=($( find "${install_path}" -type f ))
+  _files=( $( find "${install_path}" -type f ) )
   for _file in "${_files[@]}"
   do
-    remove_files --force "${_file}"
+    remove_files "${_file}"
   done
 
   _files=(
@@ -1026,13 +1035,7 @@ package_deactivate()
   "${packages_path}/${_package}/active"
   )
 
-  for _file in "${_files[@]}"
-  do
-    if file_exists "${_file}"
-    then
-      remove_files "${_file}"
-    fi
-  done
+  remove "${_files[@]}"
 
   log_step success
 
