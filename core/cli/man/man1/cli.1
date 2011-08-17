@@ -1,0 +1,66 @@
+.\"   $Id$
+.\"
+.\"   Man page for the bdsm project.
+.\"
+.\"   $Log$
+.\"
+
+.TH BDSM 1 "2011 August 17" "BDSM"
+
+.SH SYNOPSIS
+.B sm
+[cli] {file|options...} {namespace} action {action-params}
+
+.SH DESCRIPTION
+Benevolent Delectable S{cripting,ystem} Manager (BDSM) Framework (Core)
+
+.SH Actions
+.TP 13
+.B {file_name}
+Run the provided {file_name}, with BDSM initialized.
+.TP 13
+.B smrc
+Install/update smrc template file in ~/.smrc.
+.TP 13
+.B smrc install
+Force install smrc template file into ~/.smrc (no update).
+
+
+.TP 13
+.B get head
+Fetch and install the latest BDSM development version.
+.TP 13
+.B ext install {name} {uri}
+Install extension {name} from {uri}.
+.TP 13
+.B ext update {name}
+Update extension {name}.
+.TP 13
+.B sets
+List all installed extension sets and their extensions.
+.TP 13
+.B sets help
+Show available extension sets help.
+
+
+.TP 13
+.B version
+Display the curently installed BDSM version.
+.TP 13
+.B help
+Display this help.
+
+.SH Options
+.TP 13
+.B --trace={filter}
+Show trace output for functions using specified filter.
+.TP 13
+.B --debug={filter}
+Show debug messages for given filter.
+.TP 13
+.B --var-debug={variable_name}
+Display changes and stacktrace when the given {variable_name} changes.
+.TP 13
+.B --var-debug-short
+Show only list of functions instead of full stack trace when using
+.B --var-debug={variable_name}

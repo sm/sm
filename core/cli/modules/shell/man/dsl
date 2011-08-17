@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+detect_man()
+{
+  local _extensions_path=$1 _extension=${2:-cli}
+  shift
+  local _man_path _man_name="$*" #include extension in name
+  shift
+  _man_name="${_man_name:-cli}"
+  _man_name="${_man_name// /_}"
+
+  for _man_path in ${_extensions_path}/${_extension}/man/man*/${_man_name}*
+  do
+    _temp="${_man_path%/*}" #cut out file name - we know it already
+    case "${_temp##*/}" in
+      man\*)
+        continue
+        ;;
+      *)
+        man_file="${_man_path}"
+        return 0
+        ;;
+    esac
+  done
+  return 1
+}
+
+man_display()
+{
+  local man_path man_params
+  if in_search_paths detect_man "$@"
+  then
+    if man $man_file
+    then
+      :
+    else
+      local status=$?
+      case $status in
+        16)
+          #Not found page - ignore
+          ;;
+        *)
+          fail "Man returned unknown status $status"
+      esac
+    fi
+  else
+    log "Could not find man page for $*"
+  fi
+}
+
+man_list()
+{
+  NIY
+}
