@@ -56,9 +56,8 @@ install_release()
   #TODO make use of fetch_uri
   curl -s -L "${releases_url}/sm-${version}.tar.gz" -o "$archive"
 
-  if ! file_matches_md5 "${archive}" "${md5}"
-  then
-      fail "
+  file_matches_md5 "${archive}" "${md5}" ||
+    fail "
 Archive package downloaded does not match its calculated MD5 checksum ${md5}:
 
   $archives_path/sm-${version}.tar.gz
@@ -67,7 +66,6 @@ Please retry the installation, and/or check your networking setup.
 
 Halting installation.
 "
-  fi
 
   tar zxf "${archives_path}/sm-${version}.tar.gz" -C "$src_path/"
 
@@ -75,12 +73,13 @@ Halting installation.
 
   ensure_files_are_executable "install"
 
-  ./install
+  "${PWD}/install"
 }
 
 install_remote()
 {
   local remote="${1:-wayneeseguin}"
+
   install_sm_scm "sm-$remote" "$remote"
 }
 
