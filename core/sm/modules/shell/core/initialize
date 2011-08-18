@@ -105,12 +105,11 @@ source "${modules_path}/shell/string/dsl"
 source "${modules_path}/shell/logging/dsl"
 source "${modules_path}/shell/logging/initialize"
 source "${modules_path}/shell/modules/dsl"
-source "${modules_path}/shell/modules/initialize"
 
-if [[ "$MACHTYPE" = *solaris* ]]
-then # custom compilations + g*
+modules_initialize
+
+[[ "$OSTYPE" != *solaris* ]] || # custom compilations + g*
   export PATH="/bin:/opt/local/bin:/usr/sfw/bin:/usr/sbin:/usr/bin:${PATH}"
-fi
 
 # Ensure that any variables you wish export to extensions actually *are* exported.
 sm_exports
@@ -132,7 +131,7 @@ then
   case "${extension_args[0]}" in
     */*|*,*)
       #TODO: deprecated by SMP
-      modules ext/array ext/system
+      modules ext/array ext/os
       array_shift extension_args extensions
       sequential=(${extensions//,/ })
       for sequence in "${sequential[@]}"

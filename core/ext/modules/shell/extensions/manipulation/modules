@@ -1,3 +1,4 @@
 ext/variables
-ext/filesystem
+ext/files
+ext/paths
 ext/extensions/standard

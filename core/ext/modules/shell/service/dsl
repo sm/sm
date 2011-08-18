@@ -109,6 +109,10 @@ service_initialize()
   else
     service_pid=0
   fi
+
+  export PATH="/bin:/usr/bin:${prefix_path}/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin:${PATH}"
+
+  service_initialized=1
 }
 
 #
@@ -184,9 +188,28 @@ service_initialize()
 #
 services_avilable()
 {
-  # Notify that the services_available() function has not yet been implemented.
-  NIY "Available service listing has not yet been implemented."
-  services_installed
+  extensions_installed module "ext/service" "$@"
+}
+
+services_list()
+{
+  local _action="${1:-}" _args
+
+  [[ -z "${_action}" ]] || shift
+
+  case "${_action}" in
+    (active)
+      services_active "$@"
+      ;;
+
+    (available)
+      services_available "$@"
+      ;;
+
+    (installed|*)
+      services_installed "$@"
+      ;;
+  esac
 }
 
 #
@@ -304,7 +327,7 @@ services_available()
 #
 service_setup()
 {
-  service_initialize
+  (( $# == 0 )) || service_cli $@
 
   local _path _file
 
@@ -423,7 +446,7 @@ service_uninstall()
 #
 service_start()
 {
-  service_initialize
+  (( $# == 0 )) || service_cli $@
 
   variable_is_nonempty service ||
     fail "To start a service, you must set the 'service' variable."
@@ -515,7 +538,7 @@ service_stop()
 #
 service_reload()
 {
-  service_initialize
+  (( $# == 0 )) || service_cli $@
 
   variable_is_nonempty service ||
     fail "To start a service, you must set the 'service' variable."
@@ -562,7 +585,7 @@ service_reload()
 #
 service_restart()
 {
-  service_initialize
+  (( $# == 0 )) || service_cli $@
 
   variable_is_nonempty service ||
     fail "To start a service, you must set the 'service' variable."
@@ -609,7 +632,7 @@ service_restart()
 #
 service_status()
 {
-  service_initialize
+  (( $# == 0 )) || service_cli $@
 
   variable_is_nonempty service ||
     fail "To start a service, you must set the 'service' variable."
@@ -656,7 +679,7 @@ service_status()
 #
 service_logtail()
 {
-  service_initialize
+  (( $# == 0 )) || service_cli $@
 
   variable_is_nonempty service ||
     fail "To start a service, you must set the 'service' variable."
@@ -703,7 +726,7 @@ service_logtail()
 #
 service_info()
 {
-  service_initialize
+  (( $# == 0 )) || service_cli $@
 
   variable_is_nonempty service ||
     fail "In order to get info on a service, the 'service' variable must be set."
@@ -750,7 +773,7 @@ service_info()
 #
 service_configcheck()
 {
-  service_initialize
+  (( $# == 0 )) || service_cli $@
 
   variable_is_nonempty service ||
     fail "To configcheck a service, the 'service' variable must be set."
@@ -849,8 +872,7 @@ Options:
 #
 service_cli()
 {
-  # TODO: Update this for service specific items.
-  local _ignored_args=()
+  local _ignored_args=() _service_args=( $@ ) _token
 
   number_of_args=${#extension_args[@]}
 
@@ -859,49 +881,47 @@ service_cli()
     token="${extension_args[$index]}"
 
     case "$token" in
-      --prefix)
-        prefix_path="${extension_args[$((++index))]}"
-        ;;
-      --src)
-        src_path="${extension_args[$((++index))]}"
-        ;;
-      --user)
+      user)
         service_user="${extension_args[$((++index))]}"
+        [[ -n "${service_user}" ]] ||
+          error "$FUNCNAME: a user name must follow keyword 'user'"
         ;;
-      --as-root)
-        service_run_as_root_flag=1
-        ;;
-      --version)
+      version)
         service_version="${extension_args[$((++index))]}"
+        [[ -n "${service_version}" ]] ||
+          error "$FUNCNAME: a version number string must follow keyword 'version'"
         ;;
-      --base_url)
-        service_base_url="${extension_args[$((++index))]}"
+      data)
+        service_data_path="${_package_args[$((++index))]}"
+        [[ -n "${service_data_path}" ]] ||
+          error "$FUNCNAME: a path must follow keyword 'data'"
         ;;
-      --file)
-        service_file="${extension_args[$((++index))]}"
+      pid)
+        service_pid_path="${_package_args[$((++index))]}"
+        [[ -n "${service_pid_path}" ]] ||
+          error "$FUNCNAME: a path must follow keyword 'pid'"
         ;;
-      --directory)
-        service_directory="${extension_args[$((++index))]}"
+      log)
+        service_log_path="${_package_args[$((++index))]}"
+        [[ -n "${service_log_path}" ]] ||
+          error "$FUNCNAME: a path must follow keyword 'log'"
         ;;
-      --archive_format)
-        archive_format="${extension_args[$((++index))]}"
+      config)
+        service_config_path="${_package_args[$((++index))]}"
+        [[ -n "${service_config_path}" ]] ||
+          error "$FUNCNAME: a path must follow keyword 'config'"
         ;;
-      --activate|activate)
-        # TODO: Throw error if parameter is not specified.
-        if (( ${#extension_args[@]} > 0 ))
-        then
-          service_activate "${service}" "${extension_args[$((++index))]}"
-        else
-          error "Cannot activate ${service}, no version was given."
-        fi
+      lock)
+        service_lock_path="${_package_args[$((++index))]}"
+        [[ -n "${service_lock_path}" ]] ||
+          error "$FUNCNAME: a path must follow keyword 'lock'"
         ;;
-      --deactivate|deactivate)
-        service_deactivate "${service}"
+      db)
+        service_db_path="${_package_args[$((++index))]}"
+        [[ -n "${service_db_path}" ]] ||
+          error "$FUNCNAME: a path must follow keyword 'db'"
         ;;
-      --md5)
-        service_md5="${extension_args[$((++index))]}"
-        ;;
-      --help)
+      help)
         service_usage
         exit 0
         ;;
@@ -916,7 +936,7 @@ service_cli()
 
   extension_args=( "${_ignored_args[@]}" )
 
-  service_init_path
+  service_initialize "${extension_args[@]}"
 }
 
 #
@@ -1095,40 +1115,6 @@ service_install_init_d()
 }
 
 #
-# ## service\_init\_path()
-#
-# Sets the PATH explicitly for purposes of the current service extension.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# Alters the PATH variable.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# No failure conditions currently.
-#
-# ### Usage Examples
-#
-#     user$ service_init_path
-#
-service_init_path()
-{
-  PATH="${prefix_path}/bin:/bin:/usr/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin:${PATH}"
-}
-
-#
 # ## service\_init\_start()
 #
 # This is the generalized service init start function.
@@ -1160,8 +1146,6 @@ service_init_path()
 service_init_start()
 {
   log "Starting ${service}..."
-
-  service_init_path
 
   local _result=0 _command=( "${service_binary}" )
 
@@ -1233,7 +1217,6 @@ service_init_start()
 #
 service_init_stop()
 {
-  service_init_path
 
   if (( service_pid > 0 ))
   then
@@ -1287,8 +1270,6 @@ service_init_stop()
 service_init_status()
 {
   log "statusing ${service}..."
-
-  service_init_path
 
   local _command=( "${service_binary}" )
 
@@ -1360,8 +1341,6 @@ service_init_status()
 service_init_reload()
 {
   log "reloading ${service}..."
-
-  service_init_path
 
   local _command=( "${service_binary}" )
 

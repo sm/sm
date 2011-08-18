@@ -1,4 +1,5 @@
-# Benevolent Delectable S{cripting,ystem} Manager (BDSM) Framework
+# Benevolent Delectable S{cripting,ystem} Management (BDSM) Framework
+(Core)
 
 BDSM is a system scripting and DSL & management framework for beating software
 and systems into submission!

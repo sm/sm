@@ -1,5 +1,34 @@
 #!/usr/bin/env bash
 
+modules_initialize()
+{
+  (( ! ${modules_initialized:=0} )) || return 0
+
+  true $((modules_initialized++))
+
+  init_extensions_search_paths #initialize search paths
+
+  #core is loaded as BDSM starts
+  modules=(
+    "sm/core=core/sm/modules/shell/core"
+    "sm/string=core/sm/modules/shell/string"
+    "sm/logging=core/sm/modules/shell/logging"
+    "sm/modules=core/sm/modules/shell/modules"
+  )
+
+  for module_def in ${modules[@]}
+  do
+    module_name="${module_def//=*}"
+    module_path="${module_def//*=}"
+    log_search preload "$module_name" "${module_path}"
+  done
+
+  for module in ${preload_modules[@]}
+  do
+    module_or_error ${module} "$FUNCNAME: Cannot preload module: ${module}."
+  done
+}
+
 reorder_path()
 {
   local part="$1" extensions_path="$2" extension="$3"
