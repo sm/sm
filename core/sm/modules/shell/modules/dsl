@@ -294,18 +294,15 @@ modules()
 {
   local _module _sm _extension _path _file _modules=("$@")
 
-  if (( ${#_modules[@]} > 0 ))
-  then
-    for _module in "${_modules[@]}"
-    do
-      if ! module "${_module}"
-      then
-        fail "Could not find module path for ${_module}."
-      fi
-    done
-  else
-    fail "No modules specified to load."
-  fi
+  (( ${#_modules[@]} )) || fail "No modules specified to load."
+
+  for _module in "${_modules[@]}"
+  do
+    if ! module "${_module}"
+    then
+      fail "Could not find module path for ${_module}."
+    fi
+  done
 }
 
 #
@@ -337,24 +334,22 @@ modules_reinitialize()
 {
   local _module _modules=("$@") _loaded_modules _module_path _initialize_path
 
-  if array_is_nonempty _modules
-  then
-    _loaded_modules=" ${modules[*]} "
-    for _module in "${_modules[@]}"
-    do
-      _module_path="${_loaded_modules##* ${_module}=}"
-      _module_path="${_module_path%% *}"
-      if [[ -n "${_module_path}" ]]
-      then
-        _initialize_path="${sm_path}/${_module_path}/initialize"
-        [[ ! -s "${_initialize_path}" ]] || source "${_initialize_path}"
-      else
-        fail "Can not reinitialize module as it was not yet loaded"
-      fi
-    done
-  else
+  array_is_nonempty _modules ||
     fail "Cannot load a module, as no module was given."
-  fi
+
+  _loaded_modules=" ${modules[*]} "
+  for _module in "${_modules[@]}"
+  do
+    _module_path="${_loaded_modules##* ${_module}=}"
+    _module_path="${_module_path%% *}"
+    if [[ -n "${_module_path}" ]]
+    then
+      _initialize_path="${sm_path}/${_module_path}/initialize"
+      [[ ! -s "${_initialize_path}" ]] || source "${_initialize_path}"
+    else
+      fail "Can not reinitialize module as it was not yet loaded"
+    fi
+  done
 }
 
 #
@@ -392,17 +387,15 @@ module_is_loaded()
 {
   local _name="${1:-}"
 
-  if [[ -n "${_name:-}" ]]
-  then
-    case " ${modules[*]} " in
-      (*[[:space:]]${_name}=*)
-        return 0
-        ;;
-      (*)
-        return 1
-        ;;
-    esac
-  else
-    fail "Cannot determine if a module is loaded, as no module was given."
-  fi
+  [[ -n "${_name:-}" ]] ||
+    fail "Cannot determine if a module is loaded; No module was given."
+
+  case " ${modules[*]} " in
+    (*[[:space:]]${_name}=*)
+      return 0
+      ;;
+    (*)
+      return 1
+      ;;
+  esac
 }
