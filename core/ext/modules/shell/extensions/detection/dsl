@@ -378,23 +378,19 @@ extension_run()
       _namespaces=${_path##${extension_actions_path}}
       extension_modules_load ${_namespaces//\// }
 
+      action=${action%%(*}
       for _name in initialize cli
       do
-        action=${action%%(*}
-        if command_exists "${action%%_*}_${_name}"
-        then
+        ! command_exists "${action%%_*}_${_name}" ||
           "${action%%_*}_${_name}" "${extension_args[@]}"
-        fi
       done
 
       action_call "${action}" "${extension_args[@]}"
       ;;
 
     shell)
-      if [[ "${action##*/}" == help ]]
-      then # Load the help module also.
-        modules ext/help
-      fi
+      [[ "${action##*/}" != help ]] || modules ext/help
+
       _namespaces=${_path##${extension_actions_path}}
       extension_modules_load ${_namespaces//\// }
       action_source "${_path}/${action}" "${extension_args[@]}"

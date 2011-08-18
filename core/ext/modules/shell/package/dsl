@@ -322,6 +322,7 @@ package_initialize()
   esac
 
   declare -a package_dependencies
+  declare -a configure_flags
 
   true \
     "${source_path:="${sm_path}/src"}" \
@@ -351,7 +352,8 @@ package_initialize()
     "${install_base_path:="${packages_path}/${package_name}"}" \
     "${install_path:="${install_base_path}/${package_version}"}"
 
-  configure_flags=( --prefix="${install_path}" )
+  string_contains "${configure_flags[*]}" "--prefix" ||
+    configure_flags+=( --prefix="${install_path}" )
 
   # This check should only happen in places that require a version...
   #[[ -n "${package_version}" ]] ||
