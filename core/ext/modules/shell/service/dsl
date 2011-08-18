@@ -513,6 +513,8 @@ service_stop()
 #
 service_reload()
 {
+  service_initialize
+
   variable_is_nonempty service ||
     fail "To start a service, you must set the 'service' variable."
 
@@ -558,6 +560,8 @@ service_reload()
 #
 service_restart()
 {
+  service_initialize
+
   variable_is_nonempty service ||
     fail "To start a service, you must set the 'service' variable."
 
@@ -603,6 +607,8 @@ service_restart()
 #
 service_status()
 {
+  service_initialize
+
   variable_is_nonempty service ||
     fail "To start a service, you must set the 'service' variable."
 
@@ -648,6 +654,8 @@ service_status()
 #
 service_logtail()
 {
+  service_initialize
+
   variable_is_nonempty service ||
     fail "To start a service, you must set the 'service' variable."
 
@@ -693,6 +701,8 @@ service_logtail()
 #
 service_info()
 {
+  service_initialize
+
   variable_is_nonempty service ||
     fail "In order to get info on a service, the 'service' variable must be set."
 
@@ -738,6 +748,8 @@ service_info()
 #
 service_configcheck()
 {
+  service_initialize
+
   variable_is_nonempty service ||
     fail "To configcheck a service, the 'service' variable must be set."
 
