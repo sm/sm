@@ -140,87 +140,6 @@ nonempty_files()
 }
 
 #
-# ## ensure\_paths\_exist
-#
-# Iterates over the list of given paths, creating the directory if it
-# does not exist.
-#
-# ### Input Parameters
-#
-# A list of paths to create if missing.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# Paths that were given but do not exist will be created.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if no paths were given.
-#
-# ### Usage Examples
-#
-#     user$ ls -a
-#     . ..
-#     user$ ensure_paths_exist a b c
-#     user$ ls -a
-#     . .. a b c
-#
-ensure_paths_exist()
-{
-  # Declare the path and paths variables; set the files variable to an array
-  # containing all of the parameters passed in.
-  local _path _paths=("$@")
-
-  # If the paths array is nonempty, then for each path in the paths array if the
-  #   path already exists as a directory, move along to the next path.
-  #
-  # If the path already exists as a file, then issue a warning. (Question: should
-  #   this be a fail scenario?) Create the full path in the filesystem,
-  #   including intermediate directories if they do not already exist.
-  #
-  # If the path was created successfully, process the next
-  # path; otherwise, it failed to create the path on the filesystem: a system error.
-  # Fail, yielding a message with a backtrace which can be used to debug.
-  #
-  # If no files were given, this indicates a programming error.
-  # Fail, yielding a message with a backtrace which can be used to debug.
-  array_is_nonempty _paths ||
-    fail "Cannot ensure paths exist, as no paths were given."
-
-  for _path in "${_paths[@]}"
-  do
-    if path_exists "${_path}"
-    then
-      continue
-    else
-      if file_exists "${_path}"
-      then
-        if [[ -L "${_path}" ]] && [[ -d "$(readlink "${_path}")" ]]
-        then
-          continue
-        else
-          warn "Could not ensure path '${_path}' exists"\
-            " as a directory, as it is a file."
-        fi
-      else
-        mkdir -p "${_path}" ||
-          fail "Could not create the path '${_path}',"\
-            "as the 'mkdir' command failed with error code '$?'."
-        continue
-      fi
-    fi
-  done
-}
-
-#
 # ## remove\_files
 #
 # Removes the given files, if they exist.
@@ -361,108 +280,6 @@ remove()
 }
 
 #
-# ## remove\_paths
-#
-# Function Description
-#
-# ### Input Parameters
-#
-# Positional Parameter listing and descriptions.
-#
-# ### Stream Outputs
-#
-# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
-#
-# ### Environmental effects
-#
-# What, if any, environmental side effects this function causes. 'None.' for none.
-# If any paths are requested for removal that are already nonexistent, they
-# are listed in the nonexistant_paths array when this function returns.
-# Additionally, each path successfully removed is available in the
-# remove_paths array.
-#
-# ### Return Codes
-#
-# 0 if ...
-# 1 if ...
-#
-# ### Failure Scenarios
-#
-# Fails if ...
-#
-# ### Usage Examples
-#
-#     user$ {{ setup the scenario }}
-#     user$ function_name {{ parameters }}
-#     user$ {{ demonstrate the results}}
-remove_paths()
-{
-  # Declare the path and paths variables; set the files variable to an array
-  # containing all of the parameters passed in.
-  local _path _paths=("$@")
-  shift || fail "$FUNCNAME: Cannot remove paths; No paths were given."
-
-  # Declare variables that will be available after the function returns.
-  removed_paths=()
-  nonexistant_paths=()
-
-  # If the paths array is nonempty, then for each path in the paths array:
-  #
-  # If the path is a symlink, then remove it from the filesystem.
-  #   If the remove was successful, add it to the removed_paths array and
-  #   continue to the next path. Otherwise, there was a system error.
-  #   Fail, yielding a message with a backtrace which can be used to debug.
-  #
-  # If the path is a directory, then recursively remove it.
-  #   If the remove was successful, add it to the removed_paths array and
-  #   continue to the next path. Otherwise, there was a system error.
-  #   Fail, yielding a message with a backtrace which can be used to debug.
-  #
-  # If the path is not a symlink or a directory, and it still exists on the
-  #   filesystem, then path is an unhandled filesystem type and we have failed to
-  #   remove it. This likely indicates a system error. Fail, giving sysadmins an
-  #   error message with a backtrace to help debug the issue.
-  #
-  # If the filesystem path already does not exist, add it to the
-  #   nonexistant_paths array, and continue with the next path in the list.
-  #
-  # If no paths were given, this is a programming error; fail, giving
-  # developers an error message with a backtrace for debugging.
-
-  for _path in "${_paths[@]}"
-  do
-    if [[ -L "${_path}" ]]
-    then
-      if rm -f "${_path}"
-      then
-        removed_paths+=("${_path}")
-        continue
-      else
-        fail "Could not remove the entity '${_entity}',"\
-          "as the 'rm' command failed with error code '$?'."
-      fi
-    elif [[ -d "${_path}" ]]
-    then
-      if rm -rf "${_path}"
-      then
-        removed_paths+=("${_path}")
-        continue
-      else
-        fail "Could not remove the entity '${_entity}',"\
-          "as the 'rm' command failed with error code '$?'."
-      fi
-    elif [[ -e "${_path}" ]]
-    then
-      fail "Cannot remove the path '${_path}', as it is a file."
-
-    else
-      nonexistant_paths+=("${_path}")
-      continue
-    fi
-  done
-}
-
-#
 # ## ensure\_files\_exist
 #
 # Iterates over the list of given files, creates the directory if it
@@ -520,15 +337,12 @@ ensure_files_exist()
 
   for _file in "${_files[@]}"
   do
-    ! file_exists "${_file}" || continue
-
+    ! [[ -f "${_file}" ]] || continue
     _path="${_file%\/*}"
-
     ensure_paths_exist "${_path}"
-
     touch "${_file}" ||
-      fail "There was an error creating the file '${_file}' on the"\
-      "filesystem; the touch command returned error code '$?'."
+      fail "$FUNCNAME: Error creating the file '${_file}' on the filesystem; "\
+      " touch command returned error code '$?'."
   done
 }
 
@@ -571,7 +385,7 @@ ensure_files_are_executable()
   # Declare the file, files and path variables, set the files variable to an
   # array containing all of the parameters passed in.
   local _file _path _files=("$@")
-  shift || fail "Cannot ensure files are executable; No files were given."
+  shift || fail "$FUNCNAME: Cannot ensure files are executable; No files were given."
 
   # If the files array is nonempty, then for each file in the files array:
   #
@@ -592,19 +406,19 @@ ensure_files_are_executable()
 
   for _file in "${_files[@]}"
   do
-    ! path_exists "${_file}" ||
-      fail "Cannot make the file '${_file}' executable,"\
-      "as it is unexpectedly a directory."
+    ! [[ -d "${_file}" ]] ||
+      fail "$FUNCNAME: Cannot make the file '${_file}' executable;"\
+      "The file is unexpectedly a directory."
 
-    file_exists "${_file}" ||
-      fail "Cannot make the file '${_file}' executable,"\
-      " as the file does not exist."
+    [[ -f "${_file}" ]] ||
+      fail "$FUNCNAME: Cannot make the file '${_file}' executable;"\
+      "The file does not exist."
 
     _path="${_file%\/*}"
 
-    variable_is_nonempty _path && path_exists "${_path}" ||
-      fail "Cannot make the file '${_file} executable,"\
-      " as '${_path}' does not even exist."
+    variable_is_nonempty _path && [[ -d "${_path}" ]] ||
+      fail "$FUNCNAME: Cannot make the file '${_file} executable;"\
+      " '${_path}' does not exist."
 
     chmod +x "${_file}" ||
       fail "Could not make the file '${_file}' executable,"\
@@ -690,8 +504,8 @@ link()
 
   (( _force_flag == 0 )) || remove "${_target}"
 
-  ! file_exists "${_target}" || fail "Cannot link ${_source} to ${_target}; exists as a file!"
-  ! path_exists "${_target}" || fail "Cannot link ${_source} to ${_target}; exists as a directory"
+  ! [[ -f "${_target}" ]] || fail "Cannot link ${_source} to ${_target}; exists as a file!"
+  ! [[ -d "${_target}" ]] || fail "Cannot link ${_source} to ${_target}; exists as a directory"
 
   # If the target's base path is nonempty, then ensure that it exists.
   _path="${_target%\/*}"
@@ -704,103 +518,6 @@ link()
   ln -fs "${_source}" "${_target}" ||
     fail "Failed to create a symbolic link from '${_source}' to '${_target}',"\
     "as the 'ln -fs' command failed with error code '$?'."
-}
-
-#
-# ## move\_directory
-#
-# Moves a directory from one location to another.
-# (This is also used to rename a directory.)
-#
-# ### Input Parameters
-#
-# The first parameter is the source directory name.
-# The second parameter is the target directory name.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# If successful, a directory is renamed (moved).
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if the source directory is not specified.
-# Fails if the target directory is not specified.
-#
-# ### Usage Examples
-#
-#     user$ move_directory "freetds-0.91rc"* to "freetds-0.91"
-#
-move_directory()
-{
-  local _source _target _mode _owner
-
-  while (( $# > 0 ))
-  do
-    token="$1"
-    shift
-
-    case "${token}" in
-      to)
-        _target="${1}"
-        shift || fail "$FUNCNAME: Target path must be provided after keyword 'to'"
-        ;;
-
-      from)
-        _source="${1}"
-        shift || fail "$FUNCNAME: Source path must be provided after keyword 'from'"
-        ;;
-
-      mode)
-        _mode="${1}"
-        shift || fail "$FUNCNAME: Mode must be provided after keyword 'mode'"
-        ;;
-
-      owner)
-        _owner="${1}"
-        shift || fail "$FUNCNAME: Owner must be provided after keyword 'owner'"
-        ;;
-
-      *) # If the token is unknown
-        if variable_is_empty _source
-        then
-          _source="$token"
-
-        elif variable_is_empty _target
-        then
-          _target="$token"
-        fi
-        ;;
-    esac
-  done
-
-  variable_is_nonempty _source || fail "Cannot move file; Source must be given. "
-  variable_is_nonempty _target || fail "Cannot move file; Target must be given. "
-
-  mv "${_source}" "${_target}" ||
-    fail "Could not move '${_source}' to '${_target}',"\
-    "as the 'chmod -R' command failed with error code '$?'."
-
-  if variable_is_nonempty _mode
-  then
-    chmod -R "${_mode}" "${_target}" ||
-      fail "Could not recursively change mode of '${_target}' to"\
-      "${_mode}, as the 'chmod -R' command failed with error code '$?'."
-  fi
-
-  if variable_is_nonempty _owner
-  then
-    chown -R "${_owner}" "${_target}" ||
-      fail "Could not recursively change ownership of '${_target}' to"\
-      "${_owner}, as the 'chown -R' command failed with error code '$?'."
-  fi
 }
 
 #
@@ -1072,7 +789,8 @@ copy_files()
 
   for _file in "${_files[@]}"
   do
-    file_exists "${_file}" || error "Cannot copy file ${_file} to ${_target};"\
+    [[ -f "${_file}" ]] ||
+      error "$FUNCNAME: Cannot copy file ${_file} to ${_target};"\
       "The file does not exist."
 
     if (( _force_flag ))
@@ -1086,153 +804,6 @@ copy_files()
         "as the 'cp' command failed with error code '$?'."
     fi
   done
-}
-
-#
-# ## copy\_directories to
-#
-# Copies a given list of directories into the named path.
-#
-# ### Input Parameters
-#
-# The first parameter is the path to copy the directories into.
-# Remaining parameters are the directory name/path list.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# If successful, all named directories are copied into the target path.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if no target path is given.
-# Fails if no directories are given.
-#
-# ### Usage Examples
-#
-#     user$ copy_paths to "$HOME/backup/" "$HOME/bin" "$HOME/projects"
-#
-copy_paths()
-{
-  local _target _directory _force_flag=0 _directories=()
-
-  while (( $# > 0 ))
-  do
-    token="$1"
-    shift
-    case "${token}" in
-      to)
-        _target="${1}"
-        shift || fail "$FUNCNAME: Target path must be given after keyword 'from'"
-        ;;
-
-      from)
-        _directories+=( "${1}" )
-        shift || fail "$FUNCNAME: Source path must be given after keyword 'from'"
-        ;;
-
-      --force|force)
-        _force_flag=1
-        ;;
-
-      *)
-        _directories+=( "${token}" )
-        ;;
-    esac
-  done
-
-  variable_is_nonempty _target   || fail "$FUNCNAME: Cannot move file; Target must be given."
-  array_is_nonempty _directories || fail "$FUNCNAME: Cannot copy; Directories must be given."
-
-  ensure_paths_exist "${_target}"
-
-  for _directory in "${_directories[@]}"
-  do
-    path_exists "${_directory}" ||
-      error "Cannot copy directory ${_directory} to ${_target},"\
-      "as the directory '${_directory}' does not exist (in '$PWD')."
-
-    cp -Rf "${_directory}" "${_target}/" ||
-      fail "Could not copy the entity '${_entity}',"\
-      "as the 'cp -Rf' command failed with error code '$?'."
-  done
-}
-
-#
-# ## copy\_directory
-#
-# Copies a directory from one location to another.
-# (This is also used to rename a directory.)
-#
-# ### Input Parameters
-#
-# The first parameter is the source directory name.
-# The second parameter is the target directory name.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# If successful, a directory is renamed (copyd).
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if the source directory is not specified.
-# Fails if the target directory is not specified.
-#
-# ### Usage Examples
-#
-#     user$ copy_directory "freetds-0.91rc"* to "freetds-0.91"
-#
-copy_directory()
-{
-  local _source _target
-
-  while (( $# > 0 ))
-  do
-    token="$1"
-    shift
-    case "${token}" in
-      to)
-      _target="${1}"
-      shift || fail "$FUNCNAME: Target path must be given after keyword 'from'"
-      ;;
-      from)
-      _source="${1}"
-      shift || fail "$FUNCNAME: Source path must be given after keyword 'from'"
-      ;;
-      *)
-        if variable_is_empty _source
-        then
-          _source="$token"
-
-        elif variable_is_empty _target
-        then
-          _target="$token"
-        fi
-        ;;
-    esac
-  done
-
-  variable_is_nonempty _source || fail "$FUNCNAME: Cannot move file; Source must be given."
-  variable_is_nonempty _target || fail "$FUNCNAME: Cannot move file, Target must be given."
-
-  cp -Rf "${_source}" "${_target}" ||
-    fail "Could not copy '${_source}' to '${_target}',"\
-      "as the 'cp' command failed with error code '$?'."
 }
 
 #
@@ -1309,7 +880,7 @@ move_files()
   do
     variable_is_empty _source || _file="${_source}/${_file}"
 
-    if  file_exists "${_file}"
+    if  [[ -f "${_file}" ]]
     then
       if (( _force_flag == 1 ))
       then
@@ -1391,7 +962,7 @@ chown_files()
 
   for _file in "${_files[@]}"
   do
-    file_exists "${_file}" ||
+    [[ -f "${_file}" ]] ||
       fail "Cannot chown file ${_file} to ${_identity},"\
       "as the file does not exist."
 
@@ -1399,68 +970,6 @@ chown_files()
       fail "Could not recursively chown the file '${_file}' to "\
         "'${_target}/${_file//*\/},"\
         "as the 'chown -R' command failed with error code '$?'."
-  done
-}
-
-#
-# ## chown\_paths
-#
-# Change ownership of a list of paths.
-#
-# ### Input Parameters
-#
-# First parameter is the new owner[:group] of the paths.
-# Remaining parameters are the path names/paths.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if no new owner[:group] was specified.
-# Fails if no list of paths was given.
-#
-# ### Usage Examples
-#
-#     user$ chown_paths $USER "$HOME" "/usr/local"
-#
-chown_paths()
-{
-  local _identity="${1:-}" _path _recursive_flag=0 _command _flags=()
-
-  if [[ "${1:-}" == --recursive* ]]
-  then
-    _recursive_flag=1
-    shift # Remove the recursive flag parameter.
-    _identity="${1}"
-  fi
-
-  (( _recursive_flag == 0 )) || _flags+=(-R)
-
-  shift || fail "$FUNCNAME: Cannot chown paths; user[:group] was not given as the first parameter."
-
-  local _paths=("$@")
-
-  array_is_nonempty _paths || fail "$FUNCNAME: Cannot chown paths; No files were given."
-
-  for _path in "${_paths[@]}"
-  do
-    path_exists "${_path}" ||
-      fail "Cannot chown path ${_path} to ${_identity},"\
-      "as the path (directory) does not exist."
-
-    chown ${_flags[*]} ${_identity} "${_path}" ||
-      fail "Could not chown the path '${_path}' to '${_identity},"\
-      "as the 'chown' command failed with error code '$?'."
   done
 }
 
@@ -1505,122 +1014,14 @@ chmod_files()
 
   for _file in "${_files[@]}"
   do
-    file_exists "${_file}" ||
-      fail "Cannot chmod file ${_file} to ${_permissions},"\
-        "as the file (directory) does not exist."
+    [[ -f "${_file}" ]] ||
+      fail "$FUNCNAME: Cannot chmod ${_file} to ${_permissions};"\
+        "The entity does not exist."
 
     chmod ${_permissions} "${_file}" ||
-      fail "Could not chmod the file '${_file}' to "\
-        "'${_target}/${_file//*\/},"\
-        "as the 'chmod' command failed with error code '$?'."
+      fail "$FUNCNAME: Could not chmod '${_file}' to '${_target}/${_file//*\/};"\
+        "'chmod' command failed with error code '$?'."
   done
-}
-
-#
-# ## chmod\_paths
-#
-# Change ownership of a list of paths.
-#
-# ### Input Parameters
-#
-# First parameter is the new owner[:group] of the paths.
-# Remaining parameters are the path names/paths.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if no new owner[:group] was specified.
-# Fails if no list of paths was given.
-#
-# ### Usage Examples
-#
-#     user$ chmod_paths $USER "$HOME" "/usr/local"
-#
-chmod_paths()
-{
-  local _permissions="${1:-}" _path _recursive_flag=0 _command _flags=()
-
-  if [[ "${1:-}" == "--recursive" ]]
-  then
-    _recursive_flag=1
-    shift
-    _permissions="${1}"
-  fi
-
-  (( _recursive_flag == 0 )) || _flags+=(-R)
-
-  shift || fail "Cannot chmod paths; user[:group] was not given as the first parameter."
-  local _paths=("$@") # Set the paths array to the remaining parameters.
-
-  array_is_nonempty _paths ||
-    fail "Cannot chmod paths, as no files were given."
-
-  for _path in "${_paths[@]}"
-  do
-    path_exists "${_path}" ||
-      fail "Cannot chmod path ${_path} to ${_permissions},"\
-      "as the path (directory) does not exist."
-
-    chmod ${_flags[*]} ${_permissions} "${_path}" ||
-      fail "Could not chmod the file '${_file}' to "\
-      "'${_target}/${_file//*\/},"\
-      "as the 'chmod' command failed with error code '$?'."
-
-  done
-}
-
-#
-# ## enter
-#
-# Changes the current working directory ($PWD) to the given directory with
-# sanity checks.
-#
-# ### Input Parameters
-#
-# First parameter is the directory to change into.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# The current working directory (PWD) will become the given directory if
-# successful.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if no directory was given.
-# Fails if the given directory does not exist.
-#
-# ### Usage Examples
-#
-#     user$ enter "/usr/local/src"
-#
-enter()
-{
-  local _path="${1:-}"
-  shift || fail "Cannot enter a directory; No directory was given."
-  path_exists "${_path}"   || fail "Cannot enter the directory '${_path}', as it does not exist."
-
-  builtin cd "${_path}" ||
-    fail "Could not cd into the given path '${_path}'; "\
-      "'cd' command failed with error code '$?'."
 }
 
 #
@@ -1661,17 +1062,19 @@ enter()
 hash_file()
 {
   local _message _key _value _file="${1:-}"
-  shift || fail "File path/name not given.\n => Usage: $0 <filename> <key> [value]"
+  shift || fail "$FUNCNAME: File path/name not given.\n"\
+  " => Usage: $0 <filename> <key> [value]"
 
   local _key="${1:-}"
-  shift || fail "Key not given.\n => Usage: $0 <filename> <key> [value]"
+  shift || fail "$FUNCNAME: Key not given.\n"\
+    " => Usage: $0 <filename> <key> [value]"
 
   local _path=$(dirname "${_file}") # Note this will be '.' only if a file name was given.
 
-  path_exists "${_path}" ||
+  [[ -d "${_path}" ]] ||
     fail "{$_message[*]}"\
-    "Cannot access the database file '${_file}',"\
-    "as the directory '${_path}' does not exist on the filesystem."
+    "$FUNCNAME: Cannot access the database file '${_file}'; "\
+    "'${_path}' does not exist on the filesystem."
 
   ensure_files_exist "$_file"
 
@@ -2054,7 +1457,7 @@ file_is_empty_or_missing()
 #     user$ cat "$HOME/test"
 #     #!/bin/sm
 #
-#     modules ext/filesystem
+#     modules ext/files ext/paths
 #
 #     if file_contains "$HOME/.smrc" ".*w00t.*"
 #     then
@@ -2119,150 +1522,6 @@ symlink_exists()
   local _file="${1:-}"
   shift || fail "Cannot check if symlink exists; no path was given."
   [[ -L "${_file}" ]]
-}
-
-#
-# ## path\_exists()
-#
-# Check if a directory name/path exists.
-#
-# ### Input Parameters
-#
-# First parameter is a directory name/path.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 if the named path exists.
-# 1 if the named path does not exist or does not exist.
-#
-# ### Failure Scenarios
-#
-# Fails if no path name/path was given.
-#
-# ### Usage Examples
-#
-#     user$ path_exists /bin/sm
-#     user$ echo $?
-#     0
-#
-#     user$ path_exists /bin/asdfasdf
-#     user$ echo $?
-#     1
-#
-path_exists()
-{
-  local _path="${1:-}"
-  shift || fail "$FUNCNAME: Cannot check if path exists; No name/path was given."
-
-  [[ -d "$_path" ]]
-}
-
-#
-# ## path\_join()
-#
-# Joins path elements together passed as arguments into one path string.
-#
-path_join()
-{
-  local IFS='/'
-  printf "$*"
-}
-
-#
-# ## directories\_in()
-#
-# Function Description
-#
-# ### Input Parameters
-#
-# Positional Parameter listing and descriptions.
-#
-# ### Stream Outputs
-#
-# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
-#
-# ### Environmental effects
-#
-# What, if any, environmental side effects this function causes. 'None.' for none.
-#
-# ### Return Codes
-#
-# 0 if ...
-# 1 if ...
-#
-# ### Failure Scenarios
-#
-# Fails if ...
-#
-# ### Usage Examples
-#
-#     user$ {{ setup the scenario }}
-#     user$ function_name {{ parameters }}
-#     user$ {{ demonstrate the results}}
-directories_in()
-{
-  local _path="${1:-}"
-  shift || fail "$FUNCNAME: Directory name/path was not given!"
-
-  [[ -d "${_path}" ]] || fail "$FUNCNAME: '${_path}' is not a directory!"
-
-  find "${_path}" -mindepth 1 -maxdepth 1 -type d
-}
-
-#
-# ## directories\_in\_matching()
-#
-#
-directories_in_matching()
-{
-  local _pattern _path="${1:-}"
-  shift     || fail "$FUNCNAME: Directory name/path was not given!"
-  [[ -d "${_path}" ]]    || fail "$FUNCNAME: '${_path}' is not a directory!"
-
-  local _pattern="${2:-}"
-  shift  || fail "$FUNCNAME: '${_path}' is not a directory!"
-
-  find "${_path}" -mindepth 1 -maxdepth 1 -type d
-}
-
-#
-# ## directories\_under()
-#
-#
-directories_under()
-{
-  local _path="${1:-}"
-  shift  || fail "$FUNCNAME: Directory name/path was not given!"
-
-  [[ -d "${_path}" ]] || fail "$FUNCNAME: '${_path}' is not a directory!"
-
-  find "${_path}" -mindepth 1 -type d
-}
-
-#
-# ## directories\_under\_matching()
-#
-#
-directories_under_matching()
-{
-  local _path="${1:-}"
-  shift || fail "Directory name/path was not given as the second parameter."
-
-  local _pattern="${1:-}"
-  shift || fail "Pattern was not given as the second parameter."
-
-  [[ -d "${_path}" ]]    || fail "$FUNCNAME: '${_path}' is not a directory!"
-  [[ -n "${_pattern}" ]] || fail "$FUNCNAME: '${_path}' is not a directory!"
-
-  find "${_path}" -mindepth 1 -iname "${_pattern}" -type d
 }
 
 #
@@ -2649,46 +1908,3 @@ write()
   fi
 }
 
-#
-# ## full_path()
-#
-# return full path to given directory.
-#
-# ### Input Parameters
-#
-# path.
-#
-# ### Stream Outputs
-#
-# full path
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if no arguments are given.
-# Fails if given path does not exists
-#
-# ### Usage Examples
-#
-# user$ cd ; sm call full_path test
-# /home/user/test
-#
-full_path()
-{
-  local _path="$1"
-  shift || fail "$FUNCNAME: Cannot go to path; No path was given."
-
-  path_exists "${_path}" || fail "$FUNCNAME: Path '${_path}' does not exist."
-
-  (
-  builtin cd "${_path}"
-  pwd
-  )
-}

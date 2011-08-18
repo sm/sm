@@ -1,5 +1,6 @@
 ext/variables
 ext/array
-ext/filesystem
+ext/files
+ext/paths
 ext/hash
 ext/templates

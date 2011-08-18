@@ -1,4 +1,5 @@
-ext/filesystem
+ext/files
+ext/paths
 ext/vcs
 ext/users
 cli/sets

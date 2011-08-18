@@ -1,6 +1,7 @@
 ext/environment
 ext/extensions
-ext/filesystem
+ext/files
+ext/paths
 ext/os
 ext/defaults
 ext/templates
