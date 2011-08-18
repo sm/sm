@@ -365,10 +365,36 @@ extension_modules_load()
   done
 }
 
+extension_action_prerequisites()
+{
+  trace_filter action_pre
+  local _pre _name
+
+  _pre=(
+   ${action%_*}_cli
+   ${action%_*}_initialize
+  )
+
+  string_contains "${_pre[*]}" "${action%%_*}_cli" || _pre+=(
+   ${action%%_*}_cli
+   ${action%%_*}_initialize
+  )
+
+  string_contains "${_pre[*]}" "${extension}_cli" || _pre+=(
+   ${extension}_cli
+   ${extension}_initialize
+  )
+
+  for _name in ${_pre[@]}
+  do
+    ! command_exists "${_name}" || "${_name}" "${extension_args[@]}"
+  done
+}
+
 extension_run()
 {
   trace_filter extension_run
-  local _type="${action_type:-}" _path="${action_path:-}" _namespaces _name
+  local _type="${action_type:-}" _path="${action_path:-}" _namespaces
 
   builtin cd "${initial_pwd}"
 
@@ -379,12 +405,7 @@ extension_run()
       extension_modules_load ${_namespaces//\// }
 
       action=${action%%(*}
-      for _name in initialize cli
-      do
-        ! command_exists "${action%%_*}_${_name}" ||
-          "${action%%_*}_${_name}" "${extension_args[@]}"
-      done
-
+      extension_action_prerequisites
       action_call "${action}" "${extension_args[@]}"
       ;;
 
@@ -394,13 +415,7 @@ extension_run()
       _namespaces=${_path##${extension_actions_path}}
       extension_modules_load ${_namespaces//\// }
 
-      action=${action%%(*}
-      for _name in initialize cli
-      do
-        ! command_exists "${action%%_*}_${_name}" ||
-          "${action%%_*}_${_name}" "${extension_args[@]}"
-      done
-
+      extension_action_prerequisites
       action_source "${_path}/${action}" "${extension_args[@]}"
       ;;
 
@@ -422,7 +437,7 @@ extension_run()
       fail "Processing ${action} failed; file type is unknown, file does not exist, or file is not executable."
       ;;
     binary|*)
-      "${_path}/${action}" ${extension_action} ${extension_args[*]}
+      "${_path}/${action}" ${extension_action} "${extension_args[@]}"
       ;;
   esac
 }
