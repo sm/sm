@@ -311,28 +311,20 @@ service_setup()
     source_files "${extension_path}/modules/shell/${_file}"
   done
 
-  # Notify the user that we are now creating paths for the service/version.
   log "Ensuring paths for ${service} ${package_version} exist..."
 
-  # If the user is root
   if user_is_root
   then
-    # Create the service_user on the system if it is missing, with the
-    # same group as the name.
-    # ##### TODO: create an 'user_exists' function and use it here.
+    # TODO: create an 'user_exists' function and use it here.
     user_create_if_missing "${service_user}" with group "${service_user}" >/dev/null 2>&1
 
-    # Create the paths for the service_root_paths if they do not exist.
     ensure_paths_exist "${service_root_paths[@]}"
 
-    # Ensure that the service_user has ownership of the root serivce paths.
     chown_paths --recursively "${service_user}:${service_user}" "${service_root_paths[@]}"
   fi
 
-  # Create the paths for the service/version if they do not exist.
   ensure_paths_exist "${service_paths[@]}" "${install_path}"
 
-  # Ensure that the service_user has ownership of the serivce paths.
   for _path in "${service_paths[@]}"
   do
     if variable_is_nonempty _path
@@ -347,12 +339,8 @@ service_setup()
     fi
   done
 
-  if command_exists "${service}_service_setup"
-  then
-    "${service}_service_setup"
-  fi
+  ! command_exists "${service}_service_setup" || "${service}_service_setup"
 
-  # Install the service init.d scripts.
   service_install_init_d "${service}"
 }
 
@@ -433,23 +421,14 @@ service_uninstall()
 #
 service_start()
 {
-  # If the service variable is nonempty
-  if variable_is_nonempty service
-  then
-    # If the service extension has defined a start method prefixed with the
-    # service's name
-    if command_exists "${service}_start"
-    then
-      # Call the extension-defined service start function.
-      "${service}_start"
-    else
-      # Start the service using the configuration defined in the extension.
-      service_init_start
-    fi
-  else
-    # Otherwise, the service name variable was not set. This is a programming
-    # error; fail with a message and a backtrace to help with debugging.
+  variable_is_nonempty service ||
     fail "To start a service, you must set the 'service' variable."
+
+  if command_exists "${service}_start"
+  then
+    "${service}_start"
+  else
+    service_init_start
   fi
 }
 
@@ -487,23 +466,14 @@ service_start()
 #
 service_stop()
 {
-  # If the service variable is nonempty
-  if variable_is_nonempty service
-  then
-    # If the service extension has defined a start method prefixed with the
-    # service's name
-    if command_exists "${service}_stop"
-    then
-      # Call the extension-defined service stop function.
-      "${service}_stop"
-    else
-      # Stop the service using the configuration defined in the extension.
-      service_init_stop
-    fi
-  else
-    # Otherwise, the service name variable was not set. This is a programming
-    # error; fail with a message and a backtrace to help with debugging.
+  variable_is_nonempty service ||
     fail "To start a service, you must set the 'service' variable."
+
+  if command_exists "${service}_stop"
+  then
+    "${service}_stop"
+  else
+    service_init_stop
   fi
 }
 
@@ -541,23 +511,14 @@ service_stop()
 #
 service_reload()
 {
-  # If the service variable is nonempty
-  if variable_is_nonempty service
-  then
-    # If the service extension has defined a reload method prefixed with the
-    # service's name
-    if command_exists "${service}_reload"
-    then
-      # Call the extension-defined service reload function.
-      "${service}_reload"
-    else
-      # Reload the service using the configuration defined in the extension.
-      service_init_reload
-    fi
-  else
-    # Otherwise the service name variable was not set. This is a programming
-    # error; fail with a message and a backtrace to help with debugging.
+  variable_is_nonempty service ||
     fail "To start a service, you must set the 'service' variable."
+
+  if command_exists "${service}_reload"
+  then
+    "${service}_reload"
+  else
+    service_init_reload
   fi
 }
 
@@ -595,23 +556,14 @@ service_reload()
 #
 service_restart()
 {
-  # If the service variable is nonempty
-  if variable_is_nonempty service
-  then
-    # If the service extension has defined a restart method prefixed with the
-    # service's name
-    if command_exists "${service}_restart"
-    then
-      # Call the extension-defined service restart function.
-      "${service}_restart"
-    else
-      # Restart the service using the configuration defined in the extension.
-      service_init_restart
-    fi
-  else
-    # Otherwise the service name variable was not set. This is a programming
-    # error; fail with a message and a backtrace to help with debugging.
+  variable_is_nonempty service ||
     fail "To start a service, you must set the 'service' variable."
+
+  if command_exists "${service}_restart"
+  then
+    "${service}_restart"
+  else
+    service_init_restart
   fi
 }
 
@@ -649,23 +601,14 @@ service_restart()
 #
 service_status()
 {
-  # If the service variable is nonempty
-  if variable_is_nonempty service
-  then
-    # If the service extension has defined a status method prefixed with the
-    # service's name
-    if command_exists "${service}_status"
-    then
-      # Call the extension-defined service status function.
-      "${service}_status"
-    else
-      # Status the service using the configuration defined in the extension.
-      service_init_status
-    fi
-  else
-    # Otherwise, the service name variable was not set. This is a programming
-    # error; fail with a message and a backtrace to help with debugging.
+  variable_is_nonempty service ||
     fail "To start a service, you must set the 'service' variable."
+
+  if command_exists "${service}_status"
+  then
+    "${service}_status"
+  else
+    service_init_status
   fi
 }
 
@@ -703,23 +646,14 @@ service_status()
 #
 service_logtail()
 {
-  # If the service variable is nonempty
-  if variable_is_nonempty service
-  then
-    # If the service extension has defined a logtail method prefixed with the
-    # service's name
-    if command_exists "${service}_logtail"
-    then
-      # Call the extension-defined service logtail function.
-      "${service}_logtail"
-    else
-      # logtail the service using the configuration defined in the extension.
-      service_init_logtail
-    fi
-  else
-    # Otherwise, the service name variable was not set. This is a programming
-    # error; fail with a message and a backtrace to help with debugging.
+  variable_is_nonempty service ||
     fail "To start a service, you must set the 'service' variable."
+
+  if command_exists "${service}_logtail"
+  then
+    "${service}_logtail"
+  else
+    service_init_logtail
   fi
 }
 
@@ -757,23 +691,14 @@ service_logtail()
 #
 service_info()
 {
-  # If the service variable is nonempty
-  if variable_is_nonempty service
-  then
-    # If the service extension has defined a info method prefixed with the
-    # service's name
-    if command_exists "${service}_info"
-    then
-      # Call the extension-defined service info function.
-      "${service}_info"
-    else
-      # Info the service using the configuration defined in the extension.
-      service_init_info
-    fi
-  else
-    # Otherwise, the service name variable was not set. This is a programming
-    # error; fail with a message and a backtrace to help with debugging.
+  variable_is_nonempty service ||
     fail "In order to get info on a service, the 'service' variable must be set."
+
+  if command_exists "${service}_info"
+  then
+    "${service}_info"
+  else
+    service_init_info
   fi
 }
 
@@ -811,23 +736,14 @@ service_info()
 #
 service_configcheck()
 {
-  # If the service variable is nonempty
-  if variable_is_nonempty service
-  then
-    # If the service extension has defined a configcheck method prefixed with the
-    # service's name
-    if command_exists "${service}_configcheck"
-    then
-      # Call the extension-defined service configcheck function.
-      "${service}_configcheck"
-    else
-      # configcheck the service using the configuration defined in the extension.
-      service_init_configcheck
-    fi
-  else
-    # Otherwise, the service name variable was not set. This is a programming
-    # error; fail with a message and a backtrace to help with debugging.
+  variable_is_nonempty service ||
     fail "To configcheck a service, the 'service' variable must be set."
+
+  if command_exists "${service}_configcheck"
+  then
+    "${service}_configcheck"
+  else
+    service_init_configcheck
   fi
 }
 
