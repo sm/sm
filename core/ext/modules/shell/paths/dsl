@@ -34,6 +34,8 @@
 #
 ensure_paths_exist()
 {
+  trace_filter filesystem
+
   # Declare the path and paths variables; set the files variable to an array
   # containing all of the parameters passed in.
   local _path _paths=("$@")

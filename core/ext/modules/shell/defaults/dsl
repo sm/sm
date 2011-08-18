@@ -49,6 +49,8 @@
 #
 read_default()
 {
+  trace_filter read_config
+
   local key token _args=() _extension=${extension}
 
   key="${1:-}"
@@ -75,6 +77,8 @@ read_default()
 
 read_config()
 {
+  trace_filter read_config
+
   local key variable token value prefix _file _temp
 
   _extension="${1:-}"
