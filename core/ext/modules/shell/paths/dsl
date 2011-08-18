@@ -119,6 +119,7 @@ ensure_paths_exist()
 #     user$ {{ demonstrate the results}}
 remove_paths()
 {
+  trace_filter filesystem
   # Declare the path and paths variables; set the files variable to an array
   # containing all of the parameters passed in.
   local _path _paths=("$@")
@@ -218,6 +219,7 @@ remove_paths()
 #
 move_directory()
 {
+  trace_filter filesystem
   local _source _target _mode _owner
 
   while (( $# > 0 ))
@@ -314,6 +316,7 @@ move_directory()
 #
 copy_paths()
 {
+  trace_filter filesystem
   local _target _directory _force_flag=0 _directories=()
 
   while (( $# > 0 ))
@@ -392,6 +395,7 @@ copy_paths()
 #
 copy_directory()
 {
+  trace_filter filesystem
   local _source _target
 
   while (( $# > 0 ))
@@ -461,6 +465,7 @@ copy_directory()
 #
 chown_paths()
 {
+  trace_filter filesystem
   local _identity="${1:-}" _path _recursive_flag=0 _command _flags=()
 
   if [[ "${1:-}" == --recursive* ]]
@@ -523,6 +528,7 @@ chown_paths()
 #
 chmod_paths()
 {
+  trace_filter filesystem
   local _permissions="${1:-}" _path _recursive_flag=0 _command _flags=()
 
   if [[ "${1:-}" == "--recursive" ]]
@@ -588,6 +594,7 @@ chmod_paths()
 #
 enter()
 {
+  trace_filter filesystem
   local _path="${1:-}"
   shift || fail "Cannot enter path; No path was given."
 
@@ -637,6 +644,7 @@ enter()
 #
 path_exists()
 {
+  trace_filter filesystem
   local _path="${1:-}"
   shift || fail "$FUNCNAME: Cannot check if path exists; No name/path was given."
   [[ -d "$_path" ]]
@@ -649,6 +657,7 @@ path_exists()
 #
 path_join()
 {
+  trace_filter filesystem
   local IFS='/'
   printf "$*"
 }
@@ -686,6 +695,7 @@ path_join()
 #     user$ {{ demonstrate the results}}
 directories_in()
 {
+  trace_filter filesystem
   local _path="${1:-}"
   shift || fail "$FUNCNAME: Directory name/path was not given!"
 
@@ -700,6 +710,7 @@ directories_in()
 #
 directories_in_matching()
 {
+  trace_filter filesystem
   local _pattern _path="${1:-}"
   shift     || fail "$FUNCNAME: Directory name/path was not given!"
   [[ -d "${_path}" ]]    || fail "$FUNCNAME: '${_path}' is not a directory!"
@@ -716,6 +727,7 @@ directories_in_matching()
 #
 directories_under()
 {
+  trace_filter filesystem
   local _path="${1:-}"
   shift  || fail "$FUNCNAME: Directory name/path was not given!"
 
@@ -730,6 +742,7 @@ directories_under()
 #
 directories_under_matching()
 {
+  trace_filter filesystem
   local _path="${1:-}"
   shift || fail "$FUNCNAME: Directory name/path was not given as the first parameter."
 
@@ -775,6 +788,7 @@ directories_under_matching()
 #
 full_path()
 {
+  trace_filter filesystem
   local _path="$1"
   shift || fail "$FUNCNAME: Cannot go to path; No path was given."
   [[ -d "${_path}" ]] || fail "$FUNCNAME: Path '${_path}' does not exist."

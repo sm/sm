@@ -36,6 +36,7 @@
 #
 first()
 {
+  trace_filter variables
   local _array=("$@")
 
   # If the array is nonempty, print the first element out.
@@ -84,6 +85,7 @@ first()
 #
 last()
 {
+  trace_filter variables
   # Store the parameters in an array variable
   local _array=("$@")
 
@@ -136,6 +138,7 @@ last()
 #
 match()
 {
+  trace_filter variables
   local _value="${1:-}"
   shift || fail "A value and regex must be specified in order to match."
 
@@ -197,6 +200,7 @@ match()
 #
 ematch()
 {
+  trace_filter variables
   local _value="${1:-}"
   shift || fail "A value and regex must be specified in order to match."
 
@@ -265,6 +269,7 @@ ematch()
 #
 variables_must_be_nonempty()
 {
+  trace_filter variables
   local _variable _variables=("$@")
 
   (( ${#_variables[@]} > 0 )) ||
@@ -315,6 +320,7 @@ variables_must_be_nonempty()
 #
 variable_is_nonempty()
 {
+  trace_filter variables
   local _variable="${1:-}"
 
   shift || fail "Cannot check if variable is nonempty; no variable was given."
@@ -360,6 +366,7 @@ variable_is_nonempty()
 #
 variable_is_empty()
 {
+  trace_filter variables
   local _variable="${1:-}"
   shift || fail "Cannot check if variable is empty, as no variable was given."
 
@@ -413,6 +420,7 @@ variable_is_empty()
 #
 variables_are_nonempty()
 {
+  trace_filter variables
   # Store the parameters, which should be the variable names, in the
   # variables variable.
   local _variable _variables=("$@")

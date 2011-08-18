@@ -36,6 +36,7 @@
 # ### Code Walkthrough
 source_files()
 {
+  trace_filter filesystem
   # Declare the file and files variables; set the files variable to an array
   # containing all of the parameters passed in.
   local _file _files=("$@")
@@ -112,6 +113,7 @@ source_files()
 #
 nonempty_files()
 {
+  trace_filter filesystem
   # Declare the file and files variables, set the files variable to an array
   # containing all of the parameters passed in.
   local _file _files=("$@")
@@ -178,6 +180,7 @@ nonempty_files()
 #
 remove_files()
 {
+  trace_filter filesystem
   # TODO: add from parameter to remove_files
 
   local _file _files=("$@")
@@ -253,6 +256,7 @@ remove_files()
 #
 remove()
 {
+  trace_filter filesystem
   # Declare the entry and entries variables; set the entries variable to an
   # array containing all of the parameters passed in.
   local _entity _entities=("$@")
@@ -315,6 +319,7 @@ remove()
 #
 ensure_files_exist()
 {
+  trace_filter filesystem
   local _file _path _files=("$@")
   shift || fail "Cannot ensure files exist; No files were given."
 
@@ -382,6 +387,7 @@ ensure_files_exist()
 #       make this into make_files_executable or some such
 ensure_files_are_executable()
 {
+  trace_filter filesystem
   # Declare the file, files and path variables, set the files variable to an
   # array containing all of the parameters passed in.
   local _file _path _files=("$@")
@@ -463,6 +469,7 @@ ensure_files_are_executable()
 #
 link()
 {
+  trace_filter filesystem
   local token _source _target _force_flag=0 _path
 
   # While the parameters list is nonempty:
@@ -555,7 +562,7 @@ link()
 # ### Code Walkthrough
 move_file()
 {
-  trace_filter move_file
+  trace_filter filesystem
 
   local _source _target _mode _owner token
 
@@ -656,6 +663,7 @@ move_file()
 #
 copy_file()
 {
+  trace_filter filesystem
   local _source _target _flags=() _force_flag
 
   while (( $# > 0 ))
@@ -754,6 +762,7 @@ copy_file()
 #
 copy_files()
 {
+  trace_filter filesystem
   local _source _target _file _force_flag=0 _files=()
 
   while (( $# > 0 ))
@@ -846,6 +855,7 @@ copy_files()
 # ### Code Walkthrough
 move_files()
 {
+  trace_filter filesystem
   local _source _target _file _force_flag=0 _files=() _if_exists_flag=0
 
   while (( $# > 0 ))
@@ -935,6 +945,7 @@ move_files()
 #
 chown_files()
 {
+  trace_filter filesystem
   local _identity _file _flags=()
 
   while (( $# > 0 ))
@@ -1006,6 +1017,7 @@ chown_files()
 #
 chmod_files()
 {
+  trace_filter filesystem
   local _permissions="${1:-}" _file _command
   shift || fail "$FUNCNAME: Cannot chmod files; user[:group] was not given as the first parameter"
   local _files=("$@") # Set the files array to the remaining parameters.
@@ -1061,6 +1073,7 @@ chmod_files()
 #
 hash_file()
 {
+  trace_filter filesystem
   local _message _key _value _file="${1:-}"
   shift || fail "$FUNCNAME: File path/name not given.\n"\
   " => Usage: $0 <filename> <key> [value]"
@@ -1138,6 +1151,7 @@ hash_file()
 #
 file_is_executable()
 {
+  trace_filter filesystem
   local _file="${1:-}"
 
   [[ -n "${_file}" ]] ||
@@ -1184,6 +1198,7 @@ file_is_executable()
 #
 file_exists()
 {
+  trace_filter filesystem
   local _file="${1:-}"
   shift || fail "Cannot check to see if a file exists; No name/path was given."
   [[ -f "${_file}" ]]
@@ -1227,6 +1242,7 @@ file_exists()
 #
 file_does_not_exist()
 {
+  trace_filter filesystem
   local _file="${1:-}"
   [[ -n "${_file}" ]] ||
     fail "Cannot check to see if a file exists; No file name/path was given."
@@ -1272,6 +1288,7 @@ file_does_not_exist()
 #
 file_is_nonempty()
 {
+  trace_filter filesystem
   local _file="${1:-}"
 
   [[ -n "${_file}" ]] ||
@@ -1323,6 +1340,7 @@ file_is_nonempty()
 #
 file_is_empty()
 {
+  trace_filter filesystem
   local _file="${1:-}"
 
   [[ -n "${_file}" ]] ||
@@ -1369,6 +1387,7 @@ file_is_empty()
 #
 file_is_missing()
 {
+  trace_filter filesystem
   local _file="${1:-}"
 
   [[ -n "${_file}" ]] ||
@@ -1415,6 +1434,7 @@ file_is_missing()
 #
 file_is_empty_or_missing()
 {
+  trace_filter filesystem
   local _file="${1:-}"
 
   [[ -n "${_file}" ]] ||
@@ -1469,6 +1489,7 @@ file_is_empty_or_missing()
 #
 file_contains()
 {
+  trace_filter filesystem
   local _file="${1:-}" _message
   shift || fail "$FUNCNAME: File path/name must be given."
 
@@ -1519,6 +1540,7 @@ file_contains()
 #
 symlink_exists()
 {
+  trace_filter filesystem
   local _file="${1:-}"
   shift || fail "Cannot check if symlink exists; no path was given."
   [[ -L "${_file}" ]]
@@ -1557,6 +1579,7 @@ symlink_exists()
 #     user$ {{ demonstrate the results}}
 files_in()
 {
+  trace_filter filesystem
   local _path="${1:-}"
   shift || fail "$FUNCNAME: Directory name/path was not given!"
   [[ -d "${_path}" ]] || fail "'${_path}' is not a directory!"
@@ -1597,6 +1620,7 @@ files_in()
 #     user$ {{ demonstrate the results}}
 files_under()
 {
+  trace_filter filesystem
   local _path="${1:-}"
   shift || fail "$FUNCNAME: Directory name/path was not given!"
 
@@ -1638,6 +1662,7 @@ files_under()
 #
 files_in_path_matching()
 {
+  trace_filter filesystem
   local _path="${1:-}"
   shift || fail "$FUNCNAME: Path was not given as the first parameter."
 
@@ -1692,6 +1717,7 @@ files_in_path_matching()
 #
 replace_content()
 {
+  trace_filter filesystem
   local _token _pattern _content _file _message
 
   while (( $# > 0 ))
@@ -1775,6 +1801,7 @@ replace_content()
 #
 file_matches_md5()
 {
+  trace_filter filesystem
   local _file="$1" _md5="$2" _file_md5
   shift || fail "Cannot determine if file matches MD5; no file was given."
   shift || fail "Cannot determine if file matches MD5; no MD5 was given."
@@ -1793,6 +1820,7 @@ file_matches_md5()
 #
 file_md5()
 {
+  trace_filter filesystem
   local _file="${1:-}" _command _md5
 
   [[ -n "${_file}" ]] ||
@@ -1859,6 +1887,7 @@ file_md5()
 #
 write()
 {
+  trace_filter filesystem
   local _token _file _message _append_flag=0 _user="" _prefix=""
 
   while (( $# > 0 ))
