@@ -607,31 +607,23 @@ ensure_files_are_executable()
 
   for _file in "${_files[@]}"
   do
-    if path_exists "${_file}"
-    then
+    ! path_exists "${_file}" ||
       fail "Cannot make the file '${_file}' executable,"\
-        "as it is unexpectedly a directory."
-    elif ! file_exists "${_file}"
-    then
-      fail "Cannot make the file '${_file}' executable,"\
-        " as the file does not exist."
-    else
-      _path="${_file%\/*}"
+      "as it is unexpectedly a directory."
 
-      if variable_is_nonempty _path && path_exists "${_path}"
-      then
-        if chmod +x "${_file}"
-        then
-          continue
-        else
-          fail "Could not make the file '${_file}' executable,"\
-            "as the 'chmod +x' command failed with error code '$?'."
-        fi
-      else
-        fail "Cannot make the file '${_file} executable,"\
-          " as '${_path}' does not even exist."
-      fi
-    fi
+    file_exists "${_file}" ||
+      fail "Cannot make the file '${_file}' executable,"\
+      " as the file does not exist."
+
+    _path="${_file%\/*}"
+
+    variable_is_nonempty _path && path_exists "${_path}" ||
+      fail "Cannot make the file '${_file} executable,"\
+      " as '${_path}' does not even exist."
+
+    chmod +x "${_file}" ||
+      fail "Could not make the file '${_file}' executable,"\
+      "as the 'chmod +x' command failed with error code '$?'."
   done
 }
 
@@ -672,8 +664,6 @@ ensure_files_are_executable()
 #
 link()
 {
-  # Declare the token, source, target and force_flag variables.
-  # Default force_flag to 0.
   local token _source _target _force_flag=0 _path
 
   # While the parameters list is nonempty:
@@ -688,20 +678,20 @@ link()
     case "${token}" in
       # If the token is 'to', then assign the next parameter to the target
       # variable, and remove the first parameter from the parameters list.
-      to)
+      (to)
         _target="${1}"
-        shift
+        shift || fail "$FUNCNAME: Target path must be provided after keyword 'to'"
         ;;
 
       # If the token is 'from', then assign the first parameter to the source
       # variable  and remove the first parameter from the parameters list.
-      from)
+      (from)
         _source="${1}"
-        shift
+        shift || fail "$FUNCNAME: Source path must be provided after keyword 'from'"
         ;;
 
       # If the token is '--force' then set the force flag to 1
-      --force)
+      (--force|force)
         _force_flag=1
         ;;
 
@@ -709,7 +699,7 @@ link()
       # the token to the source variable; otherwise if the source variable is
       # set but the target variable is empty, then assign the token to the target
       # variable.
-      *)
+      (*)
         if variable_is_empty _source
         then
           _source="$token"
@@ -722,41 +712,25 @@ link()
     esac
   done
 
-  # If force_flag is 1, remove the target from the filesystem.
   (( _force_flag == 0 )) || remove "${_target}"
 
-  # TODO: What should we do if files already exist?
-  # If target exists, and is a file, then this is a system or programming error.
-  # Fail, yielding a message with a backtrace which can be used to debug.
-  if file_exists "${_target}"
-  then
+  ! file_exists "${_target}" ||
     fail "Cannot link ${_source} to ${_target}, as it exists and is a file!"
 
-  # If target exists, and is a directory, then this is a system/programming error.
-  # Fail, yielding a message with a backtrace which can be used to debug.
-  elif path_exists "${_target}"
-  then
+  ! path_exists "${_target}" ||
     fail "Cannot link ${_source} to ${_target}, as it exists and is a directory"
 
-  else
-    # If the target's base path is nonempty, then ensure that it exists.
-    _path="${_target%\/*}"
-    if variable_is_nonempty _path
-    then
-      ensure_paths_exist "${_path}"
-    fi
+  # If the target's base path is nonempty, then ensure that it exists.
+  _path="${_target%\/*}"
 
-    # Try to create a symbolic link from the source to the target.
-    # If it failed to create a symbolic link from the source to the target,
-    # fail, yielding a message with a backtrace which can be used to debug.
-    if ln -fs "${_source}" "${_target}"
-    then
-      return 0
-    else
-      fail "Failed to create a symbolic link from '${_source}' to '${_target}',"\
-        "as the 'ln -fs' command failed with error code '$?'."
-    fi
-  fi
+  variable_is_empty _path || ensure_paths_exist "${_path}"
+
+  # Try to create a symbolic link from the source to the target.
+  # If it failed to create a symbolic link from the source to the target,
+  # fail, yielding a message with a backtrace which can be used to debug.
+  ln -fs "${_source}" "${_target}" ||
+    fail "Failed to create a symbolic link from '${_source}' to '${_target}',"\
+    "as the 'ln -fs' command failed with error code '$?'."
 }
 
 #
@@ -2194,9 +2168,7 @@ file_is_executable()
 file_exists()
 {
   local _file="${1:-}"
-  [[ -n "${_file}" ]] ||
-    fail "Cannot check to see if a file exists, as no file name/path was given."
-
+  shift || fail "Cannot check to see if a file exists; No name/path was given."
   [[ -f "${_file}" ]]
 }
 
