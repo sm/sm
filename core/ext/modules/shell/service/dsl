@@ -113,12 +113,6 @@ service_initialize()
   export PATH="/bin:/usr/bin:${prefix_path}/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin:${PATH}"
 
   service_initialized=1
-
-  if command_exists "${extension}_initialize"
-  then
-    "${extension}_initialize"
-  fi
-
 }
 
 #

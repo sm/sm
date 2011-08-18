@@ -382,11 +382,6 @@ package_initialize()
   extension_patches_path="${extension_path}/patches"
 
   package_initialized=1
-
-  if command_exists "${extension}_initialize"
-  then
-    "${extension}_initialize"
-  fi
 }
 
 #
