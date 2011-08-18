@@ -38,6 +38,7 @@
 #
 command_exists()
 {
+  trace_filter environment
   local _name="${1:-}"
 
   if variable_is_nonempty _name
@@ -95,6 +96,7 @@ command_exists()
 #
 is_a_function()
 {
+  trace_filter environment
   local _name="${1:-}"
 
   if variable_is_nonempty _name
