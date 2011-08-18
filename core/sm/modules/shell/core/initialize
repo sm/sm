@@ -131,7 +131,7 @@ then
   case "${extension_args[0]}" in
     */*|*,*)
       #TODO: deprecated by SMP
-      modules ext/array ext/system
+      modules ext/array ext/os
       array_shift extension_args extensions
       sequential=(${extensions//,/ })
       for sequence in "${sequential[@]}"
