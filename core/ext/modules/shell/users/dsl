@@ -33,6 +33,7 @@
 # ### Code Walkthrough
 user_create_if_missing()
 {
+  trace_filter users
   # Declare the token, group and user variables.
   local _token _group _user
   # parse arguments
@@ -112,7 +113,7 @@ user_create_if_missing()
           groupadd -f "$_group"
         fi
 
-        useradd -g "${_user}" "${_user}"
+        useradd -g "${_user}" "${_user}" #TODO: add system users only !
         usermod -d "${data_path%\/*}" "${_user}"
         usermod -s /bin/bash "${_user}"
       ;;
@@ -181,6 +182,7 @@ user_create_if_missing()
 # ### Code Walkthrough
 user_delete()
 {
+  trace_filter users
   # #### TODO: Finish documenting this function
   # Declare local variables for token and group
   local _token _user
@@ -318,12 +320,7 @@ user_delete()
 user_is_root()
 {
   # If the user is root (id is 0) then return true, 0; otherwise, return false, 1.
-  if (( UID == 0 ))
-  then
-    return 0
-  else
-    return 1
-  fi
+  (( UID == 0 ))
 }
 
 #
@@ -366,12 +363,7 @@ user_is_root()
 user_is_not_root()
 {
   # If the user is not root (id > 0), return true, 0 otherwise return false, 1
-  if (( UID != 0 ))
-  then
-    return 0
-  else
-    return 1
-  fi
+  (( UID ))
 }
 
 #
@@ -487,6 +479,7 @@ user_must_not_be_root()
 # ### Code Walkthrough
 user_run_as()
 {
+  trace_filter users
   local _user="$1"
 
   variable_is_nonempty _user ||
@@ -497,12 +490,7 @@ user_run_as()
   # Run the given command as the user, with a nonlogin shell.
   # If the command completed successfully, return true, 0. Otherwise,
   # the command did not complete successfully, so return false, 1.
-  if su "${_user}" -c "$*"
-  then
-    return 0
-  else
-    return 1
-  fi
+  su "${_user}" -c "$*"
 }
 
 #
@@ -545,10 +533,5 @@ user_run_as_login()
   # Run the given command as the user, with a login shell.
   # If the command completed successfully, return true, 0. Otherwise the
   # command did not complete successfully; return false, 1.
-  if su - "${_user}" -c "$*"
-  then
-    return 0
-  else
-    return 1
-  fi
+  su - "${_user}" -c "$*"
 }
