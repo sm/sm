@@ -2160,8 +2160,7 @@ symlink_exists()
 path_exists()
 {
   local _path="${1:-}"
-  shift && [[ -L "${_path}" ]] ||
-    fail "Cannot check if path exists, as no name/path was given."
+  shift || fail "$FUNCNAME: Cannot check if path exists; No name/path was given."
 
   [[ -d "$_path" ]]
 }
@@ -2684,9 +2683,9 @@ write()
 full_path()
 {
   local _path="$1"
-  shift || fail "Cannot go to path; No path was given."
+  shift || fail "$FUNCNAME: Cannot go to path; No path was given."
 
-  path_exists "${_path}" || fail "Path '${_path}' does not exists."
+  path_exists "${_path}" || fail "$FUNCNAME: Path '${_path}' does not exist."
 
   (
   builtin cd "${_path}"
