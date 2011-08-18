@@ -8,6 +8,14 @@ string_contains()
   [[ " $1 " =~ " $2 " ]]
 }
 
+# ## string\_contains()
+# Validate if second string is key in first string.
+# Return 0 if found.
+string_contains_key()
+{
+  [[ " $1 " =~ " $2=" ]]
+}
+
 # ## string\_append()
 # Append second string to first string if not already present.
 # Prints new string.
