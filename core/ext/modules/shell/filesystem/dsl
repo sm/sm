@@ -201,15 +201,19 @@ ensure_paths_exist()
 
   for _path in "${_paths[@]}"
   do
-    if path_exists "${_path}" ||
-      symlink_exists "${_path}" && path_exists "$(readlink "${_path}")"
+    if path_exists "${_path}"
     then
       continue
     else
       if file_exists "${_path}"
       then
-        warn "Could not ensure path '${_path}' exists"\
-          " as a directory, as it is a file."
+        if [[ -L "${_path}" ]] && [[ -d "$(readlink "${_path}")" ]]
+        then
+          continue
+        else
+          warn "Could not ensure path '${_path}' exists"\
+            " as a directory, as it is a file."
+        fi
       else
         mkdir -p "${_path}" ||
           fail "Could not create the path '${_path}',"\
@@ -2772,7 +2776,7 @@ path_exists()
 {
   local _path="${1:-}"
 
-  if [[ -n "${_path}" ]] || [[ -L "${_path}" ]]
+  if [[ -n "${_path}" || -L "${_path}" ]]
   then
     [[ -d "$_path" ]]
   else

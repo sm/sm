@@ -20,7 +20,8 @@ prepare_for_installation()
     _path="${install_path}/${directory}"
     if path_exists "${_path}"
     then
-      log_step "Removing old sm component path (${_path})" rm -rf "${_path}"
+      log_step "Removing old sm component path (${_path})"\
+        rm -rf "${_path}"
     fi
   done
 
