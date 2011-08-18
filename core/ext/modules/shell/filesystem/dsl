@@ -196,32 +196,31 @@ ensure_paths_exist()
   #
   # If no files were given, this indicates a programming error.
   # Fail, yielding a message with a backtrace which can be used to debug.
-  if array_is_nonempty _paths
-  then
-    for _path in "${_paths[@]}"
-    do
-      if path_exists "${_path}"
+  array_is_nonempty _paths ||
+    fail "Cannot ensure paths exist, as no paths were given."
+
+  for _path in "${_paths[@]}"
+  do
+    if path_exists "${_path}" ||
+      symlink_exists "${_path}" && path_exists "$(readlink "${_path}")"
+    then
+      continue
+    else
+      if file_exists "${_path}"
       then
-        continue
+        warn "Could not ensure path '${_path}' exists"\
+          " as a directory, as it is a file."
       else
-        if file_exists "${_path}"
+        if mkdir -p "${_path}"
         then
-          warn "Could not ensure path '${_path}' exists"\
-            " as a directory, as it is a file."
+          continue
         else
-          if mkdir -p "${_path}"
-          then
-            continue
-          else
-            fail "Could not create the path '${_path}',"\
-              "as the 'mkdir' command failed with error code '$?'."
-          fi
+          fail "Could not create the path '${_path}',"\
+            "as the 'mkdir' command failed with error code '$?'."
         fi
       fi
-    done
-  else
-    fail "Cannot ensure paths exist, as no paths were given."
-  fi
+    fi
+  done
 }
 
 #

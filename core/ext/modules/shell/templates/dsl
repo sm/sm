@@ -175,6 +175,7 @@ install_template()
   # If mode variable is not empty then change the file mode of the target.
   # If owner variable is not empty then change the owner of the target
   ensure_paths_exist "$(dirname "${_target}")"
+
   if path_exists "${_target}"
   then
     if path_exists "${_target}/${_name}"
