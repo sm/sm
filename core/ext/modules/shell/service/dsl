@@ -304,6 +304,8 @@ services_available()
 #
 service_setup()
 {
+  service_initialize
+
   local _path _file
 
   for _file in dsl initialize cli
