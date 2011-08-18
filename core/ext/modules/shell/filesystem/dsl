@@ -211,13 +211,10 @@ ensure_paths_exist()
         warn "Could not ensure path '${_path}' exists"\
           " as a directory, as it is a file."
       else
-        if mkdir -p "${_path}"
-        then
-          continue
-        else
+        mkdir -p "${_path}" ||
           fail "Could not create the path '${_path}',"\
             "as the 'mkdir' command failed with error code '$?'."
-        fi
+        continue
       fi
     fi
   done
@@ -276,30 +273,28 @@ remove_files()
   #
   # If the files array is empty, this is a programming error.
   # Fail, yielding a message with a backtrace which can be used to debug.
-  if array_is_nonempty _files
-  then
-    for _file in "${_files[@]}"
-    do
-      if [[ -f "${_file}" || -L "${_file}" ]]
-      then
-        rm -f "${_file}"
-
-      elif [[ -d "${_file}" ]]
-      then
-        fail "Cannot remove the file ${_file}, as it is a directory."
-
-      elif [[ -e "${_file}" ]]
-      then
-        fail "Failed to remove the file from the filesystem, "\
-          "as the file exists as an unknown/unhandled filesystem entity type:"\
-          "$(file "${_file}")."
-      else
-        return 0
-      fi
-    done
-  else
+  array_is_nonempty _files ||
     fail "Cannot remove files, as no files were given to remove."
-  fi
+
+  for _file in "${_files[@]}"
+  do
+    if [[ -f "${_file}" || -L "${_file}" ]]
+    then
+      rm -f "${_file}"
+
+    elif [[ -d "${_file}" ]]
+    then
+      fail "Cannot remove the file ${_file}, as it is a directory."
+
+    elif [[ -e "${_file}" ]]
+    then
+      fail "Failed to remove the file from the filesystem, "\
+        "as the file exists as an unknown/unhandled filesystem entity type:"\
+        "$(file "${_file}")."
+    else
+      return 0
+    fi
+  done
 }
 
 #
@@ -353,27 +348,20 @@ remove()
   #
   # If the entities array is empty, this is a programming error.
   # Fail, yielding a message with a backtrace which can be used to debug.
-  if array_is_nonempty _entities
-  then
-    for _entity in "${_entities[@]}"
-    do
-      if [[ -e "${_entity}" ]]
-      then
-        if rm -rf "${_entity}"
-        then
-          continue
-        else
-          fail "Could not remove the entity '${_entity}',"\
-            "as the 'rm' command failed with error code '$?'."
-        fi
-      else
-        continue
-      fi
-    done
-  else
+  array_is_nonempty _entities ||
     fail "Cannot remove entities, as no filesystem entities were given "\
       "as parameters."
-  fi
+
+  for _entity in "${_entities[@]}"
+  do
+    if [[ -e "${_entity}" ]]
+    then
+      rm -rf "${_entity}" ||
+        fail "Could not remove the entity '${_entity}',"\
+          "as the 'rm' command failed with error code '$?'."
+
+    fi
+  done
 }
 
 #
@@ -442,42 +430,40 @@ remove_paths()
   #
   # If no paths were given, this is a programming error; fail, giving
   # developers an error message with a backtrace for debugging.
-  if array_is_nonempty _paths
-  then
-    for _path in "${_paths[@]}"
-    do
-      if [[ -L "${_path}" ]]
-      then
-        if rm -f "${_path}"
-        then
-          removed_paths+=("${_path}")
-          continue
-        else
-          fail "Could not remove the entity '${_entity}',"\
-            "as the 'rm' command failed with error code '$?'."
-        fi
-      elif [[ -d "${_path}" ]]
-      then
-        if rm -rf "${_path}"
-        then
-          removed_paths+=("${_path}")
-          continue
-        else
-          fail "Could not remove the entity '${_entity}',"\
-            "as the 'rm' command failed with error code '$?'."
-        fi
-      elif [[ -e "${_path}" ]]
-      then
-        fail "Cannot remove the path '${_path}', as it is a file."
-
-      else
-        nonexistant_paths+=("${_path}")
-        continue
-      fi
-    done
-  else
+  array_is_nonempty _paths ||
     fail "Cannot remove paths, as no paths were given."
-  fi
+
+  for _path in "${_paths[@]}"
+  do
+    if [[ -L "${_path}" ]]
+    then
+      if rm -f "${_path}"
+      then
+        removed_paths+=("${_path}")
+        continue
+      else
+        fail "Could not remove the entity '${_entity}',"\
+          "as the 'rm' command failed with error code '$?'."
+      fi
+    elif [[ -d "${_path}" ]]
+    then
+      if rm -rf "${_path}"
+      then
+        removed_paths+=("${_path}")
+        continue
+      else
+        fail "Could not remove the entity '${_entity}',"\
+          "as the 'rm' command failed with error code '$?'."
+      fi
+    elif [[ -e "${_path}" ]]
+    then
+      fail "Cannot remove the path '${_path}', as it is a file."
+
+    else
+      nonexistant_paths+=("${_path}")
+      continue
+    fi
+  done
 }
 
 #
@@ -536,30 +522,28 @@ ensure_files_exist()
   #
   # If no files were passed in, this is a programming error.
   # Fail, yielding a message with a backtrace which can be used to debug.
-  if array_is_nonempty _files
-  then
-    for _file in "${_files[@]}"
-    do
-      if file_exists "${_file}"
+  array_is_nonempty _files ||
+    fail "Cannot ensure files exist, as no files were given."
+
+  for _file in "${_files[@]}"
+  do
+    if file_exists "${_file}"
+    then
+      continue
+    else
+      _path="${_file%\/*}"
+
+      ensure_paths_exist "${_path}"
+
+      if touch "${_file}"
       then
         continue
       else
-        _path="${_file%\/*}"
-
-        ensure_paths_exist "${_path}"
-
-        if touch "${_file}"
-        then
-          continue
-        else
-          fail "There was an error creating the file '${_file}' on the"\
-            "filesystem; the touch command returned error code '$?'."
-        fi
+        fail "There was an error creating the file '${_file}' on the"\
+          "filesystem; the touch command returned error code '$?'."
       fi
-    done
-  else
-    fail "Cannot ensure files exist, as no files were given."
-  fi
+    fi
+  done
 }
 
 #
@@ -618,39 +602,37 @@ ensure_files_are_executable()
   #
   # If no files were passed in, this indicates a programming error.
   # Fail, yielding a message with a backtrace which can be used to debug.
-  if array_is_nonempty _files
-  then
-    for _file in "${_files[@]}"
-    do
-      if path_exists "${_file}"
-      then
-        fail "Cannot make the file '${_file}' executable,"\
-          "as it is unexpectedly a directory."
-      elif ! file_exists "${_file}"
-      then
-        fail "Cannot make the file '${_file}' executable,"\
-          " as the file does not exist."
-      else
-        _path="${_file%\/*}"
-
-        if variable_is_nonempty _path && path_exists "${_path}"
-        then
-          if chmod +x "${_file}"
-          then
-            continue
-          else
-            fail "Could not make the file '${_file}' executable,"\
-              "as the 'chmod +x' command failed with error code '$?'."
-          fi
-        else
-          fail "Cannot make the file '${_file} executable,"\
-            " as '${_path}' does not even exist."
-        fi
-      fi
-    done
-  else
+  array_is_nonempty _files ||
     fail "Cannot ensure files are executable, as no files were given."
-  fi
+
+  for _file in "${_files[@]}"
+  do
+    if path_exists "${_file}"
+    then
+      fail "Cannot make the file '${_file}' executable,"\
+        "as it is unexpectedly a directory."
+    elif ! file_exists "${_file}"
+    then
+      fail "Cannot make the file '${_file}' executable,"\
+        " as the file does not exist."
+    else
+      _path="${_file%\/*}"
+
+      if variable_is_nonempty _path && path_exists "${_path}"
+      then
+        if chmod +x "${_file}"
+        then
+          continue
+        else
+          fail "Could not make the file '${_file}' executable,"\
+            "as the 'chmod +x' command failed with error code '$?'."
+        fi
+      else
+        fail "Cannot make the file '${_file} executable,"\
+          " as '${_path}' does not even exist."
+      fi
+    fi
+  done
 }
 
 #
@@ -741,10 +723,7 @@ link()
   done
 
   # If force_flag is 1, remove the target from the filesystem.
-  if (( _force_flag == 1 ))
-  then
-    remove "${_target}"
-  fi
+  (( _force_flag == 0 )) || remove "${_target}"
 
   # TODO: What should we do if files already exist?
   # If target exists, and is a file, then this is a system or programming error.
@@ -894,38 +873,28 @@ move_directory()
   #
   # If the source was not passed in, this is a system / programming error.
   # Fail, yielding a message with a backtrace which can be used to debug.
-  if variable_is_nonempty _source
-  then
-    if variable_is_nonempty _target
-    then
-      if mv "${_source}" "${_target}"
-      then
-        if variable_is_nonempty _mode
-        then
-          if ! chmod -R "${_mode}" "${_target}"
-          then
-            fail "Could not recursively change mode of '${_target}' to"\
-              "${_mode}, as the 'chmod -R' command failed with error code '$?'."
-          fi
-        fi
-
-        if variable_is_nonempty _owner
-        then
-          if ! chown -R "${_owner}" "${_target}"
-          then
-            fail "Could not recursively change ownership of '${_target}' to"\
-              "${_owner}, as the 'chown -R' command failed with error code '$?'."
-          fi
-        fi
-      else
-        fail "Could not move '${_source}' to '${_target}',"\
-          "as the 'chmod -R' command failed with error code '$?'."
-      fi
-    else
-      fail "Cannot move file, as the target must be specified. "
-    fi
-  else
+  variable_is_nonempty _source ||
     fail "Cannot move file, as the source must be specified. "
+
+  variable_is_nonempty _target ||
+    fail "Cannot move file, as the target must be specified. "
+
+  mv "${_source}" "${_target}" ||
+    fail "Could not move '${_source}' to '${_target}',"\
+    "as the 'chmod -R' command failed with error code '$?'."
+
+  if variable_is_nonempty _mode
+  then
+    chmod -R "${_mode}" "${_target}" ||
+      fail "Could not recursively change mode of '${_target}' to"\
+      "${_mode}, as the 'chmod -R' command failed with error code '$?'."
+  fi
+
+  if variable_is_nonempty _owner
+  then
+    chown -R "${_owner}" "${_target}" ||
+      fail "Could not recursively change ownership of '${_target}' to"\
+      "${_owner}, as the 'chown -R' command failed with error code '$?'."
   fi
 }
 
@@ -1030,62 +999,30 @@ move_file()
     esac
   done
 
-  # If the source variable is not empty,
-  if variable_is_nonempty _source
+  variable_is_nonempty _source ||
+    fail "Cannot move file, as the source must be specified."
+
+  variable_is_nonempty _target ||
+    fail "Cannot move file, as the target must be specified."
+
+  mv -f "${_source}" "${_target}" ||
+    fail "There was an error ($?) moving the source '${_source}'" \
+      "to the target '${_target}'."
+
+  # The move was successful; now we process mode and owner if specified.
+
+  if variable_is_nonempty _mode
   then
-    # and if the target variable is not empty,
-    if variable_is_nonempty _target
-    then
-      # then move the source to the target.
-      if mv "${_source}" "${_target}"
-      then
-        # The move was successful; now we process mode and owner if specified.
+    chmod "${_mode}" "${_target}" ||
+      warn "There was an error ($?) changing the "\
+      "target's '${_target}' mode to '${_mode}'."
+  fi
 
-        # If the mode variable is set, change the target's filesystem mode.
-        if variable_is_nonempty _mode
-        then
-          # If the file mode change is not successful:
-          if ! chmod "${_mode}" "${_target}"
-          then
-            # Then print out a warning to the user, and continue processing.
-            # This is typically a non-fatal error which can be rectified
-            # afterwards.
-            warn "There was an error ($?) changing the "\
-              "target's '${_target}' mode to '${_mode}'."
-          fi
-        fi
-
-        # If the owner variable is set, change the target's owner.
-        if variable_is_nonempty _owner
-        then
-          # If the ownership change is not successful,
-          if ! chown "${_owner}" "${_target}"
-          then
-            # Then print out a warning, and continue processing.
-            # This is typically a non-fatal error which can be rectified
-            # afterwards.
-            warn "There was an error ($?) changing the "\
-              "target's '${_target}' owner to '${_owner}'."
-          fi
-        fi
-      else
-        # There was an error moving the file. Issue a failure
-        # message and provide a backtrace, as this could very well indicate a
-        # larger issue overall, and debugging will be necessary.
-        fail "There was an error ($?) moving the source '${_source}'" \
-          "to the target '${_target}'."
-      fi
-    else
-      # The target was not specified; this is a programming error.
-      # Send a fail message which will send a backtrace allowing the developer
-      # to quickly debug and pass in the proper parameters.
-      fail "Cannot move file, as the target must be specified."
-    fi
-  else
-      # The source was not specified, this is a programming error
-      # send a fail message which will send a backtrace allowing the developer
-      # to quickly debug and pass in the proper parameters.
-      fail "Cannot move file, as the source must be specified."
+  if variable_is_nonempty _owner
+  then
+    chown "${_owner}" "${_target}" ||
+      warn "There was an error ($?) changing the "\
+      "target's '${_target}' owner to '${_owner}'."
   fi
 }
 
@@ -1192,57 +1129,28 @@ copy_file()
     _flags+=(-f)
   fi
 
-  # if the source variable is not empty,
-  if variable_is_nonempty _source
+  variable_is_nonempty _source ||
+    fail "Cannot move file, as the source must be specified."
+
+  variable_is_nonempty _target ||
+    fail "Cannot move file, as the target must be specified."
+
+  cp ${_flags[*]} "${_source}" "${_target}" ||
+    fail "Could not copy '${_source}' to '${_target}',"\
+    "as the 'cp' command failed with error code '$?'."
+
+  if variable_is_nonempty _mode
   then
-    # if the target variable is not empty,
-    if variable_is_nonempty _target
-    then
-      if cp ${_flags[*]} "${_source}" "${_target}"
-      then
-        if variable_is_nonempty _mode
-        then
-          # then set the filesystem mode of the target to the given mode.
-          if ! chmod "${_mode}" "${_target}"
-          then
-            # Failed to change filesystem mode of the target.
-            # This indicates either a a system or programming error.
-            # Fail, giving a message with a backtrace that can be used to debug.
-            fail "Could not change mode of '${_target}' to"\
-              "${_mode}, as the 'chmod' command failed with error code '$?'."
-          fi
-        fi
-        # If the owner variable is not empty
-        if variable_is_nonempty _owner
-        then
-          # then set the filesystem owner of the target to the given mode.
-          if ! chown "${_owner}" "${_target}"
-          then
-            # Failed to change filesystem ownership of the target.
-            # This indicates either a a system or programming error.
-            # Fail, giving a message with a backtrace that can be used to debug.
-            fail "Could not change ownership of '${_target}' to"\
-              "${_owner}, as the 'chown' command failed with error code '$?'."
-          fi
-        fi
-      else
-        # There was an error copying the file; inform the user with a failure
-        # message, and provide a backtrace as this could very well indicate a
-        # larger issue overall; debugging will be necessary.
-        fail "Could not copy '${_source}' to '${_target}',"\
-          "as the 'cp' command failed with error code '$?'."
-      fi
-    else
-      # The target was not specified; this is a programming error.
-      # Send a fail message which will send a backtrace, allowing the developer
-      # to quickly debug and pass in the proper parameters.
-      fail "Cannot move file, as the target must be specified."
-    fi
-  else
-      # The source was not specified; this is a programming error.
-      # Send a fail message which will send a backtrace, allowing the developer
-      # to quickly debug and pass in the proper parameters.
-      fail "Cannot move file, as the source must be specified."
+    chmod "${_mode}" "${_target}" ||
+      fail "Could not change mode of '${_target}' to"\
+      "${_mode}, as the 'chmod' command failed with error code '$?'."
+  fi
+
+  if variable_is_nonempty _owner
+  then
+    chown "${_owner}" "${_target}" ||
+      fail "Could not change ownership of '${_target}' to"\
+        "${_owner}, as the 'chown' command failed with error code '$?'."
   fi
 }
 
