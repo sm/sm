@@ -448,7 +448,7 @@ user_must_not_be_root()
 {
   # If the user is not root then return true, 0. Otherwise send an error message
   # informing the user that the script must be run as root.
-  user_is_not_root
+  user_is_not_root ||
     error "sm $extension $action must be run as a (project) user, and NOT as root."
 
   return 0
