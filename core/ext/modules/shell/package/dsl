@@ -207,6 +207,8 @@ package_definition()
 #
 package_cli()
 {
+  trace_filter package_cli
+
   local _ignored_args=() _package_args=( $@ ) _token
   local number_of_args=${#_package_args[@]} index
 
