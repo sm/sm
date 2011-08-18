@@ -320,15 +320,13 @@ service_setup()
     # Create the service_user on the system if it is missing, with the
     # same group as the name.
     # ##### TODO: create an 'user_exists' function and use it here.
-    user_create_if_missing "${service_user}"\
-      with group "${service_user}" >/dev/null 2>&1
+    user_create_if_missing "${service_user}" with group "${service_user}" >/dev/null 2>&1
 
     # Create the paths for the service_root_paths if they do not exist.
     ensure_paths_exist "${service_root_paths[@]}"
 
     # Ensure that the service_user has ownership of the root serivce paths.
-    chown_paths --recursively "${service_user}:${service_user}"\
-      "${service_root_paths[@]}"
+    chown_paths --recursively "${service_user}:${service_user}" "${service_root_paths[@]}"
   fi
 
   # Create the paths for the service/version if they do not exist.
