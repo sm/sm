@@ -326,6 +326,8 @@ package_init()
   declare -a package_dependencies
   declare -a configure_flags
 
+  ! command_exists "${package_name}_initialize" || "${package_name}_initialize"
+
   true \
     "${source_path:="${sm_path}/src"}" \
     "${archives_path:="${sm_path}/archives"}" \
