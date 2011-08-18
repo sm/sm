@@ -53,6 +53,7 @@
 # ### Code Walkthrough
 array_is_nonempty()
 {
+  trace_filter array
   # Store the array name into a local variable; set to the empty string if it
   # was not passed in.
   local _array_name="${1:-}"
@@ -106,6 +107,7 @@ array_is_nonempty()
 # ### Code Walkthrough
 array_is_empty()
 {
+  trace_filter array
   # Store the array name into a local variable; set it to the empty string if it
   # was not passed in.
   local _array_name="${1:-}"
@@ -152,6 +154,7 @@ array_is_empty()
 # ### Code Walkthrough
 array_length()
 {
+  trace_filter array
   # Store the array name into a local variable; set to the empty string if it
   # was not passed in.
   local _array_name="${1:-}" _length
@@ -200,6 +203,7 @@ array_length()
 # ### Code Walkthrough
 array_last_element()
 {
+  trace_filter array
   # Store the array name into a local variable; set to the empty string if it
   # was not passed in.
   local _array_name="${1:-}" _length _element
@@ -252,6 +256,7 @@ array_last_element()
 # ### Code Walkthrough
 array_first_element()
 {
+  trace_filter array
   # Store the array name into a local variable; set to the empty string if it
   # was not passed in.
   local _array_name="${1:-}" _element _array_length
@@ -310,6 +315,7 @@ array_first_element()
 # ### Code Walkthrough
 array_push()
 {
+  trace_filter array
   # Store the array name into a local variable; set to the empty string if it
   # was not passed in.
   local _array_name="${1:-}"
@@ -375,6 +381,7 @@ array_push()
 # ### Code Walkthrough
 array_append()
 {
+  trace_filter array
   # Store the array name into a local variable; set to the empty string if it
   # was not passed in.
   local _array_name="${1:-}"
@@ -439,6 +446,7 @@ array_append()
 # ### Code Walkthrough
 array_pop()
 {
+  trace_filter array
   # Store the array name into a local variable, set to the empty string if it
   # was not passed in.
   local _array_name="${1:-}" temp_array=() index _variable="${2:-}"
@@ -500,6 +508,7 @@ array_pop()
 # ### Code Walkthrough
 array_shift()
 {
+  trace_filter array
   # Store the array name into a local variable; set to the empty string if it
   # was not passed in.
   local _array_name="${1:-}" temp_array=() index _variable="${2:-}"
@@ -561,6 +570,7 @@ array_shift()
 # ### Code Walkthrough
 array_unshift()
 {
+  trace_filter array
   # Store the array name into a local variable; set to the empty string if it
   # was not passed in.
   local _array_name="${1:-}"
@@ -627,6 +637,7 @@ array_unshift()
 # ### Code Walkthrough
 array_join()
 {
+  trace_filter array
   # Store the array name into a local variable; set to the empty string if it
   # was not passed in.
   local _array_name="${1:-}"
@@ -678,6 +689,7 @@ array_join()
 # ### Code Walkthrough
 array_largest()
 {
+  trace_filter array
   # Store the array name into a local variable; set to the empty string if it
   # was not passed in.
   local _array_name="${1:-}" _index _largest=""
@@ -744,6 +756,7 @@ array_largest()
 # ### Code Walkthrough
 array_sort_desc()
 {
+  trace_filter array
   # Store the array name into a local variable; set to the empty string if it
   # was not passed in.
   local _array_name="${1:-}" _index _largest=""
@@ -800,6 +813,7 @@ array_sort_desc()
 # ### Code Walkthrough
 array_sort_asc()
 {
+  trace_filter array
   # Store the array name into a local variable; set to the empty string if it
   # was not passed in.
   local _array_name="${1:-}" _index _largest=""
@@ -856,6 +870,7 @@ array_sort_asc()
 # ### Code Walkthrough
 array_unique()
 {
+  trace_filter array
   # Store the array name into a local variable; set to the empty string if it
   # was not passed in. Also initialize the index and largest variables.
   local _array_name="${1:-}" _index _largest=""
@@ -948,6 +963,7 @@ array_unique()
 # ### Code Walkthrough
 array_is_even()
 {
+  trace_filter array
   # Store the array name into a local variable, set to the empty string if it
   # was not passed in.
   local _array_name="${1:-}"
