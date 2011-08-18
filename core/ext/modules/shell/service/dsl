@@ -423,6 +423,8 @@ service_uninstall()
 #
 service_start()
 {
+  service_initialize
+
   variable_is_nonempty service ||
     fail "To start a service, you must set the 'service' variable."
 
