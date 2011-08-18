@@ -15,12 +15,7 @@
 #
 shell_is_interactive()
 {
-  if [[ -t 0 ]]
-  then
-    return 0
-  else
-    return 1
-  fi
+  [[ -t 0 ]]
 }
 
 if shell_is_interactive

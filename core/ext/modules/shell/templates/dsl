@@ -257,6 +257,7 @@ seed_template()
 {
   # Store the first parameter into the template variable.
   local _template="${1:-}"
+  shift || fail "Cannot install template, as no template was given."
 
   # If the template variable is not empty, remove the template from the
   # parameters list and store the remaining parameters into the hash variable.
@@ -272,47 +273,32 @@ seed_template()
   # backtrace allowing the developer to fix the issue quickly.
   # Also if no template was given, or the template file does not exist on the
   # filesystem, then fail with an error message and backtrace for debugging.
-  if variable_is_nonempty _template
+  local _hash=("$@") _strings=() temporary=${_template}.${timestamp}.$$
+
+  file_exists "${_template}" ||
+    fail "Cannot seed template; template file '${_template}' does not exist."
+
+  array_is_nonempty _hash ||
+    fail "Cannot seed template '${_template}'; No replacement keys were specified."
+
+  array_is_even _hash ||
+    fail "Every replacement key must have a replacement value."
+
+  for (( index=0 ; index < ${#_hash[@]} ; index++ ))
+  do
+    _strings+=(-e "s#{{${_hash[${index}]}}}#${_hash[$((++index))]}#g")
+  done
+
+  sed "${_strings[@]}" ${_template} > ${temporary} ||
+    error "There was an error (?) seeding the template '${_template}'." \
+    "Most often this is due to filesystem permissions / disk full."
+
+  if file_exists "${temporary}"
   then
-    shift
-    local _hash=("$@") _strings=() temporary=${_template}.${timestamp}.$$
-
-    if file_exists "${_template}"
-    then
-      if array_is_nonempty _hash
-      then
-        if array_is_even _hash
-        then
-          for (( index=0 ; index < ${#_hash[@]} ; index++ ))
-          do
-            _strings+=(-e "s#{{${_hash[${index}]}}}#${_hash[$((++index))]}#g")
-          done
-
-          if sed "${_strings[@]}" ${_template} > ${temporary}
-          then
-            if file_exists "${temporary}"
-            then
-              move_file "${temporary}" "${_template}"
-            else
-              fail "Something went horribly wrong; the template intermediate file "\
-                "'${temporary}' does not exist."
-            fi
-          else
-            error "There was an error (?) seeding the template '${_template}'." \
-              "Most often this is due to filesystem permissions / disk full."
-          fi
-        else
-          fail "Every replacement key must have a replacement value."
-        fi
-      else
-        fail "Cannot seed template '${_template}',"\
-          "as no replacement keys were specified."
-      fi
-    else
-      fail "Cannot seed template; template file '${_template}' does not exist."
-    fi
+    move_file "${temporary}" "${_template}"
   else
-    fail "Cannot install template, as no template was given."
+    fail "Something went horribly wrong; the template intermediate file "\
+      "'${temporary}' does not exist."
   fi
 }
 
