@@ -1742,6 +1742,7 @@ package_info()
 package_installed_versions()
 {
   local _path="${packages_path}/${package_name}"
+  [[ -d "${_path}" ]] || return 0 # None!
   find "${_path}" -mindepth 1 -maxdepth 1 -type d | awk -F'/' '{print $NF}'
 }
 
@@ -1764,6 +1765,7 @@ package_man()
 # pkg functions
 packages_installed()
 {
+  [[ -d "${_path}" ]] || return 0 # None!
   find "${sm_path}/pkg" -mindepth 2 -maxdepth 2 -type d |
     awk -F'/' '! /\/active\//{print $(NF - 1)":"$(NF)}' | sort
 }
@@ -1771,6 +1773,8 @@ packages_installed()
 packages_active()
 {
   local _found _package _packages=()
+
+  [[ -d "${sm_path}/pkg" ]] || return 0 # None!
 
   if [[ -z ${1:-} ]]
   then
