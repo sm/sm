@@ -27,7 +27,7 @@ service_initialize()
   fi
 
   : \
-    "${service:="${extension}"}" \
+    "${service:="${extension:-${package_name}}"}" \
     "${service_version:="${package_version}"}" \
     "${prefix_path:="${sm_path}/active"}" \
     "${service_bin_path:="${active_path}/bin"}" \
