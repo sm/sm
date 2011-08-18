@@ -2751,12 +2751,12 @@ symlink_exists()
 #
 # ### Return Codes
 #
-# 0 if the named directory exists.
-# 1 if the named directory does not exist or does not exist.
+# 0 if the named path exists.
+# 1 if the named path does not exist or does not exist.
 #
 # ### Failure Scenarios
 #
-# Fails if no directory name/path was given.
+# Fails if no path name/path was given.
 #
 # ### Usage Examples
 #
@@ -2770,13 +2770,13 @@ symlink_exists()
 #
 path_exists()
 {
-  local _directory="${1:-}"
+  local _path="${1:-}"
 
-  if [[ -n "${_directory}" ]]
+  if [[ -n "${_path}" ]] || [[ -L "${_path}" ]]
   then
-    [[ -d "$_directory" ]]
+    [[ -d "$_path" ]]
   else
-    fail "Cannot check if directory exists, as no name/path was given."
+    fail "Cannot check if path exists, as no name/path was given."
   fi
 }
 
