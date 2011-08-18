@@ -85,10 +85,7 @@ user_create_if_missing()
     esac
   done
 
-  if variable_is_empty _group
-  then
-    _group="${_user}"
-  fi
+  variable_is_nonempty _group || _group="${_user}"
 
   # If the user is root (eg. id 0)
   if (( UID == 0 ))
@@ -411,12 +408,10 @@ user_must_be_root()
 {
   # if the user is root then return true, 0. Otherwise send an error message
   # informing the user that the script must be run with root privileges.
-  if user_is_root
-  then
-    return 0
-  else
+  user_is_root ||
     error "sm $extension $action must be run as root, and NOT as a user ($USER)."
-  fi
+
+  return 0
 }
 
 #
@@ -453,12 +448,10 @@ user_must_not_be_root()
 {
   # If the user is not root then return true, 0. Otherwise send an error message
   # informing the user that the script must be run as root.
-  if user_is_not_root
-  then
-    return 0
-  else
-    fail "sm $extension $action must be run as a (project) user, and NOT as root."
-  fi
+  user_is_not_root
+    error "sm $extension $action must be run as a (project) user, and NOT as root."
+
+  return 0
 }
 
 #
@@ -494,28 +487,21 @@ user_must_not_be_root()
 # ### Code Walkthrough
 user_run_as()
 {
-  # Assign the first parameter into the user variable
   local _user="$1"
 
-  # If the user variable is nonempty
-  if variable_is_nonempty _user
-  then
-    # Remove the user from the parameters list.
-    # Run the given command as the user, with a nonlogin shell.
-    # If the command completed successfully, return true, 0. Otherwise,
-    # the command did not complete successfully, so return false, 1.
-    shift
-    if su "${_user}" -c "$*"
-    then
-      return 0
-    else
-      return 1
-    fi
-  else
-    # Otherwise, the user was not passed in. This is a programming error so we
-    # send a fail message which includes a backtrace allowing the developer
-    # to quickly pinpoint and fix their error.
+  variable_is_nonempty _user ||
     fail "Cannot run as user, as no user or commands were given."
+
+  shift # Remove the user from the parameters list.
+
+  # Run the given command as the user, with a nonlogin shell.
+  # If the command completed successfully, return true, 0. Otherwise,
+  # the command did not complete successfully, so return false, 1.
+  if su "${_user}" -c "$*"
+  then
+    return 0
+  else
+    return 1
   fi
 }
 
@@ -551,25 +537,18 @@ user_run_as()
 #
 user_run_as_login()
 {
-  # Assign the first parameter into the user variable
   local _user="$1"
 
-  # If the user variable is nonempty
-  if variable_is_nonempty _user
-  then
-    # Then run the given command as the user, with a login shell.
-    # If the command completed successfully, return true, 0. Otherwise the
-    # command did not complete successfully; return false, 1.
-    if su - "${_user}" -c "$*"
-    then
-      return 0
-    else
-      return 1
-    fi
-  else
-    # Otherwise the user was not passed in. This is a programming error so we
-    # send a fail message which includes a backtrace allowing the developer
-    # to quickly pinpoinnt and fix their error.
+  variable_is_nonempty _user ||
     fail "Cannot run as user, as no user or commands were given."
+
+  # Run the given command as the user, with a login shell.
+  # If the command completed successfully, return true, 0. Otherwise the
+  # command did not complete successfully; return false, 1.
+  if su - "${_user}" -c "$*"
+  then
+    return 0
+  else
+    return 1
   fi
 }
