@@ -352,8 +352,7 @@ package_initialize()
     "${install_base_path:="${packages_path}/${package_name}"}" \
     "${install_path:="${install_base_path}/${package_version}"}"
 
-  string_contains "${configure_flags[*]}" "--prefix" ||
-    configure_flags+=( --prefix="${install_path}" )
+  configure_flags+=( --prefix="${install_path}" )
 
   # This check should only happen in places that require a version...
   #[[ -n "${package_version}" ]] ||
