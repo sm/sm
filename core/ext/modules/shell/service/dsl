@@ -109,6 +109,8 @@ service_initialize()
   else
     service_pid=0
   fi
+
+  export PATH="/bin:/usr/bin:${prefix_path}/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin:${PATH}"
 }
 
 #
@@ -184,9 +186,28 @@ service_initialize()
 #
 services_avilable()
 {
-  # Notify that the services_available() function has not yet been implemented.
-  NIY "Available service listing has not yet been implemented."
-  services_installed
+  extensions_installed module "ext/service" "$@"
+}
+
+services_list()
+{
+  local _action="${1:-}" _args
+
+  [[ -z "${_action}" ]] || shift
+
+  case "${_action}" in
+    (active)
+      services_active "$@"
+      ;;
+
+    (available)
+      services_available "$@"
+      ;;
+
+    (installed|*)
+      services_installed "$@"
+      ;;
+  esac
 }
 
 #
@@ -913,8 +934,6 @@ service_cli()
 
   extension_args=( "${_ignored_args[@]}" )
 
-  service_init_path
-
   service_initialize "${extension_args[@]}"
 }
 
@@ -1094,40 +1113,6 @@ service_install_init_d()
 }
 
 #
-# ## service\_init\_path()
-#
-# Sets the PATH explicitly for purposes of the current service extension.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# Alters the PATH variable.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# No failure conditions currently.
-#
-# ### Usage Examples
-#
-#     user$ service_init_path
-#
-service_init_path()
-{
-  PATH="${prefix_path}/bin:/bin:/usr/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin:${PATH}"
-}
-
-#
 # ## service\_init\_start()
 #
 # This is the generalized service init start function.
@@ -1159,8 +1144,6 @@ service_init_path()
 service_init_start()
 {
   log "Starting ${service}..."
-
-  service_init_path
 
   local _result=0 _command=( "${service_binary}" )
 
@@ -1232,7 +1215,6 @@ service_init_start()
 #
 service_init_stop()
 {
-  service_init_path
 
   if (( service_pid > 0 ))
   then
@@ -1286,8 +1268,6 @@ service_init_stop()
 service_init_status()
 {
   log "statusing ${service}..."
-
-  service_init_path
 
   local _command=( "${service_binary}" )
 
@@ -1359,8 +1339,6 @@ service_init_status()
 service_init_reload()
 {
   log "reloading ${service}..."
-
-  service_init_path
 
   local _command=( "${service_binary}" )
 

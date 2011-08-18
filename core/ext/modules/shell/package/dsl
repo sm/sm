@@ -301,6 +301,7 @@ package_cli()
 package_initialize()
 {
   package_name="${1:-${package_name:-${extension}}}"
+
   [[ -n "${package_name}" ]] ||
     fail "$FUNCNAME(): Package name must be given as first parameter.\n"
 
@@ -320,6 +321,19 @@ package_initialize()
       ;;
   esac
 
+  declare -a package_dependencies
+
+  true \
+    "${source_path:="${sm_path}/src"}" \
+    "${archives_path:="${sm_path}/archives"}" \
+    ${static_flag:=0}
+
+  LDFLAGS="-L${active_path}/lib ${LDFLAGS:-}"
+  CFLAGS="-I${active_path}/include ${CFLAGS:-} "
+
+  export package_name packages_path package_name package_version archive_format \
+    package_file package_url package_md5_url packages_path bin_path source_path \
+    LDFLAGS CFLAGS package_default_version
   # Ensure that package_version is set at this point
 
   [[ -n "${package_default_version}" ]] || read_default version prefix package_default for ${package_name}
@@ -343,6 +357,16 @@ package_initialize()
   #[[ -n "${package_version}" ]] ||
   #  fail "$FUNCNAME(): Package version must be specified.\n"\
   #  "(For example version=x.y.z set in extension's config/defaults file.)\n"
+
+  fhs_dirs=(bin etc include lib libexec sbin share man)
+
+  ensure_paths_exist "${active_path}"
+
+  for dir in ${fhs_dirs}
+  do
+    ensure_paths_exist "${active_path}/${fhs_dirs}"
+  done
+
 
   if user_is_root
   then
