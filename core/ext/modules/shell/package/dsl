@@ -1043,10 +1043,8 @@ package_deactivate()
 
   log_step success
 
-  if ! string_contains "${FUNCNAME[*]}" 'package_activate'
-  then
+  string_contains "${FUNCNAME[*]}" 'package_activate' ||
     package_ldconfig "${_package}"
-  fi
 }
 
 #
@@ -1140,31 +1138,30 @@ package_ldconfig()
 #  path_exists "${packages_path}/${_package}/active/lib" ||
 #    return 0 # no lib/ directory for activated package, no need to update ldconfig
 
+  user_is_root || return 0
+
   # TODO: Figure out if solaris and freebsd have an analog to this?
-  if user_is_root
+  if os_is_linux
   then
-    if os_is_linux
+    ensure_paths_exist "/etc/ld.so.conf.d"
+
+    if ! file_exists "/etc/ld.so.conf.d/sm.conf"
     then
-      ensure_paths_exist "/etc/ld.so.conf.d"
-
-      if ! file_exists "/etc/ld.so.conf.d/sm.conf"
-      then
-        write "${active_path}/lib\n" to "/etc/ld.so.conf.d/sm.conf"
-        chmod_files 0444 "/etc/ld.so.conf.d/sm.conf"
-      fi
-
-      command_exists "${_ldconfig}" || ldconfig="ldconfig"
-
-      log_step "${package_name} ${package_version} ~ ldconfig" \
-        "${_ldconfig}" "${active_path}/lib"
-
-    elif os_is_darwin
-    then # Cluster Fuck!
-      true
-      # This should be handled by the profile.d?
-      # _files=($(find "${packages_path}/${_package}/active" -mindepth 1 -maxdepth 1 -type d))
-      # (( ${#_files[@]} > 0 )) && copy_files to "${packages_path}" "${_files[@]}"
+      write "${active_path}/lib\n" to "/etc/ld.so.conf.d/sm.conf"
+      chmod_files 0444 "/etc/ld.so.conf.d/sm.conf"
     fi
+
+    command_exists "${_ldconfig}" || ldconfig="ldconfig"
+
+    log_step "${package_name} ${package_version} ~ ldconfig" \
+      "${_ldconfig}" "${active_path}/lib"
+
+  elif os_is_darwin
+  then # Cluster Fuck!
+    true
+    # This should be handled by the profile.d?
+    # _files=($(find "${packages_path}/${_package}/active" -mindepth 1 -maxdepth 1 -type d))
+    # (( ${#_files[@]} > 0 )) && copy_files to "${packages_path}" "${_files[@]}"
   fi
 }
 
@@ -1207,17 +1204,16 @@ package_profile_d()
 
   variables_must_be_nonempty _package
 
-  if template_exists "profile.d.template"
-  then
-    log_step "Updating shell profile for ${_package}"
+  template_exists "profile.d.template" || return 0
 
-    ensure_paths_exist "${profile_d_path}"
-    ensure_files_exist "${profile_path}"
+  log_step "Updating shell profile for ${_package}"
 
-    install_template "profile.d" to "${profile_d_path}/${_package}.sh" mode 0755
+  ensure_paths_exist "${profile_d_path}"
+  ensure_files_exist "${profile_path}"
 
-    log_step success
-  fi
+  install_template "profile.d" to "${profile_d_path}/${_package}.sh" mode 0755
+
+  log_step success
 }
 
 #
@@ -1268,7 +1264,7 @@ package_uninstall()
 
   if module_is_loaded service
   then # Remove any service reminants.
-     service_uninstall
+    service_uninstall
   fi
 
   log_step success
