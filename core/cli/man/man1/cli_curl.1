@@ -1,0 +1,37 @@
+.\"   $Id$
+.\"
+.\"   Man page for the bdsm project.
+.\"
+.\"   $Log$
+.\"
+
+.TH BDSM 1 "2011 August 19" "BDSM"
+
+.SH DESCRIPTION
+By default curl does not allow to download resources securred (SSL) with not
+valid certificate. There are two most obvious reasons for that:
+
+.RS
+.B old CA certificates database.
+
+.B site is authenticated with self signed certificate.
+.RE
+
+
+.SH SOLUTION
+The best solution for this is to update CA certificates. In case of self signed
+certificates it is sometimes possible to download CA certificate from the given
+site.
+
+.SH WORKAROUND
+The easiest way for this is to add
+.B --insecure
+flag to curl command, this process can be automated by putting it to
+.B .curlrc
+file:
+
+.RS
+echo "insecure" >> $HOME/.curlrc
+.RE
+
+This process has to be done for each user that is using curl.

@@ -44,8 +44,20 @@ archive_get() {
       copy_file --force "${_uri}" to "${_archive}" || \
         fetch_error copy_failed from=${_uri} to=${_archive}
     else
-      curl -s -L "${_uri}" -o "${_archive}" || \
-        fetch_error download_failed from=${_uri} to=${_archive}
+      if curl -s -L "${_uri}" -o "${_archive}"
+      then
+        : #Download worked
+      else
+        case $? in
+          60)
+            error "\nPeer certificate cannot be authenticated with known CA certificates.\n\n\
+Please read 'sm man curl' for instructions how to solve this problem."
+            ;;
+          *)
+            fetch_error download_failed from=${_uri} to=${_archive}
+            ;;
+        esac
+      fi
     fi
   fi
   [[ -z "${__vcs_failed}" ]] || return 0
