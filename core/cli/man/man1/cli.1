@@ -55,6 +55,16 @@ Display this help.
 .B --trace={filter}
 Show trace output for functions using specified filter.
 .TP 13
+.B --trace
+Equivalent to
+.B --trace=action
+- show only called action trace.
+.TP 13
+.B --trace=all
+Show trace output for all functions that are not excluded, by default excluded is (
+.B -search
+).
+.TP 13
 .B --debug={filter}
 Show debug messages for given filter.
 .TP 13
