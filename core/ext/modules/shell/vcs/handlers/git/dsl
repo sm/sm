@@ -14,6 +14,11 @@ git_get()
   shift || fail "url must be the first parameter to git_get()."
   shift || fail "target path must be the second parameter to git_get()."
 
+  command_exists git ||
+    error "'git' was not found, please install git and try again.\n"\
+    "Note that git can be installed from the tools extension set:\n"\
+    "sm sets install tools ; sm git install"
+
   local _target="${scm_path}/$( scm_identifier "${_uri}" )"
 
   # v v v this looks slightly freakish... ~ Wayne
