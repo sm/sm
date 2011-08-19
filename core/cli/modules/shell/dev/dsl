@@ -61,7 +61,7 @@ sm_development_setup()
           _url="https://github.com/wayneeseguin/bdsm"
           ;;
         *)
-          _url="https://github.com/wayneeseguin/bdsm-${_component}"
+          _url="https://github.com/wayneeseguin/sm-${_component}"
           ;;
       esac
 

@@ -2,10 +2,8 @@
 releases_url=https://bdsm.beginrescueend.com/releases
 latest_version_url=https://bdsm.beginrescueend.com/releases/latest-version.txt
 extensions_url=https://extensions.beginrescueend.com
-extensions_repository_url=git://github.com/wayneeseguin/bdsm-extensions
 service_url=https://bdsm.beginrescueend.com/services
 sm_repo_url=git://github.com/wayneeseguin/bdsm
-service_repo_url=git://github.com/wayneeseguin/bdsm-services
 website_url=https://bdsm.beginrescueend.com/
 #pkg
 version=
