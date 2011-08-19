@@ -42,11 +42,12 @@ actions_build_actions_cache()
       ;;
     (.actions)
       # actions file
-      for _pair in $( \grep -v "^#" < "${_actions_root}${_actions_path}" | sed 's/ /\//g' )
+      _actions_path="${_actions_path%.actions}"
+      for _pair in $( sed '/^#/ d ; s/ /\//g' < "${_actions_root}${_actions_path}.actions" )
       do
         _from="${_pair%%=*}" # Cut out everything from first =
         _path="${_pair#*=}"  # Cut out everything to   first =
-        actions_build_actions_cache "${_actions_from}/${_from}" "${_actions_path%\/.actions}/${_path}"
+        actions_build_actions_cache "${_actions_from}/${_from}" "${_actions_path}${_path}"
       done
       ;;
     (*)
