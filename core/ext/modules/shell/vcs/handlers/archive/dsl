@@ -50,8 +50,8 @@ archive_get() {
       else
         case $? in
           60)
-            error "\nPeer certificate cannot be authenticated with known CA certificates.\n\n\
-Please read 'sm man curl' for instructions how to solve this problem."
+            error "Peer certificate cannot be authenticated with known CA certificates.\n\n\
+Please read 'sm man curl' for instructions how to solve this problem.\n"
             ;;
           *)
             fetch_error download_failed from=${_uri} to=${_archive}
