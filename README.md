@@ -47,12 +47,12 @@ You can read more about the DSL in the online documentation.
   ~Wayne
 
 Wayne E. Seguin
-wayneeseguin@gmail.com
-http://github.com/wayneeseguin
-http://github.com/sm
-http://twitter.com/wayneeseguin
-https://bdsm.beginrescueend.com/
-https://rvm.beginrescueend.com/
+* wayneeseguin@gmail.com
+* http://github.com/wayneeseguin
+* http://github.com/sm
+* http://twitter.com/wayneeseguin
+* https://bdsm.beginrescueend.com/
+* https://rvm.beginrescueend.com/
 
 # Contributing
 
@@ -60,19 +60,19 @@ Development repositories are found on the SM GitHub organization page:
     https://github.com/sm/
 In the spirit of free software, everyone is encouraged to help improve this project.
 
-Here are some ways you can contribute:
+Ways that you may contribute to the project are by:
 
-by using the latest development and release versions
-by reporting bugs in #beginrescueend on irc.freenode.net
-by suggesting new features in #beginrescueend on irc.freenode.net
-by writing or editing documentation, which is greatly appreciated
-by translating documentation to a new language, I speek tech and poor engrish
-by writing extensions
-by writing code (no patch is too small: fix typos, add comments, clean up inconsistent whitespace)
-by performing code reviews and assisting with refactoring
-by resolving issues
-by reviewing patches
-by donating, xoxo!
+* using the latest development and release versions
+* reporting bugs in #beginrescueend on irc.freenode.net
+* suggesting new features in #beginrescueend on irc.freenode.net
+* writing or editing documentation, which is greatly appreciated
+* translating documentation to a new language, I speek tech and poor engrish
+* writing extensions
+* writing code (no patch is too small: fix typos, add comments, clean up inconsistent whitespace)
+* performing code reviews and assisting with refactoring
+* resolving issues
+* reviewing patches
+* donating, xoxo!
 
 # License
 
@@ -93,7 +93,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-License Exceptions:
+# License Exceptions:
 
 bin/bdsm-ll is GNU Parallel and is licensed under the GNU GPL v3 which can be
 read here: http://www.gnu.org/licenses/gpl.html
