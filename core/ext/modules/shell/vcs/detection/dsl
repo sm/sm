@@ -52,12 +52,21 @@ is_github_uri()
   local _uri="${1:-}"
   if ematch "${_uri}" "^[[:alnum:]_-]+\/[[:alnum:]_-]+$"
   then
-    if curl -s -k -f -I -L "https://github.com/${_uri}" >/dev/null 2>&1
+    if curl -s -f -I -L "https://github.com/${_uri}" >/dev/null 2>&1
     then
       return 0
     else
-      debug vcs "Uri '${_uri}' looks like github one, but github claims it is not."
+      if (( $? == 60 ))
+      then
+        warn "Peer certificate cannot be authenticated with known CA certificates."
+        warn "Please read 'sm man curl' for instructions how to solve this problem."
+        if curl -s -k -f -I -L "https://github.com/${_uri}" >/dev/null 2>&1
+        then
+          return 0
+        fi
+      fi
     fi
+    debug vcs "Uri '${_uri}' looks like github one, but github claims it is not."
   fi
   return 1
 }
