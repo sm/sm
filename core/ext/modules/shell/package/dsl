@@ -326,7 +326,7 @@ package_init()
 
   if command_exists "${package_name}_initialize"
   then
-    ! string_contains "${FUNCNAME[*]}" "${package_name}_initialize" ||
+    string_contains "${FUNCNAME[*]}" "${package_name}_initialize" ||
       "${package_name}_initialize"
   fi
 
