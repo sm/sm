@@ -17,7 +17,7 @@ git_get()
   command_exists git ||
     error "'git' was not found, please install git and try again.\n"\
     "Note that git can be installed from the tools extension set:\n"\
-    "sm sets install tools ; sm git install"
+    "sm sets install vcs ; sm git install"
 
   local _target="${scm_path}/$( scm_identifier "${_uri}" )"
 
