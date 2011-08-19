@@ -355,6 +355,14 @@ copy_paths()
       error "Cannot copy directory ${_directory} to ${_target},"\
       "as the directory '${_directory}' does not exist (in '$PWD')."
 
+    [[ ! -d "${_target}/${_directory}" ]] || if (( _force_flag ))
+    then
+      rm -rf "${_target}/${_directory}"
+    else
+      error "Cannot copy directory ${_directory} from $PWD,"\
+        "as the directory '${_directory}' exist (in '${_target}')."
+    fi
+
     cp -Rf "${_directory}" "${_target}/" ||
       fail "Could not copy the entity '${_entity}',"\
       "as the 'cp -Rf' command failed with error code '$?'."
