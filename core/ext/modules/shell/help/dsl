@@ -622,11 +622,9 @@ usage()
 {
   sm_version
 
-  log "sm ${sm_version} https://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)"
+  log "SM Framework ${sm_version} https://sm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)"
 
-  sections=(
-    usage description actions notes dependencies resources
-  )
+  sections=( usage description actions notes dependencies resources )
   for section in "${sections[@]}"
   do
     "help_${section}"

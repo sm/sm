@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sm
 #
 # {{extension}} System Init script
 #
@@ -15,9 +15,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-# Initialize the BDSM framework for use in this script.
-source "{{modules_path}}/shell/core/initialize"
 
 # Set the service extension name
 export service="{{service}}"

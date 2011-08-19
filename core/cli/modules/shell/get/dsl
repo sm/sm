@@ -78,14 +78,14 @@ Halting installation.
 
 install_remote()
 {
-  local remote="${1:-wayneeseguin}"
+  local remote="${1:-sm}"
 
   install_sm_scm "sm-$remote" "$remote"
 }
 
 install_sm_scm()
 {
-  local remote="origin" dir="${1}" owner="${2:-wayneeseguin}"
+  local remote="origin" dir="${1}" owner="${2:-sm}"
 
   modules ext/vcs
 

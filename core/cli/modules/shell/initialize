@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-#TODO: update repository_url to "wayneeseguin/bdsm"
+#TODO: update repository_url to "sm/bdsm"
 true \
   "${src_path:="${sm_path}/src"}" \
   "${md5_path:="${sm_path}/md5"}" \
   "${archives_path:="${sm_path}/archives"}" \
   "${archive_format:=tar.gz}" \
   "${package_name:=${extension}}" \
-  "${repository_url:="git://github.com/wayneeseguin/bdsm"}"
+  "${repository_url:="git://github.com/sm/bdsm"}"
 
 true \
   "${extensions_url:=$(hash_file "$config_path/defaults" "extensions_url")}" \

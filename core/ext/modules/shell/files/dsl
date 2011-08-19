@@ -109,7 +109,7 @@ source_files()
 # ### Usage Examples
 #
 #     user$ nonempty_files a $HOME/.bdmsrc c
-#     /Users/wayneeseguin/.smrc
+#     /Users/sm/.smrc
 #
 nonempty_files()
 {

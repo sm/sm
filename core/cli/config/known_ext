@@ -1,2 +1,2 @@
-deploy=wayneeseguin/sm_deploy
-mux=wayneeseguin/sm_mux
+deploy=sm/sm_deploy
+mux=sm/sm_mux

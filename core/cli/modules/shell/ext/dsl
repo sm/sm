@@ -185,6 +185,6 @@ ext_check_availability()
 {
   awk -F = '/^[^#]/ {printf "%20s   %s\n", $1, $2 }' < "${sm_path}/core/cli/config/known_ext" |
   "${sm_path}/bin/sm-ll" \
-    printf "%s: " {} \; curl -s --head https://github.com/wayneeseguin/sm-{} \| awk "'/Status/{print \$2}'"
+    printf "%s: " {} \; curl -s --head https://github.com/sm/sm-{} \| awk "'/Status/{print \$2}'"
 }
 

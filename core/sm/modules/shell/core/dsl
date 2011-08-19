@@ -111,7 +111,7 @@ sm_version()
 #        Trace   Line Function             File
 #           3.    262 fail()               /sm/extensions/builtin/core/modules/shell/logging/dsl
 #           2.      5 NIY()                /sm/extensions/builtin/core/modules/shell/extensions/dsl
-#           1.      5 main()               /Users/wayneeseguin/test
+#           1.      5 main()               /Users/sm/test
 #      > modules/shell/logging/dsl fail() 263 $ exit 1
 #
 NIY()
