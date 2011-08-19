@@ -58,8 +58,6 @@ is_github_uri()
     else
       if (( $? == 60 ))
       then
-        warn "Peer certificate cannot be authenticated with known CA certificates."
-        warn "Please read 'sm man curl' for instructions how to solve this problem."
         if curl -s -k -f -I -L "https://github.com/${_uri}" >/dev/null 2>&1
         then
           return 0
