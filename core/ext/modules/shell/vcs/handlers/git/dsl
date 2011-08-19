@@ -65,7 +65,7 @@ git_get()
     then
       echo "${_uri}" > "${_target}/.uri"
     else
-      local _uri_https="${_uri/git:\/\//https:\/\/}"
+      local _uri_https="${_uri/git:\/\//https://}"
       debug vcs "git uri: ${_uri} failed, trying: ${_uri_https}"
       if git clone --depth 1 ${_uri_https} "${_target}" >/dev/null 2>&1
       then
