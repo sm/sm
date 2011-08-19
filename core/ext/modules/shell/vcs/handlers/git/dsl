@@ -71,7 +71,7 @@ git_get()
       then
         echo "${_uri_https}" > "${_target}/.uri"
       else
-        fetch_error cannot_clone
+        fetch_error cannot_clone uri="${_uri},${_uri_https}"
       fi
     fi
   fi
