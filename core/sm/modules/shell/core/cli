@@ -24,7 +24,7 @@ do
       ;;
 
     --trace)
-      trace_flags+=" all"
+      trace_flags+=" action"
       ;;
 
     --trace=*)
