@@ -12,8 +12,8 @@ github_get()
   shift || fail "uri must be specified as the first parameter."
   shift || fail "target path must be specified as the second parameter."
 
+  local save_fetch_error_handler="${fetch_error_handler}"
   fetch_error_handler=true
-
 
   for _method in ${github_resolution_order[@]}
   do
@@ -40,5 +40,6 @@ github_get()
       return 0
     fi
   done
-  return 0 #TODO say what?
+  fetch_error_handler="${save_fetch_error_handler}"
+  fetch_error all_uris_failed
 }
