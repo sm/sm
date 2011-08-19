@@ -638,15 +638,15 @@ separator()
 #     function c
 #     Error Backtrace:
 #        Trace   Line Function             File
-#           4.     25 functionc()          /Users/wayneeseguin/test
-#           3.     18 functionb()          /Users/wayneeseguin/test
-#           2.     11 functiona()          /Users/wayneeseguin/test
-#           1.     29 main()               /Users/wayneeseguin/test
-#      > /Users/wayneeseguin/test functionc() 26 $ echo 'function c'
+#           4.     25 functionc()          /Users/sm/test
+#           3.     18 functionb()          /Users/sm/test
+#           2.     11 functiona()          /Users/sm/test
+#           1.     29 main()               /Users/sm/test
+#      > /Users/sm/test functionc() 26 $ echo 'function c'
 #     function c
-#      > /Users/wayneeseguin/test functionb() 19 $ echo 'function b'
+#      > /Users/sm/test functionb() 19 $ echo 'function b'
 #     function b
-#      > /Users/wayneeseguin/test functiona() 12 $ echo 'function a'
+#      > /Users/sm/test functiona() 12 $ echo 'function a'
 #     function a
 #
 # ### Code Walkthrough

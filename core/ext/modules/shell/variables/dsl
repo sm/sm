@@ -264,7 +264,7 @@ ematch()
 #        Trace   Line Function             File
 #           3.     37 fail()               /sm/extensions/builtin/core/modules/shell/logging/dsl
 #           2.    192 variables_must_be_nonempty() /sm/extensions/builtin/core/modules/shell/variables/dsl
-#           1.      6 main()               /Users/wayneeseguin/test
+#           1.      6 main()               /Users/sm/test
 #      > modules/shell/logging/dsl fail() 38 $ exit 1
 #
 variables_must_be_nonempty()

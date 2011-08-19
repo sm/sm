@@ -7,6 +7,6 @@ case "${extension_args[0]}" in
     succeed "${sm_version:-"?.?.?"}"
     ;;
   *) # GNU-style extended version information.
-    succeed "\nBDSM Framework ${sm_version:-"?.?.?"} https://bdsm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)\n"
+    succeed "\nSM Framework ${sm_version:-"?.?.?"} https://sm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)\n"
     ;;
 esac

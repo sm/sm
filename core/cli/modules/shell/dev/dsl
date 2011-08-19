@@ -58,10 +58,10 @@ sm_development_setup()
       log "  * Cloning Core repository into $PWD/${_component}/."
       case ${_component} in
         core)
-          _url="https://github.com/wayneeseguin/bdsm"
+          _url="https://github.com/sm/sm"
           ;;
         *)
-          _url="https://github.com/wayneeseguin/bdsm-${_component}"
+          _url="https://github.com/sm/sm-${_component}"
           ;;
       esac
 

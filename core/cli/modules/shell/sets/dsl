@@ -73,7 +73,7 @@ sets_install()
 
   for _name in ${_names[@]}
   do
-    log_step "bdsm-${_name}" set_install "${_name}" ${_uri}
+    log_step "sm-${_name}" set_install "${_name}" ${_uri}
   done
 }
 
@@ -211,6 +211,6 @@ sets_check_availability()
   #       provide check_known_sets_availability or some such to wrap this.
   awk -F = '/^[^#]/ {printf "%20s   %s\n", $1, $2 }' < "${sm_path}/core/cli/config/known_sets" |
   "${sm_path}/bin/sm-ll" \
-    printf "%s: " {} \; curl -s --head https://github.com/wayneeseguin/bdsm-{} \| awk "'/Status/{print \$2}'"
+    printf "%s: " {} \; curl -s --head https://github.com/sm/sm-{} \| awk "'/Status/{print \$2}'"
 }
 
