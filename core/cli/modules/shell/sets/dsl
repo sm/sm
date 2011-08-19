@@ -107,7 +107,7 @@ sets_install_all()
   do
     _name="${_set%%=*}"
     _uri="${_set##*=}"
-    sets_install "${_name}" "${_uri}"
+    sets_install "${_name}" "${_uri}" --on-fail true
   done
 }
 
