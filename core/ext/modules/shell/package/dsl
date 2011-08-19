@@ -324,9 +324,11 @@ package_init()
   declare -a package_dependencies
   declare -a configure_flags
 
-  ! command_exists "${package_name}_initialize" &&
-  ! string_contains "${FUNCNAME[*]}" "${package_name}_initialize" ||
-    "${package_name}_initialize"
+  if command_exists "${package_name}_initialize"
+  then
+    ! string_contains "${FUNCNAME[*]}" "${package_name}_initialize" ||
+      "${package_name}_initialize"
+  fi
 
   true \
     "${source_path:="${sm_path}/src"}" \
