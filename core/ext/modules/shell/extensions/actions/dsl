@@ -1,5 +1,29 @@
 #!/bin/sh
 
+build_extensions_actions_cache()
+{
+  local _extension_path=$1 _extension _extension_namespace
+  shift || fail "Extension path must be given as the first parameter."
+
+  _extension_namespace="${_extension_path#${sm_path}\/}"
+  log_step "Updating action cache for ${_extension_namespace//\// }"
+
+  for _extension in "${_extension_path}"/*
+  do
+    debug search "build_actions_cache:${_extension}:"
+    case "${_extension}" in
+      (*\/\*|*\/.*) continue ;;
+    esac
+    [[ -d "${_extension}" ]] || continue
+    [[ ! -f "${_extension}/.actions_cache" ]] || continue
+    _extension="${_extension#${_extension_path}\/}"
+    actions_build_cache_start "${_extension_path}" "${_extension}" 2>/dev/null
+  done
+
+  log_step success
+  return 1 #fake we found nothing and continue with next search path
+}
+
 actions_build_cache_start()
 {
   local _extension_path="${1:-}" _extension="${2:-}"
