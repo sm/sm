@@ -214,7 +214,7 @@ move_directory()
     fail "Could not move '${_source}' to '${_target}',"\
     "as the 'chmod -R' command failed with error code '$?'."
 
-  [[ -z "${_mode}"]] ||
+  [[ -z "${_mode}" ]] ||
     chmod -R "${_mode}" "${_target}" ||
     fail "Could not recursively change mode of '${_target}' to"\
     "${_mode}, as the 'chmod -R' command failed with error code '$?'."
