@@ -21,11 +21,8 @@ string_contains_key()
 # Prints new string.
 string_append()
 {
-  printf "$1"                    # always use string
-  if ! string_contains "$1" "$2" # if non-existing,
-  then
-    printf " $2"                 # then append.
-  fi
+  printf "$1" # always use string
+  string_contains "$1" "$2" || printf " $2" # append if does not exist.
 }
 
 # ## string\_remove()
@@ -43,10 +40,7 @@ string_remove()
 options_check()
 {
   # Do not use brackets; they slow things down a lot.
-  if string_contains "$1" "$2"
-  then
-    return 0
-  else
-    string_contains "$1" "all" && ! string_contains "$1" "-$2"
-  fi
+  ! string_contains "$1" "$2" || return 0
+
+  string_contains "$1" "all" && ! string_contains "$1" "-$2"
 }

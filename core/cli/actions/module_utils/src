@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 
-if array_is_nonempty extension_args
-then
-  printf "${extensions_development_path}/${extension_args[0]}/"
-else
+array_is_nonempty extension_args ||
   fail "You must specify at least one extension name."
-fi
+
+printf "${extensions_development_path}/${extension_args[0]}/"
 

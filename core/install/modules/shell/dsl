@@ -155,7 +155,7 @@ make_binaries_executable()
 
 install_sm()
 {
-  log "BDSM Framework Installation:"
+  log "S{cripting,ystem,tack} Management (SM) Framework (Core) Installation:"
 
   prepare_for_installation
 
@@ -175,6 +175,6 @@ install_sm()
   log_step "Ensuring that binaries are executable" \
     make_binaries_executable
 
-  succeed "BDSM Framework installed."
+  succeed "S{cripting,ystem,tack} Management (SM) Framework (Core) installed."
 }
 

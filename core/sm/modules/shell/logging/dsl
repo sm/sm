@@ -673,10 +673,7 @@ backtrace()
   local _message="${1:-}" _flag="$2"
 
   # If a message was given, print the message to the calling environment's STDERR.
-  if [[ -n _message ]]
-  then
-    printf "\n${_message}\n\n" >&2
-  fi
+  [[ -z ${_message} ]] || printf "\n${_message}\n\n" >&2
 
   # Declare function local variables
   local _source _function _line _index _largest _format _digits _longest
@@ -701,20 +698,16 @@ backtrace()
   do
     # For each source file in the source files array, if the file name/path
     # is longer than the current longest, then set it as the new longest element.
-    if (( ${#BASH_SOURCE[${_index}]} > ${#_longest} ))
-    then
+    (( ${#BASH_SOURCE[${_index}]} <= ${#_longest} )) ||
       _longest=${BASH_SOURCE[${_index}]}
-    fi
   done
 
   for (( _index=0 ; _index < ${#BASH_LINENO[@]} ; _index++ ))
   do
     # For each line number in the line numbers array, if the number of digits
     # is greater than the current longest digits, then set it as the new largest.
-    if (( ${#BASH_LINENO[${_index}]} > ${#_digits} ))
-    then
+    (( ${#BASH_LINENO[${_index}]} <= ${#_digits} )) ||
       _digits=${BASH_LINENO[${_index}]}
-    fi
   done
 
   # Determine the format string output for the backtrace, based on your

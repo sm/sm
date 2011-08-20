@@ -110,10 +110,8 @@ init_extensions_search_paths()
   fi
 
   # Core is required to run, add it if not found
-  if ! string_contains "${extensions_search_paths[*]}" "${sm_path}/core"
-  then
+  string_contains "${extensions_search_paths[*]}" "${sm_path}/core" ||
     extensions_search_paths+=( "${sm_path}/core" )
-  fi
 
   debug search "extension_sets_home:${extension_sets_home}:"
   debug search "extension_exts_home:${extension_exts_home}:"
@@ -180,18 +178,13 @@ in_search_paths()
 
   for path in "${extensions_search_paths[@]}"
   do
-    if "${callback}" "${path}" "${args[@]}"
-    then
-      return 0
-    fi
+    "${callback}" "${path}" "${args[@]}" || continue
+    return 0
   done
 
-  if "${callback}" "${sm_path}/core" "cli" "${args[@]}"
-  then
-    return 0
-  fi
+  "${callback}" "${sm_path}/core" "cli" "${args[@]}" || return 1
 
-  return 1
+  return 0
 }
 
 #
@@ -230,11 +223,7 @@ module()
 {
   local _module=$1 _file _module_dependency _module_path
 
-  # Check if module already loaded.
-  if module_is_loaded "${_module}"
-  then
-    return 0
-  fi
+  ! module_is_loaded "${_module}" || return 0 # Return if module is loaded.
 
   # Search for module.
   if in_search_paths detect_module "${_module}"
@@ -282,10 +271,7 @@ module()
 # load module; or show error msg if module is not available.
 module_or_error()
 {
-  if ! module "$1"
-  then
-    error "$2"
-  fi
+  module "$1" || error "$2"
 }
 
 #
@@ -323,14 +309,12 @@ modules()
 {
   local _module _sm _extension _path _file _modules=("$@")
 
-  (( ${#_modules[@]} )) || fail "No modules specified to load."
+  (( ${#_modules[@]} )) || fail "$FUNCNAME: No modules given to load."
 
   for _module in "${_modules[@]}"
   do
-    if ! module "${_module}"
-    then
-      fail "Could not find module path for ${_module}."
-    fi
+    module "${_module}" ||
+      fail "$FUNCNAME: Could not find module path for ${_module}."
   done
 }
 
@@ -364,20 +348,18 @@ modules_reinitialize()
   local _module _modules=("$@") _loaded_modules _module_path _initialize_path
 
   array_is_nonempty _modules ||
-    fail "Cannot load a module, as no module was given."
+    fail "$FUNCNAME: Cannot load a module; No module name was given."
 
   _loaded_modules=" ${modules[*]} "
   for _module in "${_modules[@]}"
   do
     _module_path="${_loaded_modules##* ${_module}=}"
     _module_path="${_module_path%% *}"
-    if [[ -n "${_module_path}" ]]
-    then
-      _initialize_path="${sm_path}/${_module_path}/initialize"
-      [[ ! -s "${_initialize_path}" ]] || source "${_initialize_path}"
-    else
+    [[ -n "${_module_path}" ]] ||
       fail "Can not reinitialize module as it was not yet loaded"
-    fi
+
+    _initialize_path="${sm_path}/${_module_path}/initialize"
+    [[ ! -s "${_initialize_path}" ]] || source "${_initialize_path}"
   done
 }
 
