@@ -233,7 +233,7 @@ in_search_paths()
 #
 module()
 {
-  local _module="${1:-}" _file _module_dependency _module_path _hook
+  local _module="${1:-}" _file _module_dependency _module_path _hook _function
   shift || fail "No module name was given as the first parameter."
 
   ! module_is_loaded "${_module}" || return 0 # Return if module is loaded.
@@ -277,11 +277,14 @@ module()
     fi
   done
 
+  _function="${_module//\//_}"
+  _function="${_function//_modules_shell/_}"
+
   for _hook in initialize # options, etc... ?
   do
     if command -v "${_module##*/}_${_hook}" > /dev/null 2>&1
     then
-      "${_module//\//_}_${_hook}"
+      "${_function}_${_hook}"
     fi
   done
 
