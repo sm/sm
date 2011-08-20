@@ -208,8 +208,6 @@ install_sm()
   log_step "Ensuring that binaries are executable" \
     make_binaries_executable
 
-  sm --call=install/build_actions_cache
-
   succeed "S{cripting,ystem,tack} Management (SM) Framework (Core) installed."
 }
 
