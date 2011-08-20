@@ -159,7 +159,7 @@ build_actions_cache()
   then
     log_step "Cleaning action cache for core" \
       rm -f ${install_path}/core/*/.actions_cache
-    build_extensions_actions_cache ${install_path}/core "cli" || true
+    build_extensions_actions_cache ${install_path}/core "unused" || true
   else
     in_search_paths build_extensions_actions_cache "unused" || true
   fi
