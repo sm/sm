@@ -1495,21 +1495,20 @@ service_init_info()
 service_conf_d()
 {
   # TODO: Install a default conf.d template if extension does not define one.
-  if template_exists "conf.d"
-  then
-    install_template "conf.d.template" to "/etc/conf.d/${service}.conf" \
-      mode 0644 owner "${service_user}:${service_user}"
+  template_exists "conf.d" || return 0
 
-    if template_exists "/etc/conf.d/${service}.conf"
-    then
-      seed_template "/etc/conf.d/${service}.conf" \
-        prefix_path "${prefix_path}" \
-        init_scripts_path "${init_scripts_path}" \
-        modules_path "${modules_path}" \
-        confd_path "${confd_path}" \
-        extension "${service}" \
-        service "${service}"
-    fi
+  install_template "conf.d.template" to "/etc/conf.d/${service}.conf" \
+    mode 0644 owner "${service_user}:${service_user}"
+
+  if template_exists "/etc/conf.d/${service}.conf"
+  then
+    seed_template "/etc/conf.d/${service}.conf" \
+      prefix_path "${prefix_path}" \
+      init_scripts_path "${init_scripts_path}" \
+      modules_path "${modules_path}" \
+      confd_path "${confd_path}" \
+      extension "${service}" \
+      service "${service}"
   fi
 }
 
@@ -1598,16 +1597,14 @@ service_init_d()
   service_load_conf_d # Load the configuration file.
 
   # Sanity checks go here.
-  if file_is_executable "${service_binary}"
-  then
-    service_pid
-
-    service_cli # Parse the script arguments and take action accordingly.
-
-    service_init_action "${service_action}"
-  else
+  file_is_executable "${service_binary}" ||
     fail "Could not find ${service_binary}, or ${service_binary} is not executable."
-  fi
+
+  service_pid
+
+  service_cli # Parse the script arguments and take action accordingly.
+
+  service_init_action "${service_action}"
 }
 
 #
@@ -1723,10 +1720,8 @@ service_activate()
 
   variables_must_be_nonempty _service _version
 
-  if symlink_exists "${service_db_path}/active"
-  then
+  ! symlink_exists "${service_db_path}/active" ||
     service_deactivate "${_service}"
-  fi
 
   if path_exists "${service_db_path}/${_version}"
   then
@@ -1756,10 +1751,8 @@ service_activate()
             #  TODO: daemontools remove start on boot
 
           else # Fall back on rc.local to start redis at system startup.
-            if ! file_contains "/etc/rc.local" "${service} start"
-            then
+            file_contains "/etc/rc.local" "${service} start" ||
               sed -i -e "d#${init_scripts_path}/${service} start#" /etc/rc.local
-            fi
           fi
         fi
       elif os_is_darwin
@@ -1898,23 +1891,22 @@ service_signal()
 {
   local _signal="${1}" _pid="${2:-0}"
 
-  if [[ -n "${_pid}" ]]
-  then
-    case "${_signal}" in
-      KILL|QUIT|TERM|USR1|USR2|TTIN|TTOU|WINCH|[[:digit]]*)
-        if (( _pid > 0 ))
-        then
-          kill -${_signal} ${_pid}
-        else
-          log "Not sending signal ${_signal} to process, as pid is 0 (process not found/running)."
-        fi
-        ;;
-      *)
-        fail "The signal to send must be passed in first, and must be one of: {KILL,QUIT,TERM,USR1,USR2,TTIN,TTOU,a digit})."
-        ;;
-    esac
-  else
-    fail "The pid to signal must be passed in as the second parameter; please check your code (see trace below.)"
-  fi
+  [[ -n "${_pid}" ]] ||
+    fail "pid to signal must be passed in as the second parameter;"\
+    " please check your code (see trace below.)"
 
+  case "${_signal}" in
+    KILL|QUIT|TERM|USR1|USR2|TTIN|TTOU|WINCH|[[:digit]]*)
+      if (( _pid > 0 ))
+      then
+        kill -${_signal} ${_pid}
+      else
+        log "Not sending signal ${_signal} to process, as pid is 0 (process not found/running)."
+      fi
+      ;;
+    *)
+      fail "The signal to send must be passed in first, and must be one of:"\
+        " {KILL,QUIT,TERM,USR1,USR2,TTIN,TTOU,a digit})."
+      ;;
+  esac
 }
