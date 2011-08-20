@@ -59,7 +59,7 @@ ext_list_known()
 {
   local COLUMNS=80
 
-  awk -F = '/^[^#]/ {printf "# %18s | %s\n", $1, $2 }' <<<"Extension name=Repository"
+  printf "# %18s | %s\n" "Extension name" "Repository"
   awk -F = '/^[^#]/ {printf "%20s   %s\n", $1, $2 }' < "${sm_path}/core/cli/config/known_ext"
 }
 
@@ -74,8 +74,9 @@ ext_install()
   for _name in ${_names[@]}
   do
     log_step "Installing ${_name} in ${_extension_namespace//\// }" extension_install "${_name}" ${_uri}
-    log_step "Updating action cache for ${_extension_namespace//\// } ${_name}" \
-      actions_build_cache_start "${extension_exts_home}" "${_name}" 2>/dev/null
+    # TODO: Only generate cache on install if no cache found.
+    # log_step "Updating action cache for ${_extension_namespace//\// } ${_name}" \
+    #  actions_build_cache_start "${extension_exts_home}" "${_name}" 2>/dev/null
   done
 }
 
