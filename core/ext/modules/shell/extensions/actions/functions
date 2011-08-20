@@ -116,41 +116,66 @@ actions_build_modules_cache()
   done
 }
 
+detect_cached_action_from_action_cache_check_short()
+{
+  local _found _found_actions
+  _found_actions=( $( \awk -F = "/\/$1[=\/]/ {print}" < "${_cache_file}" ) )
+
+  if (( ${#_found_actions[@]} == 1 ))
+  then
+    _found_actions="${_found_actions#*=}"
+    action="${_found_actions##*/}"
+    action_path="${extensions_path}/${extension}/actions/${_found_actions}"
+    action_path="${action_path%/*}"
+    extension_args=( "${_rest_params[@]}" )
+    return 0
+
+  elif (( ${#_found_actions[@]} > 1 ))
+  then
+    error "More than one action found matching, please be more specific.\n\nDid you mean:\n$(
+      for candidate in "${_found_actions[@]}"
+      do
+        candidate="${candidate%%=*}"
+        printf "  sm ${extension} ${candidate//\// } ${_rest_params[@]}\n"
+      done | sort
+    )\n"
+
+  else
+    debug search "no candidates for '${_action}'"
+  fi
+  return 1
+}
+
+detect_cached_action_from_action_cache_check()
+{
+  local _found=$( \awk -F = "/^$1=/ {print \$2}" < "${_cache_file}" )
+  [[ -n "${_found}" ]] || return 1
+  action="${_found##*/}"
+  action_path="${_found%/*}"
+  [[ "${action_path}" != "${_found}" ]] || action_path=""
+  action_path="$extensions_path/$extension/actions/${action_path}"
+  extension_args=( "${_rest_params[@]}" )
+  debug search ":cached(${_cache_file}):${_action_path}=${_found}:params=${_rest_params[*]}:"
+  return 0
+}
+
 detect_cached_action_from_action_cache()
 {
   local _cache_file="$extensions_path/$extension/.actions_cache"
-  local _action_params=( "$@" ) _action_path _new_action_path _found
-  local _rest_params=() _action_params_length _param_temp
+  local _action_params=( "$@" ) _action_path _action_path_help _param_temp
+  local _rest_params=() _action_params_length _new_action_path
   if [[ -f "${_cache_file}" ]]
   then
     while :
     do
       _action_path="${_action_params[*]}"
-      _action_path="${_action_path// //}"
-      _found=$( \awk -F = "/^${_action_path//\//\/}=/ {print \$2}" < "${_cache_file}" )
-      if [[ -n "${_found}" ]]
-      then
-        action="${_found##*/}"
-        action_path="${_found%/*}"
-        [[ "${action_path}" != "${_found}" ]] || action_path=""
-        action_path="$extensions_path/$extension/actions/${action_path}"
-        extension_args=( "${_rest_params[@]}" )
-        debug search ":cached(${_cache_file}):${_action_path}=${_found}:params=${_rest_params[*]}:"
-        return 0
-      fi
-      _action_path="${_action_path}/help"
-      _action_path="${_action_path#\/}"
-      _found=$( \awk -F = "/^${_action_path//\//\/}=/ {print \$2}" < "${_cache_file}" )
-      if [[ -n "${_found}" ]]
-      then
-        action="${_found##*/}"
-        action_path="${_found%/*}"
-        [[ "${action_path}" != "${_found}" ]] || action_path=""
-        action_path="$extensions_path/$extension/actions/${action_path}"
-        extension_args=( "${_rest_params[@]}" )
-        debug search ":cached(${_cache_file}):${_action_path}=${_found}:params=${_rest_params[*]}:"
-        return 0
-      fi
+      _action_path="${_action_path// /\/}"
+      ! detect_cached_action_from_action_cache_check "${_action_path}" || return 0
+      _action_path_help="${_action_path}\/help"
+      _action_path_help="${_action_path_help#\\\/}"
+      ! detect_cached_action_from_action_cache_check "${_action_path_help}" || return 0
+      ! detect_cached_action_from_action_cache_check_short "${_action_path}" || return 0
+      ! detect_cached_action_from_action_cache_check_short "${_action_path_help}" || return 0
 
       _action_params_length=${#_action_params[@]}
       (( _action_params_length )) || break # finish if no more params

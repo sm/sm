@@ -1,124 +1,5 @@
 #!/bin/sh
 
-# detect_action $extension action extension_args "${extension_args[@]}"
-detect_action()
-{
-  extensions_path=$1
-  shift || fail "Cannot detect action; No extensions path was given."
-
-  extension="$1"
-  shift || fail "Cannot detect action; No extension name was given."
-
-  local token _word _action_path="$extensions_path/$extension/actions"
-
-  local _params=("$@")
-
-  # loop when params or .actions exists
-  while (( ${#_params[@]} > 0 )) || file_exists "${_action_path}/.actions"
-  do
-    array_shift _params token
-
-    # Detect function.
-    if  variable_is_nonempty token &&
-      match "$token" "*\(\)"
-    then
-      _params=( "${token}" "${_params[@]}" )
-      break
-
-    # Detect a namespace.
-    elif variable_is_nonempty token &&
-      path_exists "${_action_path}/${token}"
-    then
-      _action_path+="/${token}"
-
-    # Detect action.
-    elif variable_is_nonempty token &&
-      file_is_executable "${_action_path}/${token}"
-    then
-      _params=( "${token}" "${_params[@]}" )
-      break
-
-    # Detect mapping in .actions.
-    elif file_exists "${_action_path}/.actions" &&
-         file_contains "${_action_path}/.actions" "^${token}="
-    then
-      _array=( $(hash_file "${_action_path}/.actions" ${token}) )
-      _params=( "${_array[@]}" "${_params[@]}" )
-      [[ "${_array[@]}" == "$token" ]] && break # break if detected 2nd time the same
-
-    # Detect default mapping in .actions
-    elif file_exists "${_action_path}/.actions" &&
-         file_contains "${_action_path}/.actions" "^default="
-    then
-      _array=( $(hash_file "${_action_path}/.actions" default) )
-      _params=( "${_array[@]}" "${token}" "${_params[@]}" )
-      [[ "${_array[@]}" == "$token" ]] && break # break if detected 2nd time the same
-
-    # Detect help mapping in .actions
-    elif file_exists "${_action_path}/.actions" \
-    && file_contains "${_action_path}/.actions" "^help=" \
-    && (( ${#_params[@]} == 0 ))
-    then
-      _array=( $(hash_file "${_action_path}/.actions" help) )
-      _params=( "${_array[@]}" "${token}" "${_params[@]}" )
-      [[ "${_array[@]}" == "$token" ]] && break # break if detected 2nd time the same
-
-    # Finish searching path.
-    else
-      _params=( "${token}" "${_params[@]}" )
-      break
-    fi
-  done
-
-  if array_is_empty _params
-  then
-    token=""
-  else
-    array_shift _params token
-  fi
-
-  # Detect function.
-  if variable_is_nonempty token &&
-    match "${token}" "*\(\)"
-  then
-    action_path="${_action_path}"
-    action="$token"
-    extension_args=( "${_params[@]}" )
-
-  # Detect a file.
-  elif variable_is_nonempty token &&
-    file_is_executable "${_action_path}/${token}"
-  then
-    action_path="${_action_path}"
-    action="$token"
-    extension_args=( "${_params[@]}" )
-
-  # Detect default, if nothing else matches.
-  elif file_exists "${_action_path}/default"
-  then
-    action_path="${_action_path}"
-    action="default"
-    extension_args=( "$token" "${_params[@]}" )
-
-  # Detect help, if no default.
-  elif file_exists "${_action_path}/help" \
-  && (( ${#_params[@]} == 0 )) \
-  && [[ "$token" == "" ]]
-  then
-    action_path="${_action_path}"
-    action="help"
-    [[ "$token" != "" ]] && extension_args=("$token") || extension_args=()
-    extension_args+=( "${_params[@]}" )
-
-  else
-    # Not found; error.
-    return 1
-  fi
-
-  # Found, OK.
-  return 0
-}
-
 # find modules on path and return the longest module path on top
 detect_modules_paths()
 {
@@ -233,72 +114,6 @@ detect_modules_action()
     fi
   done
 
-  return 1
-}
-
-detect_unique_2nd_level_action()
-{
-  trace_filter detect_unique_2nd_level_action
-
-  extensions_path="${1:-}" extension="${2:-}"
-  local _action="${3:-}" _actions_path _found_actions=() _found_actions_paths \
-    _found_action_path _hash_action
-
-  shift || fail "cannot detect modules action;"\
-    " Extensions path was not given as first parameter."
-  shift || fail "cannot detect modules action;"\
-    " Extension name was not given as second parameter."
-  shift || return 1 # no action name was given - skip
-
-  _actions_path="$extensions_path/$extension/actions"
-  if [[ -d "${_actions_path}" ]]
-  then
-    if _found_actions_paths=( $(find "${_actions_path}" -mindepth 2 -maxdepth 3 -name "${_action}") )
-    then
-      for _found_action_path in ${_found_actions_paths[@]}
-      do
-        if [[ -x "${_found_action_path}" ]]
-        then
-          _found_actions+=( "${_found_action_path}" )
-        fi
-      done
-    fi
-
-    if _found_actions_paths=( $(find "${_actions_path}" -mindepth 2 -maxdepth 3 -name .actions) )
-    then
-      for _found_action_path in ${_found_actions_paths[@]}
-      do
-        if file_contains "${_found_action_path}" "${_action}="
-        then
-          _hash_action="$( hash_file "${_found_action_path}" "${_action}" )"
-          [[ -z "${_hash_action}" ]] ||
-            _found_actions+=( "${_found_action_path%/*}/${_hash_action}" )
-        fi
-      done
-    fi
-
-    if (( ${#_found_actions[@]} == 1 ))
-    then
-      action="${_found_actions##*/}"
-      action_path="${_found_actions%/*}"
-      extension_args=( "$@" )
-      return 0
-
-    elif (( ${#_found_actions[@]} > 1 ))
-    then
-      error "More than one action found matching, please be more specific.\n\nDid you mean:\n$(
-        for candidate in "${_found_actions[@]}"
-        do
-          candidate="${candidate##${_actions_path}}"
-          candidate="${candidate%/*}"
-          candidate="${candidate//\// }"
-          printf "  sm ${extension} ${candidate} ${_action} $@\n"
-        done | sort
-      )\n"
-    else
-      debug search "no candidates for '${_action}'"
-    fi
-  fi
   return 1
 }
 
@@ -532,14 +347,8 @@ extension_action()
       ;;
   esac
 
-  # Search in extensions actions
-  # Search in unique second level actions
-  # Search in loaded modules actions
-  if \
-    in_search_paths detect_cached_action "${extension_args[@]}" ||
-    in_search_paths detect_action "${extension_args[@]}" ||
-    in_search_paths detect_unique_2nd_level_action "${extension_args[@]}" ||
-    in_search_paths detect_modules_action "${extension_args[@]}"
+  if in_search_paths detect_cached_action "${extension_args[@]}" \
+  || in_search_paths detect_modules_action "${extension_args[@]}"
   then
     log_search action "$action" "${action_path##${sm_path}\/} params:${extension_args[@]}"
   else
