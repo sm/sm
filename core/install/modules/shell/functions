@@ -63,26 +63,6 @@ install_configuration_files()
   log_step success
 }
 
-symlink_sm_binaries()
-{
-  local _binary
-  for _binary in "${binaries[@]}"
-  do
-    link --force "${install_path}/bin/${_binary}" to "${_bin_path}/${_binary}"
-  done
-}
-
-symlink_sm()
-{
-  local _bin_path="${install_path//sm/bin}"
-
-  if variable_is_nonempty sm_path && path_exists "${_bin_path}"
-  then
-    log_step "Linking binarires (${binaries[*]}) => ${_bin_path}/" \
-      symlink_sm_binaries
-  fi
-}
-
 setup_shell_completion()
 {
   local _prefix="/etc" _mode _name
@@ -200,10 +180,7 @@ install_sm()
 
   perform setup_profile_d
 
-  user_is_not_root || {
-    # perform symlink_sm
-    perform setup_shell_completion
-  }
+  user_is_not_root || perform setup_shell_completion
 
   log_step "Ensuring that binaries are executable" \
     make_binaries_executable
