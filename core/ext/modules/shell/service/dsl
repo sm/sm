@@ -195,7 +195,7 @@ services_list()
 {
   local _action="${1:-}" _args
 
-  [[ -z "${_action}" ]] || shift
+  shift || true
 
   case "${_action}" in
     (active)
@@ -448,8 +448,7 @@ service_start()
 {
   (( $# == 0 )) || service_cli $@
 
-  variable_is_nonempty service ||
-    fail "To start a service, you must set the 'service' variable."
+  [[ -n "${service}" ]] || fail "$FUNCNAME: To start a service, you must set the 'service' variable."
 
   if command_exists "${service}_start"
   then
@@ -494,7 +493,7 @@ service_start()
 service_stop()
 {
   variable_is_nonempty service ||
-    fail "To start a service, you must set the 'service' variable."
+    fail "$FUNCNAME: To start a service, you must set the 'service' variable."
 
   if command_exists "${service}_stop"
   then
@@ -541,7 +540,7 @@ service_reload()
   (( $# == 0 )) || service_cli $@
 
   variable_is_nonempty service ||
-    fail "To start a service, you must set the 'service' variable."
+    fail "$FUNCNAME: To start a service, you must set the 'service' variable."
 
   if command_exists "${service}_reload"
   then
@@ -588,7 +587,7 @@ service_restart()
   (( $# == 0 )) || service_cli $@
 
   variable_is_nonempty service ||
-    fail "To start a service, you must set the 'service' variable."
+    fail "$FUNCNAME: To start a service, you must set the 'service' variable."
 
   if command_exists "${service}_restart"
   then
@@ -635,7 +634,7 @@ service_status()
   (( $# == 0 )) || service_cli $@
 
   variable_is_nonempty service ||
-    fail "To start a service, you must set the 'service' variable."
+    fail "$FUNCNAME: To start a service, you must set the 'service' variable."
 
   if command_exists "${service}_status"
   then
@@ -682,7 +681,7 @@ service_logtail()
   (( $# == 0 )) || service_cli $@
 
   variable_is_nonempty service ||
-    fail "To start a service, you must set the 'service' variable."
+    fail "$FUNCNAME: To start a service, you must set the 'service' variable."
 
   if command_exists "${service}_logtail"
   then
@@ -728,8 +727,8 @@ service_info()
 {
   (( $# == 0 )) || service_cli $@
 
-  variable_is_nonempty service ||
-    fail "In order to get info on a service, the 'service' variable must be set."
+  [[ -n "${service}" ]] ||
+    fail "$FUNCNAME: In order to get info on a service, the 'service' variable must be set."
 
   if command_exists "${service}_info"
   then
@@ -776,7 +775,7 @@ service_configcheck()
   (( $# == 0 )) || service_cli $@
 
   variable_is_nonempty service ||
-    fail "To configcheck a service, the 'service' variable must be set."
+    fail "$FUNCNAME: To configcheck a service, the 'service' variable must be set."
 
   if command_exists "${service}_configcheck"
   then
@@ -1072,45 +1071,43 @@ service_install_init_d()
 
   variables_must_be_nonempty _service
 
-  if path_exists "${init_scripts_path}"
-  then
-    if user_is_root
-    then
-      ensure_paths_exist "/etc/conf.d" "${init_scripts_path}"
-
-      log "Installing init scripts for ${_service}."
-
-      # TODO: Install the service init script...
-
-      if template_exists "${_service}"
-      then
-        install_template "${_service}" to "${init_scripts_path}/${_service}" \
-          mode 0755
-      else
-        # Use core svc init.d template
-        install_template "cli/init.d" \
-          to "${init_scripts_path}/${_service}" mode 0755
-
-        seed_template "${init_scripts_path}/${_service}" \
-          modules_path "${modules_path}" \
-          service "${service}" \
-          service_user "${service_user}" \
-          service_config_path "${service_config_path}"
-      fi
-
-      service_activate "${service}" "${package_version}"
-
-      # TODO: Replace this with install_template + seed_template
-      write "%s\n" "[ -d \"${prefix_path}/${_service}/active/bin\" ] && " \
-        to "/etc/profile.d/${_service}.sh"
-
-      write "%s\n" "PATH=\"\$PATH:${prefix_path}/${_service}/active/bin\" ; export PATH; " \
-        append to "/etc/profile.d/${_service}.sh"
-
-      chmod_files 0755 "/etc/profile.d/${_service}.sh"
-    fi
-  else
+  path_exists "${init_scripts_path}" ||
     return 0 # No bin/ dir, no need for it to be in the path.
+
+  if user_is_root
+  then
+    ensure_paths_exist "/etc/conf.d" "${init_scripts_path}"
+
+    log "Installing init scripts for ${_service}."
+
+    # TODO: Install the service init script...
+
+    if template_exists "${_service}"
+    then
+      install_template "${_service}" to "${init_scripts_path}/${_service}" \
+        mode 0755
+    else
+      # Use core svc init.d template
+      install_template "cli/init.d" \
+        to "${init_scripts_path}/${_service}" mode 0755
+
+      seed_template "${init_scripts_path}/${_service}" \
+        modules_path "${modules_path}" \
+        service "${service}" \
+        service_user "${service_user}" \
+        service_config_path "${service_config_path}"
+    fi
+
+    service_activate "${service}" "${package_version}"
+
+    # TODO: Replace this with install_template + seed_template
+    write "%s\n" "[ -d \"${prefix_path}/${_service}/active/bin\" ] && " \
+      to "/etc/profile.d/${_service}.sh"
+
+    write "%s\n" "PATH=\"\$PATH:${prefix_path}/${_service}/active/bin\" ; export PATH; " \
+      append to "/etc/profile.d/${_service}.sh"
+
+    chmod_files 0755 "/etc/profile.d/${_service}.sh"
   fi
 }
 
