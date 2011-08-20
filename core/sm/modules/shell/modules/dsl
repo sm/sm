@@ -31,8 +31,11 @@ modules_initialize()
 
 reorder_path()
 {
-  local part="$1" extensions_path="$2" extension="$3"
-  shift 3
+  local part="${1:-}" extensions_path="${2:-}" extension="${3:-}"
+  shift || fail "$FUNCNAME: Path part must be given as the first parameter."
+  shift || fail "$FUNCNAME: Extensions path must be given as the second parameter."
+  shift || fail "$FUNCNAME: Extension name must be given as the third parameter."
+
   local output="$extensions_path/$extension/$part/$*"
   rebuilded_path="${output// //}"
 }
@@ -40,7 +43,9 @@ reorder_path()
 rebuild_path()
 {
   local part="$1" extensions_path="$2"
-  shift 2
+  shift || fail "$FUNCNAME: Path part must be given as the first parameter."
+  shift || fail "$FUNCNAME: Extensions path must be given as the second parameter."
+
   local params="$*"
   reorder_path "${part}" "${extensions_path}" ${params//\// }
 }
@@ -53,7 +58,8 @@ is_module()
 detect_module()
 {
   local extensions_path=$1 _module_path
-  shift
+  shift || fail "$FUNCNAME: Extensions path must be given as the first parameter."
+
   rebuild_path "modules/shell" $extensions_path $@
   _module_path=${rebuilded_path}
 
@@ -172,8 +178,8 @@ extensions_in()
 in_search_paths()
 {
   trace_filter search
-  local callback=$1
-  shift
+  local callback="${1:-}"
+  shift || fail "$FUNCNAME: Callback name must be given ast the first parameter."
   local args=( "$@" ) path
 
   for path in "${extensions_search_paths[@]}"
