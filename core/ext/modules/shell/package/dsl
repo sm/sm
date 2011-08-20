@@ -546,9 +546,11 @@ To force, call:\n\tsm ${package_name} package install force\n"
       "${package_name}_postinstall"
   fi
 
-  string_contains "${FUNCNAME[*]}" 'package_update' ||
+  if ! string_contains "${FUNCNAME[*]}" 'package_update'
+  then
     log_step "${_package} ${_version} ~ activating" \
-    package_activate_if_first "${package_name}" "${package_version}"
+      package_activate_if_first "${package_name}" "${package_version}"
+  fi
 
   if command_exists "${package_name}_postactivate"
   then
