@@ -1,121 +1,6 @@
 #!/bin/sh
 
-# find modules on path and return the longest module path on top
-detect_modules_paths()
-{
-  local root="$1" path="" IFS='/'
-  shift || fail "Cannot detect modules path;"\
-    "modules root was not given as the first parameter."
-  _module_definitions=( )
-  while (( $# > 0 ))
-  do
-    if is_module "${root}${path}"
-    then
-      _module_definitions=( "${path##\/}=$*" ${_module_definitions[@]} )
-    else
-      break
-    fi
-    path+="/$1"
-    shift
-  done
-}
-
-detect_module_modules_action()
-{
-  debug detect_module_modules_action "start:$*:"
-
-  local _modules_path="${1:-}" _module_path="${2:-}" _module_params="${3:-}" \
-    _module_name module_path
-
-  shift || fail "modules path was not given as the first parameter"
-  shift || fail "another modules path was not given as the second parameter"
-  shift || fail "module parameters were not given as the third parameter"
-
-  if [[ -s "${_modules_path}/${_module_path}/modules" ]]
-  then
-    for _module_name in $( cat "${_modules_path}/${_module_path}/modules" )
-    do
-      if in_search_paths detect_module "${_module_name}"
-      then
-        if [[ -s "${module_path}/actions" ]]
-        then
-          local _params="" _action="${_module_params}" _read_action
-          while [[ -n "${_action}" ]]
-          do
-            if [[ -f "${module_path}/actions" ]] &&
-              file_contains "${module_path}/actions" "${_action}="
-            then
-              _read_action=$( hash_file "${module_path}/actions" "${_action//\//\/}" )
-              if [[ -n "$_read_action" ]]
-              then
-                action="$_read_action"
-                action_path="$extensions_path/$extension/actions/${_module_path// /\/}"
-                extension_args=( $_params )
-                return 0
-              fi
-            fi
-            if [[ "$_action" =~ "/" ]]
-            then
-              _params="${_action##*/} $_params"
-              _action="${_action%/*}"
-            else
-              break
-            fi
-          done
-        fi
-      fi
-    done
-  fi
-  return 1
-}
-
-# Search for extension that modules dependency providing matching [namespace...] action.
-detect_modules_action()
-{
-  trace_filter modules_action
-
-  extensions_path="${1:-}" extension="${2:-}"
-  shift || fail "cannot detect modules action;"\
-    " Extensions path was not given as first parameter."
-  shift || fail "cannot detect modules action;"\
-    " Extension name was not given as second parameter."
-
-  local token _word _modules_path="$extensions_path/$extension/modules/shell"
-  local __params=("$@") _module_path _module_params _module_name
-
-  # first level modules dependency
-  local _module_definition _module_definitions=()
-  detect_modules_paths "${_modules_path}" "${__params[@]}"
-
-  for _module_definition in "${_module_definitions[@]}"
-  do
-    _module_path="${_module_definition//=*}"
-    _module_params="${_module_definition//*=}"
-    if detect_module_modules_action \
-      "${_modules_path}" "${_module_path}" "${_module_params}"
-    then
-      return 0
-    fi
-  done
-
-  # second level modules dependency
-  local _found_modules_paths
-  _found_modules_paths=( $(find "${_modules_path}" -mindepth 2 -maxdepth 3 -name modules 2>/dev/null || true) )
-  for _module_path in ${_found_modules_paths[@]}
-  do
-    _module_path="${_module_path##${_modules_path}\/}"
-    _module_path="${_module_path%\/modules}"
-    _module_params="${__params[*]}"
-    _module_params="${_module_params// //}"
-    if detect_module_modules_action \
-      "${_modules_path}" "${_module_path}" "${_module_params}"
-    then
-      return 0
-    fi
-  done
-
-  return 1
-}
+#TODO: rename module to execution and move extension_action to actions (reneme actions->detection)
 
 detect_action_type()
 {
@@ -347,8 +232,7 @@ extension_action()
       ;;
   esac
 
-  if in_search_paths detect_cached_action "${extension_args[@]}" \
-  || in_search_paths detect_modules_action "${extension_args[@]}"
+  if in_search_paths detect_cached_action "${extension_args[@]}"
   then
     log_search action "$action" "${action_path##${sm_path}\/} params:${extension_args[@]}"
   else
