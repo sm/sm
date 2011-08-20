@@ -37,25 +37,8 @@
 source_files()
 {
   trace_filter filesystem
-  # Declare the file and files variables; set the files variable to an array
-  # containing all of the parameters passed in.
   local _file _files=("$@")
-
-  # If the files array is nonempty, then for each file in the files array expand
-  #   the HOME path if the file contains '~'.
-  #
-  # If the file is nonempty, then source the file.
-  #
-  # If the file is sourced, then go to the next element in the list.
-  #
-  # If sourcing the file failed, this indicates either a programming or a
-  #   system error.
-  #   Fail, yielding a message with a backtrace which can be used to debug.
-  #
-  # If no files were passed, this is a programming error.
-  # Fail, yielding a message with a backtrace to help debug.
-  array_is_nonempty _files ||
-    fail "Cannot source files, as no files were given."
+  shift || fail "$FUNCNAME: Cannot source files; No files were given."
 
   for _file in "${_files[@]}"
   do
@@ -63,19 +46,11 @@ source_files()
 
     if file_is_nonempty "${_file}"
     then
-      if bash -n "${_file}"
-      then
-        if source "${_file}"
-        then
-          continue
-        else
-          fail "There was an error sourcing the file '${_file}'."
-        fi
-      else
-        fail "Not sourcing the file '${_file}', as it has invalid syntax."
-      fi
-    else
-      continue
+      bash -n "${_file}" ||
+        fail "$FUNCNAME: Cannot source the file '${_file}'; Invalid syntax."
+
+      source "${_file}" ||
+        fail "$FUNCNAME: There was an error sourcing the file '${_file}'."
     fi
   done
 }
@@ -114,30 +89,14 @@ source_files()
 nonempty_files()
 {
   trace_filter filesystem
-  # Declare the file and files variables, set the files variable to an array
-  # containing all of the parameters passed in.
   local _file _files=("$@")
-
-  # If the files array is nonempty, then expand the HOME path if the file
-  #   contains '~'
-  #
-  # For each file in the files array: if the file is nonempty, print it to
-  #   STDOUT, including a carriage return for explicit list separation
-  #   (in case any of the files contain a path).
-  #
-  # If no files were given, this indicates a programming error.
-  # Fail, yielding a message with a backtrace which can be used to debug.
-  array_is_nonempty _files ||
-    fail "Cannot return nonempty files, as no files were given."
+  shift || fail "$FUNCNAME: Cannot return nonempty files; No files were given."
 
   _file=${_file/\~\//$HOME\/} # Expand ~/ to full value of $HOME
 
   for _file in "${_files[@]}"
   do
-    if file_is_nonempty "${_file}"
-    then
-      printf "${_file}\n"
-    fi
+    file_is_nempty "${_file}" || printf "${_file}\n"
   done
 }
 
@@ -186,16 +145,6 @@ remove_files()
   local _file _files=("$@")
   shift || fail "$FUNCNAME: Cannot remove files, as no files were given to remove."
 
-  # If the files array is nonempty, then for each file in the files array:
-  #   if the file exists or is a symlink then force-remove the file.
-  #   if the file exists as a directory, this indicates an
-  #   unexpected scenario; fail with a message and a backtrace for debugging.
-  #
-  # If the file still exists on the system, then we do not know what it is;
-  #   fail with an error message and a backtrace for debuging.
-  #
-  # If the files array is empty, this is a programming error.
-  # Fail, yielding a message with a backtrace which can be used to debug.
   for _file in "${_files[@]}"
   do
     if [[ -f "${_file}" || -L "${_file}" ]]
@@ -257,28 +206,15 @@ remove_files()
 remove()
 {
   trace_filter filesystem
-  # Declare the entry and entries variables; set the entries variable to an
-  # array containing all of the parameters passed in.
   local _entity _entities=("$@")
-
-  # If the entities array is nonempty, then for each entity in the array:
-  #
-  # If the entity exists on the filesystem then forcedly remove it recursively
-  #   if the remove was successful, continue, otherwise fail yielding an error
-  #   message and a backtrace for debugging.
-  #
-  # If the entities array is empty, this is a programming error.
-  # Fail, yielding a message with a backtrace which can be used to debug.
   shift || fail "$FUNCNAME: Cannot remove entities; No filesystem entities were given."
 
   for _entity in "${_entities[@]}"
   do
     if [[ -e "${_entity}" ]]
     then
-      rm -rf "${_entity}" ||
-        fail "Could not remove the entity '${_entity}',"\
-          "as the 'rm' command failed with error code '$?'."
-
+      rm -rf "${_entity}" || fail "$FUNCNAME: Cannot not remove entity '${_entity}';"\
+          " 'rm' command failed with error code '$?'."
     fi
   done
 }
@@ -322,23 +258,6 @@ ensure_files_exist()
   trace_filter filesystem
   local _file _path _files=("$@")
   shift || fail "Cannot ensure files exist; No files were given."
-
-  # If the files array is nonempty, then for each file in the files array:
-  #
-  # If the file exists, continue with the next file.
-  #
-  # Extract the file path, ensure the path exists, then touch the
-  # file to create it.
-  #
-  # If the file already exists, then continue with the next file
-  #
-  # If touching the file failed, this indicates either a programming or a
-  # system error.
-  # Fail, yielding a message with a backtrace which can be used
-  # to debug the issue.
-  #
-  # If no files were passed in, this is a programming error.
-  # Fail, yielding a message with a backtrace which can be used to debug.
 
   for _file in "${_files[@]}"
   do
@@ -388,27 +307,8 @@ ensure_files_exist()
 ensure_files_are_executable()
 {
   trace_filter filesystem
-  # Declare the file, files and path variables, set the files variable to an
-  # array containing all of the parameters passed in.
   local _file _path _files=("$@")
   shift || fail "$FUNCNAME: Cannot ensure files are executable; No files were given."
-
-  # If the files array is nonempty, then for each file in the files array:
-  #
-  # If the file exists on the filesystem, but is a directory,
-  # this indicates either a programming or a system error.
-  # Fail, yielding a message with a backtrace for debugging.
-  #
-  # Otherwise, strip off the filename to get the path.
-  # If the path variable is nonempty and the path exists on the filesystem,
-  # then we attempt to perform the file mode execute setting.
-  # If the file is successfully made executable, then continue with the
-  # next file in the files array.
-  # Otherwise, if it failed then this indicates a system error. Fail, giving
-  # an error message with a backtrace for debugging.
-  #
-  # If no files were passed in, this indicates a programming error.
-  # Fail, yielding a message with a backtrace which can be used to debug.
 
   for _file in "${_files[@]}"
   do
@@ -472,10 +372,6 @@ link()
   trace_filter filesystem
   local token _source _target _force_flag=0 _path
 
-  # While the parameters list is nonempty:
-  # Assign the first parameter to the token variable.
-  # Remove the first parameter from the parameters list.
-  # Switch, based on the token string's contents.
   while (( $# > 0 ))
   do
     token="$1"
@@ -514,17 +410,13 @@ link()
   ! [[ -f "${_target}" ]] || fail "Cannot link ${_source} to ${_target}; exists as a file!"
   ! [[ -d "${_target}" ]] || fail "Cannot link ${_source} to ${_target}; exists as a directory"
 
-  # If the target's base path is nonempty, then ensure that it exists.
   _path="${_target%\/*}"
 
   variable_is_empty _path || ensure_paths_exist "${_path}"
 
-  # Try to create a symbolic link from the source to the target.
-  # If it failed to create a symbolic link from the source to the target,
-  # fail, yielding a message with a backtrace which can be used to debug.
   ln -fs "${_source}" "${_target}" ||
-    fail "Failed to create a symbolic link from '${_source}' to '${_target}',"\
-    "as the 'ln -fs' command failed with error code '$?'."
+    fail "$FUNCNAME: Failed to create a symbolic link from '${_source}' to '${_target}';"\
+    "'ln -fs' command failed with error code '$?'."
 }
 
 #
@@ -710,22 +602,18 @@ copy_file()
   variable_is_nonempty _target || fail "Cannot move file; Target path must be given."
 
   cp ${_flags[*]} "${_source}" "${_target}" ||
-    fail "Could not copy '${_source}' to '${_target}';"\
+    fail "$FUNCNAME: Could not copy '${_source}' to '${_target}';"\
     "The 'cp' command failed with error code '$?'."
 
-  if variable_is_nonempty _mode
-  then
+  [[ -z "${_mode}" ]] ||
     chmod "${_mode}" "${_target}" ||
-      fail "Could not change mode of '${_target}' to ${_mode};"\
+      fail "$FUNCNAME: Could not change mode of '${_target}' to ${_mode};"\
       " 'chmod' command failed with error code '$?'."
-  fi
 
-  if variable_is_nonempty _owner
-  then
+  [[ -z "${_owner}" ]] ||
     chown "${_owner}" "${_target}" ||
-      fail "Could not change ownership of '${_target}' to ${_owner};"\
+      fail "$FUNCNAME: Could not change ownership of '${_target}' to ${_owner};"\
       " 'chown' command failed with error code '$?'."
-  fi
 }
 
 #
@@ -763,7 +651,7 @@ copy_file()
 copy_files()
 {
   trace_filter filesystem
-  local _source _target _file _force_flag=0 _files=()
+  local _source _target _file _force_flag=0 _flags=() _files=()
 
   while (( $# > 0 ))
   do
@@ -782,7 +670,7 @@ copy_files()
         ;;
 
       --force|force)
-        _force_flag=1
+        _flags+=(-f)
         ;;
 
       *)
@@ -796,22 +684,17 @@ copy_files()
 
   ensure_paths_exist "${_target}"
 
+  (( _force_flag == 0 )) || _flags+=(-f)
+
   for _file in "${_files[@]}"
   do
     [[ -f "${_file}" ]] ||
       error "$FUNCNAME: Cannot copy file ${_file} to ${_target};"\
       "The file does not exist."
 
-    if (( _force_flag ))
-    then
-      cp -f "${_file}" "${_target}/${_file//*\/}" ||
-        fail "Could not remove the entity '${_entity}',"\
-        "as the 'rm' command failed with error code '$?'."
-    else
-      cp "${_file}" "${_target}/${_file//*\/}" ||
-        fail "Failed to copy '${_file}' to '${_target}/${_file//*\/}',"\
-        "as the 'cp' command failed with error code '$?'."
-    fi
+    cp ${_flags[@]} "${_file}" "${_target}/${_file//*\/}" ||
+      fail "$FUNCNAME: Could not remove the entity '${_entity}';"\
+      " 'rm' command failed with error code '$?'."
   done
 }
 
@@ -856,7 +739,7 @@ copy_files()
 move_files()
 {
   trace_filter filesystem
-  local _source _target _file _force_flag=0 _files=() _if_exists_flag=0
+  local _source _target _file _force_flag=0 _flags=() _files=() _if_exists_flag=0
 
   while (( $# > 0 ))
   do
@@ -875,7 +758,7 @@ move_files()
         _if_exists_flag=1
         ;;
       --force|force)
-        _force_flag=1
+        _flags+=(-f)
         ;;
       *)
         _files+=( "${token}" )
@@ -892,22 +775,13 @@ move_files()
 
     if  [[ -f "${_file}" ]]
     then
-      if (( _force_flag == 1 ))
-      then
-        mv -f "${_file}" "${_target}/${_file//*\/}" ||
-          fail "Could not force-move the entity '${_entity}',"\
-            "as the 'mv -f' command failed with error code '$?'."
-      else
-        mv "${_file}" "${_target}/${_file//*\/}" ||
-          fail "Could not move the file '${_file}' to "\
-            "'${_target}/${_file//*\/},"\
-            "as the 'mv' command failed with error code '$?'."
-      fi
+      mv ${_flags[@]} "${_file}" "${_target}/${_file//*\/}" ||
+        fail "$FUNCNAME: Could not force-move the entity '${_entity}';"\
+        " 'mv -f' command failed with error code '$?'."
     else
       (( _if_exists_flag )) ||
         fail "Could not move the source file '${_file}' to the target"\
-          "'${_target}/${_file//*\/},"\
-          "as the source file does not exist."
+          "'${_target}/${_file//*\/}; the source file does not exist."
     fi
   done
 }
@@ -954,7 +828,7 @@ chown_files()
     shift
     case "${token}" in
       --recursive|recursive)
-        _flags+=("-R")
+        _flags+=(-R)
         ;;
       *)
         if variable_is_empty _identity
@@ -977,7 +851,7 @@ chown_files()
       fail "Cannot chown file ${_file} to ${_identity},"\
       "as the file does not exist."
 
-    chown ${_flags[*]} ${_identity} "${_file}" ||
+    chown ${_flags[@]} ${_identity} "${_file}" ||
       fail "Could not recursively chown the file '${_file}' to "\
         "'${_target}/${_file//*\/},"\
         "as the 'chown -R' command failed with error code '$?'."
@@ -1021,8 +895,7 @@ chmod_files()
   local _permissions="${1:-}" _file _command
   shift || fail "$FUNCNAME: Cannot chmod files; user[:group] was not given as the first parameter"
   local _files=("$@") # Set the files array to the remaining parameters.
-
-  array_is_nonempty _files || fail "$FUNCNAME: Cannot chmod files; no files were given."
+  shift || fail "$FUNCNAME: Cannot chmod files; no files were given."
 
   for _file in "${_files[@]}"
   do
@@ -1084,8 +957,7 @@ hash_file()
 
   local _path=$(dirname "${_file}") # Note this will be '.' only if a file name was given.
 
-  [[ -d "${_path}" ]] ||
-    fail "{$_message[*]}"\
+  [[ -d "${_path}" ]] || fail "{$_message[*]}"\
     "$FUNCNAME: Cannot access the database file '${_file}'; "\
     "'${_path}' does not exist on the filesystem."
 
@@ -1153,9 +1025,8 @@ file_is_executable()
 {
   trace_filter filesystem
   local _file="${1:-}"
-
-  [[ -n "${_file}" ]] ||
-    fail "Cannot check if a file is executable; No file path/name was given."
+  shift || fail "$FUNCNAME: Cannot check if a file is executable;"\
+    " No file path/name was given."
 
   [[ -r "${_file}" && -x "${_file}" ]]
 }
@@ -1200,7 +1071,8 @@ file_exists()
 {
   trace_filter filesystem
   local _file="${1:-}"
-  shift || fail "Cannot check to see if a file exists; No name/path was given."
+  shift || fail "$FUNCNAME: Cannot check to see if a file exists;"\
+    " No name/path was given."
   [[ -f "${_file}" ]]
 }
 
@@ -1244,8 +1116,8 @@ file_does_not_exist()
 {
   trace_filter filesystem
   local _file="${1:-}"
-  [[ -n "${_file}" ]] ||
-    fail "Cannot check to see if a file exists; No file name/path was given."
+  shift || fail "$FUNCNAME: Cannot check to see if a file exists;"\
+    " No file name/path was given."
 
   [[ ! -f "${_file}" ]]
 }
@@ -1290,16 +1162,14 @@ file_is_nonempty()
 {
   trace_filter filesystem
   local _file="${1:-}"
+  shift || fail "$FUNCNAME: Cannot check if file is nonempty;"\
+    " No file path/name was given."
 
-  [[ -n "${_file}" ]] ||
-    fail "Cannot check if file is nonempty; No file path/name was given."
+  [[ ! -d "${_file}" ]] ||
+    error "$FUNCNAME: When checking whether the file '${_file}' is nonempty,"\
+    " a directory was found in its place."
 
-  if [[ -d "${_file}" ]]
-  then
-    error "When checking whether the file '${_file}' is nonempty, a directory was found in its place."
-  else
-    [[ -s "${_file}" ]]
-  fi
+  [[ -s "${_file}" ]]
 }
 
 #
@@ -1342,9 +1212,8 @@ file_is_empty()
 {
   trace_filter filesystem
   local _file="${1:-}"
-
-  [[ -n "${_file}" ]] ||
-    fail "Cannot check if a file is empty; No file path/name was given."
+  shift || fail "$FUNCNAME: Cannot check if a file is empty;"\
+    " No file path/name was given."
 
   [[ -f "${_file}" && ! -s "${_file}" ]]
 }
@@ -1389,9 +1258,8 @@ file_is_missing()
 {
   trace_filter filesystem
   local _file="${1:-}"
-
-  [[ -n "${_file}" ]] ||
-    fail "Cannot check if file is missing; No file path/name was given."
+  shift || fail "$FUNCNAME: Cannot check if file is missing;"\
+    " No file path/name was given."
 
   [[ ! -f "${_file}" ]]
 }
@@ -1437,8 +1305,8 @@ file_is_empty_or_missing()
   trace_filter filesystem
   local _file="${1:-}"
 
-  [[ -n "${_file}" ]] ||
-    fail "Cannot check if file is empty or missing, as no file path/name was given."
+  shift || fail "$FUNCNAME: Cannot check if file is empty or missing;"\
+    " No file path/name was given."
 
   [[ ! -f "${_file}" || ! -s "${_file}" ]]
 }
@@ -1496,8 +1364,8 @@ file_contains()
   local _pattern="${1:-}"
   shift || fail "$FUNCNAME: String pattern for search was not given!"
 
-  [[ -f "${_file}" ]]    || fail "First parameter must be a file; '${_file}'"\
-    " does not appear to be a file."
+  [[ -f "${_file}" ]] || fail "$FUNCNAME: First parameter must be a file;"\
+    " '${_file}' does not appear to be a file."
 
   grep "${_pattern}" "${_file}" >/dev/null 2>&1
 }
@@ -1542,7 +1410,7 @@ symlink_exists()
 {
   trace_filter filesystem
   local _file="${1:-}"
-  shift || fail "Cannot check if symlink exists; no path was given."
+  shift || fail "$FUNCNAME: Cannot check if symlink exists; no path was given."
   [[ -L "${_file}" ]]
 }
 
@@ -1581,8 +1449,8 @@ files_in()
 {
   trace_filter filesystem
   local _path="${1:-}"
-  shift || fail "$FUNCNAME: Directory name/path was not given!"
-  [[ -d "${_path}" ]] || fail "'${_path}' is not a directory!"
+  shift || fail "$FUNCNAME: Directory name/path was not given! "
+  [[ -d "${_path}" ]] || fail "$FUNCNAME: '${_path}' is not a directory! "
 
   find "${_path}" -mindepth 1 -maxdepth 1 -type f
 }
@@ -1670,7 +1538,8 @@ files_in_path_matching()
   shift || fail "$FUNCNAME: Pattern name/path was not given as the second parameter.!"
 
   [[ -d "${_path}" ]]    || fail "$FUNCNAME: '${_path}' is not a directory!"
-  [[ -n "${_pattern}" ]] || fail "Cannot find files, as a filename or pattern was not given."
+  [[ -n "${_pattern}" ]] || fail "$FUNCNAME: Cannot find files;"\
+    " a filename or pattern was not given."
 
   find "${_path}" -mindepth 1 -iname "${_pattern}" -type f
 }
@@ -1745,19 +1614,17 @@ replace_content()
     esac
   done
 
-  [[ -n "${_pattern:-}" ]] ||
-    fail "Cannot replace content, as no pattern was given."
+  [[ -n "${_pattern:-}" ]] || fail "$FUNCNAME: Cannot replace content;"\
+    " no pattern was given."
 
-  [[ -n "${_content:-}" ]] ||
-    fail "Cannot replace content, as the replacement content was not given; "\
-    "specify by 'with \"replacement text\"'."
+  [[ -n "${_content:-}" ]] || fail "$FUNCNAME: Cannot replace content;"\
+    " replacement content was not given; specify by 'with \"replacement text\"'."
 
-  [[ -n "${_file:-}" ]] ||
-    fail "Cannot file content, as the filename was not given;"\
-      " specify by 'in \"/path/to/filename\"'."
+  [[ -n "${_file:-}" ]] || fail "$FUNCNAME: Cannot file content;"\
+    " the filename was not given; specify by 'in \"/path/to/filename\"'."
 
-  [[ -f "${_file:-}" ]] ||
-      fail "Cannot replace file content, as the file does not exist."
+  [[ -f "${_file:-}" ]] || fail "$FUNCNAME: Cannot replace file content;"\
+    " The file does not exist."
 
   sed "s#${_pattern//\#/\\#}#${_content//\#/\\#}#g" "${_file}" \
     > "${_file}.new" && mv  "${_file}.new" "${_file}"
@@ -1802,9 +1669,9 @@ replace_content()
 file_matches_md5()
 {
   trace_filter filesystem
-  local _file="$1" _md5="$2" _file_md5
-  shift || fail "Cannot determine if file matches MD5; no file was given."
-  shift || fail "Cannot determine if file matches MD5; no MD5 was given."
+  local _file="${1:-}" _md5="${2:-}" _file_md5
+  shift || fail "$FUNCNAME: Cannot check if file matches MD5; no file was given."
+  shift || fail "$FUNCNAME: Cannot check if file matches MD5; no MD5 was given."
 
   [[ -s "${_file}" ]] || return 1
 
@@ -1823,8 +1690,8 @@ file_md5()
   trace_filter filesystem
   local _file="${1:-}" _command _md5
 
-  [[ -n "${_file}" ]] ||
-    fail "Cannot calculate MD5 checksum, as no file name/path was given."
+  shift || fail "$FUNCNAME: Cannot calculate MD5 checksum;"\
+    " No file name/path was given."
 
   if os_is_darwin
   then
@@ -1840,7 +1707,7 @@ file_md5()
       _command="md5"
 
     else
-      error "Could not find a suitable MD5 command in the path."
+      error "$FUNCNAME: Could not find a suitable MD5 command in the path."
     fi
   fi
 
@@ -1901,11 +1768,11 @@ write()
         ;;
       (to)
         _file="${1}"
-        shift || fail "File to write to must be given after 'to'"
+        shift || fail "$FUNCNAME: File to write to must be given after 'to'"
         ;;
       (as)
         _user="${1}"
-        shift || fail "User to write as must be given after 'as'"
+        shift || fail "$FUNCNAME: User to write as must be given after 'as'"
         ;;
       (*)
         _message="${_token}"
@@ -1913,8 +1780,8 @@ write()
     esac
   done
 
-  variable_is_nonempty _message ||
-    fail "Cannot log a message, as no message was given."
+  variable_is_nonempty _message || fail "$FUNCNAME: Cannot log a message;"\
+    " No message was given."
 
   if variable_is_nonempty _file
   then
