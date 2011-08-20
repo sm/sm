@@ -2,11 +2,9 @@
 
 database_cli()
 {
-  local _ignored_args=()
+  local _ignored_args=() args_count=${#extension_args[@]}
 
-  number_of_args=${#extension_args[@]}
-
-  for (( index=0 ; index < $number_of_args ; index++ ))
+  for (( index=0 ; index < $args_count ; index++ ))
   do
     token="${extension_args[$index]}"
 
@@ -52,21 +50,15 @@ database_setup()
 {
   ensure_paths_exist "${data_base_path}"
 
-  if template_exists "/etc/conf.d/${service}.conf"
-  then
+  ! template_exists "/etc/conf.d/${service}.conf" ||
     seed_template "/etc/conf.d/${service}.conf" \
       data_path "${data_path}"
-  fi
 
-  if command_exists "${extension}_database_setup"
-  then
+  !  command_exists "${extension}_database_setup" ||
     "${extension}_database_setup"
-  fi
 
-  if command_exists "${extension}_initialize"
-  then
+  ! command_exists "${extension}_initialize" ||
     "${extension}_initialize"
-  fi
 }
 
 # TODO: Should 'service_db_path' in service_{activate,deactivate} be moved into

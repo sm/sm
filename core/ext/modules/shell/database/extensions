@@ -3,6 +3,9 @@
 database_extension_setup()
 {
   local extension="${1}" module="${2}" path="${3}"
+  shift || fail "$FUNCNAME: Extension must be given as the first parameter."
+  shift || fail "$FUNCNAME: Module must be given as the second parameter."
+  shift || fail "$FUNCNAME: Path must be given as the third parameter."
 
   enter "${path}"
 
