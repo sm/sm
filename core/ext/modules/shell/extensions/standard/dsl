@@ -3,7 +3,7 @@
 extension_path()
 {
   local path extension="${1:-}"
-  shift || fail "$FUNCNAME: Cannot process extension path;"\
+  shift || fail "Cannot process extension path;"\
     " No extension name was given."
 
   for path in ${extensions_search_paths[@]}
@@ -21,7 +21,7 @@ extension_is_valid()
 {
   local _path="${1:-}"
 
-  shift || fail "$FUNCNAME: Cannot check if extension is valid;"\
+  shift || fail "Cannot check if extension is valid;"\
     " No extension path was given."
 
   [[ -n "${_path}" ]] ||
@@ -34,9 +34,9 @@ extension_is_valid()
 detect_extension_existence()
 {
   extensions_path="${1:-}" extension="${2:-}"
-  shift || fail "$FUNCNAME: Cannot detect extension existence;"\
+  shift || fail "Cannot detect extension existence;"\
     " No extension path was given."
-  shift || fail "$FUNCNAME: Cannot detect extension existence;"\
+  shift || fail "Cannot detect extension existence;"\
     " No extension name was given."
   extension_is_valid $extensions_path/$extension
 }

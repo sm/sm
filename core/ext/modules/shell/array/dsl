@@ -55,7 +55,7 @@ array_is_nonempty()
 {
   trace_filter array
   local _array_name="${1:-}"
-  shift || fail "$FUNCNAME: Cannot determine if an array is nonempty;"\
+  shift || fail "Cannot determine if an array is nonempty;"\
     "Array name was not given."
 
   eval "(( \${#${_array_name}[@]} > 0 ))"
@@ -100,7 +100,7 @@ array_is_empty()
 {
   trace_filter array
   local _array_name="${1:-}"
-  shift || fail "$FUNCNAME: Cannot push onto array;"\
+  shift || fail "Cannot push onto array;"\
     "Array name was not given."
   eval "(( \${#${_array_name}[@]} == 0 ))"
 }
@@ -138,7 +138,7 @@ array_length()
 {
   trace_filter array
   local _array_name="${1:-}" _length
-  shift || fail "$FUNCNAME: Cannot determine array length;"\
+  shift || fail "Cannot determine array length;"\
     "Array name was not given."
   eval "_length=\${#${_array_name}[@]}"
   printf ${_length}
@@ -220,7 +220,7 @@ array_first_element()
   trace_filter array
   local _array_name="${1:-}" _element _array_length
 
-  shift || fail "$FUNCNAME: Cannot print the first element of array;"\
+  shift || fail "Cannot print the first element of array;"\
     "Array name was not given."
 
   eval "_array_length=\"\${#${_array_name}[@]}\""
@@ -265,14 +265,14 @@ array_push()
 {
   trace_filter array
   local _array_name="${1:-}"
-  shift || fail "$FUNCNAME: Cannot push elements onto array;"\
+  shift || fail "Cannot push elements onto array;"\
     " Array name not given."
 
   if eval "(( \${#${_array_name}[@]} > 0 ))"
   then
     local _element _elements=("$@")
 
-    (( ${#_elements[@]} )) || fail "$FUNCNAME: Cannot push elements onto array;"\
+    (( ${#_elements[@]} )) || fail "Cannot push elements onto array;"\
       " No elements were given."
 
     for _element in "${_elements[@]}"
@@ -318,12 +318,12 @@ array_append()
 {
   trace_filter array
   local _array_name="${1:-}"
-  shift || fail "$FUNCNAME: Cannot append elements to array;"\
+  shift || fail "Cannot append elements to array;"\
     " No array name was given."
 
   local _element _elements=("$@")
 
-  (( ${#_elements[@]} )) || fail "$FUNCNAME: Cannot append elements to array;"\
+  (( ${#_elements[@]} )) || fail "Cannot append elements to array;"\
     " No elements were given."
 
   for _element in "${_elements[@]}"
@@ -369,11 +369,11 @@ array_pop()
 
   local _array_name="${1:-}" temp_array=() index _variable="${2:-}"
 
-  shift || fail "$FUNCNAME: Cannot pop element from array;"\
+  shift || fail "Cannot pop element from array;"\
     " Array name was not given."
 
   eval "(( \${#${_array_name}[@]} ))" ||
-    fail "$FUNCNAME: Cannot pop from array; Array '${_array_name}' was empty."
+    fail "Cannot pop from array; Array '${_array_name}' was empty."
 
   variable_is_empty _variable ||
     eval "${_variable}=\${${_array_name}[\${#${_array_name}[@]}-1]}"
@@ -417,7 +417,7 @@ array_shift()
 {
   trace_filter array
   local _array_name="${1:-}" temp_array=() index _variable="${2:-}"
-  shift || fail "$FUNCNAME: Cannot shift array; Array name was not given."
+  shift || fail "Cannot shift array; Array name was not given."
 
   variable_is_empty _variable || eval "${_variable}=\${${_array_name}[0]}"
 
@@ -463,12 +463,12 @@ array_unshift()
 {
   trace_filter array
   local _array_name="${1:-}"
-  shift || fail "$FUNCNAME: Cannot unshift elements onto array;"\
+  shift || fail "Cannot unshift elements onto array;"\
     "Array name was given."
 
   local _elements=("$@")
 
-  (( ${#_elements[@]} )) || fail "$FUNCNAME: Cannot unshift elements into array;"\
+  (( ${#_elements[@]} )) || fail "Cannot unshift elements into array;"\
     " No elements were given."
 
   eval "${_array_name}=(\"${_elements[@]}\" \"\${${_array_name}[@]}\")"
@@ -514,7 +514,7 @@ array_join()
 {
   trace_filter array
   local _array_name="${1:-}"
-  shift || fail "$FUNCNAME: Cannot join array; Array name was not given."
+  shift || fail "Cannot join array; Array name was not given."
   local IFS=${1:-' '}
   eval "printf \"\${${_array_name}[*]}\""
 }
@@ -552,7 +552,7 @@ array_largest()
 {
   trace_filter array
   local _array_name="${1:-}" _index _largest=""
-  shift || fail "$FUNCNAME: Cannot find largest element;"\
+  shift || fail "Cannot find largest element;"\
     "No array variable name was given."
 
   eval "
@@ -607,7 +607,7 @@ array_sort_desc()
 {
   trace_filter array
   local _array_name="${1:-}" _index _largest=""
-  shift || fail "$FUNCNAME: Cannot sort an array in decending order;"\
+  shift || fail "Cannot sort an array in decending order;"\
     "Array variable name was not given."
 
   eval "${_array_name}=(\$(
@@ -656,7 +656,7 @@ array_sort_asc()
   trace_filter array
   local _array_name="${1:-}" _index _largest=""
 
-  shift || fail "$FUNCNAME: Cannot sort an array in ascending order;"\
+  shift || fail "Cannot sort an array in ascending order;"\
     " Array variable name was not given."
 
   eval "${_array_name}=(\$(
@@ -705,7 +705,7 @@ array_unique()
   trace_filter array
   local _array_name="${1:-}" _index _largest=""
   shift ||
-    fail "$FUNCNAME: Cannot uniquify array; Array variable name was not given."
+    fail "Cannot uniquify array; Array variable name was not given."
 
   eval "${_array_name}=(\$(
   echo \" \${${_array_name}[@]} \" |
@@ -788,7 +788,7 @@ array_is_even()
 {
   trace_filter array
   local _array_name="${1:-}"
-  shift || fail "$FUNCNAME: Cannot determine if array is even;"\
+  shift || fail "Cannot determine if array is even;"\
     " Array name was not given."
 
   eval "(( ( \${#${_array_name}[@]} % 2 ) == 0 ))"

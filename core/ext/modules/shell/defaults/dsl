@@ -55,7 +55,7 @@ read_default()
 
   key="${1:-}"
 
-  shift || fail "$FUNCNAME: key to read must be given as first parameter."
+  shift || fail "key to read must be given as first parameter."
 
   while (( $# > 0 ))
   do
@@ -82,9 +82,9 @@ read_config()
   local key variable token value prefix _file _temp \
     _extension="${1:-}" _config_file="${2:-}" key="${3:-}"
 
-  shift || fail "$FUNCNAME: extension name must be given as the first parameter."
-  shift || fail "$FUNCNAME: config file name must be given as the second parameter."
-  shift || fail "$FUNCNAME: key name must be given as the third parameter."
+  shift || fail "extension name must be given as the first parameter."
+  shift || fail "config file name must be given as the second parameter."
+  shift || fail "key name must be given as the third parameter."
 
   while (( $# > 0 ))
   do
@@ -93,11 +93,11 @@ read_config()
     case "$token" in
       into|as)
         variable="$1"
-        shift || fail "$FUNCNAME: variable name must be given after keywords 'into|as'"
+        shift || fail "variable name must be given after keywords 'into|as'"
         ;;
       prefix)
         prefix="$1"
-        shift || fail "$FUNCNAME: prefix must be given after keyword 'prefix'"
+        shift || fail "prefix must be given after keyword 'prefix'"
         ;;
       *)
         variable="$token"

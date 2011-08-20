@@ -40,7 +40,7 @@ templates_targets()
 {
   local target
 
-  (( $# )) || error "$FUNCNAME: Please provide a template name!"
+  (( $# )) || error "Please provide a template name!"
 
   [[ "$1" == "${1/_*./_.}" && -f "$1" ]] ||
     error "'${1}' is not a valid template name!"

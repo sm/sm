@@ -13,23 +13,23 @@ date_range()
     case "${_token}" in
       (step)
         _step="${1:-}"
-        shift || fail "$FUNCNAME: step must follow keyword 'step'"
+        shift || fail "step must follow keyword 'step'"
         ;;
       (format_in)
         _format_in="${1}"
-        shift || fail "$FUNCNAME: input format must follow keyword 'format_in'"
+        shift || fail "input format must follow keyword 'format_in'"
         ;;
       (format|format_out)
         _format_out="${1}"
-        shift || fail "$FUNCNAME: output format must follow keyword 'format[_out]'"
+        shift || fail "output format must follow keyword 'format[_out]'"
         ;;
       (start)
         _start="${1}"
-        shift || fail "$FUNCNAME: start must follow keyword 'start'"
+        shift || fail "start must follow keyword 'start'"
         ;;
       (end)
         _end="${1}"
-        shift || fail "$FUNCNAME: end must follow keyword 'end'"
+        shift || fail "end must follow keyword 'end'"
         ;;
       (*)
         if variable_is_empty _start
@@ -39,14 +39,14 @@ date_range()
         then
           _end="${_token}"
         else
-          fail "$FUNCNAME: Unknown token '${_token}' passed as a parameter."
+          fail "Unknown token '${_token}' passed as a parameter."
         fi
         ;;
     esac
   done
 
-  variable_is_nonempty _start || fail "$FUNCNAME: start date must be specified."
-  variable_is_nonempty _end   || fail "$FUNCNAME: end date must be specified."
+  variable_is_nonempty _start || fail "start date must be specified."
+  variable_is_nonempty _end   || fail "end date must be specified."
 
   case "${_step}" in
     minute)
@@ -68,23 +68,23 @@ date_range()
       _step=31556926
       ;;
     *)
-      fail "$FUNCNAME: Unknown step token ${1:-};"\
+      fail "Unknown step token ${1:-};"\
         " valid steps are {minute,hour,day,week,month,year}."
       ;;
   esac
 
   _start=$(date -j -f "${_format_in}" ${_start} "+%s") ||
-    fail "$FUNCNAME: Date error: "\
+    fail "Date error: "\
     " Input format '${_format_in}' for start date '${_start}'."
 
   _end=$(date -j -f "${_format_in}" ${_end} "+%s") ||
-    fail "$FUNCNAME: Date error: "\
+    fail "Date error: "\
     "Input format '${_format_in}' for end date '${_end}'."
 
   while (( _start <= _end ))
   do
     _date=$(date -r ${_start} "+${_format_out}") ||
-      fail "$FUNCNAME: Date error: "\
+      fail "Date error: "\
       "Output format '${_format_out}' for date '${_start}'."
 
     printf "%s\n" "${_date}"

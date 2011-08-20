@@ -53,7 +53,7 @@ module_dsl()
   local _function _dsl _modules="${@:-}"
 
   array_is_nonempty _modules ||
-    fail "$FUNCNAME: Cannot print the DSL for module(s); No module names given."
+    fail "Cannot print the DSL for module(s); No module names given."
 
   local _path="${modules_path}/shell/${_module}"
 
@@ -216,10 +216,10 @@ module_docs()
   done
 
   variable_is_nonempty _module ||
-    fail "$FUNCNAME: Cannot glean documentation for a module; no module name given."
+    fail "Cannot glean documentation for a module; no module name given."
 
   command_exists shocco ||
-    fail "$FUNCNAME: Cannot generate documentation for '${_module}';"\
+    fail "Cannot generate documentation for '${_module}';"\
     " 'shocco' was not found in the PATH, install shocco and try again."
 
   command_exists pygmentize ||
@@ -293,7 +293,7 @@ modules_docgen()
 
   variable_is_nonempty core_development_path &&
     path_exists "${core_development_path}" ||
-    error "$FUNCNAME: Set core_development_path in ~/.smrc, and clone the sm core "\
+    error "Set core_development_path in ~/.smrc, and clone the sm core "\
      "repository into it, to run docgen."\
      "For more information, see https://bdsm.beginrescueend.com/development/core."
 

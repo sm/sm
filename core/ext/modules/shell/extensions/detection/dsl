@@ -4,11 +4,11 @@
 detect_action()
 {
   extensions_path=$1
-  shift || fail "$FUNCNAME: Cannot detect action; No extensions path was given."
+  shift || fail "Cannot detect action; No extensions path was given."
 
   extension="${1:-core}"
   # Question: v v v ^ ^  The logic here seems... fuzzy ~ Wayne
-  shift || fail "$FUNCNAME: Cannot detect action; No extension name was given."
+  shift || fail "Cannot detect action; No extension name was given."
 
   local token _word _action_path="$extensions_path/$extension/actions"
 
@@ -124,7 +124,7 @@ detect_action()
 detect_modules_paths()
 {
   local root="$1" path="" IFS='/'
-  shift || fail "$FUNCNAME: Cannot detect modules path;"\
+  shift || fail "Cannot detect modules path;"\
     "modules root was not given as the first parameter."
   _module_definitions=( )
   while (( $# > 0 ))
@@ -147,9 +147,9 @@ detect_module_modules_action()
   local _modules_path="${1:-}" _module_path="${2:-}" _module_params="${3:-}" \
     _module_name module_path
 
-  shift || fail "$FUNCNAME: modules path was not given as the first parameter"
-  shift || fail "$FUNCNAME: another modules path was not given as the second parameter"
-  shift || fail "$FUNCNAME: module parameters were not given as the third parameter"
+  shift || fail "modules path was not given as the first parameter"
+  shift || fail "another modules path was not given as the second parameter"
+  shift || fail "module parameters were not given as the third parameter"
 
   if [[ -s "${_modules_path}/${_module_path}/modules" ]]
   then
@@ -195,9 +195,9 @@ detect_modules_action()
 
   extensions_path="${1:-}" extension="${2:-core}"
   # Question ^^^^^ vvvvvvvv The :-core piece looks suspicious ...
-  shift || fail "$FUNCNAME: cannot detect modules action;"\
+  shift || fail "cannot detect modules action;"\
     " Extensions path was not given as first parameter."
-  shift || fail "$FUNCNAME: cannot detect modules action;"\
+  shift || fail "cannot detect modules action;"\
     " Extension name was not given as second parameter."
 
   local token _word _modules_path="$extensions_path/$extension/modules/shell"
@@ -245,11 +245,11 @@ detect_unique_2nd_level_action()
   local _action="${3:-}" _actions_path _found_actions=() _found_actions_paths \
     _found_action_path
 
-  shift || fail "$FUNCNAME: cannot detect modules action;"\
+  shift || fail "cannot detect modules action;"\
     " Extensions path was not given as first parameter."
-  shift || fail "$FUNCNAME: cannot detect modules action;"\
+  shift || fail "cannot detect modules action;"\
     " Extension name was not given as second parameter."
-  shift || fail "$FUNCNAME: cannot detect modules action;"\
+  shift || fail "cannot detect modules action;"\
     " Action was not given as third parameter."
 
   _actions_path="$extensions_path/$extension/actions"
@@ -507,7 +507,7 @@ extension_run()
 extension_action()
 {
   (( extension_action_calls == 0 )) ||
-    fail "$FUNCNAME: Cannot call a 2nd time:\n"\
+    fail "Cannot call a 2nd time:\n"\
     "  extension_action ${extension_args[@]}"
 
   extension_action_calls+=1
@@ -592,19 +592,19 @@ extensions_installed()
         ;;
       (module|type)
         _type="$1"
-        shift || fail "$FUNCNAME(): An module type must follow the '${_token}' keyword"
+        shift || fail "An module type must follow the '${_token}' keyword"
         ;;
       (in)
         _paths="${1}"
-        shift || fail "$FUNCNAME(): A path must follow keyword 'in'"
+        shift || fail "A path must follow keyword 'in'"
         ;;
       (exclude)
         _exclude="${1}"
-        shift || fail "$FUNCNAME(): A string must follow keyword 'exclude'"
+        shift || fail "A string must follow keyword 'exclude'"
         _excludes+=("${_exclude//,/ }")
         ;;
       (*)
-        fail "$FUNCNAME(): Unkown token ${_token} given"
+        fail "Unkown token ${_token} given"
         ;;
     esac
   done
