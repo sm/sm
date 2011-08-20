@@ -55,7 +55,7 @@ read_default()
 
   key="${1:-}"
 
-  shift
+  shift || fail "$FUNCNAME: key to read must be given as first parameter."
 
   while (( $# > 0 ))
   do
@@ -79,14 +79,12 @@ read_config()
 {
   trace_filter read_config
 
-  local key variable token value prefix _file _temp
+  local key variable token value prefix _file _temp \
+    _extension="${1:-}" _config_file="${2:-}" key="${3:-}"
 
-  _extension="${1:-}"
-  _config_file="${2:-}"
-  key="${3:-}"
-  shift || fail "extension name is missing"
-  shift || fail "config file name is missing"
-  shift || fail "key name is missing"
+  shift || fail "$FUNCNAME: extension name must be given as the first parameter."
+  shift || fail "$FUNCNAME: config file name must be given as the second parameter."
+  shift || fail "$FUNCNAME: key name must be given as the third parameter."
 
   while (( $# > 0 ))
   do
@@ -95,11 +93,11 @@ read_config()
     case "$token" in
       into|as)
         variable="$1"
-        shift
+        shift || fail "$FUNCNAME: variable name must be given after keywords 'into|as'"
         ;;
       prefix)
         prefix="$1"
-        shift
+        shift || fail "$FUNCNAME: prefix must be given after keyword 'prefix'"
         ;;
       *)
         variable="$token"
@@ -143,27 +141,20 @@ settings_search()
 
   local extension=$1 setting=$2 path paths
 
-  # Standard paths
-  paths=( "/etc/sm/${extension}" "$HOME/.sm/${extension}" )
+  paths=( "/etc/sm/${extension}" "$HOME/.sm/${extension}" ) # Standard paths
 
-  # Extension path
-  if extension_path "${extension}"
-  then
+  ! extension_path "${extension}" ||
     paths+=( "${extension_path}/config" )
-  fi
 
-  # Additional paths
   for path in "${settings_search_path_append[@]}"
-  do
+  do # Additional paths
     settings_search_path_update "${path}"
     paths+=( "${path}/${extension}" )
   done
 
-  # Print existing paths.
   for path in "${paths[@]}"
-  do
-    if path_exists "${path}" \
-    && file_is_nonempty "${path}/${setting}"
+  do # Print existing paths.
+    if path_exists "${path}" && file_is_nonempty "${path}/${setting}"
     then
       printf "${path}/${setting}\n"
     fi
@@ -173,12 +164,12 @@ settings_search()
 settings_search_path_update()
 {
   local path=$1
-  if ! string_contains "${settings_search_path_cache[*]}" "${path}"
-  then
-    if file_exists "${path}/.uri"
-    then
-      fetch_uri "$(cat "${path}/.uri")" "${path}" >&2
-    fi
-    settings_search_path_cache+=( "${path}" )
-  fi
+
+  ! string_contains "${settings_search_path_cache[*]}" "${path}" || return 0
+
+  ! file_exists "${path}/.uri" ||
+    fetch_uri "$(cat "${path}/.uri")" "${path}" >&2
+
+  settings_search_path_cache+=( "${path}" )
 }
+
