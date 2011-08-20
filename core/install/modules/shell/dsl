@@ -153,6 +153,33 @@ make_binaries_executable()
   done
 }
 
+build_extensions_actions_cache()
+{
+  local _extension_path=$1 _extension _extension_namespace
+
+  for _extension in "${_extension_path}"/*
+  do
+    debug search "build_actions_cache:${_extension}:"
+    case "${_extension}" in
+      (*\/\*|*\/.*) continue ;;
+    esac
+    [[ -d "${_extension}" ]] || continue
+    [[ ! -f "${_extension}/.actions_cache" ]] || continue
+    _extension="${_extension#${_extension_path}\/}"
+    _extension_namespace="${_extension_path#${sm_path}\/}"
+    log_step "Updating action cache for ${_extension_namespace//\// } ${_extension}" \
+      actions_build_cache_start "${_extension_path}" "${_extension}"
+  done
+  return 1 #fake we found nothing and continue with next search path
+}
+
+build_actions_cache()
+{
+  log_step "Cleaning action cache for core *" \
+    rm -f ${install_path}/core/*/.actions_cache
+  in_search_paths build_extensions_actions_cache "unused" || true
+}
+
 install_sm()
 {
   log "S{cripting,ystem,tack} Management (SM) Framework (Core) Installation:"
@@ -174,6 +201,8 @@ install_sm()
 
   log_step "Ensuring that binaries are executable" \
     make_binaries_executable
+
+  sm --call=install/build_actions_cache
 
   succeed "S{cripting,ystem,tack} Management (SM) Framework (Core) installed."
 }

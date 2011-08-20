@@ -13,8 +13,8 @@ actions_build_cache_start()
   shopt -s dotglob
 
   #                         from to
-  actions_build_actions_cache "" "" | sort > "${_extension_path}/${_extension}/.actions_cache"
-  actions_build_modules_cache | sort -r > "${_extension_path}/${_extension}/.modules_cache"
+  actions_build_actions_cache "" "" | sort > "${_extension_path}/${_extension}/.actions_cache" || return 1
+  actions_build_modules_cache       | sort > "${_extension_path}/${_extension}/.modules_cache" || return 1
 }
 
 actions_build_actions_cache()
@@ -83,7 +83,7 @@ actions_build_actions_cache()
 actions_build_modules_cache()
 {
   local _module_path _module_name
-  for _module_path in $( find "${_modules_root}${_modules_path}" -name modules -type f )
+  for _module_path in $( find "${_modules_root}${_modules_path}" -name modules -type f || return 1 )
   do
     _module_name="${_module_path#${_modules_root}\/}"
     _module_name="${_module_name%modules}"
