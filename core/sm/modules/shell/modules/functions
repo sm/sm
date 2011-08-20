@@ -281,7 +281,7 @@ module()
   do
     if command -v "${_module##*/}_${_hook}" > /dev/null 2>&1
     then
-      "${_module##*/}_${_hook}"
+      "${_module//\//_}_${_hook}"
     fi
   done
 
