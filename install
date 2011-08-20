@@ -1,13 +1,50 @@
 #!/bin/bash
 
-# TODO: --prefix=... parameter
-if [[ -z "${sm_path:-}" ]]
+while (( $# ))
+do
+  token="$1"
+  shift
+  case "$token"
+    *trace)
+      set -x
+      ;;
+
+    *prefix)
+      prefix_path="$1"
+      if ! shift
+      then
+        echo "ERROR: A path prefix must be followed by keyword 'prefix'."
+        exit 1
+      fi
+      ;;
+
+    DESTROOT)
+      DESTROOT="$1"
+      if ! shift
+      then
+        echo "ERROR: A DESTROOT path must be followed by keyword 'DESTROOT'."
+        exit 1
+      fi
+      ;;
+
+    *)
+      echo "ERROR: Unknown parameter '$1' given."
+      exit 1
+      ;;
+  esac
+done
+
+if [[ -n "${prefix}" ]]
 then
-  if (( UID == 0 ))
+  sm_path="${DESTROOT:-}${prefix}/sm"
+
+elif [[ -z "${sm_path:-}" ]]
+then
+  if (( UID ))
   then
-    sm_path="${DESTROOT:-}/sm"
-  else
     sm_path="${DESTROOT:-}$HOME/.sm"
+  else
+    sm_path="${DESTROOT:-}/opt/sm"
   fi
 fi
 

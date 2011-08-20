@@ -115,8 +115,19 @@ setup_profile_d()
     if os_is_darwin
     then
       file_contains /etc/profile "${profile_d_path}" ||
-        write "\nif test -d '${profile_d_path}' ; then for profile in \"${profile_d_path}\"/*.sh ; do if test -x \"\$profile\" ; then . \"\$profile\" ; fi ; done ; unset profile ; fi" \
-          to /etc/profile
+        write "
+if test -d '${profile_d_path}'
+then
+  for profile in \"${profile_d_path}\"/*.sh
+  do
+    if test -x \"\$profile\"
+    then
+      . \"\$profile\"
+    fi
+  done
+  unset profile
+fi
+" to /etc/profile
     fi
   else
     ensure_files_exist "$HOME/.profile" "$HOME/.bashrc" "$HOME/.bash_profile"
@@ -138,7 +149,7 @@ setup_profile_d()
      file_contains "${profile_d_path}/sm.sh" "${install_path}/pkg/active/sbin\"" ||
      {
        # To prepend or postpend??? Because of selinux issues prepend for now.
-       write "PATH=\"\${PATH}:${install_path}/pkg/active/bin:${install_path}/pkg/active/sbin\"" \
+       write "PATH=\"\${PATH}:${install_path}/bin:${install_path}/pkg/active/bin:${install_path}/pkg/active/sbin\"" \
          to "${profile_d_path}/sm.sh"
 
        chmod_files 0755 "${profile_d_path}/sm.sh"
@@ -190,7 +201,7 @@ install_sm()
   perform setup_profile_d
 
   user_is_not_root || {
-    perform symlink_sm
+    # perform symlink_sm
     perform setup_shell_completion
   }
 
