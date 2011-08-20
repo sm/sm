@@ -182,15 +182,21 @@ in_search_paths()
   shift || fail "Callback name must be given ast the first parameter."
   local args=( "$@" ) path
 
-  for path in "${extensions_search_paths[@]}"
-  do
-    "${callback}" "${path}" "${args[@]}" || continue
+  # do search if param given
+  [[ -z "$1" ]] ||
+    for path in "${extensions_search_paths[@]}"
+    do
+      "${callback}" "${path}" "${args[@]}" || continue
+      return 0
+    done
+
+  # if nothing found yet try in cli
+  if "${callback}" "${sm_path}/core" "cli" "${args[@]}"
+  then
     return 0
-  done
+  fi
 
-  "${callback}" "${sm_path}/core" "cli" "${args[@]}" || return 1
-
-  return 0
+  return 1
 }
 
 #

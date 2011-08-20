@@ -282,7 +282,7 @@ log_todo()
 core_error()
 {
   set +o xtrace
-  printf "${FUNCNAME[1]}(): ERROR: $*\n" >&2
+  printf "ERROR(${FUNCNAME[2]}): $*\n" >&2
   set +o errtrace
   trap - ERR
   exit 1
@@ -375,13 +375,13 @@ succeed()
 core_fail()
 {
   trace_flag=0
-  backtrace "$*"
+  backtrace "FAIL(${FUNCNAME[2]}): $*"
   exit 1
 }
 
 fail()
 {
-  core_fail "${FUNCNAME[1]}(): $@"
+  core_fail "$@"
 }
 
 #

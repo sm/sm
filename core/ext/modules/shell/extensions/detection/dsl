@@ -6,8 +6,7 @@ detect_action()
   extensions_path=$1
   shift || fail "Cannot detect action; No extensions path was given."
 
-  extension="${1:-core}"
-  # Question: v v v ^ ^  The logic here seems... fuzzy ~ Wayne
+  extension="$1"
   shift || fail "Cannot detect action; No extension name was given."
 
   local token _word _action_path="$extensions_path/$extension/actions"
@@ -162,7 +161,8 @@ detect_module_modules_action()
           local _params="" _action="${_module_params}" _read_action
           while [[ -n "${_action}" ]]
           do
-            if file_contains "${module_path}/actions" "${_action}="
+            if [[ -f "${module_path}/actions" ]] &&
+              file_contains "${module_path}/actions" "${_action}="
             then
               _read_action=$( hash_file "${module_path}/actions" "${_action//\//\/}" )
               if [[ -n "$_read_action" ]]
@@ -193,8 +193,7 @@ detect_modules_action()
 {
   trace_filter modules_action
 
-  extensions_path="${1:-}" extension="${2:-core}"
-  # Question ^^^^^ vvvvvvvv The :-core piece looks suspicious ...
+  extensions_path="${1:-}" extension="${2:-}"
   shift || fail "cannot detect modules action;"\
     " Extensions path was not given as first parameter."
   shift || fail "cannot detect modules action;"\
@@ -243,14 +242,13 @@ detect_unique_2nd_level_action()
 
   extensions_path="${1:-}" extension="${2:-}"
   local _action="${3:-}" _actions_path _found_actions=() _found_actions_paths \
-    _found_action_path
+    _found_action_path _hash_action
 
   shift || fail "cannot detect modules action;"\
     " Extensions path was not given as first parameter."
   shift || fail "cannot detect modules action;"\
     " Extension name was not given as second parameter."
-  shift || fail "cannot detect modules action;"\
-    " Action was not given as third parameter."
+  shift || return 1 # no action name was given - skip
 
   _actions_path="$extensions_path/$extension/actions"
   if [[ -d "${_actions_path}" ]]
@@ -272,7 +270,9 @@ detect_unique_2nd_level_action()
       do
         if file_contains "${_found_action_path}" "${_action}="
         then
-          _found_actions+=( "${_found_action_path%/*}/$( hash_file "${_found_action_path}" "${_action}" )" )
+          _hash_action="$( hash_file "${_found_action_path}" "${_action}" )"
+          [[ -z "${_hash_action}" ]] ||
+            _found_actions+=( "${_found_action_path%/*}/${_hash_action}" )
         fi
       done
     fi
@@ -311,7 +311,7 @@ detect_action_type()
       action_type="function"
       return 0
       ;;
-    *)
+    (*)
       _path_type="$(file "${_path}/${action}")"
       ;;
   esac
@@ -535,9 +535,9 @@ extension_action()
   # Search in extensions actions
   # Search in unique second level actions
   # Search in loaded modules actions
-  if in_search_paths detect_action "${extension_args[@]}" \
-  || in_search_paths detect_unique_2nd_level_action "${extension_args[@]}" \
-  || in_search_paths detect_modules_action "${extension_args[@]}"
+  if in_search_paths detect_action "${extension_args[@]}" ||
+    in_search_paths detect_unique_2nd_level_action "${extension_args[@]}" ||
+    in_search_paths detect_modules_action "${extension_args[@]}"
   then
     log_search action "$action" "${action_path##${sm_path}\/} params:${extension_args[@]}"
   else
