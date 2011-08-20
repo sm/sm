@@ -279,9 +279,9 @@ module()
 
   for _hook in initialize # options, etc... ?
   do
-    if command -v "${_module}_${_hook}" > /dev/null 2>&1
+    if command -v "${_module##*/}_${_hook}" > /dev/null 2>&1
     then
-      "${_module}_initialize"
+      "${_module##*/}_${_hook}"
     fi
   done
 
