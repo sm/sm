@@ -4,12 +4,12 @@ while (( $# ))
 do
   token="$1"
   shift
-  case "$token"
-    *trace)
+  case "$token" in
+    (*trace)
       set -x
       ;;
 
-    *prefix)
+    (*prefix)
       prefix_path="$1"
       if ! shift
       then
@@ -18,7 +18,7 @@ do
       fi
       ;;
 
-    DESTROOT)
+    (DESTROOT)
       DESTROOT="$1"
       if ! shift
       then
@@ -27,7 +27,7 @@ do
       fi
       ;;
 
-    *)
+    (*)
       echo "ERROR: Unknown parameter '$1' given."
       exit 1
       ;;
