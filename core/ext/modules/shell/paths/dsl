@@ -219,7 +219,7 @@ move_directory()
     fail "Could not recursively change mode of '${_target}' to"\
     "${_mode}, as the 'chmod -R' command failed with error code '$?'."
 
-  [[ -z "${_owner}"]] ||
+  [[ -z "${_owner}" ]] ||
     chown -R "${_owner}" "${_target}" ||
     fail "Could not recursively change ownership of '${_target}' to"\
     "${_owner}, as the 'chown -R' command failed with error code '$?'."
