@@ -1,7 +1,7 @@
 #!/bin/sh
 
 array_is_nonempty extension_args ||
-  fail "You must specify at least one extension name."
+  fail "open: You must specify at least one extension name."
 
 enter "${extensions_development_path}/${extension_args[0]}/"
 os_open "$PWD"

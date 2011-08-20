@@ -1,6 +1,6 @@
 #!/bin/sh
 
-NYI
+NYI "sm update"
 # What is this code intended to do?
 
 #extension_action=${extension_args[0]}

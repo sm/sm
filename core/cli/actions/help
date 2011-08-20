@@ -2,7 +2,7 @@
 
 extension="<extension>"
 
-description "Benevolent Delectable S{cripting,ystem} Manager (SM) Framework (Core)"
+description "S{cripting,ystem,tack} Management (SM) Framework (Core)"
 
 action "{file_name}" "Run the provided {file_name}, with SM initialized."
 action "smrc" "Install smrc template file into ~/.smrc."

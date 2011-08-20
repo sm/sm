@@ -1,48 +1,47 @@
 #!/bin/sh
 
 array_is_nonempty extension_args ||
-  fail "You must specify at least one extension name."
+  fail "create: You must specify at least one extension name."
 
 target_path="${extensions_development_path:-"$initial_pwd"}"
 
 for extension in ${extension_args[@]}
 do
-  if path_exists "${target_path}/${extension}"
-  then
-    error "Extension '${extension}' already exists "\
-      "at ${target_path}/${extension}."
-  else
-    path_exists "${sm_path}/core/cli/templates/ext/${language:-shell}" ||
-      fail "Extension template files are missing from "\
-        "$target_path/core/cli/templates/ext/${language:-shell}."
+  ! path_exists "${target_path}/${extension}" ||
+    error "create: Extension '${extension}' already exists "\
+    "at ${target_path}/${extension}."
 
-    enter "${sm_path}/core/cli/templates/ext/${language:-shell}"
+  path_exists "${sm_path}/core/cli/templates/ext/${language:-shell}" ||
+    fail "create: Extension template files are missing from "\
+      "$target_path/core/cli/templates/ext/${language:-shell}."
 
-    _path="${target_path}/${extension}"
+  enter "${sm_path}/core/cli/templates/ext/${language:-shell}"
 
-    copy_paths actions modules templates config \
-      to "${_path}"
+  _path="${target_path}/${extension}"
 
-    copy_files README.md VERSION CHANGELOG.md TODO.md \
-      to "${_path}"
+  copy_paths actions modules templates config \
+    to "${_path}"
 
-    for _module in "${extension_modules[@]}"
-    do
-      extension_module_add "${extension}" "${_module}" "${_path}"
+  copy_files README.md VERSION CHANGELOG.md TODO.md \
+    to "${_path}"
 
-      # Run the module's extension setup function, if it exists.
-      if file_exists "${sm_path}/core/cli/modules/shell/${_module}/extensions"
+  for _module in "${extension_modules[@]}"
+  do
+    extension_module_add "${extension}" "${_module}" "${_path}"
+
+    # Run the module's extension setup function, if it exists.
+    if file_exists "${sm_path}/core/cli/modules/shell/${_module}/extensions"
+    then
+      source_files "${sm_path}/core/cli/modules/shell/${_module}/extensions"
+      if command_exists "${_module}_extension_setup"
       then
-        source_files "${sm_path}/core/cli/modules/shell/${_module}/extensions"
-        if command_exists "${_module}_extension_setup"
-        then
-          "${_module}_extension_setup" "${extension}" "${_module}" "${_path}"
-          #unset -f "${_module}_extension_setup"
-        fi
+        "${_module}_extension_setup" "${extension}" "${_module}" "${_path}"
+        #unset -f "${_module}_extension_setup"
       fi
-    done
-    log "Extension created from template at ${target_path}/${extension}/."
-  fi
+    fi
+  done
+
+  log "Extension created from template at ${target_path}/${extension}/."
 done
 
 succeed "Created extensions ${extension_args[@]}."

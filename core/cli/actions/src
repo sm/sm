@@ -1,7 +1,7 @@
 #!/bin/sh
 
 array_is_nonempty extension_args ||
-  fail "You must specify at least one extension name."
+  fail "src: You must specify at least one extension name."
 
 if path_exists "${extensions_development_path}/${extension_args[0]}"
 then

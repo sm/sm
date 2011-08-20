@@ -3,7 +3,7 @@
 shell_version=( $( ${user_shell}  --version | head -n 1 ) )
 
 [[ "${shell_version[1]}" == "bash," ]] && (( ${BASH_VERSINFO[0]} > 3 )) ||
-  error "Unsuported shell:\n  ${shell_version[*]}\n\nUse bash 4 for console\n"
+  error "console: Unsuported shell:\n  ${shell_version[*]}\n\nUse bash 4 for console\n"
 
 trap - ERR
 ${user_shell} --rcfile <(echo "
