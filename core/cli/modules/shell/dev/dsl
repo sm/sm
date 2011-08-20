@@ -65,12 +65,11 @@ sm_development_setup()
           ;;
       esac
 
-      if git clone ${_url} ${_component}
-      then
-        log "  * ${_component} repository successfully cloned into $PWD/${_component}/."
-      else
+      # TODO: Switch to using fetch_uri here.
+      git clone ${_url} ${_component} ||
         error "There was an error cloning ${_component} repository from ${_url} into ${PWD}/${_component}."
-      fi
+
+      log "  * ${_component} repository successfully cloned into $PWD/${_component}/."
     fi
   done
 
@@ -103,13 +102,10 @@ extension_package()
   do
     if command_exists ${archiver// *}
     then
-      if tar cf "${_name}-${_version}.tar" "${_name}/"
-      then
-        # TODO: parallelize this.
-        ${archiver} -f -9 "${_name}-${_version}.tar"
-      else
-        error "There was an error during packaging ($?) while trying to create a tar of the '${_name}' directory."
-      fi
+      tar cf "${_name}-${_version}.tar" "${_name}/" ||
+        error "Error during packaging ($?) whilst trying to create a tar of the '${_name}' directory."
+
+      ${archiver} -f -9 "${_name}-${_version}.tar" # TODO: parallelize this.
     fi
 
     ensure_paths_exist "${_path}/pkg"
@@ -146,21 +142,20 @@ extension_publish()
 
   for formats in ".tar.gz" ".tar.bz2" ".tar.xz"
   do
-    if path_exists "${_path}/pkg/"
-    then
-      log "publishing ${_name}-${_version}"
+    path_exists "${_path}/pkg/" ||
+    error "The local package path '${_path}' does not exist; did you run"\
+      "'extension package ${_name}' before 'extension publish ${_name}'?"
 
-      for file in "${_pth}/${_name}-${_version}".tar.{gz,xz,bz2}
-      do
-        log "  - ${file}"
-        log "  - ${file}.md5"
-        NIY "publishing"
-      done
-    else
-      error "The local package path '${_path}' does not exist; did you run"\
-        "'extension package ${_name}' before 'extension publish ${_name}'?"
-    fi
+    log "publishing ${_name}-${_version}"
+
+    for file in "${_pth}/${_name}-${_version}".tar.{gz,xz,bz2}
+    do
+      log "  - ${file}"
+      log "  - ${file}.md5"
+      NIY "publishing"
+    done
   done
+
   log "Packaging complete. (Packages are located in '${_path}/pkg' )"
 }
 

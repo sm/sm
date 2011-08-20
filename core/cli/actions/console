@@ -2,29 +2,19 @@
 
 shell_version=( $( ${user_shell}  --version | head -n 1 ) )
 
-if [[ "${shell_version[1]}" == "bash," ]] && (( ${BASH_VERSINFO[0]} > 3 ))
-then
-  trap - ERR
-  ${user_shell} --rcfile <(echo "
-    [[ -s ~/.bash_profile ]] && source ~/.bash_profile
-    [[ -s ~/.profile ]] && source ~/.profile
-    source ${sm_path}/core/sm/modules/shell/core/initialize
-    module ext/vcs
-    fail()
-    {
-      backtrace \"\$*\" no_exit
-    }
-    error()
-    {
-      printf \"\\nERROR: \$*\\n\" >&2
-    }
-    exit()
-    {
-      builtin exit 0
-    }
-    trap \"backtrace \\\"A command has returned error code (\\\$?) without being handled.\\\" no_exit\" ERR
-    export PS1='(sm) [ret=\$?] \w > '
-  ") -i
-else
+[[ "${shell_version[1]}" == "bash," ]] && (( ${BASH_VERSINFO[0]} > 3 )) ||
   error "Unsuported shell:\n  ${shell_version[*]}\n\nUse bash 4 for console\n"
-fi
+
+trap - ERR
+${user_shell} --rcfile <(echo "
+  [[ -s ~/.bash_profile ]] && source ~/.bash_profile
+  [[ -s ~/.profile ]] && source ~/.profile
+  source ${sm_path}/core/sm/modules/shell/core/initialize
+  module ext/vcs
+  fail() { backtrace \"\$*\" no_exit ; }
+  error() { printf \"\\nERROR: \$*\\n\" >&2 ; }
+  exit() { builtin exit 0 ; }
+  trap \"backtrace \\\"A command has returned error code (\\\$?) without being handled.\\\" no_exit\" ERR
+  export PS1='(sm) [ret=\$?] \w > '
+") -i
+

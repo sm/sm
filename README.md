@@ -1,5 +1,4 @@
-# S{cripting,ystem,tack} Management (SM) Framework
-(Core)
+# S{cripting,ystem,tack} Management (SM) Framework (Core)
 
 SM is a system scripting and DSL & management framework for beating software
 and systems into submission!
