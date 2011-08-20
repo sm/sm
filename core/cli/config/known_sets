@@ -1,6 +1,5 @@
 backups=sm/sm-backups
 databases=sm/sm-databases
-dependencies=sm/sm-dependencies
 gnu=sm/sm-gnu
 irc=sm/sm-irc
 java=sm/sm-java
