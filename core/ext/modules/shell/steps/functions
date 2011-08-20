@@ -1,6 +1,6 @@
 #!/bin/sh
 
-steps_initialize()
+ext_steps_initialize()
 {
   steps_started=()
 }

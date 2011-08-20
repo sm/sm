@@ -1,5 +1,10 @@
 #!/bin/sh
 
+ext_date_initialize()
+{
+  true # date_format="%Y-%m-%d"
+}
+
 date_range()
 {
   local _start _end _date _step="day" \

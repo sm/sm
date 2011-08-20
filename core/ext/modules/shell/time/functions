@@ -1,6 +1,6 @@
 #!/bin/sh
 
-time_initialize()
+ext_time_initialize()
 {
   [[ -n "${timestamp:-}" ]] || timestamp_set
 }

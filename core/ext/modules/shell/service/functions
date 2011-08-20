@@ -8,7 +8,7 @@
 #
 # Initialize service module.
 #
-service_initialize()
+ext_service_initialize()
 {
   variable_is_nonempty init_scripts_path || init_scripts_path="$(init_scripts_path)"
   variable_is_nonempty confd_path        || confd_path="$(confd_path)"

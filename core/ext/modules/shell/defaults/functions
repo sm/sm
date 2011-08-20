@@ -1,6 +1,6 @@
 #!/bin/sh
 
-defaults_initialize()
+ext_defaults_initialize()
 {
   settings_search_path_cache=()
   # This line needs to be commented to allow settings read from smrc.

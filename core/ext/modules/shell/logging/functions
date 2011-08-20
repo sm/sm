@@ -1,6 +1,6 @@
 #!/bin/sh
 
-logging_initialize()
+ext_logging_initialize()
 {
   if user_is_root
   then

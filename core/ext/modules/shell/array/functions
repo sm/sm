@@ -4,6 +4,15 @@
 # # Array Module
 #
 :
+ext_array_initialize()
+{
+  if [[ -n "${ZSH_VERSION:-}" ]]
+  then
+    __array_start=1
+  else
+    __array_start=0
+  fi
+}
 #
 # ## array\_is\_nonempty()
 #
@@ -52,15 +61,6 @@
 #
 # ### Code Walkthrough
 
-array_initialize()
-{
-  if [[ -n "${ZSH_VERSION:-}" ]]
-  then
-    __array_start=1
-  else
-    __array_start=0
-  fi
-}
 array_is_nonempty()
 {
   trace_filter array

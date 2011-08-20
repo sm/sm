@@ -33,7 +33,7 @@
 #     production
 #
 # ### Code Walkthrough
-project_initialize()
+ext_project_initialize()
 {
   # TODO: Read project and project_path from defaults file first.
   if user_is_not_root

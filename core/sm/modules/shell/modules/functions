@@ -1,6 +1,6 @@
 #!/bin/sh
 
-modules_initialize()
+modules_core_initialize()
 {
   (( ! ${modules_initialized:=0} )) || return 0
 
@@ -278,7 +278,7 @@ module()
   done
 
   _function="${_module//\//_}"
-  _function="${_function//_modules_shell/_}"
+  _function="${_function/_modules_shell/_}"
 
   for _hook in initialize # options, etc... ?
   do

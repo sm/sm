@@ -1,6 +1,6 @@
 #!/bin/sh
 
-help_initialize()
+ext_help_initialize()
 {
   declare -a help_descriptions
   declare -a help_action_names

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-database_initialize()
+ext_database_initialize()
 {
   if user_is_root
   then

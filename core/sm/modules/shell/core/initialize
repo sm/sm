@@ -106,7 +106,7 @@ source "${modules_path}/shell/logging/functions"
 source "${modules_path}/shell/logging/initialize"
 source "${modules_path}/shell/modules/functions"
 
-modules_initialize
+modules_core_initialize
 
 [[ "$OSTYPE" != *solaris* ]] || # custom compilations + g*
   export PATH="/bin:/opt/local/bin:/usr/sfw/bin:/usr/sbin:/usr/bin:${PATH}"
