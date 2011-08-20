@@ -1175,10 +1175,11 @@ package_activate_if_first()
 package_ldconfig()
 {
   local _package="${1:-${package_name}}" _path _files _ldconfig="/sbin/ldconfig"
-  variables_must_be_nonempty _package
+  [[ -n "${_package}" ]] || fail "$FUNCNAME: Cannot run ldconfig for a package;"\
+    "Package name must be given."
 
-#  path_exists "${packages_path}/${_package}/active/lib" ||
-#    return 0 # no lib/ directory for activated package, no need to update ldconfig
+  #  path_exists "${packages_path}/${_package}/active/lib" ||
+  #    return 0 # no lib/ directory for activated package, no need to update ldconfig
 
   user_is_root || return 0
 
@@ -1187,11 +1188,10 @@ package_ldconfig()
   then
     ensure_paths_exist "/etc/ld.so.conf.d"
 
-    if ! file_exists "/etc/ld.so.conf.d/sm.conf"
-    then
+    file_exists "/etc/ld.so.conf.d/sm.conf" || {
       write "${active_path}/lib\n" to "/etc/ld.so.conf.d/sm.conf"
       chmod_files 0444 "/etc/ld.so.conf.d/sm.conf"
-    fi
+    }
 
     command_exists "${_ldconfig}" || ldconfig="ldconfig"
 
@@ -1243,8 +1243,8 @@ package_ldconfig()
 package_profile_d()
 {
   local _package="${1:-${package_name}}"
-
-  variables_must_be_nonempty _package
+  [[ -n "${_package}" ]] || fail "$FUNCNAME: Cannot run setup profile_d for a package;"\
+    "Package name must be given."
 
   template_exists "profile.d.template" || return 0
 
@@ -1297,17 +1297,14 @@ package_uninstall()
 
   if package_is_active "${package_name}" "${package_version}"
   then # Deactivate the package if active.
-     package_deactivate "${package_name}" "${package_version}"
+    package_deactivate "${package_name}" "${package_version}"
   fi
 
   log_step "${package_name} ${package_version} ~ uninstall"
 
   remove_paths "${install_path}"
 
-  if module_is_loaded service
-  then # Remove any service reminants.
-    service_uninstall
-  fi
+  ! module_is_loaded service || service_uninstall # Remove any service reminants
 
   log_step success
 }
@@ -1400,13 +1397,11 @@ package_patch()
 package_apply_patches()
 {
   local _patch _patches=("$@")
-
-  array_is_nonempty _patches ||
-    fail "Cannot apply patches, as no patches were given."
+  shift || fail "$FUNCNAME: Cannot apply patches; No patches were given."
 
   for _patch in "${_patches[@]}"
   do
-    log "TODO: patch application is NIY (see package_patch())"
+    error "$FUNCNAME: TODO: patch application is NIY (see package_patch())"
   done
 }
 
@@ -1498,8 +1493,7 @@ package_usage() {
 package_is_active()
 {
   local _name="${1:-}" _version="${2:-}"
-
-  shift || fail "Cannot query if a package is active;"\
+  shift || fail "$FUNCNAME: Cannot query if a package is active;"\
     " No package name was given, or name is empty."
 
   local _path="${packages_path}/${_name}"
@@ -1549,11 +1543,11 @@ package_must_be_active()
 {
   local _name="${1:-}"
 
-  shift || fail "Cannot ensure that package is active;"\
+  shift || fail "$FUNCNAME: Cannot ensure that package is active;"\
     "No package name was given (or name is empty.)"
 
   package_is_active "${_name}" ||
-    error "Install/activate the node package extension, before installing ${_name}."
+    error "$FUNCNAME: Install/activate the node package extension, before installing ${_name}."
 }
 
 #
@@ -1592,8 +1586,7 @@ package_must_be_active()
 packages_must_be_active()
 {
   local _package _packages="$@"
-
-  array_is_nonempty _packages || fail "Cannot ensure that packages are active;"\
+  shift || fail "$FUNCNAME: Cannot ensure that packages are active;"\
     "No packages were given."
 
   for _package in "${_packages[@]}"
@@ -1691,6 +1684,7 @@ package_dependencies()
   do
     package_is_active ${dependency/-/ } || _missing_dependencies+=( ${dependency} )
   done
+
   if array_is_nonempty _missing_dependencies
   then
     local IFS=','
@@ -1749,6 +1743,7 @@ package_info()
   : \
     "${package_dir:="${package_name}-${package_version}"}" \
     "${package_url:="${package_base_url}/${package_file}"}"
+
   [[ -n "${package_md5}" ]] || read_config "${package_name}" md5 "${package_file}" as package_md5
 
   log "package_name: ${package_name}"
@@ -1792,18 +1787,17 @@ package_man()
 
   MANPATH="${package_path}/man"
 
-  if path_exists $MANPATH
-  then
-    man ${extension_actions[@]:-${package_name}} || true
-  else
-    error "No man page available for package ${package_name} ${package_version}"
-  fi
+  path_exists $MANPATH ||
+    error "$FUNCNAME: No man page available for package ${package_name} ${package_version}"
+
+  man ${extension_actions[@]:-${package_name}} || true
 }
 
 # pkg functions
 packages_installed()
 {
   [[ -d "${_path}" ]] || return 0 # None!
+
   find "${sm_path}/pkg" -mindepth 2 -maxdepth 2 -type d |
     awk -F'/' '! /\/active\//{print $(NF - 1)":"$(NF)}' | sort
 }
@@ -1847,8 +1841,7 @@ packages_available()
 packages_list()
 {
   local _action="${1:-}" _args
-
-  [[ -z "${_action}" ]] || shift
+  shift || true
 
   case "${_action}" in
     (active)
