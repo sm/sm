@@ -1,4 +1,4 @@
 #!/bin/sh
 
-[[ -n "$timestamp" ]] || timestamp_set
+[[ -n "${timestamp:-}" ]] || timestamp_set
 
