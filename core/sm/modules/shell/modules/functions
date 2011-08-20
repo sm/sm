@@ -233,7 +233,8 @@ in_search_paths()
 #
 module()
 {
-  local _module=$1 _file _module_dependency _module_path
+  local _module="${1:-}" _file _module_dependency _module_path _hook
+  shift || fail "No module name was given as the first parameter."
 
   ! module_is_loaded "${_module}" || return 0 # Return if module is loaded.
 
@@ -253,8 +254,7 @@ module()
   # Load env before dependencies, so they can use env settings.
   if [[ -s "${_module_path}/env" ]]
   then
-    #TODO: should we check for errors here ?!?!?!
-    source "${_module_path}/env"
+    source "${_module_path}/env" # TODO: should we check for errors here ?!?!?!
   fi
 
   # Load module dependencies.
@@ -274,6 +274,14 @@ module()
     then
       #TODO: should we check for errors here ?!?!?!
       source "${_module_path}/${_file}"
+    fi
+  done
+
+  for _hook in initialize # options, etc... ?
+  do
+    if command_exists "${_module}_${_hook}"
+    then
+      "${_module}_initialize"
     fi
   done
 
