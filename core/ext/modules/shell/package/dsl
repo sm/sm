@@ -546,8 +546,10 @@ To force, call:\n\tsm ${package_name} package install force\n"
       "${package_name}_postinstall"
   fi
 
-  string_contains "${FUNCNAME[*]}" 'package_update' ||
+  if ! string_contains "${FUNCNAME[*]}" 'package_update'
+  then
     package_activate_if_first "${package_name}" "${package_version}"
+  fi
 
   if command_exists "${package_name}_postactivate"
   then
@@ -1127,7 +1129,6 @@ package_activate_if_first()
   if path_exists "${install_path}"
   then
     symlink_exists "${packages_path}/${_package}/active" ||
-      log_step "Activating ${_package} ${_version}" \
       package_activate "${_package}" "${_version}"
   else
     log "'${install_path}' not found; skipping activation."
