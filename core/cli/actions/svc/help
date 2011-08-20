@@ -1,10 +1,10 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
-description "${extension} BDSM extension."
+description "SM Service extension."
 
-actions "  list     - List services installed through BDSM extensions using the service module.
-  active     - List active services versions.
-  activate   - Activate a given service and version.
-  deactivate - Deactivate a given service."
+action "list" "List services installed through SM extensions which are using the ext/service module."
+action "active" "List active services versions."
+action "activate" " Activate a given service and version."
+action "deactivate" "Deactivate a given service."
 
 show_help usage

@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 smrc_install()
 {
@@ -45,7 +45,8 @@ smrc_update()
 
   # TODO: Read project, repository_url and environment from defaults file.
   #       ~/.sm/project/config/defaults
-  : "${repository_url:="username/repository"}"
+  : \
+    "${repository_url:="username/repository"}"
 
   update_seed_template "${template}" "${target}" "${incoming}" \
     project "$project" \

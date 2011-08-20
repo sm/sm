@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 #
 # In order to use the sm interactive project functions, the project module's
 # interactive file must be sourced in your profile, such as ~/.bash_profile,

@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 declare -a help_descriptions
 declare -a help_action_names

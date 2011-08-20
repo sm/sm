@@ -1,6 +1,9 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
-: ${debug_flags:=""} ${debug_flag:=0} ${trace_flags:="-backtrace"} ${trace_flag:=0} ${var_debug_type_flag:="long"}
+: \
+  ${debug_flags:=""} ${debug_flag:=0} ${trace_flags:="-backtrace"} \
+  ${trace_flag:=0} ${var_debug_type_flag:="long"}
+
 declare -a var_debug_flags
 
 trace_filter_stack=()

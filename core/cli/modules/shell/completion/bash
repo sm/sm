@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 for file in $(find $bdsm_path -type f -name completion)
 do

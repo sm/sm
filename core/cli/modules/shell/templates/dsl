@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 # actions
 templates_help()
@@ -67,6 +67,7 @@ templates_list() {
   else
     log "Template settings are missing: $template.settings"
   fi
+
   if [[ "$2" == "all" ]]
   then
     templates_targets $1
@@ -89,16 +90,13 @@ templates_list_all() {
       all="all"
       ;;
   esac
-  if (( ${#templates[@]} == 0 ))
-  then
-    error "No templates found.\n"
-  fi
+
+  (( ${#templates[@]} )) || error "No templates found.\n"
+
   for template in ${templates[@]}
   do
-    if [[ ! "$template" =~ ".settings" ]]
-    then
+    [[ "$template" =~ ".settings" ]] ||
       templates_list "$template" "$all"
-    fi
   done
 }
 
@@ -126,10 +124,7 @@ templates_apply_all()
 {
   local list template first="$1"
 
-  if (( $# < 1 ))
-  then
-    error "Please provide a template or target name!"
-  fi
+  (( $# )) || error "Please provide a template or target name!"
 
   if [[ "$first" == "${first/_*./_.}" && -f "$first" ]]
   then
@@ -167,10 +162,7 @@ templates_apply_diffs()
 {
   local list template
 
-  if (( $# < 1 ))
-  then
-    error "Please provide a template or target name!"
-  fi
+  (( $# )) || error "Please provide a template or target name!"
 
   if [[ "$1" == "${1/_*./_.}" && -f "$1" ]]
   then

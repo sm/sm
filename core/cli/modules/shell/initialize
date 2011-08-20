@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 #TODO: update repository_url to "sm/bdsm"
 true \

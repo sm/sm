@@ -1,51 +1,48 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
-if array_is_nonempty extension_args
-then
-  target_path="${extensions_development_path:-"$initial_pwd"}"
+array_is_nonempty extension_args ||
+  fail "create: You must specify at least one extension name."
 
-  for extension in ${extension_args[@]}
+target_path="${extensions_development_path:-"$initial_pwd"}"
+
+for extension in ${extension_args[@]}
+do
+  ! path_exists "${target_path}/${extension}" ||
+    error "create: Extension '${extension}' already exists "\
+    "at ${target_path}/${extension}."
+
+  path_exists "${sm_path}/core/cli/templates/ext/${language:-shell}" ||
+    fail "create: Extension template files are missing from "\
+      "$target_path/core/cli/templates/ext/${language:-shell}."
+
+  enter "${sm_path}/core/cli/templates/ext/${language:-shell}"
+
+  _path="${target_path}/${extension}"
+
+  copy_paths actions modules templates config \
+    to "${_path}"
+
+  copy_files README.md VERSION CHANGELOG.md TODO.md \
+    to "${_path}"
+
+  for _module in "${extension_modules[@]}"
   do
-    if path_exists "${target_path}/${extension}"
+    extension_module_add "${extension}" "${_module}" "${_path}"
+
+    # Run the module's extension setup function, if it exists.
+    if file_exists "${sm_path}/core/cli/modules/shell/${_module}/extensions"
     then
-      error "Extension '${extension}' already exists "\
-        "at ${target_path}/${extension}."
-    else
-      if path_exists "${sm_path}/core/cli/templates/ext/${language:-shell}"
+      source_files "${sm_path}/core/cli/modules/shell/${_module}/extensions"
+      if command_exists "${_module}_extension_setup"
       then
-        enter "${sm_path}/core/cli/templates/ext/${language:-shell}"
-
-        _path="${target_path}/${extension}"
-
-        copy_paths actions modules templates config \
-          to "${_path}"
-
-        copy_files README.md VERSION CHANGELOG.md TODO.md \
-          to "${_path}"
-
-        for _module in "${extension_modules[@]}"
-        do
-          extension_module_add "${extension}" "${_module}" "${_path}"
-
-          # Run the module's extension setup function, if it exists.
-          if file_exists "${sm_path}/core/cli/modules/shell/${_module}/extensions"
-          then
-            source_files "${sm_path}/core/cli/modules/shell/${_module}/extensions"
-            if command_exists "${_module}_extension_setup"
-            then
-              "${_module}_extension_setup" "${extension}" "${_module}" "${_path}"
-              #unset -f "${_module}_extension_setup"
-            fi
-          fi
-        done
-        log "Extension created from template at ${target_path}/${extension}/."
-      else
-        fail "Extension template files are missing from "\
-          "$target_path/core/cli/templates/ext/${language:-shell}."
+        "${_module}_extension_setup" "${extension}" "${_module}" "${_path}"
+        #unset -f "${_module}_extension_setup"
       fi
     fi
   done
-  succeed "Created extensions ${extension_args[@]}."
-else
-  fail "You must specify at least one extension name."
-fi
+
+  log "Extension created from template at ${target_path}/${extension}/."
+done
+
+succeed "Created extensions ${extension_args[@]}."
+

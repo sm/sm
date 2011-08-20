@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 #
 # ## show\_help()
@@ -84,12 +84,8 @@ show_help()
 description()
 {
   local _description="$*"
-  if variable_is_nonempty _description
-  then
-    help_descriptions+=("$*")
-  else
-    fail "Cannot add description to help, as no help description was given."
-  fi
+  shift || fail "$FUNCNAME: Cannot add description to help; description given."
+  help_descriptions+=("$*")
 }
 
 #
@@ -138,15 +134,14 @@ help_description()
 {
   local _description
 
-  if array_is_nonempty help_descriptions
-  then
-    help_section "Description"
+  array_is_nonempty help_descriptions || return 0
 
-    for _description in "${help_descriptions[@]}"
-    do
-      printf "  %s\n" "${_description}"
-    done
-  fi
+  help_section "Description"
+
+  for _description in "${help_descriptions[@]}"
+  do
+    printf "  %s\n" "${_description}"
+  done
 }
 
 #
@@ -183,21 +178,17 @@ help_description()
 action()
 {
   local _name="${1:-}" _description="${2:-}"
+  shift || fail "$FUNCNAME: An action name must be provided:\naction {name} {description}."
+  shift || fail "$FUNCNAME: An description must be provided:\naction {name} {description}."
 
-  if variable_is_nonempty _name &&
-    variable_is_nonempty _description
-  then
-    help_action_names+=( "${_name}" )
-    help_action_descriptions+=( "${_description}" )
-  else
-    fail "An action and a description must be provided:\naction {name} {description}."
-  fi
+  help_action_names+=( "${_name}" )
+  help_action_descriptions+=( "${_description}" )
 }
 
 action_separator()
 {
   help_action_names+=( "" )
-  help_action_descriptions+=( "$1" )
+  help_action_descriptions+=( "${1:-}" )
 }
 
 #
@@ -420,15 +411,14 @@ help_notes()
 {
   local _index
 
-  if array_is_nonempty help_notes
-  then
-    help_section "Notes"
+  array_is_nonempty help_notes || return 0
 
-    for (( _index=0 ; _index < ${#help_notes[@]} ; _index++ ))
-    do
-      printf "  * %s\n" "${help_notes[${_index}]}"
-    done
-  fi
+  help_section "Notes"
+
+  for (( _index=0 ; _index < ${#help_notes[@]} ; _index++ ))
+  do
+    printf "  * %s\n" "${help_notes[${_index}]}"
+  done
 }
 
 #
@@ -462,15 +452,14 @@ help_dependencies()
 {
   local _index
 
-  if array_is_nonempty help_dependencies
-  then
-    help_section "Dependencies"
+  array_is_nonempty help_dependencies || return 0
 
-    for (( _index=0 ; _index < ${#help_dependencies[@]} ; _index++ ))
-    do
-      printf " * %s\n" "${help_dependencies[${_index}]}"
-    done
-  fi
+  help_section "Dependencies"
+
+  for (( _index=0 ; _index < ${#help_dependencies[@]} ; _index++ ))
+  do
+    printf " * %s\n" "${help_dependencies[${_index}]}"
+  done
 }
 
 #
@@ -506,15 +495,14 @@ help_resources()
 {
   local _index
 
-  if array_is_nonempty help_resources
-  then
-    help_section "Resources"
+  array_is_nonempty help_resources || return 0
 
-    for (( _index=0 ; _index < ${#help_resources[@]} ; _index++ ))
-    do
-      printf " * %s\n" "${help_resources[${_index}]}"
-    done
-  fi
+  help_section "Resources"
+
+  for (( _index=0 ; _index < ${#help_resources[@]} ; _index++ ))
+  do
+    printf " * %s\n" "${help_resources[${_index}]}"
+  done
 }
 
 #

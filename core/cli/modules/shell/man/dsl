@@ -1,11 +1,13 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 detect_man()
 {
   local _extensions_path=$1 _extension=${2:-cli}
   shift
+
   local _man_path _man_name="$*" #include extension in name
   shift
+
   _man_name="${_man_name:-cli}"
   _man_name="${_man_name// /_}"
 

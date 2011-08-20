@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 #
 # # Hash in file Module
@@ -9,14 +9,19 @@
 # Read keys from given file($1)
 hash_keys()
 {
-  local file=$1 valid_keys='^[^ ^=]+'
+  local file="${1:-}" valid_keys='^[^ ^=]+'
+  shift || fail "$FUNCNAME: Cannot read keys from hash file; Filename not given."
   echo -n $(grep -E "${valid_keys}=" $file | grep -Eo "${valid_keys}")
 }
 
 # Read value from given file($1) for given key($2), and assign it to a variable($3).
 hash_read()
 {
-  local file=$1 key=$2 variable=$3 valid_keys='^[^ ^=]+'
+  local file="${1:-}" key="${2:-}" variable="${3:-}" valid_keys='^[^ ^=]+'
+
+  shift || fail "$FUNCNAME: Cannot read values from hash file; Filename was not given."
+  shift || fail "$FUNCNAME: Cannot read values from hash file; Key name was not given."
+  shift || fail "$FUNCNAME: Cannot read values from hash file; Variable was not given."
   eval "${variable}=$(
     awk \
       -v key="^${key}=" \

@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 date_range()
 {
@@ -13,23 +13,23 @@ date_range()
     case "${_token}" in
       (step)
         _step="${1:-}"
-        shift
+        shift || fail "$FUNCNAME: step must follow keyword 'step'"
         ;;
       (format_in)
         _format_in="${1}"
-        shift
+        shift || fail "$FUNCNAME: input format must follow keyword 'format_in'"
         ;;
       (format|format_out)
         _format_out="${1}"
-        shift
+        shift || fail "$FUNCNAME: output format must follow keyword 'format[_out]'"
         ;;
       (start)
         _start="${1}"
-        shift
+        shift || fail "$FUNCNAME: start must follow keyword 'start'"
         ;;
       (end)
         _end="${1}"
-        shift
+        shift || fail "$FUNCNAME: end must follow keyword 'end'"
         ;;
       (*)
         if variable_is_empty _start
@@ -39,64 +39,57 @@ date_range()
         then
           _end="${_token}"
         else
-          fail "Unknown token '${_token}' passed as a parameter."
+          fail "$FUNCNAME: Unknown token '${_token}' passed as a parameter."
         fi
         ;;
     esac
   done
 
-  if variable_is_empty _start
-  then
-    fail "Start date must be specified."
-  elif variable_is_empty _end
-  then
-    fail "End date must be specified."
-  else
-    case "${_step}" in
-      minute)
-        _minute=60
-        ;;
-      hour)
-        _step=3600
-        ;;
-      day)
-        _step=86400
-        ;;
-      week)
-        _step=604800
-        ;;
-      month)
-        _step=2629743
-        ;;
-      year)
-        _step=31556926
-        ;;
-      *)
-        fail "Unknown step token ${1:-}; valid steps are {minute,hour,day,week,month,year}."
-        ;;
-    esac
+  variable_is_nonempty _start || fail "$FUNCNAME: start date must be specified."
+  variable_is_nonempty _end   || fail "$FUNCNAME: end date must be specified."
 
-    if ! _start=$(date -j -f "${_format_in}" ${_start} "+%s")
-    then
-      fail "Date error: Input format '${_format_in}' for start date '${_start}'."
-    fi
+  case "${_step}" in
+    minute)
+      _minute=60
+      ;;
+    hour)
+      _step=3600
+      ;;
+    day)
+      _step=86400
+      ;;
+    week)
+      _step=604800
+      ;;
+    month)
+      _step=2629743
+      ;;
+    year)
+      _step=31556926
+      ;;
+    *)
+      fail "$FUNCNAME: Unknown step token ${1:-};"\
+        " valid steps are {minute,hour,day,week,month,year}."
+      ;;
+  esac
 
-    if ! _end=$(date -j -f "${_format_in}" ${_end} "+%s")
-    then
-      fail "Date error: Input format '${_format_in}' for end date '${_end}'."
-    fi
+  _start=$(date -j -f "${_format_in}" ${_start} "+%s") ||
+    fail "$FUNCNAME: Date error: "\
+    " Input format '${_format_in}' for start date '${_start}'."
 
-    while (( _start <= _end ))
-    do
-      if _date=$(date -r ${_start} "+${_format_out}")
-      then
-        printf "%s\n" "${_date}"
-        _date=$(date -j -f "${_format_out}" ${_date} "+%s" 2>/dev/null)
-        (( _start = _date + _step ))
-      else
-        fail "Date error: Output format '${_format_out}' for date '${_start}'."
-      fi
-    done
-  fi
+  _end=$(date -j -f "${_format_in}" ${_end} "+%s") ||
+    fail "$FUNCNAME: Date error: "\
+    "Input format '${_format_in}' for end date '${_end}'."
+
+  while (( _start <= _end ))
+  do
+    _date=$(date -r ${_start} "+${_format_out}") ||
+      fail "$FUNCNAME: Date error: "\
+      "Output format '${_format_out}' for date '${_start}'."
+
+    printf "%s\n" "${_date}"
+    _date=$(date -j -f "${_format_out}" ${_date} "+%s" 2>/dev/null)
+    (( _start = _date + _step ))
+  done
 }
 

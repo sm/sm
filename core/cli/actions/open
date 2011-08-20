@@ -1,15 +1,10 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
-if array_is_nonempty extension_args
-then
-  if path_exists "${extensions_development_path}/${extension_args[0]}"
-  then
-    enter "${extensions_development_path}/${extension_args[0]}"
+array_is_nonempty extension_args ||
+  fail "open: You must specify at least one extension name."
 
-    os_open "$PWD"
-  else
-    error "Failed to open '${extension_args[0]}'; it appears to not be installed."
-  fi
-else
-  fail "You must specify at least one extension name."
-fi
+path_exists "${extensions_development_path}/${extension_args[0]}" ||
+  error "open: Failed to open '${extension_args[0]}'; it appears to not be installed."
+
+os_open "${extensions_development_path}/${extension_args[0]}"
+

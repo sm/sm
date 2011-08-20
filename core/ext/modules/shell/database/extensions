@@ -1,8 +1,11 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 database_extension_setup()
 {
   local extension="${1}" module="${2}" path="${3}"
+  shift || fail "$FUNCNAME: Extension must be given as the first parameter."
+  shift || fail "$FUNCNAME: Module must be given as the second parameter."
+  shift || fail "$FUNCNAME: Path must be given as the third parameter."
 
   enter "${path}"
 
@@ -11,7 +14,7 @@ database_extension_setup()
   # Setup modules/shell/package/{dsl,initialize,cli}
   for file in dsl initialize cli
   do
-    write '#!/usr/bin/env bash' to "modules/${language}/${module}/${file}"
+    write '#!/bin/sh' to "modules/${language}/${module}/${file}"
   done
 
   write "\n${module}_cli\n" append to "modules/${language}/${module}/cli"
@@ -19,7 +22,7 @@ database_extension_setup()
   # setup actions/package/{...}
   for action in help initialize
   do
-    write '#!/usr/bin/env bash' to "actions/${module}/${action}"
+    write '#!/bin/sh' to "actions/${module}/${action}"
     chmod_files 0755 "actions/${module}/${action}"
   done
 

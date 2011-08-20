@@ -14,11 +14,6 @@ export p_search_path_depth="{{p_search_path_depth}}"
 # It is used in several path and file calculations.
 export environment="{{environment}}"
 
-# For Rails projects, we need to set RAILS_ENV.
-# Be sure that config/environments/$environment.rb exists!
-# It should be safe to copy config/environments/production.rb to create it.
-export RAILS_ENV="$environment"
-
 #
 #  The below settings are for repository options.
 #
@@ -37,6 +32,6 @@ branch="master"
 # The tag of your application, if any.
 # tag="v1.0.0"
 
-# Add here modules that should be always loaded with BDSM
+# Add here modules that should be always loaded with SM
 preload_modules=( )
 

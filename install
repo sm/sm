@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # TODO: --prefix=... parameter
 if [[ -z "${sm_path:-}" ]]

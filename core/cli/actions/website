@@ -1,9 +1,9 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
-if array_is_nonempty extension_args
-then
-  enter "${extensions_development_path}/${extension_args[0]}/"
-  os_open "$PWD"
-else
-  fail "You must specify at least one extension name."
-fi
+array_is_nonempty extension_args ||
+  fail "website: You must specify at least one extension name."
+
+enter "${extensions_development_path}/${extension_args[0]}/"
+
+os_open "$PWD"
+

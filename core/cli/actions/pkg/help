@@ -1,6 +1,6 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
-description "${extension} BDSM extension."
+description "SM pkg extension."
 
 action "pkg list [installed]" "List packages installed via package module."
 action "pkg list active" "List packages installed via package module with version."

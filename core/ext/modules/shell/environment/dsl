@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 #
 # ## command\_exists()
@@ -40,17 +40,14 @@ command_exists()
 {
   trace_filter environment
   local _name="${1:-}"
+  shift || fail "$FUNCNAME: Cannot test if command exists;"\
+    " No command name was given."
 
-  if variable_is_nonempty _name
+  if command -v "${_name}" > /dev/null 2>&1
   then
-    if command -v "${_name}" > /dev/null 2>&1
-    then
-      return 0
-    else
-      return 1
-    fi
+    return 0
   else
-    fail "Cannot test if command exists; no command name was given."
+    return 1
   fi
 }
 
@@ -98,17 +95,14 @@ is_a_function()
 {
   trace_filter environment
   local _name="${1:-}"
+  shift || fail "$FUNCNAME: Cannot test if function exists;"\
+    " No function name was given."
 
-  if variable_is_nonempty _name
+  if declare -f "${_name}" >/dev/null 2>&1
   then
-    if declare -f "${_name}" >/dev/null 2>&1
-    then
-      return 0
-    else
-      return 1
-    fi
+    return 0
   else
-    fail "Cannot test if function exists, as no function name was given."
+    return 1
   fi
 }
 

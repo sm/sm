@@ -1,4 +1,4 @@
-# Extension README
+# SM Extension README
 
 This extension has the purpose...
 

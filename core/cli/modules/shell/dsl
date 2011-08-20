@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 #TODO: this code should be distributed to proper places
 extension_cli()

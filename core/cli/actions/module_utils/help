@@ -1,8 +1,8 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 modules help
 
-description "BDSM Extension Manager."
+description "SM Extension Manager."
 
 action "create {name}" \
   "Create a named module. Use --language {name} to specify the language."

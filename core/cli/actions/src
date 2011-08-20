@@ -1,15 +1,13 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
-if array_is_nonempty extension_args
+array_is_nonempty extension_args ||
+  fail "src: You must specify at least one extension name."
+
+if path_exists "${extensions_development_path}/${extension_args[0]}"
 then
-  if path_exists "${extensions_development_path}/${extension_args[0]}"
-  then
-    printf "${extensions_development_path}/${extension_args[0]}"
-  else
-    printf "." # Stay put!
-    error "Failed to edit '${extension_args[0]}'; it appears to not be installed."
-  fi
+  printf "${extensions_development_path}/${extension_args[0]}"
 else
-  fail "You must specify at least one extension name."
+  printf "." # Stay put!
+  error "Failed to edit '${extension_args[0]}'; it appears to not be installed."
 fi
 

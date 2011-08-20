@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 # ## logrotate()
 #
@@ -79,19 +79,19 @@ log_streams()
         ;;
       err)
         _stderr="${1}"
-        shift
+        shift || fail "$FUNCNAME: stderr name must follow keyword 'err'"
         ;;
       out)
         _stdout="${1}"
-        shift
+        shift || fail "$FUNCNAME: stdout name must follow keyword 'out'"
         ;;
       mix)
         _stdmix="${1}"
-        shift
+        shift || fail "$FUNCNAME: stdmix name must follow keyword 'mix'"
         ;;
       *)
         _command="${1}"
-        shift
+        shift || fail "$FUNCNAME: A command must be given in order to log it's streams."
         ;;
     esac
   done

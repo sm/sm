@@ -1,19 +1,19 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 extension="<extension>"
 
-description "Benevolent Delectable S{cripting,ystem} Manager (BDSM) Framework (Core)"
+description "S{cripting,ystem,tack} Management (SM) Framework (Core)"
 
-action "{file_name}" "Run the provided {file_name}, with BDSM initialized."
+action "{file_name}" "Run the provided {file_name}, with SM initialized."
 action "smrc" "Install smrc template file into ~/.smrc."
 action_separator
-action "get head" "Fetch and install the latest BDSM development version."
+action "get head" "Fetch and install the latest SM development version."
 action "ext install {name} {uri}" "Install extension {name} from {uri}."
 action "ext update {name}" "Update extension {name}."
 action "sets" "List all installed extension sets and their extensions."
 action "sets help" "Show available extension sets help."
 action_separator
-action "version" "Display the curently installed BDSM version."
+action "version" "Display the curently installed SM version."
 action "help" "Display this help."
 
 notes="
@@ -38,8 +38,8 @@ notes="
 
 "
 
-resource "http://bdsm.beginrescueend.com/"
-resource "http://bdsm.beginrescueend.com/extensions/"
+resource "http://sm.beginrescueend.com/"
+resource "http://sm.beginrescueend.com/extensions/"
 resource "https://www.pivotaltracker.com/projects/26822"
 
 show_help usage

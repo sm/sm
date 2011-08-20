@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 #
 # ## log()
@@ -76,6 +76,7 @@ core_warn()
 {
   printf "WARNING: $*\n"
 }
+
 warn()
 {
   core_warn "$@"
@@ -125,7 +126,7 @@ warn()
 core_debug()
 {
   local type="$1"
-  shift
+  shift || fail "$FUNCNAME: Debug type must be given as the first parameter."
 
   if (( debug_flag == 1 )) && options_check "$debug_flags" "$type"
   then
@@ -141,6 +142,7 @@ core_debug()
     return 0
   fi
 }
+
 debug()
 {
   core_debug "$@"
@@ -179,9 +181,9 @@ debug()
 #
 core_log_search()
 {
-  local name=$1 value=$2
-  shift
-  shift
+  local name="${1:-}" value="${2:-}"
+  shift || fail "$FUNCNAME: name must be given as the first parameter."
+  shift || fail "$FUNCNAME: value must be given as the second parameter."
 
   if (( debug_flag == 1 )) && options_check "$debug_flags" "search"
   then
@@ -190,6 +192,7 @@ core_log_search()
     return 0
   fi
 }
+
 log_search()
 {
   core_log_search "$@"
@@ -284,6 +287,7 @@ core_error()
   trap - ERR
   exit 1
 }
+
 error()
 {
   core_error "$@"
@@ -329,6 +333,7 @@ core_succeed() {
   fi
   exit 0
 }
+
 succeed()
 {
   core_succeed "$@"
@@ -373,6 +378,7 @@ core_fail()
   backtrace "$*"
   exit 1
 }
+
 fail()
 {
   core_fail "$@"
@@ -453,7 +459,8 @@ set_ps4()
 core_trace_filter()
 {
   local _action="$1" old
-  shift
+  shift || fail "$FUNCNAME: Filter action {start,stop} must be specified."
+
   case "${_action}" in
     start)
       trace_filter_stack=( "$1" "${trace_filter_stack[@]}" )
@@ -468,9 +475,10 @@ core_trace_filter()
       fi
       ;;
     *)
-      fail "Unknown core_trace_filter action ${_action}."
+      fail "$FUNCNAME: Unknown trace action ${_action}, use {start,stop}."
       ;;
   esac
+
   filter="${trace_filter_stack[0]}"
 
   if [[ -n "$filter" ]]
@@ -509,8 +517,8 @@ action_call()
 action_source()
 {
   local script="$1"
-  shift
-  [[ -r "$script" ]] || fail "Could not find script to run: $script."
+  shift || fail "$FUNCNAME: No script was given as the first parameter."
+  [[ -r "$script" ]] || fail "$FUNCNAME: Could not find script to run: $script."
   trace_filter action
   source "$script"
 }
@@ -568,10 +576,7 @@ separator()
 
   if [[ -z "${COLUMNS}" ]]
   then
-    if ! _columns=$(tput cols)
-    then
-      _columns=80
-    fi
+    _columns=$(tput cols) || _columns=80
     export COLUMNS=${_columns}
   fi
 
@@ -659,10 +664,7 @@ backtrace()
   local _separator _columns
 
   # If setting the columns via tput does not work, default to 80 columns.
-  if ! _columns=$(tput cols)
-  then
-    _columns=80
-  fi
+  _columns=$(tput cols) || _columns=80
 
   # Set the separator variable contents to the separator, filled out to the
   # number of columns.
@@ -673,10 +675,7 @@ backtrace()
   local _message="${1:-}" _flag="$2"
 
   # If a message was given, print the message to the calling environment's STDERR.
-  if [[ -n _message ]]
-  then
-    printf "\n${_message}\n\n" >&2
-  fi
+  [[ -z ${_message} ]] || printf "\n${_message}\n\n" >&2
 
   # Declare function local variables
   local _source _function _line _index _largest _format _digits _longest
@@ -701,20 +700,16 @@ backtrace()
   do
     # For each source file in the source files array, if the file name/path
     # is longer than the current longest, then set it as the new longest element.
-    if (( ${#BASH_SOURCE[${_index}]} > ${#_longest} ))
-    then
+    (( ${#BASH_SOURCE[${_index}]} <= ${#_longest} )) ||
       _longest=${BASH_SOURCE[${_index}]}
-    fi
   done
 
   for (( _index=0 ; _index < ${#BASH_LINENO[@]} ; _index++ ))
   do
     # For each line number in the line numbers array, if the number of digits
     # is greater than the current longest digits, then set it as the new largest.
-    if (( ${#BASH_LINENO[${_index}]} > ${#_digits} ))
-    then
+    (( ${#BASH_LINENO[${_index}]} <= ${#_digits} )) ||
       _digits=${BASH_LINENO[${_index}]}
-    fi
   done
 
   # Determine the format string output for the backtrace, based on your
@@ -776,12 +771,9 @@ backtrace()
   # then turn tracing back on.
   printf "${_separator// /=}\n" 1>&2
 
-  if [[ "${_flag}" != "no_exit" ]]
-  then
-    finish_app
-  else
-    return 0
-  fi
+  [[ "${_flag}" != "no_exit" ]] || return 0
+
+  finish_app
 }
 
 finish_app()
@@ -843,7 +835,7 @@ core_log_step()
 
 log_step()
 {
-  local _message="$1" _output _log_file _status
+  local _message="${1:-}" _output _log_file _status
 
   if (( $# > 1 ))
   then
