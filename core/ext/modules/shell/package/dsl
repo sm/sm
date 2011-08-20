@@ -45,7 +45,7 @@
 package_error()
 {
   local _message="${1:-}" _log="${2:-}"
-  shift || fail "Cannot print a package error; No message was provided."
+  shift || fail "No message was provided."
 
   if [[ -n ${_log} ]] && file_exists ${_log}
   then # Append tail of error log to the error message.
@@ -301,8 +301,7 @@ package_init()
 {
   package_name="${1:-${package_name:-${extension}}}"
 
-  [[ -n "${package_name}" ]] ||
-    fail "Package name must be given as first parameter.\n"
+  [[ -n "${package_name}" ]] || fail "Package name must be given.\n"
 
   case "${package_name}" in
     *=*) # exact version specifier
@@ -547,10 +546,8 @@ To force, call:\n\tsm ${package_name} package install force\n"
       "${package_name}_postinstall"
   fi
 
-  if ! string_contains "${FUNCNAME[*]}" 'package_update'
-  then
+  string_contains "${FUNCNAME[*]}" 'package_update' ||
     package_activate_if_first "${package_name}" "${package_version}"
-  fi
 
   if command_exists "${package_name}_postactivate"
   then
@@ -1044,8 +1041,7 @@ package_deactivate()
   local _package="${package_name}" _package_version="${2:-${package_version}}" \
     _file _files _version
 
-  [[ -n "${_package}" ]] || fail "Cannot deactivate package;"\
-    " Package name must be given."
+  [[ -n "${_package}" ]] || fail "Package name must be given."
 
   if symlink_exists "${packages_path}/${_package}/active"
   then
@@ -1125,14 +1121,13 @@ package_deactivate()
 package_activate_if_first()
 {
   local _package="${1:-}" _version="${2:-}"
-  shift || fail "Cannot activate package, if first;"\
-    " Package name must be given as first parameter."
-  shift || fail "Cannot activate package, if first;"
-    " Package version must be given as second parameter."
+  shift || fail "Package name must be given as first parameter."
+  shift || fail "Package version must be given as second parameter."
 
   if path_exists "${install_path}"
   then
     symlink_exists "${packages_path}/${_package}/active" ||
+      log_step "Activating ${_package} ${_version}" \
       package_activate "${_package}" "${_version}"
   else
     log "'${install_path}' not found; skipping activation."
@@ -1175,8 +1170,7 @@ package_activate_if_first()
 package_ldconfig()
 {
   local _package="${1:-${package_name}}" _path _files _ldconfig="/sbin/ldconfig"
-  [[ -n "${_package}" ]] || fail "Cannot run ldconfig for a package;"\
-    "Package name must be given."
+  [[ -n "${_package}" ]] || fail "Package name must be given."
 
   #  path_exists "${packages_path}/${_package}/active/lib" ||
   #    return 0 # no lib/ directory for activated package, no need to update ldconfig
@@ -1243,8 +1237,7 @@ package_ldconfig()
 package_profile_d()
 {
   local _package="${1:-${package_name}}"
-  [[ -n "${_package}" ]] || fail "Cannot run setup profile_d for a package;"\
-    "Package name must be given."
+  [[ -n "${_package}" ]] || fail "Package name must be given."
 
   template_exists "profile.d.template" || return 0
 
@@ -1397,7 +1390,7 @@ package_patch()
 package_apply_patches()
 {
   local _patch _patches=("$@")
-  shift || fail "Cannot apply patches; No patches were given."
+  shift || fail "No patches were given."
 
   for _patch in "${_patches[@]}"
   do
@@ -1493,8 +1486,7 @@ package_usage() {
 package_is_active()
 {
   local _name="${1:-}" _version="${2:-}"
-  shift || fail "Cannot query if a package is active;"\
-    " No package name was given, or name is empty."
+  shift || fail "No package name was given, or name is empty."
 
   local _path="${packages_path}/${_name}"
 
@@ -1543,8 +1535,7 @@ package_must_be_active()
 {
   local _name="${1:-}"
 
-  shift || fail "Cannot ensure that package is active;"\
-    "No package name was given (or name is empty.)"
+  shift || fail "No package name was given (or name is empty.)"
 
   package_is_active "${_name}" ||
     error "Install/activate the node package extension, before installing ${_name}."
@@ -1586,8 +1577,7 @@ package_must_be_active()
 packages_must_be_active()
 {
   local _package _packages="$@"
-  shift || fail "Cannot ensure that packages are active;"\
-    "No packages were given."
+  shift || fail "No packages were given."
 
   for _package in "${_packages[@]}"
   do
