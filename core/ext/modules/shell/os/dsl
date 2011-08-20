@@ -36,20 +36,14 @@
 # ### Code Walkthrough
 init_scripts_path()
 {
-  # If the user id is 0 (eg. the user is root)
   if (( UID == 0 ))
   then
-    # then based on operating system type
     case "$OSTYPE" in
       *darwin*)
-        # If the OS is darwin, there is no 'init.d path' so to speak, the
-        # service module will create and use one at /etc/init.d.
         printf "/etc/init.d"
         ;;
 
       *linux*|*)
-        # If the OS is Linux, test for the location of the init.d
-        # scripts, either /etc/init.d (eg. CentOS) or /etc/rc.d (eg. ArchLinux)
         if [[ -d "/etc/init.d" ]]
         then
           printf "/etc/init.d"
@@ -57,15 +51,11 @@ init_scripts_path()
         then
           printf "/etc/rc.d"
         else
-          # If neither /etc/init.d nor /etc/rc.d were found, fail throwing a
-          # backtrace as this case needs to be accounted for. Currently I am not
-          # aware of a linux that does not use either one of these two schemes.
-          fail "Unknown init scripts directory (/etc/init.d or /etc/rc.d not found)."
+          fail "$FUNCNAME: Unknown init scripts directory (/etc/init.d or /etc/rc.d not found)."
         fi
         ;;
     esac
   else
-    # If the user is not root, set the init.d path inside the user's $HOME.
     printf "$HOME/.init.d"
   fi
 }
@@ -103,8 +93,6 @@ init_scripts_path()
 # ### Code Walkthrough
 confd_path()
 {
-  # If the user id is 0 (eg. the user is root) then Use the FHS standard /etc
-  # direcotry otherwise place the conf.d directory inside the user's $HOME
   if (( UID == 0 ))
   then
     printf "/etc/conf.d"
@@ -148,8 +136,6 @@ confd_path()
 # ### Code Walkthrough
 os_is_linux()
 {
-  # If the machine type is linux then return the code for true/success, 0
-  # Otherwise return a nonzero error code, 1
   [[ "$OSTYPE" = *linux* ]]
 }
 
@@ -188,8 +174,6 @@ os_is_linux()
 # ### Code Walkthrough
 os_is_darwin()
 {
-  # If the machine type is darwin then return the code for true/success, 0
-  # otherwise return a nonzero error code, 1.
   [[ "$OSTYPE" = *darwin* ]]
 }
 
@@ -228,8 +212,6 @@ os_is_darwin()
 # ### Code Walkthrough
 os_is_bsd()
 {
-  # If the machine type is BSD then return the code for true/success, 0
-  # otherwise return a nonzero error code, 1
   [[ "$OSTYPE" = *bsd* ]]
 }
 
@@ -268,8 +250,6 @@ os_is_bsd()
 # ### Code Walkthrough
 os_is_solaris()
 {
-  # If the machine type is Solaris then return the code for true/success, 0
-  # otherwise return a nonzero error code, 1.
   [[ "$OSTYPE" = *solaris* ]]
 }
 
@@ -308,15 +288,13 @@ os_is_solaris()
 # ### Code Walkthrough
 os_is_aix()
 {
-  # If the machine type is aix then return the code for true/success, 0
-  # otherwise return a nonzero error code, 1
   [[ "$OSTYPE" = *aix* ]]
 }
 
 #
 # ## os\_type()
 #
-# Prints out the operating system category / type.
+# Print out the OS category / type based on the detected machine type.
 #
 # ### Input Parameters
 #
@@ -349,7 +327,6 @@ os_is_aix()
 # ### Code Walkthrough
 os_type()
 {
-  # Print out the OS type based on the detected machine type.
   case "$OSTYPE" in
     (*linux*)
       printf "%s" "linux"
@@ -376,7 +353,7 @@ os_type()
 #
 # ## os\_arch\_type()
 #
-# Prints out the OS Arch type.
+# Print out the OS architecture type based on the detected machine type.
 #
 # ### Input Parameters
 #
@@ -407,7 +384,6 @@ os_type()
 # ### Code Walkthrough
 os_arch_type()
 {
-  # Print out the OS architecture type based on the detected machine type.
   case "${MACHTYPE//-*}" in
     # The machine type is 32 bit.
     # Note that this accounts for Solaris 32 bit as well (i86pc).
@@ -458,8 +434,6 @@ os_arch_type()
 # ### Code Walkthrough
 os_arch()
 {
-  # Print out the full OS machine type string, which includes the architecture,
-  # to the calling environment's STDOUT stream.
   printf '%s' "${MACHTYPE//-*}"
 }
 
@@ -497,14 +471,8 @@ os_arch()
 # ### Code Walkthrough
 os_arch_capable()
 {
-  # If the operating system is 'darwin' (OSX)
-  # Otherwise return the default for the OS, defer to os_arch_type().
   if os_is_darwin
   then
-    # Now determine whether the CPU has 64 bit capabilities. On OSX we use
-    # sysctl key hw.cpu64bit_capable key to find this out.  If the value is 1,
-    # then the CPU is 64 bit capable; emit x86_64 to the calling environment's
-    # STDOUT. Otherwise, output either i386 or ppc, by deferring to os_arch_type()
     local _string
     read -r _string < <(sysctl hw.cpu64bit_capable)
     if (( ${_string//* } == 1 ))
@@ -551,33 +519,25 @@ os_arch_capable()
 # ### Code Walkthrough
 os_cpu_count()
 {
-  # Default the CPU count to 1
   local _cpu_count=1
 
-  # If the operating system is Darwin (OSX),
-  # then read the CPU count using the sysctl key hw.ncpu, and trim off
-  # everything except the last space separated field.
   if os_is_darwin
   then
     read -r _cpu_count < <(/usr/sbin/sysctl hw.ncpu)
     _cpu_count="${_cpu_count//* }"
-  # If the operating system is Linux, gather the information directly from
-  # the proc filesystem.
+
   elif os_is_linux
   then
     _cpu_count=$(awk '/^processor/{count++} END{print count}' /proc/cpuinfo 2>&1)
 
-  # Warn that this function has not yet been implemented for solaris.
   elif os_is_solaris
   then
     warn "CPU counting for Solaris has not yet been implemented; returning 1."
 
-  # Warn that this function has not yet been implemented for bsd.
   elif os_is_bsd
   then
     warn "CPU counting for BSD has not yet been implemented; returning 1."
 
-  # Warn that this function has not yet been implemented for aix.
   elif os_is_aix
   then
     warn "CPU counting for AIX has not yet been implemented; returning 1."
@@ -625,9 +585,6 @@ os_cpu_count()
 # ### Code Walkthrough
 os_version()
 {
-  # Read the revision string using the uname utility, and strip off the rightmost
-  # piece, which typically contains additional info. Then print the remaining
-  # string to the STDOUT of the calling environment.
   read -r os_version < <(uname -r)
   os_version=${os_version//-*}
   printf "%s" "${os_version}"
@@ -670,8 +627,6 @@ os_version()
 # ### Code Walkthrough
 os_version_major()
 {
-  # Grab the full version string from os_version(). Then strip off everything to
-  # the right of the first set of digits and print it to STDOUT.
   os_version_major=$(os_version)
   os_version_major="${os_version_major//\.*}"
   printf "${os_version_major}"
@@ -714,9 +669,6 @@ os_version_major()
 # ### Code Walkthrough
 os_version_minor()
 {
-  # Grab the full version string from os_version(). Strip off everything to the
-  # left of the middle set of digits, then strip off everything to the right of
-  # the middle set of digits. Print the remaining string to STDOUT.
   os_version_minor=$(os_version)
   os_version_minor="${os_version_minor#*\.}"
   os_version_minor="${os_version_minor%\.*}"
@@ -760,8 +712,6 @@ os_version_minor()
 # ### Code Walkthrough
 os_version_patch()
 {
-  # Grab the full version string from os_version(). Strip off everything to the
-  # left of the last set of digits. Print the version string to STDOUT.
   os_version_patch=$(os_version)
   os_version_patch="${os_version_patch//*\.}"
   printf "${os_version_patch}"
@@ -779,30 +729,18 @@ os_version_patch()
 # ### Code Walkthrough
 os_open()
 {
-  # Store the URI in a local variable, set to the empty string if it was not
-  # passed in.
   local _uri="${1:-}"
+  shift || fail "$FUNCNAME: Cannot open URI; No uri was given."
 
-  shift || fail "Cannot open URI; No uri was given."
-
-  # and if the 'open' command exists on the system
   if command_exists open
   then
-    # Call open, passing in the URI.
     open "${_uri}"
 
-  # Otherwise if the 'xdg-open' command exists on the system,
   elif command_exists xdg-open
   then
-    # Call xdg-open, passing in the URI.
     xdg-open "${_uri}"
 
-  # otherwise
   else
-    # If the shell is interactive
-    # and if the uri is a file uri then open it up in the shell set editor,
-    # or less if the editor variable has not been set.
-    # Otherwise the shell is non-interactive, so for now print the uri.
     modules ext/interactive
     if shell_is_interactive
     then
