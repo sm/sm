@@ -13,7 +13,7 @@ detect_uri()
 {
   local extensions_path="${1:-}" _uri_path
 
-  shift || fail "extensions_path must be specified as the first parameter."
+  shift || fail "extensions_path must be given as first parameter."
 
   rebuild_path ".uri" $extensions_path $@
 
@@ -37,7 +37,7 @@ scm_identifier()
 {
   local _uri="${1:-}"
 
-  shift || fail "url must be the first parameter to scm_identifier()."
+  shift || fail "url must be given as first parameter."
 
   printf "${_uri//\//_}"
 }
@@ -50,6 +50,8 @@ scm_identifier()
 is_github_uri()
 {
   local _uri="${1:-}"
+  shift || fail "uri must be given as first parameter."
+
   if ematch "${_uri}" "^[[:alnum:]_-]+\/[[:alnum:]_-]+$"
   then
     if curl -s -f -I -L "https://github.com/${_uri}" >/dev/null 2>&1
@@ -69,8 +71,11 @@ is_github_uri()
   return 1
 }
 
-is_archive_uri() {
-  case "$1" in
+is_archive_uri()
+{
+  local _uri="${1:-}"
+  shift || fail "uri must be given as first parameter."
+  case "${_uri}" in
     *.tar|*.tgz|*.txz|*.tbz2|*.xz|*.bz2|*.gz|*.zip|*.lzma|*github.com/*/*ball/*)
       return 0
       ;;
@@ -83,6 +88,9 @@ is_archive_uri() {
 fetch_uri_detect_scm_type()
 {
   local _uri="${1:-}"
+
+  shift || fail "uri must be given as first parameter."
+
   if [[ -d "${_uri}" ]] # check for directory
   then
     scm_type="path"

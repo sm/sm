@@ -34,50 +34,37 @@
 user_create_if_missing()
 {
   trace_filter users
-  # Declare the token, group and user variables.
   local _token _group _user
-  # parse arguments
+
   while (( $# > 0 ))
   do
-    # Set the token to the first parameter.
     _token="$1"
-    # Remove the token from the parameters list.
     shift
 
-    # Switch based on the value of the token.
     case "${_token}" in
-      # If the token is 'group', then set the group variable to the next prameter
-      # and remove the next parameter from the parameters list.
       group)
-        _group="${1}"
-        shift
+        _group="${1:-}"
+        shift || fail "Group name must follow keyword 'group'"
         ;;
-      # If the token is 'with', then move on to processing the next token
-      # as this is syntactic sugar.
+
       with)
-        continue
+        continue # syntactic sugar.
         ;;
-      # If the token is 'from', then set the source variable to the next parameter
-      # and remove the next parameter from the parameters list.
+
       from)
-        _source="${1}"
-        shift
+        _source="${1:-}"
+        shift || fail "from source name must follow keyword 'from'"
         ;;
-      # If the token is '--force' then set the force_flag to 1.
+
       --force)
         _force_flag=1
         ;;
 
-      # If the token does not match any of the above, then
       *)
-        # If the user variable has not yet been set, then assign the token into
-        # the user variable.
         if variable_is_empty _user
         then
           _user="${_token}"
 
-        # Otherwise, if the group variable has not yet been set, then assign
-        # the token into the group variable.
         elif variable_is_empty _group
         then
           _group="${_token}"
@@ -88,66 +75,62 @@ user_create_if_missing()
 
   variable_is_nonempty _group || _group="${_user}"
 
-  # If the user is root (eg. id 0)
-  if (( UID == 0 ))
-  then
-    # Switch based on the uname command ouptput for os type.
-    # ##### TODO: Use the os_is_X functions here instead.
-    case "$(uname)" in
-      "OpenBSD")
-        groupadd "$_group"
-        useradd -g "$_user" "$_user" -s /bin/bash
-        usermod -s /bin/bash "$_user"
-        ;;
-
-      "FreeBSD")
-        pw groupadd -q "$_user"
-        ;;
-
-      "Linux")
-        # groupadd nginx
-        # useradd -G nginx -M nginx
-        if [[ -f "/etc/SuSE-release" ]] ; then
-          groupadd "$_group"
-        else
-          groupadd -f "$_group"
-        fi
-
-        useradd -g "${_user}" "${_user}" #TODO: add system users only !
-        usermod -d "${data_path%\/*}" "${_user}"
-        usermod -s /bin/bash "${_user}"
-      ;;
-
-      "Darwin")
-        current_max_gid=$(dscl . -list /Groups gid | awk '{print $2}' | sort -g -r | head -1)
-        next_gid=$((current_max_gid+1))
-
-        current_max_uid=$(dscl . -list /Users UniqueID | awk '{print $2}' | sort -g -r | head -1)
-        next_uid=$((current_max_uid+1))
-
-        if ! dscl . -list /Users | grep -q "^${_user}$" ; then
-          dscl . -create "/Groups/$_group"
-          dscl . -create "/Groups/$_group" gid "$next_gid"
-          dscl . -create "/Users/${_user}"
-          dscl . -create "/Users/${_user}" PrimaryGroupID "$gid" # UserShell /bin/bash
-          dscl . -create "/Users/${_user}" uid "$next_uid"
-          dscl . -create "/Users/${_user}" realname "Postgresql User"
-          dscl . -create "/Users/${_user}" home "${data_path%\/*}"
-          dscl . -create "/Users/${_user}" shell "/bin/bash"
-          dscl . -create "/Users/${_user}" gid "$gid"
-          dscl . -create "/Users/${_user}" passwd "*"
-        fi
-      ;;
-
-      "SunOS")
-        groupadd "$_group"
-        useradd -g "$_user" -s /bin/bash -d "${data_path}" "$_user"
-        usermod -s /bin/bash "$_user"
-        ;;
-    esac
-  else
+  (( UID == 0 )) || # root user has id 0
     fail "Users and groups may be manipulated only by the super-user (root), via su or sudo."
-  fi
+
+  # ##### TODO: Use the os_is_X functions here instead.
+  case "$(uname)" in
+    "OpenBSD")
+      groupadd "$_group"
+      useradd -g "$_user" "$_user" -s /bin/bash
+      usermod -s /bin/bash "$_user"
+      ;;
+
+    "FreeBSD")
+      pw groupadd -q "$_user"
+      ;;
+
+    "Linux")
+      # groupadd nginx
+      # useradd -G nginx -M nginx
+      if [[ -f "/etc/SuSE-release" ]] ; then
+        groupadd "$_group"
+      else
+        groupadd -f "$_group"
+      fi
+
+      useradd -g "${_user}" "${_user}" #TODO: add system users only !
+      usermod -d "${data_path%\/*}" "${_user}"
+      usermod -s /bin/bash "${_user}"
+    ;;
+
+    "Darwin")
+      current_max_gid=$(dscl . -list /Groups gid | awk '{print $2}' | sort -g -r | head -1)
+      next_gid=$((current_max_gid+1))
+
+      current_max_uid=$(dscl . -list /Users UniqueID | awk '{print $2}' | sort -g -r | head -1)
+      next_uid=$((current_max_uid+1))
+
+      if ! dscl . -list /Users | grep -q "^${_user}$" ; then
+        dscl . -create "/Groups/$_group"
+        dscl . -create "/Groups/$_group" gid "$next_gid"
+        dscl . -create "/Users/${_user}"
+        dscl . -create "/Users/${_user}" PrimaryGroupID "$gid" # UserShell /bin/bash
+        dscl . -create "/Users/${_user}" uid "$next_uid"
+        dscl . -create "/Users/${_user}" realname "Postgresql User"
+        dscl . -create "/Users/${_user}" home "${data_path%\/*}"
+        dscl . -create "/Users/${_user}" shell "/bin/bash"
+        dscl . -create "/Users/${_user}" gid "$gid"
+        dscl . -create "/Users/${_user}" passwd "*"
+      fi
+    ;;
+
+    "SunOS")
+      groupadd "$_group"
+      useradd -g "$_user" -s /bin/bash -d "${data_path}" "$_user"
+      usermod -s /bin/bash "$_user"
+      ;;
+  esac
 }
 
 #
@@ -183,46 +166,33 @@ user_create_if_missing()
 user_delete()
 {
   trace_filter users
-  # #### TODO: Finish documenting this function
-  # Declare local variables for token and group
   local _token _user
 
-  # While there are parameters, loop over them
   while (( $# > 0 ))
   do
-    # Set the first parameter into the token variable and remove the token from
-    # the parameters list now that it is in a variable.
     _token="$1"
     shift
 
-    # Switch on the token variable's contents
     case "${_token}" in
-      # If the token is 'user', assign the next parameter to the user
-      # variable and remove the next parameter from the parameters list.
       user)
         _user="${1}"
-        shift
+        shift || fail "User name must follow keyword 'user'"
         ;;
-      # If the token is 'with', then go on to processing the next token as this
-      # is syntactic sugar.
+
       with)
-        continue
+        continue # syntactic sugar.
         ;;
-      # If the token is 'from', assign the next parameter to the source
-      # variable and remove the next parameter from the parameters list.
+
       from)
         _source="${1}"
-        shift
+        shift || fail "From source must follow keyword 'from'"
         ;;
-      # If the token is '--force', set the force_flag to 1
-      # (non-default value).
+
       --force)
         _force_flag=1
         ;;
-      # If the token does not match any of the above, then
+
       *)
-        # If the user variable is empty, assign the current token into the
-        # user variable and stop processing input parameters.
         if variable_is_empty _user
         then
           _user="${_token}"
@@ -232,52 +202,48 @@ user_delete()
     esac
   done
 
-  # If the user is root (eg. id 0)
-  if (( UID == 0 ))
-  then
-    (
-    # Switch based on the os type.
-    # TODO: Switch these to use the os_is_X system module DSL
-    case "$(uname)" in
-      "Linux")
-        userdel "${package_user}"
-      ;;
-      "OpenBSD")
-        groupdel "$package_user"
-        userdel -g "$package_user" "$package_user"
-        ;;
-
-      "FreeBSD")
-        pw groupdel -q "$package_user"
-        ;;
-
-      "Darwin")
-        gid="501" # only gids > 500 show up in user preferences.
-
-        # Find an open gid
-        while true; do
-          name=$(dscl . search /groups PrimaryGroupID $gid | cut -f1 -s)
-          if [ -z "$name" ] ; then
-            break
-          fi
-          gid=$[$gid +1]
-        done
-
-        # Create the group
-        dscl . -delete "/Users/${package_user}" PrimaryGroupID "$gid" # UserShell /bin/bash
-        dscl . -delete "/Groups/$package_user"
-        dscl . -delete "/Groups/$package_user" gid "$gid"
-      ;;
-
-      "SunOS")
-        groupdel "$package_user"
-        userdel "$package_user"
-        ;;
-    esac
-    ) || true # Ignore failures with this for now...
-  else
+  (( UID == 0 )) || # root user has id 0
     fail "Users and groups may be manipulated only by the super-user (root), via su or sudo."
-  fi
+  (
+  # Switch based on the os type.
+  # TODO: Switch these to use the os_is_X system module DSL
+  case "$(uname)" in
+    "Linux")
+      userdel "${package_user}"
+    ;;
+    "OpenBSD")
+      groupdel "$package_user"
+      userdel -g "$package_user" "$package_user"
+      ;;
+
+    "FreeBSD")
+      pw groupdel -q "$package_user"
+      ;;
+
+    "Darwin")
+      gid="501" # only gids > 500 show up in user preferences.
+
+      # Find an open gid
+      while true; do
+        name=$(dscl . search /groups PrimaryGroupID $gid | cut -f1 -s)
+        if [ -z "$name" ] ; then
+          break
+        fi
+        gid=$[$gid +1]
+      done
+
+      # Create the group
+      dscl . -delete "/Users/${package_user}" PrimaryGroupID "$gid" # UserShell /bin/bash
+      dscl . -delete "/Groups/$package_user"
+      dscl . -delete "/Groups/$package_user" gid "$gid"
+    ;;
+
+    "SunOS")
+      groupdel "$package_user"
+      userdel "$package_user"
+      ;;
+  esac
+  ) || true # Ignore failures with this for now...
 }
 
 #
@@ -398,12 +364,8 @@ user_is_not_root()
 #
 user_must_be_root()
 {
-  # if the user is root then return true, 0. Otherwise send an error message
-  # informing the user that the script must be run with root privileges.
-  user_is_root ||
-    error "sm $extension $action must be run as root, and NOT as a user ($USER)."
-
-  return 0
+  user_is_root || error "sm $extension $action must be run as root;"\
+    " NOT as a user ($USER)."
 }
 
 #
@@ -438,12 +400,8 @@ user_must_be_root()
 #
 user_must_not_be_root()
 {
-  # If the user is not root then return true, 0. Otherwise send an error message
-  # informing the user that the script must be run as root.
-  user_is_not_root ||
-    error "sm $extension $action must be run as a (project) user, and NOT as root."
-
-  return 0
+  user_is_not_root || error "sm $extension $action must be run as a user"\
+    " NOT as root."
 }
 
 #
@@ -480,16 +438,8 @@ user_must_not_be_root()
 user_run_as()
 {
   trace_filter users
-  local _user="$1"
-
-  variable_is_nonempty _user ||
-    fail "Cannot run as user, as no user or commands were given."
-
-  shift # Remove the user from the parameters list.
-
-  # Run the given command as the user, with a nonlogin shell.
-  # If the command completed successfully, return true, 0. Otherwise,
-  # the command did not complete successfully, so return false, 1.
+  local _user="${1:-}"
+  shift || fail "Cannot run as user; No user or commands were given."
   su "${_user}" -c "$*"
 }
 
@@ -525,13 +475,8 @@ user_run_as()
 #
 user_run_as_login()
 {
-  local _user="$1"
-
-  variable_is_nonempty _user ||
-    fail "Cannot run as user, as no user or commands were given."
-
-  # Run the given command as the user, with a login shell.
-  # If the command completed successfully, return true, 0. Otherwise the
-  # command did not complete successfully; return false, 1.
+  local _user="${1:-}"
+  shift || fail "Cannot run as user; No user or commands were given."
   su - "${_user}" -c "$*"
 }
+
