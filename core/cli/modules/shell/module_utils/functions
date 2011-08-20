@@ -18,17 +18,17 @@ modules_installed()
 }
 
 #
-# ## module\_dsl()
+# ## module\_functions()
 #
-# Print out a list of all DSL for the given module.
+# Print out a list of all functions for the given module.
 #
 # ### Input Parameters
 #
-# First parameter is the module name to print out the DSL for.
+# First parameter is the module name to print out the functions for.
 #
 # ### Stream Outputs
 #
-# The named module's DSL function listing is printed to the calling
+# The named module's functions function listing is printed to the calling
 # environment's STDOUT.
 #
 # ### Environmental effects
@@ -45,24 +45,24 @@ modules_installed()
 #
 # ### Usage Examples
 #
-#     user$ module_dsl defaults
+#     user$ module_functions defaults
 #     read_default()
 #
-module_dsl()
+module_functions()
 {
-  local _function _dsl _modules="${@:-}"
+  local _function _functions _modules="${@:-}"
 
   array_is_nonempty _modules ||
-    fail "Cannot print the DSL for module(s); No module names given."
+    fail "Cannot print the functions for module(s); No module names given."
 
   local _path="${modules_path}/shell/${_module}"
 
-  _dsl=($(
-  find "${_path}" -mindepth 1 -maxdepth 1 -name dsl -type f -print0 |
+  _functions=($(
+  find "${_path}" -mindepth 1 -maxdepth 1 -name functions -type f -print0 |
   xargs -0 grep '^[a-z_]*()$' 2>/dev/null || true
   ))
 
-  for _function in "${_dsl[@]}"
+  for _function in "${_functions[@]}"
   do
     _function="${_function##*modules\/shell\/}"
     printf "%s\n" "${_function//*:}"
@@ -72,15 +72,15 @@ module_dsl()
 #
 # ## modules\_list()
 #
-# Lists DSL for all modules.
+# Lists functions for all modules.
 #
 # ### Input Parameters
 #
-# First parameter is the module name to print out the DSL for.
+# First parameter is the module name to print out the functions for.
 #
 # ### Stream Outputs
 #
-# DSL function listing for each module is printed to the STDOUT of the calling
+# functions function listing for each module is printed to the STDOUT of the calling
 # environment.
 #
 # ### Environmental effects
@@ -113,7 +113,7 @@ module_dsl()
 #
 modules_list()
 {
-  local _module _modules _function _dsl
+  local _module _modules _function _functions
 
   for language in shell ruby
   do
@@ -121,8 +121,8 @@ modules_list()
     for _module in "${_modules[@]}"
     do
       printf "\n%s\n\n" "${_module}"
-      _dsl=($(module_dsl "${_module}"))
-      for _function in "${_dsl[@]}"
+      _functions=($(module_functions "${_module}"))
+      for _function in "${_functions[@]}"
       do
         printf "%s\n" "  ${_function}"
       done
@@ -133,15 +133,15 @@ modules_list()
 #
 # ## modules\_docs()
 #
-# Output the module DSL documentation for a given module name.
+# Output the module functions documentation for a given module name.
 #
 # ### Input Parameters
 #
-# First parameter is the module name to print out the DSL documentation for.
+# First parameter is the module name to print out the functions documentation for.
 #
 # ### Stream Outputs
 #
-# DSL documentation for every function of the named module.
+# functions documentation for every function of the named module.
 #
 # ### Environmental effects
 #
@@ -197,7 +197,7 @@ modules_list()
 #
 module_docs()
 {
-  local _function _dsl _module content_flag table_flag
+  local _function _functions _module content_flag table_flag
 
   while (( $# > 0 ))
   do
@@ -229,29 +229,29 @@ module_docs()
   local _path="${core_development_path}/modules/shell/${_module}"
   if (( content_flag == 1 ))
   then
-    shocco "${_path}/dsl" |
+    shocco "${_path}/functions" |
       awk '/<body>/{p=1;next;} /\/body>/{p=0;next;} {if (p == 1) print ; } '
   elif (( table_flag == 1 ))
   then
-    shocco "${_path}/dsl" |
+    shocco "${_path}/functions" |
       awk '/<table/{p=1;} {if (p == 1) print ; } /\/table>/{p=0;} '
   else
-    shocco "${_path}/dsl"
+    shocco "${_path}/functions"
   fi
 }
 
 #
 # ## modules\_docgen()
 #
-# Lists DSL for all modules.
+# Lists functions for all modules.
 #
 # ### Input Parameters
 #
-# First parameter is the module name to print out the DSL for.
+# First parameter is the module name to print out the functions for.
 #
 # ### Stream Outputs
 #
-# DSL function listing for each module is printed to the STDOUT of the calling
+# functions function listing for each module is printed to the STDOUT of the calling
 # environment.
 #
 # ### Environmental effects
@@ -285,9 +285,9 @@ module_docs()
 modules_docgen()
 {
   # TODO: Replace with,
-  # for file in modules/shell/*/dsl ; do (name=${file%%\/dsl}; shocco $file > html/${name//*\/}.html)& done ; wait
+  # for file in modules/shell/*/functions ; do (name=${file%%\/functions}; shocco $file > html/${name//*\/}.html)& done ; wait
 
-  local _module _modules _function _dsl
+  local _module _modules _function _functions
   local _prefix="${core_development_path}/html/modules"
   local _path="${site_development_path}"
 
@@ -336,7 +336,7 @@ modules_docgen()
 modules_docopen()
 {
   # TODO: Replace with,
-  # for file in modules/shell/*/dsl ; do (name=${file%%\/dsl}; shocco $file > html/${name//*\/}.html)& done ; wait
+  # for file in modules/shell/*/functions ; do (name=${file%%\/functions}; shocco $file > html/${name//*\/}.html)& done ; wait
   variable_is_nonempty core_development_path &&
     path_exists "${core_development_path}" ||
     error "To run docopen, set core_development_path in ~/.smrc, and clone the sm core "\
@@ -352,9 +352,9 @@ modules_docopen()
 modules_site_docgen()
 {
   # TODO: Replace with,
-  # for file in modules/shell/*/dsl ; do (name=${file%%\/dsl}; shocco $file > html/${name//*\/}.html)& done ; wait
+  # for file in modules/shell/*/functions ; do (name=${file%%\/functions}; shocco $file > html/${name//*\/}.html)& done ; wait
 
-  local _module _modules _function _dsl
+  local _module _modules _function _functions
   local _prefix="${core_development_path}/html/modules"
   local _path="${site_development_path}"
 
@@ -399,8 +399,8 @@ modules_site_docgen()
 
     ensure_paths_exist "${site_development_path}/content/modules/shell/${name}"
 
-    log "Building ${name} DSL from generated docs."
-    cat > "${site_development_path}/content/modules/shell/${name}/dsl.haml" <<Header
+    log "Building ${name} functions from generated docs."
+    cat > "${site_development_path}/content/modules/shell/${name}/functions.haml" <<Header
   .breadcrumbs
     %a{ :href => "/" }
       Documentation
@@ -414,18 +414,18 @@ modules_site_docgen()
     %a{ :href => "/modules/shell/${name}/" }
       ${name}
     &nbsp;>&nbsp;
-    %a{ :href => "/modules/shell/${name}/dsl/" }
-      DSL API :: ${name}
+    %a{ :href => "/modules/shell/${name}/functions/" }
+      functions API :: ${name}
     %hr
 
   %h1
     Module ${name}
 
 Header
-    cat $file >> "${site_development_path}/content/modules/shell/${name}/dsl.haml"
+    cat $file >> "${site_development_path}/content/modules/shell/${name}/functions.haml"
 
     html2haml "${_base}.html" \
-      >> "${site_development_path}/content/modules/shell/${name}/dsl.haml"
+      >> "${site_development_path}/content/modules/shell/${name}/functions.haml"
     )&
   done
 

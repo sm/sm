@@ -331,7 +331,7 @@ service_setup()
 
   local _path _file
 
-  for _file in dsl initialize cli
+  for _file in functions initialize cli
   do
     source_files "${extension_path}/modules/shell/${_file}"
   done

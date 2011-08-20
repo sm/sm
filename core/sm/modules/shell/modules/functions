@@ -52,7 +52,7 @@ rebuild_path()
 
 is_module()
 {
-  [[ -s "$1/dsl" && ! -d "$1/dsl" ]] || [[ -s "$1/modules" && ! -d "$1/modules" ]]
+  [[ -s "$1/functions" && ! -d "$1/functions" ]] || [[ -s "$1/modules" && ! -d "$1/modules" ]]
 }
 
 detect_module()
@@ -268,7 +268,7 @@ module()
   fi
 
   # Load module
-  for _file in dsl cli initialize
+  for _file in functions cli initialize
   do
     if [[ -s "${_module_path}/${_file}" ]]
     then

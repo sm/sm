@@ -1,4 +1,0 @@
-#!/bin/sh
-
-ensure_paths_exist "${sm_path}/exts"
-

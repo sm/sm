@@ -11,8 +11,8 @@ database_extension_setup()
 
   ensure_paths_exist "modules/${language:=shell}/${module}" "actions/${module}"
 
-  # Setup modules/shell/package/{dsl,initialize,cli}
-  for file in dsl initialize cli
+  # Setup modules/shell/package/{functions,initialize,cli}
+  for file in functions initialize cli
   do
     write '#!/bin/sh' to "modules/${language}/${module}/${file}"
   done

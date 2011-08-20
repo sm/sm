@@ -1,5 +1,10 @@
 #!/bin/sh
 
+ext_initialize()
+{
+  ensure_paths_exist "${sm_path}/exts"
+}
+
 ext_help()
 {
   modules ext/help

@@ -100,11 +100,11 @@ fi
 export sm_path modules_path initial_pwd extension_action_calls=0
 
 # Load module() function, then load core modules.
-source "${modules_path}/shell/core/dsl"
-source "${modules_path}/shell/string/dsl"
-source "${modules_path}/shell/logging/dsl"
+source "${modules_path}/shell/core/functions"
+source "${modules_path}/shell/string/functions"
+source "${modules_path}/shell/logging/functions"
 source "${modules_path}/shell/logging/initialize"
-source "${modules_path}/shell/modules/dsl"
+source "${modules_path}/shell/modules/functions"
 
 modules_initialize
 

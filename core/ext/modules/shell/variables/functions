@@ -249,10 +249,10 @@ ematch()
 #     ERROR: A command has returned an unhandled error code (nonzero return value).
 #     Backtrace:
 #        Trace   Line Function             File
-#           3.     37 fail()               /sm/extensions/builtin/core/modules/shell/logging/dsl
-#           2.    192 variables_must_be_nonempty() /sm/extensions/builtin/core/modules/shell/variables/dsl
+#           3.     37 fail()               /sm/extensions/builtin/core/modules/shell/logging/functions
+#           2.    192 variables_must_be_nonempty() /sm/extensions/builtin/core/modules/shell/variables/functions
 #           1.      6 main()               /Users/sm/test
-#      > modules/shell/logging/dsl fail() 38 $ exit 1
+#      > modules/shell/logging/functions fail() 38 $ exit 1
 #
 variables_must_be_nonempty()
 {

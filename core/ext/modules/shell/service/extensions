@@ -14,7 +14,7 @@ service_extension_setup()
 
   ensure_paths_exist "modules/${language}/${module}" "actions/${module}"
 
-  for file in dsl initialize cli
+  for file in functions initialize cli
   do
     write '#!/bin/sh' to "modules/${language}/${module}/${file}"
   done

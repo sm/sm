@@ -443,7 +443,7 @@ extension_run()
 
     ruby)
       requires=()
-      for script in dsl initialize
+      for script in functions initialize
       do
         requires+=( "-r${modules_path}/ruby/core/${script}.rb" )
       done
