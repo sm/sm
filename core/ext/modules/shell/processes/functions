@@ -1,5 +1,10 @@
 #!/bin/sh
 
+process_initialize()
+{
+  process_exit_commands=()
+}
+
 #
 # ## process\_lockfile\_lock()
 #

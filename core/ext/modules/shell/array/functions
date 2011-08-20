@@ -51,6 +51,16 @@
 #     the array is empty.
 #
 # ### Code Walkthrough
+
+array_initialize()
+{
+  if [[ -n "${ZSH_VERSION:-}" ]]
+  then
+    __array_start=1
+  else
+    __array_start=0
+  fi
+}
 array_is_nonempty()
 {
   trace_filter array

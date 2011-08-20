@@ -1,5 +1,21 @@
 #!/bin/sh
 
+rvm_initialize()
+{
+  source_files "/etc/rvmrc" "$HOME/.rvmrc"
+
+  rvm_files=(
+  "$rvm_path/scripts/rvm"
+  "$HOME/.rvm/scripts/rvm"
+  "/usr/local/rvm/scripts/rvm"
+  )
+
+  files=( $(nonempty_files "${rvm_files[@]}") )
+
+  array_is_empty "files" ||
+    source_files $(array_first_element files)
+}
+
 #
 # ## rvm\_install()
 #

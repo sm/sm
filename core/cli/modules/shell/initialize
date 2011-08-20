@@ -1,5 +1,4 @@
 #!/bin/sh
-
 #TODO: update repository_url to "sm/bdsm"
 true \
   "${src_path:="${sm_path}/src"}" \
@@ -30,3 +29,4 @@ user="$USER"
 extensions_src_path="${src_path}/extensions"
 
 export source_path
+

@@ -1,5 +1,10 @@
 #!/bin/sh
 
+steps_initialize()
+{
+  steps_started=()
+}
+
 start_step()
 {
   steps_started+=( "$1" )

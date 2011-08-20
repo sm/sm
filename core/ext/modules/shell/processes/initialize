@@ -1,4 +1,0 @@
-#!/bin/sh
-
-process_exit_commands=()
-

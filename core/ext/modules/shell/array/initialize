@@ -1,9 +1,0 @@
-#!/bin/sh
-
-if [[ -n "${ZSH_VERSION:-}" ]]
-then
-  __array_start=1
-else
-  __array_start=0
-fi
-

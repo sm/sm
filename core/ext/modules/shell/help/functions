@@ -1,5 +1,17 @@
 #!/bin/sh
 
+help_initialize()
+{
+  declare -a help_descriptions
+  declare -a help_action_names
+  declare -a help_action_descriptions
+  declare -a help_notes
+  declare -a help_dependencies
+  declare -a help_resources
+
+  help_usage="sm ${extension} ${namespace:-"[namespace]"} {action} [arguments...]"
+}
+
 #
 # ## show\_help()
 #

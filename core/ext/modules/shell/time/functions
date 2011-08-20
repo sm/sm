@@ -1,5 +1,10 @@
 #!/bin/sh
 
+time_initialize()
+{
+  [[ -n "${timestamp:-}" ]] || timestamp_set
+}
+
 #
 # ## timestamp_set()
 #

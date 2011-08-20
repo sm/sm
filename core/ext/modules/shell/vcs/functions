@@ -1,5 +1,19 @@
 #!/bin/sh
 
+vcs_initialize()
+{
+  if [[ ! -w $sm_path ]]
+  then
+    archives_path="$HOME/.sm/archives"
+    scm_path="$HOME/.sm/scm"
+    src_path="$HOME/.sm/src"
+  fi
+
+  [[ -d "${archives_path}" ]] || mkdir -p $archives_path
+  [[ -d "${scm_path}" ]]      || mkdir -p $scm_path
+  [[ -d "${src_path}" ]]      || mkdir -p $src_path
+}
+
 #
 # # VCS (SCM) Module
 #

@@ -1,5 +1,10 @@
 #!/bin/sh
 
+github_initialize()
+{
+  [[ -n "${github_resolution_order[*]}" ]] || github_resolution_order=( tgz zip git )
+}
+
 # ## github\_get()
 #
 #

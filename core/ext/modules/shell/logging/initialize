@@ -1,9 +1,0 @@
-#!/bin/sh
-
-if user_is_root
-then
-  true "${log_path:="${sm_path}/log"}"
-else
-  true "${log_path:="$HOME/log"}"
-fi
-

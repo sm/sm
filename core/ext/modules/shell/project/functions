@@ -35,6 +35,26 @@
 # ### Code Walkthrough
 project_initialize()
 {
+  # TODO: Read project and project_path from defaults file first.
+  if user_is_not_root
+  then
+    true "${project:="$USER"}" "${project_path:="$HOME"}"
+  else
+    # TODO: When run as root, we must ensure that project and project_path are set.
+    true
+  fi
+
+  export project environment project_path shared previous_path release_path \
+    stage_path log_path
+
+  if module_is_loaded rvm
+  then
+    if variable_is_nonempty release_path && file_is_nonempty "${release_path}/.rvmrc"
+    then
+      source "${release_path}/.rvmrc"
+    fi
+  fi
+
   # If the project_path variable is nonempty
   if variable_is_nonempty project_path
   then

@@ -1,4 +1,0 @@
-#!/bin/sh
-
-[[ -n "${github_resolution_order[*]}" ]] || github_resolution_order=( tgz zip git )
-
