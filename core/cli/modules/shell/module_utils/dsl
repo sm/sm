@@ -53,11 +53,14 @@ module_dsl()
   local _function _dsl _modules="${@:-}"
 
   array_is_nonempty _modules ||
-    fail "Cannot print the DSL for module(s), as no module names were given."
+    fail "$FUNCNAME: Cannot print the DSL for module(s); No module names given."
 
   local _path="${modules_path}/shell/${_module}"
 
-  _dsl=($(find "${_path}" -mindepth 1 -maxdepth 1 -name dsl -type f -print0 | xargs -0 grep '^[a-z_]*()$' 2>/dev/null || true))
+  _dsl=($(
+  find "${_path}" -mindepth 1 -maxdepth 1 -name dsl -type f -print0 |
+  xargs -0 grep '^[a-z_]*()$' 2>/dev/null || true
+  ))
 
   for _function in "${_dsl[@]}"
   do
@@ -213,15 +216,15 @@ module_docs()
   done
 
   variable_is_nonempty _module ||
-    fail "Cannot glean documentation for a module, as no module name was given."
+    fail "$FUNCNAME: Cannot glean documentation for a module; no module name given."
 
   command_exists shocco ||
-    fail "Cannot generate documentation for the '${_module}' module,"\
-    " as the shocco command was not found in the PATH."
+    fail "$FUNCNAME: Cannot generate documentation for '${_module}';"\
+    " 'shocco' was not found in the PATH, install shocco and try again."
 
   command_exists pygmentize ||
-    fail "Cannot generate documentation for the '${_module}' module,"\
-      " as the pygmentize command was not found in the PATH."
+    fail "Cannot generate documentation for '${_module}';"\
+      " 'pygmentize' was not found in the PATH, install pygmentize and try again."
 
   local _path="${core_development_path}/modules/shell/${_module}"
   if (( content_flag == 1 ))
@@ -290,13 +293,13 @@ modules_docgen()
 
   variable_is_nonempty core_development_path &&
     path_exists "${core_development_path}" ||
-    error "Set core_development_path in ~/.smrc, and clone the sm core "\
+    error "$FUNCNAME: Set core_development_path in ~/.smrc, and clone the sm core "\
      "repository into it, to run docgen."\
      "For more information, see https://bdsm.beginrescueend.com/development/core."
 
   ensure_paths_exist "${_prefix}"
 
-  log "<html><body><h2>BDSM Module Documentation</h2><ul>" \
+  log "<html><body><h2>SM Module Documentation</h2><ul>" \
     > "${_prefix}/index.html"
 
   _modules=($(
@@ -358,7 +361,7 @@ modules_site_docgen()
   path_exists "${core_development_path}" ||
     fail "Set core_development_path in ~/.smrc, to run docgen."
 
-  log "<html><body><h2>BDSM Module Documentation</h2><ul>" \
+  log "<html><body><h2>SM Module Documentation</h2><ul>" \
     > "${_prefix}/index.html"
 
   _modules=($(

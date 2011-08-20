@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 # Templates are useful for many things, including:
 # init scripts for services, default configuation files, and more.

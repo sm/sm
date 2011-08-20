@@ -1,4 +1,5 @@
 #!/bin/sh
+
 if [ -s "{{confd_path}}/{{extension}}.conf" ]
 then
   prefix_path=$(. "{{confd_path}}/{{extension}}.conf" > /dev/null 2>&1 ; printf "$prefix_path")

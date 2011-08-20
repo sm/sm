@@ -193,13 +193,13 @@ sets_uninstall()
 
   if [[ ! -d "${_name}" ]]
   then
-      if in_search_paths detect_extension_existence "${_name}" \
-      && [[ "${extension}" == "${_name}" ]] # do not count finding fallback default extension: sm
-      then
-        error "Extension set ${_name} is installed system wide and can not be uninstaled by user."
-      else
-        error "Extension set ${_name} does not exist."
-      fi
+    if in_search_paths detect_extension_existence "${_name}" &&
+      [[ "${extension}" == "${_name}" ]] # do not count finding fallback default extension: sm
+    then
+      error "Extension set ${_name} is installed system wide and can not be uninstaled by user."
+    else
+      error "Extension set ${_name} does not exist."
+    fi
   fi
 
   log_step "Uninstalling extension set: ${_name}." rm -rf "${_name}"
