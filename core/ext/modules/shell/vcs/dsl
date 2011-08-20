@@ -7,6 +7,7 @@
 fetch_uri_parse_args()
 {
   local _token _allowed_arg
+
   while (( $# > 0 ))
   do
     _token="$1"
@@ -126,8 +127,8 @@ fetch_update()
 {
   local _uri _target="${1:-}"
   shift || fail "target path must be specified as the second parameter."
-  if [[ -d "${_target}" ]] \
-  && [[ -s "${_target}/.uri" ]]
+
+  if [[ -d "${_target}" ]] && [[ -s "${_target}/.uri" ]]
   then
     _uri=$( cat "${_target}/.uri" )
     if [[ -n "${_uri}" ]]
@@ -153,3 +154,4 @@ cli_fetch_update()
   shift || error "target path must be specified as the second parameter."
   fetch_update "${_target}" --on-fail error "$@"
 }
+

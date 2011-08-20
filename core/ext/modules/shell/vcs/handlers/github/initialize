@@ -1,6 +1,4 @@
 #!/bin/sh
 
-if [[ -z "${github_resolution_order[*]}" ]]
-then
-  github_resolution_order=( zip git tgz )
-fi
+[[ -n "${github_resolution_order[*]}" ]] || github_resolution_order=( zip git tgz )
+
