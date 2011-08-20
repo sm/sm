@@ -115,3 +115,65 @@ actions_build_modules_cache()
     echo "${_module_name}=$( cat ${_module_path} | tr '\n' ' ' )"
   done
 }
+
+detect_cached_action_from_action_cache()
+{
+  local _cache_file="$extensions_path/$extension/.actions_cache"
+  local _action_params=( "$@" ) _action_path _new_action_path _found
+  local _rest_params=() _action_params_length _param_temp
+  if [[ -f "${_cache_file}" ]]
+  then
+    while :
+    do
+      _action_path="${_action_params[*]}"
+      _action_path="${_action_path// //}"
+      _found=$( \awk -F = "/^${_action_path//\//\/}=/ {print \$2}" < "${_cache_file}" )
+      if [[ -n "${_found}" ]]
+      then
+        action="${_found##*/}"
+        action_path="${_found%/*}"
+        [[ "${action_path}" != "${_found}" ]] || action_path=""
+        action_path="$extensions_path/$extension/actions/${action_path}"
+        extension_args=( "${_rest_params[@]}" )
+        debug search ":cached(${_cache_file}):${_action_path}=${_found}:params=${_rest_params[*]}:"
+        return 0
+      fi
+      _action_path="${_action_path}/help"
+      _action_path="${_action_path#\/}"
+      _found=$( \awk -F = "/^${_action_path//\//\/}=/ {print \$2}" < "${_cache_file}" )
+      if [[ -n "${_found}" ]]
+      then
+        action="${_found##*/}"
+        action_path="${_found%/*}"
+        [[ "${action_path}" != "${_found}" ]] || action_path=""
+        action_path="$extensions_path/$extension/actions/${action_path}"
+        extension_args=( "${_rest_params[@]}" )
+        debug search ":cached(${_cache_file}):${_action_path}=${_found}:params=${_rest_params[*]}:"
+        return 0
+      fi
+
+      _action_params_length=${#_action_params[@]}
+      (( _action_params_length )) || break # finish if no more params
+      #TODO: account for zsh indexes ( -1 -> -0 )
+      _param_temp="${_action_params[$(( _action_params_length - 1 ))]}"
+      _rest_params=( "${_param_temp}" "${_rest_params[@]}" )
+      unset _action_params[$(( _action_params_length - 1 ))]
+    done
+  fi
+  return 1
+}
+
+detect_cached_action()
+{
+  extensions_path="${1:-}" extension="${2:-}"
+  shift || fail "Cannot detect extension existence;"\
+    " No extension path was given."
+  shift || fail "Cannot detect extension existence;"\
+    " No extension name was given."
+
+  if extension_is_valid $extensions_path/$extension
+  then
+    ! detect_cached_action_from_action_cache "$@" || return 0
+  fi
+  return 1
+}

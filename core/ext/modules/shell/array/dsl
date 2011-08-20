@@ -379,6 +379,7 @@ array_pop()
     eval "${_variable}=\${${_array_name}[\${#${_array_name}[@]}-1]}"
 
   eval "unset ${_array_name}[\${#${_array_name}[@]}-1]"
+  #TODO: check if this one is required:
   eval "${_array_name}=( \"\${${_array_name}[@]}\" ) "
 }
 

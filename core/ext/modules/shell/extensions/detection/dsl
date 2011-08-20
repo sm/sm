@@ -535,7 +535,9 @@ extension_action()
   # Search in extensions actions
   # Search in unique second level actions
   # Search in loaded modules actions
-  if in_search_paths detect_action "${extension_args[@]}" ||
+  if \
+    in_search_paths detect_cached_action "${extension_args[@]}" ||
+    in_search_paths detect_action "${extension_args[@]}" ||
     in_search_paths detect_unique_2nd_level_action "${extension_args[@]}" ||
     in_search_paths detect_modules_action "${extension_args[@]}"
   then
