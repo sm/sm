@@ -34,13 +34,13 @@ install_core()
   local _dir
 
   log_step "Installing core directories (${directories[*]})" \
-    copy_paths --force to "${install_path}/" "${directories[@]}"
+    copy_paths to "${install_path}/" "${directories[@]}"
 
   log_step "Installing core files (${files[*]})" \
     copy_files to "${install_path}" ${files[@]}
 
   log_step "Installing core extension set (sets/core)" \
-    copy_paths --force to "${install_path}/" "core"
+    copy_paths to "${install_path}/" "core"
 }
 
 install_configuration_files()

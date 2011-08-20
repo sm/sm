@@ -1,3 +1,5 @@
+#!/bin/sh
+
 #
 # ## ensure\_paths\_exist
 #
@@ -36,47 +38,27 @@ ensure_paths_exist()
 {
   trace_filter filesystem
 
-  # Declare the path and paths variables; set the files variable to an array
-  # containing all of the parameters passed in.
   local _path _paths=("$@")
 
-  # If the paths array is nonempty, then for each path in the paths array if the
-  #   path already exists as a directory, move along to the next path.
-  #
-  # If the path already exists as a file, then issue a warning. (Question: should
-  #   this be a fail scenario?) Create the full path in the filesystem,
-  #   including intermediate directories if they do not already exist.
-  #
-  # If the path was created successfully, process the next
-  # path; otherwise, it failed to create the path on the filesystem: a system error.
-  # Fail, yielding a message with a backtrace which can be used to debug.
-  #
-  # If no files were given, this indicates a programming error.
-  # Fail, yielding a message with a backtrace which can be used to debug.
-  array_is_nonempty _paths ||
-    fail "Cannot ensure paths exist, as no paths were given."
+  shift || fail "FUNCNAME: Cannot ensure paths exist; No paths were given."
 
   for _path in "${_paths[@]}"
   do
-    if [[ -d "${_path}" ]]
+    [[ ! -d "${_path}" ]] || continue
+
+    if [[ -f "${_path}" ]]
     then
-      continue
-    else
-      if [[ -f "${_path}" ]]
+      if [[ -L "${_path}" ]] && [[ -d "$(readlink "${_path}")" ]]
       then
-        if [[ -L "${_path}" ]] && [[ -d "$(readlink "${_path}")" ]]
-        then
-          continue
-        else
-          warn "Could not ensure path '${_path}' exists"\
-            " as a directory, as it is a file."
-        fi
-      else
-        mkdir -p "${_path}" ||
-          fail "Could not create the path '${_path}',"\
-            "as the 'mkdir' command failed with error code '$?'."
         continue
+      else
+        warn "Could not ensure path '${_path}' exists"\
+          " as a directory, as it is a file."
       fi
+    else
+      mkdir -p "${_path}" ||
+        fail "Could not create the path '${_path}',"\
+          "as the 'mkdir' command failed with error code '$?'."
     fi
   done
 }
@@ -120,67 +102,31 @@ ensure_paths_exist()
 remove_paths()
 {
   trace_filter filesystem
-  # Declare the path and paths variables; set the files variable to an array
-  # containing all of the parameters passed in.
   local _path _paths=("$@")
   shift || fail "$FUNCNAME: Cannot remove paths; No paths were given."
 
-  # Declare variables that will be available after the function returns.
   removed_paths=()
   nonexistant_paths=()
-
-  # If the paths array is nonempty, then for each path in the paths array:
-  #
-  # If the path is a symlink, then remove it from the filesystem.
-  #   If the remove was successful, add it to the removed_paths array and
-  #   continue to the next path. Otherwise, there was a system error.
-  #   Fail, yielding a message with a backtrace which can be used to debug.
-  #
-  # If the path is a directory, then recursively remove it.
-  #   If the remove was successful, add it to the removed_paths array and
-  #   continue to the next path. Otherwise, there was a system error.
-  #   Fail, yielding a message with a backtrace which can be used to debug.
-  #
-  # If the path is not a symlink or a directory, and it still exists on the
-  #   filesystem, then path is an unhandled filesystem type and we have failed to
-  #   remove it. This likely indicates a system error. Fail, giving sysadmins an
-  #   error message with a backtrace to help debug the issue.
-  #
-  # If the filesystem path already does not exist, add it to the
-  #   nonexistant_paths array, and continue with the next path in the list.
-  #
-  # If no paths were given, this is a programming error; fail, giving
-  # developers an error message with a backtrace for debugging.
 
   for _path in "${_paths[@]}"
   do
     if [[ -L "${_path}" ]]
     then
-      if rm -f "${_path}"
-      then
-        removed_paths+=("${_path}")
-        continue
-      else
-        fail "Could not remove the entity '${_entity}',"\
-          "as the 'rm' command failed with error code '$?'."
-      fi
+      rm -f "${_path}" || fail "$FUNCNAME: Could not remove the entity '${_entity}';"\
+          "'rm' command failed with error code '$?'."
+      removed_paths+=("${_path}")
     elif [[ -d "${_path}" ]]
     then
-      if rm -rf "${_path}"
-      then
-        removed_paths+=("${_path}")
-        continue
-      else
-        fail "Could not remove the entity '${_entity}',"\
-          "as the 'rm' command failed with error code '$?'."
-      fi
+      rm -rf "${_path}" || fail "$FUNCNAME: Could not remove the entity '${_entity}';"\
+          "'rm' command failed with error code '$?'."
+      removed_paths+=("${_path}")
+
     elif [[ -e "${_path}" ]]
     then
-      fail "Cannot remove the path '${_path}', as it is a file."
+      fail "$FUNCNAME: Cannot remove the path '${_path}', as it is a file."
 
     else
       nonexistant_paths+=("${_path}")
-      continue
     fi
   done
 }
@@ -268,19 +214,15 @@ move_directory()
     fail "Could not move '${_source}' to '${_target}',"\
     "as the 'chmod -R' command failed with error code '$?'."
 
-  if variable_is_nonempty _mode
-  then
+  [[ -z "${_mode}"]] ||
     chmod -R "${_mode}" "${_target}" ||
-      fail "Could not recursively change mode of '${_target}' to"\
-      "${_mode}, as the 'chmod -R' command failed with error code '$?'."
-  fi
+    fail "Could not recursively change mode of '${_target}' to"\
+    "${_mode}, as the 'chmod -R' command failed with error code '$?'."
 
-  if variable_is_nonempty _owner
-  then
+  [[ -z "${_owner}"]] ||
     chown -R "${_owner}" "${_target}" ||
-      fail "Could not recursively change ownership of '${_target}' to"\
-      "${_owner}, as the 'chown -R' command failed with error code '$?'."
-  fi
+    fail "Could not recursively change ownership of '${_target}' to"\
+    "${_owner}, as the 'chown -R' command failed with error code '$?'."
 }
 
 #
@@ -334,10 +276,6 @@ copy_paths()
         shift || fail "$FUNCNAME: Source path must be given after keyword 'from'"
         ;;
 
-      --force|force)
-        _force_flag=1
-        ;;
-
       *)
         _directories+=( "${token}" )
         ;;
@@ -352,19 +290,11 @@ copy_paths()
   for _directory in "${_directories[@]}"
   do
     [[ -d "${_directory}" ]] ||
-      error "Cannot copy directory ${_directory} to ${_target},"\
+      error "$FUNCNAME: Cannot copy directory ${_directory} to ${_target},"\
       "as the directory '${_directory}' does not exist (in '$PWD')."
 
-    [[ ! -d "${_target}/${_directory}" ]] || if (( _force_flag ))
-    then
-      rm -rf "${_target}/${_directory}"
-    else
-      error "Cannot copy directory ${_directory} from $PWD,"\
-        "as the directory '${_directory}' exist (in '${_target}')."
-    fi
-
     cp -Rf "${_directory}" "${_target}/" ||
-      fail "Could not copy the entity '${_entity}',"\
+      fail "$FUNCNAME: Could not copy the entity '${_entity}',"\
       "as the 'cp -Rf' command failed with error code '$?'."
   done
 }
@@ -432,11 +362,11 @@ copy_directory()
     esac
   done
 
-  variable_is_nonempty _source || fail "$FUNCNAME: Cannot move file; Source must be given."
-  variable_is_nonempty _target || fail "$FUNCNAME: Cannot move file, Target must be given."
+  [[ -n "${_source}" ]] || fail "$FUNCNAME: Cannot move file; Source must be given."
+  [[ -n "${_target}" ]] || fail "$FUNCNAME: Cannot move file, Target must be given."
 
   cp -Rf "${_source}" "${_target}" ||
-    fail "Could not copy '${_source}' to '${_target}',"\
+    fail "$FUNCNAME: Could not copy '${_source}' to '${_target}',"\
       "as the 'cp' command failed with error code '$?'."
 }
 
@@ -549,6 +479,7 @@ chmod_paths()
   (( _recursive_flag == 0 )) || _flags+=(-R)
 
   shift || fail "Cannot chmod paths; user[:group] was not given as the first parameter."
+
   local _paths=("$@") # Set the paths array to the remaining parameters.
 
   array_is_nonempty _paths ||
