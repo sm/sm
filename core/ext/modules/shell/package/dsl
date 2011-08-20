@@ -44,9 +44,8 @@
 #
 package_error()
 {
-  local _message=$1 _log
-  shift || fail "Cannot print a package error, as no message was provided."
-  _log=$1
+  local _message="${1:-}" _log="${2:-}"
+  shift || fail "$FUNCNAME: Cannot print a package error; No message was provided."
 
   if [[ -n ${_log} ]] && file_exists ${_log}
   then # Append tail of error log to the error message.
@@ -166,7 +165,7 @@ package_definition()
       #  eval "${key}=${value}"
       #  ;;
       *)
-        fail "Unknown key '${key}' (value: ${value})."
+        fail "$FUNCNAME: Unknown key '${key}' (value: ${value})."
       ;;
     esac
   done
@@ -365,7 +364,7 @@ package_init()
   #  fail "$FUNCNAME(): Package version must be specified.\n"\
   #  "(For example version=x.y.z set in extension's config/defaults file.)\n"
 
-  fhs_dirs=(bin etc include lib libexec sbin share man)
+  fhs_dirs=( bin etc include lib libexec sbin share man )
 
   ensure_paths_exist "${active_path}"
 
@@ -440,8 +439,8 @@ package_install()
 {
   (( $# == 0 )) || package_cli $@
 
-  if package_installed_versions | grep -q "${package_version}" \
-  && [[ "${force_flag}" != "1" ]]
+  if package_installed_versions | grep -q "${package_version}" &&
+    [[ "${force_flag}" != "1" ]]
   then
     log "The ${package_name} ${package_version} package is already installed.
 To force, call:\n\tsm ${package_name} package install force\n"
@@ -624,18 +623,18 @@ package_fetch_md5()
     "${packge_md5_url:="${package_base_url}/${package_file}.md5"}"
 
   [[ -n "${package_md5}" ]] || read_config "${package_name}" md5 "${package_file}" as package_md5
+  [[ -n "${package_md5}" ]] ||
+    if [[ -n "${package_md5_url}" ]]
+    then # TODO: Can this be added into fetch_uri ?
+      curl -L "${packge_md5_url}" -o "${archives_path}/${package_file}.md5" 2>/dev/null ||
+        error "Fetching MD5 checksum from '${package_md5_url}' failed."
 
-  [[ -n "${package_md5}" ]] || if [[ -n "${package_md5_url}" ]]
-  then
-    curl -L "${packge_md5_url}" -o "${archives_path}/${package_file}.md5" 2>/dev/null ||
-      error "Fetching MD5 checksum from '${package_md5_url}' failed."
+      package_md5=$(cat "${archives_path}/${package_file}.md5")
 
-    package_md5=$(cat "${archives_path}/${package_file}.md5")
-
-    rm "${archives_path}/${package_file}.md5"
-  else
-    package_md5="" # not known.
-  fi
+      rm "${archives_path}/${package_file}.md5"
+    else
+      package_md5="" # not known.
+    fi
 }
 
 #
@@ -1001,15 +1000,8 @@ package_setup()
 
   package_profile_d "${_package}"
 
-  if module_is_loaded "service"
-  then
-    service_setup "${_package}"
-  fi
-
-  if module_is_loaded "database"
-  then
-    database_setup "${_package}"
-  fi
+  ! module_is_loaded "service"  || service_setup "${_package}"
+  ! module_is_loaded "database" || database_setup "${_package}"
 }
 
 #
@@ -1049,9 +1041,11 @@ package_deactivate()
 {
   (( $# == 0 )) || package_cli $@
 
-  local _package="${package_name}" _package_version="${2:-${package_version}}" _file _files _version
+  local _package="${package_name}" _package_version="${2:-${package_version}}" \
+    _file _files _version
 
-  variables_must_be_nonempty _package
+  [[ -n "${_package}" ]] || fail "$FUNCNAME: Cannot deactivate package;"\
+    " Package name must be given."
 
   if symlink_exists "${packages_path}/${_package}/active"
   then
@@ -1062,8 +1056,8 @@ package_deactivate()
     return 0
   fi
 
-  if [[ -n "${_package_version}" ]] \
-  && [[ "${_package_version}" != "${_version}" ]]
+  if [[ -n "${_package_version}" ]] &&
+    [[ "${_package_version}" != "${_version}" ]]
   then
     debug package "Another version activated - skipping deactivation."
     return 0
@@ -1131,8 +1125,10 @@ package_deactivate()
 package_activate_if_first()
 {
   local _package="${1:-}" _version="${2:-}"
-
-  variables_must_be_nonempty _package _version
+  shift || fail "$FUNCNAME: Cannot activate package, if first;"\
+    " Package name must be given as first parameter."
+  shift || fail "$FUNCNAME: Cannot activate package, if first;"
+    " Package version must be given as second parameter."
 
   if path_exists "${install_path}"
   then
@@ -1179,10 +1175,11 @@ package_activate_if_first()
 package_ldconfig()
 {
   local _package="${1:-${package_name}}" _path _files _ldconfig="/sbin/ldconfig"
-  variables_must_be_nonempty _package
+  [[ -n "${_package}" ]] || fail "$FUNCNAME: Cannot run ldconfig for a package;"\
+    "Package name must be given."
 
-#  path_exists "${packages_path}/${_package}/active/lib" ||
-#    return 0 # no lib/ directory for activated package, no need to update ldconfig
+  #  path_exists "${packages_path}/${_package}/active/lib" ||
+  #    return 0 # no lib/ directory for activated package, no need to update ldconfig
 
   user_is_root || return 0
 
@@ -1191,11 +1188,10 @@ package_ldconfig()
   then
     ensure_paths_exist "/etc/ld.so.conf.d"
 
-    if ! file_exists "/etc/ld.so.conf.d/sm.conf"
-    then
+    file_exists "/etc/ld.so.conf.d/sm.conf" || {
       write "${active_path}/lib\n" to "/etc/ld.so.conf.d/sm.conf"
       chmod_files 0444 "/etc/ld.so.conf.d/sm.conf"
-    fi
+    }
 
     command_exists "${_ldconfig}" || ldconfig="ldconfig"
 
@@ -1247,8 +1243,8 @@ package_ldconfig()
 package_profile_d()
 {
   local _package="${1:-${package_name}}"
-
-  variables_must_be_nonempty _package
+  [[ -n "${_package}" ]] || fail "$FUNCNAME: Cannot run setup profile_d for a package;"\
+    "Package name must be given."
 
   template_exists "profile.d.template" || return 0
 
@@ -1301,17 +1297,14 @@ package_uninstall()
 
   if package_is_active "${package_name}" "${package_version}"
   then # Deactivate the package if active.
-     package_deactivate "${package_name}" "${package_version}"
+    package_deactivate "${package_name}" "${package_version}"
   fi
 
   log_step "${package_name} ${package_version} ~ uninstall"
 
   remove_paths "${install_path}"
 
-  if module_is_loaded service
-  then # Remove any service reminants.
-    service_uninstall
-  fi
+  ! module_is_loaded service || service_uninstall # Remove any service reminants
 
   log_step success
 }
@@ -1404,13 +1397,11 @@ package_patch()
 package_apply_patches()
 {
   local _patch _patches=("$@")
-
-  array_is_nonempty _patches ||
-    fail "Cannot apply patches, as no patches were given."
+  shift || fail "$FUNCNAME: Cannot apply patches; No patches were given."
 
   for _patch in "${_patches[@]}"
   do
-    log "TODO: patch application is NIY (see package_patch())"
+    error "$FUNCNAME: TODO: patch application is NIY (see package_patch())"
   done
 }
 
@@ -1502,8 +1493,7 @@ package_usage() {
 package_is_active()
 {
   local _name="${1:-}" _version="${2:-}"
-
-  shift || fail "Cannot query if a package is active;"\
+  shift || fail "$FUNCNAME: Cannot query if a package is active;"\
     " No package name was given, or name is empty."
 
   local _path="${packages_path}/${_name}"
@@ -1553,11 +1543,11 @@ package_must_be_active()
 {
   local _name="${1:-}"
 
-  shift || fail "Cannot ensure that package is active;"\
+  shift || fail "$FUNCNAME: Cannot ensure that package is active;"\
     "No package name was given (or name is empty.)"
 
   package_is_active "${_name}" ||
-    error "Install/activate the node package extension, before installing ${_name}."
+    error "$FUNCNAME: Install/activate the node package extension, before installing ${_name}."
 }
 
 #
@@ -1596,8 +1586,7 @@ package_must_be_active()
 packages_must_be_active()
 {
   local _package _packages="$@"
-
-  array_is_nonempty _packages || fail "Cannot ensure that packages are active;"\
+  shift || fail "$FUNCNAME: Cannot ensure that packages are active;"\
     "No packages were given."
 
   for _package in "${_packages[@]}"
@@ -1695,6 +1684,7 @@ package_dependencies()
   do
     package_is_active ${dependency/-/ } || _missing_dependencies+=( ${dependency} )
   done
+
   if array_is_nonempty _missing_dependencies
   then
     local IFS=','
@@ -1753,6 +1743,7 @@ package_info()
   : \
     "${package_dir:="${package_name}-${package_version}"}" \
     "${package_url:="${package_base_url}/${package_file}"}"
+
   [[ -n "${package_md5}" ]] || read_config "${package_name}" md5 "${package_file}" as package_md5
 
   log "package_name: ${package_name}"
@@ -1796,18 +1787,17 @@ package_man()
 
   MANPATH="${package_path}/man"
 
-  if path_exists $MANPATH
-  then
-    man ${extension_actions[@]:-${package_name}} || true
-  else
-    error "No man page available for package ${package_name} ${package_version}"
-  fi
+  path_exists $MANPATH ||
+    error "$FUNCNAME: No man page available for package ${package_name} ${package_version}"
+
+  man ${extension_actions[@]:-${package_name}} || true
 }
 
 # pkg functions
 packages_installed()
 {
   [[ -d "${_path}" ]] || return 0 # None!
+
   find "${sm_path}/pkg" -mindepth 2 -maxdepth 2 -type d |
     awk -F'/' '! /\/active\//{print $(NF - 1)":"$(NF)}' | sort
 }
@@ -1851,8 +1841,7 @@ packages_available()
 packages_list()
 {
   local _action="${1:-}" _args
-
-  [[ -z "${_action}" ]] || shift
+  shift || true
 
   case "${_action}" in
     (active)
