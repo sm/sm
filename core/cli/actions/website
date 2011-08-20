@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 array_is_nonempty extension_args ||
   fail "You must specify at least one extension name."

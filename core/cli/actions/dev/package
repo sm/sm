@@ -1,11 +1,10 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
-if array_is_nonempty extension_args
-then
-  for extension in "${extension_args[@]}"
-  do
-    extension_package "${extension}"
-  done
-else
+array_is_nonempty extension_args ||
   error "You must specify at least one extension name for packaging."
-fi
+
+for extension in "${extension_args[@]}"
+do
+  extension_package "${extension}"
+done
+

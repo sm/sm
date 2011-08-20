@@ -1,9 +1,7 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
-if (( ${#extension_args[@]} == 0 ))
-then
+(( ${#extension_args[@]} )) ||
   error "You must specify at least one extension name for packaging."
-fi
 
 for extension in "${extension_args[@]}"
 do

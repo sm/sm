@@ -1,16 +1,37 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 os_cpu_count()
 {
-  local _cpu_count
+  # Default the CPU count to 1
+  local _cpu_count=1
 
-  if [[ "$OSTYPE" = *darwin* ]]
+  # If the operating system is Darwin (OSX),
+  # then read the CPU count using the sysctl key hw.ncpu, and trim off
+  # everything except the last space separated field.
+  if os_is_darwin
   then
     read -r _cpu_count < <(/usr/sbin/sysctl hw.ncpu)
     _cpu_count="${_cpu_count//* }"
-  elif [[ "$OSTYPE" = *linux* ]]
+  # If the operating system is Linux, gather the information directly from
+  # the proc filesystem.
+  elif os_is_linux
   then
     _cpu_count=$(awk '/^processor/{count++} END{print count}' /proc/cpuinfo 2>&1)
+
+  # Warn that this function has not yet been implemented for solaris.
+  elif os_is_solaris
+  then
+    warn "CPU counting for Solaris has not yet been implemented; returning 1."
+
+  # Warn that this function has not yet been implemented for bsd.
+  elif os_is_bsd
+  then
+    warn "CPU counting for BSD has not yet been implemented; returning 1."
+
+  # Warn that this function has not yet been implemented for aix.
+  elif os_is_aix
+  then
+    warn "CPU counting for AIX has not yet been implemented; returning 1."
   fi
 
   (( _cpu_count > 0 )) || _cpu_count=1 # Sanity Check
@@ -58,3 +79,4 @@ case "$*" in
   *)
     sm "$@"
 esac
+

@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 package_extension_setup()
 {
@@ -10,12 +10,12 @@ package_extension_setup()
 
   for file in dsl initialize cli
   do
-    write '#!/usr/bin/env bash' to "modules/${language}/${module}/${file}"
+    write '#!/bin/sh' to "modules/${language}/${module}/${file}"
   done
 
   write "\n${module}_cli\n" append to "modules/${language}/${module}/cli"
 
-  write "#!/usr/bin/env bash
+  write "#!/bin/sh
 description \"Extension for managing ${extension} \${website_url:-}.\"
 
 action \"package install\" \"Installs ${extension} package.\"

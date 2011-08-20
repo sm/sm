@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 if [[ -z "${github_resolution_order[*]}" ]]
 then

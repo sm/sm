@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 source_files "/etc/rvmrc" "$HOME/.rvmrc"
 

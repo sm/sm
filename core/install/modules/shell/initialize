@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 cleanse_paths=( external completion modules bin extensions )
 directories=( bin )

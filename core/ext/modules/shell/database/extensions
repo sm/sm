@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 database_extension_setup()
 {
@@ -11,7 +11,7 @@ database_extension_setup()
   # Setup modules/shell/package/{dsl,initialize,cli}
   for file in dsl initialize cli
   do
-    write '#!/usr/bin/env bash' to "modules/${language}/${module}/${file}"
+    write '#!/bin/sh' to "modules/${language}/${module}/${file}"
   done
 
   write "\n${module}_cli\n" append to "modules/${language}/${module}/cli"
@@ -19,7 +19,7 @@ database_extension_setup()
   # setup actions/package/{...}
   for action in help initialize
   do
-    write '#!/usr/bin/env bash' to "actions/${module}/${action}"
+    write '#!/bin/sh' to "actions/${module}/${action}"
     chmod_files 0755 "actions/${module}/${action}"
   done
 

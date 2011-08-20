@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 # detect_action $extension action extension_args "${extension_args[@]}"
 detect_action()

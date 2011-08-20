@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 ensure_paths_exist "${sm_path}/exts"
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 shell_version=( $( ${user_shell}  --version | head -n 1 ) )
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 # Print out a list of all installed modules.
 # ## modules\_installed()

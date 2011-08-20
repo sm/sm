@@ -1,6 +1,6 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
-if [[ ${#extension_args[@]} -eq 0 ]]
+if (( ${#extension_args[@]} == 0 ))
 then
   log 'usage:\n  sm call function_name [function_args...]'
 elif ! declare -F "${extension_args[0]}" >/dev/null

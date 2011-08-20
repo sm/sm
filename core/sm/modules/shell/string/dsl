@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 # ## string\_contains()
 # Validate if second string is part of first string.

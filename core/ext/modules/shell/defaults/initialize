@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 settings_search_path_cache=()
 # This line needs to be commented to allow settings read from smrc.
