@@ -32,23 +32,18 @@
 extension_version()
 {
   local _extension="${1:-}"
+  shift || fail "$FUNCNAME: Cannot retrieve extension version;"\
+    " No extension was given."
+  true ${extension_path:="${extensions_path}/${_extension}"}
 
-  if variable_is_nonempty _extension
+  if file_exists "${extension_path}/VERSION"
   then
-    shift
-    true ${extension_path:="${extensions_path}/${_extension}"}
-
-    if file_exists "${extension_path}/VERSION"
-    then
-      read -r extension_version < "${extension_path}/VERSION"
-    else
-      extension_version="head"
-    fi
-
-    log "${extension}-${extension_version}"
+    read -r extension_version < "${extension_path}/VERSION"
   else
-    fail "Cannot retrieve extension version, as no extension was given."
+    extension_version="head"
   fi
+
+  log "${extension}-${extension_version}"
 }
 
 #
@@ -101,12 +96,11 @@ extension_license()
 {
   local _extension="${1:-${extension}}"
 
-  if variable_is_nonempty _extension
-  then
-    cat -v "${extensions_path}/${_extension}/LICENSE"
-  else
-    fail "Cannot display extension license, as an extension was not given."
-  fi
+  variable_is_nonempty _extension ||
+    fail "$FUNCNAME: Cannot display extension license;"\
+    " Extension name was not given."
+
+  cat -v "${extensions_path}/${_extension}/LICENSE"
 }
 
 #
@@ -151,26 +145,21 @@ extension_actions()
 {
   local _extension="${1:-}" _files _file _actions=()
 
-  if variable_is_nonempty _extension
-  then
-    if path_exists "${extension_actions_path}"
-    then
-      _files=($(
-      find "${extension_actions_path}" -mindepth 1 -type f -perm -o+rx
-      ))
+  shift || fail "$FUNCNAME; Cannot list actions for extension;"\
+    " No extension was given."
 
-      for _file in "${_files[@]}"
-      do
-        _actions+=("${_file#${extension_actions_path}}")
-      done
-      _actions="${_actions[@]}" # Convert from array to string.
-      printf "${_actions}"
-    else
-      return 0
-    fi
-  else
-    fail "Cannot list actions for extension, as no extension was given."
-  fi
+  path_exists "${extension_actions_path}" || return 0
+
+  _files=($(
+  find "${extension_actions_path}" -mindepth 1 -type f -perm -o+rx
+  ))
+
+  for _file in "${_files[@]}"
+  do
+    _actions+=("${_file#${extension_actions_path}}")
+  done
+  _actions="${_actions[@]}" # Convert from array to string.
+  printf "${_actions}"
 }
 
 #
@@ -206,32 +195,27 @@ extension_actions()
 #
 extension_install()
 {
-  local _extension="${1:-}" _src
-  _src="${2:-${_extension}}"
+  # TODO: This should likely be removed now with sets/ext ?
 
-  if variable_is_nonempty _extension
-  then
-    if extension_is_valid "${extensions_src_path}/${_src}"
-    then
-      log "Installing ${_extension}"
-      if path_exists "${sm_path}/exts/${_extension}"
-      then
-        remove_paths "${sm_path}/exts/${_extension}"
-      fi
+  local _extension="${1:-}" _src="${2:-${_extension}}"
+  shift || fail "$FUNCNAME: Cannot install extension;"\
+    " No extension name was given."
 
-      copy_directory "${extensions_src_path}/${_src}" \
-        to "${sm_path}/exts/${_extension}"
+  extension_is_valid "${extensions_src_path}/${_src}" ||
+    error "$FUNCNAME: ${extensions_src_path}/${_src} is not a valid extension,"\
+    "as it is missing VERSION and/or actions/help files."
 
-      write "${extension_uri}" to "${sm_path}/exts/${_extension}/.uri"
+  log "Installing ${_extension}"
 
-      #
-      # TODO: Process extension dependencies...
-      #
-    else
-      error "${extensions_src_path}/${_src} is not a valid extension,"\
-        "as it is missing VERSION and/or actions/help files."
-    fi
-  else
-    fail "Cannot install an extension, as no extension name was given."
-  fi
+  ! path_exists "${sm_path}/exts/${_extension}" ||
+    remove_paths "${sm_path}/exts/${_extension}"
+
+  copy_directory "${extensions_src_path}/${_src}" \
+    to "${sm_path}/exts/${_extension}"
+
+  write "${extension_uri}" to "${sm_path}/exts/${_extension}/.uri"
+
+  #
+  # TODO: Process extension dependencies...
+  #
 }

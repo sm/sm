@@ -4,10 +4,11 @@
 detect_action()
 {
   extensions_path=$1
-  shift || fail "$FUNCNAME: Cannot detect action; No extensions path was passed"
+  shift || fail "$FUNCNAME: Cannot detect action; No extensions path was given."
 
   extension="${1:-core}"
-  shift
+  # Question: v v v ^ ^  The logic here seems... fuzzy ~ Wayne
+  shift || fail "$FUNCNAME: Cannot detect action; No extension name was given."
 
   local token _word _action_path="$extensions_path/$extension/actions"
 
@@ -119,12 +120,12 @@ detect_action()
   return 0
 }
 
-# find modules on path
-# return longest module path on top
+# find modules on path and return the longest module path on top
 detect_modules_paths()
 {
   local root="$1" path="" IFS='/'
-  shift
+  shift || fail "$FUNCNAME: Cannot detect modules path;"\
+    "modules root was not given as the first parameter."
   _module_definitions=( )
   while (( $# > 0 ))
   do
@@ -142,7 +143,14 @@ detect_modules_paths()
 detect_module_modules_action()
 {
   debug detect_module_modules_action "start:$*:"
-  local _modules_path="$1" _module_path="$2" _module_params="$3" _module_name module_path
+
+  local _modules_path="${1:-}" _module_path="${2:-}" _module_params="${3:-}" \
+    _module_name module_path
+
+  shift || fail "$FUNCNAME: modules path was not given as the first parameter"
+  shift || fail "$FUNCNAME: another modules path was not given as the second parameter"
+  shift || fail "$FUNCNAME: module parameters were not given as the third parameter"
+
   if [[ -s "${_modules_path}/${_module_path}/modules" ]]
   then
     for _module_name in $( cat "${_modules_path}/${_module_path}/modules" )
@@ -185,8 +193,12 @@ detect_modules_action()
 {
   trace_filter modules_action
 
-  extensions_path=$1 extension="${2:-core}"
-  shift 2 # TODO: proper error handling here...
+  extensions_path="${1:-}" extension="${2:-core}"
+  # Question ^^^^^ vvvvvvvv The :-core piece looks suspicious ...
+  shift || fail "$FUNCNAME: cannot detect modules action;"\
+    " Extensions path was not given as first parameter."
+  shift || fail "$FUNCNAME: cannot detect modules action;"\
+    " Extension name was not given as second parameter."
 
   local token _word _modules_path="$extensions_path/$extension/modules/shell"
   local __params=("$@") _module_path _module_params _module_name
@@ -194,6 +206,7 @@ detect_modules_action()
   # first level modules dependency
   local _module_definition _module_definitions=()
   detect_modules_paths "${_modules_path}" "${__params[@]}"
+
   for _module_definition in "${_module_definitions[@]}"
   do
     _module_path="${_module_definition//=*}"
@@ -227,9 +240,18 @@ detect_modules_action()
 detect_unique_2nd_level_action()
 {
   trace_filter detect_unique_2nd_level_action
-  extensions_path=$1 extension=$2
-  local _action=$3 _actions_path _found_actions=() _found_actions_paths _found_action_path
-  shift 3
+
+  extensions_path="${1:-}" extension="${2:-}"
+  local _action="${3:-}" _actions_path _found_actions=() _found_actions_paths \
+    _found_action_path
+
+  shift || fail "$FUNCNAME: cannot detect modules action;"\
+    " Extensions path was not given as first parameter."
+  shift || fail "$FUNCNAME: cannot detect modules action;"\
+    " Extension name was not given as second parameter."
+  shift || fail "$FUNCNAME: cannot detect modules action;"\
+    " Action was not given as third parameter."
+
   _actions_path="$extensions_path/$extension/actions"
   if [[ -d "${_actions_path}" ]]
   then
@@ -484,10 +506,9 @@ extension_run()
 #
 extension_action()
 {
-  if (( extension_action_calls > 0 ))
-  then
-    fail "Cannot call a 2nd time:\n  extension_action ${extension_args[@]}"
-  fi
+  (( extension_action_calls == 0 )) ||
+    fail "$FUNCNAME: Cannot call a 2nd time:\n"\
+    "  extension_action ${extension_args[@]}"
 
   extension_action_calls+=1
 

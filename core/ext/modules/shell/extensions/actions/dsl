@@ -2,8 +2,9 @@
 
 actions_build_cache_start()
 {
-  local _extension_path=$1 _extension=$2
-  shift 2 || fail "Missing extension path and name"
+  local _extension_path="${1:-}" _extension="${2:-}"
+  shift || fail "$FUNCNAME: Extension path must be given as the first parameter."
+  shift || fail "$FUNCNAME: Extension name must be given as the second parameter."
 
   local _actions_root _modules_root
   _actions_root="${_extension_path}/${_extension}/actions"
@@ -18,7 +19,10 @@ actions_build_cache_start()
 
 actions_build_actions_cache()
 {
-  local _actions_from="$1" _actions_path="$2" _file _pair _from _path
+  # Question, what's with the name 'actions_from' ~ Wayne
+  local _actions_from="${1:-}" _actions_path="${2:-}" _file _pair _from _path
+  shift || fail "$FUNCNAME: actions from must be given as the first parameter."
+  shift || fail "$FUNCNAME: actions path must be given as the second parameter."
 
   case "${_actions_path##*/}" in
     (\*)

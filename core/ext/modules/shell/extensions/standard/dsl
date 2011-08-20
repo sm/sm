@@ -2,7 +2,10 @@
 
 extension_path()
 {
-  local path extension=$1
+  local path extension="${1:-}"
+  shift || fail "$FUNCNAME: Cannot process extension path;"\
+    " No extension name was given."
+
   for path in ${extensions_search_paths[@]}
   do
     if [[ -d "${path}/${extension}/actions" || -d "${path}/${extension}/modules" ]]
@@ -16,19 +19,24 @@ extension_path()
 
 extension_is_valid()
 {
-  local _path="$1"
+  local _path="${1:-}"
 
-  if [[ -n "${_path}" ]]
-  then
-    # TODO: Add all extension requirement checks here.
-    [[ -d "${_path}/actions" ]] || [[ -d "${_path}/modules" ]]
-  else
+  shift || fail "$FUNCNAME: Cannot check if extension is valid;"\
+    " No extension path was given."
+
+  [[ -n "${_path}" ]] ||
     fail "Cannot determine if an extension is valid, as the path to the extension was not given."
-  fi
+
+  # TODO: Add all extension requirement checks here.
+  [[ -d "${_path}/actions" ]] || [[ -d "${_path}/modules" ]]
 }
 
 detect_extension_existence()
 {
-  extensions_path=$1 extension=$2
+  extensions_path="${1:-}" extension="${2:-}"
+  shift || fail "$FUNCNAME: Cannot detect extension existence;"\
+    " No extension path was given."
+  shift || fail "$FUNCNAME: Cannot detect extension existence;"\
+    " No extension name was given."
   extension_is_valid $extensions_path/$extension
 }
