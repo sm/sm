@@ -1890,6 +1890,11 @@ service_status()
 service_signal()
 {
   local _signal="${1}" _pid="${2:-0}"
+  shift || fail "Cannot signal service;"\
+    " Signal must be given as the first parameter and be one of:"\
+    " {KILL,QUIT,TERM,USR1,USR2,TTIN,TTOU,a digit})."
+  shift || fail "Cannot signal service;"\
+    " Module name not given as second parameter."
 
   [[ -n "${_pid}" ]] ||
     fail "pid to signal must be passed in as the second parameter;"\
@@ -1905,7 +1910,7 @@ service_signal()
       fi
       ;;
     *)
-      fail "The signal to send must be passed in first, and must be one of:"\
+      fail "Signal must be one of:"\
         " {KILL,QUIT,TERM,USR1,USR2,TTIN,TTOU,a digit})."
       ;;
   esac
