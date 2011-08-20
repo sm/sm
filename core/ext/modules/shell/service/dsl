@@ -448,7 +448,7 @@ service_start()
 {
   (( $# == 0 )) || service_cli $@
 
-  [[ -n "${service}" ]] || fail "$FUNCNAME: To start a service, you must set the 'service' variable."
+  [[ -n "${service}" ]] || fail "To start a service, you must set the 'service' variable."
 
   if command_exists "${service}_start"
   then
@@ -493,7 +493,7 @@ service_start()
 service_stop()
 {
   variable_is_nonempty service ||
-    fail "$FUNCNAME: To start a service, you must set the 'service' variable."
+    fail "To start a service, you must set the 'service' variable."
 
   if command_exists "${service}_stop"
   then
@@ -540,7 +540,7 @@ service_reload()
   (( $# == 0 )) || service_cli $@
 
   variable_is_nonempty service ||
-    fail "$FUNCNAME: To start a service, you must set the 'service' variable."
+    fail "To start a service, you must set the 'service' variable."
 
   if command_exists "${service}_reload"
   then
@@ -587,7 +587,7 @@ service_restart()
   (( $# == 0 )) || service_cli $@
 
   variable_is_nonempty service ||
-    fail "$FUNCNAME: To start a service, you must set the 'service' variable."
+    fail "To start a service, you must set the 'service' variable."
 
   if command_exists "${service}_restart"
   then
@@ -634,7 +634,7 @@ service_status()
   (( $# == 0 )) || service_cli $@
 
   variable_is_nonempty service ||
-    fail "$FUNCNAME: To start a service, you must set the 'service' variable."
+    fail "To start a service, you must set the 'service' variable."
 
   if command_exists "${service}_status"
   then
@@ -681,7 +681,7 @@ service_logtail()
   (( $# == 0 )) || service_cli $@
 
   variable_is_nonempty service ||
-    fail "$FUNCNAME: To start a service, you must set the 'service' variable."
+    fail "To start a service, you must set the 'service' variable."
 
   if command_exists "${service}_logtail"
   then
@@ -728,7 +728,7 @@ service_info()
   (( $# == 0 )) || service_cli $@
 
   [[ -n "${service}" ]] ||
-    fail "$FUNCNAME: In order to get info on a service, the 'service' variable must be set."
+    fail "In order to get info on a service, the 'service' variable must be set."
 
   if command_exists "${service}_info"
   then
@@ -775,7 +775,7 @@ service_configcheck()
   (( $# == 0 )) || service_cli $@
 
   variable_is_nonempty service ||
-    fail "$FUNCNAME: To configcheck a service, the 'service' variable must be set."
+    fail "To configcheck a service, the 'service' variable must be set."
 
   if command_exists "${service}_configcheck"
   then
@@ -883,42 +883,42 @@ service_cli()
       user)
         service_user="${extension_args[$((++index))]}"
         [[ -n "${service_user}" ]] ||
-          error "$FUNCNAME: a user name must follow keyword 'user'"
+          error "a user name must follow keyword 'user'"
         ;;
       version)
         service_version="${extension_args[$((++index))]}"
         [[ -n "${service_version}" ]] ||
-          error "$FUNCNAME: a version number string must follow keyword 'version'"
+          error "a version number string must follow keyword 'version'"
         ;;
       data)
         service_data_path="${_package_args[$((++index))]}"
         [[ -n "${service_data_path}" ]] ||
-          error "$FUNCNAME: a path must follow keyword 'data'"
+          error "a path must follow keyword 'data'"
         ;;
       pid)
         service_pid_path="${_package_args[$((++index))]}"
         [[ -n "${service_pid_path}" ]] ||
-          error "$FUNCNAME: a path must follow keyword 'pid'"
+          error "a path must follow keyword 'pid'"
         ;;
       log)
         service_log_path="${_package_args[$((++index))]}"
         [[ -n "${service_log_path}" ]] ||
-          error "$FUNCNAME: a path must follow keyword 'log'"
+          error "a path must follow keyword 'log'"
         ;;
       config)
         service_config_path="${_package_args[$((++index))]}"
         [[ -n "${service_config_path}" ]] ||
-          error "$FUNCNAME: a path must follow keyword 'config'"
+          error "a path must follow keyword 'config'"
         ;;
       lock)
         service_lock_path="${_package_args[$((++index))]}"
         [[ -n "${service_lock_path}" ]] ||
-          error "$FUNCNAME: a path must follow keyword 'lock'"
+          error "a path must follow keyword 'lock'"
         ;;
       db)
         service_db_path="${_package_args[$((++index))]}"
         [[ -n "${service_db_path}" ]] ||
-          error "$FUNCNAME: a path must follow keyword 'db'"
+          error "a path must follow keyword 'db'"
         ;;
       help)
         service_usage
@@ -1215,23 +1215,20 @@ service_init_start()
 service_init_stop()
 {
 
-  if (( service_pid > 0 ))
-  then
-    log "Stopping ${service}..."
+  (( service_pid > 0 )) || error "Service pid has not been set, or is zero."
 
-    if command_exists "${service}_stop"
-    then
-      "${service}_stop"
-    else
-      if kill -QUIT "${service_pid}"
-      then
-        rm -f "$service_pid_file"
-      else
-        return $?
-      fi
-    fi
+  log "Stopping ${service}..."
+
+  if command_exists "${service}_stop"
+  then
+    "${service}_stop"
   else
-    error "Service pid has not been set, or is zero."
+    if kill -QUIT "${service_pid}"
+    then
+      rm -f "$service_pid_file"
+    else
+      return $?
+    fi
   fi
 }
 

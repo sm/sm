@@ -126,7 +126,7 @@ warn()
 core_debug()
 {
   local type="$1"
-  shift || fail "$FUNCNAME: Debug type must be given as the first parameter."
+  shift || fail "Debug type must be given as the first parameter."
 
   if (( debug_flag == 1 )) && options_check "$debug_flags" "$type"
   then
@@ -182,8 +182,8 @@ debug()
 core_log_search()
 {
   local name="${1:-}" value="${2:-}"
-  shift || fail "$FUNCNAME: name must be given as the first parameter."
-  shift || fail "$FUNCNAME: value must be given as the second parameter."
+  shift || fail "name must be given as the first parameter."
+  shift || fail "value must be given as the second parameter."
 
   if (( debug_flag == 1 )) && options_check "$debug_flags" "search"
   then
@@ -282,7 +282,7 @@ log_todo()
 core_error()
 {
   set +o xtrace
-  printf "\nERROR: $*\n" >&2
+  printf "${FUNCNAME[1]}(): ERROR: $*\n" >&2
   set +o errtrace
   trap - ERR
   exit 1
@@ -381,7 +381,7 @@ core_fail()
 
 fail()
 {
-  core_fail "$@"
+  core_fail "${FUNCNAME[1]}(): $@"
 }
 
 #
@@ -459,7 +459,7 @@ set_ps4()
 core_trace_filter()
 {
   local _action="$1" old
-  shift || fail "$FUNCNAME: Filter action {start,stop} must be specified."
+  shift || fail "Filter action {start,stop} must be specified."
 
   case "${_action}" in
     start)
@@ -475,7 +475,7 @@ core_trace_filter()
       fi
       ;;
     *)
-      fail "$FUNCNAME: Unknown trace action ${_action}, use {start,stop}."
+      fail "Unknown trace action ${_action}, use {start,stop}."
       ;;
   esac
 
@@ -517,8 +517,8 @@ action_call()
 action_source()
 {
   local script="$1"
-  shift || fail "$FUNCNAME: No script was given as the first parameter."
-  [[ -r "$script" ]] || fail "$FUNCNAME: Could not find script to run: $script."
+  shift || fail "No script was given as the first parameter."
+  [[ -r "$script" ]] || fail "Could not find script to run: $script."
   trace_filter action
   source "$script"
 }

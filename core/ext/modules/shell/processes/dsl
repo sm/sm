@@ -19,7 +19,7 @@
 process_lockfile_lock()
 {
   local _lockfile="${1:-}"
-  shift || fail "$FUNCNAME: Cannot lock lockfile;"\
+  shift || fail "Cannot lock lockfile;"\
       "No lockfile was specified as the first parameter."
 
   printf "$$" >> "${_lockfile}" # *Append* current process's pid to the lockfile

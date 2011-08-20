@@ -40,7 +40,7 @@ ensure_paths_exist()
 
   local _path _paths=("$@")
 
-  shift || fail "FUNCNAME: Cannot ensure paths exist; No paths were given."
+  shift || fail "Cannot ensure paths exist; No paths were given."
 
   for _path in "${_paths[@]}"
   do
@@ -103,7 +103,7 @@ remove_paths()
 {
   trace_filter filesystem
   local _path _paths=("$@")
-  shift || fail "$FUNCNAME: Cannot remove paths; No paths were given."
+  shift || fail "Cannot remove paths; No paths were given."
 
   removed_paths=()
   nonexistant_paths=()
@@ -112,18 +112,18 @@ remove_paths()
   do
     if [[ -L "${_path}" ]]
     then
-      rm -f "${_path}" || fail "$FUNCNAME: Could not remove the entity '${_entity}';"\
+      rm -f "${_path}" || fail "Could not remove the entity '${_entity}';"\
           "'rm' command failed with error code '$?'."
       removed_paths+=("${_path}")
     elif [[ -d "${_path}" ]]
     then
-      rm -rf "${_path}" || fail "$FUNCNAME: Could not remove the entity '${_entity}';"\
+      rm -rf "${_path}" || fail "Could not remove the entity '${_entity}';"\
           "'rm' command failed with error code '$?'."
       removed_paths+=("${_path}")
 
     elif [[ -e "${_path}" ]]
     then
-      fail "$FUNCNAME: Cannot remove the path '${_path}', as it is a file."
+      fail "Cannot remove the path '${_path}', as it is a file."
 
     else
       nonexistant_paths+=("${_path}")
@@ -176,22 +176,22 @@ move_directory()
     case "${token}" in
       to)
         _target="${1}"
-        shift || fail "$FUNCNAME: Target path must be provided after keyword 'to'"
+        shift || fail "Target path must be provided after keyword 'to'"
         ;;
 
       from)
         _source="${1}"
-        shift || fail "$FUNCNAME: Source path must be provided after keyword 'from'"
+        shift || fail "Source path must be provided after keyword 'from'"
         ;;
 
       mode)
         _mode="${1}"
-        shift || fail "$FUNCNAME: Mode must be provided after keyword 'mode'"
+        shift || fail "Mode must be provided after keyword 'mode'"
         ;;
 
       owner)
         _owner="${1}"
-        shift || fail "$FUNCNAME: Owner must be provided after keyword 'owner'"
+        shift || fail "Owner must be provided after keyword 'owner'"
         ;;
 
       *) # If the token is unknown
@@ -268,12 +268,12 @@ copy_paths()
     case "${token}" in
       to)
         _target="${1}"
-        shift || fail "$FUNCNAME: Target path must be given after keyword 'from'"
+        shift || fail "Target path must be given after keyword 'from'"
         ;;
 
       from)
         _directories+=( "${1}" )
-        shift || fail "$FUNCNAME: Source path must be given after keyword 'from'"
+        shift || fail "Source path must be given after keyword 'from'"
         ;;
 
       *)
@@ -282,19 +282,19 @@ copy_paths()
     esac
   done
 
-  variable_is_nonempty _target   || fail "$FUNCNAME: Cannot move file; Target must be given."
-  array_is_nonempty _directories || fail "$FUNCNAME: Cannot copy; Directories must be given."
+  variable_is_nonempty _target   || fail "Cannot move file; Target must be given."
+  array_is_nonempty _directories || fail "Cannot copy; Directories must be given."
 
   ensure_paths_exist "${_target}"
 
   for _directory in "${_directories[@]}"
   do
     [[ -d "${_directory}" ]] ||
-      error "$FUNCNAME: Cannot copy directory ${_directory} to ${_target},"\
+      error "Cannot copy directory ${_directory} to ${_target},"\
       "as the directory '${_directory}' does not exist (in '$PWD')."
 
     cp -Rf "${_directory}" "${_target}/" ||
-      fail "$FUNCNAME: Could not copy the entity '${_entity}',"\
+      fail "Could not copy the entity '${_entity}',"\
       "as the 'cp -Rf' command failed with error code '$?'."
   done
 }
@@ -343,11 +343,11 @@ copy_directory()
     case "${token}" in
       to)
       _target="${1}"
-      shift || fail "$FUNCNAME: Target path must be given after keyword 'from'"
+      shift || fail "Target path must be given after keyword 'from'"
       ;;
       from)
       _source="${1}"
-      shift || fail "$FUNCNAME: Source path must be given after keyword 'from'"
+      shift || fail "Source path must be given after keyword 'from'"
       ;;
       *)
         if variable_is_empty _source
@@ -362,11 +362,11 @@ copy_directory()
     esac
   done
 
-  [[ -n "${_source}" ]] || fail "$FUNCNAME: Cannot move file; Source must be given."
-  [[ -n "${_target}" ]] || fail "$FUNCNAME: Cannot move file, Target must be given."
+  [[ -n "${_source}" ]] || fail "Cannot move file; Source must be given."
+  [[ -n "${_target}" ]] || fail "Cannot move file, Target must be given."
 
   cp -Rf "${_source}" "${_target}" ||
-    fail "$FUNCNAME: Could not copy '${_source}' to '${_target}',"\
+    fail "Could not copy '${_source}' to '${_target}',"\
       "as the 'cp' command failed with error code '$?'."
 }
 
@@ -415,11 +415,11 @@ chown_paths()
 
   (( _recursive_flag == 0 )) || _flags+=(-R)
 
-  shift || fail "$FUNCNAME: Cannot chown paths; user[:group] was not given as the first parameter."
+  shift || fail "Cannot chown paths; user[:group] was not given as the first parameter."
 
   local _paths=("$@")
 
-  array_is_nonempty _paths || fail "$FUNCNAME: Cannot chown paths; No files were given."
+  array_is_nonempty _paths || fail "Cannot chown paths; No files were given."
 
   for _path in "${_paths[@]}"
   do
@@ -538,7 +538,7 @@ enter()
   shift || fail "Cannot enter path; No path was given."
 
   [[ -d "${_path}" ]] ||
-    fail "$FUNCNAME: Cannot enter path '${_path}'; Path does not exist."
+    fail "Cannot enter path '${_path}'; Path does not exist."
 
   builtin cd "${_path}" ||
     fail "Could not cd into the given path '${_path}'; "\
@@ -585,7 +585,7 @@ path_exists()
 {
   trace_filter filesystem
   local _path="${1:-}"
-  shift || fail "$FUNCNAME: Cannot check if path exists; No name/path was given."
+  shift || fail "Cannot check if path exists; No name/path was given."
   [[ -d "$_path" ]]
 }
 
@@ -636,9 +636,9 @@ directories_in()
 {
   trace_filter filesystem
   local _path="${1:-}"
-  shift || fail "$FUNCNAME: Directory name/path was not given!"
+  shift || fail "Directory name/path was not given!"
 
-  [[ -d "${_path}" ]] || fail "$FUNCNAME: '${_path}' is not a directory!"
+  [[ -d "${_path}" ]] || fail "'${_path}' is not a directory!"
 
   find "${_path}" -mindepth 1 -maxdepth 1 -type d
 }
@@ -651,11 +651,11 @@ directories_in_matching()
 {
   trace_filter filesystem
   local _pattern _path="${1:-}"
-  shift     || fail "$FUNCNAME: Directory name/path was not given!"
-  [[ -d "${_path}" ]]    || fail "$FUNCNAME: '${_path}' is not a directory!"
+  shift     || fail "Directory name/path was not given!"
+  [[ -d "${_path}" ]]    || fail "'${_path}' is not a directory!"
 
   local _pattern="${2:-}"
-  shift  || fail "$FUNCNAME: '${_path}' is not a directory!"
+  shift  || fail "'${_path}' is not a directory!"
 
   find "${_path}" -mindepth 1 -maxdepth 1 -type d
 }
@@ -668,9 +668,9 @@ directories_under()
 {
   trace_filter filesystem
   local _path="${1:-}"
-  shift  || fail "$FUNCNAME: Directory name/path was not given!"
+  shift  || fail "Directory name/path was not given!"
 
-  [[ -d "${_path}" ]] || fail "$FUNCNAME: '${_path}' is not a directory!"
+  [[ -d "${_path}" ]] || fail "'${_path}' is not a directory!"
 
   find "${_path}" -mindepth 1 -type d
 }
@@ -683,13 +683,13 @@ directories_under_matching()
 {
   trace_filter filesystem
   local _path="${1:-}"
-  shift || fail "$FUNCNAME: Directory name/path was not given as the first parameter."
+  shift || fail "Directory name/path was not given as the first parameter."
 
   local _pattern="${1:-}"
-  shift || fail "$FUNCNAME: Pattern was not given as the second parameter."
+  shift || fail "Pattern was not given as the second parameter."
 
-  [[ -d "${_path}" ]]    || fail "$FUNCNAME: '${_path}' is not a directory!"
-  [[ -n "${_pattern}" ]] || fail "$FUNCNAME: '${_path}' is not a directory!"
+  [[ -d "${_path}" ]]    || fail "'${_path}' is not a directory!"
+  [[ -n "${_pattern}" ]] || fail "'${_path}' is not a directory!"
 
   find "${_path}" -mindepth 1 -iname "${_pattern}" -type d
 }
@@ -729,8 +729,8 @@ full_path()
 {
   trace_filter filesystem
   local _path="$1"
-  shift || fail "$FUNCNAME: Cannot go to path; No path was given."
-  [[ -d "${_path}" ]] || fail "$FUNCNAME: Path '${_path}' does not exist."
+  shift || fail "Cannot go to path; No path was given."
+  [[ -d "${_path}" ]] || fail "Path '${_path}' does not exist."
   (
   builtin cd "${_path}"
   pwd

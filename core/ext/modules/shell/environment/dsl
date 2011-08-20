@@ -40,7 +40,7 @@ command_exists()
 {
   trace_filter environment
   local _name="${1:-}"
-  shift || fail "$FUNCNAME: Cannot test if command exists;"\
+  shift || fail "Cannot test if command exists;"\
     " No command name was given."
 
   if command -v "${_name}" > /dev/null 2>&1
@@ -95,7 +95,7 @@ is_a_function()
 {
   trace_filter environment
   local _name="${1:-}"
-  shift || fail "$FUNCNAME: Cannot test if function exists;"\
+  shift || fail "Cannot test if function exists;"\
     " No function name was given."
 
   if declare -f "${_name}" >/dev/null 2>&1

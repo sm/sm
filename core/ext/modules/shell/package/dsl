@@ -45,7 +45,7 @@
 package_error()
 {
   local _message="${1:-}" _log="${2:-}"
-  shift || fail "$FUNCNAME: Cannot print a package error; No message was provided."
+  shift || fail "Cannot print a package error; No message was provided."
 
   if [[ -n ${_log} ]] && file_exists ${_log}
   then # Append tail of error log to the error message.
@@ -165,7 +165,7 @@ package_definition()
       #  eval "${key}=${value}"
       #  ;;
       *)
-        fail "$FUNCNAME: Unknown key '${key}' (value: ${value})."
+        fail "Unknown key '${key}' (value: ${value})."
       ;;
     esac
   done
@@ -217,52 +217,52 @@ package_cli()
       prefix)
         packages_path="${_package_args[$((++index))]}"
         [[ -n "${packages_path}" ]] ||
-          error "$FUNCNAME: a path must follow keyword 'prefix'"
+          error "a path must follow keyword 'prefix'"
         ;;
       src)
         src_path="${_package_args[$((++index))]}"
         [[ -n "${src_path}" ]] ||
-          error "$FUNCNAME: a path must follow keyword 'src'"
+          error "a path must follow keyword 'src'"
         ;;
       data)
         data_path="${_package_args[$((++index))]}"
         [[ -n "${data_path}" ]] ||
-          error "$FUNCNAME: a path must follow keyword 'data'"
+          error "a path must follow keyword 'data'"
         ;;
       user)
         package_user="${_package_args[$((++index))]}"
         [[ -n "${package_user}" ]] ||
-          error "$FUNCNAME: a user name must follow keyword 'user'"
+          error "a user name must follow keyword 'user'"
         ;;
       version)
         package_version="${_package_args[$((++index))]}"
         [[ -n "${package_version}" ]] ||
-          error "$FUNCNAME: a version number string must follow keyword 'version'"
+          error "a version number string must follow keyword 'version'"
         ;;
       base_url)
         package_base_url="${_package_args[$((++index))]}"
         [[ -n "${package_base_url}" ]] ||
-          error "$FUNCNAME: a base path url must follow keyword 'base_url'"
+          error "a base path url must follow keyword 'base_url'"
         ;;
       file)
         package_file="${_package_args[$((++index))]}"
         [[ -n "${package_file}" ]] ||
-          error "$FUNCNAME: a path must follow keyword 'file'"
+          error "a path must follow keyword 'file'"
         ;;
       dir)
         package_directory="${_package_args[$((++index))]}"
         [[ -n "${package_directory}" ]] ||
-          error "$FUNCNAME: a single extracted directory name must follow keyword 'dir'"
+          error "a single extracted directory name must follow keyword 'dir'"
         ;;
       archive_format)
         archive_format="${_package_args[$((++index))]}"
         [[ -n "${archive_format}" ]] ||
-          error "$FUNCNAME: an archive format (tar.gz,tar.bz2,tar.xz,zip,...) must follow keyword 'archive_format'"
+          error "an archive format (tar.gz,tar.bz2,tar.xz,zip,...) must follow keyword 'archive_format'"
         ;;
       md5)
         package_md5="${_package_args[$((++index))]}"
         [[ -n "${package_md5}" ]] ||
-          error "$FUNCNAME: an md5 sum string must follow keyword 'md5'"
+          error "an md5 sum string must follow keyword 'md5'"
         ;;
       force)
         force_flag=1
@@ -302,7 +302,7 @@ package_init()
   package_name="${1:-${package_name:-${extension}}}"
 
   [[ -n "${package_name}" ]] ||
-    fail "$FUNCNAME(): Package name must be given as first parameter.\n"
+    fail "Package name must be given as first parameter.\n"
 
   case "${package_name}" in
     *=*) # exact version specifier
@@ -361,7 +361,7 @@ package_init()
 
   # This check should only happen in places that require a version...
   #[[ -n "${package_version}" ]] ||
-  #  fail "$FUNCNAME(): Package version must be specified.\n"\
+  #  fail "Package version must be specified.\n"\
   #  "(For example version=x.y.z set in extension's config/defaults file.)\n"
 
   fhs_dirs=( bin etc include lib libexec sbin share man )
@@ -1044,7 +1044,7 @@ package_deactivate()
   local _package="${package_name}" _package_version="${2:-${package_version}}" \
     _file _files _version
 
-  [[ -n "${_package}" ]] || fail "$FUNCNAME: Cannot deactivate package;"\
+  [[ -n "${_package}" ]] || fail "Cannot deactivate package;"\
     " Package name must be given."
 
   if symlink_exists "${packages_path}/${_package}/active"
@@ -1125,9 +1125,9 @@ package_deactivate()
 package_activate_if_first()
 {
   local _package="${1:-}" _version="${2:-}"
-  shift || fail "$FUNCNAME: Cannot activate package, if first;"\
+  shift || fail "Cannot activate package, if first;"\
     " Package name must be given as first parameter."
-  shift || fail "$FUNCNAME: Cannot activate package, if first;"
+  shift || fail "Cannot activate package, if first;"
     " Package version must be given as second parameter."
 
   if path_exists "${install_path}"
@@ -1175,7 +1175,7 @@ package_activate_if_first()
 package_ldconfig()
 {
   local _package="${1:-${package_name}}" _path _files _ldconfig="/sbin/ldconfig"
-  [[ -n "${_package}" ]] || fail "$FUNCNAME: Cannot run ldconfig for a package;"\
+  [[ -n "${_package}" ]] || fail "Cannot run ldconfig for a package;"\
     "Package name must be given."
 
   #  path_exists "${packages_path}/${_package}/active/lib" ||
@@ -1243,7 +1243,7 @@ package_ldconfig()
 package_profile_d()
 {
   local _package="${1:-${package_name}}"
-  [[ -n "${_package}" ]] || fail "$FUNCNAME: Cannot run setup profile_d for a package;"\
+  [[ -n "${_package}" ]] || fail "Cannot run setup profile_d for a package;"\
     "Package name must be given."
 
   template_exists "profile.d.template" || return 0
@@ -1397,11 +1397,11 @@ package_patch()
 package_apply_patches()
 {
   local _patch _patches=("$@")
-  shift || fail "$FUNCNAME: Cannot apply patches; No patches were given."
+  shift || fail "Cannot apply patches; No patches were given."
 
   for _patch in "${_patches[@]}"
   do
-    error "$FUNCNAME: TODO: patch application is NIY (see package_patch())"
+    error "TODO: patch application is NIY (see package_patch())"
   done
 }
 
@@ -1493,7 +1493,7 @@ package_usage() {
 package_is_active()
 {
   local _name="${1:-}" _version="${2:-}"
-  shift || fail "$FUNCNAME: Cannot query if a package is active;"\
+  shift || fail "Cannot query if a package is active;"\
     " No package name was given, or name is empty."
 
   local _path="${packages_path}/${_name}"
@@ -1543,11 +1543,11 @@ package_must_be_active()
 {
   local _name="${1:-}"
 
-  shift || fail "$FUNCNAME: Cannot ensure that package is active;"\
+  shift || fail "Cannot ensure that package is active;"\
     "No package name was given (or name is empty.)"
 
   package_is_active "${_name}" ||
-    error "$FUNCNAME: Install/activate the node package extension, before installing ${_name}."
+    error "Install/activate the node package extension, before installing ${_name}."
 }
 
 #
@@ -1586,7 +1586,7 @@ package_must_be_active()
 packages_must_be_active()
 {
   local _package _packages="$@"
-  shift || fail "$FUNCNAME: Cannot ensure that packages are active;"\
+  shift || fail "Cannot ensure that packages are active;"\
     "No packages were given."
 
   for _package in "${_packages[@]}"
@@ -1788,7 +1788,7 @@ package_man()
   MANPATH="${package_path}/man"
 
   path_exists $MANPATH ||
-    error "$FUNCNAME: No man page available for package ${package_name} ${package_version}"
+    error "No man page available for package ${package_name} ${package_version}"
 
   man ${extension_actions[@]:-${package_name}} || true
 }

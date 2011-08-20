@@ -84,7 +84,7 @@ show_help()
 description()
 {
   local _description="$*"
-  shift || fail "$FUNCNAME: Cannot add description to help; description given."
+  shift || fail "Cannot add description to help; description given."
   help_descriptions+=("$*")
 }
 
@@ -178,8 +178,8 @@ help_description()
 action()
 {
   local _name="${1:-}" _description="${2:-}"
-  shift || fail "$FUNCNAME: An action name must be provided:\naction {name} {description}."
-  shift || fail "$FUNCNAME: An description must be provided:\naction {name} {description}."
+  shift || fail "An action name must be provided:\naction {name} {description}."
+  shift || fail "An description must be provided:\naction {name} {description}."
 
   help_action_names+=( "${_name}" )
   help_action_descriptions+=( "${_description}" )

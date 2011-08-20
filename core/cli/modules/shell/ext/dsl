@@ -61,7 +61,7 @@ ext_list_known()
 ext_install()
 {
   local _name _names="${1:-}" _uri=${2:-}
-  shift || fail "$FUNCNAME: Cannot install a ext; No ext name was given."
+  shift || fail "Cannot install a ext; No ext name was given."
 
   _names=(${_names//,/ })
 
@@ -74,7 +74,7 @@ ext_install()
 extension_install()
 {
   local _name="${1:-}"
-  shift || fail "$FUNCNAME: Cannot install extension; No extension name was given."
+  shift || fail "Cannot install extension; No extension name was given."
 
   local _uri="${1:-}"
   shift || _uri=$( awk -F = "/^${_name}=/ {print \$2 }" < "${sm_path}/core/cli/config/known_ext" | tail -n 1 )
@@ -82,7 +82,7 @@ extension_install()
   local _identifier="$(scm_identifier "${_uri}")"
 
   [[ -n "${_uri}" ]] ||
-    error "$FUNCNAME: uri not given and cannot find ${_name} in known extensions."
+    error "uri not given and cannot find ${_name} in known extensions."
 
   local _identifier="$(scm_identifier "${_uri}")"
 

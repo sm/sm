@@ -51,7 +51,7 @@ init_scripts_path()
         then
           printf "/etc/rc.d"
         else
-          fail "$FUNCNAME: Unknown init scripts directory (/etc/init.d or /etc/rc.d not found)."
+          fail "Unknown init scripts directory (/etc/init.d or /etc/rc.d not found)."
         fi
         ;;
     esac
@@ -730,7 +730,7 @@ os_version_patch()
 os_open()
 {
   local _uri="${1:-}"
-  shift || fail "$FUNCNAME: Cannot open URI; No uri was given."
+  shift || fail "Cannot open URI; No uri was given."
 
   if command_exists open
   then

@@ -67,7 +67,7 @@ sets_list_known()
 sets_install()
 {
   local _name _names="${1:-}" _uri=${2:-}
-  shift || fail "$FUNCNAME: Cannot install a set; No set name was given."
+  shift || fail "Cannot install a set; No set name was given."
 
   _names=(${_names//,/ })
 
@@ -80,7 +80,7 @@ sets_install()
 set_install()
 {
   local _name="${1:-}"
-  shift || fail "$FUNCNAME: Cannot install a set; No set name was given."
+  shift || fail "Cannot install a set; No set name was given."
 
   local _uri="${1:-}"
   shift || _uri=$( awk -F = "/^${_name}=/ {print \$2 }" < "${sm_path}/core/cli/config/known_sets" | tail -n 1 )
@@ -88,7 +88,7 @@ set_install()
   local _identifier="$(scm_identifier "${_uri}")"
 
   [[ -n "${_uri}" ]] ||
-    error "$FUNCNAME: uri not given and cannot find ${_name} in known extension sets."
+    error "uri not given and cannot find ${_name} in known extension sets."
 
   ensure_paths_exist "${extension_sets_home}"
   enter "${extension_sets_home}"
