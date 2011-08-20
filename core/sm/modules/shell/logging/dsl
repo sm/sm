@@ -845,6 +845,7 @@ log_step()
 
     _log_file="${TMP_PATH:-/tmp}/$$.stderr.log"
 
+    touch "${_log_file}"
     if "$@" > "${_log_file}"
     then
       core_log_step "succ"
