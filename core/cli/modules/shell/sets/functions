@@ -81,7 +81,7 @@ sets_install()
     log_step "Installing ${_name} in ${_extension_namespace//\// }" set_install "${_name}" "$@" || true
     # TODO: only generate the cache if no cache files are found.
     # [[ ! -d "${extension_sets_home}/${_name}" ]] ||
-    #   build_extensions_actions_cache "${extension_sets_home}/${_name}" "unused" || true
+    #   build_actions_cache "${extension_sets_home}/${_name}" "unused" || true
   done
 }
 

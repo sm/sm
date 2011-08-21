@@ -105,14 +105,8 @@ init_extensions_search_paths()
 
     # System extension sets
     local _extension_set_path
-    for _extension_set_path in ${extension_sets_path}/*
-    do
-      if [[ -d "${_extension_set_path}" ]]
-      then
-        extensions_search_paths+=( "${_extension_set_path}" )
-      fi
-    done
 
+    extensions_search_paths+=($(find ${extension_sets_home} -mindepth 1 -maxdepth 1 -type d))
   fi
 
   # Core is required to run, add it if not found

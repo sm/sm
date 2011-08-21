@@ -237,7 +237,7 @@ extension_action()
       ;;
   esac
 
-  if in_search_paths detect_cached_action "${extension_args[@]}"
+  if in_search_paths cached_action "${extension_args[@]}"
   then
     log_search action "$action" "${action_path##${sm_path}\/} params:${extension_args[@]}"
   else

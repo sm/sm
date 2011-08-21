@@ -154,18 +154,6 @@ make_binaries_executable()
   done
 }
 
-build_actions_cache()
-{
-  if [[ -f ${install_path}/core/cli/.actions_cache ]]
-  then
-    log_step "Cleaning action cache for core" \
-      rm -f ${install_path}/core/*/.actions_cache
-    build_extensions_actions_cache ${install_path}/core "unused" || true
-  else
-    in_search_paths build_extensions_actions_cache "unused" || true
-  fi
-}
-
 install_sm()
 {
   log "S{cripting,ystem,tack} Management (SM) Framework (Core) Installation:"
