@@ -113,6 +113,7 @@ init_extensions_search_paths()
         extensions_search_paths+=( "${_extension_set_path}" )
       fi
     done
+  fi
 
   # Core is required to run, add it if not found
   string_contains "${extensions_search_paths[*]}" "${sm_path}/core" ||
