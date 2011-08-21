@@ -262,7 +262,7 @@ module()
   # Load module dependencies.
   if [[ -s "${module_path}/includes" ]]
   then
-    for _module_dependency in $( cat ${_module_path}/modules )
+    for _module_dependency in $( cat "${_module_path}/includes" )
     do
       module_or_error "${_module_dependency}" \
         "Could not find module dependency '${_module_dependency}' from '${_module_path##${sm_path}\/}/includes'."
