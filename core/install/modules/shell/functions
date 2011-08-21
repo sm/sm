@@ -2,7 +2,7 @@
 
 install_initialize()
 {
-  cleanse_paths=( external completion modules bin extensions )
+  cleanse_paths=( external completion modules extensions )
   directories=( bin )
   binaries=( sm sm-ll smp )
   files=( LICENSE VERSION README.md )
@@ -39,18 +39,29 @@ prepare_for_installation()
   ensure_paths_exist "${directories[@]}" "${aux_paths[@]}"
 }
 
+with_clean()
+{
+  local command="$1" target="$3" entity
+  shift 3 || fail "Usage:\n\n  with_clean copy_{files,paths} to <target> list of files/paths"
+  for entity in "$@"
+  do
+    rm -rf "${target}/${entity}"
+  done
+  "${command}" to "${target}" "$@"
+}
+
 install_core()
 {
   local _dir
 
   log_step "Installing core directories (${directories[*]})" \
-    copy_paths to "${install_path}/" "${directories[@]}"
+    with_clean copy_paths to "${install_path}/" "${directories[@]}"
 
   log_step "Installing core files (${files[*]})" \
-    copy_files to "${install_path}" ${files[@]}
+    with_clean copy_files to "${install_path}" ${files[@]}
 
-  log_step "Installing core extension set (sets/core)" \
-    copy_paths to "${install_path}/" "core"
+  log_step "Installing core extension set" \
+    with_clean copy_paths to "${install_path}/" "core"
 }
 
 install_configuration_files()
