@@ -935,7 +935,7 @@ service_cli()
 
   extension_args=( "${_ignored_args[@]}" )
 
-  service_initialize "${extension_args[@]}"
+  ext_service_initialize "${extension_args[@]}"
 }
 
 #
