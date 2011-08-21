@@ -18,20 +18,20 @@ detect_action_type()
 
   case "${_path_type}" in
 
-    *sh[[:space:]]script*|*POSIX[[:space:]]shell*|*Bourne-Again*)
+    (*sh[[:space:]]script*|*POSIX[[:space:]]shell*|*Bourne-Again*)
       action_type="shell"
       ;;
 
-    *ASCII*)
+    (*ASCII*)
       # Launch with helper DSL, if possible.
       extension="${_path//.}"
 
       case "${extension}" in
-        shell|zsh|bash|sh)
+        (shell|zsh|bash|sh)
           action_type="shell"
           #rb) action_type="ruby"   ;;
           ;;
-        *)
+        (*)
           read -r shebang < "${_path}"
 
           case "${shebang}" in
@@ -40,7 +40,7 @@ detect_action_type()
               binary="${binary##* }"
               action_type="ruby"
               ;;
-            *)
+            (*)
               if [[ -x "${_path}" ]] ; then
                 action_type="binary"
               else
@@ -53,11 +53,11 @@ detect_action_type()
       result=$?
       ;;
 
-    cannot[[:space:]]open)
+    (cannot[[:space:]]open)
       action_type="dne"
       ;;
 
-    *)
+    (*)
       if file_is_executable "${_path}"
       then
         action_type="binary"
@@ -109,20 +109,24 @@ extension_action_prerequisites()
 
   for _name in ${_pre[@]}
   do
-    ! command_exists "${_name}" || "${_name}" "${extension_args[@]}"
+    if command_exists "${_name}"
+    then
+      "${_name}" "${extension_args[@]}"
+    fi
   done
 }
 
 extension_run()
 {
   trace_filter extension_run
+
   local _type="${action_type:-}" _path="${action_path:-}" _namespaces
 
   builtin cd "${initial_pwd}"
 
   # Now launch the extension, based on the determined _type.
   case "${_type}" in
-    function)
+    (function)
       _namespaces=${_path##${extension_actions_path}}
       extension_modules_load ${_namespaces//\// }
 
@@ -131,7 +135,7 @@ extension_run()
       action_call "${action}" "${extension_args[@]}"
       ;;
 
-    shell)
+    (shell)
       [[ "${action##*/}" != help ]] || modules ext/help
 
       _namespaces=${_path##${extension_actions_path}}
@@ -141,7 +145,7 @@ extension_run()
       action_source "${_path}/${action}" "${extension_args[@]}"
       ;;
 
-    ruby)
+    (ruby)
       requires=()
       for script in functions initialize
       do
@@ -155,10 +159,10 @@ extension_run()
       #   ADD "${modules_path}/${_type}/" to the lib path so the script can require "sm"
       #  "${_path}"
       #  ;;
-    dne|noexec)
+    (dne|noexec)
       fail "Processing ${action} failed; file type is unknown, file does not exist, or file is not executable."
       ;;
-    binary|*)
+    (binary|*)
       "${_path}/${action}" ${extension_action} "${extension_args[@]}"
       ;;
   esac
@@ -207,8 +211,7 @@ extension_run()
 extension_action()
 {
   (( extension_action_calls == 0 )) ||
-    fail "Cannot call a 2nd time:\n"\
-    "  extension_action ${extension_args[@]}"
+    fail "Cannot call a 2nd time, args: ${extension_args[*]}"
 
   extension_action_calls+=1
 
@@ -216,14 +219,14 @@ extension_action()
 
   #TODO: Should be moved to core/cli?
   case "${extension_args[0]}" in
-    *=*) # exact version specifier
+    (*=*) # exact version specifier
       package_name="${extension_args[0]}"
       export package_version="${package_name##*=}"
       export package_name="${package_name%%=*}"
       export extension="${package_name}"
       extension_args[0]="${extension}"
       ;;
-    *:*)
+    (*:*)
       package_name="${extension_args[0]}"
       export package_version="${package_name##*:}"
       export package_name="${package_name%%:*}"

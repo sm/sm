@@ -169,7 +169,7 @@ detect_cached_action_from_action_cache_check_short()
       for candidate in "${_found_actions[@]}"
       do
         candidate="${candidate%%=*}"
-        printf "  sm ${extension} ${candidate//\// } ${_rest_params[@]}\n\n"
+        printf "  %s\n" "sm ${extension} ${candidate//\// } ${_rest_params[@]}"
       done
     )\n"
 
@@ -181,9 +181,14 @@ detect_cached_action_from_action_cache_check_short()
 
 detect_cached_action_from_action_cache_check()
 {
-  local _found=$( \awk -F = "/^$1=/ {print \$2}" < "${_action_cache}" )
-  if [[ -n "${_found}" ]]
+  #local _found=$( \awk -F = "/^$1=/ {print \$2}" < "${_action_cache}" )
+  local _found _name="${1:-}"
+  shift || fail "No action name given."
+
+  #if [[ -n "${_found}" ]]
+  if found=$( grep "^${_name}=" )
   then
+    _found="${_found/*=}"
     action="${_found##*/}"
     action_path="${_found%/*}"
     [[ "${action_path}" != "${_found}" ]] || action_path=""
@@ -196,8 +201,9 @@ detect_cached_action_from_action_cache_check()
     then
       _found_actions=( $(
         for f in "${_modules_cache[@]}"
-        do echo $f
-        done | \awk "/^$1=/ {print}"
+        do
+          echo $f
+        done | grep "^${_name}="
       ) )
       if (( ${#_found_actions[@]} == 1 ))
       then
