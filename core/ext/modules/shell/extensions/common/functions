@@ -27,8 +27,7 @@ extension_is_valid()
   [[ -n "${_path}" ]] ||
     fail "Cannot determine if an extension is valid, as the path to the extension was not given."
 
-  # TODO: Add all extension requirement checks here.
-  [[ -d "${_path}/actions" ]] || [[ -d "${_path}/modules" ]]
+  [[ -d "${_path}/actions" ]] # Realistically, all an extension needs is actions
 }
 
 detect_extension_existence()
