@@ -3,47 +3,18 @@
 #TODO: rename module to detection (after it is renamed to execution)
 
 #TODO: deprecated
-build_actions_cache()
-{
-  trace_filter action_cache
-
-  local _extension_path=$1 _extension _extension_namespace
-  shift || fail "Extension path must be given as the first parameter."
-
-  _extension_namespace="${_extension_path#${sm_path}\/}"
-  log_step "Updating action cache for ${_extension_namespace//\// }"
-
-  for _extension in "${_extension_path}"/*
-  do
-    debug search "build_actions_cache:${_extension}:"
-    case "${_extension}" in
-      (*\/\*|*\/.*) continue ;;
-    esac
-    [[ -d "${_extension}" ]] || continue
-    [[ ! -f "${_extension}/actions.map" ]] || continue
-    _extension="${_extension#${_extension_path}\/}"
-    actions_build_cache_start "${_extension_path}" "${_extension}" 2>/dev/null
-  done
-
-  log_step success
-  return 1 #fake we found nothing and continue with next search path
-}
-
-#TODO: deprecated
 actions_build_cache_start()
 {
   trace_filter action_cache
+
+  shopt -s dotglob
 
   local _extension_path="${1:-}" _extension="${2:-}"
   shift || fail "Extension path must be given as the first parameter."
   shift || fail "Extension name must be given as the second parameter."
 
   local _actions_root="${_extension_path}/${_extension}/actions"
-
-  shopt -s dotglob
-
-  #                         from to
-  actions_build_actions_cache "" "" | sort > "${_extension_path}/${_extension}/actions.map" || return 1
+  actions_build_actions_cache | sort > "${_extension_path}/${_extension}/actions.map" || return 1
 }
 
 #TODO: deprecated
@@ -53,8 +24,6 @@ actions_build_actions_cache()
 
   # Question, what's with the name 'actions_from' ~ Wayne
   local _actions_from="${1:-}" _actions_path="${2:-}" _file _pair _from _path
-  shift || fail "actions from must be given as the first parameter."
-  shift || fail "actions path must be given as the second parameter."
 
   case "${_actions_path##*/}" in
     (\*)
