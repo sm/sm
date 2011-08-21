@@ -949,9 +949,6 @@ package_activate()
       to "${packages_path}/${package_name}/active"
 
     log_step success
-  else
-    warn "Skipping activation of ${package_name} ${package_version}, "\
-      "as '${install_path}' does not exist."
   fi
 
   package_ldconfig "${package_name}"

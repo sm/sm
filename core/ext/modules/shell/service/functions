@@ -1767,8 +1767,6 @@ service_activate()
         fi
       fi
     fi
-  else
-    log "Skipping activation of ${_service} ${_version}, as '${install_path}' does not exist."
   fi
 }
 
