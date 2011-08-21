@@ -7,11 +7,11 @@ do
   token="$1"
   shift
   case "$token" in
-    (*trace)
+    (--trace|trace)
       extension_args+=("--trace=all")
       ;;
 
-    (*prefix)
+    (--prefix|prefix)
       prefix_path="$1"
       if ! shift
       then
