@@ -2,6 +2,7 @@
 
 #TODO: rename module to detection (after it is renamed to execution)
 
+#TODO: deprecated
 build_actions_cache()
 {
   trace_filter action_cache
@@ -19,7 +20,7 @@ build_actions_cache()
       (*\/\*|*\/.*) continue ;;
     esac
     [[ -d "${_extension}" ]] || continue
-    [[ ! -f "${_extension}/.actions_cache" ]] || continue
+    [[ ! -f "${_extension}/actions.map" ]] || continue
     _extension="${_extension#${_extension_path}\/}"
     actions_build_cache_start "${_extension_path}" "${_extension}" 2>/dev/null
   done
@@ -28,6 +29,7 @@ build_actions_cache()
   return 1 #fake we found nothing and continue with next search path
 }
 
+#TODO: deprecated
 actions_build_cache_start()
 {
   trace_filter action_cache
@@ -36,17 +38,15 @@ actions_build_cache_start()
   shift || fail "Extension path must be given as the first parameter."
   shift || fail "Extension name must be given as the second parameter."
 
-  local _actions_root _modules_root
-  _actions_root="${_extension_path}/${_extension}/actions"
-  _modules_root="${_extension_path}/${_extension}/modules/shell"
+  local _actions_root="${_extension_path}/${_extension}/actions"
 
   shopt -s dotglob
 
   #                         from to
-  actions_build_actions_cache "" "" | sort > "${_extension_path}/${_extension}/.actions_cache" || return 1
-  actions_build_modules_cache       | sort > "${_extension_path}/${_extension}/.modules_cache" || return 1
+  actions_build_actions_cache "" "" | sort > "${_extension_path}/${_extension}/actions.map" || return 1
 }
 
+#TODO: deprecated
 actions_build_actions_cache()
 {
   trace_filter action_cache
@@ -112,46 +112,36 @@ actions_build_actions_cache()
   esac
 }
 
-actions_build_modules_cache()
+modules_actions_cache_initialize()
 {
   trace_filter action_cache
 
-  local _module_path _module_name
+  (( ! "${#_module_cache[@]}" )) || return 0
+  local _module_path _module_name _action_pair
+
   for _module_path in $( find "${_modules_root}${_modules_path}" -name modules -type f || return 1 )
   do
     _module_name="${_module_path#${_modules_root}\/}"
     _module_name="${_module_name%modules}"
     _module_name="${_module_name%\/}"
-    echo "${_module_name}=$( cat ${_module_path} | tr '\n' ' ' )"
-  done
-}
-
-action_from_modules_cache_initialize()
-{
-  trace_filter action_cache
-
-  [[ -f "${_module_cache}" ]] || return 0
-  local _path _line
-  for _path in $( tr ' ' ',' < "${_module_cache}" )
-  do
-    _module_path="${_path%%=*}"
-    _module_path="${_module_path:+${_module_path}\/}"
-    _module_deps="${_path#*=}"
-    for _module_dep in ${_module_deps//,/ }
+    while read _module_dep
     do
       if in_search_paths detect_module "${_module_dep}" &&
         [[ -f "${module_path}/actions" ]]
       then
-        while read _line
+        while read _action_pair
         do
-          if [[ "$_line" == [[:alpha:]]* ]]
+          if [[ "${_action_pair}" == [[:alpha:]]* ]]
           then
-            _modules_cache+=( "${_module_path}${_line/=*}=${_module_path}${_line/*=}" )
+            _modules_actions_cache+=( "${_module_name}/${_action_pair/=*}=${_module_name}/${_action_pair/*=}" )
           fi
         done < "${module_path}/actions"
       fi
-    done
+    done < ${_module_path}
   done
+  #for _action_pair in ${_modules_actions_cache[@]}
+  #do log_search "m-a-cache" "${_action_pair%%=*}" "${_action_pair#*=}"
+  #done
 }
 
 action_cache_check_short()
@@ -160,12 +150,11 @@ action_cache_check_short()
 
   local _found _found_actions _name="${1:-}" _item
 
-  #_found_actions=( $( \awk "/\/$1[=\/]/ {print}" < "${_action_cache}" ) )
-  _found_actions=( $( grep "/${_name}[=/]" "${_action_cache}" ) )
+  _found_actions=( $( grep "/${_name}[=/]" < "${_actions_map}" ) )
 
-  if (( ${#_modules_cache[@]} ))
+  if (( ${#_modules_actions_cache[@]} ))
   then
-    for _item in "${_modules_cache[@]}"
+    for _item in "${_modules_actions_cache[@]}"
     do
       if [[ "${_item}" == "${_name}="* ]]
       then
@@ -207,7 +196,7 @@ action_cache_check()
   local _found _name="${1:-}" _item _found_actions=()
   shift || fail "No action name given."
 
-  _found="$( grep "^${_name}=" "${_action_cache}" 2>/dev/null || true )"
+  _found="$( grep "^${_name}=" "${_actions_map}" 2>/dev/null || true )"
   if [[ -n "${_found}" ]]
   then
     _found="${_found/*=}"
@@ -216,12 +205,12 @@ action_cache_check()
     [[ "${action_path}" != "${_found}" ]] || action_path=""
     action_path="$extensions_path/$extension/actions/${action_path}"
     extension_args=( "${_rest_params[@]}" )
-    debug search ":cached(${_action_cache}):${_action_path}=${_found}:params=${_rest_params[*]}:"
+    debug search ":cached(${_actions_map}):${_action_path}=${_found}:params=${_rest_params[*]}:"
     return 0
   else
-    if (( ${#_modules_cache[@]} ))
+    if (( ${#_modules_actions_cache[@]} ))
     then
-      for _item in "${_modules_cache[@]}"
+      for _item in "${_modules_actions_cache[@]}"
       do
         if [[ "${_item}" == "${_name}="* ]]
         then
@@ -243,28 +232,25 @@ action_cache_check()
   return 1
 }
 
-action_from_action_cache()
+action_from_actions_map()
 {
   trace_filter action_cache
 
-  local _action_cache="$extensions_path/$extension/.actions_cache"
-  local _module_cache="$extensions_path/$extension/.modules_cache"
+  local _actions_map="${extensions_path}/${extension}/actions.map"
+  local _modules_root="${extensions_path}/${extension}/modules/shell"
   local _action_params=("$@") _action_path _new_action_path
-  local _rest_params=() _param_temp _action_params_length _modules_cache=()
+  local _rest_params=() _param_temp _action_params_length _modules_actions_cache=()
 
-  action_from_modules_cache_initialize
+  modules_actions_cache_initialize
 
-  if [[ -f "${_action_cache}" ]]
+  if [[ -f "${_actions_map}" ]]
   then
     while :
     do
       _action_path="${_action_params[*]}"
-      _action_path="${_action_path// /\/}"
-      if action_cache_check "${_action_path}"
-      then
-        return 0
-      fi
-      if action_cache_check_short "${_action_path}"
+      _action_path="${_action_path// //}"
+      if action_cache_check "${_action_path}" ||
+        action_cache_check_short "${_action_path}"
       then
         return 0
       fi
@@ -292,6 +278,6 @@ cached_action()
     " No extension name was given."
 
   extension_is_valid $extensions_path/$extension &&
-    action_from_action_cache "$@"
+    action_from_actions_map "$@"
 }
 
