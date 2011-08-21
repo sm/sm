@@ -106,10 +106,13 @@ init_extensions_search_paths()
     # System extension sets
     local _extension_set_path
 
-    mkdir -p "${extension_sets_home}"
-
-    extensions_search_paths+=($(find ${extension_sets_home} -mindepth 1 -maxdepth 1 -type d))
-  fi
+    for _extension_set_path in ${extension_sets_home}/*
+    do
+      if [[ -d "${_extension_set_path}" ]]
+      then
+        extensions_search_paths+=( "${_extension_set_path}" )
+      fi
+    done
 
   # Core is required to run, add it if not found
   string_contains "${extensions_search_paths[*]}" "${sm_path}/core" ||
@@ -179,12 +182,14 @@ in_search_paths()
   local args=( "$@" ) path
 
   # do search if param given
-  [[ -z "$1" ]] ||
+  if [[ -n "$1" ]]
+  then
     for path in "${extensions_search_paths[@]}"
     do
       "${callback}" "${path}" "${args[@]}" || continue
       return 0
     done
+  fi
 
   # if nothing found yet try in cli
   if "${callback}" "${sm_path}/core" "cli" "${args[@]}"
