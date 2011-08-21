@@ -1,5 +1,10 @@
 #!/bin/sh
 
+actions_cache_add()
+{
+  string_contains "${_actions_cache[*]}" "$1" || _actions_cache+=( "$1" )
+}
+
 # Step 1 collect direct filesystem mapping
 initialize_filesystem_cache()
 {
@@ -19,7 +24,7 @@ initialize_filesystem_cache()
       (.*) continue ;;
     esac
 
-    _actions_cache+=( "${_action_path}=${_action_path}" )
+    actions_cache_add "${_action_path}=${_action_path}"
   done
 }
 
@@ -27,9 +32,12 @@ initialize_filesystem_cache()
 initialize_actions_map_cache()
 {
   trace_filter action_detection
+  local _mapping
   if [[ -f "${_actions_map}" ]]
   then
-    _actions_cache+=( $( grep -v "^#" < "${_actions_map}" ) )
+    for _mapping in $( grep -v "^#" < "${_actions_map}" )
+    do actions_cache_add "${_mapping}"
+    done
   fi
 }
 
@@ -60,7 +68,7 @@ initialize_modules_actions_cache()
         do
           if [[ "${_action_pair}" == [[:alpha:]]* ]]
           then
-            _actions_cache+=( "${_module_name:+${_module_name}/}${_action_pair/=*}=${_module_name:+${_module_name}/}${_action_pair/*=}" )
+            actions_cache_add "${_module_name:+${_module_name}/}${_action_pair/=*}=${_module_name:+${_module_name}/}${_action_pair/*=}"
           fi
         done < "${module_path}/actions"
       fi
@@ -68,14 +76,8 @@ initialize_modules_actions_cache()
   done
 }
 
-action_cache_check()
+action_cache_find_matching()
 {
-  trace_filter action_detection
-
-  local _found_actions=() _method="$1" _name="$2" _item
-  shift || fail "No method and action name was given for search"
-  shift || fail "No action name was given for search"
-
   for _item in "${_actions_cache[@]}"
   do
     case "${_method}" in
@@ -93,11 +95,29 @@ action_cache_check()
             ;;
         esac
         ;;
+      (starting)
+        case "${_item}" in
+          (${_name}*=*)
+            _found_actions+=("${_item}")
+            ;;
+        esac
+        ;;
       (*)
-        fail "Unknown search method, use 'only_one' or 'allow_many'."
+        fail "Unknown search method, use 'only_one', 'allow_many', 'starting'."
         ;;
     esac
   done
+}
+
+action_cache_check()
+{
+  trace_filter action_detection
+
+  local _found_actions=() _method="$1" _name="$2" _item
+  shift || fail "No method and action name was given for search"
+  shift || fail "No action name was given for search"
+
+  action_cache_find_matching "${_method}" "${_name}"
 
   case "${_method}" in
     (only_one)
@@ -128,7 +148,7 @@ action_cache_check()
     done
     local screen_height=$LINES
     : ${screen_height:=20}
-    if (( ${#_found_actions[@]} > screen_height ))
+    if (( ${#_found_actions[@]} + 4  > screen_height ))
     then
       error "More than one action found matching, please be more specific.\n\nDid you mean:\n ${_candidates[*]}\n" 2>&1 | less
     else
