@@ -43,7 +43,7 @@ do
   esac
 done
 
-if [[ -n "${prefix}" ]]
+if [[ -n "${prefix_path}" ]]
 then
   sm_path="${DESTROOT:-}${prefix_path}/sm"
 
