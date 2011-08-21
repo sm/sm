@@ -1,5 +1,114 @@
 #!/bin/sh
 
+actions_cache_add()
+{
+  string_contains "${_actions_cache[*]}" "$1" || _actions_cache+=( "$1" )
+}
+
+# Step 1 collect direct filesystem mapping
+initialize_filesystem_cache()
+{
+  trace_filter action_detection
+  local _action_path _file_name
+
+  for _action_path in $( find "${_actions_root}" -type f )
+  do
+    # Ignore not executable files
+    [[ -x "${_action_path}" ]] || continue
+
+    _action_path="${_action_path#${_actions_root}\/}"
+    _file_name="${_action_path##*/}"
+
+    # Ignore hidden files
+    case "${_file_name}" in
+      (.*) continue ;;
+    esac
+
+    actions_cache_add "${_action_path}=${_action_path}"
+  done
+}
+
+# Step 2 read actions.map
+initialize_actions_map_cache()
+{
+  trace_filter action_detection
+  local _mapping
+  if [[ -f "${_actions_map}" ]]
+  then
+    for _mapping in $( grep -v "^#" < "${_actions_map}" )
+    do actions_cache_add "${_mapping}"
+    done
+  fi
+}
+
+detect_module_actions()
+{
+  detect_module "$@" &&
+    [[ -f "${module_path}/actions" ]] &&
+    [[ -s "${module_path}/actions" ]]
+}
+
+# Step 3 collect dependent modules actions mapping
+initialize_modules_actions_cache()
+{
+  trace_filter action_detection
+  local _module_path _module_name _action_pair
+
+  for _module_path in $( find "${_modules_root}" -name modules -type f )
+  do
+    _module_name="${_module_path#${_modules_root}\/}"
+    _module_name="${_module_name%modules}"
+    _module_name="${_module_name%\/}"
+    while read _module_dep
+    do
+      if in_search_paths detect_module_actions "${_module_dep}"
+      then
+        log_search "actiondep" "${extension}${_module_name:+/}${_module_name}" "${module_path#${sm_path}\/}/actions"
+        while read _action_pair
+        do
+          if [[ "${_action_pair}" == [[:alpha:]]* ]]
+          then
+            actions_cache_add "${_module_name:+${_module_name}/}${_action_pair/=*}=${_module_name:+${_module_name}/}${_action_pair/*=}"
+          fi
+        done < "${module_path}/actions"
+      fi
+    done < ${_module_path}
+  done
+}
+
+action_cache_find_matching()
+{
+  for _item in "${_actions_cache[@]}"
+  do
+    case "${_method}" in
+      (only_one)
+        case "${_item}" in
+          (${_name}=*)
+            _found_actions+=("${_item}")
+            ;;
+        esac
+        ;;
+      (allow_many)
+        case "${_item}" in
+          (*${_name}*=*)
+            _found_actions+=("${_item}")
+            ;;
+        esac
+        ;;
+      (starting)
+        case "${_item}" in
+          (${_name}*=*)
+            _found_actions+=("${_item}")
+            ;;
+        esac
+        ;;
+      (*)
+        fail "Unknown search method, use 'only_one', 'allow_many', 'starting'."
+        ;;
+    esac
+  done
+}
+
 #TODO: deprecated
 build_actions_cache()
 {
