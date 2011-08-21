@@ -249,7 +249,7 @@ action_from_action_cache()
 
   local _action_cache="$extensions_path/$extension/.actions_cache"
   local _module_cache="$extensions_path/$extension/.modules_cache"
-  local _action_params=("$@") _action_path _action_path_help _new_action_path
+  local _action_params=("$@") _action_path _new_action_path
   local _rest_params=() _param_temp _action_params_length _modules_cache=()
 
   action_from_modules_cache_initialize
@@ -260,21 +260,11 @@ action_from_action_cache()
     do
       _action_path="${_action_params[*]}"
       _action_path="${_action_path// /\/}"
-      _action_path_help="${_action_path}\/help"
-      _action_path_help="${_action_path_help#\\\/}"
       if action_cache_check "${_action_path}"
       then
         return 0
       fi
       if action_cache_check_short "${_action_path}"
-      then
-        return 0
-      fi
-      if action_cache_check "${_action_path_help}"
-      then
-        return 0
-      fi
-      if action_cache_check_short "${_action_path_help}"
       then
         return 0
       fi
