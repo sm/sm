@@ -176,7 +176,7 @@ detect_cached_action_from_action_cache_check_short()
       for candidate in "${_found_actions[@]}"
       do
         candidate="${candidate%%=*}"
-        printf "  %s\n" "sm ${extension} ${candidate//\// } ${_rest_params[@]}"
+        printf "sm ${extension} ${candidate//\// } ${_rest_params[@]}\n"
       done
     )\n"
 
