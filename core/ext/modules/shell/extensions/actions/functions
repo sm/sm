@@ -160,7 +160,8 @@ action_cache_check_short()
 
   local _found _found_actions _name="${1:-}" _item
 
-  _found_actions=( $( \awk "/\/$1[=\/]/ {print}" < "${_action_cache}" ) )
+  #_found_actions=( $( \awk "/\/$1[=\/]/ {print}" < "${_action_cache}" ) )
+  _found_actions=( $( grep "/${_name}[=/]" "${_action_cache}" ) )
 
   if (( ${#_modules_cache[@]} ))
   then
