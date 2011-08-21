@@ -1,4 +1,0 @@
-version=install_release()
-latest=install_latest()
-head=install_remote()
-default=install_remote()

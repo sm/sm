@@ -1,3 +1,0 @@
-default=smrc_update()
-install=smrc_install()
-update=smrc_update()

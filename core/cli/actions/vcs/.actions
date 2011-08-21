@@ -1,4 +1,0 @@
-help=scm_help()
-default=scm_help()
-fetch=cli_fetch()
-scm_get=cli_fetch()
