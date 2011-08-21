@@ -101,7 +101,7 @@ rebuild_path()
 
 is_module()
 {
-  [[ -s "$1/functions" && ! -d "$1/functions" ]] || [[ -s "$1/modules" && ! -d "$1/modules" ]]
+  [[ -s "$1/functions" && ! -d "$1/functions" ]] || [[ -s "$1/includes" && ! -d "$1/includes" ]]
 }
 
 detect_module()
@@ -338,8 +338,7 @@ modules()
 
   for _module in "${_modules[@]}"
   do
-    module "${_module}" ||
-      fail "Could not find module path for ${_module}."
+    module "${_module}" || fail "Could not find module path for ${_module}."
   done
 }
 
