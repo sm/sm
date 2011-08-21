@@ -11,6 +11,10 @@ do
       extension_args+=("--trace=all")
       ;;
 
+    (--prefix=)
+      prefix_path="${token/*=}"
+      ;;
+
     (--prefix|prefix)
       prefix_path="$1"
       if ! shift
@@ -18,6 +22,10 @@ do
         echo "ERROR: A prefix path must be followed by keyword 'prefix'."
         exit 1
       fi
+      ;;
+
+    (DESTROOT=)
+      DESTROOT="${token/*=}"
       ;;
 
     (DESTROOT)
