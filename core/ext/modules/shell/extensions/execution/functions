@@ -1,0 +1,169 @@
+#!/bin/sh
+
+detect_action_type()
+{
+  local _path="${action_path:-}"
+
+  case "${action}" in
+    (*\(\))
+      action_type="function"
+      return 0
+      ;;
+    (*)
+      _path_type="$(file "${_path}/${action}")"
+      ;;
+  esac
+
+  case "${_path_type}" in
+
+    (*sh[[:space:]]script*|*POSIX[[:space:]]shell*|*Bourne-Again*)
+      action_type="shell"
+      ;;
+
+    (*ASCII*)
+      # Launch with helper DSL, if possible.
+      extension="${_path//.}"
+
+      case "${extension}" in
+        (shell|zsh|bash|sh)
+          action_type="shell"
+          #rb) action_type="ruby"   ;;
+          ;;
+        (*)
+          read -r shebang < "${_path}"
+
+          case "${shebang}" in
+            *ruby|*rbx|*jruby|*macruby)
+              binary="${shebang##*(#|!)}"
+              binary="${binary##* }"
+              action_type="ruby"
+              ;;
+            (*)
+              if [[ -x "${_path}" ]] ; then
+                action_type="binary"
+              else
+                action_type="not executable"
+              fi
+              ;;
+          esac
+          ;;
+      esac
+      result=$?
+      ;;
+
+    (cannot[[:space:]]open)
+      action_type="dne"
+      ;;
+
+    (*)
+      if file_is_executable "${_path}"
+      then
+        action_type="binary"
+      else
+        action_type="noexec"
+      fi
+      ;;
+  esac
+
+  return $?
+}
+
+extension_modules_load()
+{
+  local _token _namespace=""
+
+  module_name="${extension}"
+  module "$module_name"
+
+  while (( $# > 0 ))
+  do
+    _namespace+="/$1"
+    shift
+
+    module_name="${extension}${_namespace}"
+    module "$module_name" || true
+  done
+}
+
+extension_action_prerequisites()
+{
+  trace_filter action_pre
+  local _pre _name
+
+  _pre=(
+   ${action}_cli
+   ${action}_initialize
+  )
+
+  string_contains "${_pre[*]}" "${action%%_*}_cli" || _pre+=(
+   ${action%%_*}_cli
+   ${action%%_*}_initialize
+  )
+
+  string_contains "${_pre[*]}" "${extension}_cli" || _pre+=(
+   ${extension}_cli
+   ${extension}_initialize
+  )
+
+  for _name in ${_pre[@]}
+  do
+    if command_exists "${_name}"
+    then
+      "${_name}" "${extension_args[@]}"
+    fi
+  done
+}
+
+extension_run()
+{
+  trace_filter extension_run
+
+  local _type="${action_type:-}" _path="${action_path:-}" _namespaces
+
+  builtin cd "${initial_pwd}"
+
+  # Now launch the extension, based on the determined _type.
+  case "${_type}" in
+    (function)
+      _namespaces=${_path##${extension_actions_path}}
+      extension_modules_load ${_namespaces//\// }
+
+      action=${action%%(*}
+      extension_action_prerequisites
+      action_call "${action}" "${extension_args[@]}"
+      ;;
+
+    (shell)
+      [[ "${action##*/}" != help ]] || modules ext/help
+
+      _namespaces=${_path##${extension_actions_path}}
+      extension_modules_load ${_namespaces//\// }
+
+      extension_action_prerequisites
+      action_source "${_path}/${action}" "${extension_args[@]}"
+      ;;
+
+    (ruby)
+      requires=()
+      for script in functions initialize
+      do
+        requires+=( "-r${modules_path}/ruby/core/${script}.rb" )
+      done
+
+      "${binary:-ruby}" -I"${modules_path}/ruby" -I"${extension_modules_path}/ruby" \
+        ${requires[@]} "${_path}/${action}"
+      ;;
+    # python|lua|javascript)
+      #   ADD "${modules_path}/${_type}/" to the lib path so the script can require "sm"
+      #  "${_path}"
+      #  ;;
+
+    (dne|noexec)
+      fail "Processing ${action} failed; file type is unknown, file does not exist, or file is not executable."
+      ;;
+
+    (binary|*)
+      "${_path}/${action}" ${extension_action} "${extension_args[@]}"
+      ;;
+  esac
+}
