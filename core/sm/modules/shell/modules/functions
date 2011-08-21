@@ -80,7 +80,7 @@ init_extensions_search_paths()
 {
   if [[ -z "${extensions_search_paths[*]}" ]]
   then
-    extensions_search_paths=( )
+    extensions_search_paths=()
 
     # Single user extensions
     if [[ "${extension_exts_path}" != "${extension_exts_home}" ]]
@@ -105,6 +105,8 @@ init_extensions_search_paths()
 
     # System extension sets
     local _extension_set_path
+
+    ensure_paths_exist "${extension_sets_home}"
 
     extensions_search_paths+=($(find ${extension_sets_home} -mindepth 1 -maxdepth 1 -type d))
   fi
