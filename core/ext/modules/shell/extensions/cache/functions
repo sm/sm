@@ -11,21 +11,24 @@ initialize_filesystem_cache()
   trace_filter action_detection
   local _action_path _file_name
 
-  for _action_path in $( find "${_actions_root}" -type f )
-  do
-    # Ignore not executable files
-    [[ -x "${_action_path}" ]] || continue
+  if [[ -d "${_actions_root}" ]]
+  then
+    for _action_path in $( find "${_actions_root}" -type f )
+    do
+      # Ignore not executable files
+      [[ -x "${_action_path}" ]] || continue
 
-    _action_path="${_action_path#${_actions_root}\/}"
-    _file_name="${_action_path##*/}"
+      _action_path="${_action_path#${_actions_root}\/}"
+      _file_name="${_action_path##*/}"
 
-    # Ignore hidden files
-    case "${_file_name}" in
-      (.*) continue ;;
-    esac
+      # Ignore hidden files
+      case "${_file_name}" in
+        (.*) continue ;;
+      esac
 
-    actions_cache_add "${_action_path}=${_action_path}"
-  done
+      actions_cache_add "${_action_path}=${_action_path}"
+    done
+  fi
 }
 
 # Step 2 read actions.map
