@@ -60,7 +60,11 @@ ext_list_known()
   local COLUMNS=80
 
   printf "# %18s | %s\n" "Extension name" "Repository"
-  awk -F = '/^[^#]/ {printf "%20s   %s\n", $1, $2 }' < "${sm_path}/core/cli/config/known_ext"
+
+  while read line
+  do
+    printf "%20s   %s\n" "${line/=*}" "${line/*=}"
+  done < "${sm_path}/core/cli/config/known_ext"
 }
 
 ext_install()
@@ -192,8 +196,25 @@ ext_uninstall()
 
 ext_check_availability()
 {
-  awk -F = '/^[^#]/ {printf "%20s   %s\n", $1, $2 }' < "${sm_path}/core/cli/config/known_ext" |
-  "${sm_path}/bin/sm-ll" \
-    printf "%s: " {} \; curl -s --head https://github.com/sm/sm-{} \| awk "'/Status/{print \$2}'"
+  local _ext _line _args=($@)
+
+  # TODO: refactor this to take argument of uri to check instead.
+  #       provide check_known_exts_availability or some such to wrap this.
+  while read _ext
+  do
+    case "$line" in
+      (^#)
+        true # Skipt comment lines
+        ;;
+      (*)
+        while read _line
+        do
+          [[ "${_line}" == Status* ]] || continue
+          echo "${_ext/=*}" "${_line/*:}"
+          break
+        done < <(curl -s --head https://github.com/sm/sm_"${_ext/=*}")
+        ;;
+    esac
+  done < "${sm_path}/core/cli/config/known_ext"
 }
 

@@ -13,7 +13,7 @@ do
       prefix_path="$1"
       if ! shift
       then
-        echo "ERROR: A path prefix must be followed by keyword 'prefix'."
+        echo "ERROR: A prefix path must be followed by keyword 'prefix'."
         exit 1
       fi
       ;;

@@ -61,7 +61,11 @@ sets_list_known()
 {
   local COLUMNS=80
   printf "# %18s | %s\n" "Set Name" "Repository"
-  awk -F = '/^[^#]/ {printf "%20s   %s\n", $1, $2 }' < "${sm_path}/core/cli/config/known_sets"
+
+  while read line
+  do
+    printf "%20s   %s\n" "${line/=*}" "${line/*=}"
+  done < "${sm_path}/core/cli/config/known_sets"
 }
 
 sets_install()
@@ -87,7 +91,7 @@ set_install()
   shift || fail "Cannot install a set; No set name was given."
 
   local _uri="${1:-}"
-  shift || _uri=$( awk -F = "/^${_name}=/ {print \$2 }" < "${sm_path}/core/cli/config/known_sets" | tail -n 1 )
+  shift || _uri=$( awk -F= "/^${_name}=/ {print \$2 }" < "${sm_path}/core/cli/config/known_sets" | tail -n 1 )
 
   local _identifier="$(scm_identifier "${_uri}")"
 
@@ -109,12 +113,14 @@ sets_install_all()
 {
   local _set _name _uri COLUMNS=80
 
-  for _set in $( awk '/^[^#]/' < "${sm_path}/core/cli/config/known_sets" )
+  while read _set
   do
-    _name="${_set%%=*}"
-    _uri="${_set##*=}"
+    [[ "${line}" != \#* ]] || continue
+
+    _name="${_set/=*}"
+    _uri="${_set/*=}"
     sets_install "${_name}" "${_uri}" --on-fail true
-  done
+  done < "${sm_path}/core/cli/config/known_sets"
 }
 
 sets_update()
@@ -213,10 +219,25 @@ sets_uninstall()
 
 sets_check_availability()
 {
+  local _set _line _args=($@)
+
   # TODO: refactor this to take argument of uri to check instead.
   #       provide check_known_sets_availability or some such to wrap this.
-  awk -F = '/^[^#]/ {printf "%20s   %s\n", $1, $2 }' < "${sm_path}/core/cli/config/known_sets" |
-  "${sm_path}/bin/sm-ll" \
-    printf "%s: " {} \; curl -s --head https://github.com/sm/sm-{} \| awk "'/Status/{print \$2}'"
+  while read _set
+  do
+    case "$line" in
+      (^#)
+        true # Skipt comment lines
+        ;;
+      (*)
+        while read _line
+        do
+          [[ "${_line}" == Status* ]] || continue
+          echo "${_set/=*}" "${_line/*:}"
+          break
+        done < <(curl -s --head https://github.com/sm/sm-"${_set/=*}")
+        ;;
+    esac
+  done < "${sm_path}/core/cli/config/known_sets"
 }
 
