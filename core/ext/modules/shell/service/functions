@@ -450,7 +450,7 @@ service_start()
 
   if command_exists "${service}_start"
   then
-    "${service}_start"
+    log_step "Starting ${service}..." "${service}_start"
   else
     service_init_start
   fi
@@ -495,7 +495,7 @@ service_stop()
 
   if command_exists "${service}_stop"
   then
-    "${service}_stop"
+    log_step "Stopping ${service}..." "${service}_stop"
   else
     service_init_stop
   fi
@@ -589,7 +589,7 @@ service_restart()
 
   if command_exists "${service}_restart"
   then
-    "${service}_restart"
+    log_step "Restarting ${service}..." "${service}_restart"
   else
     service_init_restart
   fi
@@ -1178,7 +1178,7 @@ service_install_init_d()
 #
 service_init_start()
 {
-  log "Starting ${service}..."
+  log_step "Starting ${service}..."
 
   local _result=0 _command=( "${service_binary}" )
 
@@ -1217,6 +1217,7 @@ service_init_start()
       error
     fi
   fi
+  log_step success
 }
 
 #
@@ -1250,11 +1251,8 @@ service_init_start()
 #
 service_init_stop()
 {
-
   (( service_pid > 0 )) || error "Service pid has not been set, or is zero."
-
-  log "Stopping ${service}..."
-
+  log_step "Stopping ${service}..."
   if command_exists "${service}_stop"
   then
     "${service}_stop"
@@ -1266,6 +1264,7 @@ service_init_stop()
       return $?
     fi
   fi
+  log_step success
 }
 
 #
