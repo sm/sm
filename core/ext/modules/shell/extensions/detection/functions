@@ -1,5 +1,38 @@
 #!/bin/sh
 
+# Step 1 collect direct filesystem mapping
+initialize_filesystem_cache()
+{
+  trace_filter action_detection
+  local _action_path _file_name
+
+  for _action_path in $( find "${_actions_root}" -type f )
+  do
+    # Ignore not executable files
+    [[ -x "${_action_path}" ]] || continue
+
+    _action_path="${_action_path#${_actions_root}\/}"
+    _file_name="${_action_path##*/}"
+
+    # Ignore hidden files
+    case "${_file_name}" in
+      (.*) continue ;;
+    esac
+
+    _actions_cache+=( "${_action_path}=${_action_path}" )
+  done
+}
+
+# Step 2 read actions.map
+initialize_actions_map_cache()
+{
+  trace_filter action_detection
+  if [[ -f "${_actions_map}" ]]
+  then
+    _actions_cache+=( $( grep -v "^#" < "${_actions_map}" ) )
+  fi
+}
+
 detect_module_actions()
 {
   detect_module "$@" &&
@@ -7,14 +40,13 @@ detect_module_actions()
     [[ -s "${module_path}/actions" ]]
 }
 
-modules_actions_cache_initialize()
+# Step 3 collect dependent modules actions mapping
+initialize_modules_actions_cache()
 {
   trace_filter action_detection
-
-  (( ! "${#_module_cache[@]}" )) || return 0
   local _module_path _module_name _action_pair
 
-  for _module_path in $( find "${_modules_root}" -name modules -type f || return 1 )
+  for _module_path in $( find "${_modules_root}" -name modules -type f )
   do
     _module_name="${_module_path#${_modules_root}\/}"
     _module_name="${_module_name%modules}"
@@ -28,39 +60,54 @@ modules_actions_cache_initialize()
         do
           if [[ "${_action_pair}" == [[:alpha:]]* ]]
           then
-            _modules_actions_cache+=( "${_module_name:+${_module_name}/}${_action_pair/=*}=${_module_name:+${_module_name}/}${_action_pair/*=}" )
+            _actions_cache+=( "${_module_name:+${_module_name}/}${_action_pair/=*}=${_module_name:+${_module_name}/}${_action_pair/*=}" )
           fi
         done < "${module_path}/actions"
       fi
     done < ${_module_path}
   done
-  #for _action_pair in ${_modules_actions_cache[@]}
-  #do log_search "m-a-cache" "${_action_pair%%=*}" "${_action_pair#*=}"
-  #done
 }
 
-action_cache_check_short()
+action_cache_check()
 {
   trace_filter action_detection
 
-  local _found _found_actions=() _name="${1}" _item
+  local _found_actions=() _method="$1" _name="$2" _item
+  shift || fail "No method and action name was given for search"
   shift || fail "No action name was given for search"
 
-  if [[ -f "${_actions_map}" ]]
-  then
-    _found_actions+=( $( grep "/${_name}[=/]" < "${_actions_map}" ) )
-  fi
+  for _item in "${_actions_cache[@]}"
+  do
+    case "${_method}" in
+      (only_one)
+        case "${_item}" in
+          (${_name}=*)
+            _found_actions+=("${_item}")
+            ;;
+        esac
+        ;;
+      (allow_many)
+        case "${_item}" in
+          (*${_name}*=*)
+            _found_actions+=("${_item}")
+            ;;
+        esac
+        ;;
+      (*)
+        fail "Unknown search method, use 'only_one' or 'allow_many'."
+        ;;
+    esac
+  done
 
-  if (( ${#_modules_actions_cache[@]} ))
-  then
-    for _item in "${_modules_actions_cache[@]}"
-    do
-      if [[ "${_item}" == "${_name}="* ]]
+  case "${_method}" in
+    (only_one)
+      #TODO: allow user to choice what to do if interactive shell ?
+      if (( ${#_found_actions[@]} > 1 ))
       then
-        _found_actions+=("${_item}")
+        _found_actions=( "${_found_actions[0]}" )
       fi
-    done
-  fi
+      ;;
+  esac
 
   if (( ${#_found_actions[@]} == 1 ))
   then
@@ -79,53 +126,18 @@ action_cache_check_short()
       _candidate="${_candidate%%=*}"
       _candidates+=( "sm ${extension} ${_candidate//\// } ${_rest_params[@]}\n" )
     done
-
-    error "More than one action found matching, please be more specific.\n\nDid you mean:\n${_candidates[*]}\n"
+    local screen_height=$LINES
+    : ${screen_height:=20}
+    if (( ${#_found_actions[@]} > screen_height ))
+    then
+      error "More than one action found matching, please be more specific.\n\nDid you mean:\n ${_candidates[*]}\n" 2>&1 | less
+    else
+      error "More than one action found matching, please be more specific.\n\nDid you mean:\n ${_candidates[*]}\n"
+    fi
+    exit 1
 
   else
     debug search "no actions found in '${extension}' for '${1}'"
-  fi
-  return 1
-}
-
-action_cache_check()
-{
-  trace_filter action_detection
-
-  local _found _name="${1:-}" _item _found_actions=()
-  shift || fail "No action name given."
-
-  _found="$( grep "^${_name}=" "${_actions_map}" 2>/dev/null || true )"
-  if [[ -n "${_found}" ]]
-  then
-    _found="${_found/*=}"
-    action="${_found##*/}"
-    action_path="${_found%/*}"
-    [[ "${action_path}" != "${_found}" ]] || action_path=""
-    action_path="$extensions_path/$extension/actions/${action_path}"
-    extension_args=( "${_rest_params[@]}" )
-    return 0
-  else
-    if (( ${#_modules_actions_cache[@]} ))
-    then
-      for _item in "${_modules_actions_cache[@]}"
-      do
-        if [[ "${_item}" == "^${_name}="* ]]
-        then
-          _found_actions+=("${_item}")
-        fi
-      done
-
-      if (( ${#_found_actions[@]} == 1 ))
-      then
-        _found_actions="${_found_actions#*=}"
-        action="${_found_actions##*/}"
-        action_path="${extensions_path}/${extension}/actions/${_found_actions}"
-        action_path="${action_path%/*}"
-        extension_args=( "${_rest_params[@]}" )
-        return 0
-      fi
-    fi
   fi
   return 1
 }
@@ -138,27 +150,33 @@ find_extension_action()
     " No extension path was given."
   shift || fail "Cannot detect extension existence;"\
     " No extension name was given."
+
+  local _action_params=("$@") _action_path _new_action_path
+  local _rest_params=() _param_temp _action_params_length
+
+  local _actions_root="${extensions_path}/${extension}/actions"
   local _actions_map="${extensions_path}/${extension}/actions.map"
   local _modules_root="${extensions_path}/${extension}/modules/shell"
-  local _action_params=("$@") _action_path _new_action_path
-  local _rest_params=() _param_temp _action_params_length _modules_actions_cache=()
+  local _actions_cache=()
 
-  modules_actions_cache_initialize
+  initialize_filesystem_cache
+  initialize_actions_map_cache
+  initialize_modules_actions_cache
 
   if [[ ! -f "${_actions_map}" ]]
   then
     log_search "missing" "actions map" "${_actions_map}"
   fi
 
-  if [[ -f "${_actions_map}" ]] || (( ${#_modules_actions_cache[@]} ))
+  if (( ${#_actions_cache[@]} ))
   then
     while :
     do
       _action_path="${_action_params[*]}"
       _action_path="${_action_path// //}"
 
-      if action_cache_check "${_action_path}" ||
-        action_cache_check_short "${_action_path}"
+      if action_cache_check only_one "${_action_path}" ||
+        action_cache_check allow_many "${_action_path}"
       then
         return 0
       fi
