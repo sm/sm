@@ -336,8 +336,6 @@ service_setup()
     source_files "${extension_path}/modules/shell/${_file}"
   done
 
-  log "Ensuring paths for ${service} ${package_version} exist..."
-
   if user_is_root
   then
     # TODO: create an 'user_exists' function and use it here.
@@ -1078,10 +1076,7 @@ service_install_init_d()
   then
     ensure_paths_exist "/etc/conf.d" "${init_scripts_path}"
 
-    log "Installing init scripts for ${_service}."
-
     # TODO: Install the service init script...
-
     if template_exists "${_service}"
     then
       install_template "${_service}" to "${init_scripts_path}/${_service}" \
