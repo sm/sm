@@ -65,7 +65,8 @@ src_path="${sm_path}/src"
 extension_sets_home="${sm_path}/sets"
 extension_exts_home="${sm_path}/exts"
 
-export install_path archives_path scm_path src_path extension_sets_home DESTROOT
+export sm_path install_path archives_path scm_path src_path \
+  extension_sets_home DESTROOT
 
 exec "${PWD}/local" --call=install/install_sm "${extension_args[@]}"
 
