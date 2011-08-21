@@ -1,8 +1,0 @@
-=ext/os ext/files ext/files ext/environment ext/vcs cli/module_utils 
-ext=ext/extensions ext/extensions/actions ext/vcs 
-pkg=ext/files ext/paths ext/package 
-sets=ext/extensions/standard ext/extensions/actions ext/vcs 
-smrc=ext/templates ext/time ext/project 
-srv=ext/service 
-templates=ext/variables ext/array ext/files ext/paths ext/hash ext/templates 
-vcs=ext/vcs ext/help 
