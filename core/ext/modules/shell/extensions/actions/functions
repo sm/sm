@@ -121,7 +121,7 @@ actions_build_modules_cache()
 detect_cached_action_from_modules_cache_initialize()
 {
   [[ -f "${_module_cache}" ]] || return 0
-  local _path
+  local _path _line
   for _path in $( tr ' ' ',' < "${_module_cache}" )
   do
     _module_path="${_path%%=*}"
@@ -132,9 +132,16 @@ detect_cached_action_from_modules_cache_initialize()
       if in_search_paths detect_module "${_module_dep}" &&
         [[ -f "${module_path}/actions" ]]
       then
-        _modules_cache+=( $(
-          awk -F = "/^[a-Z]/ { print \"${_module_path}\"\$1\"=${_module_path}\"\$2 }" < "${module_path}/actions"
-        ) )
+        while read _line
+        do
+          if [[ "$_line" == [[:alpha:]]* ]]
+          then
+            _modules_cache+=( "${_module_path}${_line/=*}=${_module_path}${_line/*=}" )
+          fi
+        done < "${module_path}/actions"
+        #_modules_cache+=( $(
+        #  awk -F = "/^[a-Z]/ { print \"${_module_path}\"\$1\"=${_module_path}\"\$2 }" < "${module_path}/actions"
+        #) )
       fi
     done
   done
