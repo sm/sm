@@ -45,7 +45,7 @@ done
 
 if [[ -n "${prefix}" ]]
 then
-  sm_path="${DESTROOT:-}${prefix}/sm"
+  sm_path="${DESTROOT:-}${prefix_path}/sm"
 
 elif [[ -z "${sm_path:-}" ]]
 then
