@@ -303,8 +303,8 @@ modules_docgen()
     > "${_prefix}/index.html"
 
   _modules=($(
-  find "${core_development_path}/modules" -mindepth 1 -maxdepth 1 \
-    -type d | sed -e 's#.*/##g' -e '/\..*/d'
+  find "${core_development_path}/modules" -mindepth 1 -maxdepth 1  -type d |
+    sed -e 's#.*/##g' -e '/\..*/d'
   ))
 
   ensure_paths_exist "${_prefix}"

@@ -258,7 +258,7 @@ extensions_installed()
     ensure_paths_exist "${_paths[@]}"
   }
 
-  _modules=($( find "${_paths[@]}" -mindepth 2 -name "modules" -type f ))
+  _modules=($( find "${_paths[@]}" -mindepth 2 -name "includes" -type f ))
 
   _excludes="${_excludes[*]:-'#'}"
 
