@@ -96,13 +96,15 @@ modules_actions_cache_initialize()
     while read _module_dep
     do
       if in_search_paths detect_module "${_module_dep}" &&
-        [[ -f "${module_path}/actions" ]]
+        [[ -f "${module_path}/actions" ]] &&
+        [[ -s "${module_path}/actions" ]]
       then
+        log_search "actiondep" "${extension}${_module_name:+/}${_module_name}" "${module_path#${sm_path}\/}/actions"
         while read _action_pair
         do
           if [[ "${_action_pair}" == [[:alpha:]]* ]]
           then
-            _modules_actions_cache+=( "${_module_name}/${_action_pair/=*}=${_module_name}/${_action_pair/*=}" )
+            _modules_actions_cache+=( "${_module_name:+${_module_name}/}${_action_pair/=*}=${_module_name:+${_module_name}/}${_action_pair/*=}" )
           fi
         done < "${module_path}/actions"
       fi
@@ -117,9 +119,13 @@ action_cache_check_short()
 {
   trace_filter action_cache
 
-  local _found _found_actions _name="${1:-}" _item
+  local _found _found_actions=() _name="${1}" _item
+  shift || fail "No action name was given for search"
 
-  _found_actions=( $( grep "/${_name}[=/]" < "${_actions_map}" ) )
+  if [[ -f "${_actions_map}" ]]
+  then
+    _found_actions+=( $( grep "/${_name}[=/]" < "${_actions_map}" ) )
+  fi
 
   if (( ${#_modules_actions_cache[@]} ))
   then
@@ -153,7 +159,7 @@ action_cache_check_short()
     error "More than one action found matching, please be more specific.\n\nDid you mean:\n${_candidates[*]}\n"
 
   else
-    debug search "no actions found for '${1}'"
+    debug search "no actions found in '${extension}' for '${1}'"
   fi
   return 1
 }
@@ -181,7 +187,7 @@ action_cache_check()
     then
       for _item in "${_modules_actions_cache[@]}"
       do
-        if [[ "${_item}" == "${_name}="* ]]
+        if [[ "${_item}" == "^${_name}="* ]]
         then
           _found_actions+=("${_item}")
         fi
@@ -212,12 +218,18 @@ action_from_actions_map()
 
   modules_actions_cache_initialize
 
-  if [[ -f "${_actions_map}" ]]
+  if [[ ! -f "${_actions_map}" ]]
+  then
+    log_search "missing" "actions map" "${_actions_map}"
+  fi
+
+  if [[ -f "${_actions_map}" ]] || (( ${#_modules_actions_cache[@]} ))
   then
     while :
     do
       _action_path="${_action_params[*]}"
       _action_path="${_action_path// //}"
+
       if action_cache_check "${_action_path}" ||
         action_cache_check_short "${_action_path}"
       then
@@ -233,6 +245,8 @@ action_from_actions_map()
       _rest_params=( "${_param_temp}" "${_rest_params[@]}" )
       unset _action_params[$(( _action_params_length - 1 ))]
     done
+  else
+    error "${extensions_path}/${extension} does not have actions.map or module dependencies with actions"
   fi
   return 1
 }
