@@ -1,5 +1,5 @@
 ext/variables
 ext/files
 ext/paths
-ext/extensions/standard
+ext/extensions/common
 ext/vcs
