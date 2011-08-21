@@ -106,7 +106,7 @@ init_extensions_search_paths()
     # System extension sets
     local _extension_set_path
 
-    for _extension_set_path in ${extension_sets_home}/*
+    for _extension_set_path in ${extension_sets_path}/*
     do
       if [[ -d "${_extension_set_path}" ]]
       then
