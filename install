@@ -43,9 +43,9 @@ do
   esac
 done
 
-if [[ -n "${prefix}" ]]
+if [[ -n "${prefix_path}" ]]
 then
-  sm_path="${DESTROOT:-}${prefix}/sm"
+  sm_path="${DESTROOT:-}${prefix_path}/sm"
 
 elif [[ -z "${sm_path:-}" ]]
 then
@@ -65,7 +65,8 @@ src_path="${sm_path}/src"
 extension_sets_home="${sm_path}/sets"
 extension_exts_home="${sm_path}/exts"
 
-export install_path archives_path scm_path src_path extension_sets_home DESTROOT
+export sm_path install_path archives_path scm_path src_path \
+  extension_sets_home DESTROOT
 
 exec "${PWD}/local" --call=install/install_sm "${extension_args[@]}"
 
