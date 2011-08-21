@@ -8,7 +8,7 @@ do
   shift
   case "$token" in
     (*trace)
-      set -x
+      extension_args+=("--trace=all")
       ;;
 
     (*prefix)

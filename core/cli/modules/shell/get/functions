@@ -102,3 +102,4 @@ install_sm_scm()
 
   exec bash ${PWD}/install --trace="$trace_flags" --debug="$debug_flags"
 }
+
