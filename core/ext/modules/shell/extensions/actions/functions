@@ -193,7 +193,7 @@ detect_cached_action_from_action_cache_check()
   shift || fail "No action name given."
 
   #if [[ -n "${_found}" ]]
-  if found=$( grep "^${_name}=" )
+  if found=$( grep "^${_name}=" "${_action_cache}" )
   then
     _found="${_found/*=}"
     action="${_found##*/}"
