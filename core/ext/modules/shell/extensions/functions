@@ -4,4 +4,3 @@ ext_extensions_initialize()
 {
   true "${extensions_development_path:="${extensions_src_path}"}"
 }
-

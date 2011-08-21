@@ -216,7 +216,7 @@ cached_action()
 #
 #     $ cat $HOME/test
 #     #!/bin/sm
-#     modules ext/extensions
+#     modules ext/extensions/detection
 #     extension_action ext list
 #
 #     $  $HOME/test

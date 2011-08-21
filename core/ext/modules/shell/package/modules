@@ -1,5 +1,5 @@
 ext/environment
-ext/extensions
+ext/extensions/manipulation
 ext/files
 ext/paths
 ext/os

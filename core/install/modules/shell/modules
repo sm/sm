@@ -3,4 +3,4 @@ ext/paths
 ext/vcs
 ext/users
 cli/sets
-ext/extensions/actions
+ext/extensions/cache
