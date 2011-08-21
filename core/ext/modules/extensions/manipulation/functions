@@ -267,7 +267,7 @@ extensions_installed()
     "${sm_path}/bin/sm-ll" \
       if grep -q "'${_type}'" {} \; then echo {} \; fi ::: ${_modules[@]} |
         sed -e "s#${sm_path}/sets/##" -e "s#${sm_path}/exts/##" \
-          -e "s#/modules/shell/modules##" | sort | awk '!'"/${_excludes// /|}/"
+          -e "s#/modules/includes##" | sort | awk '!'"/${_excludes// /|}/"
   else
     echo ${_modules[@]} | awk '!'"/${_excludes// /|}/"
   fi

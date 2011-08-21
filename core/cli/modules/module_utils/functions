@@ -4,10 +4,10 @@
 # ## modules\_installed()
 modules_installed()
 {
-  local _module _module_type="${1:-"shell"}" _modules
+  local _module _modules
 
   _modules=($(
-  find "${modules_path}/${_module_type}" -mindepth 1 -maxdepth 1 -type d |
+  find "${modules_path}" -mindepth 1 -maxdepth 1 -type d |
   sed -e 's#.*/##g' -e '/\..*/d'
   ))
 
@@ -55,7 +55,7 @@ module_functions()
   array_is_nonempty _modules ||
     fail "Cannot print the functions for module(s); No module names given."
 
-  local _path="${modules_path}/shell/${_module}"
+  local _path="${modules_path}/${_module}"
 
   _functions=($(
   find "${_path}" -mindepth 1 -maxdepth 1 -name functions -type f -print0 |
@@ -226,7 +226,7 @@ module_docs()
     fail "Cannot generate documentation for '${_module}';"\
       " 'pygmentize' was not found in the PATH, install pygmentize and try again."
 
-  local _path="${core_development_path}/modules/shell/${_module}"
+  local _path="${core_development_path}/modules/${_module}"
   if (( content_flag == 1 ))
   then
     shocco "${_path}/functions" |
@@ -285,7 +285,7 @@ module_docs()
 modules_docgen()
 {
   # TODO: Replace with,
-  # for file in modules/shell/*/functions ; do (name=${file%%\/functions}; shocco $file > html/${name//*\/}.html)& done ; wait
+  # for file in modules/*/functions ; do (name=${file%%\/functions}; shocco $file > html/${name//*\/}.html)& done ; wait
 
   local _module _modules _function _functions
   local _prefix="${core_development_path}/html/modules"
@@ -303,7 +303,7 @@ modules_docgen()
     > "${_prefix}/index.html"
 
   _modules=($(
-  find "${core_development_path}/modules/shell" -mindepth 1 -maxdepth 1 \
+  find "${core_development_path}/modules" -mindepth 1 -maxdepth 1 \
     -type d | sed -e 's#.*/##g' -e '/\..*/d'
   ))
 
@@ -336,7 +336,7 @@ modules_docgen()
 modules_docopen()
 {
   # TODO: Replace with,
-  # for file in modules/shell/*/functions ; do (name=${file%%\/functions}; shocco $file > html/${name//*\/}.html)& done ; wait
+  # for file in modules/*/functions ; do (name=${file%%\/functions}; shocco $file > html/${name//*\/}.html)& done ; wait
   variable_is_nonempty core_development_path &&
     path_exists "${core_development_path}" ||
     error "To run docopen, set core_development_path in ~/.smrc, and clone the sm core "\
@@ -352,7 +352,7 @@ modules_docopen()
 modules_site_docgen()
 {
   # TODO: Replace with,
-  # for file in modules/shell/*/functions ; do (name=${file%%\/functions}; shocco $file > html/${name//*\/}.html)& done ; wait
+  # for file in modules/*/functions ; do (name=${file%%\/functions}; shocco $file > html/${name//*\/}.html)& done ; wait
 
   local _module _modules _function _functions
   local _prefix="${core_development_path}/html/modules"
@@ -365,7 +365,7 @@ modules_site_docgen()
     > "${_prefix}/index.html"
 
   _modules=($(
-  find "${core_development_path}/modules/shell" -mindepth 1 -maxdepth 1 \
+  find "${core_development_path}/modules" -mindepth 1 -maxdepth 1 \
     -type d | sed -e 's#.*/##g' -e '/\..*/d'
   ))
   for _module in "${_modules[@]}"
@@ -397,10 +397,10 @@ modules_site_docgen()
     name=${file##*\/}
     name=${name%.haml}
 
-    ensure_paths_exist "${site_development_path}/content/modules/shell/${name}"
+    ensure_paths_exist "${site_development_path}/content/modules/${name}"
 
     log "Building ${name} functions from generated docs."
-    cat > "${site_development_path}/content/modules/shell/${name}/functions.haml" <<Header
+    cat > "${site_development_path}/content/modules/${name}/functions.haml" <<Header
   .breadcrumbs
     %a{ :href => "/" }
       Documentation
@@ -408,13 +408,10 @@ modules_site_docgen()
     %a{ :href => "/modules/" }
       Modules
     &nbsp;>&nbsp;
-    %a{ :href => "/modules/shell/" }
-      shell
-    &nbsp;>&nbsp;
-    %a{ :href => "/modules/shell/${name}/" }
+    %a{ :href => "/modules/${name}/" }
       ${name}
     &nbsp;>&nbsp;
-    %a{ :href => "/modules/shell/${name}/functions/" }
+    %a{ :href => "/modules/${name}/functions/" }
       functions API :: ${name}
     %hr
 
@@ -422,10 +419,10 @@ modules_site_docgen()
     Module ${name}
 
 Header
-    cat $file >> "${site_development_path}/content/modules/shell/${name}/functions.haml"
+    cat $file >> "${site_development_path}/content/modules/${name}/functions.haml"
 
     html2haml "${_base}.html" \
-      >> "${site_development_path}/content/modules/shell/${name}/functions.haml"
+      >> "${site_development_path}/content/modules/${name}/functions.haml"
     )&
   done
 

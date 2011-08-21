@@ -10,10 +10,10 @@ modules_core_initialize()
 
   #core is loaded as BDSM starts
   modules=(
-    "sm/core=core/sm/modules/shell/core"
-    "sm/string=core/sm/modules/shell/string"
-    "sm/logging=core/sm/modules/shell/logging"
-    "sm/modules=core/sm/modules/shell/modules"
+    "sm/core=core/sm/modules/core"
+    "sm/string=core/sm/modules/string"
+    "sm/logging=core/sm/modules/logging"
+    "sm/modules=core/sm/modules/modules"
   )
 
   for module_def in ${modules[@]}
@@ -109,7 +109,7 @@ detect_module()
   local extensions_path=$1 _module_path
   shift || fail "Extensions path must be given as the first parameter."
 
-  rebuild_path "modules/shell" $extensions_path $@
+  rebuild_path "modules" $extensions_path $@
   _module_path=${rebuilded_path}
 
   debug search_module_path ":${_module_path}:"
@@ -260,12 +260,12 @@ module()
   fi
 
   # Load module dependencies.
-  if [[ -s "${module_path}/modules" ]]
+  if [[ -s "${module_path}/includes" ]]
   then
     for _module_dependency in $( cat ${_module_path}/modules )
     do
       module_or_error "${_module_dependency}" \
-        "Could not find module dependency '${_module_dependency}' from '${_module_path##${sm_path}\/}/modules'."
+        "Could not find module dependency '${_module_dependency}' from '${_module_path##${sm_path}\/}/includes'."
     done
   fi
 
@@ -280,7 +280,7 @@ module()
   done
 
   _function="${_module//\//_}"
-  _function="${_function/_modules_shell/_}"
+  _function="${_function/_modules/_}"
 
   for _hook in initialize # options, etc... ?
   do

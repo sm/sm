@@ -67,7 +67,7 @@ find_extension_action()
 
   local _actions_root="${extensions_path}/${extension}/actions"
   local _actions_map="${extensions_path}/${extension}/actions.map"
-  local _modules_root="${extensions_path}/${extension}/modules/shell"
+  local _modules_root="${extensions_path}/${extension}/modules"
   local _actions_cache=()
 
   initialize_filesystem_cache

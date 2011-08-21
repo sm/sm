@@ -28,7 +28,7 @@ sm_development_setup()
   else
     log "  * project functions are now setup in $HOME/.bash_profile."
 
-    write "[[ -s \"${modules_path}/shell/project/interactive\" ]] && source \"${modules_path}/shell/project/interactive\""  \
+    write "[[ -s \"${modules_path}/project/interactive\" ]] && source \"${modules_path}/project/interactive\""  \
       append to "$HOME/.bash_profile"
   fi
 
@@ -164,6 +164,6 @@ extension_module_add()
   local _extension="${1}" _module="${2}" _path
   _path="${3:-"${extensions_development_path}/${_extension}"}"
 
-  file_contains "${_path}/modules/shell/modules" "${_module}" ||
-    write "\n${_module}" append to "${_path}/modules/shell/modules"
+  file_contains "${_path}/modules/includes" "${_module}" ||
+    write "\n${_module}" append to "${_path}/modules/includes"
 }

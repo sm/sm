@@ -109,10 +109,10 @@ sm_version()
 #     ERROR: This feature has not yet been implemented.
 #     Backtrace:
 #        Trace   Line Function             File
-#           3.    262 fail()               /sm/extensions/builtin/core/modules/shell/logging/functions
-#           2.      5 NIY()                /sm/extensions/builtin/core/modules/shell/extensions/functions
+#           3.    262 fail()               /sm/extensions/builtin/core/modules/logging/functions
+#           2.      5 NIY()                /sm/extensions/builtin/core/modules/extensions/functions
 #           1.      5 main()               /Users/sm/test
-#      > modules/shell/logging/functions fail() 263 $ exit 1
+#      > modules/logging/functions fail() 263 $ exit 1
 #
 NIY()
 {

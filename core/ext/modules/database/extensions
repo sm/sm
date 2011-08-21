@@ -9,15 +9,15 @@ database_extension_setup()
 
   enter "${path}"
 
-  ensure_paths_exist "modules/${language:=shell}/${module}" "actions/${module}"
+  ensure_paths_exist "modules/${module}" "actions/${module}"
 
-  # Setup modules/shell/package/{functions,initialize,cli}
+  # Setup modules/package/{functions,initialize,cli}
   for file in functions initialize cli
   do
-    write '#!/bin/sh' to "modules/${language}/${module}/${file}"
+    write '#!/bin/sh' to "modules/${module}/${file}"
   done
 
-  write "\n${module}_cli\n" append to "modules/${language}/${module}/cli"
+  write "\n${module}_cli\n" append to "modules/${module}/cli"
 
   # setup actions/package/{...}
   for action in help initialize

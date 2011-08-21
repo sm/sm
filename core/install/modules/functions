@@ -92,7 +92,7 @@ setup_shell_completion()
 
   log_step "Setting up sm shell completion (${completion_prefix}/${_name})" \
     copy_file \
-      from "${install_path}/core/cli/modules/shell/completion/bash" \
+      from "${install_path}/core/cli/modules/completion/bash" \
       to "${completion_prefix}/${_name}" \
       mode ${_mode} owner "root"
 }
@@ -155,7 +155,7 @@ set_sm_path()
     in "${install_path}/bin/sm"
 
   replace_content "^saved_sm_path=.*" with "saved_sm_path=\"\${sm_path:-${install_path}}\"" \
-    in "${install_path}/core/sm/modules/shell/core/initialize"
+    in "${install_path}/core/sm/modules/core/initialize"
 }
 
 make_binaries_executable()

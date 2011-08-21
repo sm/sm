@@ -5,9 +5,9 @@
 #
 # The following example sources the file only if it exists and is nonempty:
 #
-#     if [[ -s "/sm/extensions/builtin/core/modules/shell/project/interactive" ]]
+#     if [[ -s "/sm/extensions/builtin/core/modules/project/interactive" ]]
 #     then
-#       source "/sm/extensions/builtin/core/modules/shell/project/interactive"
+#       source "/sm/extensions/builtin/core/modules/project/interactive"
 #     fi
 #
 true "${p_search_path_depth:="7"}"
