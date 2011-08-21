@@ -185,3 +185,108 @@ cached_action()
     action_from_actions_map "$@"
 }
 
+#
+# ## extension\_action()
+#
+# Load the environment for a given extension action, then call it.
+# This is the main function for BDSM.
+#
+# ### Input Parameters
+#
+# One or more extension names.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# The current extension's initialize file will be resourced into the current
+# environment.
+#
+# ### Return Codes
+#
+# 0 for success.
+# 1 for failure
+#
+# ### Failure Scenarios
+#
+# Fails if no extension was given.
+# Fails if no action was given.
+#
+# ### Usage Examples
+#
+#     $ cat $HOME/test
+#     #!/bin/sm
+#     modules ext/extensions
+#     extension_action ext list
+#
+#     $  $HOME/test
+#     bash fossil git libevent nginx p7zip postgresql rails redis svc tig tmux zeromq zlib
+#
+#
+extension_action()
+{
+  (( extension_action_calls == 0 )) ||
+    fail "Cannot call a 2nd time, args: ${extension_args[*]}"
+
+  extension_action_calls+=1
+
+  unset extension action
+
+  #TODO: Should be moved to core/cli?
+  case "${extension_args[0]}" in
+    (*=*) # exact version specifier
+      package_name="${extension_args[0]}"
+      export package_version="${package_name##*=}"
+      export package_name="${package_name%%=*}"
+      export extension="${package_name}"
+      extension_args[0]="${extension}"
+      ;;
+    (*:*)
+      package_name="${extension_args[0]}"
+      export package_version="${package_name##*:}"
+      export package_name="${package_name%%:*}"
+      export extension="${package_name}"
+      extension_args[0]="${extension}"
+      ;;
+  esac
+
+  if in_search_paths cached_action "${extension_args[@]}"
+  then
+    log_search action "$action" "${action_path##${sm_path}\/} params:${extension_args[@]}"
+  else
+    if in_search_paths detect_extension_existence "${extension_args[@]}" \
+    && [[ "${extension}" == "${extension_args}" ]]
+    then
+      log_search extension "$extension" "$extensions_path"
+      error "Unknown action path: "${extension_args[@]}"\n\nUsage: \n  sm extension [namespace] [action].\n"
+    else
+      error "Could not find extension: "${extension_args}"\n"
+    fi
+  fi
+
+  extension_path="$extensions_path/$extension"
+  extension_config_path="$extension_path/config"
+  extension_templates_path="$extension_path/templates"
+  extension_modules_path="$extension_path/modules"
+  extension_actions_path="$extension_path/actions"
+  extension_log_path="$log_path/$extension"
+
+  paths=$(env | awk -F= -v ORS=' ' '/_path/{print $1}')
+  flags=$(env | awk -F= -v ORS=' ' '/_flag/{print $1}')
+
+  debug search "environment:
+  action=${action}
+  action_path=${action_path}
+  extension_args=${extension_args}
+  extension_path=${extension_path}
+  extension_config_path=${extension_config_path}
+  extension_templates_path=${extension_templates_path}
+  extension_modules_path=${extension_modules_path}
+  extension_actions_path=${extension_actions_path}
+  extension_log_path=${extension_log_path}"
+
+  enter "${extension_path}"
+  sm_exports
+}
