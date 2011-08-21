@@ -1,0 +1,80 @@
+#!/bin/sh
+
+#TODO: deprecated
+actions_build_cache_start()
+{
+  trace_filter action_cache
+
+  shopt -s dotglob
+
+  local _extension_path="${1:-}" _extension="${2:-}"
+  shift || fail "Extension path must be given as the first parameter."
+  shift || fail "Extension name must be given as the second parameter."
+
+  local _actions_root="${_extension_path}/${_extension}/actions"
+  actions_build_actions_cache | sort > "${_extension_path}/${_extension}/actions.map" || return 1
+}
+
+#TODO: deprecated
+actions_build_actions_cache()
+{
+  trace_filter action_cache
+
+  # Question, what's with the name 'actions_from' ~ Wayne
+  local _actions_from="${1:-}" _actions_path="${2:-}" _file _pair _from _path
+
+  case "${_actions_path##*/}" in
+    (\*)
+      # empty directory yields *
+      if [[ -f "${_actions_root}${_actions_path%\/\*}/.actions" ]]
+      then
+        actions_build_actions_cache "${_actions_from%\/\*}" "${_actions_path%\/\*}/.actions"
+      else
+        debug search "EMPTY *: ${_actions_from}=${_actions_path}" >&2
+      fi
+      ;;
+    (*\(\))
+      # function()
+      if [[ -d "${_actions_root}${_actions_path%/*}" ]]
+      then
+        _actions_from="${_actions_from%\/default}"
+        printf "${_actions_from#\/}=${_actions_path#\/}\n"
+      else
+        debug search "NODIR(): ${_actions_from}=${_actions_path}" >&2
+      fi
+      ;;
+    (.actions)
+      # actions file
+      _actions_path="${_actions_path%.actions}"
+      for _pair in $( sed '/^#/ d ; s/ /\//g' < "${_actions_root}${_actions_path}.actions" )
+      do
+        _from="${_pair%%=*}" # Cut out everything from first =
+        _path="${_pair#*=}"  # Cut out everything to   first =
+        actions_build_actions_cache "${_actions_from}/${_from}" "${_actions_path}${_path}"
+      done
+      ;;
+    (*)
+      # namespace
+      if [[ -d "${_actions_root}${_actions_path}" ]]
+      then
+        for _file in ${_actions_root}${_actions_path}/*
+        do
+          _file="${_file#${_actions_root}${_actions_path}\/}"
+          if [[ "${_file}" == ".actions" ]]
+          then
+            actions_build_actions_cache "${_actions_from}" "${_actions_path}/${_file}"
+          else
+            actions_build_actions_cache "${_actions_from}/${_file}" "${_actions_path}/${_file}"
+          fi
+        done
+      # <action> file
+      elif [[ -x "${_actions_root}${_actions_path}" ]]
+      then
+        _actions_from="${_actions_from%\/default}"
+        printf "${_actions_from#\/}=${_actions_path#\/}\n"
+      else
+        debug search "NOMATCH: ${_actions_from}=${_actions_path}" >&2
+      fi
+      ;;
+  esac
+}
