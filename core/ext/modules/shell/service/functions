@@ -596,6 +596,47 @@ service_restart()
 }
 
 #
+# ## service\_init\_restart()
+#
+# This is the generalized service init restart function.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# Logging telling the end user what is happening.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure conditions currently.
+#
+# ### Usage Examples
+#
+#     user$ service_init_restart
+#
+service_init_restart()
+{
+  if command_exists "${service}_restart"
+  then
+    log_step "Restarting ${service}..." "${service}_restart"
+  else
+    log "Restarting ${service}..."
+    service_init_stop $@
+    service_init_start $@
+  fi
+}
+
+#
 # ## service\_status()
 #
 # Status of the given service using init scripts.
