@@ -79,7 +79,7 @@ find_extension_action()
     log_search "missing" "actions map" "${_actions_map}"
   fi
 
-  if (( ${#_actions_cache[@]} ))
+  if [[ -f "${_actions_map}" ]] || (( ${#_actions_cache[@]} ))
   then
     while :
     do
