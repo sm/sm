@@ -138,8 +138,7 @@ sets_update()
 
     if [[ ! -d "${extension_sets_home}/${_name}" ]]
     then
-      if in_search_paths detect_extension_existence "${_name}" \
-      && [[ "${extension}" == "${_name}" ]] # do not count finding fallback default extension: sm
+      if in_search_paths detect_extension_existence "${_name}"
       then
         error "Extension set ${_name} is installed system wide and can not be updated by user."
       else
@@ -203,8 +202,7 @@ sets_uninstall()
 
   if [[ ! -d "${_name}" ]]
   then
-    if in_search_paths detect_extension_existence "${_name}" &&
-      [[ "${extension}" == "${_name}" ]] # do not count finding fallback default extension: sm
+    if in_search_paths detect_extension_existence "${_name}"
     then
       error "Extension set ${_name} is installed system wide and can not be uninstaled by user."
     else

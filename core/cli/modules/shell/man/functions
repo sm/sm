@@ -52,7 +52,8 @@ man_display()
     shift
   fi
 
-  if in_search_paths detect_man "$@"
+  if in_search_paths detect_man "$@" ||
+    in_cli_path detect_man "$@"
   then
     if man $man_file
     then

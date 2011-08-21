@@ -1,22 +1,27 @@
 #!/bin/sh
 
+detect_module_actions()
+{
+  detect_module "$@" &&
+    [[ -f "${module_path}/actions" ]] &&
+    [[ -s "${module_path}/actions" ]]
+}
+
 modules_actions_cache_initialize()
 {
-  trace_filter action_cache
+  trace_filter action_detection
 
   (( ! "${#_module_cache[@]}" )) || return 0
   local _module_path _module_name _action_pair
 
-  for _module_path in $( find "${_modules_root}${_modules_path}" -name modules -type f || return 1 )
+  for _module_path in $( find "${_modules_root}" -name modules -type f || return 1 )
   do
     _module_name="${_module_path#${_modules_root}\/}"
     _module_name="${_module_name%modules}"
     _module_name="${_module_name%\/}"
     while read _module_dep
     do
-      if in_search_paths detect_module "${_module_dep}" &&
-        [[ -f "${module_path}/actions" ]] &&
-        [[ -s "${module_path}/actions" ]]
+      if in_search_paths detect_module_actions "${_module_dep}"
       then
         log_search "actiondep" "${extension}${_module_name:+/}${_module_name}" "${module_path#${sm_path}\/}/actions"
         while read _action_pair
@@ -36,7 +41,7 @@ modules_actions_cache_initialize()
 
 action_cache_check_short()
 {
-  trace_filter action_cache
+  trace_filter action_detection
 
   local _found _found_actions=() _name="${1}" _item
   shift || fail "No action name was given for search"
@@ -85,7 +90,7 @@ action_cache_check_short()
 
 action_cache_check()
 {
-  trace_filter action_cache
+  trace_filter action_detection
 
   local _found _name="${1:-}" _item _found_actions=()
   shift || fail "No action name given."
@@ -99,7 +104,6 @@ action_cache_check()
     [[ "${action_path}" != "${_found}" ]] || action_path=""
     action_path="$extensions_path/$extension/actions/${action_path}"
     extension_args=( "${_rest_params[@]}" )
-    debug search ":cached(${_actions_map}):${_action_path}=${_found}:params=${_rest_params[*]}:"
     return 0
   else
     if (( ${#_modules_actions_cache[@]} ))
@@ -126,10 +130,14 @@ action_cache_check()
   return 1
 }
 
-action_from_actions_map()
+find_extension_action()
 {
-  trace_filter action_cache
-
+  trace_filter action_detection
+  extensions_path="$1" extension="$2"
+  shift || fail "Cannot detect extension existence;"\
+    " No extension path was given."
+  shift || fail "Cannot detect extension existence;"\
+    " No extension name was given."
   local _actions_map="${extensions_path}/${extension}/actions.map"
   local _modules_root="${extensions_path}/${extension}/modules/shell"
   local _action_params=("$@") _action_path _new_action_path
@@ -168,19 +176,6 @@ action_from_actions_map()
     error "${extensions_path}/${extension} does not have actions.map or module dependencies with actions"
   fi
   return 1
-}
-
-cached_action()
-{
-  trace_filter action_cache
-  extensions_path="${1:-}" extension="${2:-}"
-  shift || fail "Cannot detect extension existence;"\
-    " No extension path was given."
-  shift || fail "Cannot detect extension existence;"\
-    " No extension name was given."
-
-  extension_is_valid $extensions_path/$extension &&
-    action_from_actions_map "$@"
 }
 
 #
@@ -225,6 +220,8 @@ cached_action()
 #
 extension_action()
 {
+  trace_filter action_detection
+
   (( extension_action_calls == 0 )) ||
     fail "Cannot call a 2nd time, args: ${extension_args[*]}"
 
@@ -250,14 +247,29 @@ extension_action()
       ;;
   esac
 
-  if in_search_paths cached_action "${extension_args[@]}"
+  local _extension_found=0 _action_found=0
+  if in_search_paths detect_extension_existence "${extension_args[@]}"
+  then
+    _extension_found=1
+    log_search extension "$extension" "$extensions_path"
+    if find_extension_action "$extensions_path" "${extension_args[@]}"
+    then
+      _action_found=1
+    fi
+  fi
+
+  if (( ! _action_found )) &&
+    in_cli_path find_extension_action "${extension_args[@]}"
+  then
+    _action_found=1
+  fi
+
+  if (( _action_found ))
   then
     log_search action "$action" "${action_path##${sm_path}\/} params:${extension_args[@]}"
   else
-    if in_search_paths detect_extension_existence "${extension_args[@]}" \
-    && [[ "${extension}" == "${extension_args}" ]]
+    if (( _extension_found ))
     then
-      log_search extension "$extension" "$extensions_path"
       error "Unknown action path: "${extension_args[@]}"\n\nUsage: \n  sm extension [namespace] [action].\n"
     else
       error "Could not find extension: "${extension_args}"\n"
@@ -285,6 +297,5 @@ extension_action()
   extension_actions_path=${extension_actions_path}
   extension_log_path=${extension_log_path}"
 
-  enter "${extension_path}"
   sm_exports
 }
