@@ -149,16 +149,19 @@ detect_cached_action_from_modules_cache_initialize()
 
 detect_cached_action_from_action_cache_check_short()
 {
-  local _found _found_actions
+  local _found _found_actions _name="${1:-}" _item
+
   _found_actions=( $( \awk "/\/$1[=\/]/ {print}" < "${_action_cache}" ) )
 
   if (( ${#_modules_cache[@]} ))
   then
-    _found_actions+=( $(
-      for f in "${_modules_cache[@]}"
-      do echo $f
-      done | \awk "/$1=/ {print}"
-    ) )
+    for _item in "${_modules_cache[@]}"
+    do
+      if [[ "${_item}" == "${_name}="* ]]
+      then
+        _found_actions+=("${_item}")
+      fi
+    done
   fi
 
   if (( ${#_found_actions[@]} == 1 ))
@@ -170,18 +173,19 @@ detect_cached_action_from_action_cache_check_short()
     extension_args=( "${_rest_params[@]}" )
     return 0
 
-  elif (( ${#_found_actions[@]} > 1 ))
+  elif (( ${#_found_actions[@]} ))
   then
-    error "More than one action found matching, please be more specific.\n\nDid you mean:\n$(
-      for candidate in "${_found_actions[@]}"
-      do
-        candidate="${candidate%%=*}"
-        printf "sm ${extension} ${candidate//\// } ${_rest_params[@]}\n"
-      done
-    )\n"
+    local _candidate _candidates=()
+    for _candidate in "${_found_actions[@]}"
+    do
+      _candidate="${_candidate%%=*}"
+      _candidates+=( "sm ${extension} ${_candidate//\// } ${_rest_params[@]}\n" )
+    done
+
+    error "More than one action found matching, please be more specific.\n\nDid you mean:\n${_candidates[*]}\n"
 
   else
-    debug search "no candidates for '${1}'"
+    debug search "no actions found for '${1}'"
   fi
   return 1
 }
@@ -189,7 +193,7 @@ detect_cached_action_from_action_cache_check_short()
 detect_cached_action_from_action_cache_check()
 {
   #local _found=$( \awk -F = "/^$1=/ {print \$2}" < "${_action_cache}" )
-  local _found _name="${1:-}"
+  local _found _name="${1:-}" _item _found_actions
   shift || fail "No action name given."
 
   #if [[ -n "${_found}" ]]
@@ -206,12 +210,14 @@ detect_cached_action_from_action_cache_check()
   else
     if (( ${#_modules_cache[@]} ))
     then
-      _found_actions=( $(
-        for f in "${_modules_cache[@]}"
-        do
-          echo $f
-        done | grep "^${_name}="
-      ) )
+      for _item in "${_modules_cache[@]}"
+      do
+        if [[ "${_item}" == "${_name}="* ]]
+        then
+          _found_actions+=("${_item}")
+        fi
+      done
+
       if (( ${#_found_actions[@]} == 1 ))
       then
         _found_actions="${_found_actions#*=}"

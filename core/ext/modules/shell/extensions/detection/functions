@@ -159,9 +159,11 @@ extension_run()
       #   ADD "${modules_path}/${_type}/" to the lib path so the script can require "sm"
       #  "${_path}"
       #  ;;
+
     (dne|noexec)
       fail "Processing ${action} failed; file type is unknown, file does not exist, or file is not executable."
       ;;
+
     (binary|*)
       "${_path}/${action}" ${extension_action} "${extension_args[@]}"
       ;;
