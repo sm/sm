@@ -38,7 +38,7 @@ initialize_actions_map_cache()
   local _mapping
   if [[ -f "${_actions_map}" ]]
   then
-    for _mapping in $( grep -v "^#" < "${_actions_map}" )
+    for _mapping in $( grep -v "^#" < "${_actions_map}" || true )
     do actions_cache_add "${_mapping}"
     done
   fi
