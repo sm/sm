@@ -1,3 +1,0 @@
-docgen=modules_docgen()
-docopen=modules_docopen()
-functions=module_functions()
