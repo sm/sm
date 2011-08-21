@@ -783,8 +783,7 @@ finish_app()
 
 core_log_step()
 {
-  local _message="${1:-}" _unicode=0 _columns="${COLUMNS:-80}"
-  _columns=$((_columns - 5))
+  local _message="${1:-}" _unicode=0
 
   if [[ -z "${LANG:-}" || "${LANG}" = *UTF* || "${LANG}" = *utf8* ]]
   then
@@ -797,9 +796,9 @@ core_log_step()
       # then
         if (( _unicode == 1 ))
         then
-          printf "\r  [\033[31m✘\033[0m] %-${_columns}s\n" "${log_step_message:-"done"}!  "
+          printf "\r  [\033[31m✘\033[0m] %s\n" "${log_step_message:-"done"}!  "
         else
-          printf "\r  [\033[31mX\033[0m] %-${_columns}s\n" "${log_step_message:-"done"}!  "
+          printf "\r  [\033[31mX\033[0m] %s\n" "${log_step_message:-"done"}!  "
         fi
       # else
       #   printf "  failed.\n"
@@ -811,9 +810,9 @@ core_log_step()
       # then
         if (( _unicode == 1 ))
         then
-          printf "\r  [\033[32m✔\033[0m] %-${_columns}s\n" "${log_step_message:-"done"}.  "
+          printf "\r  [\033[32m✔\033[0m] %s\n" "${log_step_message:-"done"}.  "
         else
-          printf "\r  [\033[32m@\033[0m] %-${_columns}s\n" "${log_step_message:-"done"}.  "
+          printf "\r  [\033[32m@\033[0m] %s\n" "${log_step_message:-"done"}.  "
         fi
       # else
       #   printf "  done.\n"
@@ -824,7 +823,7 @@ core_log_step()
       log_step_message="${_message}"
       # if [[ -t 1 ]]
       # then
-        printf "  [ ] %-${_columns}s " "${log_step_message}..."
+        printf "  [ ] %s " "${log_step_message}..."
       # else
       #   printf "  %s" "${log_step_message}..."
       # fi
