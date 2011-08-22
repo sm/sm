@@ -117,8 +117,8 @@ sm_exports
 
 if [[ -n $sm_script ]]
 then
-  if [[ "$sm_script" == "/" ]]
-  then
+  if [[ "$sm_script" == "/" ]] # Leave this until we can properly detect source vs shebang
+  then # Sourcing needed for loading from bash 3, for now, set sm_script='/'
     true # Skip any actions, stop with the framework simply loaded.
   else
     action_source $sm_script "${extension_args[@]}" # load script

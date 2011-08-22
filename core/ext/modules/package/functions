@@ -442,7 +442,7 @@ package_install()
     [[ "${force_flag}" != "1" ]]
   then
     log "The ${package_name} ${package_version} package is already installed.
-To force, call:\n\tsm ${package_name} package install force\n"
+To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
     exit 0
   fi
 
