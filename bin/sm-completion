@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# usage: complete -C sm-completion sm
+sm --call=ext/extensions/completion/extension_action_completion
