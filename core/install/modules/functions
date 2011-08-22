@@ -90,11 +90,13 @@ setup_shell_completion()
   #   _mode=0755
   # fi
 
-  log_step "Setting up sm shell completion (${completion_prefix}/${_name})" \
-    copy_file \
-      from "${install_path}/core/cli/modules/completion/bash" \
-      to "${completion_prefix}/${_name}" \
-      mode ${_mode} owner "root"
+  install_template "install/sm-completion.sh" \
+    to "${completion_prefix}/${_name}"
+
+  seed_template "${completion_prefix}/${_name}" \
+    sm_path "${sm_path}"
+
+  chmod_files "${_mode}" "${completion_prefix}/${_name}"
 }
 
 setup_profile_d()
@@ -105,22 +107,10 @@ setup_profile_d()
   then
     if os_is_darwin
     then
-      file_contains /etc/profile "${profile_d_path}" ||
-        write "
-for index in /etc/profile.d/*.sh
-do
-  if [ -r \"\$index\" ]
-  then
-    if [ \"\${-#*index}\" != \"\$-\" ]
-    then
-      . \"\$index\"
-    else
-      . \"\$index\" >/dev/null 2>&1
-    fi
-  fi
-done
-unset index
-" to /etc/profile
+      file_contains /etc/profile "${profile_d_path}" || {
+        install_template install/etc_profile to /etc/profile
+        seed_template /etc/profile profile_d_path "${profile_d_path}"
+      }
     fi
   else
     ensure_files_exist "$HOME/.profile" "$HOME/.bashrc" "$HOME/.bash_profile"
@@ -139,7 +129,7 @@ unset index
   fi
 
   file_exists "${profile_d_path}/sm.sh" &&
-     file_contains "${profile_d_path}/sm.sh" "${install_path}/pkg/active/sbin\"" ||
+     file_contains "${profile_d_path}/sm.sh" "${install_path}/pkg/active/sbin" ||
      {
        # To prepend or postpend??? Because of selinux issues prepend for now.
        write "PATH=\"\${PATH}:${install_path}/bin:${install_path}/pkg/active/bin:${install_path}/pkg/active/sbin\"" \
@@ -184,7 +174,9 @@ install_sm()
 
   perform setup_profile_d
 
-  user_is_not_root || perform setup_shell_completion
+  user_is_not_root || \
+    log_step "Setting up sm shell completion (${completion_prefix}/${_name})" \
+      perform setup_shell_completion
 
   log_step "Ensuring that binaries are executable" \
     make_binaries_executable
