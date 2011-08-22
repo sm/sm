@@ -423,6 +423,8 @@ chown_paths()
 
   for _path in "${_paths[@]}"
   do
+    [[ -n "${_path}" ]] || continue
+
     [[ -d "${_path}" ]] ||
       fail "Cannot chown path ${_path} to ${_identity},"\
       "as the path (directory) does not exist."
