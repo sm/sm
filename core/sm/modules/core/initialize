@@ -117,8 +117,12 @@ sm_exports
 
 if [[ -n $sm_script ]]
 then
-  # load script
-  action_source $sm_script "${extension_args[@]}"
+  if [[ "$sm_script" == "/" ]]
+  then
+    true # Skip any actions, stop with the framework simply loaded.
+  else
+    action_source $sm_script "${extension_args[@]}" # load script
+  fi
 elif [[ -n "${call_action}" ]]
 then
   if ! declare -F "${call_action}" >/dev/null
