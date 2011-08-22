@@ -1,6 +1,7 @@
 #!/bin/bash
 
-sm_path="/opt/sm/bin/sm" # BDSM framework path
+sm_path="/opt/sm" # BDSM framework path
+export PATH="${PATH}:${sm_path}"
 
 os_cpu_count()
 {
