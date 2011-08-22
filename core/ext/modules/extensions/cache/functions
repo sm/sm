@@ -62,6 +62,7 @@ initialize_modules_actions_cache()
     _module_name="${_module_path#${_modules_root}\/}"
     _module_name="${_module_name%modules}"
     _module_name="${_module_name%\/}"
+
     while read _module_dep
     do
       if in_search_paths detect_module_actions "${_module_dep}"

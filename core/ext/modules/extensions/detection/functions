@@ -41,12 +41,11 @@ action_cache_check()
     : ${screen_height:=20}
     if (( ${#_found_actions[@]} + 4  > screen_height ))
     then
-      error "More than one action found matching, please be more specific.\n\nDid you mean:\n ${_candidates[*]}\n" 2>&1 | less
+      error "More than one matching action found;\n\nDid you mean:\n ${_candidates[*]}\n" 2>&1 | less
     else
-      error "More than one action found matching, please be more specific.\n\nDid you mean:\n ${_candidates[*]}\n"
+      error "More than one matching action found;\n\nDid you mean:\n ${_candidates[*]}\n"
     fi
     exit 1
-
   else
     debug search "no actions found in '${extension}' for '${1}'"
   fi
@@ -57,10 +56,9 @@ find_extension_action()
 {
   trace_filter action_detection
   extensions_path="$1" extension="$2"
-  shift || fail "Cannot detect extension existence;"\
-    " No extension path was given."
-  shift || fail "Cannot detect extension existence;"\
-    " No extension name was given."
+
+  shift || fail "Extension path must be given as the first parameter."
+  shift || fail "Extension name must be given as the second parameter."
 
   local _action_params=("$@") _action_path _new_action_path
   local _rest_params=() _param_temp _action_params_length

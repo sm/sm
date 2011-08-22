@@ -13,7 +13,7 @@ modules_core_initialize()
     "sm/core=core/sm/modules/core"
     "sm/string=core/sm/modules/string"
     "sm/logging=core/sm/modules/logging"
-    "sm/modules=core/sm/modules/includes"
+    "sm/modules=core/sm/modules/modules"
   )
 
   for module_def in ${modules[@]}
