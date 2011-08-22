@@ -60,7 +60,7 @@ initialize_modules_actions_cache()
   for _module_path in $( find "${_modules_root}" -name includes -type f )
   do
     _module_name="${_module_path#${_modules_root}\/}"
-    _module_name="${_module_name%modules}"
+    _module_name="${_module_name%includes}"
     _module_name="${_module_name%\/}"
 
     while read _module_dep
