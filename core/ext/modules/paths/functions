@@ -404,22 +404,22 @@ copy_directory()
 chown_paths()
 {
   trace_filter filesystem
-  local _identity="${1:-}" _path _recursive_flag=0 _command _flags=()
+  local _identity _path _recursive_flag=0 _command _flags=() _paths=()
 
-  if [[ "${1:-}" == --recursive* ]]
-  then
-    _recursive_flag=1
-    shift # Remove the recursive flag parameter.
-    _identity="${1}"
-  fi
+  case "${1:-}" in
+    (recursive|--recursive*)
+      _flags+=(-R)
+      shift # Remove the recursive flag parameter.
+      ;;
+    (*)
+      _identity="${1:-}"
+      ;;
+  esac
 
-  (( _recursive_flag == 0 )) || _flags+=(-R)
-
-  shift || fail "Cannot chown paths; user[:group] was not given as the first parameter."
-
-  local _paths=("$@")
-
-  array_is_nonempty _paths || fail "Cannot chown paths; No files were given."
+  _identity="${1:-}"
+  shift || fail "user[:group] was not given as the first parameter"
+  _paths=("$@")
+  shift || fail "No paths given after user and group first parameter"
 
   for _path in "${_paths[@]}"
   do
