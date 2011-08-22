@@ -68,9 +68,9 @@ sm-parallel()
     _parallel=( ${_sequence//\// } )
     if (( ${#_parallel[@]} > 1 ))
     then
-      sm-ll --noswap -j $(os_cpu_count) sm "${_before[@]}" {} "$@" ::: ${_parallel[@]}
+      "${sm_path}/bin/sm-ll" --noswap -j $(os_cpu_count) sm "${_before[@]}" {} "$@" ::: ${_parallel[@]}
     else
-      sm "${_before[@]}" ${_parallel} "$@"
+      "${sm_path}/bin/sm" "${_before[@]}" ${_parallel} "$@"
     fi
   done
 }
@@ -80,6 +80,6 @@ case "$*" in
     sm-parallel "$@"
     ;;
   *)
-    sm "$@"
+    "${sm_path}/bin/sm" "$@"
 esac
 
