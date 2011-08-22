@@ -20,7 +20,7 @@ set -o errexit # exit on errors in early stage before logging is initialized
 set -o nounset # do not allow unset variables processing
 
 initial_pwd="$PWD"         # record where the script was run from right away.
-sm_path="${DESTROOT:-}/sm" # BDSM framework path
+sm_path="/opt/sm/bin/sm" # BDSM framework path
 modules_path="${sm_path}/core/sm/modules"
 
 export initial_pwd sm_path modules_path initial_pwd

@@ -154,6 +154,9 @@ set_sm_path()
   replace_content "^sm_path=.*" with "sm_path=\"${install_path}\"" \
     in "${install_path}/bin/sm"
 
+  replace_content "^sm_path=.*" with "sm_path=\"${install_path}\"" \
+    in "${install_path}/bin/smp"
+
   replace_content "^saved_sm_path=.*" with "saved_sm_path=\"\${sm_path:-${install_path}}\"" \
     in "${install_path}/core/sm/modules/core/initialize"
 }
