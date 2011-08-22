@@ -81,7 +81,7 @@ setup_shell_completion()
   if path_exists "${_prefix}/bash_completion.d"
   then
     completion_prefix="${_prefix}/bash_completion.d"
-    _name="sm"
+    _name="sm.bash"
     _mode=0644
   else
     completion_prefix="${_prefix}/profile.d"
