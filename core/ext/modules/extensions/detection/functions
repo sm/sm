@@ -1,0 +1,228 @@
+#!/bin/sh
+
+action_cache_check()
+{
+  trace_filter action_detection
+
+  local _found_actions=() _method="$1" _name="$2" _item
+  shift || fail "No method and action name was given for search"
+  shift || fail "No action name was given for search"
+
+  action_cache_find_matching "${_method}" "${_name}"
+
+  case "${_method}" in
+    (only_one)
+      #TODO: allow user to choice what to do if interactive shell ?
+      if (( ${#_found_actions[@]} > 1 ))
+      then
+        _found_actions=( "${_found_actions[0]}" )
+      fi
+      ;;
+  esac
+
+  if (( ${#_found_actions[@]} == 1 ))
+  then
+    _found_actions="${_found_actions#*=}"
+    action="${_found_actions##*/}"
+    action_path="${extensions_path}/${extension}/actions/${_found_actions}"
+    action_path="${action_path%/*}"
+    extension_args=( "${_rest_params[@]}" )
+    return 0
+
+  elif (( ${#_found_actions[@]} ))
+  then
+    local _candidate _candidates=()
+    for _candidate in "${_found_actions[@]}"
+    do
+      _candidate="${_candidate%%=*}"
+      _candidates+=( "sm ${extension} ${_candidate//\// } ${_rest_params[@]}\n" )
+    done
+    local screen_height=$LINES
+    : ${screen_height:=20}
+    if (( ${#_found_actions[@]} + 4  > screen_height ))
+    then
+      error "More than one matching action found;\n\nDid you mean:\n ${_candidates[*]}\n" 2>&1 | less
+    else
+      error "More than one matching action found;\n\nDid you mean:\n ${_candidates[*]}\n"
+    fi
+    exit 1
+  else
+    debug search "no actions found in '${extension}' for '${1}'"
+  fi
+  return 1
+}
+
+find_extension_action()
+{
+  trace_filter action_detection
+  extensions_path="$1" extension="$2"
+
+  shift || fail "Extension path must be given as the first parameter."
+  shift || fail "Extension name must be given as the second parameter."
+
+  local _action_params=("$@") _action_path _new_action_path
+  local _rest_params=() _param_temp _action_params_length
+
+  local _actions_root="${extensions_path}/${extension}/actions"
+  local _actions_map="${extensions_path}/${extension}/actions.map"
+  local _modules_root="${extensions_path}/${extension}/modules"
+  local _actions_cache=()
+
+  initialize_filesystem_cache
+  initialize_actions_map_cache
+  initialize_modules_actions_cache
+
+  if [[ ! -f "${_actions_map}" ]]
+  then
+    log_search "missing" "actions map" "${_actions_map}"
+  fi
+
+  if [[ -f "${_actions_map}" ]] || (( ${#_actions_cache[@]} ))
+  then
+    while :
+    do
+      _action_path="${_action_params[*]}"
+      _action_path="${_action_path// //}"
+
+      if action_cache_check only_one "${_action_path}" ||
+        action_cache_check allow_many "${_action_path}"
+      then
+        return 0
+      fi
+
+      # Not found, go down one level
+      _action_params_length=${#_action_params[@]}
+      (( _action_params_length )) || break # finish if no more params
+
+      #TODO: account for zsh indexes ( -1 -> -0 )
+      _param_temp="${_action_params[$(( _action_params_length - 1 ))]}"
+      _rest_params=( "${_param_temp}" "${_rest_params[@]}" )
+      unset _action_params[$(( _action_params_length - 1 ))]
+    done
+  else
+    error "${extensions_path}/${extension} does not have actions.map or module dependencies with actions"
+  fi
+  return 1
+}
+
+#
+# ## extension\_action()
+#
+# Load the environment for a given extension action, then call it.
+# This is the main function for BDSM.
+#
+# ### Input Parameters
+#
+# One or more extension names.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# The current extension's initialize file will be resourced into the current
+# environment.
+#
+# ### Return Codes
+#
+# 0 for success.
+# 1 for failure
+#
+# ### Failure Scenarios
+#
+# Fails if no extension was given.
+# Fails if no action was given.
+#
+# ### Usage Examples
+#
+#     $ cat $HOME/test
+#     #!/bin/sm
+#     modules ext/extensions/detection
+#     extension_action ext list
+#
+#     $  $HOME/test
+#     bash fossil git libevent nginx p7zip postgresql rails redis svc tig tmux zeromq zlib
+#
+#
+extension_action()
+{
+  trace_filter action_detection
+
+  (( extension_action_calls == 0 )) ||
+    fail "Cannot call a 2nd time, args: ${extension_args[*]}"
+
+  extension_action_calls+=1
+
+  unset extension action
+
+  #TODO: Should be moved to core/cli?
+  case "${extension_args[0]}" in
+    (*=*) # exact version specifier
+      package_name="${extension_args[0]}"
+      export package_version="${package_name##*=}"
+      export package_name="${package_name%%=*}"
+      export extension="${package_name}"
+      extension_args[0]="${extension}"
+      ;;
+    (*:*)
+      package_name="${extension_args[0]}"
+      export package_version="${package_name##*:}"
+      export package_name="${package_name%%:*}"
+      export extension="${package_name}"
+      extension_args[0]="${extension}"
+      ;;
+  esac
+
+  local _extension_found=0 _action_found=0
+  if in_search_paths detect_extension_existence "${extension_args[@]}"
+  then
+    _extension_found=1
+    log_search extension "$extension" "$extensions_path"
+    if find_extension_action "$extensions_path" "${extension_args[@]}"
+    then
+      _action_found=1
+    fi
+  fi
+
+  if (( ! _action_found )) &&
+    in_cli_path find_extension_action "${extension_args[@]}"
+  then
+    _action_found=1
+  fi
+
+  if (( _action_found ))
+  then
+    log_search action "$action" "${action_path##${sm_path}\/} params:${extension_args[@]}"
+  else
+    if (( _extension_found ))
+    then
+      error "Unknown action path: "${extension_args[@]}"\n\nUsage: \n  sm extension [namespace] [action].\n"
+    else
+      error "Could not find extension: "${extension_args}"\n"
+    fi
+  fi
+
+  extension_path="$extensions_path/$extension"
+  extension_config_path="$extension_path/config"
+  extension_templates_path="$extension_path/templates"
+  extension_modules_path="$extension_path/modules"
+  extension_actions_path="$extension_path/actions"
+  extension_log_path="$log_path/$extension"
+
+  paths=$(env | awk -F= -v ORS=' ' '/_path/{print $1}')
+  flags=$(env | awk -F= -v ORS=' ' '/_flag/{print $1}')
+
+  debug search "environment:
+  action=${action}
+  action_path=${action_path}
+  extension_args=${extension_args}
+  extension_path=${extension_path}
+  extension_config_path=${extension_config_path}
+  extension_templates_path=${extension_templates_path}
+  extension_modules_path=${extension_modules_path}
+  extension_actions_path=${extension_actions_path}
+  extension_log_path=${extension_log_path}"
+
+  sm_exports
+}

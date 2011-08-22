@@ -1,0 +1,100 @@
+#!/bin/sh
+
+find_starting_action()
+{
+  trace_filter action_completion
+  extensions_path="$1" extension="$2"
+  shift || fail "Cannot detect extension existence;"\
+    " No extension path was given."
+  shift || fail "Cannot detect extension existence;"\
+    " No extension name was given."
+
+  local _action_params=("$@") _action_path _new_action_path
+  local _rest_params=() _param_temp _action_params_length
+
+  local _actions_root="${extensions_path}/${extension}/actions"
+  local _actions_map="${extensions_path}/${extension}/actions.map"
+  local _modules_root="${extensions_path}/${extension}/modules"
+  local _actions_cache=() _found_actions=()
+
+  initialize_filesystem_cache
+  initialize_actions_map_cache
+  initialize_modules_actions_cache
+
+  if (( ${#_actions_cache[@]} ))
+  then
+    _action_path="${_action_params[*]}"
+    _action_path="${_action_path// //}"
+    if action_cache_find_matching starting "${_action_path}"
+    then
+      local _candidate
+      for _candidate in "${_found_actions[@]}"
+      do
+        _candidate="${_candidate%%=*}"
+        printf "${_candidate//\// }\n"
+      done
+      return 0
+    fi
+  fi
+  return 1
+}
+
+show_extension_names()
+{
+  extensions_path="$1"
+  shift || fail "no path given"
+  #$1 is ignored == "unused"
+  local _patern=$2
+  for extension in ${extensions_path}/*
+  do
+    extension="${extension##*/}"
+    case "${extension##*/}" in
+      (\*) continue ;; #skip empty dirs
+      (.*) continue ;; #skip hidden stuff
+      (${_patern}*) printf "${extension}\n" ;;
+    esac
+  done
+  return 1
+}
+
+extension_action_completion()
+{
+  trace_filter action_completion
+  local _action_found=0
+
+  extension_args=( ${COMP_LINE:0:COMP_POINT} )
+  unset extension_args[0]
+  extension_args=( ${extension_args[@]} )
+
+  local last_char=${COMP_LINE:COMP_POINT-1:1} cut_count
+
+  if [[ "${last_char}" == " " ]]
+  then
+    cut_count=$(( COMP_POINT - 2 ))
+  else
+    tmp="${COMP_LINE:0:COMP_POINT}"
+    tmp="${tmp% *}"
+    cut_count=$(( ${#tmp} - 1 ))
+  fi
+
+  {
+    if in_search_paths detect_extension_existence "${extension_args[@]}"
+    then
+      if find_starting_action "$extensions_path" "${extension_args[@]}"
+      then
+        _action_found=1
+      fi
+    fi
+
+    if (( ${#extension_args[@]} <= 1 ))
+    then
+      in_search_paths show_extension_names "unused" "${extension_args}" || true
+    fi
+
+    if (( ! _action_found ))
+    then
+      in_cli_path find_starting_action "${extension_args[@]}" || true
+    fi
+
+  } | cut -c ${cut_count}- | cut -d ' ' -f 1 | sort -u
+}

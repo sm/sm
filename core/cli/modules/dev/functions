@@ -1,0 +1,169 @@
+#!/bin/sh
+
+sm_development_setup()
+{
+  local _component _separator _string
+
+  printf -v _separator '%*s' "${_columns:-${COLUMNS:-80}}"
+
+  true "${projects_path:="$HOME/projects"}"
+
+  log "BDSM development environment setup"
+  log "=> configuration"
+  log "${_separator// /=}"
+
+  if file_contains "$HOME/.bash_profile" "projects_path="
+  then
+    log "  * projects_path is already set in $HOME/.bash_profile."
+  else
+    write 'export projects_path="$HOME/projects"' \
+      append to "$HOME/.bash_profile"
+
+    log "  * Setting projects_path in $HOME/.bash_profile."
+  fi
+
+  if file_contains "$HOME/.bash_profile" "modules/bash/project/interactive"
+  then
+    log "  * project functions are setup in $HOME/.bash_profile."
+  else
+    log "  * project functions are now setup in $HOME/.bash_profile."
+
+    write "[[ -s \"${modules_path}/project/interactive\" ]] && source \"${modules_path}/project/interactive\""  \
+      append to "$HOME/.bash_profile"
+  fi
+
+  ensure_paths_exist "${projects_path}/sm"
+
+  ensure_files_exist "${HOME}/.smrc"
+
+  enter "${projects_path}/sm"
+
+  for _component in core extensions site
+  do
+    log "=> ${_component}"
+    log "${_separator// /=}"
+    if file_contains "$HOME/.smrc" "${_component}_development_path"
+    then
+      log "  * ${_component}_development_path is already set in .smrc"
+    else
+      write "export ${_component}_development_path=\"${projects_path}/sm/${_component}\"" \
+        append to "$HOME/.smrc"
+      log "Setting ${_component}_development_path in .smrc"
+    fi
+
+    if path_exists "${_component}"
+    then
+      log "  * Repository already exists at $PWD/${_component}/."
+    else
+      log "  * Cloning Core repository into $PWD/${_component}/."
+      case ${_component} in
+        core)
+          _url="https://github.com/sm/sm"
+          ;;
+        *)
+          _url="https://github.com/sm/sm-${_component}"
+          ;;
+      esac
+
+      # TODO: Switch to using fetch_uri here.
+      git clone ${_url} ${_component} ||
+        error "There was an error cloning ${_component} repository from ${_url} into ${PWD}/${_component}."
+
+      log "  * ${_component} repository successfully cloned into $PWD/${_component}/."
+    fi
+  done
+
+  log "BDSM development environment setup is complete."
+}
+
+sm_development_update()
+{
+  NIY
+}
+
+extension_package()
+{
+  local _name="${1:-}" _path _version file
+  shift || fail "Cannot package an extension; no extension name was given."
+
+  _path="${extensions_development_path:-"$extensions_src_path"}"
+
+  ensure_paths_exist "${_path}"
+  enter "${_path}"
+
+  extension_is_valid "${_path}/${_name}" ||
+    error "Cannot package extension '${_name}'; the extension is not valid."
+
+  _version="$(cat "${_name}/VERSION")"
+  log "Packaging extension ${_name}"
+  log "${_name}-${_version}:"
+
+  for archiver in "gzip" "bzip2 -z" "xz -z"
+  do
+    if command_exists ${archiver// *}
+    then
+      tar cf "${_name}-${_version}.tar" "${_name}/" ||
+        error "Error during packaging ($?) whilst trying to create a tar of the '${_name}' directory."
+
+      ${archiver} -f -9 "${_name}-${_version}.tar" # TODO: parallelize this.
+    fi
+
+    ensure_paths_exist "${_path}/pkg"
+
+    for file in "${_name}-${_version}".tar.*
+    do
+      log "  - ${file}"
+      write "$( file_md5 "${file}" )" to "${file}.md5"
+      log "  - ${file}.md5"
+      move_files --force "${file}" "${file}.md5" \
+        to "${_path}/pkg" from "${_path}"
+    done
+  done
+  log "Packaging complete! (Packages are located in '${_path}/pkg'.)"
+}
+
+extension_publish()
+{
+  local _name="${1:-}" _path _version
+  shift || fail "Cannot publish an extension; no extension name was given."
+
+  NIY "Extension publishing locally, to extensions. beginrescueend.com has not yet been implemented."
+
+  _path="${extensions_development_path:-"$extensions_src_path"}"
+
+  enter "${_path}"
+
+  extension_is_valid "${_path}/${_name}" ||
+    error "Cannot package extension '${_name}'; the extension is not valid."
+
+  _version="$(cat "${_name}/VERSION")"
+  log "Packaging extension ${_name}"
+  log "${_name}-${_version}:"
+
+  for formats in ".tar.gz" ".tar.bz2" ".tar.xz"
+  do
+    path_exists "${_path}/pkg/" ||
+    error "The local package path '${_path}' does not exist; did you run"\
+      "'extension package ${_name}' before 'extension publish ${_name}'?"
+
+    log "publishing ${_name}-${_version}"
+
+    for file in "${_pth}/${_name}-${_version}".tar.{gz,xz,bz2}
+    do
+      log "  - ${file}"
+      log "  - ${file}.md5"
+      NIY "publishing"
+    done
+  done
+
+  log "Packaging complete. (Packages are located in '${_path}/pkg' )"
+}
+
+extension_module_add()
+{
+  local _extension="${1}" _module="${2}" _path
+  _path="${3:-"${extensions_development_path}/${_extension}"}"
+
+  file_contains "${_path}/modules/includes" "${_module}" ||
+    write "\n${_module}" append to "${_path}/modules/includes"
+}
