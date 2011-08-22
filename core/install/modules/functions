@@ -78,17 +78,17 @@ setup_shell_completion()
 {
   local _prefix="/etc" _mode _name
 
-  if path_exists "${_prefix}/bash_completion.d"
-  then
-    completion_prefix="${_prefix}/bash_completion.d"
-    _name="sm.bash"
-    _mode=0644
-  else
-    completion_prefix="${_prefix}/profile.d"
-    ensure_paths_exist "${_prefix}/profile.d/"
-    _name="sm-completion.sh"
-    _mode=0755
-  fi
+  path_exists "${_prefix}/bash_completion.d" || return 0
+
+  completion_prefix="${_prefix}/bash_completion.d"
+  _name="sm.bash"
+  _mode=0644
+  # else
+  #   completion_prefix="${_prefix}/profile.d"
+  #   ensure_paths_exist "${_prefix}/profile.d/"
+  #   _name="sm-completion.sh"
+  #   _mode=0755
+  # fi
 
   log_step "Setting up sm shell completion (${completion_prefix}/${_name})" \
     copy_file \
