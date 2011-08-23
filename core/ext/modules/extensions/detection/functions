@@ -203,12 +203,16 @@ extension_action()
     fi
   fi
 
+  # Set the base extension path.
   extension_path="$extensions_path/$extension"
-  extension_config_path="$extension_path/config"
-  extension_templates_path="$extension_path/templates"
   extension_modules_path="$extension_path/modules"
   extension_actions_path="$extension_path/actions"
-  extension_log_path="$log_path/$extension"
+
+  # Now allow the extensions to override the paths.
+  true \
+    "${extension_log_path:="$log_path/$extension"}" \
+    "${extension_templates_path:="$extension_path/templates"}" \
+    "${extension_config_path="$extension_path/config"}"
 
   paths=$(env | awk -F= -v ORS=' ' '/_path/{print $1}')
   flags=$(env | awk -F= -v ORS=' ' '/_flag/{print $1}')
