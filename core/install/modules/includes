@@ -4,3 +4,4 @@ ext/vcs
 ext/users
 cli/sets
 ext/extensions/cache
+ext/templates

@@ -1,0 +1,12 @@
+
+if test -d {{profile_d_path}}
+then
+  for file in {{profile_d_path}}/*.sh
+  do
+    if [[ -r "${file}" && ! -k "${file}" ]]
+    then
+      source "${file}"
+    fi
+  done
+  unset file
+fi
