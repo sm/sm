@@ -418,6 +418,7 @@ chown_paths()
 
   _identity="${1:-}"
   shift || fail "user[:group] was not given as the first parameter"
+
   _paths=("$@")
   shift || fail "No paths given after user and group first parameter"
 
@@ -425,7 +426,7 @@ chown_paths()
   do
     [[ -n "${_path}" ]] || continue
 
-    [[ -d "${_path}" ]] ||
+    [[ -e "${_path}" ]] ||
       fail "Cannot chown path ${_path} to ${_identity},"\
       "as the path (directory) does not exist."
 
