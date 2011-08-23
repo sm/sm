@@ -204,10 +204,10 @@ extension_action()
   fi
 
   extension_path="$extensions_path/$extension"
-  extension_config_path="$extension_path/config"
-  extension_templates_path="$extension_path/templates"
   extension_modules_path="$extension_path/modules"
   extension_actions_path="$extension_path/actions"
+  extension_config_path="$extension_path/config"
+  extension_templates_path="$extension_path/templates"
   extension_log_path="$log_path/$extension"
 
   paths=$(env | awk -F= -v ORS=' ' '/_path/{print $1}')

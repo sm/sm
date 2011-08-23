@@ -83,12 +83,6 @@ setup_shell_completion()
   completion_prefix="${_prefix}/bash_completion.d"
   _name="sm.bash"
   _mode=0644
-  # else
-  #   completion_prefix="${_prefix}/profile.d"
-  #   ensure_paths_exist "${_prefix}/profile.d/"
-  #   _name="sm-completion.sh"
-  #   _mode=0755
-  # fi
 
   install_template "install/sm-completion.sh" \
     to "${completion_prefix}/${_name}"

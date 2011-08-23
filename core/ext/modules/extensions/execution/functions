@@ -144,6 +144,9 @@ extension_run()
       ;;
 
     (ruby)
+      # Allow env settings via _initialize
+      extension_modules_load ${_namespaces//\// }
+
       requires=()
       for script in functions initialize
       do
