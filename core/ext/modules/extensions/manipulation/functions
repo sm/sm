@@ -210,7 +210,7 @@ extension_install()
   ! path_exists "${sm_path}/exts/${_extension}" ||
     remove_paths "${sm_path}/exts/${_extension}"
 
-  copy_directory "${extensions_src_path}/${_src}" \
+  copy_path "${extensions_src_path}/${_src}" \
     to "${sm_path}/exts/${_extension}"
 
   write "${extension_uri}" to "${sm_path}/exts/${_extension}/.uri"

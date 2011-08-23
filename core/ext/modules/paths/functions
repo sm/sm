@@ -3,8 +3,7 @@
 #
 # ## ensure\_paths\_exist
 #
-# Iterates over the list of given paths, creating the directory if it
-# does not exist.
+# Iterates over the list of given paths, creating the path if it does not exist.
 #
 # ### Input Parameters
 #
@@ -52,8 +51,7 @@ ensure_paths_exist()
       then
         continue
       else
-        warn "Could not ensure path '${_path}' exists"\
-          " as a directory, as it is a file."
+        warn "Could not ensure path '${_path}' exists as the path is a file."
       fi
     else
       mkdir -p "${_path}" ||
@@ -103,7 +101,7 @@ remove_paths()
 {
   trace_filter filesystem
   local _path _paths=("$@")
-  shift || fail "Cannot remove paths; No paths were given."
+  shift || fail "No paths were given."
 
   removed_paths=()
   nonexistant_paths=()
@@ -132,15 +130,15 @@ remove_paths()
 }
 
 #
-# ## move\_directory
+# ## move\_path
 #
-# Moves a directory from one location to another.
-# (This is also used to rename a directory.)
+# Moves a path from one location to another.
+# (This is also used to rename a path.)
 #
 # ### Input Parameters
 #
-# The first parameter is the source directory name.
-# The second parameter is the target directory name.
+# The first parameter is the source path name.
+# The second parameter is the target path name.
 #
 # ### Stream Outputs
 #
@@ -148,7 +146,7 @@ remove_paths()
 #
 # ### Environmental effects
 #
-# If successful, a directory is renamed (moved).
+# If successful, a path is renamed (moved).
 #
 # ### Return Codes
 #
@@ -156,14 +154,14 @@ remove_paths()
 #
 # ### Failure Scenarios
 #
-# Fails if the source directory is not specified.
-# Fails if the target directory is not specified.
+# Fails if the source path is not specified.
+# Fails if the target path is not specified.
 #
 # ### Usage Examples
 #
-#     user$ move_directory "freetds-0.91rc"* to "freetds-0.91"
+#     user$ move_path "freetds-0.91rc"* to "freetds-0.91"
 #
-move_directory()
+move_path()
 {
   trace_filter filesystem
   local _source _target _mode _owner
@@ -195,11 +193,11 @@ move_directory()
         ;;
 
       *) # If the token is unknown
-        if variable_is_empty _source
+        if [[ -z "${_source}" ]]
         then
           _source="$token"
 
-        elif variable_is_empty _target
+        elif [[ -z "${_target}" ]]
         then
           _target="$token"
         fi
@@ -207,8 +205,8 @@ move_directory()
     esac
   done
 
-  variable_is_nonempty _source || fail "Cannot move file; Source must be given. "
-  variable_is_nonempty _target || fail "Cannot move file; Target must be given. "
+  [[ -n "${_source}" ]] || fail "Source must be given. "
+  [[ -n "${_target}" ]] || fail "Target must be given. "
 
   mv "${_source}" "${_target}" ||
     fail "Could not move '${_source}' to '${_target}',"\
@@ -226,14 +224,14 @@ move_directory()
 }
 
 #
-# ## copy\_directories to
+# ## copy\_paths to
 #
 # Copies a given list of directories into the named path.
 #
 # ### Input Parameters
 #
 # The first parameter is the path to copy the directories into.
-# Remaining parameters are the directory name/path list.
+# Remaining parameters are the paths list.
 #
 # ### Stream Outputs
 #
@@ -259,7 +257,7 @@ move_directory()
 copy_paths()
 {
   trace_filter filesystem
-  local _target _directory _force_flag=0 _directories=()
+  local _target _path _force_flag=0 _directories=()
 
   while (( $# > 0 ))
   do
@@ -282,33 +280,32 @@ copy_paths()
     esac
   done
 
-  variable_is_nonempty _target   || fail "Cannot move file; Target must be given."
-  array_is_nonempty _directories || fail "Cannot copy; Directories must be given."
+  [[ -n "${_target}" ]] || fail "Target must be given."
+  array_is_nonempty _directories || fail "Directories must be given."
 
   ensure_paths_exist "${_target}"
 
-  for _directory in "${_directories[@]}"
+  for _path in "${_directories[@]}"
   do
-    [[ -d "${_directory}" ]] ||
-      error "Cannot copy directory ${_directory} to ${_target},"\
-      "as the directory '${_directory}' does not exist (in '$PWD')."
+    [[ -d "${_path}" ]] ||
+      error "Cannot copy path ${_path} to ${_target},"\
+      "as path (directory) '${_path}' does not exist (in '$PWD')."
 
-    cp -Rf "${_directory}" "${_target}/" ||
+    cp -Rf "${_path}" "${_target}/" ||
       fail "Could not copy the entity '${_entity}',"\
       "as the 'cp -Rf' command failed with error code '$?'."
   done
 }
 
 #
-# ## copy\_directory
+# ## copy\_path
 #
-# Copies a directory from one location to another.
-# (This is also used to rename a directory.)
+# Copies a path (directory) from one location to another.
 #
 # ### Input Parameters
 #
-# The first parameter is the source directory name.
-# The second parameter is the target directory name.
+# The first parameter is the source path name.
+# The second parameter is the target path name.
 #
 # ### Stream Outputs
 #
@@ -316,7 +313,7 @@ copy_paths()
 #
 # ### Environmental effects
 #
-# If successful, a directory is renamed (copyd).
+# If successful, a path is renamed (copyd).
 #
 # ### Return Codes
 #
@@ -324,14 +321,14 @@ copy_paths()
 #
 # ### Failure Scenarios
 #
-# Fails if the source directory is not specified.
-# Fails if the target directory is not specified.
+# Fails if the source path is not specified.
+# Fails if the target path is not specified.
 #
 # ### Usage Examples
 #
-#     user$ copy_directory "freetds-0.91rc"* to "freetds-0.91"
+#     user$ copy_path "freetds-0.91rc"* to "freetds-0.91"
 #
-copy_directory()
+copy_path()
 {
   trace_filter filesystem
   local _source _target
@@ -350,11 +347,11 @@ copy_directory()
       shift || fail "Source path must be given after keyword 'from'"
       ;;
       *)
-        if variable_is_empty _source
+        if [[ -z "${_source}" ]]
         then
           _source="$token"
 
-        elif variable_is_empty _target
+        elif [[ -z "${_target}" ]]
         then
           _target="$token"
         fi
@@ -485,8 +482,7 @@ chmod_paths()
 
   local _paths=("$@") # Set the paths array to the remaining parameters.
 
-  array_is_nonempty _paths ||
-    fail "Cannot chmod paths, as no files were given."
+  array_is_nonempty _paths || fail "No files were given."
 
   for _path in "${_paths[@]}"
   do
@@ -505,12 +501,12 @@ chmod_paths()
 #
 # ## enter
 #
-# Changes the current working directory ($PWD) to the given directory with
+# Changes the current working path ($PWD) to the given path with
 # sanity checks.
 #
 # ### Input Parameters
 #
-# First parameter is the directory to change into.
+# First parameter is the path to change into.
 #
 # ### Stream Outputs
 #
@@ -518,7 +514,7 @@ chmod_paths()
 #
 # ### Environmental effects
 #
-# The current working directory (PWD) will become the given directory if
+# The current working path (PWD) will become the given path if
 # successful.
 #
 # ### Return Codes
@@ -527,8 +523,8 @@ chmod_paths()
 #
 # ### Failure Scenarios
 #
-# Fails if no directory was given.
-# Fails if the given directory does not exist.
+# Fails if no path was given.
+# Fails if the given path does not exist.
 #
 # ### Usage Examples
 #
@@ -538,10 +534,10 @@ enter()
 {
   trace_filter filesystem
   local _path="${1:-}"
-  shift || fail "Cannot enter path; No path was given."
 
-  [[ -d "${_path}" ]] ||
-    fail "Cannot enter path '${_path}'; Path does not exist."
+  shift || fail "No path was given."
+
+  [[ -d "${_path}" ]] || fail "Cannot enter path '${_path}'; Path does not exist."
 
   builtin cd "${_path}" ||
     fail "Could not cd into the given path '${_path}'; "\
@@ -551,11 +547,11 @@ enter()
 #
 # ## path\_exists()
 #
-# Check if a directory name/path exists.
+# Check if given path exists.
 #
 # ### Input Parameters
 #
-# First parameter is a directory name/path.
+# First parameter is a path.
 #
 # ### Stream Outputs
 #
@@ -588,7 +584,7 @@ path_exists()
 {
   trace_filter filesystem
   local _path="${1:-}"
-  shift || fail "Cannot check if path exists; No name/path was given."
+  shift || fail "No name/path was given."
   [[ -d "$_path" ]]
 }
 
@@ -639,9 +635,9 @@ directories_in()
 {
   trace_filter filesystem
   local _path="${1:-}"
-  shift || fail "Directory name/path was not given!"
+  shift || fail "path name was not given!"
 
-  [[ -d "${_path}" ]] || fail "'${_path}' is not a directory!"
+  [[ -d "${_path}" ]] || fail "'${_path}' is not a path!"
 
   find "${_path}" -mindepth 1 -maxdepth 1 -type d
 }
@@ -654,11 +650,11 @@ directories_in_matching()
 {
   trace_filter filesystem
   local _pattern _path="${1:-}"
-  shift     || fail "Directory name/path was not given!"
-  [[ -d "${_path}" ]]    || fail "'${_path}' is not a directory!"
+  shift     || fail "Path was not given!"
+  [[ -d "${_path}" ]]    || fail "'${_path}' is not a path!"
 
   local _pattern="${2:-}"
-  shift  || fail "'${_path}' is not a directory!"
+  shift  || fail "'${_path}' is not a path!"
 
   find "${_path}" -mindepth 1 -maxdepth 1 -type d
 }
@@ -671,9 +667,9 @@ directories_under()
 {
   trace_filter filesystem
   local _path="${1:-}"
-  shift  || fail "Directory name/path was not given!"
+  shift  || fail "Path was not given!"
 
-  [[ -d "${_path}" ]] || fail "'${_path}' is not a directory!"
+  [[ -d "${_path}" ]] || fail "'${_path}' is not a path!"
 
   find "${_path}" -mindepth 1 -type d
 }
@@ -686,13 +682,13 @@ directories_under_matching()
 {
   trace_filter filesystem
   local _path="${1:-}"
-  shift || fail "Directory name/path was not given as the first parameter."
+  shift || fail "Path was not given as the first parameter."
 
   local _pattern="${1:-}"
   shift || fail "Pattern was not given as the second parameter."
 
+  [[ -n "${_pattern}" ]] || fail "'${_path}' is not a path!"
   [[ -d "${_path}" ]]    || fail "'${_path}' is not a directory!"
-  [[ -n "${_pattern}" ]] || fail "'${_path}' is not a directory!"
 
   find "${_path}" -mindepth 1 -iname "${_pattern}" -type d
 }
@@ -700,7 +696,7 @@ directories_under_matching()
 #
 # ## full_path()
 #
-# return full path to given directory.
+# return full path to given path.
 #
 # ### Input Parameters
 #

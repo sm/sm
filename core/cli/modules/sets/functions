@@ -104,7 +104,7 @@ set_install()
   [[ -z "${__vcs_failed}" ]] || return 1
 
   remove_paths "${_name}"
-  copy_directory "${src_path}/${_identifier}" to "${_name}"
+  copy_path "${src_path}/${_identifier}" to "${_name}"
 }
 
 sets_install_all()

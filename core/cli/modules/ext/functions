@@ -103,7 +103,7 @@ extension_install()
   fetch_uri "${_uri}" "${src_path}/${_identifier}" "$@" || return $?
 
   remove_paths "${_name}"
-  copy_directory "${src_path}/${_identifier}" to "${_name}"
+  copy_path "${src_path}/${_identifier}" to "${_name}"
 }
 
 ext_install_all()
