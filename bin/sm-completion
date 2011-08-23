@@ -1,4 +1,4 @@
 #!/bin/sh
 
 # usage: complete -C sm-completion sm
-sm --call=ext/extensions/completion/extension_action_completion
+sm --call=ext/extensions/completion/extension_action_completion -- "${COMP_LINE:0:COMP_POINT}"
