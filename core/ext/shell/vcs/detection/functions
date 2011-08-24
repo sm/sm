@@ -39,6 +39,11 @@ scm_identifier()
 
   shift || fail "url must be given as first parameter."
 
+  if [[ -d "${_uri}" ]]
+  then
+    _uri=$( builtin cd "${_uri}"; pwd )
+  fi
+
   printf "${_uri//\//_}"
 }
 
