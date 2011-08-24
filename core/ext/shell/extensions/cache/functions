@@ -47,7 +47,8 @@ initialize_actions_map_cache()
 detect_module_actions()
 {
   detect_module "$@" &&
-    [[ -s "${module_path}/shell/actions" ]]
+    [[ -f "${module_path}/actions" ]] &&
+    [[ -s "${module_path}/actions" ]]
 }
 
 # Step 3 collect dependent modules actions mapping
@@ -66,14 +67,14 @@ initialize_modules_actions_cache()
     do
       if in_search_paths detect_module_actions "${_module_dep}"
       then
-        log_search "actiondep" "${extension}${_module_name:+/}${_module_name}" "${module_path#${sm_path}\/}/bin"
+        log_search "actiondep" "${extension}${_module_name:+/}${_module_name}" "${module_path#${sm_path}\/}/actions"
         while read _action_pair
         do
           if [[ "${_action_pair}" == [[:alpha:]]* ]]
           then
             actions_cache_add "${_module_name:+${_module_name}/}${_action_pair/=*}=${_module_name:+${_module_name}/}${_action_pair/*=}"
           fi
-        done < "${module_path}/bin"
+        done < "${module_path}/actions"
       fi
     done < ${_module_path}
   done
