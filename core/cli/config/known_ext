@@ -1,2 +1,3 @@
 deploy=sm/sm_deploy
 # mux=sm/sm_mux
+mp_backup=mpapis/sm_backup
