@@ -57,9 +57,11 @@ initialize_modules_actions_cache()
   trace_filter action_detection
   local _module_path _module_name _action_pair
 
-  [[ -d "${_modules_root}" ]] ||
-    debug search "missing modules dir '${_modules_root}'?" &&
+  if [[ ! -d "${_modules_root}" ]]
+  then
+    debug search "missing modules dir '${_modules_root}'?"
     return 0
+  fi
 
   for _module_path in $( find "${_modules_root}" -name includes -type f )
   do
