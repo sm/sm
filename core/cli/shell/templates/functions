@@ -1,0 +1,177 @@
+#!/bin/sh
+
+templates_help()
+{
+  echo "
+Usage:
+
+  sm templates list                        #show available templates.
+  sm templates list  all                   #show available templates with targets.
+  sm templates list  [template name]       #show generated files for given template.
+  sm templates apply [target file name...] #apply template on the given files.
+  sm templates apply [template]            #apply template on all targets.
+  sm templates diff  [target file name...] #diff template on the given files.
+  sm templates diff  [template]            #diff template on all targets.
+
+Template name should contain '_' before the final '.'. For example:
+
+  my_app_nginx_.conf
+
+The settings filename pattern is template name + .settings:
+
+  my_app_nginx_.conf.settings
+
+The settings file content consists of file names, and replacements for them:
+
+  my_app_nginx_dev.conf=(
+    host_name my.host.name
+    port 8080
+  )
+  my_app_nginx_prod.conf=(
+    host_name my.host.name
+    port 80
+  )
+
+"
+}
+
+templates_targets()
+{
+  local target
+
+  (( $# )) || error "Please provide a template name!"
+
+  [[ "$1" == "${1/_*./_.}" && -f "$1" ]] ||
+    error "'${1}' is not a valid template name!"
+
+  for target in $(hash_keys $1.settings)
+  do
+    if [[ -f $target ]]
+    then
+      log "  $target -> exists"
+    else
+      log "  $target -> missing"
+    fi
+  done
+}
+
+templates_list() {
+  local template="$1"
+  local settings="$template.settings"
+
+  log "Template: $template"
+  if [[ -f $settings ]]
+  then
+    log "Template settings: $template.settings"
+  else
+    log "Template settings are missing: $template.settings"
+  fi
+
+  if [[ "$2" == "all" ]]
+  then
+    templates_targets $1
+  fi
+}
+
+templates_list_all() {
+  local template templates all
+  case "x$1" in
+    xall)
+      templates=( $( ls -1d *_.* 2>/dev/null || true ) )
+      all="all"
+      ;;
+    x)
+      templates=( $( ls -1d *_.* 2>/dev/null || true ) )
+      all=""
+      ;;
+    *)
+      templates=( $( ls -1d "$@" 2>/dev/null || true ) )
+      all="all"
+      ;;
+  esac
+
+  (( ${#templates[@]} )) || error "No templates found.\n"
+
+  for template in ${templates[@]}
+  do
+    [[ "$template" =~ ".settings" ]] ||
+      templates_list "$template" "$all"
+  done
+}
+
+templates_apply_one()
+{
+  local target="$1" target_new="$1.$$"
+  local key="$1" template="${1/_*./_.}"
+  local settings="${template}.settings" replacements
+
+  cp -f $template $target_new
+  hash_read $settings $key replacements
+  seed_template $target_new "${replacements[@]}" | grep -v "WARNING: Template Seeding (replacing defaults) has not yet been fully implemented." || true
+
+  if [[ ! -f $target ]] || ! diff -q $target_new $target > /dev/null
+  then
+    mv $target_new $target
+    return $?
+  else
+    rm $target_new
+    return 1
+  fi
+}
+
+templates_apply_all()
+{
+  local list template first="$1"
+
+  (( $# )) || error "Please provide a template or target name!"
+
+  if [[ "$first" == "${first/_*./_.}" && -f "$first" ]]
+  then
+    list=( $(hash_keys ${first}.settings) )
+  else
+    list=( $( ls -1d $@ ) )
+  fi
+
+  for template in "${list[@]}"
+  do
+    if templates_apply_one $template
+    then
+      log "  $template -> changed"
+    else
+      log "  $template"
+    fi
+  done
+}
+
+templates_apply_diff()
+{
+  local target="$1" target_new="$1.new"
+  local key="$1" template="${target/_*./_.}"
+  local settings="${template}.settings" replacements
+
+  cp -f $template $target_new
+  hash_read $settings $key replacements
+  seed_template $target_new "${replacements[@]}" | grep -v "WARNING: Template Seeding (replacing defaults) has not yet been fully implemented." || true
+
+  diff -u $target $target_new || true
+  rm -rf $target_new
+}
+
+templates_apply_diffs()
+{
+  local list template
+
+  (( $# )) || error "Please provide a template or target name!"
+
+  if [[ "$1" == "${1/_*./_.}" && -f "$1" ]]
+  then
+    list=( $(hash_keys $1.settings) )
+  else
+    list=( $( ls -1d $@ ) )
+  fi
+
+  for template in "${list[@]}"
+  do
+    templates_apply_diff $template
+  done
+}

@@ -1,0 +1,433 @@
+#!/bin/sh
+
+# Print out a list of all installed modules.
+# ## modules\_installed()
+modules_installed()
+{
+  local _module _modules
+
+  _modules=($(
+  find "${modules_path}" -mindepth 1 -maxdepth 1 -type d |
+  sed -e 's#.*/##g' -e '/\..*/d'
+  ))
+
+  for _module in ${_modules[@]}
+  do
+    printf "%s\n" "${_module}"
+  done
+}
+
+#
+# ## module\_functions()
+#
+# Print out a list of all functions for the given module.
+#
+# ### Input Parameters
+#
+# First parameter is the module name to print out the functions for.
+#
+# ### Stream Outputs
+#
+# The named module's functions function listing is printed to the calling
+# environment's STDOUT.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# Fails if no module name was given.
+#
+# ### Usage Examples
+#
+#     user$ module_functions defaults
+#     read_default()
+#
+module_functions()
+{
+  local _function _functions _modules="${@:-}"
+
+  array_is_nonempty _modules ||
+    fail "Cannot print the functions for module(s); No module names given."
+
+  local _path="${modules_path}/${_module}"
+
+  _functions=($(
+  find "${_path}" -mindepth 1 -maxdepth 1 -name functions -type f -print0 |
+  xargs -0 grep '^[a-z_]*()$' 2>/dev/null || true
+  ))
+
+  for _function in "${_functions[@]}"
+  do
+    _function="${_function##*modules\/shell\/}"
+    printf "%s\n" "${_function//*:}"
+  done
+}
+
+#
+# ## modules\_list()
+#
+# Lists functions for all modules.
+#
+# ### Input Parameters
+#
+# First parameter is the module name to print out the functions for.
+#
+# ### Stream Outputs
+#
+# functions function listing for each module is printed to the STDOUT of the calling
+# environment.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user$ modules_list
+#     array
+#
+#       array_is_nonempty()
+#       array_length()
+#       array_last_element()
+#       array_first_element()
+#       array_push()
+#       array_append()
+#       array_shift()
+#       array_unshift()
+#       array_join()
+#     ... longish output ...
+#
+modules_list()
+{
+  local _module _modules _function _functions
+
+  for language in shell ruby
+  do
+    _modules=($(modules_installed ${language}))
+    for _module in "${_modules[@]}"
+    do
+      printf "\n%s\n\n" "${_module}"
+      _functions=($(module_functions "${_module}"))
+      for _function in "${_functions[@]}"
+      do
+        printf "%s\n" "  ${_function}"
+      done
+    done
+  done
+}
+
+#
+# ## modules\_docs()
+#
+# Output the module functions documentation for a given module name.
+#
+# ### Input Parameters
+#
+# First parameter is the module name to print out the functions documentation for.
+#
+# ### Stream Outputs
+#
+# functions documentation for every function of the named module.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# Fails if no module name is given.
+#
+# ### Usage Examples
+#
+#     user$ module_docs defaults
+#
+#     # read_default
+#
+#     Reads default values from an extension's config/defaults file.
+#
+#     ### Input Parameters
+#
+#     First parameter is the defaults file key to read (key=value).
+#     Second parameter is the variable name to store the retrieved value in.
+#     Remaining parameters are parsed out as token, value and prefix
+#       into|as <variable name>
+#       prefix <name>
+#       <variable> # If no specifier.
+#
+#     ### Stream Outputs
+#
+#     None.
+#
+#     ### Environmental effects
+#
+#     A variable will be set to the value, if the value is nonempty. If no variable
+#     name is specified, the variable will be assigned the same name as the key.
+#
+#     ### Return Codes
+#
+#     0 for success.
+#
+#     ### Failure Scenarios
+#
+#     Fails if no arguments are passed in; you need to at least specify a key.
+#
+#     ### Usage Examples
+#
+#         user$ read_default "version" prefix "package" # extension is nginx, for example.
+#         user$ echo $package_version
+#         1.0.0
+#
+module_docs()
+{
+  local _function _functions _module content_flag table_flag
+
+  while (( $# > 0 ))
+  do
+    token="$1"
+    shift
+    case "${token}" in
+      --content)
+        content_flag=1
+        ;;
+      --table)
+        table_flag=1
+        ;;
+      *)
+        _module="$token"
+    esac
+  done
+
+  variable_is_nonempty _module ||
+    fail "Cannot glean documentation for a module; no module name given."
+
+  command_exists shocco ||
+    fail "Cannot generate documentation for '${_module}';"\
+    " 'shocco' was not found in the PATH, install shocco and try again."
+
+  command_exists pygmentize ||
+    fail "Cannot generate documentation for '${_module}';"\
+      " 'pygmentize' was not found in the PATH, install pygmentize and try again."
+
+  local _path="${core_development_path}/shell/${_module}"
+  if (( content_flag == 1 ))
+  then
+    shocco "${_path}/functions" |
+      awk '/<body>/{p=1;next;} /\/body>/{p=0;next;} {if (p == 1) print ; } '
+  elif (( table_flag == 1 ))
+  then
+    shocco "${_path}/functions" |
+      awk '/<table/{p=1;} {if (p == 1) print ; } /\/table>/{p=0;} '
+  else
+    shocco "${_path}/functions"
+  fi
+}
+
+#
+# ## modules\_docgen()
+#
+# Lists functions for all modules.
+#
+# ### Input Parameters
+#
+# First parameter is the module name to print out the functions for.
+#
+# ### Stream Outputs
+#
+# functions function listing for each module is printed to the STDOUT of the calling
+# environment.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user$ modules_list
+#     array
+#
+#       array_is_nonempty()
+#       array_length()
+#       array_last_element()
+#       array_first_element()
+#       array_push()
+#       array_append()
+#       array_shift()
+#       array_unshift()
+#       array_join()
+#     ... longish output ...
+#
+modules_docgen()
+{
+  # TODO: Replace with,
+  # for file in modules/*/functions ; do (name=${file%%\/functions}; shocco $file > html/${name//*\/}.html)& done ; wait
+
+  local _module _modules _function _functions
+  local _prefix="${core_development_path}/html/shell"
+  local _path="${site_development_path}"
+
+  variable_is_nonempty core_development_path &&
+    path_exists "${core_development_path}" ||
+    error "Set core_development_path in ~/.smrc, and clone the sm core "\
+     "repository into it, to run docgen."\
+     "For more information, see https://bdsm.beginrescueend.com/development/core."
+
+  ensure_paths_exist "${_prefix}"
+
+  log "<html><body><h2>SM Module Documentation</h2><ul>" \
+    > "${_prefix}/index.html"
+
+  _modules=($(
+  find "${core_development_path}/shell" -mindepth 1 -maxdepth 1  -type d |
+    sed -e 's#.*/##g' -e '/\..*/d'
+  ))
+
+  ensure_paths_exist "${_prefix}"
+
+  for _module in "${_modules[@]}"
+  do
+    (
+    _base="${_prefix}/${_module}"
+    log "Generating ${_base}.html"
+    module_docs "${_module}" > "${_base}.html"
+
+    log "<li><a href=\"./${_module}.html\">${_module}</a></li>" \
+      >> "${_prefix}/index.html"
+
+    # Replace the shocco generated css url with a local filesystem css file,
+    # so that a network request is not required in order to have styling when
+    # viewing the documentation offline.
+    replace_content "http://jashkenas.github.com/docco/resources/docco" \
+      with "../css/shocco" in "${_base}.html"
+    )&
+  done
+  wait
+
+  log "  </ul></body></html>" >> "${_prefix}/index.html"
+  log "Modules documentation content generated in ${_prefix}."
+}
+
+# ## modules_docopen()
+modules_docopen()
+{
+  # TODO: Replace with,
+  # for file in modules/*/functions ; do (name=${file%%\/functions}; shocco $file > html/${name//*\/}.html)& done ; wait
+  variable_is_nonempty core_development_path &&
+    path_exists "${core_development_path}" ||
+    error "To run docopen, set core_development_path in ~/.smrc, and clone the sm core "\
+    "repository into it."
+
+  file_exists "${core_development_path}/html/shell/index.html" ||
+    error "Run '$ sm mod docgen' before trying docopen."
+
+  os_open "${core_development_path}/html/shell/index.html"
+}
+
+# ## modules_site_docopen()
+modules_site_docgen()
+{
+  # TODO: Replace with,
+  # for file in modules/*/functions ; do (name=${file%%\/functions}; shocco $file > html/${name//*\/}.html)& done ; wait
+
+  local _module _modules _function _functions
+  local _prefix="${core_development_path}/html/shell"
+  local _path="${site_development_path}"
+
+  path_exists "${core_development_path}" ||
+    fail "Set core_development_path in ~/.smrc, to run docgen."
+
+  log "<html><body><h2>SM Module Documentation</h2><ul>" \
+    > "${_prefix}/index.html"
+
+  _modules=($(
+  find "${core_development_path}/shell" -mindepth 1 -maxdepth 1 \
+    -type d | sed -e 's#.*/##g' -e '/\..*/d'
+  ))
+  for _module in "${_modules[@]}"
+  do
+    (
+    ensure_paths_exist "${_prefix}/${_module}"
+    _base="${_prefix}/${_module}"
+    log "Generating ${_base}.html"
+    module_docs "${_module}" > "${_base}.html"
+    log "<li><a href=\"./${_module}.html\">${_module}</a></li>" \
+      >> "${_prefix}/index.html"
+    )&
+  done
+  wait
+  log "  </ul></body></html>" >> "${_prefix}/index.html"
+  log "Modules documentation content has been generated in ${_prefix}."
+
+  path_exists "${site_development_path}" ||
+    fail "Set site_development_path in ~/.smrc, to run docgen."
+
+  # TODO: Extract this section into a separate location.
+  # Copy the generated files into the proper site content dir.
+  files=($(
+  find "${_prefix}" -mindepth 1 -iname '*.haml'
+  ))
+  for file in "${files[@]}"
+  do
+    (
+    name=${file##*\/}
+    name=${name%.haml}
+
+    ensure_paths_exist "${site_development_path}/content/shell/${name}"
+
+    log "Building ${name} functions from generated docs."
+    cat > "${site_development_path}/content/shell/${name}/functions.haml" <<Header
+  .breadcrumbs
+    %a{ :href => "/" }
+      Documentation
+    &nbsp;>&nbsp;
+    %a{ :href => "/shell/" }
+      Modules
+    &nbsp;>&nbsp;
+    %a{ :href => "/shell/${name}/" }
+      ${name}
+    &nbsp;>&nbsp;
+    %a{ :href => "/shell/${name}/functions/" }
+      functions API :: ${name}
+    %hr
+
+  %h1
+    Module ${name}
+
+Header
+    cat $file >> "${site_development_path}/content/shell/${name}/functions.haml"
+
+    html2haml "${_base}.html" \
+      >> "${site_development_path}/content/shell/${name}/functions.haml"
+    )&
+  done
+
+  wait
+
+  log "Module documentation generated from the source code path: ${core_development_path}"
+  log "into the site development path: ${site_development_path}."
+}

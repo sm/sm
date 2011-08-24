@@ -1,0 +1,871 @@
+#!/bin/sh
+
+#
+# ## log()
+#
+# Log arguments to the calling environment's STDOUT.
+#
+# ### Input Parameters
+#
+# Strings to be logged.
+#
+# ### Stream Outputs
+#
+# Prints arguments passed in to the calling environment's STDOUT,
+# with a newline character appended.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# none.
+#
+# ### Usage Examples
+#
+# user$ log "Hello there! "
+# Hello there!
+#
+core_log()
+{
+  printf "$*\n"
+}
+
+log()
+{
+  core_log "$@"
+}
+
+#
+# ## warn()
+#
+# Log arguments to the calling environment's STDOUT, preceeded by 'WARNING '.
+#
+# ### Input Parameters
+#
+# Strings to be logged.
+#
+# ### Stream Outputs
+#
+# Prints arguments passed in to the calling environment's STDOUT,
+# with a newline character appended, and 'WARNING ' prepended.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# none.
+#
+# ### Usage Examples
+#
+# user$ info "Bad Monkeys Are Typing! "
+# WARNING: Bad Monkeys Are Typing!
+#
+core_warn()
+{
+  printf "WARNING: $*\n"
+}
+
+warn()
+{
+  core_warn "$@"
+}
+#
+# ## debug()
+#
+# Log arguments to the calling environment's STDOUT, preceeded by 'DEBUG: '.
+#
+# ### Input Parameters
+#
+# Debug type, Strings to be logged.
+#
+# ### Stream Outputs
+#
+# Prints arguments passed in to the calling environment's STDOUT,
+# with a newline character appended, and 'DEBUG: ' prepended.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# Fails if no arguments are given.
+#
+# ### Usage Examples
+#
+# The following appears when sm is called with --debug=[welcome|all],
+# or if you set debug_flags to welcome|all.
+# Code:
+#
+# $ debug welcome "Hello there! "
+# Output:
+#
+# DEBUG welcome: Hello there!
+#
+#
+# $ echo test > >( debug vcs - )
+#
+# DEBUG vcs: test
+#
+core_debug()
+{
+  local type="$1"
+  shift || fail "Debug type must be given as the first parameter."
+
+  if (( debug_flag == 1 )) && options_check "$debug_flags" "$type"
+  then
+    if [[ "$1" == "-" ]]
+    then
+      printf "DEBUG $type: "
+      cat -
+      printf "\n"
+    else
+      printf "DEBUG $type: $*\n"
+    fi
+  else
+    return 0
+  fi
+}
+
+debug()
+{
+  core_debug "$@"
+}
+
+#
+# ## log_search()
+#
+# Log arguments to the calling environment's STDOUT, preceeded by 'DEBUG: '.
+#
+# ### Input Parameters
+#
+# Search type, Search result, Strings to be logged.
+#
+# ### Stream Outputs
+#
+# Prints arguments passed in to the calling environment's STDOUT,
+# with a newline character appended, and 'DEBUG: ' prepended.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# Fails if no arguments are given.
+#
+# ### Usage Examples
+#
+# user$ ./install --debug=search help
+# DEBUG search:   module sm/help            in builtin/sm/shell/help.
+#
+core_log_search()
+{
+  local name="${1:-}" value="${2:-}"
+  shift || fail "name must be given as the first parameter."
+  shift || fail "value must be given as the second parameter."
+
+  if (( debug_flag == 1 )) && options_check "$debug_flags" "search"
+  then
+    printf "DEBUG search: %9s %-25s in $*.\n" "$name" "$value"
+  else
+    return 0
+  fi
+}
+
+log_search()
+{
+  core_log_search "$@"
+}
+
+#
+# ## log_todo()
+#
+# Log arguments to the calling environment's STDOUT, preceeded by 'DEBUG: ' and caller file:line.
+#
+# ### Input Parameters
+#
+# Search type, Search result, Strings to be logged.
+#
+# ### Stream Outputs
+#
+# Prints arguments passed in to the calling environment's STDOUT,
+# with a newline character appended, and 'DEBUG: caller_file:line' prepended.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# Fails if no arguments are given.
+#
+# ### Usage Examples
+#
+# user$ ./install --debug=search help
+# DEBUG search:   module sm/help            in builtin/sm/shell/help.
+#
+core_log_todo()
+{
+  if (( debug_flag == 1 )) && options_check "$debug_flags" "todo"
+  then
+    local file="${BASH_SOURCE[2]}" line="${BASH_LINENO[1]}"
+    printf "DEBUG todo: ${file##${sm_path}\/}:${line}:\n"
+    printf "$*" | xargs -s 72 | xargs -I {} printf "DEBUG todo: # {}\n"
+  else
+    return 0
+  fi
+}
+
+log_todo()
+{
+  core_log_todo "$@"
+}
+
+#
+# ## error()
+#
+# Log arguments to the calling environment's STDERR, preceeded by 'ERROR '.
+# Exits with status code 1.
+#
+# ### Input Parameters
+#
+# Strings to be logged.
+#
+# ### Stream Outputs
+#
+# Prints arguments passed in to the calling environment's STDOUT,
+# with a newline character appended, and 'ERROR ' prepended.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 1 for failure.
+#
+# ### Failure Scenarios
+#
+# Fails if no arguments are given.
+#
+# ### Usage Examples
+#
+# user$ error "Hello there! "
+# ERROR Hello there!
+# *poof* shell closed...
+#
+core_error()
+{
+  set +o xtrace
+  printf "ERROR(${FUNCNAME[2]}): $*\n" >&2
+  set +o errtrace
+  trap - ERR
+  exit 1
+}
+
+error()
+{
+  core_error "$@"
+}
+
+#
+# ## succeed()
+#
+# Log arguments to the calling environment's STDOUT. Exits with status code 0.
+#
+# ### Input Parameters
+#
+# Strings to be logged.
+#
+# ### Stream Outputs
+#
+# Prints arguments passed in to the calling environment's STDOUT,
+# with a newline character appended.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# Fails if no arguments are given.
+#
+# ### Usage Examples
+#
+# user$ succeed "Hello there! "
+# Hello there!
+# *poof* shell closed...
+#
+core_succeed() {
+  set +o xtrace
+  if [[ -n "$*" ]]
+  then
+    printf "$*\n"
+  fi
+  exit 0
+}
+
+succeed()
+{
+  core_succeed "$@"
+}
+
+#
+# ## fail()
+#
+# Log arguments to the calling environment's STDERR, preceeded by 'ERROR '.
+# Exits with status code 1.
+#
+# ### Input Parameters
+#
+# Strings to be logged.
+#
+# ### Stream Outputs
+#
+# Prints arguments passed in to the calling environment's STDOUT,
+# with a newline character appended, and 'ERROR ' prepended.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 1 for failure.
+#
+# ### Failure Scenarios
+#
+# Fails if no arguments are given.
+#
+# ### Usage Examples
+#
+# user$ error "Hello there! "
+# ERROR Hello there!
+# *poof* shell closed...
+#
+core_fail()
+{
+  trace_flag=0
+  backtrace "FAIL(${FUNCNAME[2]}): $*"
+  exit 1
+}
+
+fail()
+{
+  core_fail "$@"
+}
+
+#
+# ## set_ps4()
+#
+# Set the environmental PS4 variable for informative tracing.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user$ echo "'$PS4'"
+#     '+ '
+#     user$ set_ps4
+#     user$ echo "'$PS4'"
+#     ' > ${BASH_SOURCE##${sm_path}\/} ${FUNCNAME[0]:+${FUNCNAME[0]}()} ${LINENO} $ '
+#
+# ### Code Walkthrough
+set_ps4()
+{
+  # Set and export the PS4 variable, so that this script -- and called bash scripts --
+  # will display more detailed and formatted trace output.
+  # Finally, return true, 0, for success.
+  PS4="# \${BASH_SOURCE##\${sm_path}\/} \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO} $ "
+  export PS4
+  return 0
+}
+
+#
+# ## trace_filter()
+#
+# Enables tracing, depending on the filter.
+# If enabled, display every line of code execution after the function returns,
+# in the format specified by the PS4 environment variable
+# (see set_ps4).
+#
+# ### Input Parameters
+#
+# type of trace to filter
+# if none given restores default state
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     trace_filter search
+#     <search code>
+#     trace_filter
+#
+# ### Code Walkthrough
+core_trace_filter()
+{
+  local _action="$1" old
+  shift || fail "Filter action {start,stop} must be specified."
+
+  case "${_action}" in
+    start)
+      trace_filter_stack=( "$1" "${trace_filter_stack[@]}" )
+      ;;
+    stop)
+      old="${trace_filter_stack[0]}"
+      old="${old%%=*}"
+      if [[ "${FUNCNAME[2]}" == "${old}" ]]
+      then
+        shift || true
+        trace_filter_stack=( "$@" )
+      fi
+      ;;
+    *)
+      fail "Unknown trace action ${_action}, use {start,stop}."
+      ;;
+  esac
+
+  filter="${trace_filter_stack[0]}"
+
+  if [[ -n "$filter" ]]
+  then
+    if options_check "$trace_flags" "${filter##*=}"
+    then
+      trap 'set +o xtrace "\$?=$?" ; trace_filter' RETURN
+      set -o xtrace
+    fi
+  else
+    # No param, restore default state
+    if (( trace_flag != 0 ))
+    then
+      trap 'set +o xtrace "\$?=$?" ; trace_filter' RETURN
+      set -o xtrace
+    fi
+  fi
+}
+trace_filter()
+{
+  set +o xtrace
+  if [[ -n "$1" ]]
+  then
+    core_trace_filter start $state "${FUNCNAME[1]}=$1"
+  else
+    core_trace_filter stop $state "${trace_filter_stack[@]}"
+  fi
+}
+
+action_call()
+{
+  trace_filter action
+  "$@"
+}
+
+action_source()
+{
+  local script="$1"
+  shift || fail "No script was given as the first parameter."
+  [[ -r "$script" ]] || fail "Could not find script to run: $script."
+  trace_filter action
+  source "$script"
+}
+
+var_debug_callback()
+{
+  local _variable
+  for _variable in ${var_debug_flags[@]}
+  do
+    eval "
+      if [[ \"\${${_variable}[*]}\" != \"\${${_variable}_previous_value[*]}\" ]]
+      then
+        if string_contains "$-" "xtrace"
+        then
+          log \"var debug '${_variable}' change from '\${${_variable}_previous_value[*]}' to '\${${_variable}[*]}'.\"
+        elif [[ \"${var_debug_type_flag}\" == \"short\" ]]
+        then
+          log \"var debug '${_variable}' change from '\${${_variable}_previous_value[*]}' to '\${${_variable}[*]}' function path: ${FUNCNAME[*]}\"
+        else
+          backtrace \"var debug '${_variable}' change from '\${${_variable}_previous_value[*]}' to '\${${_variable}[*]}'.\" no_exit
+        fi
+        if set | grep '^${_variable}=(' >/dev/null
+        then
+          ${_variable}_previous_value=( \"\${${_variable}[@]}\" )
+        else
+          ${_variable}_previous_value=\"\${${_variable}}\"
+        fi
+      fi
+    "
+  done
+}
+
+var_debug_callback_initialize()
+{
+  local _variable
+  for _variable in "${var_debug_flags[@]}"
+  do
+    eval "
+      if [[ \"\${${_variable}[*]}\" != \"\${${_variable}_previous_value[*]}\" ]]
+      then
+        if set | grep '^${_variable}=(' >/dev/null
+        then
+          ${_variable}_previous_value=( \"\${${_variable}[@]}\" )
+        else
+          ${_variable}_previous_value=\"\${${_variable}}\"
+        fi
+      fi
+    "
+  done
+}
+
+separator()
+{
+  local _columns
+
+  if [[ -z "${COLUMNS}" ]]
+  then
+    _columns=$(tput cols) || _columns=80
+    export COLUMNS=${_columns}
+  fi
+
+  printf -v _separator '%*s' "${COLUMNS}"
+  printf "${_separator// /=}\n"
+}
+
+#
+# ## backtrace()
+#
+# Display a backtrace of the current call stack, to the point that backtrace was
+# called from. Currently, trace is turned on as well, so that execution after
+# calling backtrace is traced, too.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# The call stack, up to the current point of execution, is printed to
+# the STDOUT of the calling environment.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user$ cat ./test
+#     #!/bin/sm
+#     modules ext/trace # Load the trace module.
+#
+#     functiona()
+#     {
+#       echo "function a"
+#       functionb
+#       echo "function a"
+#     }
+#
+#     functionb()
+#     {
+#       echo "function b"
+#       functionc
+#       echo "function b"
+#     }
+#
+#     functionc()
+#     {
+#       echo "function c"
+#       backtrace
+#       echo "function c"
+#     }
+#
+#     functiona
+#
+#     user$ $PWD/test
+#     function a
+#     function b
+#     function c
+#     Error Backtrace:
+#        Trace   Line Function             File
+#           4.     25 functionc()          /Users/sm/test
+#           3.     18 functionb()          /Users/sm/test
+#           2.     11 functiona()          /Users/sm/test
+#           1.     29 main()               /Users/sm/test
+#      > /Users/sm/test functionc() 26 $ echo 'function c'
+#     function c
+#      > /Users/sm/test functionb() 19 $ echo 'function b'
+#     function b
+#      > /Users/sm/test functiona() 12 $ echo 'function a'
+#     function a
+#
+# ### Code Walkthrough
+backtrace()
+{
+  # Turn off shell tracing.
+  trace_filter backtrace # backtrace is disabled by default.
+
+  # Declare separator and columns variables. Initialize columns to the terminal.
+  local _separator _columns
+
+  # If setting the columns via tput does not work, default to 80 columns.
+  _columns=$(tput cols) || _columns=80
+
+  # Set the separator variable contents to the separator, filled out to the
+  # number of columns.
+  printf -v _separator '%*s' "${_columns:-${COLUMNS:-80}}"
+
+  # Store the passed-in message, if given as the first parameter, in the
+  # message variable. Default to empty string.
+  local _message="${1:-}" _flag="$2"
+
+  # If a message was given, print the message to the calling environment's STDERR.
+  [[ -z ${_message} ]] || printf "\n${_message}\n\n" >&2
+
+  # Declare function local variables
+  local _source _function _line _index _largest _format _digits _longest
+
+  # Loop over the function names in the function array stack, to determine
+  # which is longest.
+  # Note that we do not use array_largest here, as we are inside an error function.
+  for (( _index=0 ; _index < ${#FUNCNAME[@]} ; _index++ ))
+  do
+    # For each function name in the stack, if the function name is longer than
+    # the current largest, then...
+    if (( ${#FUNCNAME[${_index}]} > ${#_largest} ))
+    then
+      # ...set it as the new largest element.
+      _largest=${FUNCNAME[${_index}]}
+    fi
+  done
+
+  # Loop over the bash source files array, to find the longest element.
+  # Note that we do not use array_largest here, as we are in an error function.
+  for (( _index=0 ; _index < ${#BASH_SOURCE[@]} ; _index++ ))
+  do
+    # For each source file in the source files array, if the file name/path
+    # is longer than the current longest, then set it as the new longest element.
+    (( ${#BASH_SOURCE[${_index}]} <= ${#_longest} )) ||
+      _longest=${BASH_SOURCE[${_index}]}
+  done
+
+  for (( _index=0 ; _index < ${#BASH_LINENO[@]} ; _index++ ))
+  do
+    # For each line number in the line numbers array, if the number of digits
+    # is greater than the current longest digits, then set it as the new largest.
+    (( ${#BASH_LINENO[${_index}]} <= ${#_digits} )) ||
+      _digits=${BASH_LINENO[${_index}]}
+  done
+
+  # Determine the format string output for the backtrace, based on your
+  # set editor. If you haven't set an editor, SM defaults the editor variable to
+  # the pager, or to empty string.
+  case "${EDITOR:=${PAGER:-}}" in
+    (mvim*|mate*)
+      # Set the format based on GUI editing tools format for opening
+      # a file to a given line using a file URI.
+      _format="%-60s # %-$((${#_largest} + 2))s \n"
+      # Print the backtrace header to the calling environment's STDERR
+      printf "${_format}" "Source" "function()"  1>&2
+      ;;
+    (vi*|gvim*|emacs*|*)
+      # Set the format based on the console editing tools format for opening
+      # a file to a given line.
+      # _format="%-$((${#_largest} + 2))s $ %${#EDITOR}s +%-$((${#_digits}))s %-$((${#_longest} + 2))s %s\n"
+      _format="%${#EDITOR}s +%-$((${#_digits}))s %-$((${#_longest} + 2))s # %s %-$((${#_largest} + 2))s\n"
+      # Print the backtrace header to the calling environment's STDERR.
+      printf "${_format}" ' ' "#" "source file" "function()"  1>&2
+      ;;
+  esac
+
+  # Print the backtrace separator line.
+  printf "${_separator// /=}\n" 1>&2
+
+  # Iterate over the functions array stack, skipping this backtrace function [0].
+  for (( _index=1 ; _index < ${#FUNCNAME[@]} ; ++_index ))
+  do
+    _source="${BASH_SOURCE[${_index}]}"
+    _function="${FUNCNAME[${_index}]:+${FUNCNAME[${_index}]}()}"
+    _line=${BASH_LINENO[$(( _index - 1 ))]}
+
+    case "$_function" in
+      fail\(\)|error\(\)|command_not_found_handle\(\)|command_not_found\(\))
+        continue
+        ;;
+    esac
+
+    # Determine the format string output for the backtrace, based on your
+    # set editor. Note that if you didn't set an editor, BDSM previously
+    # defaulted it to the pager. If no pager is set, BDSM simply outputs a standard
+    # Unix utility trace line.
+    case "${EDITOR:-}" in
+      # Print a file with the format and content for GUI editing tools, to open a
+      # given line using a URI. Print a backtrace to calling environment's STDERR.
+      (mvim*|mate*)
+        printf "${_format}" "open ${EDITOR// *}://open?url=file://${_source}&line=${_line}" "${_function}" 1>&2
+        ;;
+      # Print a file with the format and content for console editing tools, to open a
+      # file to a given line. Print backtrace to calling environment's STDERR.
+      (vi*|gvim*|emacs*|*)
+        printf "${_format}" "${EDITOR}" "${_line}" "${_source} " "${_function}" 1>&2
+        ;;
+    esac
+  done
+
+  # Print the backtrace separator line, and if the trace flag is nonnegative,
+  # then turn tracing back on.
+  printf "${_separator// /=}\n" 1>&2
+
+  [[ "${_flag}" != "no_exit" ]] || return 0
+
+  finish_app
+}
+
+finish_app()
+{
+  kill -s USR2 $APP_PID # to exit application, not current subshell.
+}
+
+core_log_step()
+{
+  local _message="${1:-}" _unicode=0
+
+  if [[ -z "${LANG:-}" || "${LANG}" = *UTF* || "${LANG}" = *utf8* ]]
+  then
+    _unicode=1
+  fi
+
+  case "${_message}" in
+    fail*)
+      # if [[ -t 1 ]]
+      # then
+        if (( _unicode == 1 ))
+        then
+          printf "\r  [\033[31m✘\033[0m] %s\n" "${log_step_message:-"done"}!  "
+        else
+          printf "\r  [\033[31mX\033[0m] %s\n" "${log_step_message:-"done"}!  "
+        fi
+      # else
+      #   printf "  failed.\n"
+      # fi
+      ;;
+
+    succ*)
+      # if [[ -t 1 ]]
+      # then
+        if (( _unicode == 1 ))
+        then
+          printf "\r  [\033[32m✔\033[0m] %s\n" "${log_step_message:-"done"}.  "
+        else
+          printf "\r  [\033[32m@\033[0m] %s\n" "${log_step_message:-"done"}.  "
+        fi
+      # else
+      #   printf "  done.\n"
+      # fi
+      ;;
+
+    *)
+      log_step_message="${_message}"
+      # if [[ -t 1 ]]
+      # then
+        printf "  [ ] %s " "${log_step_message}..."
+      # else
+      #   printf "  %s" "${log_step_message}..."
+      # fi
+      return 0
+      ;;
+  esac
+  unset log_step_message
+}
+
+log_step()
+{
+  local _message="${1:-}" _output _log_file _status
+
+  if (( $# > 1 ))
+  then
+    shift
+    core_log_step "${_message}"
+
+    _log_file="${TMP_PATH:-/tmp}/$$.stderr.log"
+
+    touch "${_log_file}"
+    if "$@" > "${_log_file}"
+    then
+      core_log_step "succ"
+      cat "${_log_file}"
+      rm -rf "${_log_file}"
+      return 0
+    else
+      _status="$?"
+      core_log_step "fail"
+      cat "${_log_file}" >&2
+      rm -rf "${_log_file}"
+      return ${_status} # pass error return status code up !
+    fi
+  else
+    core_log_step "${_message}"
+  fi
+}
+
+clean_tmp_logs()
+{
+  rm -rf ${TMP_PATH:-/tmp}/err_*.log || \
+    printf "Could not clean old logs, please clean by calling:\n  sudo rm -rf ${TMP_PATH:-/tmp}/err_*.log\n"
+}
+

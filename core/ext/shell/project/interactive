@@ -1,0 +1,96 @@
+#!/bin/sh
+#
+# In order to use the sm interactive project functions, the project module's
+# interactive file must be sourced in your profile, such as ~/.bash_profile,
+#
+# The following example sources the file only if it exists and is nonempty:
+#
+#     if [[ -s "/sm/extensions/builtin/core/shell/project/interactive" ]]
+#     then
+#       source "/sm/extensions/builtin/core/shell/project/interactive"
+#     fi
+#
+true "${p_search_path_depth:="7"}"
+true "${projects_path:="$HOME/projects"}"
+export projects_path
+
+# ## p() -- Project
+#
+# Project function.
+#
+# cd into the first directory which matches the parameters passed in.
+#
+# Examples:
+#
+# user ~ $ p sm core
+# user ~/projects/sm/core $
+#
+# Partial prefix completion is also supported,
+# user ~ $ p bd e
+# user ~/projects/sm/extensions $
+#
+p()
+{
+  local _path regex1 regex2
+
+  if [[ "$PS4" = "+ " ]]
+  then
+    PS4="+ \${BASH_SOURCE##\${sm_path}} \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO} > "
+    export PS4
+  fi
+
+  regex1="${1:-}"
+  regex2="${2:-}"
+
+  true "${projects_path:="$HOME/projects"}"
+
+  if [[ -n "${regex1}" ]]
+  then
+    _path=$(
+    find "$projects_path" -mindepth 1 -maxdepth ${p_search_path_depth} -iname "${regex1}*" -type d |
+    head -1
+    )
+
+    cd "$_path"
+
+    if [[ -n "${regex2}" ]]
+    then
+      _path=$(
+      find "$_path" -mindepth 1 -maxdepth ${p_search_path_depth} -iname "${regex2}*" -type d |
+      head -1
+      )
+
+      cd "$_path"
+    fi
+  else
+    echo "A project name or directory must be specified as the first parameter.";
+  fi
+}
+
+# ## pe() -- Project Edit
+#
+# Changes directory to a project based on the parameters passed into the
+# function, then launches the editor on the given directory.
+#
+pe()
+{
+  # Project edit function;
+  # use the project switch function in addition to launching the editor.
+  p $*
+  ${EDITOR:-vim} .
+}
+
+#
+# ## po() -- Project Open
+#
+# Changes directory to a project based on the parameters passed into the
+# function, and then opens the given directory in the operating system.
+#
+po()
+{
+  # Project open function; use the project switch function in addition to
+  # opening the filesystem directory.
+  p $*
+  os_open
+}
+

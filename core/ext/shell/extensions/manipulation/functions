@@ -1,0 +1,273 @@
+#!/bin/sh
+
+#
+# ## extension\_version()
+#
+# Outputs the named extension's version.
+#
+# ### Input Parameters
+#
+# First parameter must be the name of an extension.
+#
+# ### Stream Outputs
+#
+# The version string for the named extension.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# Fails if the extension name is not given.
+#
+# ### Usage Examples
+#
+#     user$ extension_version
+#
+extension_version()
+{
+  local _extension="${1:-}"
+  shift || fail "Cannot retrieve extension version;"\
+    " No extension was given."
+  true ${extension_path:="${extensions_path}/${_extension}"}
+
+  if file_exists "${extension_path}/VERSION"
+  then
+    read -r extension_version < "${extension_path}/VERSION"
+  else
+    extension_version="head"
+  fi
+
+  log "${extension}-${extension_version}"
+}
+
+#
+# ## extension\_licence()
+#
+# Emits the extension's license file, if it exists.
+#
+# ### Input Parameters
+#
+# First parameter may optionally be an extension name.
+#
+# ### Stream Outputs
+#
+# If the extension has a LICENSE file, then it will be printed to STDOUT.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently exist.
+#
+# ### Usage Examples
+#
+#     $ cat $HOME/test
+#     #!/bin/sm
+#     modules ext/extensions/manipulation
+#     extension_license postgresql
+#
+#     $ $HOME/test
+#     Copyright (c) 2009-2011 Wayne E. Seguin
+#
+#     Licensed under the Apache License, Version 2.0 (the \"License\");
+#     you may not use this file except in compliance with the License.
+#     You may obtain a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0
+#
+#     Unless required by applicable law or agreed to in writing, software
+#     distributed under the License is distributed on an \"AS IS\" BASIS,
+#     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#     See the License for the specific language governing permissions and
+#     limitations under the License.
+extension_license()
+{
+  local _extension="${1:-${extension}}"
+
+  variable_is_nonempty _extension ||
+    fail "Cannot display extension license;"\
+    " Extension name was not given."
+
+  cat -v "${extensions_path}/${_extension}/LICENSE"
+}
+
+#
+# ## extension\_actions()
+#
+# Lists actions exposed by the named extension.
+#
+# ### Input Parameters
+#
+# First parameter is the name of the extension to list actions for.
+#
+# ### Stream Outputs
+#
+# The names of the extensions in the given directory are printed to the
+# calling environment's STDOUT.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# Fails if no extension name is given.
+#
+# ### Usage Examples
+#
+#      $ cat $HOME/test
+#      #!/bin/sm
+#      modules ext/extensions/manipulation
+#      extension_actions "postgresql"
+#
+#      $ $HOME/test
+#      backup configure help initialize install restart start status stop uninstall upgrade
+#
+#
+#
+extension_actions()
+{
+  local _extension="${1:-}" _files _file _actions=()
+
+  shift || fail "No extension was given."
+
+  path_exists "${extension_bin_path}" || return 0
+
+  _files=($(
+  find "${extension_bin_path}" -mindepth 1 -type f -perm -o+rx
+  ))
+
+  for _file in "${_files[@]}"
+  do
+    _actions+=("${_file#${extension_bin_path}}")
+  done
+  _actions="${_actions[@]}" # Convert from array to string.
+  printf "${_actions}"
+}
+
+#
+# ## extension\_install()
+#
+# Installs the given external extension.
+#
+# ### Input Parameters
+#
+# First parameter is the name of the extension to install.
+# Second parameter is the src_path of the extension to install.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# The named extension will be installed to the filesystem in the BDSM
+# external extension directory.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# Fails if no extension are passed in to install.
+#
+# ### Usage Examples
+#
+#     user$ extension_install backup mpapis_sm_backup
+#
+extension_install()
+{
+  # TODO: This should likely be removed now with sets/ext ?
+
+  local _extension="${1:-}" _src="${2:-${_extension}}"
+  shift || fail "Cannot install extension;"\
+    " No extension name was given."
+
+  extension_is_valid "${extensions_src_path}/${_src}" ||
+    error "${extensions_src_path}/${_src} is not a valid extension;"\
+    "It is missing modules/ and/or bin/ files."
+
+  log "Installing ${_extension}"
+
+  ! path_exists "${sm_path}/exts/${_extension}" ||
+    remove_paths "${sm_path}/exts/${_extension}"
+
+  copy_path "${extensions_src_path}/${_src}" \
+    to "${sm_path}/exts/${_extension}"
+
+  write "${extension_uri}" to "${sm_path}/exts/${_extension}/.uri"
+
+  #
+  # TODO: Process extension dependencies...
+  #
+}
+
+extensions_installed()
+{
+  local _token _type _modules _paths=() _excludes=() _exclude
+
+  args="$*"
+
+  while (( $# > 0 ))
+  do
+    _token="$1"
+    shift
+    case "${_token}" in
+      (sets|exts)
+        _paths+=("${sm_path}/${_token}")
+        ;;
+      (module|type)
+        _type="$1"
+        shift || fail "An module type must follow the '${_token}' keyword"
+        ;;
+      (in)
+        _paths="${1}"
+        shift || fail "A path must follow keyword 'in'"
+        ;;
+      (exclude)
+        _exclude="${1}"
+        shift || fail "A string must follow keyword 'exclude'"
+        _excludes+=("${_exclude//,/ }")
+        ;;
+      (*)
+        fail "Unkown token ${_token} given"
+        ;;
+    esac
+  done
+
+  [[ -n ${_paths:-} ]] || {
+    _paths=( "${sm_path}/sets" "${sm_path}/exts" )
+    ensure_paths_exist "${_paths[@]}"
+  }
+
+  _modules=($( find "${_paths[@]}" -mindepth 2 -name "includes" -type f ))
+
+  _excludes="${_excludes[*]:-'#'}"
+
+  if [[ -n "${_type:-}" ]]
+  then # Filter by type given
+    "${sm_path}/bin/sm-ll" \
+      if grep -q "'${_type}'" {} \; then echo {} \; fi ::: ${_modules[@]} |
+        sed -e "s#${sm_path}/sets/##" -e "s#${sm_path}/exts/##" \
+          -e "s#/shell/includes##" | sort | awk '!'"/${_excludes// /|}/"
+  else
+    echo ${_modules[@]} | awk '!'"/${_excludes// /|}/"
+  fi
+}

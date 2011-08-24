@@ -1,0 +1,163 @@
+#!/bin/sh
+
+#
+# ## sm_exports()
+#
+# Exports relevant framework environment variables for extension action
+# processes.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user$ sm_exports
+#
+sm_exports()
+{ # TODO: Filter this list of exports down.
+  export action archives_path sm_path branch config_path database database_name debug_flag environment error_message extension extension_action extension_args extension_bin_path extension_config_path extension_modules_path extension_path extension_templates_path flags framework head_flag hooks_flag keep_releases modules_path old_releases parse_break paths previous_path project project_path release_path remote repository result revision shared_path src_path templates_path timestamp tmp_path trace_flag user extension_log_path packages_path
+}
+
+#
+# ## sm_version()
+#
+# Reads the currently installed sm version into the variable 'sm_version'.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# The variable 'sm_version' will be set after the function is executed.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user$ sm_version
+#     user$ echo $sm_version
+#     69.69.69
+#
+sm_version()
+{
+  if [[ -s "$sm_path/VERSION" ]]
+  then
+    read -r sm_version < "$sm_path/VERSION"
+  else
+    sm_version="?.?.?"
+  fi
+}
+
+#
+# ## NIY()
+#
+# Prints a failure message and backtrace to the screen, letting the caller know
+# that the requested feature has not yet been implemented.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# Prints "This feature has not yet been implemented." to STDERR of the calling
+# environment.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# None; only exit is through failure.
+#
+# ### Failure Scenarios
+#
+# Fails always.
+#
+# ### Usage Examples
+#
+#     user$ cat $HOME/test
+#     #!/bin/sm
+#     NIY
+#
+#     user$ $HOME/test
+#     ERROR: This feature has not yet been implemented.
+#     Backtrace:
+#        Trace   Line Function             File
+#           3.    262 fail()               /sm/extensions/builtin/core/shell/logging/functions
+#           2.      5 NIY()                /sm/extensions/builtin/core/shell/extensions/functions
+#           1.      5 main()               /Users/sm/test
+#      > modules/logging/functions fail() 263 $ exit 1
+#
+NIY()
+{
+  fail "This feature has not yet been implemented.\n$*"
+}
+
+# Allow for command_missing when a command is not found during lookup.
+if (( ${BASH_VERSINFO[0]} > 3 ))
+then
+  command_not_found()
+  {
+    echo "bash: $1: command not found ($*)." >&2
+    return 127
+  }
+
+  command_not_found_handle()
+  {
+    # do not run when inside Midnight Commander or within a Pipe
+    if [[ -n "${MC_SID:-}" ]] || [[ ! -t 1 ]]
+    then
+      command_not_found "$@"
+    fi
+
+    if [[ $MACHTYPE = *linux* ]]
+    then # do not run when within a subshell, Linux version.
+      local cmd state remainder
+      local -i pid ppid pgrp session tty_nr tpgid
+      read pid cmd state ppid pgrp session tty_nr tpgid remainder \
+        < /proc/self/stat
+
+      if (( $$ == ${tpgid} ))
+      then
+        command_not_found "$@"
+      fi
+    fi
+
+    # If a function named 'command_missing' is defined then call it with the
+    # parameters of the unknown command and name otherwise call
+    # 'command_not_found' for default behavior.
+    if command -v command_missing
+    then
+      command_missing "$@"
+    else
+      command_not_found "$@"
+    fi
+  }
+fi
+

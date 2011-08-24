@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# This file is where you define any necessary functions that will be shared
+# between all of your actions. You may also make actions.map file in the root
+# extension path defining a mapping of cli items to function names, example:
+#
+#install=myextension_install()
+#
+
+# myextension_cli()
+# {
+#   true # In here you implement any CLI processing
+#        # arguements are passed to you in either $@ or extension_args.
+# }
+
+#
+# myextension_initialize()
+# {
+#   true # In here you do any initialization for your extension.
+# }
+#
