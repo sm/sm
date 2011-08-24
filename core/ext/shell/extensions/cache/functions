@@ -47,8 +47,7 @@ initialize_actions_map_cache()
 detect_module_actions()
 {
   detect_module "$@" &&
-    [[ -f "${module_path}/bin" ]] &&
-    [[ -s "${module_path}/bin" ]]
+    [[ -s "${module_path}/shell/actions" ]]
 }
 
 # Step 3 collect dependent modules actions mapping
