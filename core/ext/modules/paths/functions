@@ -589,6 +589,50 @@ path_exists()
 }
 
 #
+# ## path\_does\_not\_exist()
+#
+# Check if given path does not exist.
+#
+# ### Input Parameters
+#
+# First parameter is a path.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 1 if the named path exists.
+# 0 if the named path does not exist.
+#
+# ### Failure Scenarios
+#
+# Fails if no path name/path was given.
+#
+# ### Usage Examples
+#
+#     user$ path_does_not_exist /bin/sm
+#     user$ echo $?
+#     1
+#
+#     user$ path_does_not_exist /bin/asdfasdf
+#     user$ echo $?
+#     1
+#
+path_does_not_exist()
+{
+  trace_filter filesystem
+  local _path="${1:-}"
+  shift || fail "No name/path was given."
+  [[ ! -d "$_path" ]]
+}
+
+#
 # ## path\_join()
 #
 # Joins path elements together passed as arguments into one path string.
@@ -694,6 +738,50 @@ directories_under_matching()
 }
 
 #
+# ## directory\_empty()
+#
+#
+directory_empty()
+{
+  trace_filter filesystem
+  local _path="${1:-}"
+  shift || fail "Path was not given as the first parameter."
+
+  [[ -d "${_path}" ]] || fail "'${_path}' is not a directory!"
+
+  for f in "${_path}"/*
+  do
+    case "$f" in
+      (*/\*) return 0 ;;
+      (*) return 1 ;;
+    esac
+  done
+  return 1
+}
+
+#
+# ## directory\_nonempty()
+#
+#
+directory_nonempty()
+{
+  trace_filter filesystem
+  local _path="${1:-}"
+  shift || fail "Path was not given as the first parameter."
+
+  [[ -d "${_path}" ]] || fail "'${_path}' is not a directory!"
+
+  for f in "${_path}"/*
+  do
+    case "$f" in
+      (*/\*) return 1 ;;
+      (*) return 0 ;;
+    esac
+  done
+  return 1
+}
+
+#
 # ## full_path()
 #
 # return full path to given path.
@@ -735,3 +823,4 @@ full_path()
   pwd
   )
 }
+

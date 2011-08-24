@@ -1038,7 +1038,7 @@ package_deactivate()
   (( $# == 0 )) || package_cli $@
 
   local _package="${package_name}" _package_version="${2:-${package_version}}" \
-    _file _files _version
+    _file _files _dir _dirs _version
 
   [[ -n "${_package}" ]] || fail "Package name must be given."
 
@@ -1065,13 +1065,22 @@ package_deactivate()
   _files=( $( find "${install_path}" -type f ) )
   for _file in "${_files[@]}"
   do
-    remove_files "${_file}"
+    remove_files "${active_path}/${_file#${install_path}/}"
+  done
+
+  _dirs=( $( find "${install_path}" -mindepth 1 -type d | sort -r ) )
+  for _dir in "${_dirs[@]}"
+  do
+    _dir="${active_path}/${_dir#${install_path}/}"
+    path_does_not_exist "${_dir}" ||
+      directory_nonempty "${_dir}" ||
+      remove "${_dir}"
   done
 
   _files=(
-  "/etc/ld.so.profile.d/${_package}.conf"
-  "/etc/profile.d/${_package}.sh"
-  "${packages_path}/${_package}/active"
+    "/etc/ld.so.profile.d/${_package}.conf"
+    "/etc/profile.d/${_package}.sh"
+    "${packages_path}/${_package}/active"
   )
 
   remove "${_files[@]}"
