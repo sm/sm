@@ -8,7 +8,7 @@ extension_path()
 
   for path in ${extensions_search_paths[@]}
   do
-    if [[ -d "${path}/${extension}/bin" || -d "${path}/${extension}/modules" ]]
+    if [[ -d "${path}/${extension}/bin" || -d "${path}/${extension}/shell" ]]
     then
       extension_path="${path}/${extension}"
       return 0
@@ -27,7 +27,7 @@ extension_is_valid()
   [[ -n "${_path}" ]] ||
     fail "Cannot determine if an extension is valid, as the path to the extension was not given."
 
-  [[ -d "${_path}/bin" || -d "${_path}/modules" ]]
+  [[ -d "${_path}/bin" || -d "${_path}/shell" ]]
 }
 
 detect_extension_existence()

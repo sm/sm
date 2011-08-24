@@ -333,7 +333,7 @@ service_setup()
 
   for _file in functions initialize cli
   do
-    source_files "${extension_path}/modules/${_file}"
+    source_files "${extension_path}/shell/${_file}"
   done
 
   if user_is_root

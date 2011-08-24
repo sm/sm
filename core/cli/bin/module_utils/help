@@ -11,7 +11,7 @@ action "list" \
   "List all modules installed in the system."
 
 action "docgen" \
-  "Generate module documentation from the system-installed BDSM instance into content/modules/."
+  "Generate module documentation from the system-installed BDSM instance into content/shell/."
 
 action "src" \
   "Prints out the modules source directory."
@@ -22,7 +22,7 @@ action "open" \
 action "functions" \
   "Prints out a summary listing of DSL functions, by module."
 
-resource "http://bdsm.beginrescueend.com/modules/"
+resource "http://bdsm.beginrescueend.com/shell/"
 
 show_help usage
 

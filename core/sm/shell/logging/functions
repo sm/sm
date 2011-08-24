@@ -177,7 +177,7 @@ debug()
 # ### Usage Examples
 #
 # user$ ./install --debug=search help
-# DEBUG search:   module sm/help            in builtin/sm/modules/help.
+# DEBUG search:   module sm/help            in builtin/sm/shell/help.
 #
 core_log_search()
 {
@@ -227,7 +227,7 @@ log_search()
 # ### Usage Examples
 #
 # user$ ./install --debug=search help
-# DEBUG search:   module sm/help            in builtin/sm/modules/help.
+# DEBUG search:   module sm/help            in builtin/sm/shell/help.
 #
 core_log_todo()
 {

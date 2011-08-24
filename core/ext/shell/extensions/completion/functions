@@ -14,7 +14,7 @@ find_starting_action()
 
   local _actions_root="${extensions_path}/${extension}/bin"
   local _actions_map="${extensions_path}/${extension}/actions.map"
-  local _modules_root="${extensions_path}/${extension}/modules"
+  local _modules_root="${extensions_path}/${extension}/shell"
   local _actions_cache=() _found_actions=()
 
   initialize_filesystem_cache

@@ -65,7 +65,7 @@ find_extension_action()
 
   local _actions_root="${extensions_path}/${extension}/bin"
   local _actions_map="${extensions_path}/${extension}/actions.map"
-  local _modules_root="${extensions_path}/${extension}/modules"
+  local _modules_root="${extensions_path}/${extension}/shell"
   local _actions_cache=()
 
   initialize_filesystem_cache
@@ -204,7 +204,7 @@ extension_action()
   fi
 
   extension_path="$extensions_path/$extension"
-  extension_modules_path="$extension_path/modules"
+  extension_modules_path="$extension_path/shell"
   extension_bin_path="$extension_path/bin"
   extension_config_path="$extension_path/config"
   extension_templates_path="$extension_path/templates"

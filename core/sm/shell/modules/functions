@@ -10,10 +10,10 @@ modules_core_initialize()
 
   #core is loaded as BDSM starts
   modules=(
-    "sm/core=core/sm/modules/core"
-    "sm/string=core/sm/modules/string"
-    "sm/logging=core/sm/modules/logging"
-    "sm/modules=core/sm/modules/modules"
+    "sm/core=core/sm/shell/core"
+    "sm/string=core/sm/shell/string"
+    "sm/logging=core/sm/shell/logging"
+    "sm/modules=core/sm/shell/modules"
   )
 
   for module_def in ${modules[@]}
@@ -164,7 +164,7 @@ extensions_in()
   then
     for _extension in "${_path}"/*
     do
-      if [[ -d "${_extension}/bin" || -d "${_extension}/modules" ]]
+      if [[ -d "${_extension}/bin" || -d "${_extension}/shell" ]]
       then
         found_extensions+=( "${_extension##${_path}\/}" )
       fi

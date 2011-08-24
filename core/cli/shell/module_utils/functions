@@ -226,7 +226,7 @@ module_docs()
     fail "Cannot generate documentation for '${_module}';"\
       " 'pygmentize' was not found in the PATH, install pygmentize and try again."
 
-  local _path="${core_development_path}/modules/${_module}"
+  local _path="${core_development_path}/shell/${_module}"
   if (( content_flag == 1 ))
   then
     shocco "${_path}/functions" |
@@ -288,7 +288,7 @@ modules_docgen()
   # for file in modules/*/functions ; do (name=${file%%\/functions}; shocco $file > html/${name//*\/}.html)& done ; wait
 
   local _module _modules _function _functions
-  local _prefix="${core_development_path}/html/modules"
+  local _prefix="${core_development_path}/html/shell"
   local _path="${site_development_path}"
 
   variable_is_nonempty core_development_path &&
@@ -303,7 +303,7 @@ modules_docgen()
     > "${_prefix}/index.html"
 
   _modules=($(
-  find "${core_development_path}/modules" -mindepth 1 -maxdepth 1  -type d |
+  find "${core_development_path}/shell" -mindepth 1 -maxdepth 1  -type d |
     sed -e 's#.*/##g' -e '/\..*/d'
   ))
 
@@ -342,10 +342,10 @@ modules_docopen()
     error "To run docopen, set core_development_path in ~/.smrc, and clone the sm core "\
     "repository into it."
 
-  file_exists "${core_development_path}/html/modules/index.html" ||
+  file_exists "${core_development_path}/html/shell/index.html" ||
     error "Run '$ sm mod docgen' before trying docopen."
 
-  os_open "${core_development_path}/html/modules/index.html"
+  os_open "${core_development_path}/html/shell/index.html"
 }
 
 # ## modules_site_docopen()
@@ -355,7 +355,7 @@ modules_site_docgen()
   # for file in modules/*/functions ; do (name=${file%%\/functions}; shocco $file > html/${name//*\/}.html)& done ; wait
 
   local _module _modules _function _functions
-  local _prefix="${core_development_path}/html/modules"
+  local _prefix="${core_development_path}/html/shell"
   local _path="${site_development_path}"
 
   path_exists "${core_development_path}" ||
@@ -365,7 +365,7 @@ modules_site_docgen()
     > "${_prefix}/index.html"
 
   _modules=($(
-  find "${core_development_path}/modules" -mindepth 1 -maxdepth 1 \
+  find "${core_development_path}/shell" -mindepth 1 -maxdepth 1 \
     -type d | sed -e 's#.*/##g' -e '/\..*/d'
   ))
   for _module in "${_modules[@]}"
@@ -397,21 +397,21 @@ modules_site_docgen()
     name=${file##*\/}
     name=${name%.haml}
 
-    ensure_paths_exist "${site_development_path}/content/modules/${name}"
+    ensure_paths_exist "${site_development_path}/content/shell/${name}"
 
     log "Building ${name} functions from generated docs."
-    cat > "${site_development_path}/content/modules/${name}/functions.haml" <<Header
+    cat > "${site_development_path}/content/shell/${name}/functions.haml" <<Header
   .breadcrumbs
     %a{ :href => "/" }
       Documentation
     &nbsp;>&nbsp;
-    %a{ :href => "/modules/" }
+    %a{ :href => "/shell/" }
       Modules
     &nbsp;>&nbsp;
-    %a{ :href => "/modules/${name}/" }
+    %a{ :href => "/shell/${name}/" }
       ${name}
     &nbsp;>&nbsp;
-    %a{ :href => "/modules/${name}/functions/" }
+    %a{ :href => "/shell/${name}/functions/" }
       functions API :: ${name}
     %hr
 
@@ -419,10 +419,10 @@ modules_site_docgen()
     Module ${name}
 
 Header
-    cat $file >> "${site_development_path}/content/modules/${name}/functions.haml"
+    cat $file >> "${site_development_path}/content/shell/${name}/functions.haml"
 
     html2haml "${_base}.html" \
-      >> "${site_development_path}/content/modules/${name}/functions.haml"
+      >> "${site_development_path}/content/shell/${name}/functions.haml"
     )&
   done
 

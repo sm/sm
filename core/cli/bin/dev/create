@@ -19,7 +19,7 @@ do
 
   _path="${target_path}/${extension}"
 
-  copy_paths bin modules templates config \
+  copy_paths bin shell templates config \
     to "${_path}"
 
   copy_files README.md VERSION CHANGELOG.md TODO.md \
@@ -30,9 +30,9 @@ do
     extension_module_add "${extension}" "${_module}" "${_path}"
 
     # Run the module's extension setup function, if it exists.
-    if file_exists "${sm_path}/core/cli/modules/${_module}/extensions"
+    if file_exists "${sm_path}/core/cli/shell/${_module}/extensions"
     then
-      source_files "${sm_path}/core/cli/modules/${_module}/extensions"
+      source_files "${sm_path}/core/cli/shell/${_module}/extensions"
       if command_exists "${_module}_extension_setup"
       then
         "${_module}_extension_setup" "${extension}" "${_module}" "${_path}"

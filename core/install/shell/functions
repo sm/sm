@@ -142,7 +142,7 @@ set_sm_path()
     in "${install_path}/bin/smp"
 
   replace_content "^saved_sm_path=.*" with "saved_sm_path=\"\${sm_path:-${install_path}}\"" \
-    in "${install_path}/core/sm/modules/core/initialize"
+    in "${install_path}/core/sm/shell/core/initialize"
 }
 
 make_binaries_executable()
@@ -168,9 +168,11 @@ install_sm()
 
   perform setup_profile_d
 
-  user_is_not_root || \
+  if user_is_root
+  then
     log_step "Setting up sm shell completion (${completion_prefix}/${_name})" \
       perform setup_shell_completion
+  fi
 
   log_step "Ensuring that binaries are executable" \
     make_binaries_executable

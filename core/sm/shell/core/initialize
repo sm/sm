@@ -34,7 +34,7 @@ else
 fi
 
 true \
-  "${modules_path:="${sm_path}/core/sm/modules"}" \
+  "${modules_path:="${sm_path}/core/sm/shell"}" \
   "${templates_path:="${sm_path}/templates"}" \
   "${src_path:="${sm_path}/src"}" \
   "${md5_path:="${sm_path}/md5"}" \
