@@ -2,17 +2,21 @@
 
 detect_template()
 {
-  local extensions_path=$1 _module_path
-  shift || fail "Cannot detect template;"\
-    " No extensions path given as first parameter."
+  trace_filter template
+
+  local extensions_path="${1:-}" _module_path
+
+  shift || fail "No extensions path given as first parameter."
 
   rebuild_path "templates" $extensions_path $@
+
   _template_path="${rebuilded_path}"
 
   if [[ -f "${_template_path}.template" ]]
   then
     template_path="${_template_path}.template"
     return 0
+
   elif [[ -f "${_template_path}" ]]
   then
     template_path="${_template_path}"
@@ -54,8 +58,9 @@ detect_template()
 # ### Code Walkthrough
 template_exists()
 {
-  if in_search_paths detect_template "$@" ||
-    in_cli_path detect_template "$@"
+  trace_filter template
+
+  if in_search_paths detect_template "$@" || in_cli_path detect_template "$@"
   then
     log_search "template" "$template_name" "${template_path##${sm_path}\/}"
     return 0
@@ -100,6 +105,7 @@ template_exists()
 # ### Code Walkthrough
 install_template()
 {
+  trace_filter template
   # Declare function local variables, also set source mode and owner defaults
   local _template _name _target _source="${extension_templates_path}" \
     _mode=0644 _owner=$USER
@@ -132,18 +138,19 @@ install_template()
     case "${token}" in
       to)
         _target="$1"
-        shift
+        shift || fail "target path must follow keyword 'to'"
         ;;
       mode)
         _mode="$1"
-        shift
+        shift || fail "mode must follow keyword 'mode'"
         ;;
       owner)
         _owner="$1"
-        shift
+        shift || fail "owner must follow keyword 'owner'"
         ;;
       from)
-        fail 'install_template is not valid.'
+        _source="$1"
+        shift || fail "source template path must follow keyword 'from'"
         ;;
       *)
         if variable_is_empty _name
@@ -157,8 +164,7 @@ install_template()
     esac
   done
 
-  template_exists "${_name}" || fail "Cannot install template; "\
-    "No template found matching '${_name}'."
+  template_exists "${_name}" || fail "No template found matching '${_name}'."
 
   _template="${template_path}"
   _name="$(basename "${_name}")"
@@ -167,9 +173,11 @@ install_template()
 
   if path_exists "${_target}"
   then
-    ! path_exists "${_target}/${_name}" ||
+    if path_exists "${_target}/${_name}"
+    then
       fail "Cannot install the template '${_template}' to ${_target}/${_name},"\
         " as it is a directory."
+    fi
 
     copy_file "${_template}" to "${_target}/${_name}"
 
@@ -228,6 +236,8 @@ install_template()
 # ### Code Walkthrough
 seed_template()
 {
+  trace_filter template
+
   local _template="${1:-}"
   shift || fail "Cannot seed template;"\
     " No template name was given as the first parameter."
@@ -260,6 +270,8 @@ seed_template()
 
 update_seed_template()
 {
+  trace_filter template
+
   local _template="${1:-}" _target="${2:-}"
   shift || fail "Cannot update seed template;"\
     " Template name was not given as the first parameter."

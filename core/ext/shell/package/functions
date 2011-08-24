@@ -314,8 +314,7 @@ package_init()
       package_name="${package_name%%:*}"
       ;;
     *)
-      : "${package_version:="${2:-}"}"
-      : "${archive_format:="${3:-}"}"
+      true "${package_version:="${2:-}"}" "${archive_format:="${3:-}"}"
       ;;
   esac
 
@@ -333,8 +332,19 @@ package_init()
     "${archives_path:="${sm_path}/archives"}" \
     ${static_flag:=0}
 
-  LDFLAGS="-L${active_path}/lib ${LDFLAGS:-}"
-  CFLAGS="-I${active_path}/include ${CFLAGS:-} "
+  case "${package_strategy:-gnu}" in
+    gnu)
+      LDFLAGS="-L${active_path}/lib ${LDFLAGS:-}"
+      CFLAGS="-I${active_path}/include ${CFLAGS:-} "
+      if os_is_darwin && [[ -x /usr/bin/gcc-4.2 ]]
+      then
+        export CC=/usr/bin/gcc-4.2
+      fi
+      ;;
+    *)
+      fail "Unknown strategy ${package_strategy}"
+      ;;
+  esac
 
   export package_name packages_path package_name package_version archive_format \
     package_file package_url package_md5_url packages_path bin_path source_path \
@@ -674,14 +684,20 @@ package_fetch()
 {
   (( $# == 0 )) || package_cli $@
 
+  local _args=()
+
   : \
     "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
     "${package_url:="${package_base_url}/${package_file}"}"
 
   package_fetch_md5
+  if [[ -n "${scm_type:-}" ]]
+  then
+    _args+=( "scm_type" "${scm_type}" )
+  fi
 
-  fetch_uri "${package_url}" "${source_path}/${package_dir}" "${package_md5:-#}" ||
-    return 1
+  fetch_uri "${package_url}" "${source_path}/${package_dir}" \
+    "${package_md5:-#}" ${_args[@]} || return 1
 
   [[ -d "${source_path}/${package_dir}/${package_dir}" ]] || return 0
 
@@ -1038,7 +1054,7 @@ package_deactivate()
   (( $# == 0 )) || package_cli $@
 
   local _package="${package_name}" _package_version="${2:-${package_version}}" \
-    _file _files _version
+    _file _files _dir _dirs _version
 
   [[ -n "${_package}" ]] || fail "Package name must be given."
 
@@ -1065,13 +1081,22 @@ package_deactivate()
   _files=( $( find "${install_path}" -type f ) )
   for _file in "${_files[@]}"
   do
-    remove_files "${_file}"
+    remove_files "${active_path}/${_file#${install_path}/}"
+  done
+
+  _dirs=( $( find "${install_path}" -mindepth 1 -type d | sort -r ) )
+  for _dir in "${_dirs[@]}"
+  do
+    _dir="${active_path}/${_dir#${install_path}/}"
+    path_does_not_exist "${_dir}" ||
+      directory_nonempty "${_dir}" ||
+      remove "${_dir}"
   done
 
   _files=(
-  "/etc/ld.so.profile.d/${_package}.conf"
-  "/etc/profile.d/${_package}.sh"
-  "${packages_path}/${_package}/active"
+    "/etc/ld.so.profile.d/${_package}.conf"
+    "/etc/profile.d/${_package}.sh"
+    "${packages_path}/${_package}/active"
   )
 
   remove "${_files[@]}"
