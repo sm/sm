@@ -20,7 +20,7 @@ do
       extension_action="head"
       ;;
 
-    # With the event of begin able to call functions from .actions files on the
+    # With the event of begin able to call functions from bin files on the
     # command line this can no longer be done here. ~ Wayne
     # (${version_pattern}) # x.y.z
     #   # TODO: Set env vars instead of calling the method.

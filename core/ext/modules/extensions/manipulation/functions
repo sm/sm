@@ -145,18 +145,17 @@ extension_actions()
 {
   local _extension="${1:-}" _files _file _actions=()
 
-  shift || fail "Cannot list actions for extension;"\
-    " No extension was given."
+  shift || fail "No extension was given."
 
-  path_exists "${extension_actions_path}" || return 0
+  path_exists "${extension_bin_path}" || return 0
 
   _files=($(
-  find "${extension_actions_path}" -mindepth 1 -type f -perm -o+rx
+  find "${extension_bin_path}" -mindepth 1 -type f -perm -o+rx
   ))
 
   for _file in "${_files[@]}"
   do
-    _actions+=("${_file#${extension_actions_path}}")
+    _actions+=("${_file#${extension_bin_path}}")
   done
   _actions="${_actions[@]}" # Convert from array to string.
   printf "${_actions}"
@@ -202,8 +201,8 @@ extension_install()
     " No extension name was given."
 
   extension_is_valid "${extensions_src_path}/${_src}" ||
-    error "${extensions_src_path}/${_src} is not a valid extension,"\
-    "as it is missing VERSION and/or actions/help files."
+    error "${extensions_src_path}/${_src} is not a valid extension;"\
+    "It is missing modules/ and/or bin/ files."
 
   log "Installing ${_extension}"
 

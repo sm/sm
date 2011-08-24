@@ -164,7 +164,7 @@ extensions_in()
   then
     for _extension in "${_path}"/*
     do
-      if [[ -d "${_extension}/actions" || -d "${_extension}/modules" ]]
+      if [[ -d "${_extension}/bin" || -d "${_extension}/modules" ]]
       then
         found_extensions+=( "${_extension##${_path}\/}" )
       fi

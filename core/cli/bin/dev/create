@@ -19,7 +19,7 @@ do
 
   _path="${target_path}/${extension}"
 
-  copy_paths actions modules templates config \
+  copy_paths bin modules templates config \
     to "${_path}"
 
   copy_files README.md VERSION CHANGELOG.md TODO.md \

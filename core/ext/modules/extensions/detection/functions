@@ -24,7 +24,7 @@ action_cache_check()
   then
     _found_actions="${_found_actions#*=}"
     action="${_found_actions##*/}"
-    action_path="${extensions_path}/${extension}/actions/${_found_actions}"
+    action_path="${extensions_path}/${extension}/bin/${_found_actions}"
     action_path="${action_path%/*}"
     extension_args=( "${_rest_params[@]}" )
     return 0
@@ -63,7 +63,7 @@ find_extension_action()
   local _action_params=("$@") _action_path _new_action_path
   local _rest_params=() _param_temp _action_params_length
 
-  local _actions_root="${extensions_path}/${extension}/actions"
+  local _actions_root="${extensions_path}/${extension}/bin"
   local _actions_map="${extensions_path}/${extension}/actions.map"
   local _modules_root="${extensions_path}/${extension}/modules"
   local _actions_cache=()
@@ -205,7 +205,7 @@ extension_action()
 
   extension_path="$extensions_path/$extension"
   extension_modules_path="$extension_path/modules"
-  extension_actions_path="$extension_path/actions"
+  extension_bin_path="$extension_path/bin"
   extension_config_path="$extension_path/config"
   extension_templates_path="$extension_path/templates"
   extension_log_path="$log_path/$extension"
@@ -221,7 +221,7 @@ extension_action()
   extension_config_path=${extension_config_path}
   extension_templates_path=${extension_templates_path}
   extension_modules_path=${extension_modules_path}
-  extension_actions_path=${extension_actions_path}
+  extension_bin_path=${extension_bin_path}
   extension_log_path=${extension_log_path}"
 
   sm_exports

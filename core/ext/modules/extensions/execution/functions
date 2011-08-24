@@ -125,7 +125,7 @@ extension_run()
   # Now launch the extension, based on the determined _type.
   case "${_type}" in
     (function)
-      _namespaces=${_path##${extension_actions_path}}
+      _namespaces=${_path##${extension_bin_path}}
       extension_modules_load ${_namespaces//\// }
 
       action=${action%%(*}
@@ -136,7 +136,7 @@ extension_run()
     (shell)
       [[ "${action##*/}" != help ]] || modules ext/help
 
-      _namespaces=${_path##${extension_actions_path}}
+      _namespaces=${_path##${extension_bin_path}}
       extension_modules_load ${_namespaces//\// }
 
       extension_action_prerequisites

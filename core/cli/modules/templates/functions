@@ -1,6 +1,5 @@
 #!/bin/sh
 
-# actions
 templates_help()
 {
   echo "

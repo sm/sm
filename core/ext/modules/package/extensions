@@ -7,32 +7,9 @@ package_extension_setup()
   shift || fail "Cannot setup package extension; no module name given."
   shift || fail "Cannot setup package extension; no path given."
 
-  enter "${path}"
-
-  ensure_paths_exist "modules/${language}/${module}" "actions/${module}"
-
-  for file in functions initialize cli
+  for action in install uninstall update activate deactivate
   do
-    write '#!/bin/sh' to "modules/${language}/${module}/${file}"
+    write "${action}=${module}_${action}()" append to "${path}/actions.map"
   done
-
-  write "\n${module}_cli\n" append to "modules/${language}/${module}/cli"
-
-  write "#!/bin/sh
-description \"Extension for managing ${extension} \${website_url:-}.\"
-
-action \"package install\" \"Installs ${extension} package.\"
-action \"package uninstall\" \"Uninstalls ${extension} package.\"
-action \"package update\" \"Updates ${extension} package to the latest known version.\"
-
-show_help usage
-" append to "actions/${module}/help"
-  chmod_files 0755 "actions/${module}/help"
-
-  for action in install uninstall update
-  do
-    write "${action}=${module}_${action}()" append to "actions/${module}/.actions"
-  done
-  chmod_files 0755 "actions/${module}/.actions"
 }
 

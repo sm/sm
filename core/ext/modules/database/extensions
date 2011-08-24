@@ -9,7 +9,7 @@ database_extension_setup()
 
   enter "${path}"
 
-  ensure_paths_exist "modules/${module}" "actions/${module}"
+  ensure_paths_exist "modules/${module}" "bin/${module}"
 
   # Setup modules/package/{functions,initialize,cli}
   for file in functions initialize cli
@@ -19,11 +19,11 @@ database_extension_setup()
 
   write "\n${module}_cli\n" append to "modules/${module}/cli"
 
-  # setup actions/package/{...}
+  # setup bin/package/{...}
   for action in help initialize
   do
-    write '#!/bin/sh' to "actions/${module}/${action}"
-    chmod_files 0755 "actions/${module}/${action}"
+    write '#!/bin/sh' to "bin/${module}/${action}"
+    chmod_files 0755 "bin/${module}/${action}"
   done
 
   write "
@@ -32,10 +32,11 @@ description \"Extension for managing ${extension} (${website_url}).\"
 action \"initialize\" \"Initialize ${extension} database.\"
 
 show_help usage
-" append to "actions/${module}/help"
+" append to "bin/${module}/help"
 
   for action in initialize
   do
-    write "\n${module}_${action}\n" append to "actions/${module}/${action}"
+    write "\n${module}_${action}\n" append to "bin/${module}/${action}"
   done
 }
+
