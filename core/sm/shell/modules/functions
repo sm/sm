@@ -109,7 +109,7 @@ detect_module()
   local extensions_path=$1 _module_path
   shift || fail "Extensions path must be given as the first parameter."
 
-  rebuild_path "modules" $extensions_path $@
+  rebuild_path "shell" $extensions_path $@
   _module_path=${rebuilded_path}
 
   debug search_module_path ":${_module_path}:"
@@ -238,7 +238,10 @@ module()
   local _module="${1:-}" _file _module_dependency _module_path _hook _function
   shift || fail "No module name was given as the first parameter."
 
-  ! module_is_loaded "${_module}" || return 0 # Return if module is loaded.
+  if module_is_loaded "${_module}"
+  then
+    return 0 # Return if module is loaded.
+  fi
 
   # Search for module.
   if in_search_paths detect_module "${_module}"
