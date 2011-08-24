@@ -88,7 +88,7 @@ setup_shell_completion()
     to "${completion_prefix}/${_name}"
 
   seed_template "${completion_prefix}/${_name}" \
-    sm_path "${sm_path}"
+    sm_path "${install_path}"
 
   chmod_files "${_mode}" "${completion_prefix}/${_name}"
 }
