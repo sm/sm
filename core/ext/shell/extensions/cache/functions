@@ -116,6 +116,15 @@ action_cache_find_matching()
   done
 }
 
+debug_cache()
+{
+  local _entry
+  for _entry in "${_actions_cache[@]}"
+  do
+    debug search "cache: ${_entry}"
+  done
+}
+
 #TODO: deprecated
 build_actions_cache()
 {

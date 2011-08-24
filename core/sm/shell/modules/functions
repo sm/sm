@@ -283,7 +283,7 @@ module()
   done
 
   _function="${_module//\//_}"
-  _function="${_function/_modules/_}"
+  _function="${_function/_shell/_}"
 
   for _hook in initialize # options, etc... ?
   do

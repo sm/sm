@@ -47,7 +47,7 @@ action_cache_check()
     fi
     exit 1
   else
-    debug search "no actions found in '${extension}' for '${1}'"
+    debug search "no actions found in '${extension}' for '${_name}'"
   fi
   return 1
 }
@@ -71,6 +71,7 @@ find_extension_action()
   initialize_filesystem_cache
   initialize_actions_map_cache
   initialize_modules_actions_cache
+  debug_cache
 
   if [[ ! -f "${_actions_map}" ]]
   then
