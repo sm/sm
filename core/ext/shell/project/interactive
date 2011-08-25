@@ -5,12 +5,12 @@
 #
 # The following example sources the file only if it exists and is nonempty:
 #
-#     if [[ -s "/sm/extensions/builtin/core/shell/project/interactive" ]]
-#     then
-#       source "/sm/extensions/builtin/core/shell/project/interactive"
-#     fi
+# if [[ -s /opt/sm/core/ext/shell/project/interactive ]]
+# then
+#   . /opt/sm/core/ext/shell/project/interactive
+# fi
 #
-true "${p_search_path_depth:="7"}"
+true "${project_maxdepth:="3"}"
 true "${projects_path:="$HOME/projects"}"
 export projects_path
 
@@ -47,7 +47,7 @@ p()
   if [[ -n "${regex1}" ]]
   then
     _path=$(
-    find "$projects_path" -mindepth 1 -maxdepth ${p_search_path_depth} -iname "${regex1}*" -type d |
+    find "$projects_path" -mindepth 1 -maxdepth ${project_maxdepth} -iname "${regex1}*" -type d |
     head -1
     )
 
@@ -56,7 +56,7 @@ p()
     if [[ -n "${regex2}" ]]
     then
       _path=$(
-      find "$_path" -mindepth 1 -maxdepth ${p_search_path_depth} -iname "${regex2}*" -type d |
+      find "$_path" -mindepth 1 -maxdepth ${project_maxdepth} -iname "${regex2}*" -type d |
       head -1
       )
 
