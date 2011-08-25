@@ -9,7 +9,7 @@ service_extension_setup()
 
   for action in start stop restart status list
   do
-    write "${action}=${module}_${action}()" append to "${path}/actions.map"
+    write "${action}=${module}_${action}()" append to "${path}/map"
   done
 }
 

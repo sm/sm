@@ -13,12 +13,12 @@ find_starting_action()
   local _rest_params=() _param_temp _action_params_length
 
   local _actions_root="${extensions_path}/${extension}/bin"
-  local _actions_map="${extensions_path}/${extension}/actions.map"
+  local _map="${extensions_path}/${extension}/map"
   local _modules_root="${extensions_path}/${extension}/shell"
   local _actions_cache=() _found_actions=()
 
   initialize_filesystem_cache
-  initialize_actions_map_cache
+  initialize_map_cache
   initialize_modules_actions_cache
 
   if (( ${#_actions_cache[@]} ))

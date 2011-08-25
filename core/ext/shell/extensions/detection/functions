@@ -64,21 +64,21 @@ find_extension_action()
   local _rest_params=() _param_temp _action_params_length
 
   local _actions_root="${extensions_path}/${extension}/bin"
-  local _actions_map="${extensions_path}/${extension}/actions.map"
+  local _map="${extensions_path}/${extension}/map"
   local _modules_root="${extensions_path}/${extension}/shell"
   local _actions_cache=()
 
   initialize_filesystem_cache
-  initialize_actions_map_cache
+  initialize_map_cache
   initialize_modules_actions_cache
   debug_cache
 
-  if [[ ! -f "${_actions_map}" ]]
+  if [[ ! -f "${_map}" ]]
   then
-    log_search "missing" "actions map" "${_actions_map}"
+    log_search "missing" "map" "${_map}"
   fi
 
-  if [[ -f "${_actions_map}" ]] || (( ${#_actions_cache[@]} ))
+  if [[ -f "${_map}" ]] || (( ${#_actions_cache[@]} ))
   then
     while :
     do
@@ -101,7 +101,7 @@ find_extension_action()
       unset _action_params[$(( _action_params_length - 1 ))]
     done
   else
-    error "${extensions_path}/${extension} does not have actions.map or module dependencies with actions"
+    error "${extensions_path}/${extension} does not have map or module dependencies with actions"
   fi
   return 1
 }

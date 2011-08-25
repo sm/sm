@@ -31,14 +31,14 @@ initialize_filesystem_cache()
   fi
 }
 
-# Step 2 read actions.map
-initialize_actions_map_cache()
+# Step 2 read map
+initialize_map_cache()
 {
   trace_filter action_detection
   local _mapping
-  if [[ -f "${_actions_map}" ]]
+  if [[ -f "${_map}" ]]
   then
-    for _mapping in $( grep -v "^#" < "${_actions_map}" || true )
+    for _mapping in $( grep -v "^#" < "${_map}" || true )
     do actions_cache_add "${_mapping}"
     done
   fi
@@ -51,7 +51,7 @@ detect_module_actions()
     [[ -s "${module_path}/actions" ]]
 }
 
-# Step 3 collect dependent modules actions mapping
+# Step 3 collect dependent modules mapping
 initialize_modules_actions_cache()
 {
   trace_filter action_detection
@@ -144,7 +144,7 @@ build_actions_cache()
   shift || fail "Extension name must be given as the second parameter."
 
   local _actions_root="${_extension_path}/${_extension}/bin"
-  extension_build_actions_cache | sort > "${_extension_path}/${_extension}/actions.map" || return 1
+  extension_build_actions_cache | sort > "${_extension_path}/${_extension}/map" || return 1
 }
 
 #TODO: deprecated
