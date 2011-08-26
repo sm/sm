@@ -413,8 +413,7 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
     log_step "${package_name} ${package_version} ~ install" \
       "${package_name}_install"
   else
-    log_step "${package_name} ${package_version} ~ install" \
-      package_make_install
+    package_make_install
   fi
 
   if command_exists "${package_name}_postinstall"
@@ -561,12 +560,14 @@ package_make_install()
     _command="make ${make_install_flags[@]:-install}"
   fi
 
+  log_step "${package_name} ${package_version} ~ install"
+  ${_command} > make.install.log 2>&1 ||
+    package_error "Installation of ${package_name} ${package_version} failed! " "make.install.log"
+  log_step success
+
   verfs add \
     path "${packages_path}" name "${package_name}" version "${package_version}" \
     source "${install_path}"
-
-  ${_command} > make.install.log 2>&1 ||
-    package_error "Installation of ${package_name} ${package_version} failed! " "make.install.log"
 }
 
 package_activate()
