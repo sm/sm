@@ -91,11 +91,14 @@ extension_install()
 
   local _identifier="$(scm_identifier "${_uri}")"
 
-  fetch_uri "${_uri}" "${src_path}/${_identifier}" "$@" || return $?
-
-  versioned_fs add \
-    path "${exts_user_path}" name "${_name}" version "" \
-    source "${src_path}/${_identifier}"
+  if fetch_uri "${_uri}" "${src_path}/${_identifier}" "$@"
+  then
+    versionedfs add \
+      path "${exts_user_path}" name "${_name}" version "" \
+      source "${src_path}/${_identifier}"
+  else
+    return $?
+  fi
 }
 
 ext_install_all()
@@ -130,7 +133,7 @@ ext_update()
 
     if [[ ! -s "${exts_user_path}/active/${_name}/.uri" ]]
     then
-      log "Extension ${_name} does not contain stored uri."
+      warn "Extension ${_name} does not contain stored uri."
       continue
     fi
 
@@ -138,7 +141,7 @@ ext_update()
 
     if [[ -z "${_uri}" ]]
     then
-      log "Extension ${_name} does not contain stored uri."
+      warn "Extension ${_name} does not contain stored uri."
     else
       ext_install "${_name}" "${_uri}"
     fi
@@ -182,7 +185,7 @@ ext_uninstall()
     fi
   fi
 
-  versioned_fs remove \
+  versionedfs remove \
     path "${exts_user_path}" name "${_name}"
 }
 

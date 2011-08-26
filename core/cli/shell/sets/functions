@@ -96,11 +96,14 @@ set_install()
 
   local _identifier="$(scm_identifier "${_uri}")"
 
-  fetch_uri "${_uri}" "${src_path}/${_identifier}" "$@" || return $?
-
-  versioned_fs add \
-    path "${sets_user_path}" name "${_name}" version "" \
-    source "${src_path}/${_identifier}"
+  if fetch_uri "${_uri}" "${src_path}/${_identifier}" "$@"
+  then
+    versionedfs add \
+      path "${sets_user_path}" name "${_name}" version "" \
+      source "${src_path}/${_identifier}"
+  else
+    return $?
+  fi
 }
 
 sets_install_all()
@@ -135,7 +138,7 @@ sets_update()
 
     if [[ ! -s "${sets_user_path}/active/${_name}/.uri" ]]
     then
-      log "Extension set ${_name} does not contain stored uri."
+      warn "Extension set ${_name} does not contain stored uri."
       continue
     fi
 
@@ -143,7 +146,7 @@ sets_update()
 
     if [[ -z "${_uri}" ]]
     then
-      log "Extension set ${_name} does not contain stored uri."
+      warn "Extension set ${_name} does not contain stored uri."
     else
       sets_install "${_name}" "${_uri}"
     fi
@@ -187,7 +190,7 @@ sets_uninstall()
     fi
   fi
 
-  versioned_fs remove \
+  versionedfs remove \
     path "${sets_user_path}" name "${_name}"
 }
 

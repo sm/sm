@@ -1,19 +1,19 @@
 #!/bin/sh
 
 #
-# SM Framework Core Module ~ Versioned FileSystem (versioned_fs)
+# SM Framework Core Module ~ Versioned FileSystem (versionedfs)
 #
 # API Version: 1.0.0
 #
-# versioned_fs \
-#   path "{versioned_fs root path}" \
+# versionedfs \
+#   path "{versionedfs root path}" \
 #   strategy "{fhs,name}" \
 #   method "{link,copy}" \
 #   activate "{newest,first}"
 #
 # Example: (package module)
 #
-# versioned_fs \
+# versionedfs \
 #   path /opt/sm/pkg \
 #   strategy fhs \
 #   method link \
@@ -21,8 +21,8 @@
 #
 # FileSystem structure:
 #
-# {versioned_fs_path}/
-#   .versioned_fs/
+# {versionedfs_path}/
+#   .versionedfs/
 #     strategy # contains one of {fhs,name}
 #     method   # contains one of {link,copy}
 #     activate # contains one of {newest,first}
@@ -41,11 +41,11 @@
 # In both cases if method is 'link' then each entry will be a symlink
 # otherwise each entry will be copied files/directories.
 #
-versioned_fs()
+versionedfs()
 {
   local _token _path _paths _source _name _version _strategy _method _activate
   local _action="${1:-}"
-  shift || fail "Usage: versioned_fs path \"{versioned_fs root path}\" strategy \"{fhs,name}\" method \"{link,copy}\" activate \"{newest,first}\""
+  shift || fail "Usage: versionedfs path \"{versionedfs root path}\" strategy \"{fhs,name}\" method \"{link,copy}\" activate \"{newest,first}\""
 
   while (( $# ))
   do
@@ -53,7 +53,7 @@ versioned_fs()
     case "${_token}" in
       (path)
         _path="${1}"
-        shift || fail "versioned_fs path must follow keyword 'path'"
+        shift || fail "versionedfs path must follow keyword 'path'"
         ;;
       (source)
         _source="${1}"
@@ -91,66 +91,75 @@ versioned_fs()
           (*) fail "Activate must be one of {first,newest}" ;;
         esac
         ;;
+      (keep)
+        _keep="${1}"
+        shift || fail "activate path must follow keyword 'activate'"
+        case "${_keep}" in
+          (+([[:digit]]))
+            (( _keep > 0)) || fail "Keep must be a positive integer." ;;
+          (*) fail "Keep must be an integer." ;;
+        esac
+        ;;
       (*)
         fail "Unknown parameter '${_token}'"
     esac
   done
 
-  [[ -n "${_path}" ]] || fail "A versioned_fs root path must be given."
+  [[ -n "${_path}" ]] || fail "A versionedfs root path must be given."
 
-  [[ "${_action}" == create || -d "${_path}/.versioned_fs" ]] ||
-    fail "${_path} is not a versioned_fs root path; "\
-    "Use 'versioned_fs create path {path}' to initialize."
+  [[ "${_action}" == create || -d "${_path}/.versionedfs" ]] ||
+    fail "${_path} is not a versionedfs root path; "\
+    "Use 'versionedfs create path {path}' to initialize."
 
   case "${_action}" in
     (create)
-      _versioned_fs_create "${_path}"
+      _versionedfs_create "${_path}"
       ;;
     (add)
       [[ -n "${_name}" && -n "${_source}" ]] ||
         fail "Name and Source must be given."
       [[ -n "${_version}" ]] || _version="$(date +"%Y%m%d%H%M%S")"
-      _versioned_fs_add "${_path}" "${_name}" "${_version}" "${_source}"
-      _versioned_fs_activate "${_path}" "${_name}" "${_version}"
+      _versionedfs_add "${_path}" "${_name}" "${_version}" "${_source}"
+      _versionedfs_activate "${_path}" "${_name}" "${_version}"
       ;;
     (remove)
       [[ -n "${_name}" ]]    || fail "Name must be given."
-      _versioned_fs_remove "${_path}" "${_name}" "${_version}"
+      _versionedfs_remove "${_path}" "${_name}" "${_version}"
       ;;
     (activate)
       [[ -n "${_name}" && -n "${_version}" ]] ||
         fail "Name and Version must be given."
-      _versioned_fs_activate "${_path}" "${_name}" "${_version}"
+      _versionedfs_activate "${_path}" "${_name}" "${_version}"
       ;;
     (deactivate)
       [[ -n "${_name}" ]]    || fail "Name must be given."
-      _versioned_fs_deactivate "${_path}" "${_name}" "${_version}"
+      _versionedfs_deactivate "${_path}" "${_name}" "${_version}"
       ;;
     (versions)
-      _versioned_fs_remove "${_path}" "${_name}" "${_version}"
+      _versionedfs_remove "${_path}" "${_name}" "${_version}"
       ;;
     (active)
-      _versioned_fs_active "${_path}" "${_name}" "${_version}"
+      _versionedfs_active "${_path}" "${_name}" "${_version}"
       ;;
     (*)
-      fail "Unknown versioned_fs action '${_action}'"
+      fail "Unknown versionedfs action '${_action}'"
       ;;
   esac
 }
 
-_versioned_fs_create()
+_versionedfs_create()
 {
   local _path="$1"
-  mkdir -p "${_path}/"{.versioned_fs,versions,active} ||
-    fail "Could not create paths ${_path}/{.versioned_fs,versions,active}"
+  mkdir -p "${_path}/"{.versionedfs,versions,active} ||
+    fail "Could not create paths ${_path}/{.versionedfs,versions,active}"
 
-  echo "${_strategy}" > "${_path}/.versioned_fs/strategy"
-  echo "${_method}"   > "${_path}/.versioned_fs/method"
-  echo "${_activate}" > "${_path}/.versioned_fs/activate"
+  echo "${_strategy}" > "${_path}/.versionedfs/strategy"
+  echo "${_method}"   > "${_path}/.versionedfs/method"
+  echo "${_activate}" > "${_path}/.versionedfs/activate"
 
 }
 
-_versioned_fs_add()
+_versionedfs_add()
 {
   local _path="$1" _name="$2" _version="${3}" _source="$4"
 
@@ -169,12 +178,12 @@ _versioned_fs_add()
   fi
 }
 
-_versioned_fs_remove()
+_versionedfs_remove()
 {
   local _path="$1" _name="${2}" _version="${3}"
   local _version_path="${_path}/versions/${_name}/${_version}"
 
-  _versioned_fs_deactivate "${_path}" "${_name}" "${_version}"
+  _versionedfs_deactivate "${_path}" "${_name}" "${_version}"
 
   if [[ -d "${_version_path}" ]]
   then
@@ -182,7 +191,7 @@ _versioned_fs_remove()
   fi
 }
 
-_versioned_fs_activate()
+_versionedfs_activate()
 {
   local _path="$1" _name="${2}" _version="${3}" _target
   local _version_path="${_path}/versions/${_name}/${_version}"
@@ -192,7 +201,7 @@ _versioned_fs_activate()
   then # Deactivate if active version.
     if [[ "$(readlink "${_path}/versions/${_name}/active")" != "${_version_path}" ]]
     then
-      _versioned_fs_deactivate "${_path}" "${_name}"
+      _versionedfs_deactivate "${_path}" "${_name}"
     else
       return 0 # Success if the given name/version is already active.
     fi
@@ -200,7 +209,7 @@ _versioned_fs_activate()
 
   local _activate _active_version_path _index=0 _count _active_path
 
-  read -r _activate < "${_path}/.versioned_fs/activate"
+  read -r _activate < "${_path}/.versionedfs/activate"
 
   if [[ -L "${_path}/versions/${_name}/active" ]]
   then
@@ -215,8 +224,8 @@ _versioned_fs_activate()
     esac
   fi
 
-  read -r _strategy < "${_path}/.versioned_fs/strategy"
-  read -r _method < "${_path}/.versioned_fs/method"
+  read -r _strategy < "${_path}/.versionedfs/strategy"
+  read -r _method < "${_path}/.versionedfs/method"
 
   core_log_step "${_name} ${_version} ~ activate"
 
@@ -257,7 +266,7 @@ _versioned_fs_activate()
   # TODO: Add to active 'db'
 }
 
-_versioned_fs_deactivate()
+_versionedfs_deactivate()
 {
   local _path="$1" _name="${2}" _version="${3:-}"
   local _name_path="${_path}/versions/${_name}"
@@ -274,7 +283,7 @@ _versioned_fs_deactivate()
     return 0 #
   fi
 
-  read -r _strategy < "${_path}/.versioned_fs/strategy"
+  read -r _strategy < "${_path}/.versionedfs/strategy"
 
   case "${_strategy}" in
     (fhs)
@@ -297,7 +306,7 @@ _versioned_fs_deactivate()
   # Remove from active metadata
 }
 
-_versioned_fs_versions()
+_versionedfs_versions()
 {
   local _path="$1" _name="${2:-}"
 
@@ -311,7 +320,7 @@ _versioned_fs_versions()
   fi
 }
 
-_versioned_fs_active()
+_versionedfs_active()
 {
   local _path="$1" _name="${2:-}" _version _found
 

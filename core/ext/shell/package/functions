@@ -444,7 +444,7 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
       "${package_name}_postactivate"
   fi
 
-  versioned_fs add \
+  versionedfs add \
     path "${packages_path}" name "${package_name}" version "${package_version}" \
     source "${install_path}"
 
@@ -590,7 +590,7 @@ package_activate()
 {
   (( $# == 0 )) || package_cli $@
 
-  versioned_fs activate \
+  versionedfs activate \
     path "${packages_path}" name "${package_name}" version "${package_version}"
 
   package_ldconfig "${package_name}"
@@ -614,7 +614,7 @@ package_deactivate()
 
   log_step "${package_name} ${_version} ~ deactivate"
 
-  versioned_fs deactivate \
+  versionedfs deactivate \
     path "${packages_path}" name "${package_name}"
 
   log_step success
@@ -922,12 +922,12 @@ package_man()
 
 package_installed_versions()
 {
-  versioned_fs versions path "${packages_path}" name "${package_name}"
+  versionedfs versions path "${packages_path}" name "${package_name}"
 }
 
 packages_installed()
 {
-  versioned_fs versions path "${packages_path}"
+  versionedfs versions path "${packages_path}"
 }
 
 packages_active()
@@ -935,9 +935,9 @@ packages_active()
   local _name="${1:-}"
   if [[ -n "${_name}" ]]
   then
-    versioned_fs active path "${packages_path}" name "${_name}"
+    versionedfs active path "${packages_path}" name "${_name}"
   else
-    versioned_fs active path "${packages_path}"
+    versionedfs active path "${packages_path}"
   fi
 }
 

@@ -60,6 +60,7 @@ Please read 'sm man curl' for instructions how to solve this problem.\n"
       fi
     fi
   fi
+
   [[ -z "${__vcs_failed}" ]] || return 0
 
   rm -rf "${_final_target}" || true
@@ -104,9 +105,11 @@ Please read 'sm man curl' for instructions how to solve this problem.\n"
       fetch_error unknown_archive_format
       ;;
   esac
+
   [[ -z "${__vcs_failed}" ]] || return 0
 
   ls -d * >/dev/null 2>&1 || fetch_error empty_archive
 
-  echo "${_uri}" > "./.uri"
+  write "${_uri}" to "${_final_target}/.uri"
 }
+
