@@ -22,7 +22,7 @@
 # FileSystem structure:
 #
 # {versioned_fs_path}/
-#   versioned_fs/
+#   .versioned_fs/
 #     strategy # contains one of {fhs,name}
 #     method   # contains one of {link,copy}
 #     activate # contains one of {newest,first}
@@ -98,7 +98,7 @@ versioned_fs()
 
   [[ -n "${_path}" ]] || fail "A versioned_fs root path must be given."
 
-  [[ "${_action}" == create || -d "${_path}/versioned_fs" ]] ||
+  [[ "${_action}" == create || -d "${_path}/.versioned_fs" ]] ||
     fail "${_path} is not a versioned_fs root path; "\
     "Use 'versioned_fs create path {path}' to initialize."
 
@@ -141,12 +141,12 @@ versioned_fs()
 _versioned_fs_create()
 {
   local _path="$1"
-  mkdir -p "${_path}/"{versioned_fs,versions,active} ||
-    fail "Could not create paths ${_path}/{versioned_fs,versions,active}"
+  mkdir -p "${_path}/"{.versioned_fs,versions,active} ||
+    fail "Could not create paths ${_path}/{.versioned_fs,versions,active}"
 
-  echo "${_strategy}" > "${_path}/versioned_fs/strategy"
-  echo "${_method}"   > "${_path}/versioned_fs/method"
-  echo "${_activate}" > "${_path}/versioned_fs/activate"
+  echo "${_strategy}" > "${_path}/.versioned_fs/strategy"
+  echo "${_method}"   > "${_path}/.versioned_fs/method"
+  echo "${_activate}" > "${_path}/.versioned_fs/activate"
 
 }
 
@@ -200,7 +200,7 @@ _versioned_fs_activate()
 
   local _activate _active_version_path _index=0 _count _active_path
 
-  read -r _activate < "${_path}/versioned_fs/activate"
+  read -r _activate < "${_path}/.versioned_fs/activate"
 
   if [[ -L "${_path}/versions/${_name}/active" ]]
   then
@@ -215,8 +215,8 @@ _versioned_fs_activate()
     esac
   fi
 
-  read -r _strategy < "${_path}/versioned_fs/strategy"
-  read -r _method < "${_path}/versioned_fs/method"
+  read -r _strategy < "${_path}/.versioned_fs/strategy"
+  read -r _method < "${_path}/.versioned_fs/method"
 
   core_log_step "${_name} ${_version} ~ activate"
 
@@ -274,7 +274,7 @@ _versioned_fs_deactivate()
     return 0 #
   fi
 
-  read -r _strategy < "${_path}/versioned_fs/strategy"
+  read -r _strategy < "${_path}/.versioned_fs/strategy"
 
   case "${_strategy}" in
     (fhs)
