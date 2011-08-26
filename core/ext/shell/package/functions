@@ -444,7 +444,7 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
       "${package_name}_postactivate"
   fi
 
-  verfs add \
+  versioned_fs add \
     path "${packages_path}" name "${package_name}" version "${package_version}" \
     source "${install_path}"
 
@@ -590,7 +590,7 @@ package_activate()
 {
   (( $# == 0 )) || package_cli $@
 
-  verfs activate \
+  versioned_fs activate \
     path "${packages_path}" name "${package_name}" version "${package_version}"
 
   package_ldconfig "${package_name}"
@@ -614,7 +614,7 @@ package_deactivate()
 
   log_step "${package_name} ${_version} ~ deactivate"
 
-  verfs deactivate \
+  versioned_fs deactivate \
     path "${packages_path}" name "${package_name}"
 
   log_step success
@@ -922,12 +922,12 @@ package_man()
 
 package_installed_versions()
 {
-  verfs versions path "${packages_path}" name "${package_name}"
+  versioned_fs versions path "${packages_path}" name "${package_name}"
 }
 
 packages_installed()
 {
-  verfs versions path "${packages_path}"
+  versioned_fs versions path "${packages_path}"
 }
 
 packages_active()
@@ -935,9 +935,9 @@ packages_active()
   local _name="${1:-}"
   if [[ -n "${_name}" ]]
   then
-    verfs active path "${packages_path}" name "${_name}"
+    versioned_fs active path "${packages_path}" name "${_name}"
   else
-    verfs active path "${packages_path}"
+    versioned_fs active path "${packages_path}"
   fi
 }
 

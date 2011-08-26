@@ -109,7 +109,7 @@ source "${modules_path}/modules/functions"
 
 modules_core_initialize
 
-modules sm/verfs # Used for pkg, extensions and modules.
+modules sm/versioned_fs # Used for pkg, extensions and modules.
 
 [[ "$OSTYPE" != *solaris* ]] || # custom compilations + g*
   export PATH="/bin:/opt/local/bin:/usr/sfw/bin:/usr/sbin:/usr/bin:${PATH}"

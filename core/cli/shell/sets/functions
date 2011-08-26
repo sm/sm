@@ -98,7 +98,7 @@ set_install()
 
   fetch_uri "${_uri}" "${src_path}/${_identifier}" "$@" || return $?
 
-  verfs add \
+  versioned_fs add \
     path "${sets_user_path}" name "${_name}" version "" \
     source "${src_path}/${_identifier}"
 }
@@ -187,7 +187,7 @@ sets_uninstall()
     fi
   fi
 
-  verfs remove \
+  versioned_fs remove \
     path "${sets_user_path}" name "${_name}"
 }
 

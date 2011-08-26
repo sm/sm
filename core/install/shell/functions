@@ -154,15 +154,15 @@ make_binaries_executable()
   done
 }
 
-create_verfs_paths()
+create_versioned_fs_paths()
 {
-  verfs create \
+  versioned_fs create \
     path "${install_path}/pkg" strategy fhs method link activate first
 
-  verfs create \
+  versioned_fs create \
     path "${install_path}/sets" strategy name method copy activate first
 
-  verfs create \
+  versioned_fs create \
     path "${install_path}/exts" strategy name method copy activate first
 }
 
@@ -174,7 +174,7 @@ install_sm()
 
   perform install_core
 
-  perform create_verfs_paths
+  perform create_versioned_fs_paths
 
   perform set_sm_path
 

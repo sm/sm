@@ -93,7 +93,7 @@ extension_install()
 
   fetch_uri "${_uri}" "${src_path}/${_identifier}" "$@" || return $?
 
-  verfs add \
+  versioned_fs add \
     path "${exts_user_path}" name "${_name}" version "" \
     source "${src_path}/${_identifier}"
 }
@@ -182,7 +182,7 @@ ext_uninstall()
     fi
   fi
 
-  verfs remove \
+  versioned_fs remove \
     path "${exts_user_path}" name "${_name}"
 }
 
