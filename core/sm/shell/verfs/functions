@@ -222,7 +222,7 @@ _verfs_activate()
             [[ -d "${_target%/*}" ]] || mkdir -p "${_target%/*}"
             ln -sf "${_file}" "${_target}"
           done
-          printf "\r  [o] %40s" "${_name} ${_version} ~ linking"
+          printf "\r  [o] %-40s" "${_name} ${_version} ~ linking"
           ;;
         (copy)
           cp -Rf "${_version_path}/" "${_active_path}/"
