@@ -408,6 +408,8 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
       package_preinstall
   fi
 
+  ensure_paths_exist "${install_path}"
+
   if command_exists "${package_name}_install"
   then
     log_step "${package_name} ${package_version} ~ install" \
@@ -415,6 +417,9 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
   else
     package_make_install
   fi
+
+  link --force "${source_path}/${package_dir}" \
+    to "${install_path}/src"
 
   if command_exists "${package_name}_postinstall"
   then
@@ -429,6 +434,9 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
   then
     package_activate_if_first "${package_name}" "${package_version}"
   fi
+
+  link --force "${source_path}/${package_dir}" \
+    to "${install_path}/src"
 
   if command_exists "${package_name}_postactivate"
   then
@@ -552,7 +560,7 @@ package_build()
 
 package_preinstall()
 {
-  link --force "${source_path}/${package_dir}" to "${install_path}/src"
+  true
 }
 
 package_make_install()
@@ -572,9 +580,10 @@ package_make_install()
   log_step success
 
 }
+
 package_postinstall()
 {
-  link --force "${source_path}/${package_dir}" to "${install_path}/src"
+  true
 }
 
 package_activate()
