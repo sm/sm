@@ -71,7 +71,7 @@ sets_list_known()
 sets_install()
 {
   local _name _names="${1:-}" _extension_namespace
-  shift || fail "Cannot install a set; No set name was given."
+  shift || fail "No set name was given."
 
   _names=(${_names//,/ })
   _extension_namespace="${sets_user_path#${sm_path}\/}"
@@ -79,39 +79,37 @@ sets_install()
 
   for _name in ${_names[@]}
   do
-    log_step "Installing ${_name} in ${_extension_namespace//\// }" set_install "${_name}" "$@" || true
+    log_step "Installing ${_name} in ${_extension_namespace//\// }" \
+      set_install "${_name}" "$@" || true
   done
 }
 
 set_install()
 {
   local _name="${1:-}"
-  shift || fail "Cannot install a set; No set name was given."
+  shift || fail "No set name was given."
 
   local _uri="${1:-}"
   shift || _uri=$( awk -F= "/^${_name}=/ {print \$2 }" < "${sm_path}/core/cli/config/known_sets" | tail -n 1 )
 
-  local _identifier="$(scm_identifier "${_uri}")"
-
   [[ -n "${_uri}" ]] ||
     error "uri not given and cannot find ${_name} in known extension sets."
 
+  local _identifier="$(scm_identifier "${_uri}")"
+
   fetch_uri "${_uri}" "${src_path}/${_identifier}" "$@" || return $?
 
-  [[ -z "${__vcs_failed}" ]] || return 1
-
   verfs add \
-    "${sets_user_path}" "${_name}" "" "${src_path}/${_identifier}"
+    path "${sets_user_path}" name "${_name}" version "" \
+    source "${src_path}/${_identifier}"
 }
 
 sets_install_all()
 {
   local _set _name _uri COLUMNS=80
-
   while read _set
   do
     [[ "${line}" != \#* ]] || continue
-
     _name="${_set/=*}"
     _uri="${_set/*=}"
     sets_install "${_name}" "${_uri}" --on-fail true
@@ -121,19 +119,12 @@ sets_install_all()
 sets_update()
 {
   local _name _uri
-
   (( $# > 0 )) ||
     error "Cannot update extension sets without giving their names! "
 
   for _name in "$@"
   do
-    case "${_name}" in
-      builtin|ext)
-        error "Extension set ${_name} cannot be updated."
-        ;;
-    esac
-
-    if [[ ! -d "${sets_user_path}/${_name}" ]]
+    if [[ ! -d "${sets_user_path}/active/${_name}" ]]
     then
       if in_search_paths detect_extension_existence "${_name}"
       then
@@ -141,17 +132,15 @@ sets_update()
       else
         error "Extension set ${_name} does not exist."
       fi
-    else
-      true
     fi
 
-    if [[ ! -s "${sets_user_path}/${_name}/.uri" ]]
+    if [[ ! -s "${sets_user_path}/active/${_name}/.uri" ]]
     then
       log "Extension set ${_name} does not contain stored uri."
       continue
     fi
 
-    _uri=$( cat "${sets_user_path}/${_name}/.uri" )
+    _uri=$( cat "${sets_user_path}/active/${_name}/.uri" )
 
     if [[ -z "${_uri}" ]]
     then
@@ -167,14 +156,11 @@ sets_update_all()
   local _name
   for _name in ${sets_user_path}/*
   do
-    [[ -d "${_name}"  ]] || continue
+    [[ -d "${sets_user_path}/active/${_name}"  ]] || continue
 
     case "${_name##*/}" in
-      (builtin|ext)
-        # Skip those two
-        ;;
       (\*)
-        log "No extension sets found for update."
+        error "No extension sets found for update."
         ;;
       (*)
         sets_update "${_name##*/}"
@@ -190,14 +176,9 @@ sets_uninstall()
     */*|.|..)
       error "Please specify a valid extension name."
       ;;
-    builtin|ext)
-      error "Extension set ${_name} cannot be removed."
-      ;;
   esac
 
-  enter "${sets_user_path}"
-
-  if [[ ! -d "${_name}" ]]
+  if [[ ! -d "${sets_user_path}/active/${_name}" ]]
   then
     if in_search_paths detect_extension_existence "${_name}"
     then
@@ -207,7 +188,8 @@ sets_uninstall()
     fi
   fi
 
-  log_step "Uninstalling extension set: ${_name}." rm -rf "${_name}"
+  verfs remove \
+    path "${sets_user_path}" name "${_name}"
 }
 
 sets_check_availability()
