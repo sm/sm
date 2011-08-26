@@ -1,28 +1,10 @@
 #!/bin/sh
 
 #
-# ## sm_exports()
+# SM Framework Core Module ~ Core (core)
 #
-# Exports relevant framework environment variables for extension action
-# processes.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# No failure scenarios currently.
-#
-# ### Usage Examples
+
+# Examples
 #
 #     user$ sm_exports
 #
@@ -31,32 +13,7 @@ sm_exports()
   export action archives_path sm_path branch config_path database database_name debug_flag environment error_message extension extension_action extension_args extension_bin_path extension_config_path extension_modules_path extension_path extension_templates_path flags framework head_flag hooks_flag keep_releases modules_path old_releases parse_break paths previous_path project project_path release_path remote repository result revision shared_path src_path templates_path timestamp tmp_path trace_flag user extension_log_path packages_path
 }
 
-#
-# ## sm_version()
-#
-# Reads the currently installed sm version into the variable 'sm_version'.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# The variable 'sm_version' will be set after the function is executed.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# No failure scenarios currently.
-#
-# ### Usage Examples
+# Examples
 #
 #     user$ sm_version
 #     user$ echo $sm_version
@@ -72,34 +29,7 @@ sm_version()
   fi
 }
 
-#
-# ## NIY()
-#
-# Prints a failure message and backtrace to the screen, letting the caller know
-# that the requested feature has not yet been implemented.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# Prints "This feature has not yet been implemented." to STDERR of the calling
-# environment.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# None; only exit is through failure.
-#
-# ### Failure Scenarios
-#
-# Fails always.
-#
-# ### Usage Examples
+# Examples
 #
 #     user$ cat $HOME/test
 #     #!/bin/sm

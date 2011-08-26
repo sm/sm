@@ -7,38 +7,7 @@ ext_defaults_initialize()
   #settings_search_path_append=()
 }
 
-#
-# ## read\_default()
-#
-# Reads default values from an extension's config/defaults file.
-#
-# ### Input Parameters
-#
-# First parameter is the defaults file key to read (key=value).
-# Second parameter is the variable name to store the retrieved value in.
-# Remaining parameters are parsed out as token, value and prefix
-#   into|as <variable name>
-#   prefix <name>
-#   <variable> # If no specifier.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# A variable will be set to the value, if the value is nonempty. If no variable
-# name is specified, the variable will be assigned the same name as the key.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if no arguments are passed in; you must at least specify a key.
-#
-# ### Usage Examples
+# Examples
 #
 #     user$ read_default "version" prefix "package" # extension is nginx, for example.
 #     user$ echo $package_version

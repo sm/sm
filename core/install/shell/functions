@@ -154,6 +154,18 @@ make_binaries_executable()
   done
 }
 
+create_verfs_paths()
+{
+  verfs create \
+    path "${install_path}/pkg" strategy fhs method link activate first
+
+  verfs create \
+    path "${install_path}/sets" strategy name method copy activate first
+
+  verfs create \
+    path "${install_path}/exts" strategy name method copy activate first
+}
+
 install_sm()
 {
   log "S{cripting,ystem,tack} Management (SM) Framework (Core) Installation:"
@@ -161,6 +173,8 @@ install_sm()
   prepare_for_installation
 
   perform install_core
+
+  perform create_verfs_paths
 
   perform set_sm_path
 

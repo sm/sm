@@ -1,5 +1,9 @@
 #!/bin/sh
 
+#
+# SM Framework Core Module ~ Modules (modules)
+#
+
 modules_core_initialize()
 {
   (( ! ${modules_initialized:=0} )) || return 0
@@ -201,30 +205,7 @@ in_cli_path()
   "${callback}" "${sm_path}/core" "cli" "$@"
 }
 
-#
-# ## module()
-#
-# Loads given module, and its dependencies.
-#
-# ### Input Parameters
-#
-# Module name to load
-#
-# ### Stream Outputs
-#
-# None,
-# except when '--debug=search' used - displays search result.
-#
-# ### Return Codes
-#
-# 0 for success.
-# 1 for module not found
-#
-# ### Failure Scenarios
-#
-# ERROR when dependent modules could not be loaded.
-#
-# ### Usage Examples
+# Examples
 #
 #    if module backup
 #    then
@@ -302,28 +283,7 @@ module_or_error()
   module "$1" || error "$2"
 }
 
-#
-# ## modules()
-#
-# Loads named BDSM modules into the calling environment.
-#
-# ### Input Parameters
-#
-# Positional Parameter listing and descriptions.
-#
-# ### Stream Outputs
-#
-# None, unless loading the module causes output to a stream.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if no module names were given as parameters.
-#
-# ### Usage Examples
+# Examples
 #
 #     user$ modules array system
 #
@@ -345,28 +305,7 @@ modules()
   done
 }
 
-#
-# ## modules\_reinitialize()
-#
-# Function Description
-#
-# ### Input Parameters
-#
-# Positional Parameter listing and descriptions.
-#
-# ### Stream Outputs
-#
-# None, unless loading the module causes output to a stream.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if no extension module files names have been given.
-#
-# ### Usage Examples
+# Examples
 #
 #     user$ module_reinitialize package
 #
@@ -390,29 +329,7 @@ modules_reinitialize()
   done
 }
 
-#
-# ## module\_is\_loaded()
-#
-# Checks to see whether or not the named module has been loaded.
-#
-# ### Input Parameters
-#
-# First parameter is a module name.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 - if the module has already been loaded.
-# 1 - if the module has not already been loaded.
-#
-# ### Failure Scenarios
-#
-# Fails if no module name was given as the first parameter.
-#
-# ### Usage Examples
+# Examples
 #
 #     user$ module_is_loaded package
 #     user$ echo $?
@@ -437,3 +354,4 @@ module_is_loaded()
       ;;
   esac
 }
+

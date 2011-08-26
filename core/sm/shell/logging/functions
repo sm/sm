@@ -1,113 +1,40 @@
 #!/bin/sh
 
 #
-# ## log()
+# SM Framework Core Module ~ Logging (logging)
 #
-# Log arguments to the calling environment's STDOUT.
-#
-# ### Input Parameters
-#
-# Strings to be logged.
-#
-# ### Stream Outputs
-#
-# Prints arguments passed in to the calling environment's STDOUT,
-# with a newline character appended.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# none.
-#
-# ### Usage Examples
-#
-# user$ log "Hello there! "
-# Hello there!
-#
+
 core_log()
 {
   printf "$*\n"
 }
 
+# Examples
+#
+# user$ log "Hello there! "
+# Hello there!
+#
 log()
 {
   core_log "$@"
 }
 
-#
-# ## warn()
-#
-# Log arguments to the calling environment's STDOUT, preceeded by 'WARNING '.
-#
-# ### Input Parameters
-#
-# Strings to be logged.
-#
-# ### Stream Outputs
-#
-# Prints arguments passed in to the calling environment's STDOUT,
-# with a newline character appended, and 'WARNING ' prepended.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# none.
-#
-# ### Usage Examples
-#
-# user$ info "Bad Monkeys Are Typing! "
-# WARNING: Bad Monkeys Are Typing!
-#
 core_warn()
 {
   printf "WARNING: $*\n"
 }
 
+# Examples
+#
+# user$ info "Bad Monkeys Are Typing! "
+# WARNING: Bad Monkeys Are Typing!
+#
 warn()
 {
   core_warn "$@"
 }
-#
-# ## debug()
-#
-# Log arguments to the calling environment's STDOUT, preceeded by 'DEBUG: '.
-#
-# ### Input Parameters
-#
-# Debug type, Strings to be logged.
-#
-# ### Stream Outputs
-#
-# Prints arguments passed in to the calling environment's STDOUT,
-# with a newline character appended, and 'DEBUG: ' prepended.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if no arguments are given.
-#
-# ### Usage Examples
+
+# Examples
 #
 # The following appears when sm is called with --debug=[welcome|all],
 # or if you set debug_flags to welcome|all.
@@ -148,33 +75,7 @@ debug()
   core_debug "$@"
 }
 
-#
-# ## log_search()
-#
-# Log arguments to the calling environment's STDOUT, preceeded by 'DEBUG: '.
-#
-# ### Input Parameters
-#
-# Search type, Search result, Strings to be logged.
-#
-# ### Stream Outputs
-#
-# Prints arguments passed in to the calling environment's STDOUT,
-# with a newline character appended, and 'DEBUG: ' prepended.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if no arguments are given.
-#
-# ### Usage Examples
+# Examples
 #
 # user$ ./install --debug=search help
 # DEBUG search:   module sm/help            in builtin/sm/shell/help.
@@ -198,33 +99,7 @@ log_search()
   core_log_search "$@"
 }
 
-#
-# ## log_todo()
-#
-# Log arguments to the calling environment's STDOUT, preceeded by 'DEBUG: ' and caller file:line.
-#
-# ### Input Parameters
-#
-# Search type, Search result, Strings to be logged.
-#
-# ### Stream Outputs
-#
-# Prints arguments passed in to the calling environment's STDOUT,
-# with a newline character appended, and 'DEBUG: caller_file:line' prepended.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if no arguments are given.
-#
-# ### Usage Examples
+# Examples
 #
 # user$ ./install --debug=search help
 # DEBUG search:   module sm/help            in builtin/sm/shell/help.
@@ -246,34 +121,7 @@ log_todo()
   core_log_todo "$@"
 }
 
-#
-# ## error()
-#
-# Log arguments to the calling environment's STDERR, preceeded by 'ERROR '.
-# Exits with status code 1.
-#
-# ### Input Parameters
-#
-# Strings to be logged.
-#
-# ### Stream Outputs
-#
-# Prints arguments passed in to the calling environment's STDOUT,
-# with a newline character appended, and 'ERROR ' prepended.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 1 for failure.
-#
-# ### Failure Scenarios
-#
-# Fails if no arguments are given.
-#
-# ### Usage Examples
+# Examples
 #
 # user$ error "Hello there! "
 # ERROR Hello there!
@@ -293,33 +141,7 @@ error()
   core_error "$@"
 }
 
-#
-# ## succeed()
-#
-# Log arguments to the calling environment's STDOUT. Exits with status code 0.
-#
-# ### Input Parameters
-#
-# Strings to be logged.
-#
-# ### Stream Outputs
-#
-# Prints arguments passed in to the calling environment's STDOUT,
-# with a newline character appended.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if no arguments are given.
-#
-# ### Usage Examples
+# Examples
 #
 # user$ succeed "Hello there! "
 # Hello there!
@@ -339,34 +161,7 @@ succeed()
   core_succeed "$@"
 }
 
-#
-# ## fail()
-#
-# Log arguments to the calling environment's STDERR, preceeded by 'ERROR '.
-# Exits with status code 1.
-#
-# ### Input Parameters
-#
-# Strings to be logged.
-#
-# ### Stream Outputs
-#
-# Prints arguments passed in to the calling environment's STDOUT,
-# with a newline character appended, and 'ERROR ' prepended.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 1 for failure.
-#
-# ### Failure Scenarios
-#
-# Fails if no arguments are given.
-#
-# ### Usage Examples
+# Examples
 #
 # user$ error "Hello there! "
 # ERROR Hello there!
@@ -384,28 +179,7 @@ fail()
   core_fail "$@"
 }
 
-#
-# ## set_ps4()
-#
-# Set the environmental PS4 variable for informative tracing.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# No failure scenarios currently.
-#
-# ### Usage Examples
+# Examples
 #
 #     user$ echo "'$PS4'"
 #     '+ '
@@ -424,32 +198,7 @@ set_ps4()
   return 0
 }
 
-#
-# ## trace_filter()
-#
-# Enables tracing, depending on the filter.
-# If enabled, display every line of code execution after the function returns,
-# in the format specified by the PS4 environment variable
-# (see set_ps4).
-#
-# ### Input Parameters
-#
-# type of trace to filter
-# if none given restores default state
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# No failure scenarios currently.
-#
-# ### Usage Examples
+# Examples
 #
 #     trace_filter search
 #     <search code>
@@ -497,6 +246,7 @@ core_trace_filter()
     fi
   fi
 }
+
 trace_filter()
 {
   set +o xtrace
@@ -584,31 +334,7 @@ separator()
   printf "${_separator// /=}\n"
 }
 
-#
-# ## backtrace()
-#
-# Display a backtrace of the current call stack, to the point that backtrace was
-# called from. Currently, trace is turned on as well, so that execution after
-# calling backtrace is traced, too.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# The call stack, up to the current point of execution, is printed to
-# the STDOUT of the calling environment.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# No failure scenarios currently.
-#
-# ### Usage Examples
+# Examples
 #
 #     user$ cat ./test
 #     #!/bin/sm

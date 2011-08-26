@@ -9,7 +9,7 @@ ext_database_initialize()
       "${database_user:="${package_user:-"${extension}"}"}"
   else
     true \
-      "${data_base_path:="${packages_path}/db/${package_name}"}" \
+      "${data_base_path:="${active_path}/db/${package_name}"}" \
       "${database_user:="${package_user:-"$USER"}"}"
   fi
 

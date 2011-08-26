@@ -1,47 +1,5 @@
 #!/bin/sh
 
-# ## package\_error
-#
-# Presents the user with a package-related error message, including the tail
-# of an optional log file.
-#
-# ### Input Parameters
-#
-# String to be logged; an optional log file containing more details, and
-# an optional number of lines of the file to show (defaults to 25).
-#
-# ### Stream Outputs
-#
-# Prints arguments passed in to the calling environment's STDOUT,
-# with a newline character appended, and 'ERROR ' prepended.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 1 for failure.
-#
-# ### Failure Scenarios
-#
-# Fails if no arguments are given.
-#
-# ### Usage Examples
-#
-#     user$ package_error "Hello there! " configure.log 5
-#     ERROR Hello there!
-#
-#
-#     Tail of configure.log:
-#			checking for inflate in -lz... no
-#			configure: error: zlib library not found
-#			If you have zlib already installed, see config.log for details on the
-#			failure.  It is possible the compiler isn't looking in the proper directory.
-#			Use --without-zlib to disable zlib support.
-#
-#     *poof* shell closed...
-#
 package_error()
 {
   local _message="${1:-}" _log="${2:-}"
@@ -58,44 +16,12 @@ package_error()
 #
 # ## package\_definition
 #
-# Enables module developers to easily set package variables in name, value pairs.
-#
-# ### Input Parameters
-#
-# Parameters must come in pairs, variable name first (without the 'package'
-# prefix), value second.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# For each name/value pair, a variable package_${name} is created with the given
-# value.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if extension developer accidentailly separates key/value with an = :)
-# Fails if a key is given without a matching value.
-#
 # ### Usage Examples
-#
-# Example Usage:
 #
 # user$ package_definition \
 #         name "bash" \
 #         version "4.2" \
 #         url "ftp.gnu.org/gnu/bash/"
-#
-# ### Notes
-#
-# For readability, it is recommended to split the line into "key value" lines by
-# ending the line with a single backslash '\' character, with no space afterwards.
 #
 package_definition()
 {
@@ -142,9 +68,6 @@ package_definition()
       md5_url)
         package_md5_url="${value}"
         ;;
-      active_path)
-        active_path="${value}"
-        ;;
       bin_path)
         bin_path="${value}"
         ;;
@@ -171,39 +94,6 @@ package_definition()
   done
 }
 
-#
-# ## package\_cli
-#
-# Parses package CLI arguments.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# none.
-#
-# ### Environmental effects
-#
-# Updates cli configuration for the given package.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Errors halting program if cli setup fails for any reason.
-#
-# ### Usage Examples
-#
-# Example Usage:
-#
-# user$ package_cli "${extension_args[@]}"
-#
-# ### Notes
-#
 package_cli()
 {
   local _ignored_args=() _package_args=( $@ ) _token
@@ -363,7 +253,7 @@ package_init()
     "${init_scripts_path:="$(init_scripts_path)"}" \
     "${archive_format:=tar.gz}" \
     "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
-    "${install_base_path:="${packages_path}/${package_name}"}" \
+    "${install_base_path:="${packages_path}/versions/${package_name}"}" \
     "${install_path:="${install_base_path}/${package_version}"}"
 
   configure_flags+=( --prefix="${install_path}" )
@@ -382,7 +272,6 @@ package_init()
     ensure_paths_exist "${active_path}/${fhs_dirs}"
   done
 
-
   if user_is_root
   then
     true \
@@ -390,7 +279,7 @@ package_init()
       "${package_user:="${package_name}"}"
   else
     true \
-      "${log_path:="${packages_path}/log"}" \
+      "${log_path:="${active_path}/log"}" \
       "${package_user:="$USER"}"
   fi
 
@@ -411,26 +300,6 @@ package_init()
 # * activation
 # * service setup, if service module is loaded
 #
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# Steps performed are logged to STDOUT of the calling environment.
-#
-# ### Environmental effects
-#
-# Package installation artifacts are created in the system and source directories.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if any of the constituant components fail.
-#
 # ### Usage Examples
 #
 # Example Usage:
@@ -441,8 +310,6 @@ package_init()
 #         url "ftp.gnu.org/gnu/bash/"
 #
 # user$ package_install
-#
-# ### Notes
 #
 package_install()
 {
@@ -570,9 +437,6 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
   package_setup
 }
 
-#
-# ## package\_update
-#
 package_update()
 {
   (( $# == 0 )) || package_cli $@
@@ -588,39 +452,6 @@ package_update()
   fi
 }
 
-#
-# ## package\_fetch\_md5
-#
-# Fetches the package's md5 sum from the md5_url, if given.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# none.
-#
-# ### Environmental effects
-#
-# The 'package_md5' variable is set with the downloaded md5 sum.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if any of the constituant components fail.
-#
-# ### Usage Examples
-#
-# Example Usage:
-#
-# user$ package_fetch_md5
-#
-# ### Notes
-#
 package_fetch_md5()
 {
   (( $# == 0 )) || package_cli $@
@@ -646,40 +477,6 @@ package_fetch_md5()
     fi
 }
 
-#
-# ## package\_fetch
-#
-# Fetches the package and extract it to source.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# scm output goes to STDERR of the calling environment.
-#
-# ### Environmental effects
-#
-# The archive file will be fetched to filesystem.
-# The archive file will be extracted to filesystem.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# No failure scenarios currently.
-#
-# ### Usage Examples
-#
-# Example Usage:
-#
-# user$ package_fetch
-#
-# ### Notes
-#
 package_fetch()
 {
   (( $# == 0 )) || package_cli $@
@@ -707,39 +504,6 @@ package_fetch()
   rm -rf "${source_path}/${package_dir}/${package_dir}/"
 }
 
-#
-# ## package\_configure
-#
-# Configures the package source (eg. ./configure ...).
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# none.
-#
-# ### Environmental effects
-#
-# Makefile will be generated for a standard package extension.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Errors halting program if configuration fails for any reason.
-#
-# ### Usage Examples
-#
-# Example Usage:
-#
-# user$ package_configure
-#
-# ### Notes
-#
 package_configure()
 {
   local _command
@@ -761,39 +525,6 @@ package_configure()
     package_error "Configuration of ${package_name} ${package_version} failed." "configure.log"
 }
 
-#
-# ## package\_build
-#
-# builds the package source (eg. make)
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# none.
-#
-# ### Environmental effects
-#
-# Makefile will be generated for a standard package extension.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Errors halting program if building fails for any reason.
-#
-# ### Usage Examples
-#
-# Example Usage:
-#
-# user$ package_build
-#
-# ### Notes
-#
 package_build()
 {
   local _command
@@ -811,77 +542,12 @@ package_build()
     package_error "Compilation of ${package_name} ${package_version} failed! " "build.log"
 }
 
-#
-# ## package\_preinstall
-#
-# Link compilation dir to installation dir/src
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# none.
-#
-# ### Environmental effects
-#
-# Compilation dir will be available as src in installation directory
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# None
-#
-# ### Usage Examples
-#
-# Example Usage:
-#
-# user$ package_preinstall
-#
-# ### Notes
-#
+
 package_preinstall()
 {
   link --force "${source_path}/${package_dir}" to "${install_path}/src"
 }
 
-#
-# ## package\_make\_install
-#
-# make install  the package source (eg. make)
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# none.
-#
-# ### Environmental effects
-#
-# Installation files will be installed to the install_path.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Errors halting program if make install fails for any reason.
-#
-# ### Usage Examples
-#
-# Example Usage:
-#
-# user$ package_make_install
-#
-# ### Notes
-#
 package_make_install()
 {
   local _command
@@ -897,115 +563,22 @@ package_make_install()
     package_error "Installation of ${package_name} ${package_version} failed! " "make.install.log"
 }
 
-#
-# ## package\_activate
-#
-# activates the package
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# none.
-#
-# ### Environmental effects
-#
-# Symlink will be created to the active version in the package install path.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Errors halting program if activating fails for any reason.
-#
-# ### Usage Examples
-#
-# Example Usage:
-#
-# user$ package_activate
-#
-# ### Notes
-#
 package_activate()
 {
   (( $# == 0 )) || package_cli $@
 
-  local _file _files=() _path _paths
+  log_step "${package_name} ${package_version} ~ activate"
 
-  true "${install_path:="${packages_path}/${package_name}/${package_version}"}"
+  verfs activate \
+    path "${packages_path}" name "${package_name}" version "${package_version}"
 
-  if path_exists "${install_path}"
-  then
-    if symlink_exists "${packages_path}/${package_name}/active"
-    then
-      local _version=$(readlink "${packages_path}/${package_name}/active")
-      package_deactivate "${package_name}" ${_version##*/}
-    fi
-
-    log_step "${package_name} ${package_version} ~ activate" \
-
-    _paths=($( find "${install_path}" -type d ))
-    for _path in "${_paths[@]}"
-    do
-      ensure_paths_exist "${active_path}${_path##${install_path}}"
-    done
-
-    _files=($( find "${install_path}" -type f ))
-    for _file in "${_files[@]}"
-    do
-      link --force "${_file}" \
-        to "${active_path}${_file##${install_path}}"
-    done
-
-    link --force "${install_path}" \
-      to "${packages_path}/${package_name}/active"
-
-    log_step success
-  fi
+  log_step success
 
   package_ldconfig "${package_name}"
 
   package_setup "${package_name}"
 }
 
-#
-# ## package\_setup
-#
-# Sets up the package
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# none.
-#
-# ### Environmental effects
-#
-# ldconfig, profile.d and service (init.d / conf.d) files will be put in place
-# on the system.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Errors halting program if setup fails for any reason.
-#
-# ### Usage Examples
-#
-# Example Usage:
-#
-# user$ package_setup
-#
-# ### Notes
-#
 package_setup()
 {
   local _package="${1:-${package_name}}"
@@ -1016,90 +589,14 @@ package_setup()
   ! module_is_loaded "database" || database_setup "${_package}"
 }
 
-#
-# ## package\_deactivate
-#
-# deactivates the package
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# none.
-#
-# ### Environmental effects
-#
-# Active symlinks will be removed from the filesystem.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Errors halting program if deactivating fails for any reason.
-#
-# ### Usage Examples
-#
-# Example Usage:
-#
-# user$ package_deactivate
-#
-# ### Notes
-#
 package_deactivate()
 {
   (( $# == 0 )) || package_cli $@
 
-  local _package="${package_name}" _package_version="${2:-${package_version}}" \
-    _file _files _dir _dirs _version
-
-  [[ -n "${_package}" ]] || fail "Package name must be given."
-
-  if symlink_exists "${packages_path}/${_package}/active"
-  then
-    _version=$(readlink "${packages_path}/${_package}/active")
-    _version=${_version##*/}
-  else
-    debug package "No active version to deactivate."
-    return 0
-  fi
-
-  if [[ -n "${_package_version}" ]] &&
-    [[ "${_package_version}" != "${_version}" ]]
-  then
-    debug package "Another version activated - skipping deactivation."
-    return 0
-  fi
-
   log_step "${package_name} ${_version} ~ deactivate"
 
-  true "${install_path:="${packages_path}/${_package}/${_version}"}"
-
-  _files=( $( find "${install_path}" -type f ) )
-  for _file in "${_files[@]}"
-  do
-    remove_files "${active_path}/${_file#${install_path}/}"
-  done
-
-  _dirs=( $( find "${install_path}" -mindepth 1 -type d | sort -r ) )
-  for _dir in "${_dirs[@]}"
-  do
-    _dir="${active_path}/${_dir#${install_path}/}"
-    path_does_not_exist "${_dir}" ||
-      directory_nonempty "${_dir}" ||
-      remove "${_dir}"
-  done
-
-  _files=(
-    "/etc/ld.so.profile.d/${_package}.conf"
-    "/etc/profile.d/${_package}.sh"
-    "${packages_path}/${_package}/active"
-  )
-
-  remove "${_files[@]}"
+  verfs deactivate \
+    path "${packages_path}" name "${package_name}"
 
   log_step success
 
@@ -1107,41 +604,6 @@ package_deactivate()
     package_ldconfig "${_package}"
 }
 
-#
-# ## package\_activate\_if\_first
-#
-# Activates the package version , if another package version has not yet been
-# activated.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# none.
-#
-# ### Environmental effects
-#
-# Active symlinks will be added to the filesystem if it is the first version
-# installed.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Errors halting program if deactivating fails for any reason.
-#
-# ### Usage Examples
-#
-# Example Usage:
-#
-# user$ package_activate_if_first
-#
-# ### Notes
-#
 package_activate_if_first()
 {
   local _package="${1:-}" _version="${2:-}"
@@ -1150,52 +612,19 @@ package_activate_if_first()
 
   if path_exists "${install_path}"
   then
-    symlink_exists "${packages_path}/${_package}/active" ||
+    symlink_exists "${packages_path}/versions/${_package}/active" ||
       package_activate "${_package}" "${_version}"
   else
     log "'${install_path}' not found; skipping activation."
   fi
 }
 
-#
-# ## package\_ldconfig
-#
-# Sets up system level ldconfigs for the package libraries.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# none.
-#
-# ### Environmental effects
-#
-# Adjusts ldconfig configuration and runs ldconfig (on linux).
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Errors halting program if deactivating fails for any reason.
-#
-# ### Usage Examples
-#
-# Example Usage:
-#
-# user$ package_ldconfig
-#
-# ### Notes
-#
 package_ldconfig()
 {
   local _package="${1:-${package_name}}" _path _files _ldconfig="/sbin/ldconfig"
   [[ -n "${_package}" ]] || fail "Package name must be given."
 
-  #  path_exists "${packages_path}/${_package}/active/lib" ||
+  #  path_exists "${packages_path}/versions/${_package}/active/lib" ||
   #    return 0 # no lib/ directory for activated package, no need to update ldconfig
 
   user_is_root || return 0
@@ -1212,6 +641,12 @@ package_ldconfig()
 
     command_exists "${_ldconfig}" || ldconfig="ldconfig"
 
+    if [[ -d /selinux ]]
+    then
+      restorecon -R "${active_path}/lib" # -v ~ verbose
+      restorecon -R "${packages_path}/versions/${package_name}" # -v ~ verbose
+    fi
+
     log_step "${package_name} ${package_version} ~ ldconfig" \
       "${_ldconfig}" "${active_path}/lib"
 
@@ -1219,44 +654,11 @@ package_ldconfig()
   then # Cluster Fuck!
     true
     # This should be handled by the profile.d?
-    # _files=($(find "${packages_path}/${_package}/active" -mindepth 1 -maxdepth 1 -type d))
+    # _files=($(find "${packages_path}/versions/${_package}/active" -mindepth 1 -maxdepth 1 -type d))
     # (( ${#_files[@]} > 0 )) && copy_files to "${packages_path}" "${_files[@]}"
   fi
 }
 
-#
-# ## package\_profile\_d
-#
-# Sets up system level profile_d configuration for the package.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# none.
-#
-# ### Environmental effects
-#
-# Updates profile_d configuration for the given package.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Errors halting program if profile_d setup fails for any reason.
-#
-# ### Usage Examples
-#
-# Example Usage:
-#
-# user$ package_profile_d
-#
-# ### Notes
-#
 package_profile_d()
 {
   local _package="${1:-${package_name}}"
@@ -1274,39 +676,6 @@ package_profile_d()
   log_step success
 }
 
-#
-# ## package\_uninstall
-#
-# Uninstalls the package.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# Uninstalls the package install effects from the system.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Errors halting program if uninstall fails for any reason.
-#
-# ### Usage Examples
-#
-# Example Usage:
-#
-# user$ package_uninstall
-#
-# ### Notes
-#
 package_uninstall()
 {
   (( $# == 0 )) || package_cli $@
@@ -1325,39 +694,6 @@ package_uninstall()
   log_step success
 }
 
-#
-# ## package\_patch
-#
-# Applies any patches found for the current package.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# Updates the source code directory for the package with any patches found.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Errors halting program if patching fails for any reason.
-#
-# ### Usage Examples
-#
-# Example Usage:
-#
-# user$ package_patch
-#
-# ### Notes
-#
 package_patch()
 {
   local _patches _patch _path _paths
@@ -1377,39 +713,6 @@ package_patch()
   done
 }
 
-#
-# ## package\_apply\_patches
-#
-# Applies patches found
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# none.
-#
-# ### Environmental effects
-#
-# Applies any patches found for the current package.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Errors halting program if apply_patches fails for any reason.
-#
-# ### Usage Examples
-#
-# Example Usage:
-#
-# user$ package_apply_patches
-#
-# ### Notes
-#
 package_apply_patches()
 {
   local _patch _patches=("$@")
@@ -1421,39 +724,6 @@ package_apply_patches()
   done
 }
 
-#
-# ## package\_usage
-#
-# Sets up system level usage configuration for the package
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# none.
-#
-# ### Environmental effects
-#
-# Updates usage configuration for the given package.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Errors halting program if usage setup fails for any reason.
-#
-# ### Usage Examples
-#
-# Example Usage:
-#
-# user$ package_usage
-#
-# ### Notes
-#
 package_usage() {
   log "
   Usage:
@@ -1473,45 +743,12 @@ package_usage() {
   "
 }
 
-#
-# ## package\_active
-#
-# Parses package active arguments.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# none.
-#
-# ### Environmental effects
-#
-# Updates active configuration for the given package.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Errors halting program if active setup fails for any reason.
-#
-# ### Usage Examples
-#
-# Example Usage:
-#
-# user$ package_active
-#
-# ### Notes
-#
 package_is_active()
 {
   local _name="${1:-}" _version="${2:-}"
   shift || fail "No package name was given, or name is empty."
 
-  local _path="${packages_path}/${_name}"
+  local _path="${packages_path}/versions/${_name}"
 
   if shift
   then # version was passed
@@ -1521,39 +758,6 @@ package_is_active()
   fi
 }
 
-#
-# ## package\_must\_be\_active
-#
-# Parses package must be arguments.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# none.
-#
-# ### Environmental effects
-#
-# Updates must be configuration for the given package.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Errors halting program if must be setup fails for any reason.
-#
-# ### Usage Examples
-#
-# Example Usage:
-#
-# user$ package_must be
-#
-# ### Notes
-#
 package_must_be_active()
 {
   local _name="${1:-}"
@@ -1564,39 +768,6 @@ package_must_be_active()
     error "Install/activate the node package extension, before installing ${_name}."
 }
 
-#
-# ## packages\_must\_be\_active
-#
-# Parses package must_be_active arguments.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# none.
-#
-# ### Environmental effects
-#
-# Updates must_be_active configuration for the given package.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Errors halting program if must_be_active setup fails for any reason.
-#
-# ### Usage Examples
-#
-# Example Usage:
-#
-# user$ packages_must_be_active
-#
-# ### Notes
-#
 packages_must_be_active()
 {
   local _package _packages="$@"
@@ -1608,79 +779,11 @@ packages_must_be_active()
   done
 }
 
-#
-# ## package\_docs
-#
-# Opens package documentation website, either in the web browser (if able),
-# or via curl through PAGER (defaulting to less).
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# None, if can open web browser or website docs in PAGER otherwise.
-#
-# ### Environmental effects
-#
-# Documentation opens in web browser or PAGER.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Error if package_docs_url has not been set.
-#
-# ### Usage Examples
-#
-# Example Usage:
-#
-# user$ package_docs
-#
-# ### Notes
-#
 package_docs()
 {
   os_open "${package_docs_url}"
 }
 
-#
-# ## package\_website
-#
-# Opens package documentation website, either in the web browser (if able) or via
-# curl through PAGER (defaulting to less).
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# None if can open web browser or website website in PAGER otherwise.
-#
-# ### Environmental effects
-#
-# Web browser will open with documentation url if able.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Error if package_website_url has not been set.
-#
-# ### Usage Examples
-#
-# Example Usage:
-#
-# user$ package_website
-#
-# ### Notes
-#
 package_website()
 {
   os_open "${package_website_url}"
@@ -1751,7 +854,7 @@ package_info()
 {
   (( $# == 0 )) || package_cli $@
 
-  local _installed _path="${sm_path}/pkg/${package_name}" package_md5
+  local _installed _path="${packages_path}/versions/${package_name}" package_md5
 
   : \
     "${package_dir:="${package_name}-${package_version}"}" \
@@ -1785,18 +888,11 @@ package_info()
     log "  dependencies: ${package_dependencies[*]}"
 }
 
-package_installed_versions()
-{
-  local _path="${packages_path}/${package_name}"
-  [[ -d "${_path}" ]] || return 0 # None!
-  find "${_path}" -mindepth 1 -maxdepth 1 -type d | awk -F'/' '{print $NF}'
-}
-
 package_man()
 {
   (( $# == 0 )) || package_cli $@
 
-  true "${package_path:="${packages_path}/${package_name}/${package_version}"}"
+  true "${package_path:="${packages_path}/versions/${package_name}/${package_version}"}"
 
   MANPATH="${package_path}/man"
 
@@ -1806,44 +902,25 @@ package_man()
   man ${extension_actions[@]:-${package_name}} || true
 }
 
-# pkg functions
+package_installed_versions()
+{
+  verfs versions path "${packages_path}" name "${package_name}"
+}
+
 packages_installed()
 {
-  [[ -d "${_path}" ]] || return 0 # None!
-
-  find "${sm_path}/pkg" -mindepth 2 -maxdepth 2 -type d |
-    awk -F'/' '! /\/active\//{print $(NF - 1)":"$(NF)}' | sort
+  verfs versions path "${packages_path}"
 }
 
 packages_active()
 {
-  local _found _package _packages=()
-
-  [[ -d "${sm_path}/pkg" ]] || return 0 # None!
-
-  if [[ -z ${1:-} ]]
+  local _name="${1:-}"
+  if [[ -n "${_name}" ]]
   then
-    _found=($(
-    find "${sm_path}/pkg" -mindepth 2 -maxdepth 2 -name active  -type l |
-    awk -F'/' '! /\/active\//{print $(NF - 1)}'
-    ))
+    verfs active path "${packages_path}" name "${_name}"
   else
-    _packages="${1//,/ }"
-
-    _found=($(
-    find "${sm_path}/pkg" -mindepth 2 -maxdepth 2 -name active -type l |
-    awk -F'/' '! /\/active\//{print $(NF - 1)}' | awk "/${_packages// /|}/"
-    ))
+    verfs active path "${packages_path}"
   fi
-
-  for _package in "${_found[@]}"
-  do
-    if [[ -L "${sm_path}/pkg/${_package}/active" ]]
-    then
-      readlink "${sm_path}/pkg/${_package}/active" |
-        awk -F'/' '{print $(NF-1) ":" $NF}'
-    fi
-  done
 }
 
 packages_available()
@@ -1870,3 +947,4 @@ packages_list()
       ;;
   esac
 }
+

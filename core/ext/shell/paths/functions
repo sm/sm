@@ -1,30 +1,5 @@
 #!/bin/sh
 
-#
-# ## ensure\_paths\_exist
-#
-# Iterates over the list of given paths, creating the path if it does not exist.
-#
-# ### Input Parameters
-#
-# A list of paths to create if missing.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# Paths that were given but do not exist will be created.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if no paths were given.
-#
 # ### Usage Examples
 #
 #     user$ ls -a
@@ -43,55 +18,21 @@ ensure_paths_exist()
 
   for _path in "${_paths[@]}"
   do
-    [[ ! -d "${_path}" ]] || continue
-
-    if [[ -f "${_path}" ]]
+    if [[ -d "${_path}" ]] || [[ -L "${_path}" && -d "$(readlink "${_path}")" ]]
     then
-      if [[ -L "${_path}" ]] && [[ -d "$(readlink "${_path}")" ]]
-      then
-        continue
-      else
-        warn "Could not ensure path '${_path}' exists as the path is a file."
-      fi
+      continue
+    fi
+
+    if [[ -f "${_path}" || -L "${_path}" ]]
+    then
+      warn "Could not ensure path '${_path}' exists as the path is a file."
     else
-      mkdir -p "${_path}" ||
-        fail "Could not create the path '${_path}',"\
-          "as the 'mkdir' command failed with error code '$?'."
+      mkdir -p "${_path}" || fail "Could not create the path '${_path}',"\
+        "as the 'mkdir' command failed with error code '$?'."
     fi
   done
 }
 
-
-#
-# ## remove\_paths
-#
-# Function Description
-#
-# ### Input Parameters
-#
-# Positional Parameter listing and descriptions.
-#
-# ### Stream Outputs
-#
-# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
-#
-# ### Environmental effects
-#
-# What, if any, environmental side effects this function causes. 'None.' for none.
-# If any paths are requested for removal that are already nonexistent, they
-# are listed in the nonexistant_paths array when this function returns.
-# Additionally, each path successfully removed is available in the
-# remove_paths array.
-#
-# ### Return Codes
-#
-# 0 if ...
-# 1 if ...
-#
-# ### Failure Scenarios
-#
-# Fails if ...
-#
 # ### Usage Examples
 #
 #     user$ {{ setup the scenario }}
@@ -129,34 +70,6 @@ remove_paths()
   done
 }
 
-#
-# ## move\_path
-#
-# Moves a path from one location to another.
-# (This is also used to rename a path.)
-#
-# ### Input Parameters
-#
-# The first parameter is the source path name.
-# The second parameter is the target path name.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# If successful, a path is renamed (moved).
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if the source path is not specified.
-# Fails if the target path is not specified.
-#
 # ### Usage Examples
 #
 #     user$ move_path "freetds-0.91rc"* to "freetds-0.91"
@@ -223,33 +136,6 @@ move_path()
     "${_owner}, as the 'chown -R' command failed with error code '$?'."
 }
 
-#
-# ## copy\_paths to
-#
-# Copies a given list of directories into the named path.
-#
-# ### Input Parameters
-#
-# The first parameter is the path to copy the directories into.
-# Remaining parameters are the paths list.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# If successful, all named directories are copied into the target path.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if no target path is given.
-# Fails if no directories are given.
-#
 # ### Usage Examples
 #
 #     user$ copy_paths to "$HOME/backup/" "$HOME/bin" "$HOME/projects"
@@ -297,33 +183,6 @@ copy_paths()
   done
 }
 
-#
-# ## copy\_path
-#
-# Copies a path (directory) from one location to another.
-#
-# ### Input Parameters
-#
-# The first parameter is the source path name.
-# The second parameter is the target path name.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# If successful, a path is renamed (copyd).
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if the source path is not specified.
-# Fails if the target path is not specified.
-#
 # ### Usage Examples
 #
 #     user$ copy_path "freetds-0.91rc"* to "freetds-0.91"
@@ -367,33 +226,6 @@ copy_path()
       "as the 'cp' command failed with error code '$?'."
 }
 
-#
-# ## chown\_paths
-#
-# Change ownership of a list of paths.
-#
-# ### Input Parameters
-#
-# First parameter is the new owner[:group] of the paths.
-# Remaining parameters are the path names/paths.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if no new owner[:group] was specified.
-# Fails if no list of paths was given.
-#
 # ### Usage Examples
 #
 #     user$ chown_paths $USER "$HOME" "/usr/local"
@@ -433,33 +265,6 @@ chown_paths()
   done
 }
 
-#
-# ## chmod\_paths
-#
-# Change ownership of a list of paths.
-#
-# ### Input Parameters
-#
-# First parameter is the new owner[:group] of the paths.
-# Remaining parameters are the path names/paths.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if no new owner[:group] was specified.
-# Fails if no list of paths was given.
-#
 # ### Usage Examples
 #
 #     user$ chmod_paths $USER "$HOME" "/usr/local"
@@ -498,35 +303,7 @@ chmod_paths()
   done
 }
 
-#
-# ## enter
-#
-# Changes the current working path ($PWD) to the given path with
-# sanity checks.
-#
-# ### Input Parameters
-#
-# First parameter is the path to change into.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# The current working path (PWD) will become the given path if
-# successful.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if no path was given.
-# Fails if the given path does not exist.
-#
-# ### Usage Examples
+# Examples
 #
 #     user$ enter "/usr/local/src"
 #
@@ -544,33 +321,7 @@ enter()
       "'cd' command failed with error code '$?'."
 }
 
-#
-# ## path\_exists()
-#
-# Check if given path exists.
-#
-# ### Input Parameters
-#
-# First parameter is a path.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 if the named path exists.
-# 1 if the named path does not exist or does not exist.
-#
-# ### Failure Scenarios
-#
-# Fails if no path name/path was given.
-#
-# ### Usage Examples
+# Examples
 #
 #     user$ path_exists /bin/sm
 #     user$ echo $?
@@ -588,33 +339,7 @@ path_exists()
   [[ -d "$_path" ]]
 }
 
-#
-# ## path\_does\_not\_exist()
-#
-# Check if given path does not exist.
-#
-# ### Input Parameters
-#
-# First parameter is a path.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 1 if the named path exists.
-# 0 if the named path does not exist.
-#
-# ### Failure Scenarios
-#
-# Fails if no path name/path was given.
-#
-# ### Usage Examples
+# Examples
 #
 #     user$ path_does_not_exist /bin/sm
 #     user$ echo $?
@@ -632,10 +357,7 @@ path_does_not_exist()
   [[ ! -d "$_path" ]]
 }
 
-#
-# ## path\_join()
-#
-# Joins path elements together passed as arguments into one path string.
+# Examples
 #
 path_join()
 {
@@ -644,33 +366,7 @@ path_join()
   printf "$*"
 }
 
-#
-# ## directories\_in()
-#
-# Function Description
-#
-# ### Input Parameters
-#
-# Positional Parameter listing and descriptions.
-#
-# ### Stream Outputs
-#
-# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
-#
-# ### Environmental effects
-#
-# What, if any, environmental side effects this function causes. 'None.' for none.
-#
-# ### Return Codes
-#
-# 0 if ...
-# 1 if ...
-#
-# ### Failure Scenarios
-#
-# Fails if ...
-#
-# ### Usage Examples
+# Examples
 #
 #     user$ {{ setup the scenario }}
 #     user$ function_name {{ parameters }}
@@ -687,7 +383,7 @@ directories_in()
 }
 
 #
-# ## directories\_in\_matching()
+# Examples
 #
 #
 directories_in_matching()
@@ -704,7 +400,7 @@ directories_in_matching()
 }
 
 #
-# ## directories\_under()
+# Examples
 #
 #
 directories_under()
@@ -719,7 +415,7 @@ directories_under()
 }
 
 #
-# ## directories\_under\_matching()
+# Examples
 #
 #
 directories_under_matching()
@@ -738,7 +434,7 @@ directories_under_matching()
 }
 
 #
-# ## directory\_empty()
+# Examples
 #
 #
 directory_empty()
@@ -760,7 +456,7 @@ directory_empty()
 }
 
 #
-# ## directory\_nonempty()
+# Examples
 #
 #
 directory_nonempty()
@@ -781,33 +477,7 @@ directory_nonempty()
   return 1
 }
 
-#
-# ## full_path()
-#
-# return full path to given path.
-#
-# ### Input Parameters
-#
-# path.
-#
-# ### Stream Outputs
-#
-# full path
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if no arguments are given.
-# Fails if given path does not exists
-#
-# ### Usage Examples
+# Examples
 #
 # user$ cd ; sm call full_path test
 # /home/user/test

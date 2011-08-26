@@ -1,13 +1,9 @@
 #!/bin/sh
 
 #
-# # General Services functions.
+# SM Framework Extended Module ~ Service Module
 #
 
-# ## services\_list()
-#
-# Initialize service module.
-#
 ext_service_initialize()
 {
   variable_is_nonempty init_scripts_path || init_scripts_path="$(init_scripts_path)"
@@ -115,77 +111,6 @@ ext_service_initialize()
   service_initialized=1
 }
 
-#
-# ## services\_list()
-#
-# List installed services. These are extensions that have
-# loaded the service module.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# A list of available services to install are printed to STDOUT of
-# the calling environment.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# NIY
-# No failure conditions currently.
-#
-# ### Usage Examples
-#
-#     user$ services_avilable
-#     Available service listing has not yet been implemented.
-#     This feature has not yet been implemented.
-#
-#
-# # General Services functions.
-#
-#
-# ## services\_list()
-#
-# List installed services. These are extensions that have
-# loaded the service module.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# A list of available services to install are printed to STDOUT of
-# the calling environment.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# NIY
-# No failure conditions currently.
-#
-# ### Usage Examples
-#
-#     user$ services_avilable
-#     Available service listing has not yet been implemented.
-#     This feature has not yet been implemented.
-#
 services_avilable()
 {
   extensions_installed module "ext/service" "$@"
@@ -212,129 +137,25 @@ services_list()
   esac
 }
 
-#
-# ## services\_installed()
-#
-# List installed services. These are extensions that have
-# loaded the service module.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# A list of installed extensions that load the service module are printed
-# to the STDOUT of the calling environment.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# NIY
-# No failure conditions currently.
-#
-# ### Usage Examples
-#
-#     user$ services_installed
-#     nginx unicorn redis postgresql
-#
 services_installed()
 {
   # Notify that the services_installed() function has not yet been implemented.
   NIY "Installed services has not yet been implemented."
 }
 
-#
-# ## services\_available()
-#
-# List available services. These are extensions that
-# load the service module.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# A list of available extensions that load the service module are printed to
-# STDOUT of the calling environment.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# NIY
-# No failure conditions currently.
-#
-# ### Usage Examples
-#
-#     user$ services_available
-#     nginx redis postgresql mongodb ...
-#
 services_available()
 {
   # Notify that the services_available() function has not yet been implemented.
   NIY "Installed services has not yet been implemented."
 }
 
-#
-# # Single Service functions.
-#
-#
-# ## service\_setup()
-#
-# Service setup and configuration.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# Creates a system service user with the same name as the service.
-# Sets up the service init_d file from template, if it exists.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# No failure scenarios currently.
-#
-# ### Usage Examples
-#
-#     user$ service=redis
-#     user$ service_setup
-#     ...
-#
 service_setup()
 {
   (( $# == 0 )) || service_cli $@
 
   local _path _file
 
-  for _file in functions initialize cli
-  do
-    source_files "${extension_path}/shell/${_file}"
-  done
+  source_files "${extension_path}"/shell/{functions,initialize,cli}
 
   if user_is_root
   then
@@ -367,41 +188,6 @@ service_setup()
   service_install_init_d "${service}"
 }
 
-#
-# # Single Service functions.
-#
-#
-# ## service\_uninstall()
-#
-# Service uninstall and configuration.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# Creates a system service user with the same name as the service.
-# Sets up the service init_d file from template, if it exists.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# No failure scenarios currently.
-#
-# ### Usage Examples
-#
-#     user$ service=redis
-#     user$ service_uninstall
-#     ...
-#
 service_uninstall()
 {
   NIY "service_uninstall() has not yet been implemented."
@@ -410,38 +196,6 @@ service_uninstall()
   # 3. Deactivate database path.
 }
 
-#
-# ## service\_start()
-#
-# Starts the given service using init scripts.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# Whatever stream output comes from the called init script.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if extension was not set.
-# Fails if the init script is missing or not executable.
-#
-# ### Usage Examples
-#
-#     user$ extension=redis
-#     user$ service_start
-#     ...
-#
 service_start()
 {
   (( $# == 0 )) || service_cli $@
@@ -456,38 +210,6 @@ service_start()
   fi
 }
 
-#
-# ## service\_stop()
-#
-# stops the given service using init scripts.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# Whatever stream output comes from the called init script.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if service was not set.
-# Fails if the init script is missing or not executable.
-#
-# ### Usage Examples
-#
-#     user$ service=redis
-#     user$ service_stop
-#     ...
-#
 service_stop()
 {
   variable_is_nonempty service ||
@@ -501,38 +223,6 @@ service_stop()
   fi
 }
 
-#
-# ## service\_reload()
-#
-# Reloads the given service using init scripts.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# Whatever stream output comes from the called init script.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if service was not set.
-# Fails if the init script is missing or not executable.
-#
-# ### Usage Examples
-#
-#     user$ service=redis
-#     user$ service_reload
-#     ...
-#
 service_reload()
 {
   (( $# == 0 )) || service_cli $@
@@ -548,38 +238,6 @@ service_reload()
   fi
 }
 
-#
-# ## service\_restart()
-#
-# Restarts the given service using init scripts.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# Whatever stream output comes from the called init script.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if service was not set.
-# Fails if the init script is missing or not executable.
-#
-# ### Usage Examples
-#
-#     user$ service=redis
-#     user$ service_restart
-#     ...
-#
 service_restart()
 {
   (( $# == 0 )) || service_cli $@
@@ -595,35 +253,6 @@ service_restart()
   fi
 }
 
-#
-# ## service\_init\_restart()
-#
-# This is the generalized service init restart function.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# Logging telling the end user what is happening.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# No failure conditions currently.
-#
-# ### Usage Examples
-#
-#     user$ service_init_restart
-#
 service_init_restart()
 {
   if command_exists "${service}_restart"
@@ -636,38 +265,6 @@ service_init_restart()
   fi
 }
 
-#
-# ## service\_status()
-#
-# Status of the given service using init scripts.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# Whatever stream output comes from the called init script.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if service was not set.
-# Fails if the init script is missing or not executable.
-#
-# ### Usage Examples
-#
-#     user$ service=redis
-#     user$ service_status
-#     ...
-#
 service_status()
 {
   (( $# == 0 )) || service_cli $@
@@ -683,38 +280,6 @@ service_status()
   fi
 }
 
-#
-# ## service\_logtail()
-#
-# logtails the given service using init scripts.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# Whatever stream output comes from the called init script.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if service was not set.
-# Fails if the init script is missing or not executable.
-#
-# ### Usage Examples
-#
-#     user$ service=redis
-#     user$ service_logtail
-#     ...
-#
 service_logtail()
 {
   (( $# == 0 )) || service_cli $@
@@ -730,38 +295,6 @@ service_logtail()
   fi
 }
 
-#
-# ## service\_info()
-#
-# infos the given service using init scripts.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# Whatever stream output comes from the called init script.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if service was not set.
-# Fails if the init script is missing or not executable.
-#
-# ### Usage Examples
-#
-#     user$ service=redis
-#     user$ service_info
-#     ...
-#
 service_info()
 {
   (( $# == 0 )) || service_cli $@
@@ -777,38 +310,6 @@ service_info()
   fi
 }
 
-#
-# ## service\_configcheck()
-#
-# configchecks the given service using init scripts.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# Whatever stream output comes from the called init script.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if service was not set.
-# Fails if the init script is missing or not executable.
-#
-# ### Usage Examples
-#
-#     user$ service=redis
-#     user$ service_configcheck
-#     ...
-#
 service_configcheck()
 {
   (( $# == 0 )) || service_cli $@
@@ -824,38 +325,6 @@ service_configcheck()
   fi
 }
 
-#
-# ## service\_usage()
-#
-# usages the given service using init scripts.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# Whatever stream output comes from the called init script.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if service was not set.
-# Fails if the init script is missing or not executable.
-#
-# ### Usage Examples
-#
-#     user$ service=redis
-#     user$ service_usage
-#     ...
-#
 service_usage() {
   # TODO: Update this for service specific items.
   printf "
@@ -876,38 +345,6 @@ Options:
   return 0
 }
 
-#
-# ## service\_cli()
-#
-# clis the given service using init scripts.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# Whatever stream output comes from the called init script.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if service was not set.
-# Fails if the init script is missing or not executable.
-#
-# ### Usage Examples
-#
-#     user$ service=redis
-#     user$ service_cli
-#     ...
-#
 service_cli()
 {
   local _ignored_args=() _service_args=( $@ ) _token
@@ -977,40 +414,6 @@ service_cli()
   ext_service_initialize "${extension_args[@]}"
 }
 
-#
-# ## service\_pid()
-#
-# List installed services. These are extensions that have
-# loaded the service module.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# A list of extensions that load the service module are printed to STDOUT of
-# the calling environment.
-#
-# ### Environmental effects
-#
-# Sets the variable 'service_pid' to contain the pid of the process or 0.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# None currently.
-#
-# ### Usage Examples
-#
-#     root# service=redis
-#     root# service_pid
-#     root# echo $service_pid
-#     0
-#
 service_pid()
 {
   local _path="${run_path:="/var/run"}/${service}"
@@ -1036,74 +439,11 @@ service_pid()
   return 0
 }
 
-#
-# ## service\_load\_conf\_d()
-#
-# Load the /etc/conf.d/{service}.conf configuration file into the calling
-# environment.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# None, unless the configuration file contains any print statements.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# No failure conditions currently.
-#
-# ### Usage Examples
-#
-#     user$ service=redis
-#     user$ service_load_conf_d
-#
 service_load_conf_d()
 {
   source_files "${confd_path}/${service}.conf"
 }
 
-#
-# # Service init functions.
-#
-#
-# ## service\_install\_init\_d()
-#
-# Installs the BDSM service module init.d script for the current extension.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# Logging messages informing the end user of what is occurring.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# No failure conditions currently.
-#
-# ### Usage Examples
-#
-#     user$ service_install_init_d
-#
 service_install_init_d()
 {
   local _service="${1:-}" _version="${2:-${package_version}}"
@@ -1147,35 +487,6 @@ service_install_init_d()
   fi
 }
 
-#
-# ## service\_init\_start()
-#
-# This is the generalized service init start function.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# Logging telling the end user what is happening.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# No failure conditions currently.
-#
-# ### Usage Examples
-#
-#     user$ service_init_start
-#
 service_init_start()
 {
   log_step "Starting ${service}..."
@@ -1220,35 +531,6 @@ service_init_start()
   log_step success
 }
 
-#
-# ## service\_init\_stop()
-#
-# This is the generalized service init stop function.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# Logging telling the end user what is happening.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# No failure conditions currently.
-#
-# ### Usage Examples
-#
-#     user$ service_init_stop
-#
 service_init_stop()
 {
   (( service_pid > 0 )) || error "Service pid has not been set, or is zero."
@@ -1267,35 +549,6 @@ service_init_stop()
   log_step success
 }
 
-#
-# ## service\_init\_status()
-#
-# This is the generalized service init status function.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# Logging telling the end user what is happening.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# No failure conditions currently.
-#
-# ### Usage Examples
-#
-#     user$ service_init_status
-#
 service_init_status()
 {
   log "statusing ${service}..."
@@ -1338,35 +591,6 @@ service_init_status()
   fi
 }
 
-#
-# ## service\_init\_reload()
-#
-# This is the generalized service init reload function.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# Logging telling the end user what is happening.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# No failure conditions currently.
-#
-# ### Usage Examples
-#
-#     user$ service_init_reload
-#
 service_init_reload()
 {
   log "reloading ${service}..."
@@ -1391,70 +615,12 @@ service_init_reload()
   fi
 }
 
-#
-# ## service\_init\_usage()
-#
-# This is the generalized service init usage function.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# Logging telling the end user what is happening.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# No failure conditions currently.
-#
-# ### Usage Examples
-#
-#     user$ service_init_usage
-#
 service_init_usage()
 {
   log "Usage:"
   log "  $0 {start|stop|restart|status|info|logtail}"
 }
 
-#
-# ## service\_init\_logtail()
-#
-# This is the generalized service init logtail function.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# Logging telling the end user what is happening.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# No failure conditions currently.
-#
-# ### Usage Examples
-#
-#     user$ service_init_logtail
-#
 service_init_logtail()
 {
   # TODO: Adjust this to allow for parameter passing.
@@ -1462,71 +628,11 @@ service_init_logtail()
   tail -n 10 "${service_log_file}"
 }
 
-#
-# ## service\_init\_info()
-#
-# This is the generalized service init info function.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# Outputs information about the service (version, etc...).
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# No failure conditions currently.
-#
-# ### Usage Examples
-#
-#     user$ service_init_info
-#
 service_init_info()
 {
   NIY "service_init_info has not yet been implemented for the service module."
 }
 
-#
-# ## service\_conf\_d()
-#
-# Installs the conf.d template for the service, if it exists.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# Logging updates to inform the user what is happening.
-#
-# ### Environmental effects
-#
-# Once completed a conf.d file should be in place.
-# For example /etc/conf.d/redis.conf for the redis service.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# No failure conditions currently.
-#
-# ### Usage Examples
-#
-#     user$ service=redis
-#     user$ service_conf_d
-#
 service_conf_d()
 {
   # TODO: Install a default conf.d template if extension does not define one.
@@ -1547,35 +653,6 @@ service_conf_d()
   fi
 }
 
-#
-# ## service\_init\_start()
-#
-# This is the generalized service init start function.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# Logging telling the end user what is happening.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# No failure conditions currently.
-#
-# ### Usage Examples
-#
-#     user$ service_init_action start
-#
 service_init_action()
 {
   local _action="${1:-}"
@@ -1597,36 +674,6 @@ service_init_action()
   return $?
 }
 
-#
-# ## service\_init\_d()
-#
-# The main logic for generalized service init.d scripts.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# Logging updates to inform the user what is happening.
-#
-# ### Environmental effects
-#
-# May alter the runstate of the service extension.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# No failure conditions currently.
-#
-# ### Usage Examples
-#
-#     user$ service=redis
-#     user$ service_init_d
-#
 service_init_d()
 {
   service_load_conf_d # Load the configuration file.
@@ -1642,36 +689,6 @@ service_init_d()
   service_init_action "${service_action}"
 }
 
-#
-# ## service\_deactivate()
-#
-# Deactivates the named service.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# Logging updates to inform the user what is happening.
-#
-# ### Environmental effects
-#
-# Changes the current or named service's init script to be nonexecutable.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# No failure conditions currently.
-#
-# ### Usage Examples
-#
-#     user$ service=redis
-#     user$ service_deactivate
-#
 service_deactivate()
 {
   local _service="${1:-"${service}"}"
@@ -1714,36 +731,6 @@ service_deactivate()
   # TDOO: hook into system's paths.
 }
 
-#
-# ## service\_activate()
-#
-# Activates the named service.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# Logging updates to inform the user what is happening.
-#
-# ### Environmental effects
-#
-# Changes the current or named service's init script to be nonexecutable.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# No failure conditions currently.
-#
-# ### Usage Examples
-#
-#     user$ service=redis
-#     user$ service_deactivate
-#
 service_activate()
 {
   local _service="${1:-"${service}"}"
@@ -1805,10 +792,6 @@ service_activate()
   fi
 }
 
-#
-# ## service\_status()
-#
-#
 service_status()
 {
   log "${service}:"
@@ -1948,3 +931,4 @@ service_signal()
       ;;
   esac
 }
+

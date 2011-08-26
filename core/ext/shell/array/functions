@@ -13,30 +13,8 @@ ext_array_initialize()
     __array_start=0
   fi
 }
-#
-# ## array\_is\_nonempty()
-#
-# Checks to see if an array is nonempty,
-# with the name given as the first parameter.
-#
-# ### Input Parameters
-#
-# The first parameter is the name of the array variable.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 if the array is non-empty.
-# 1 if the array is empty.
-#
-# ### Failure Scenarios
-#
-# Fails if the array name is not given as the first parameter.
-#
-# ### Usage Examples
+
+# Examples
 #
 #     user$ cat $HOME/test
 #     the_array=(1 2 3 4 5)
@@ -70,29 +48,7 @@ array_is_nonempty()
   eval "(( \${#${_array_name}[@]} > 0 ))"
 }
 
-#
-# ## array\_is\_empty()
-#
-# Checks to see if an array is empty, with the name given as the first parameter.
-#
-# ### Input Parameters
-#
-# The first parameter is the name of the array variable.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 if the array is empty.
-# 1 if the array is non-empty.
-#
-# ### Failure Scenarios
-#
-# Fails if the array name is not given as the first parameter.
-#
-# ### Usage Examples
+# Examples
 #
 #     user$ the_array=()
 #     user$ array_is_empty the_array
@@ -113,29 +69,7 @@ array_is_empty()
   eval "(( \${#${_array_name}[@]} == 0 ))"
 }
 
-#
-# ## array\_length()
-#
-# Return the length of the given array.
-#
-# ### Input Parameters
-#
-# First parameter is the name of the array variable.
-#
-# ### Stream Outputs
-#
-# Prints the length of the named array to the STDOUT stream of the calling
-# environment.
-#
-# ### Return Codes
-#
-# returns 0
-#
-# ### Failure Scenarios
-#
-# Fails if the array name is not given as the first parameter.
-#
-# ### Usage Examples
+# Examples
 #
 #     user$ the_array=(1 2 3 4 5)
 #     user$ array_length the_array
@@ -152,29 +86,7 @@ array_length()
   return 0
 }
 
-#
-# ## array\_last\_element()
-#
-# Print the last element of the given array.
-#
-# ### Input Parameters
-#
-# First parameter is the name of the array variable.
-#
-# ### Stream Outputs
-#
-# Prints the last element of the named array to the STDOUT stream of the
-# calling environment.
-#
-# ### Failure Scenarios
-#
-# Fails if the array name is not given as the first parameter.
-#
-# ### Return Codes
-#
-# 0 denoting success
-#
-# ### Usage Examples
+# Examples
 #
 #     $ the_array=(one two three four five)
 #     $ array_last_element the_array
@@ -193,29 +105,7 @@ array_last_element()
   printf "%{_element}"
 }
 
-#
-# ## array\_first\_element()
-#
-# Print the first element of the given array.
-#
-# ### Input Parameters
-#
-# First parameter is the name of the array variable.
-#
-# ### Stream Outputs
-#
-# Prints the first element of the named array to the STDOUT stream of the
-# calling environment.
-#
-# ### Return Codes
-#
-# 0 denoting success
-#
-# ### Failure Scenarios
-#
-# Fails if the array name is not given as the first parameter.
-#
-# ### Usage Examples
+# Examples
 #
 #     $ the_array=(one two three four five)
 #     $ array_first_element the_array
@@ -236,30 +126,7 @@ array_first_element()
   printf "${_element}"
 }
 
-#
-# ## array\_push()
-#
-# Appends one or more elements to the array with the given name.
-#
-# ### Input Parameters
-#
-#   The first parameter is the name of the array variable.
-#   Remaining parameters are the elements to be appended to the array.
-#
-# ### Stream Outputs
-#
-#   None.
-#
-# ### Returns
-#
-#   0 denoting success
-#
-# ### Failure Scenarios
-#
-# Fails if the array name is not given as the first parameter.
-# Fails if no elements were given (second parameter and beyond).
-#
-# ### Usage Examples
+# Examples
 #
 #     $ the_array=(1 2 3 4 5)
 #     $ array_push the_array 6
@@ -286,30 +153,7 @@ array_push()
   fi
 }
 
-#
-# ## array\_append()
-#
-# Return the length of the given array.
-#
-# ### Input Parameters
-#
-# The first parameter is the name of the array variable.
-# Remaining parameters are the elements to append to the end of the array.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Returns
-#
-# 0 denoting success
-#
-# ### Failure Scenarios
-#
-# Fails if the array name is not given as the first parameter.
-# Fails if no elements were given to append to the array.
-#
-# ### Usage Examples
+# Examples
 #
 #     user$ the_array=(1)
 #     user$ array_append the_array 2 3 4 5
@@ -334,21 +178,7 @@ array_append()
   done
 }
 
-#
-# ## array\_pop()
-#
-# Removes the last element of the array and assigns it to variable.
-#
-# ### Input Parameters
-#
-#   The first parameter is the name of the array variable.
-#   The second parameter is the name of variable to assign.
-#
-# ### Stream Outputs
-#
-#   none.
-#
-# ### Usage Examples
+# Examples
 #
 #     user$ cat $HOME/test
 #     #!/bin/sm
@@ -384,21 +214,7 @@ array_pop()
   eval "${_array_name}=( \"\${${_array_name}[@]}\" ) "
 }
 
-#
-# ## array\_shift()
-#
-# Removes the first element of the array, and prints it.
-#
-# ### Input Parameters
-#
-#   The first parameter is the name of the array variable.
-#
-# ### Stream Outputs
-#
-#   Prints the first element of the named array to the STDOUT stream of the
-#   calling environment.
-#
-# ### Usage Examples
+# Examples
 #
 #     user$ cat $HOME/test
 #     #!/bin/sm
@@ -427,28 +243,7 @@ array_shift()
   eval "${_array_name}=( \"\${${_array_name}[@]}\" ) "
 }
 
-#
-# ## array\_unshift()
-#
-#   Prepends one or more elements to the array whose name is given, in the order
-#   given.
-#
-# ### Input Parameters Parameters
-#
-#   The first parameter is the name of the array variable.
-#   Remaining parameters are the elements to prepend to the array.
-#
-# ### Stream Outputs
-#
-#   None.
-#   Yields a failure message if no array name was given.
-#   Yields a failure message if no elements were given to unshift.
-#
-# ### Return Codes
-#
-#   0 denoting success
-#
-# ### Usage Examples
+# Examples
 #
 #     $ the_array=(2 3 4 5)
 #     $ array_unshift 1
@@ -474,33 +269,7 @@ array_unshift()
   eval "${_array_name}=(\"${_elements[@]}\" \"\${${_array_name}[@]}\")"
 }
 
-#
-# ## array\_join()
-#
-# Joins the named array into a string separated by either a space or
-# a given string.
-#
-# ### Input Parameters
-#
-# The first parameter is the name of the array variable.
-# The second parameter is the separator between elements in the string. This is
-# optional, and defaults to a space.
-#
-# ### Stream Outputs
-#
-# Prints the elements of the named array, separated by either the 2nd parameter
-# (if given), or else a space character, to the STDOUT stream of the calling
-# environment.
-#
-# ### Return Codes
-#
-# 0 denoting success
-#
-# ### Failure Scenarios
-#
-# Fails if the array name is not given as the first parameter.
-#
-# ### Usage Examples
+# Examples
 #
 #     $ the_array=(1 2 3 4 5)
 #     $ array_join the_array
@@ -519,29 +288,7 @@ array_join()
   eval "printf \"\${${_array_name}[*]}\""
 }
 
-#
-# ## array\_largest()
-#
-# Outputs the first string in the array with the largest length.
-#
-# ### Input Parameters
-#
-# The first element is an array variable name.
-#
-# ### Stream Outputs
-#
-# Prints the largest elements of the named array to the STDOUT
-# stream of the calling environment.
-#
-# ### Return Codes
-#
-# 0 denoting success
-#
-# ### Failure Scenarios
-#
-# Fails if the array name, the first parameter, is not given.
-#
-# ### Usage Examples
+# Examples
 #
 #     $ the_array=(billie bob joe)
 #     $ array_largest the_array
@@ -566,28 +313,7 @@ array_largest()
   printf "%s" "${_largest}"
 }
 
-#
-# ## array\_sort\_desc()
-#
-# Sorts the named array contents in descending order.
-#
-# ### Input Parameters
-#
-# An array variable name.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 denoting success
-#
-# ### Failure Scenarios
-#
-# Fails if the array name, the first parameter, is not given.
-#
-# ### Usage Examples
+# Examples
 #
 #     user$ cat $HOME/test
 #     #!/bin/sm
@@ -613,28 +339,7 @@ array_sort_desc()
   ))"
 }
 
-#
-# ## array\_sort\_asc()
-#
-# Sorts the named array contents in ascending order.
-#
-# ### Input Parameters
-#
-# An array variable name.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 denoting success
-#
-# ### Failure Scenarios
-#
-# Fails if the array name, the first parameter, is not given.
-#
-# ### Usage Examples
+# Examples
 #
 #     user$ cat $HOME/test
 #     #!/bin/sm
@@ -661,28 +366,7 @@ array_sort_asc()
   ))"
 }
 
-#
-# ## array\_unique()
-#
-# Sorts the named array contents in ascending order.
-#
-# ### Input Parameters
-#
-# An array variable name.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 denoting success
-#
-# ### Failure Scenarios
-#
-# Fails if the array name, the first parameter, is not given.
-#
-# ### Usage Examples
+# Examples
 #
 #     user$ cat $HOME/test
 #     #!/bin/sm
@@ -709,29 +393,7 @@ array_unique()
   ))"
 }
 
-# ## array\_is\_even()
-#
-# Checks to see if an array with the name given as the first parameter
-# is even.
-#
-# ### Input Parameters
-#
-# The first parameter is the name of the array variable.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 if the array is non-empty.
-# 1 if the array is empty.
-#
-# ### Failure Scenarios
-#
-# Fails if the array name is not given as the first parameter.
-#
-# ### Usage Examples
+# Examples
 #
 #     user$ cat $HOME/test
 #     #!/bin/sm

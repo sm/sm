@@ -1,5 +1,9 @@
 #!/bin/sh
 
+#
+# SM Framework Core Module ~ String (string)
+#
+
 # ## string\_contains()
 # Validate if second string is part of first string.
 # Return 0 if found.
