@@ -641,7 +641,7 @@ package_ldconfig()
 
     command_exists "${_ldconfig}" || ldconfig="ldconfig"
 
-    if [[ -d /selinux ]]
+    if [[ -d /selinux ]] && command_exists restorecon
     then
       restorecon -R "${active_path}/lib" # -v ~ verbose
       restorecon -R "${packages_path}/versions/${package_name}" # -v ~ verbose
