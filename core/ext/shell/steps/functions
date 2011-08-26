@@ -13,16 +13,23 @@ start_step()
 step()
 {
   local name="$1"
+
   shift || fail "Cannot take step as no step name given;"\
     "step [name] <- missing name."
 
   start_step "$name"
 
-  ! command_exists before_step || before_step "$name" "$@"
+  if command_exists before_step
+  then
+    before_step "$name" "$@"
+  fi
 
   "$name" "$@"
 
-  ! command_exists after_step || after_step "$name" "$@"
+  if command_exists after_step
+  then
+    after_step "$name" "$@"
+  fi
 }
 
 steps()
@@ -45,7 +52,14 @@ retreat()
   while array_is_nonempty steps_started
   do
     array_pop steps_started step
-    ! command_exists "fail_${step}" || "fail_${step}"
-    ! command_exists after_step || after_step "fail_${step}"
+    if command_exists "fail_${step}"
+    then
+      "fail_${step}"
+    fi
+
+    if command_exists after_step
+    then
+      after_step "fail_${step}"
+    fi
   done
 }

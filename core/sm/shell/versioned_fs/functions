@@ -1,19 +1,19 @@
 #!/bin/sh
 
 #
-# SM Framework Core Module ~ Versioned FileSystem (verfs)
+# SM Framework Core Module ~ Versioned FileSystem (versioned_fs)
 #
 # API Version: 1.0.0
 #
-# verfs \
-#   path "{verfs root path}" \
+# versioned_fs \
+#   path "{versioned_fs root path}" \
 #   strategy "{fhs,name}" \
 #   method "{link,copy}" \
 #   activate "{newest,first}"
 #
 # Example: (package module)
 #
-# verfs \
+# versioned_fs \
 #   path /opt/sm/pkg \
 #   strategy fhs \
 #   method link \
@@ -21,8 +21,8 @@
 #
 # FileSystem structure:
 #
-# {verfs_path}/
-#   verfs/
+# {versioned_fs_path}/
+#   .versioned_fs/
 #     strategy # contains one of {fhs,name}
 #     method   # contains one of {link,copy}
 #     activate # contains one of {newest,first}
@@ -41,11 +41,11 @@
 # In both cases if method is 'link' then each entry will be a symlink
 # otherwise each entry will be copied files/directories.
 #
-verfs()
+versioned_fs()
 {
   local _token _path _paths _source _name _version _strategy _method _activate
   local _action="${1:-}"
-  shift || fail "Usage: verfs path \"{verfs root path}\" strategy \"{fhs,name}\" method \"{link,copy}\" activate \"{newest,first}\""
+  shift || fail "Usage: versioned_fs path \"{versioned_fs root path}\" strategy \"{fhs,name}\" method \"{link,copy}\" activate \"{newest,first}\""
 
   while (( $# ))
   do
@@ -53,7 +53,7 @@ verfs()
     case "${_token}" in
       (path)
         _path="${1}"
-        shift || fail "Verfs path must follow keyword 'path'"
+        shift || fail "versioned_fs path must follow keyword 'path'"
         ;;
       (source)
         _source="${1}"
@@ -96,83 +96,93 @@ verfs()
     esac
   done
 
-  [[ -n "${_path}" ]] || fail "A verfs root path must be given."
+  [[ -n "${_path}" ]] || fail "A versioned_fs root path must be given."
 
-  [[ "${_action}" == create || -d "${_path}/verfs" ]] ||
-    fail "${_path} is not a verfs root path; "\
-    "Use 'verfs create path {path}' to initialize."
+  [[ "${_action}" == create || -d "${_path}/.versioned_fs" ]] ||
+    fail "${_path} is not a versioned_fs root path; "\
+    "Use 'versioned_fs create path {path}' to initialize."
 
   case "${_action}" in
     (create)
-      _verfs_create "${_path}"
+      _versioned_fs_create "${_path}"
       ;;
     (add)
       [[ -n "${_name}" && -n "${_source}" ]] ||
         fail "Name and Source must be given."
-      _verfs_add "${_path}" "${_name}" "${_version}" "${_source}"
+      [[ -n "${_version}" ]] || _version="$(date +"%Y%m%d%H%M%S")"
+      _versioned_fs_add "${_path}" "${_name}" "${_version}" "${_source}"
+      _versioned_fs_activate "${_path}" "${_name}" "${_version}"
       ;;
     (remove)
       [[ -n "${_name}" ]]    || fail "Name must be given."
-      _verfs_remove "${_path}" "${_name}" "${_version}"
+      _versioned_fs_remove "${_path}" "${_name}" "${_version}"
       ;;
     (activate)
       [[ -n "${_name}" && -n "${_version}" ]] ||
         fail "Name and Version must be given."
-
-      _verfs_activate "${_path}" "${_name}" "${_version}"
+      _versioned_fs_activate "${_path}" "${_name}" "${_version}"
       ;;
     (deactivate)
       [[ -n "${_name}" ]]    || fail "Name must be given."
-      _verfs_deactivate "${_path}" "${_name}" "${_version}"
+      _versioned_fs_deactivate "${_path}" "${_name}" "${_version}"
       ;;
     (versions)
-      _verfs_remove "${_path}" "${_name}" "${_version}"
+      _versioned_fs_remove "${_path}" "${_name}" "${_version}"
       ;;
     (active)
-      _verfs_active "${_path}" "${_name}" "${_version}"
+      _versioned_fs_active "${_path}" "${_name}" "${_version}"
       ;;
     (*)
-      fail "Unknown verfs action '${_action}'"
+      fail "Unknown versioned_fs action '${_action}'"
       ;;
   esac
 }
 
-_verfs_create()
+_versioned_fs_create()
 {
   local _path="$1"
-  mkdir -p "${_path}/"{verfs,versions,active} ||
-    fail "Could not create paths ${_path}/{verfs,versions,active}"
+  mkdir -p "${_path}/"{.versioned_fs,versions,active} ||
+    fail "Could not create paths ${_path}/{.versioned_fs,versions,active}"
 
-  echo "${_strategy}" > "${_path}/verfs/strategy"
-  echo "${_method}"   > "${_path}/verfs/method"
-  echo "${_activate}" > "${_path}/verfs/activate"
+  echo "${_strategy}" > "${_path}/.versioned_fs/strategy"
+  echo "${_method}"   > "${_path}/.versioned_fs/method"
+  echo "${_activate}" > "${_path}/.versioned_fs/activate"
 
 }
 
-_verfs_add()
+_versioned_fs_add()
 {
-  local _path="$1" _source="$2" _name="$3" _version="${3:-}"
+  local _path="$1" _name="$2" _version="${3}" _source="$4"
+
   local _version_path="${_path}/versions/${_name}/${_version}"
 
-  [[ -n "${_version}" ]] || _version="$(date +"%H%M%S")"
+  if [[ -d "${_version_path}" ]]
+  then
+    rm -rf "${_version_path}"
+  fi
 
-  [[ -d "${_version_path}" ]] || mkdir -p "${_version_path}"
+  mkdir -p "${_version_path}"
 
-  [[ "${_version_path}" == "${_source}" ]] ||
-    cp -Rf "${_source}"/ "${_version_path}"
+  if [[ "${_version_path}" != "${_source}" ]]
+  then
+    cp -Rf "${_source}"/* "${_version_path}"
+  fi
 }
 
-_verfs_remove()
+_versioned_fs_remove()
 {
   local _path="$1" _name="${2}" _version="${3}"
   local _version_path="${_path}/versions/${_name}/${_version}"
 
-  _verfs_deactivate "${_path}" "${_name}" "${_version}"
+  _versioned_fs_deactivate "${_path}" "${_name}" "${_version}"
 
-  [[ ! -d "${_version_path}" ]] || rm -rf "${_version_path}/"
+  if [[ -d "${_version_path}" ]]
+  then
+    rm -rf "${_version_path}/"
+  fi
 }
 
-_verfs_activate()
+_versioned_fs_activate()
 {
   local _path="$1" _name="${2}" _version="${3}" _target
   local _version_path="${_path}/versions/${_name}/${_version}"
@@ -182,7 +192,7 @@ _verfs_activate()
   then # Deactivate if active version.
     if [[ "$(readlink "${_path}/versions/${_name}/active")" != "${_version_path}" ]]
     then
-      _verfs_deactivate "${_path}" "${_name}"
+      _versioned_fs_deactivate "${_path}" "${_name}"
     else
       return 0 # Success if the given name/version is already active.
     fi
@@ -190,7 +200,7 @@ _verfs_activate()
 
   local _activate _active_version_path _index=0 _count _active_path
 
-  read -r _activate < "${_path}/verfs/activate"
+  read -r _activate < "${_path}/.versioned_fs/activate"
 
   if [[ -L "${_path}/versions/${_name}/active" ]]
   then
@@ -205,8 +215,10 @@ _verfs_activate()
     esac
   fi
 
-  read -r _strategy < "${_path}/verfs/strategy"
-  read -r _method < "${_path}/verfs/method"
+  read -r _strategy < "${_path}/.versioned_fs/strategy"
+  read -r _method < "${_path}/.versioned_fs/method"
+
+  core_log_step "${_name} ${_version} ~ activate"
 
   case "${_strategy}" in
     (fhs)
@@ -217,30 +229,35 @@ _verfs_activate()
           for _file in "${_files[@]}"
           do
             (( _index++ )) || true
-            printf "\r  [ ] ${_name} ${_version} ~ linking (${_index}/${_count})...    "
+            printf "\r  [ ] ${_name} ${_version} ~ activate (${_index}/${_count})...    "
             _target="${_active_path}/${_file##${_version_path}/}"
             [[ -d "${_target%/*}" ]] || mkdir -p "${_target%/*}"
             ln -sf "${_file}" "${_target}"
           done
-          printf "\r  [o] ${_name} ${_version} ~ linking complete."
+          printf "\r  [o] %-40s" "${_name} ${_version} ~ activate"
           ;;
         (copy)
-          cp -Rf "${_version_path}/" "${_active_path}/"
+          cp -Rf "${_version_path}"/* "${_active_path}"
           ;;
       esac
       ;;
     (name)
-      [[ ! -d "${_active_path}/${_name}" ]] || rm -rf "${_active_path}/${_name}"
-
-      cp -Rf "${_version_path}/" "${_active_path}/${_name}"
+      if [[ -d "${_active_path}/${_name}" ]]
+      then
+        rm -rf "${_active_path}/${_name}"
+      fi
+      mkdir -p "${_active_path}/${_name}"
+      cp -Rf "${_version_path}"/* "${_active_path}/${_name}"
       ;;
   esac
+
+  core_log_step success
 
   ln -sf "${_version_path}" "${_path}/versions/${_name}/active"
   # TODO: Add to active 'db'
 }
 
-_verfs_deactivate()
+_versioned_fs_deactivate()
 {
   local _path="$1" _name="${2}" _version="${3:-}"
   local _name_path="${_path}/versions/${_name}"
@@ -257,7 +274,7 @@ _verfs_deactivate()
     return 0 #
   fi
 
-  read -r _strategy < "${_path}/verfs/strategy"
+  read -r _strategy < "${_path}/.versioned_fs/strategy"
 
   case "${_strategy}" in
     (fhs)
@@ -280,7 +297,7 @@ _verfs_deactivate()
   # Remove from active metadata
 }
 
-_verfs_versions()
+_versioned_fs_versions()
 {
   local _path="$1" _name="${2:-}"
 
@@ -294,7 +311,7 @@ _verfs_versions()
   fi
 }
 
-_verfs_active()
+_versioned_fs_active()
 {
   local _path="$1" _name="${2:-}" _version _found
 

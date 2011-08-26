@@ -40,18 +40,18 @@ init_extensions_search_paths()
     extensions_search_paths=()
 
     # Single user extensions
-    if [[ "${extension_exts_path}" != "${extension_exts_home}" ]]
+    if [[ "${exts_system_path}" != "${exts_user_path}" ]]
     then
-      extensions_search_paths+=( "${extension_exts_home}" )
+      extensions_search_paths+=( "${exts_user_path}/active" )
     fi
 
     # Single system extensions
-    extensions_search_paths+=( "${extension_exts_path}" )
+    extensions_search_paths+=( "${exts_system_path}/active" )
 
     # User extension sets
-    if [[ "${extension_sets_path}" != "${extension_sets_home}" ]]
+    if [[ "${sets_system_path}" != "${sets_user_path}" ]]
     then
-      for _extension_set_path in ${extension_sets_home}/*
+      for _extension_set_path in "${sets_user_path}"/active/*
       do
         if [[ -d "${_extension_set_path}" ]]
         then
@@ -63,7 +63,7 @@ init_extensions_search_paths()
     # System extension sets
     local _extension_set_path
 
-    for _extension_set_path in ${extension_sets_path}/*
+    for _extension_set_path in ${sets_system_path}/active/*
     do
       if [[ -d "${_extension_set_path}" ]]
       then
@@ -76,8 +76,8 @@ init_extensions_search_paths()
   string_contains "${extensions_search_paths[*]}" "${sm_path}/core" ||
     extensions_search_paths+=( "${sm_path}/core" )
 
-  debug search "extension_sets_home:${extension_sets_home}:"
-  debug search "extension_exts_home:${extension_exts_home}:"
+  debug search "sets_user_path:${sets_user_path}:"
+  debug search "exts_user_path:${exts_user_path}:"
   debug search "extensions_search_paths:${extensions_search_paths[*]}:"
   export extensions_search_paths
 }

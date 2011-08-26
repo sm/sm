@@ -428,19 +428,26 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
       package_preinstall
   fi
 
+  ensure_paths_exist "${install_path}"
+
   if command_exists "${package_name}_install"
   then
     log_step "${package_name} ${package_version} ~ install" \
       "${package_name}_install"
   else
-    log_step "${package_name} ${package_version} ~ install" \
-      package_make_install
+    package_make_install
   fi
+
+  link --force "${source_path}/${package_dir}" \
+    to "${install_path}/src"
 
   if command_exists "${package_name}_postinstall"
   then
     log_step "${package_name} ${package_version} ~ postinstall" \
       "${package_name}_postinstall"
+  else
+    log_step "${package_name} ${package_version} ~ postinstall" \
+      package_postinstall
   fi
 
   if ! string_contains "${FUNCNAME[*]}" 'package_update'
@@ -448,11 +455,18 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
     package_activate_if_first "${package_name}" "${package_version}"
   fi
 
+  link --force "${source_path}/${package_dir}" \
+    to "${install_path}/src"
+
   if command_exists "${package_name}_postactivate"
   then
     log_step "${package_name} ${package_version} ~ postactivate" \
       "${package_name}_postactivate"
   fi
+
+  versioned_fs add \
+    path "${packages_path}" name "${package_name}" version "${package_version}" \
+    source "${install_path}"
 
   package_setup
 }
@@ -516,6 +530,8 @@ package_fetch()
   fetch_uri "${package_url}" "${source_path}/${package_dir}" \
     "${package_md5:-#}" ${_args[@]} || return 1
 
+  [[ -z "${__vcs_failed}" ]] || return 1
+
   [[ -d "${source_path}/${package_dir}/${package_dir}" ]] || return 0
 
   mv "${source_path}/${package_dir}/${package_dir}"/* \
@@ -563,10 +579,9 @@ package_build()
     package_error "Compilation of ${package_name} ${package_version} failed! " "build.log"
 }
 
-
 package_preinstall()
 {
-  link --force "${source_path}/${package_dir}" to "${install_path}/src"
+  true
 }
 
 package_make_install()
@@ -580,20 +595,24 @@ package_make_install()
     _command="make ${make_install_flags[@]:-install}"
   fi
 
+  log_step "${package_name} ${package_version} ~ install"
   ${_command} > make.install.log 2>&1 ||
     package_error "Installation of ${package_name} ${package_version} failed! " "make.install.log"
+  log_step success
+
+}
+
+package_postinstall()
+{
+  true
 }
 
 package_activate()
 {
   (( $# == 0 )) || package_cli $@
 
-  log_step "${package_name} ${package_version} ~ activate"
-
-  verfs activate \
+  versioned_fs activate \
     path "${packages_path}" name "${package_name}" version "${package_version}"
-
-  log_step success
 
   package_ldconfig "${package_name}"
 
@@ -616,7 +635,7 @@ package_deactivate()
 
   log_step "${package_name} ${_version} ~ deactivate"
 
-  verfs deactivate \
+  versioned_fs deactivate \
     path "${packages_path}" name "${package_name}"
 
   log_step success
@@ -653,20 +672,19 @@ package_ldconfig()
   # TODO: Figure out if solaris and freebsd have an analog to this?
   if os_is_linux
   then
-    ensure_paths_exist "/etc/ld.so.conf.d"
-
-    file_exists "/etc/ld.so.conf.d/sm.conf" || {
+    if path_exists "/etc/ld.so.conf.d"
+    then
       write "${active_path}/lib\n" to "/etc/ld.so.conf.d/sm.conf"
       chmod_files 0444 "/etc/ld.so.conf.d/sm.conf"
-    }
-
-    command_exists "${_ldconfig}" || ldconfig="ldconfig"
+    fi
 
     if [[ -d /selinux ]] && command_exists restorecon
     then
       restorecon -R "${active_path}/lib" # -v ~ verbose
       restorecon -R "${packages_path}/versions/${package_name}" # -v ~ verbose
     fi
+
+    command_exists "${_ldconfig}" || ldconfig="ldconfig"
 
     log_step "${package_name} ${package_version} ~ ldconfig" \
       "${_ldconfig}" "${active_path}/lib"
@@ -925,12 +943,12 @@ package_man()
 
 package_installed_versions()
 {
-  verfs versions path "${packages_path}" name "${package_name}"
+  versioned_fs versions path "${packages_path}" name "${package_name}"
 }
 
 packages_installed()
 {
-  verfs versions path "${packages_path}"
+  versioned_fs versions path "${packages_path}"
 }
 
 packages_active()
@@ -938,9 +956,9 @@ packages_active()
   local _name="${1:-}"
   if [[ -n "${_name}" ]]
   then
-    verfs active path "${packages_path}" name "${_name}"
+    versioned_fs active path "${packages_path}" name "${_name}"
   else
-    verfs active path "${packages_path}"
+    versioned_fs active path "${packages_path}"
   fi
 }
 

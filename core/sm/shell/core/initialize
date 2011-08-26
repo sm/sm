@@ -40,8 +40,8 @@ true \
   "${md5_path:="${sm_path}/md5"}" \
   "${archives_path:="${sm_path}/archives"}" \
   "${scm_path:="${sm_path}/scm"}" \
-  "${extension_sets_path:="${sm_path}/sets"}" \
-  "${extension_exts_path:="${sm_path}/exts"}" \
+  "${sets_system_path:="${sm_path}/sets"}" \
+  "${exts_system_path:="${sm_path}/exts"}" \
   "${extensions_src_path:="${src_path}/extensions"}" \
   "${tmp_path:="${sm_path}/tmp"}" \
   "${bin_path:="${sm_path}/bin"}" \
@@ -70,23 +70,23 @@ case "${user_shell}" in
   ;;
 esac
 
-if [[ -z "${extension_sets_home}" ]]
+if [[ -z "${sets_user_path}" ]]
 then
-  if [[ -w "${extension_sets_path}" ]] || (( UID == 0 ))
+  if [[ -w "${sets_system_path}" ]] || (( UID == 0 ))
   then
-    extension_sets_home="${extension_sets_path}"
+    sets_user_path="${sets_system_path}"
   else
-    extension_sets_home="${user_sm_path}/sets"
+    sets_user_path="${user_sm_path}/sets"
   fi
 fi
 
-if [[ -z "${extension_exts_home}" ]]
+if [[ -z "${exts_user_path}" ]]
 then
-  if [[ -w "${extension_exts_path}" ]] || (( UID == 0 ))
+  if [[ -w "${exts_system_path}" ]] || (( UID == 0 ))
   then
-    extension_exts_home="${extension_exts_path}"
+    exts_user_path="${exts_system_path}"
   else
-    extension_exts_home="${user_sm_path}/exts"
+    exts_user_path="${user_sm_path}/exts"
   fi
 fi
 
@@ -109,7 +109,7 @@ source "${modules_path}/modules/functions"
 
 modules_core_initialize
 
-modules sm/verfs # Used for pkg, extensions and modules.
+modules sm/versioned_fs # Used for pkg, extensions and modules.
 
 [[ "$OSTYPE" != *solaris* ]] || # custom compilations + g*
   export PATH="/bin:/opt/local/bin:/usr/sfw/bin:/usr/sbin:/usr/bin:${PATH}"
