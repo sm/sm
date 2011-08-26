@@ -420,6 +420,9 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
   then
     log_step "${package_name} ${package_version} ~ postinstall" \
       "${package_name}_postinstall"
+  else
+    log_step "${package_name} ${package_version} ~ postinstall" \
+      package_postinstall
   fi
 
   if ! string_contains "${FUNCNAME[*]}" 'package_update'
@@ -432,6 +435,10 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
     log_step "${package_name} ${package_version} ~ postactivate" \
       "${package_name}_postactivate"
   fi
+
+  verfs add \
+    path "${packages_path}" name "${package_name}" version "${package_version}" \
+    source "${install_path}"
 
   package_setup
 }
@@ -543,7 +550,6 @@ package_build()
     package_error "Compilation of ${package_name} ${package_version} failed! " "build.log"
 }
 
-
 package_preinstall()
 {
   link --force "${source_path}/${package_dir}" to "${install_path}/src"
@@ -565,9 +571,10 @@ package_make_install()
     package_error "Installation of ${package_name} ${package_version} failed! " "make.install.log"
   log_step success
 
-  verfs add \
-    path "${packages_path}" name "${package_name}" version "${package_version}" \
-    source "${install_path}"
+}
+package_postinstall()
+{
+  link --force "${source_path}/${package_dir}" to "${install_path}/src"
 }
 
 package_activate()
