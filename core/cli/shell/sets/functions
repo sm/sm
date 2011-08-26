@@ -33,13 +33,13 @@ sets_list()
   do
     [[ -d "${_path}"  ]] || continue
 
-    if [[ "${_path}" =~ "${extension_sets_path}" ]]
+    if [[ "${_path}" =~ "${sets_system_path}" ]]
     then
-      log "${_path##${extension_sets_path}\/}:"
-    elif [[ "${_path}" =~ "${extension_sets_home}" ]]
+      log "${_path##${sets_system_path}\/}:"
+    elif [[ "${_path}" =~ "${sets_user_path}" ]]
     then
-      log "${_path##${extension_sets_home}\/}: # User set"
-    elif [[ "${_path}" == "${extension_exts_home}" ]]
+      log "${_path##${sets_user_path}\/}: # User set"
+    elif [[ "${_path}" == "${exts_user_path}" ]]
     then
       log "${_path##*\/}: # User set"
     else
@@ -74,7 +74,7 @@ sets_install()
   shift || fail "Cannot install a set; No set name was given."
 
   _names=(${_names//,/ })
-  _extension_namespace="${extension_sets_home#${sm_path}\/}"
+  _extension_namespace="${sets_user_path#${sm_path}\/}"
   _extension_namespace="${_extension_namespace#${user_sm_path}\/}"
 
   for _name in ${_names[@]}
@@ -96,15 +96,12 @@ set_install()
   [[ -n "${_uri}" ]] ||
     error "uri not given and cannot find ${_name} in known extension sets."
 
-  ensure_paths_exist "${extension_sets_home}"
-  enter "${extension_sets_home}"
-
   fetch_uri "${_uri}" "${src_path}/${_identifier}" "$@" || return $?
 
   [[ -z "${__vcs_failed}" ]] || return 1
 
-  remove_paths "${_name}"
-  copy_path "${src_path}/${_identifier}" to "${_name}"
+  verfs add \
+    "${sets_user_path}" "${_name}" "" "${src_path}/${_identifier}"
 }
 
 sets_install_all()
@@ -136,7 +133,7 @@ sets_update()
         ;;
     esac
 
-    if [[ ! -d "${extension_sets_home}/${_name}" ]]
+    if [[ ! -d "${sets_user_path}/${_name}" ]]
     then
       if in_search_paths detect_extension_existence "${_name}"
       then
@@ -148,13 +145,13 @@ sets_update()
       true
     fi
 
-    if [[ ! -s "${extension_sets_home}/${_name}/.uri" ]]
+    if [[ ! -s "${sets_user_path}/${_name}/.uri" ]]
     then
       log "Extension set ${_name} does not contain stored uri."
       continue
     fi
 
-    _uri=$( cat "${extension_sets_home}/${_name}/.uri" )
+    _uri=$( cat "${sets_user_path}/${_name}/.uri" )
 
     if [[ -z "${_uri}" ]]
     then
@@ -168,7 +165,7 @@ sets_update()
 sets_update_all()
 {
   local _name
-  for _name in ${extension_sets_home}/*
+  for _name in ${sets_user_path}/*
   do
     [[ -d "${_name}"  ]] || continue
 
@@ -198,7 +195,7 @@ sets_uninstall()
       ;;
   esac
 
-  enter "${extension_sets_home}"
+  enter "${sets_user_path}"
 
   if [[ ! -d "${_name}" ]]
   then

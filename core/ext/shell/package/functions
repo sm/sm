@@ -496,6 +496,8 @@ package_fetch()
   fetch_uri "${package_url}" "${source_path}/${package_dir}" \
     "${package_md5:-#}" ${_args[@]} || return 1
 
+  [[ -z "${__vcs_failed}" ]] || return 1
+
   [[ -d "${source_path}/${package_dir}/${package_dir}" ]] || return 0
 
   mv "${source_path}/${package_dir}/${package_dir}"/* \
@@ -559,6 +561,9 @@ package_make_install()
     _command="make ${make_install_flags[@]:-install}"
   fi
 
+  verfs add \
+    path "${packages_path}" name "${package_name}" version "${package_version}" "${install_path}"
+
   ${_command} > make.install.log 2>&1 ||
     package_error "Installation of ${package_name} ${package_version} failed! " "make.install.log"
 }
@@ -567,12 +572,8 @@ package_activate()
 {
   (( $# == 0 )) || package_cli $@
 
-  log_step "${package_name} ${package_version} ~ activate"
-
   verfs activate \
     path "${packages_path}" name "${package_name}" version "${package_version}"
-
-  log_step success
 
   package_ldconfig "${package_name}"
 

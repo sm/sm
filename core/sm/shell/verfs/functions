@@ -110,6 +110,7 @@ verfs()
       [[ -n "${_name}" && -n "${_source}" ]] ||
         fail "Name and Source must be given."
       _verfs_add "${_path}" "${_name}" "${_version}" "${_source}"
+      _verfs_activate "${_path}" "${_name}" "${_version}"
       ;;
     (remove)
       [[ -n "${_name}" ]]    || fail "Name must be given."
@@ -151,7 +152,7 @@ _verfs_create()
 
 _verfs_add()
 {
-  local _path="$1" _source="$2" _name="$3" _version="${3:-}"
+  local _path="$1" _name="$3" _version="${3:-}" _source="$2"
   local _version_path="${_path}/versions/${_name}/${_version}"
 
   [[ -n "${_version}" ]] || _version="$(date +"%H%M%S")"
@@ -208,6 +209,7 @@ _verfs_activate()
   read -r _strategy < "${_path}/verfs/strategy"
   read -r _method < "${_path}/verfs/method"
 
+  log_step "${_name} ${_version} ~ activate"
   case "${_strategy}" in
     (fhs)
       case "${_method}" in
@@ -217,12 +219,12 @@ _verfs_activate()
           for _file in "${_files[@]}"
           do
             (( _index++ )) || true
-            printf "\r  [ ] ${_name} ${_version} ~ linking (${_index}/${_count})...    "
+            printf "\r  [ ] ${_name} ${_version} ~ activate (${_index}/${_count})...    "
             _target="${_active_path}/${_file##${_version_path}/}"
             [[ -d "${_target%/*}" ]] || mkdir -p "${_target%/*}"
             ln -sf "${_file}" "${_target}"
           done
-          printf "\r  [o] %-40s" "${_name} ${_version} ~ linking"
+          printf "\r  [o] %-40s" "${_name} ${_version} ~ activate"
           ;;
         (copy)
           cp -Rf "${_version_path}/" "${_active_path}/"
@@ -235,6 +237,7 @@ _verfs_activate()
       cp -Rf "${_version_path}/" "${_active_path}/${_name}"
       ;;
   esac
+  log_step success
 
   ln -sf "${_version_path}" "${_path}/versions/${_name}/active"
   # TODO: Add to active 'db'

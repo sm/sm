@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# Note exts_system_path ~ search path
+# Note exts_user_path ~
 ext_initialize()
 {
   ensure_paths_exist "${sm_path}/exts"
@@ -35,7 +37,7 @@ ext_list()
 {
   local extensions COLUMNS=80
 
-  if extensions_in "${extension_exts_path}"
+  if extensions_in "${exts_system_path}"
   then
     log "exts: #system"
     echo ${found_extensions[@]} | xargs -s ${COLUMNS} | xargs -I '{}' echo "  - {}"
@@ -43,9 +45,9 @@ ext_list()
     log "# No single system extensions (exts) are currently installed."
   fi
 
-  if [[ "${extension_exts_path}" != "${extension_exts_home}" ]]
+  if [[ "${exts_system_path}" != "${exts_user_path}" ]]
   then
-    if extensions_in "${extension_exts_home}"
+    if extensions_in "${exts_user_path}"
     then
       log "exts: #user"
       echo ${found_extensions[@]} | xargs -s ${COLUMNS} | xargs -I '{}' echo "  - {}"
@@ -73,7 +75,7 @@ ext_install()
   shift || fail "Cannot install a ext; No ext name was given."
 
   _names=(${_names//,/ })
-  _extension_namespace="${extension_exts_home#${sm_path}\/}"
+  _extension_namespace="${exts_user_path#${sm_path}\/}"
   _extension_namespace="${_extension_namespace#${user_sm_path}\/}"
 
   for _name in ${_names[@]}
@@ -97,8 +99,8 @@ extension_install()
 
   local _identifier="$(scm_identifier "${_uri}")"
 
-  ensure_paths_exist "${extension_exts_home}"
-  enter "${extension_exts_home}"
+  ensure_paths_exist "${exts_user_path}"
+  enter "${exts_user_path}"
 
   fetch_uri "${_uri}" "${src_path}/${_identifier}" "$@" || return $?
 
@@ -126,21 +128,21 @@ ext_update()
   fi
   for _name in "$@"
   do
-    if [[ ! -d "${extension_exts_home}/${_name}" ]]
+    if [[ ! -d "${exts_user_path}/${_name}" ]]
     then
-      if [[ -d "${extension_exts_path}/${_name}" ]]
+      if [[ -d "${exts_system_path}/${_name}" ]]
       then
         error "Extension ${_name} is in system exts and cannot be updated."
       else
         error "Extension ${_name} does not exist."
       fi
     fi
-    if [[ ! -s "${extension_exts_home}/${_name}/.uri" ]]
+    if [[ ! -s "${exts_user_path}/${_name}/.uri" ]]
     then
       log "Extension ${_name} does not contain stored uri."
       continue
     fi
-    _uri=$( cat "${extension_exts_home}/${_name}/.uri" )
+    _uri=$( cat "${exts_user_path}/${_name}/.uri" )
     if [[ -z "${_uri}" ]]
     then
       log "Extension ${_name} does not contain stored uri."
@@ -153,7 +155,7 @@ ext_update()
 ext_update_all()
 {
   local _name
-  for _name in ${extension_exts_home}/*
+  for _name in ${exts_user_path}/*
   do
     case "${_name##*/}" in
       \*)
@@ -175,10 +177,10 @@ ext_uninstall()
       error "Please specify a valid extension name."
       ;;
   esac
-  enter "${extension_exts_home}"
+  enter "${exts_user_path}"
   if [[ ! -d "${_name}" ]]
   then
-    if [[ -d "${extension_exts_path}/${_name}" ]]
+    if [[ -d "${exts_system_path}/${_name}" ]]
     then
       error "Extension ${_name} is in system exts and cannot be uninstalled."
     else
