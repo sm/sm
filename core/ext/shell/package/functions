@@ -1,5 +1,11 @@
 #!/bin/sh
 
+package_initialize()
+{
+  declare -a package_dependencies
+  declare -a configure_flags
+}
+
 package_error()
 {
   local _message="${1:-}" _log="${2:-}"
@@ -94,6 +100,24 @@ package_definition()
   done
 }
 
+package_configure_flags()
+{
+  local _flag
+  for _flag in "$@"
+  do
+    string_contains "${configure_flags[*]}" "${_flag}" ||
+      configure_flags+=( "${_flag}" )
+  done
+}
+
+package_configure_flag_add_key()
+{
+  local _flag=$1 _value=$2
+  string_contains_key "${configure_flags[*]}" "${_flag}" ||
+    configure_flags+=( "${_flag}=${_value}" )
+}
+
+
 package_cli()
 {
   local _ignored_args=() _package_args=( $@ ) _token
@@ -158,12 +182,12 @@ package_cli()
         force_flag=1
         ;;
       static)
-        configure_flags+=( --static )
+        package_configure_flags --static
         static_flag=1
         ;;
       shared)
         shared_flag=1
-        configure_flags+=( --enable-shared )
+        package_configure_flags --enable-shared
         ;;
       licence)
         extension_license
@@ -174,8 +198,7 @@ package_cli()
         succeed
         ;;
       --with*|--enable*|--disable*)
-        string_contains "${configure_flags[*]}" "${_token}" ||
-          configure_flags+=( "${_token}" )
+        package_configure_flags "${_token}"
         ;;
       *)
         _ignored_args+=("${_token}")
@@ -207,9 +230,6 @@ package_init()
       true "${package_version:="${2:-}"}" "${archive_format:="${3:-}"}"
       ;;
   esac
-
-  declare -a package_dependencies
-  declare -a configure_flags
 
   if command_exists "${package_name}_initialize"
   then
@@ -256,7 +276,7 @@ package_init()
     "${install_base_path:="${packages_path}/versions/${package_name}"}" \
     "${install_path:="${install_base_path}/${package_version}"}"
 
-  configure_flags+=( --prefix="${install_path}" )
+  package_configure_flag_add_key --prefix "${install_path}"
 
   # This check should only happen in places that require a version...
   #[[ -n "${package_version}" ]] ||
@@ -514,7 +534,8 @@ package_configure()
   else
     export PREFIX="${install_base_path}/${package_version}"
 
-    _command="./configure ${configure_flags[@]:-"--prefix=${install_path}"}"
+    package_configure_flag_add_key --prefix "${install_path}"
+    _command="./configure ${configure_flags[*]}"
 
     file_is_executable "configure" || return 0
   fi
