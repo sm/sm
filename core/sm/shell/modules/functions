@@ -42,16 +42,16 @@ init_extensions_search_paths()
     # Single user extensions
     if [[ "${exts_system_path}" != "${exts_user_path}" ]]
     then
-      extensions_search_paths+=( "${exts_user_path}" )
+      extensions_search_paths+=( "${exts_user_path}/active" )
     fi
 
     # Single system extensions
-    extensions_search_paths+=( "${exts_system_path}" )
+    extensions_search_paths+=( "${exts_system_path}/active" )
 
     # User extension sets
     if [[ "${sets_system_path}" != "${sets_user_path}" ]]
     then
-      for _extension_set_path in ${sets_user_path}/*
+      for _extension_set_path in "${sets_user_path}"/active/*
       do
         if [[ -d "${_extension_set_path}" ]]
         then
@@ -63,7 +63,7 @@ init_extensions_search_paths()
     # System extension sets
     local _extension_set_path
 
-    for _extension_set_path in ${sets_system_path}/*
+    for _extension_set_path in ${sets_system_path}/active/*
     do
       if [[ -d "${_extension_set_path}" ]]
       then

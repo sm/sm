@@ -109,6 +109,7 @@ verfs()
     (add)
       [[ -n "${_name}" && -n "${_source}" ]] ||
         fail "Name and Source must be given."
+      [[ -n "${_version}" ]] || _version="$(date +"%Y%m%d%H%M%S")"
       _verfs_add "${_path}" "${_name}" "${_version}" "${_source}"
       _verfs_activate "${_path}" "${_name}" "${_version}"
       ;;
@@ -119,7 +120,6 @@ verfs()
     (activate)
       [[ -n "${_name}" && -n "${_version}" ]] ||
         fail "Name and Version must be given."
-
       _verfs_activate "${_path}" "${_name}" "${_version}"
       ;;
     (deactivate)
@@ -152,15 +152,21 @@ _verfs_create()
 
 _verfs_add()
 {
-  local _path="$1" _name="$3" _version="${3:-}" _source="$2"
+  local _path="$1" _name="$2" _version="${3}" _source="$4"
+
   local _version_path="${_path}/versions/${_name}/${_version}"
 
-  [[ -n "${_version}" ]] || _version="$(date +"%H%M%S")"
+  if [[ -d "${_version_path}" ]]
+  then
+    rm -rf "${_version_path}"
+  fi
 
-  [[ -d "${_version_path}" ]] || mkdir -p "${_version_path}"
+  mkdir -p "${_version_path}"
 
-  [[ "${_version_path}" == "${_source}" ]] ||
-    cp -Rf "${_source}"/ "${_version_path}"
+  if [[ "${_version_path}" != "${_source}" ]]
+  then
+    cp -Rf "${_source}"/* "${_version_path}"
+  fi
 }
 
 _verfs_remove()
@@ -170,7 +176,10 @@ _verfs_remove()
 
   _verfs_deactivate "${_path}" "${_name}" "${_version}"
 
-  [[ ! -d "${_version_path}" ]] || rm -rf "${_version_path}/"
+  if [[ -d "${_version_path}" ]]
+  then
+    rm -rf "${_version_path}/"
+  fi
 }
 
 _verfs_activate()
@@ -209,7 +218,8 @@ _verfs_activate()
   read -r _strategy < "${_path}/verfs/strategy"
   read -r _method < "${_path}/verfs/method"
 
-  log_step "${_name} ${_version} ~ activate"
+  core_log_step "${_name} ${_version} ~ activate"
+
   case "${_strategy}" in
     (fhs)
       case "${_method}" in
@@ -227,17 +237,21 @@ _verfs_activate()
           printf "\r  [o] %-40s" "${_name} ${_version} ~ activate"
           ;;
         (copy)
-          cp -Rf "${_version_path}/" "${_active_path}/"
+          cp -Rf "${_version_path}"/* "${_active_path}"
           ;;
       esac
       ;;
     (name)
-      [[ ! -d "${_active_path}/${_name}" ]] || rm -rf "${_active_path}/${_name}"
-
-      cp -Rf "${_version_path}/" "${_active_path}/${_name}"
+      if [[ -d "${_active_path}/${_name}" ]]
+      then
+        rm -rf "${_active_path}/${_name}"
+      fi
+      mkdir -p "${_active_path}/${_name}"
+      cp -Rf "${_version_path}"/* "${_active_path}/${_name}"
       ;;
   esac
-  log_step success
+
+  core_log_step success
 
   ln -sf "${_version_path}" "${_path}/versions/${_name}/active"
   # TODO: Add to active 'db'
