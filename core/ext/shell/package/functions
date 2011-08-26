@@ -562,7 +562,8 @@ package_make_install()
   fi
 
   verfs add \
-    path "${packages_path}" name "${package_name}" version "${package_version}" "${install_path}"
+    path "${packages_path}" name "${package_name}" version "${package_version}" \
+    source "${install_path}"
 
   ${_command} > make.install.log 2>&1 ||
     package_error "Installation of ${package_name} ${package_version} failed! " "make.install.log"
