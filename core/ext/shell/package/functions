@@ -632,20 +632,19 @@ package_ldconfig()
   # TODO: Figure out if solaris and freebsd have an analog to this?
   if os_is_linux
   then
-    ensure_paths_exist "/etc/ld.so.conf.d"
-
-    file_exists "/etc/ld.so.conf.d/sm.conf" || {
+    if path_exists "/etc/ld.so.conf.d"
+    then
       write "${active_path}/lib\n" to "/etc/ld.so.conf.d/sm.conf"
       chmod_files 0444 "/etc/ld.so.conf.d/sm.conf"
-    }
-
-    command_exists "${_ldconfig}" || ldconfig="ldconfig"
+    fi
 
     if [[ -d /selinux ]] && command_exists restorecon
     then
       restorecon -R "${active_path}/lib" # -v ~ verbose
       restorecon -R "${packages_path}/versions/${package_name}" # -v ~ verbose
     fi
+
+    command_exists "${_ldconfig}" || ldconfig="ldconfig"
 
     log_step "${package_name} ${package_version} ~ ldconfig" \
       "${_ldconfig}" "${active_path}/lib"
