@@ -136,11 +136,10 @@ versionedfs()
       _versionedfs_deactivate "${_path}" "${_name}" "${_version}"
       ;;
     (versions)
-      #TODO: _versionedfs_versions
-      _versionedfs_active "${_path}" "${_name}" "${_version}"
+      _versionedfs_list versions "${_path}" "${_name}" "${_version}"
       ;;
     (active)
-      _versionedfs_active "${_path}" "${_name}" "${_version}"
+      _versionedfs_list active "${_path}" "${_name}" "${_version}"
       ;;
     (*)
       fail "Unknown versionedfs action '${_action}'"
@@ -321,31 +320,49 @@ _versionedfs_versions()
   fi
 }
 
-_versionedfs_active()
+_versionedfs_list()
 {
-  local _path="$1" _name="${2:-}" _version _found
+  local _method=$1 _path="$2" _name="${3:-}" __path __name __version
 
   if [[ -n "${_name}" ]]
   then
-    _name="${_name//,/|}"
-    _found=( $(
-      find "${_path}/versions" -mindepth 2 -maxdepth 2 -name active -type l |
-        awk -F'/' '! /\/active\//{print $(NF - 1)}' |
-        awk "/${_name}/"
-    ) )
-  else
-    _found=( $(
-      find "${_path}/versions" -mindepth 2 -maxdepth 2 -name active -type l |
-      awk -F'/' '! /\/active\//{print $(NF - 1)}'
-    ) )
+    _name="${_name//,/ }"
   fi
 
-  for _version in "${_found[@]}"
+  for __path in "${_path}"/versions/*/*
   do
-    if [[ -L "${_path}/versions/${_version}/active" ]]
+    __version="${__path##*/}"
+    case "${_method}" in
+      (active)
+        if [[ "${__version}" == "active" && -L "${__path}" ]]
+        then
+          __path="$( readlink "${__path}" )"
+          __version="${__path##*/}"
+        else
+          __version=""
+        fi
+        ;;
+      (versions)
+        if [[ "${__version}" == "active" ]]
+        then
+          __version=""
+        fi
+        ;;
+    esac
+
+    if [[ -n "${__version}" ]]
     then
-      readlink "${_path}/versions/${_version}/active" |
-        awk -F'/' '{print $(NF-1) ":" $NF}'
+      __name="${__path%/*}"
+      __name="${__name##*/}"
+      if [[ -n "${_name}" ]] && ! string_contains "${_name}" "${__name}"
+      then
+        __name=""
+      fi
+
+      if [[ -n "${__name}" ]]
+      then
+        printf "${__name}:${__version}\n"
+      fi
     fi
   done
 }
