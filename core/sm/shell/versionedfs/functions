@@ -136,7 +136,8 @@ versionedfs()
       _versionedfs_deactivate "${_path}" "${_name}" "${_version}"
       ;;
     (versions)
-      _versionedfs_remove "${_path}" "${_name}" "${_version}"
+      #TODO: _versionedfs_versions
+      _versionedfs_active "${_path}" "${_name}" "${_version}"
       ;;
     (active)
       _versionedfs_active "${_path}" "${_name}" "${_version}"
@@ -326,21 +327,24 @@ _versionedfs_active()
 
   if [[ -n "${_name}" ]]
   then
-    _name="${1//,/ }"
-    _found=($( find "${_path}" -mindepth 1 -maxdepth 1 -name active -type l |
-    awk -F'/' '! /\/active\//{print $(NF - 1)}' | awk "/${_name// /|}/"
-    ))
+    _name="${_name//,/|}"
+    _found=( $(
+      find "${_path}/versions" -mindepth 2 -maxdepth 2 -name active -type l |
+        awk -F'/' '! /\/active\//{print $(NF - 1)}' |
+        awk "/${_name}/"
+    ) )
   else
-    _found=($( find "${_path}" -mindepth 2 -maxdepth 2 -name active -type l |
-    awk -F'/' '! /\/active\//{print $(NF - 1)}'
-    ))
+    _found=( $(
+      find "${_path}/versions" -mindepth 2 -maxdepth 2 -name active -type l |
+      awk -F'/' '! /\/active\//{print $(NF - 1)}'
+    ) )
   fi
 
   for _version in "${_found[@]}"
   do
-    if [[ -L "${_path}/versions/${_name}/active" ]]
+    if [[ -L "${_path}/versions/${_version}/active" ]]
     then
-      readlink "${_path}/versions/${_name}/active" |
+      readlink "${_path}/versions/${_version}/active" |
         awk -F'/' '{print $(NF-1) ":" $NF}'
     fi
   done
