@@ -26,6 +26,7 @@
 #     strategy # contains one of {fhs,name}
 #     method   # contains one of {link,copy}
 #     activate # contains one of {newest,first}
+#     retain   # contains one of {[[:digit:]],all}
 #
 #   versions/
 #     {name}/{version}/ # For each {name}:{version} pair added.
@@ -45,7 +46,8 @@ versionedfs()
 {
   local _token _path _paths _source _name _version _strategy _method _activate
   local _action="${1:-}"
-  shift || fail "Usage: versionedfs path \"{versionedfs root path}\" strategy \"{fhs,name}\" method \"{link,copy}\" activate \"{newest,first}\""
+  shift || fail "Usage: versionedfs path \"{versionedfs root path}\" "\
+    "strategy \"{fhs,name}\" method \"{link,copy}\" activate \"{newest,first}\""
 
   while (( $# ))
   do
@@ -304,20 +306,6 @@ _versionedfs_deactivate()
 
   rm -f "${_path}/versions/${_name}/active"
   # Remove from active metadata
-}
-
-_versionedfs_versions()
-{
-  local _path="$1" _name="${2:-}"
-
-  if [[ -n "${_name}" ]]
-  then
-    find "${_path}/versions/${_name}" -mindepth 1 -maxdepth 1 -type d |
-      awk -F'/' '! /\/active\//{print $(NF - 1)":"$(NF)}' | sort
-  else
-    find "${_path}" -mindepth 2 -maxdepth 2 -type d |
-      awk -F'/' '! /\/active\//{print $(NF - 1)":"$(NF)}' | sort
-  fi
 }
 
 _versionedfs_list()
