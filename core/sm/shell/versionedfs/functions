@@ -122,7 +122,6 @@ versionedfs()
         fail "Name and Source must be given."
       [[ -n "${_version}" ]] || _version="$(date +"%Y%m%d%H%M%S")"
       _versionedfs_add "${_path}" "${_name}" "${_version}" "${_source}"
-      _versionedfs_activate "${_path}" "${_name}" "${_version}"
       ;;
     (remove)
       [[ -n "${_name}" ]]    || fail "Name must be given."
@@ -235,15 +234,23 @@ _versionedfs_activate()
     (fhs)
       case "${_method}" in
         (link)
-          _files=($( find "${_version_path}" -type f ))
+          _files=($( find "${_version_path}" -mindepth 1 ))
           _count="${#_files[@]}"
           for _file in "${_files[@]}"
           do
-            (( _index++ )) || true
+            : $(( _index++ ))
             printf "\r  [ ] ${_name} ${_version} ~ linking (${_index}/${_count})..."
             _target="${_active_path}/${_file##${_version_path}/}"
-            [[ -d "${_target%/*}" ]] || mkdir -p "${_target%/*}"
-            ln -sf "${_file}" "${_target}"
+            if [[ -d "${_file}" ]]
+            then
+              mkdir -p "${_target}"
+            else
+              if [[ -f "${_target}" ]]
+              then
+                rm -rf "${_target}"
+              fi
+              ln -s "${_file}" "${_target}"
+            fi
           done
           printf "\r  [o] %-40s" "${_name} ${_version}"
           ;;
@@ -289,14 +296,30 @@ _versionedfs_deactivate()
 
   case "${_strategy}" in
     (fhs)
-      _files=($( find "${_version_path}" -type f ))
+      _files=($( find "${_version_path}" -mindepth 1 | sort -r ))
       _count="${#_files[@]}"
       echo
       for _file in "${_files[@]}"
       do
-        (( _index++ ))
+        : $(( _index++ ))
         printf "\r  Removing (${_index}/${_count})"
-        rm -f "${_active_path}/${_file##${_version_path}}"
+        _target="${_active_path}/${_file##${_version_path}}"
+        if [[ -L "${_target}" ]]
+        then
+          rm -f "${_target}"
+        elif [[ -d "${_target}" ]]
+        then
+          for _file in "${_target}"/*
+          do
+            case "${_file}" in
+              (${_target}/\*) rm -rf "${_target}" ;;
+              (*) break ;;
+            esac
+          done
+        elif [[ -f "${_target}" ]]
+        then
+          fail "Unknown file type for ${_target}."
+        fi
       done
       ;;
     (name)

@@ -654,8 +654,7 @@ package_activate_if_first()
 
   if path_exists "${install_path}"
   then
-    symlink_exists "${packages_path}/versions/${_package}/active" ||
-      package_activate "${_package}" "${_version}"
+    package_activate "${_package}" "${_version}"
   else
     log "'${install_path}' not found; skipping activation."
   fi
