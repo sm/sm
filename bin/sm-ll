@@ -1,5 +1,23 @@
 #!/usr/bin/perl -w
 
+# Copyright (C) 2007,2008,2009,2010,2011 Ole Tange and Free Software
+# Foundation, Inc.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, see <http://www.gnu.org/licenses/>
+# or write to the Free Software Foundation, Inc., 51 Franklin St,
+# Fifth Floor, Boston, MA 02110-1301 USA
+
 # open3 used in Job::start
 use IPC::Open3;
 # &WNOHANG used in reaper
@@ -61,6 +79,7 @@ if($::opt_nonall or $::opt_onall) {
 	close $outfh;
 	push @argfiles, $name;
     }
+    if(@::opt_basefile) { setup_basefile(); }
     # for each sshlogin do:
     # parallel -S $sshlogin $command :::: @argfiles
     #
@@ -71,12 +90,14 @@ if($::opt_nonall or $::opt_onall) {
 	     ((defined $::opt_P) ? "-P $::opt_P" : ""),
 	     ((defined $::opt_u) ? "-u" : ""),
 	     ((defined $::opt_g) ? "-g" : ""),
+	     ((defined $::opt_D) ? "-D" : ""),
 	);
     my $suboptions =
 	join(" ",
 	     ((defined $::opt_u) ? "-u" : ""),
 	     ((defined $::opt_g) ? "-g" : ""),
 	     ((defined @::opt_v) ? "-vv" : ""),
+	     ((defined $::opt_D) ? "-D" : ""),
 	);
     ::debug("| parallel");
     open(PARALLEL,"| parallel $options") || die;
@@ -86,6 +107,7 @@ if($::opt_nonall or $::opt_onall) {
 	    shell_quote_scalar($command)." :::: @argfiles\n";
     }
     close PARALLEL;
+    if(@::opt_basefile) { cleanup_basefile(); }
     unlink(@argfiles);
     wait_and_exit(min(undef_as_zero($Global::exitstatus),254));
 }
@@ -124,6 +146,8 @@ if($::opt_halt_on_error) {
 } else {
     wait_and_exit(min(undef_as_zero($Global::exitstatus),254));
 }
+
+sub __PIPE_MODE__ {}
 
 sub spreadstdin {
     # read a record
@@ -307,6 +331,8 @@ sub write_record_to_pipe {
     return;
 }
 
+sub __SEM_MODE__ {}
+
 sub acquire_semaphore {
     # Acquires semaphore. If needed: spawns to the background
     # Returns:
@@ -334,6 +360,8 @@ sub acquire_semaphore {
     return $sem;
 }
 
+sub __PARSE_OPTIONS__ {}
+
 sub options_hash {
     # Returns a hash of the GetOptions config
     return
@@ -356,13 +384,14 @@ sub options_hash {
 	 "basenameextensionreplace|bner=s" => \$::opt_basenameextensionreplace,
 	 "seqreplace=s" => \$::opt_seqreplace,
 	 "jobs|j=s" => \$::opt_P,
-	 "load=f" => \$::opt_load,
+	 "load=s" => \$::opt_load,
 	 "noswap" => \$::opt_noswap,
 	 "max-line-length-allowed" => \$::opt_max_line_length_allowed,
 	 "number-of-cpus" => \$::opt_number_of_cpus,
 	 "number-of-cores" => \$::opt_number_of_cores,
 	 "use-cpus-instead-of-cores" => \$::opt_use_cpus_instead_of_cores,
 	 "nice=i" => \$::opt_nice,
+	 "timeout=i" => \$::opt_timeout,
 	 "onall" => \$::opt_onall,
 	 "nonall" => \$::opt_nonall,
 	 "sshlogin|S=s" => \@::opt_sshlogin,
@@ -456,7 +485,7 @@ sub get_options_from_array {
 sub parse_options {
     # Returns: N/A
     # Defaults:
-    $Global::version = 20110722;
+    $Global::version = 20110822;
     $Global::progname = 'parallel';
     $Global::infinity = 2**31;
     $Global::debug = 0;
@@ -512,6 +541,7 @@ sub parse_options {
     }
     if(defined $::opt_E) { $Global::end_of_file_string = $::opt_E; }
     if(defined $::opt_n) { $Global::max_number_of_args = $::opt_n; }
+    if(defined $::opt_timeout) { $Global::timeoutq = TimeoutQueue->new($::opt_timeout); }
     if(defined $::opt_tmpdir) { $ENV{'TMPDIR'} = $::opt_tmpdir; }
     if(defined $::opt_help) { die_usage(); }
     if(defined $::opt_colsep) { $Global::trim = 'lr'; }
@@ -794,39 +824,12 @@ sub read_args_from_command_line {
     return @new_argv;
 }
 
-sub open_or_exit {
-    # Returns:
-    #   file handle to read-opened file
-    #   exits if file cannot be opened
-    my $file = shift;
-    if($file eq "-") {
-	$Global::stdin_in_opt_a = 1;
-	return ($Global::original_stdin || *STDIN);
-    }
-    if(ref $file eq "GLOB") {
-	# This is an open filehandle
-	return $file;
-    }
-    my $fh = gensym;
-    if(not open($fh,"<",$file)) {
-        print STDERR "$Global::progname: ".
-            "Cannot open input file `$file': ".
-            "No such file or directory\n";
-        wait_and_exit(255);
-    }
-    return $fh;
-}
-
 sub cleanup {
     # Returns: N/A
-    if(@::opt_basefile) {
-        cleanup_basefile();
-    }
+    if(@::opt_basefile) { cleanup_basefile(); }
 }
 
-#
-# Generating the command line
-#
+sub __QUOTING_ARGUMENTS_FOR_SHELL__ {}
 
 sub shell_quote {
     my @strings = (@_);
@@ -865,7 +868,7 @@ sub shell_unquote {
     return wantarray ? @strings : "@strings";
 }
 
-sub __NUMBER_OF_PROCESSES_FILEHANDLES_MAX_LENGTH_OF_COMMAND_LINE__ {}
+sub __FILEHANDLES__ {}
 
 sub enough_file_handles {
     # check that we have enough filehandles available for starting
@@ -889,94 +892,30 @@ sub enough_file_handles {
     }
 }
 
-#
-# General useful library functions
-#
-
-sub min {
+sub open_or_exit {
     # Returns:
-    #   Minimum value of array
-    my $min;
-    for (@_) {
-        # Skip undefs
-        defined $_ or next;
-        defined $min or do { $min = $_; next; }; # Set $_ to the first non-undef
-        $min = ($min < $_) ? $min : $_;
+    #   file handle to read-opened file
+    #   exits if file cannot be opened
+    my $file = shift;
+    if($file eq "-") {
+	$Global::stdin_in_opt_a = 1;
+	return ($Global::original_stdin || *STDIN);
     }
-    return $min;
-}
-
-sub max {
-    # Returns:
-    #   Maximum value of array
-    my $max;
-    for (@_) {
-        # Skip undefs
-        defined $_ or next;
-        defined $max or do { $max = $_; next; }; # Set $_ to the first non-undef
-        $max = ($max > $_) ? $max : $_;
+    if(ref $file eq "GLOB") {
+	# This is an open filehandle
+	return $file;
     }
-    return $max;
-}
-
-sub sum {
-    # Returns:
-    #   Sum of values of array
-    my @args = @_;
-    my $sum = 0;
-    for (@args) {
-        # Skip undefs
-        $_ and do { $sum += $_; }
+    my $fh = gensym;
+    if(not open($fh,"<",$file)) {
+        print STDERR "$Global::progname: ".
+            "Cannot open input file `$file': ".
+            "No such file or directory\n";
+        wait_and_exit(255);
     }
-    return $sum;
+    return $fh;
 }
 
-sub undef_as_zero {
-    my $a = shift;
-    return $a ? $a : 0;
-}
-
-
-sub undef_as_empty {
-    my $a = shift;
-    return $a ? $a : "";
-}
-
-sub hostname {
-    if(not $Private::hostname) {
-        my $hostname = `hostname`;
-        chomp($hostname);
-        $Private::hostname = $hostname || "nohostname";
-    }
-    return $Private::hostname;
-}
-
-sub usleep {
-    # Sleep this many milliseconds.
-    my $secs = shift;
-    ::debug("Sleeping ",$secs," millisecs\n");
-    select(undef, undef, undef, $secs/1000);
-}
-
-sub multiply_binary_prefix {
-    # Evalualte numbers with binary prefix
-    # 13G = 13*1024*1024*1024 = 13958643712
-    my $s = shift;
-    $s =~ s/Ki?/*1024/gi;
-    $s =~ s/Mi?/*1024*1024/gi;
-    $s =~ s/Gi?/*1024*1024*1024/gi;
-    $s =~ s/Ti?/*1024*1024*1024*1024/gi;
-    $s =~ s/Pi?/*1024*1024*1024*1024*1024/gi;
-    $s =~ s/Ei?/*1024*1024*1024*1024*1024*1024/gi;
-    $s =~ s/Zi?/*1024*1024*1024*1024*1024*1024*1024/gi;
-    $s =~ s/Yi?/*1024*1024*1024*1024*1024*1024*1024*1024/gi;
-    $s =~ s/Xi?/*1024*1024*1024*1024*1024*1024*1024*1024*1024/gi;
-    $s = eval $s;
-    return $s;
-}
-
-
-sub __RUNNING_AND_PRINTING_THE_JOBS__ {}
+sub __RUNNING_THE_JOBS_AND_PRINTING_PROGRESS__ {}
 
 # Variable structure:
 #
@@ -999,8 +938,100 @@ sub init_run_jobs {
     $Global::tty_taken = 0;
     $SIG{USR1} = \&list_running_jobs;
     $SIG{USR2} = \&toggle_progress;
-    if(@::opt_basefile) {
-        setup_basefile();
+    if(@::opt_basefile) { setup_basefile(); }
+}
+
+sub start_more_jobs {
+    # Returns:
+    #   number of jobs started
+    my $jobs_started = 0;
+    if(not $Global::start_no_new_jobs) {
+        if($Global::max_procs_file) {
+            my $mtime = (stat($Global::max_procs_file))[9];
+            if($mtime > $Global::max_procs_file_last_mod) {
+                $Global::max_procs_file_last_mod = $mtime;
+                for my $sshlogin (values %Global::host) {
+                    $sshlogin->set_max_jobs_running(undef);
+                }
+            }
+        }
+        if($Global::max_load_file) {
+            my $mtime = (stat($Global::max_load_file))[9];
+            if($mtime > $Global::max_load_file_last_mod) {
+                $Global::max_load_file_last_mod = $mtime;
+                for my $sshlogin (values %Global::host) {
+                    $sshlogin->set_max_loadavg(undef);
+                }
+            }
+        }
+
+        for my $sshlogin (values %Global::host) {
+            debug("Running jobs before on ".$sshlogin->string().": ".$sshlogin->jobs_running()."\n");
+            if($::opt_load and $sshlogin->loadavg_too_high()) {
+                # The load is too high or unknown
+                next;
+            }
+            if($::opt_noswap and $sshlogin->swapping()) {
+                # The server is swapping
+                next;
+            }
+            while ($sshlogin->jobs_running() < $sshlogin->max_jobs_running()) {
+                if($Global::JobQueue->empty() and not $::opt_pipe) {
+                    last;
+                }
+                debug($sshlogin->string()." has ".$sshlogin->jobs_running()
+		      . " out of " . $sshlogin->max_jobs_running()
+		      . " jobs running. Start another.\n");
+                if(start_another_job($sshlogin) == 0) {
+                    # No more jobs to start on this $sshlogin
+                    debug("No jobs started on ".$sshlogin->string()."\n");
+                    last;
+                }
+                debug("Job started on ".$sshlogin->string()."\n");
+                $sshlogin->inc_jobs_running();
+                $jobs_started++;
+            }
+            debug("Running jobs after on ".$sshlogin->string().": ".$sshlogin->jobs_running()
+                  ." of ".$sshlogin->max_jobs_running() ."\n");
+        }
+    }
+    return $jobs_started;
+}
+
+sub start_another_job {
+    # Grab a job from Global::JobQueue, start it at sshlogin
+    # and remember the pid, the STDOUT and the STDERR handles
+    # Returns:
+    #   1 if another jobs was started
+    #   0 otherwise
+    my $sshlogin = shift;
+    # Do we have enough file handles to start another job?
+    if(enough_file_handles()) {
+        if($Global::JobQueue->empty() and not $::opt_pipe) {
+            # No more commands to run
+	    debug("Not starting: JobQueue empty\n");
+	    return 0;
+        } else {
+            my $job = get_job_with_sshlogin($sshlogin);
+            if(not defined $job) {
+                # No command available for that sshlogin
+		debug("Not starting: no jobs available for ".$sshlogin->string()."\n");
+                return 0;
+            }
+            debug("Command to run on '".$job->sshlogin()."': '".$job->replaced()."'\n");
+            if($job->start()) {
+                $Global::running{$job->pid()} = $job;
+                debug("Started as seq ".$job->seq(),"\n");
+                return 1;
+            } else {
+                # If interactive says: Dont run the job, then skip it and run the next
+                return start_another_job($sshlogin);
+            }
+        }
+    } else {
+        # No more file handles
+	debug("Not starting: no more file handles\n");
+        return 0;
     }
 }
 
@@ -1016,7 +1047,9 @@ sub drain_job_queue {
     my $sleep = 0.2;
     do {
         while($Global::total_running > 0) {
-            debug("jobs running: ",$Global::total_running," ",scalar keys %Global::running, " Memory usage:".my_memory_usage()."\n");
+            debug("jobs running: ", $Global::total_running, "==", scalar
+		  keys %Global::running," slots: ", $Global::max_jobs_running,
+		  " Memory usage:".my_memory_usage()." ");
 	    $sleep = ($sleep < 1000) ? ($sleep * 1.1) : ($sleep);
 	    usleep($sleep);
 	    do_not_reap();
@@ -1248,87 +1281,6 @@ sub terminal_columns {
     return $Private::columns;
 }
 
-sub start_more_jobs {
-    # Returns:
-    #   number of jobs started
-    my $jobs_started = 0;
-    if(not $Global::start_no_new_jobs) {
-        if($Global::max_procs_file) {
-            my $mtime = (stat($Global::max_procs_file))[9];
-            if($mtime > $Global::max_procs_file_last_mod) {
-                $Global::max_procs_file_last_mod = $mtime;
-                for my $sshlogin (values %Global::host) {
-                    $sshlogin->set_max_jobs_running(undef);
-                }
-            }
-        }
-        for my $sshlogin (values %Global::host) {
-            debug("Running jobs before on ".$sshlogin->string().": ".$sshlogin->jobs_running()."\n");
-            if($::opt_load and $sshlogin->loadavg_too_high()) {
-                # The load is too high or unknown
-                next;
-            }
-            if($::opt_noswap and $sshlogin->swapping()) {
-                # The server is swapping
-                next;
-            }
-            while ($sshlogin->jobs_running() < $sshlogin->max_jobs_running()) {
-                if($Global::JobQueue->empty() and not $::opt_pipe) {
-                    last;
-                }
-                debug("Try starting a job on ".$sshlogin->string()."\n");
-                if(start_another_job($sshlogin) == 0) {
-                    # No more jobs to start on this $sshlogin
-                    debug("Empty after retry: ",$Global::JobQueue->empty(),"\n");
-                    last;
-                }
-                debug("Job started on ".$sshlogin->string()."\n");
-                $sshlogin->inc_jobs_running();
-                $jobs_started++;
-            }
-            debug("Running jobs after on ".$sshlogin->string().": ".$sshlogin->jobs_running()
-                  ." of ".$sshlogin->max_jobs_running() ."\n");
-        }
-    }
-    return $jobs_started;
-}
-
-sub start_another_job {
-    # Grab a job from Global::JobQueue, start it at sshlogin
-    # and remember the pid, the STDOUT and the STDERR handles
-    # Returns:
-    #   1 if another jobs was started
-    #   0 otherwise
-    my $sshlogin = shift;
-    # Do we have enough file handles to start another job?
-    if(enough_file_handles()) {
-        if($Global::JobQueue->empty() and not $::opt_pipe) {
-            # No more commands to run
-            return 0;
-        } else {
-            my $job = get_job_with_sshlogin($sshlogin);
-            if(not defined $job) {
-                # No command available for that sshlogin
-                return 0;
-            }
-            debug("Command to run on '".$job->sshlogin()."': '".$job->replaced()."'\n");
-            if($job->start()) {
-                $Global::running{$job->pid()} = $job;
-                debug("Started as seq ".$job->seq(),"\n");
-                return 1;
-            } else {
-                # If interactive says: Dont run the job, then skip it and run the next
-                return start_another_job($sshlogin);
-            }
-        }
-    } else {
-        # No more file handles
-        return 0;
-    }
-}
-
-sub __READING_AND_QUOTING_ARGUMENTS__ {}
-
 sub get_job_with_sshlogin {
     # Returns:
     #   next command to run with ssh command wrapping if remote
@@ -1342,6 +1294,7 @@ sub get_job_with_sshlogin {
     my $job = $Global::JobQueue->get();
     if(not defined $job) {
         # No more jobs
+	::debug("No more jobs: JobQueue empty\n");
         return undef;
     }
 
@@ -1557,7 +1510,7 @@ sub reaper {
     $Private::reaperlevel++;
     my $stiff;
     my $children_reaped = 0;
-    debug("Reaper called $Private::reaperlevel\n");
+    debug("Reaper called $Private::reaperlevel ");
     while (($stiff = waitpid(-1, &WNOHANG)) > 0) {
 	$children_reaped++;
         if($Global::sshmaster{$stiff}) {
@@ -1630,10 +1583,24 @@ sub reaper {
     return $children_reaped;
 }
 
+sub timeout {
+    # SIGALRM was received. Check if there was a timeout
+    # @Global::timeout is sorted by timeout
+    while (@Global::timeouts) {
+	my $t = $Global::timeouts[0];
+	if($t->timed_out()) {
+	    $t->kill();
+	    shift @Global::timeouts;
+	} else {
+	    # Because they are sorted by timeout
+	    last;
+	}
+    }
+}
 sub __USAGE__ {}
 
 sub wait_and_exit {
-    # If we do not wait, we sometimes get a segfault.
+    # If we do not wait, we sometimes get segfault
     # Returns: N/A
     for (keys %Global::unkilled_children) {
         kill 9, $_;
@@ -1659,37 +1626,37 @@ sub usage {
 	 "$Global::progname [options] [command [arguments]] (::: arguments|:::: argfile(s))...",
 	 "cat ... | $Global::progname --pipe [options] [command [arguments]]",
 	 "",
-	 "-j n           Run n jobs in parallel.",
-	 "-k             Keep same order.",
-	 "-X             Multiple arguments with context replace.",
-	 "--colsep regexp      Split input on regexp for positional replacements.",
-	 "{} {.} {/} {/.} {#}  Replacement strings.",
-	 "{3} {3.} {3/} {3/.}  Positional replacement strings.",
+	 "-j n           Run n jobs in parallel",
+	 "-k             Keep same order",
+	 "-X             Multiple arguments with context replace",
+	 "--colsep regexp      Split input on regexp for positional replacements",
+	 "{} {.} {/} {/.} {#}  Replacement strings",
+	 "{3} {3.} {3/} {3/.}  Positional replacement strings",
 	 "",
-	 "-S sshlogin    Example: foo\@server.example.com.",
+	 "-S sshlogin    Example: foo\@server.example.com",
 	 "--trc {}.bar   Shorthand for --transfer --return {}.bar --cleanup",
-	 "--onall        Run the given command with arguments on all sshlogins.",
-	 "--nonall       Run the given command with no arguments on all sshlogins.",
+	 "--onall        Run the given command with argument on all sshlogins",
+	 "--nonall       Run the given command with no arguments on all sshlogins",
 	 "",
 	 "--pipe         Split stdin (standard input) to multiple jobs.",
 	 "--recend str   Record end separator for --pipe.",
 	 "--recstart str Record start separator for --pipe.",
 	 "",
-	 "See 'man $Global::progname' for details.",
+	 "See 'man $Global::progname' for details",
 	 "");
 }
 
 sub die_bug {
     my $bugid = shift;
     print STDERR
-	("$Global::progname: This should not happen. You have found a bug!\n",
+	("$Global::progname: This should not happen. You have found a bug.\n",
 	 "Please contact <parallel\@gnu.org> and include:\n",
 	 "* The version number: $Global::version\n",
 	 "* The bugid: $bugid\n",
 	 "* The command line being run\n",
-	 "* The files being read (put the files on a webserver if they are big).\n",
+	 "* The files being read (put the files on a webserver if they are big)\n",
 	 "\n",
-	 "If you can reproduce the error with smaller/fewer files, please include those instead.\n");
+	 "If you get the error on smaller/fewer files, please include those instead.\n");
     ::wait_and_exit(255);
 }
 
@@ -1722,6 +1689,106 @@ sub show_limits {
           "press CTRL-D or CTRL-C\n");
 }
 
+sub __GENERIC_COMMON_FUNCTION__ {}
+
+sub min {
+    # Returns:
+    #   Minimum value of array
+    my $min;
+    for (@_) {
+        # Skip undefs
+        defined $_ or next;
+        defined $min or do { $min = $_; next; }; # Set $_ to the first non-undef
+        $min = ($min < $_) ? $min : $_;
+    }
+    return $min;
+}
+
+sub max {
+    # Returns:
+    #   Maximum value of array
+    my $max;
+    for (@_) {
+        # Skip undefs
+        defined $_ or next;
+        defined $max or do { $max = $_; next; }; # Set $_ to the first non-undef
+        $max = ($max > $_) ? $max : $_;
+    }
+    return $max;
+}
+
+sub sum {
+    # Returns:
+    #   Sum of values of array
+    my @args = @_;
+    my $sum = 0;
+    for (@args) {
+        # Skip undefs
+        $_ and do { $sum += $_; }
+    }
+    return $sum;
+}
+
+sub undef_as_zero {
+    my $a = shift;
+    return $a ? $a : 0;
+}
+
+sub undef_as_empty {
+    my $a = shift;
+    return $a ? $a : "";
+}
+
+sub hostname {
+    if(not $Private::hostname) {
+        my $hostname = `hostname`;
+        chomp($hostname);
+        $Private::hostname = $hostname || "nohostname";
+    }
+    return $Private::hostname;
+}
+
+sub usleep {
+    # Sleep this many milliseconds.
+    my $secs = shift;
+    ::debug("Sleeping ",$secs," millisecs\n");
+    select(undef, undef, undef, $secs/1000);
+    if($::opt_timeout) {
+	::debug(my_dump($Global::timeoutq));
+	$Global::timeoutq->process_timeouts();
+    }
+}
+
+sub multiply_binary_prefix {
+    # Evalualte numbers with binary prefix
+    # k=10^3, m=10^6, g=10^9, t=10^12, p=10^15, e=10^18, z=10^21, y=10^24
+    # K=2^10, M=2^20, G=2^30, T=2^40, P=2^50, E=2^70, Z=2^80, Y=2^80
+    # Ki=2^10, Mi=2^20, Gi=2^30, Ti=2^40, Pi=2^50, Ei=2^70, Zi=2^80, Yi=2^80
+    # ki=2^10, mi=2^20, gi=2^30, ti=2^40, pi=2^50, ei=2^70, zi=2^80, yi=2^80
+    # 13G = 13*1024*1024*1024 = 13958643712
+    my $s = shift;
+    $s =~ s/k/*1000/g;
+    $s =~ s/M/*1000*1000/g;
+    $s =~ s/G/*1000*1000*1000/g;
+    $s =~ s/T/*1000*1000*1000*1000/g;
+    $s =~ s/P/*1000*1000*1000*1000*1000/g;
+    $s =~ s/E/*1000*1000*1000*1000*1000*1000/g;
+    $s =~ s/Z/*1000*1000*1000*1000*1000*1000*1000/g;
+    $s =~ s/Y/*1000*1000*1000*1000*1000*1000*1000*1000/g;
+    $s =~ s/X/*1000*1000*1000*1000*1000*1000*1000*1000*1000/g;
+
+    $s =~ s/Ki?/*1024/gi;
+    $s =~ s/Mi?/*1024*1024/gi;
+    $s =~ s/Gi?/*1024*1024*1024/gi;
+    $s =~ s/Ti?/*1024*1024*1024*1024/gi;
+    $s =~ s/Pi?/*1024*1024*1024*1024*1024/gi;
+    $s =~ s/Ei?/*1024*1024*1024*1024*1024*1024/gi;
+    $s =~ s/Zi?/*1024*1024*1024*1024*1024*1024*1024/gi;
+    $s =~ s/Yi?/*1024*1024*1024*1024*1024*1024*1024*1024/gi;
+    $s =~ s/Xi?/*1024*1024*1024*1024*1024*1024*1024*1024*1024/gi;
+    $s = eval $s;
+    return $s;
+}
 
 sub __DEBUGGING__ {}
 
@@ -1782,8 +1849,8 @@ sub my_dump {
         # Data::Dump not installed
         eval "use Data::Dumper;";
         if ($@) {
-            my $err =  "Neither Data::Dump nor Data::Dumper is installed.\n".
-                "Cannot dump output.\n";
+            my $err =  "Neither Data::Dump nor Data::Dumper is installed\n".
+                "Not dumping output\n";
             print $Global::original_stderr $err;
             return $err;
         } else {
@@ -1795,9 +1862,8 @@ sub my_dump {
     }
 }
 
-###
-##### OO Parts below
-###
+sub __OBJECT_ORIENTED_PARTS__ {}
+
 
 package SSHLogin;
 
@@ -2019,6 +2085,11 @@ sub max_loadavg {
     return $self->{'max_loadavg'};
 }
 
+sub set_max_loadavg {
+    my $self = shift;
+    $self->{'max_loadavg'} = shift;
+}
+
 sub compute_max_loadavg {
     # Parse the max loadaverage that the user asked for using --load
     # Returns:
@@ -2043,25 +2114,19 @@ sub compute_max_loadavg {
                 $self->ncpus() * $j / 100;
         } elsif ($loadspec =~ /^(\d+(\.\d+)?)$/) {
             $load = $1;
-            if($load == 0) {
-                # --load 0 = infinity (or at least close)
-                $load = 2**31;
-            }
         } elsif (-f $loadspec) {
-            # TODO this needs to be done for $loadspec
-            ::die_bug("loadspec-unimplemented");
-            $Global::max_procs_file = $loadspec;
-            $Global::max_procs_file_last_mod = (stat($Global::max_procs_file))[9];
-            if(open(IN, $Global::max_procs_file)) {
-                my $opt_P_file = join("",<IN>);
+            $Global::max_load_file = $loadspec;
+            $Global::max_load_file_last_mod = (stat($Global::max_load_file))[9];
+            if(open(IN, $Global::max_load_file)) {
+                my $opt_load_file = join("",<IN>);
                 close IN;
-                $load = $self->compute_max_loadavg($opt_P_file);
+                $load = $self->compute_max_loadavg($opt_load_file);
             } else {
-                print $Global::original_stderr "Cannot open $loadspec.\n";
+                print $Global::original_stderr "Cannot open $loadspec\n";
                 exit(255);
             }
         } else {
-            print $Global::original_stderr "Parsing of --load failed.\n";
+            print $Global::original_stderr "Parsing of --load failed\n";
             ::die_usage();
         }
         if($load < 0.01) {
@@ -2240,15 +2305,14 @@ sub simultaneous_sshlogin_limit {
             ("parallel: Warning: ssh to $serverlogin only allows ",
              "for $ssh_limit simultaneous logins.\n",
              "You may raise this by changing ",
-             "/etc/ssh/sshd_config:MaxStartup on $serverlogin,\n",
-             "Use only ",$ssh_limit-1," connections ",
-             "to avoid race conditions.\n");
+             "/etc/ssh/sshd_config:MaxStartup on $serverlogin\n",
+             "Using only ",$ssh_limit-1," connections ",
+             "to avoid race conditions\n");
     }
     # Race condition can cause problem if using all sshs.
     if($ssh_limit > 1) { $ssh_limit -= 1; }
     return $ssh_limit;
 }
-
 
 sub simultaneous_sshlogin {
     # Using $sshlogin try to see if we can do $wanted_processes
@@ -2311,11 +2375,11 @@ sub user_requested_processes {
                 close IN;
                 $processes = $self->user_requested_processes($opt_P_file);
             } else {
-                print $Global::original_stderr "Cannot open $opt_P.\n";
+                print $Global::original_stderr "Cannot open $opt_P\n";
                 exit(255);
             }
         } else {
-            print $Global::original_stderr "Parsing of --jobs/-j/--max-procs/-P failed.\n";
+            print $Global::original_stderr "Parsing of --jobs/-j/--max-procs/-P failed\n";
             ::die_usage();
         }
         if($processes < 1) {
@@ -2349,7 +2413,7 @@ sub ncpus {
             } else {
                 print $Global::original_stderr
                     ("parallel: Warning: Could not figure out ",
-                     "number of CPUs on $serverlogin ($ncpu). Using 1 CPU.\n");
+                     "number of cpus on $serverlogin ($ncpu). Using 1\n");
                 $self->{'ncpus'} = 1;
             }
         }
@@ -2360,7 +2424,7 @@ sub ncpus {
 sub no_of_cpus {
     # Returns:
     #   Number of physical CPUs
-    local $/="\n"; # If delmiiter is set, then $/ will be wrong
+    local $/="\n"; # If delimiter is set, then $/ will be wrong
     my $no_of_cpus = (no_of_cpus_freebsd()
                       || no_of_cpus_darwin()
                       || no_of_cpus_solaris()
@@ -2370,7 +2434,7 @@ sub no_of_cpus {
     if($no_of_cpus) {
         return $no_of_cpus;
     } else {
-        warn("parallel: Cannot figure out number of cpus. Using 1 CPU.");
+        warn("parallel: Cannot figure out number of cpus. Using 1");
         return 1;
     }
 }
@@ -2388,7 +2452,7 @@ sub no_of_cores {
     if($no_of_cores) {
         return $no_of_cores;
     } else {
-        warn("parallel: Cannot figure out number of CPU cores. Using 1 CPU.");
+        warn("parallel: Cannot figure out number of CPU cores. Using 1");
         return 1;
     }
 }
@@ -2432,7 +2496,10 @@ sub no_of_cpus_darwin {
     # Returns:
     #   Number of physical CPUs on Mac Darwin
     #   undef if not Mac Darwin
-    my $no_of_cpus = `sysctl -a hw 2>/dev/null | grep -w physicalcpu | awk '{ print \$2 }'`;
+    my $no_of_cpus =
+	(`sysctl -n hw.physicalcpu 2>/dev/null`
+	 or
+	 `sysctl -a hw 2>/dev/null | grep -w physicalcpu | awk '{ print \$2 }'`);
     return $no_of_cpus;
 }
 
@@ -2440,7 +2507,10 @@ sub no_of_cores_darwin {
     # Returns:
     #   Number of CPU cores on Mac Darwin
     #   undef if not Mac Darwin
-    my $no_of_cores = `sysctl -a hw  2>/dev/null | grep -w logicalcpu | awk '{ print \$2 }'`;
+    my $no_of_cores =
+	(`sysctl -n hw.logicalcpu 2>/dev/null`
+	 or
+	 `sysctl -a hw  2>/dev/null | grep -w logicalcpu | awk '{ print \$2 }'`);
     return $no_of_cores;
 }
 
@@ -2449,7 +2519,7 @@ sub no_of_cpus_freebsd {
     #   Number of physical CPUs on FreeBSD
     #   undef if not FreeBSD
     my $no_of_cpus =
-	(`sysctl -a dev.cpu | grep \%parent | awk '{ print \$2 }' | uniq | wc -l | awk '{ print \$1 }'`
+	(`sysctl -a dev.cpu 2>/dev/null | grep \%parent | awk '{ print \$2 }' | uniq | wc -l | awk '{ print \$1 }'`
 	 or
 	 `sysctl hw.ncpu 2>/dev/null | awk '{ print \$2 }'`);
     chomp $no_of_cpus;
@@ -2594,7 +2664,6 @@ sub sshcommand_of_sshlogin {
     $self->{'serverlogin'} = $serverlogin;
 }
 
-
 sub control_path_dir {
     # Returns:
     #   path to directory
@@ -2609,7 +2678,6 @@ sub control_path_dir {
     }
     return $self->{'control_path_dir'};
 }
-
 
 
 package JobQueue;
@@ -2712,6 +2780,8 @@ sub new {
         'sshlogin_wrap' => undef,
         'exitstatus' => undef,
         'exitsignal' => undef,
+	# Timestamp for timeout if any
+	'timeout' => undef,
     }, ref($class) || $class;
 }
 
@@ -2847,6 +2917,38 @@ sub set_endtime {
 }
 
 
+sub set_timeout {
+    my $self = shift;
+    my $delta_time = shift;
+    $self->{'timeout'} = time + $delta_time;
+}
+
+sub timeout {
+    my $self = shift;
+    return $self->{'timeout'};
+}
+
+sub timedout {
+    my $self = shift;
+    return time > $self->{'timeout'};
+}
+
+sub kill {
+    # kill the jobs
+    my $self = shift;
+    my $pid = $self->pid();
+    for my $signal ("TERM", "TERM", "KILL") {
+	# Send two TERMs to give time to clean up
+	if(kill 0, $pid) {
+	    # The job still running
+	    kill $signal, $pid;
+	    if($signal eq "TERM") { ::usleep(200); }
+	} else {
+	    # The job is already finished
+	    last;
+	}
+    }
+}
 sub failed {
     # return number of times failed for this $sshlogin
     my $self = shift;
@@ -3215,7 +3317,7 @@ sub start {
     $ENV{'PARALLEL_SEQ'} = $job->seq();
     $ENV{'PARALLEL_PID'} = $$;
     ::debug("$Global::total_running processes. Starting ("
-	    . $job->seq() . "): $command.\n");
+	    . $job->seq() . "): $command\n");
     if($::opt_pipe) {
 	my ($in);
 	$pid = ::open3($in, ">&OUT", ">&ERR", $command) ||
@@ -3243,6 +3345,11 @@ sub start {
     }
     $job->set_pid($pid);
     $job->set_starttime();
+    if($::opt_timeout) {
+	# Timeout must be set before inserting into queue
+	$job->set_timeout($::opt_timeout);
+	$Global::timeoutq->insert($job);
+    }
     return $job;
 }
 
@@ -3256,7 +3363,7 @@ sub should_be_retried {
 	return 0;
     }
     if(not $self->exitstatus()) {
-	# Completed with success. If there is a recorded failure: forget it.
+	# Completed with success. If there is a recorded failure: forget it
 	$self->reset_failed_here();
 	return 0
     } else {
@@ -3311,8 +3418,8 @@ sub print {
 	    print STDOUT $command,"\n";
 	}
 	# If STDOUT and STDERR are merged,
-	# we want the command to be printed first;
-	# so flush to avoid STDOUT being buffered.
+	# we want the command to be printed first
+	# so flush to avoid STDOUT being buffered
 	flush STDOUT;
     }
     seek $err, 0, 0;
@@ -3550,10 +3657,10 @@ sub number_of_args {
 }
 
 sub len {
-    # The length of the command line, with args substituted
+    # The length of the command line with args substituted
     my $self = shift;
     my $len = 0;
-    # Add length of the original command, with no args
+    # Add length of the original command with no args
     $len += $self->{'len'}{'no_args'};
     if($self->{'context_replace'}) {
 	$len += $self->number_of_args()*$self->{'len'}{'context'};
@@ -3565,8 +3672,8 @@ sub len {
 	}
 	$len += ($self->number_of_args()-1) * $self->{'len'}{'contextgroups'};
     } else {
-	# Each replacement string may occur several times.
-	# Add the length for each time.
+	# Each replacement string may occur several times
+	# Add the length for each time
 	for my $replstring (keys %{$self->{'replacecount'}}) {
 	    if(defined $self->{'len'}{$replstring}) {
 		$len += $self->{'len'}{$replstring} *
@@ -3574,7 +3681,7 @@ sub len {
 	    }
 	    if($Global::replace{$replstring}) {
 		# This is a multi replacestring ({} {/} {//} {.} {/.})
-		# Add each space between two arguments.
+		# Add each space between two arguments
 		my $number_of_args = ($#{$self->{'arg_list'}[0]}+1) *
 		    $self->number_of_args();
 		$len += ($number_of_args-1) *
@@ -3583,7 +3690,7 @@ sub len {
 	}
     }
     if($::opt_nice) {
-	# Pessimistic length if --nice is set.
+	# Pessimistic length if --nice is set
 	# Worse than worst case: every char needs to be quoted with \
 	$len *= 2;
     }
@@ -3736,7 +3843,7 @@ sub context_replace_placeholders {
     # Normal replace strings
     my $rep_str_regexp = multi_regexp();
 
-    # Fish out the words that have replacement strings in them.
+    # Fish out the words that have replacement strings in them
     my $tt = $target;
     my %word;
     while($tt =~ s/(\S*(?:$rep_str_regexp|\{\d+$rep_inner_regexp\}|$rep_seq_regexp)\S*)/\0/o) {
@@ -3747,27 +3854,27 @@ sub context_replace_placeholders {
 	my @pos_replacements=();
 	my @replacements=();
 	my $w;
-	my $word = $origword; # Make a local modifyable copy.
+	my $word = $origword; # Make a local modifyable copy
 
 	# replace {#} if it exists
 	$word =~ s/\{\#\}/$self->seq()/geo;
 	if($word =~ m:\{\d+$rep_inner_regexp\}:o) {
-	    # There are positional replacement strings.
+	    # There are positional replacement strings
 	    my @argset;
 	    if($#{$self->{'arg_list'}->[0]} == 0) {
-		# Only one input source: Treat it as a set.
+		# Only one input source: Treat it as a set
 		@argset = [ @args ];
 	    } else {
 		@argset = @{$self->{'arg_list'}};
 	    }
-	    # Match 1..n where n = max args in an argset.
+	    # Match 1..n where n = max args in a argset
 	    my $pos_regexp = "(?:".join("|", 1 .. $#{$argset[0]}+1).")";
 	    for my $argset (@argset) {
 		# Replace all positional arguments - e.g. {7/.}
 		# with the replacement function - e.g. {/.}
 		# of that argument
 		if(defined $self->{'max_number_of_args'}) {
-		    # Fill up if we have a half completed line, so {n} will be empty.
+		    # Fill up if we have a half completed line, so {n} will be empty
 		    while($#$argset < $self->{'max_number_of_args'}-1) {
 			CORE::push @$argset, Arg->new("");
 		    }
@@ -3782,7 +3889,7 @@ sub context_replace_placeholders {
 	}
 
 	if($word =~ m:$rep_str_regexp:) {
-	    # There are normal replacement strings.
+	    # There are normal replacement strings
 	    for my $w (@pos_replacements) {
 		for my $arg (@args) {
 		    my $wmulti = $w;
@@ -3797,8 +3904,8 @@ sub context_replace_placeholders {
 	    CORE::push @{$replace{$origword}}, @pos_replacements;
 	}
     }
-    # Substitute the replace strings with the replacement values.
-    # Must be sorted by length if a short word is a substring of a long word.
+    # Substitute the replace strings with the replacement values
+    # Must be sorted by length if a short word is a substring of a long word
     my $regexp = join('|', map { $_=~s/(\W)/\\$1/g; $_}
 		      sort { length $b <=> length $a } keys %word);
     $target =~ s/($regexp)/join(" ",@{$replace{$1}})/ge;
@@ -3817,7 +3924,7 @@ sub simple_replace_placeholders {
     my %replace;
 
     for my $record (@{$self->{'arg_list'}}) {
-	# Merge arguments from records into args for easy access.
+	# Merge arguments from records into args for easy access
 	CORE::push @args, @$record;
     }
     # Which replace strings are used?
@@ -3833,11 +3940,11 @@ sub simple_replace_placeholders {
 	    my $positional = $1; # number if any
 	    my $replacementfunction = "{".::undef_as_empty($2)."}"; # {} {/} {//} {.} or {/.}
 	    if(defined $args[$positional-1]) {
-		# we have a matching argument for {n}.
+		# we have a matching argument for {n}
 		$replace{$used} = $args[$positional-1]->replace($replacementfunction);
 	    } else {
 		if($positional <= $self->{'max_number_of_args'}) {
-		    # Fill up if we have a half-completed line.
+		    # Fill up if we have a half completed line
 		    $replace{$used} = "";
 		}
 	    }
@@ -3849,12 +3956,12 @@ sub simple_replace_placeholders {
 	}
     }
 
-    # Substitute the replace strings with the replacement values.
+    # Substitute the replace strings with the replacement values
     my $regexp = join('|', map { $_=~s/(\W)/\\$1/g; $_} keys %replace);
     if($regexp) {
 	if($quoteall) {
 	    # This is for --return: The whole expression must be
-	    # quoted - not just the replacements.
+	    # quoted - not just the replacements
 	    %replace = map { $_ => ::shell_unquote($replace{$_}) } keys %replace;
 	    $target =~ s/($regexp)/$replace{$1}/g;
 	    $target = ::shell_quote_scalar($target);
@@ -3888,22 +3995,6 @@ sub new {
     }, ref($class) || $class;
 }
 
-sub seq {
-    my $self = shift;
-    return $self->{'seq'};
-}
-
-sub set_seq {
-    my $self = shift;
-    $self->{'seq'} = shift;
-}
-
-sub quote_args {
-    my $self = shift;
-    # If there is not command, emulate |bash.
-    return $self->{'command'};
-}
-
 sub get {
     my $self = shift;
     if(@{$self->{'unget'}}) {
@@ -3920,12 +4011,15 @@ sub get {
 	    );
 	$cmd_line->populate();
 	::debug("cmd_line->number_of_args ".$cmd_line->number_of_args()."\n");
-	if(not $::opt_pipe and ($cmd_line->number_of_args() == 0 or $cmd_line->replaced() eq "")) {
+	if(not $::opt_pipe and $cmd_line->number_of_args() == 0) {
 	    # We did not get more args - maybe at EOF string?
 	    return undef;
+	} elsif($cmd_line->replaced() eq "") {
+	    # Empty command - get the next instead
+	    return $self->get();
 	} else {
 	    $self->set_seq($self->seq()+1);
-	    return ($cmd_line);
+	    return $cmd_line;
 	}
     }
 }
@@ -3940,6 +4034,22 @@ sub empty {
     my $empty = (not @{$self->{'unget'}}) && $self->{'arg_queue'}->empty();
     ::debug("CommandLineQueue->empty $empty\n");
     return $empty;
+}
+
+sub seq {
+    my $self = shift;
+    return $self->{'seq'};
+}
+
+sub set_seq {
+    my $self = shift;
+    $self->{'seq'} = shift;
+}
+
+sub quote_args {
+    my $self = shift;
+    # If there is not command emulate |bash
+    return $self->{'command'};
 }
 
 sub size {
@@ -3961,17 +4071,17 @@ sub size {
 
 package Limits::Command;
 
-# Maximal command line length (for -m and -X).
+# Maximal command line length (for -m and -X)
 sub max_length {
-    # Find the max_length of a command line.
+    # Find the max_length of a command line and cache it
     # Returns:
-    #   number of chars on the longest command line allowed.
+    #   number of chars on the longest command line allowed
     if(not $Limits::Command::line_max_len) {
 	if($::opt_s) {
 	    if(is_acceptable_command_line_length($::opt_s)) {
 		$Limits::Command::line_max_len = $::opt_s;
 	    } else {
-		# -s is too long: Find the correct value.
+		# -s is too long: Find the correct
 		$Limits::Command::line_max_len = binary_find_max_length(0,$::opt_s);
 	    }
 	    if($::opt_s <= $Limits::Command::line_max_len) {
@@ -3988,23 +4098,24 @@ sub max_length {
 }
 
 sub real_max_length {
+    # Find the max_length of a command line
     # Returns:
-    #   The maximal command line length.
-    # Use an upper bound of 8 MB if the shell allows for for infinitely long lengths.
+    #   The maximal command line length
+    # Use an upper bound of 8 MB if the shell allows for for infinite long lengths
     my $upper = 8_000_000;
     my $len = 8;
     do {
 	if($len > $upper) { return $len };
 	$len *= 16;
     } while (is_acceptable_command_line_length($len));
-    # Then search for the actual max length, between 0 and upper bound.
+    # Then search for the actual max length between 0 and upper bound
     return binary_find_max_length(int($len/16),$len);
 }
 
 sub binary_find_max_length {
-    # Given a lower and upper bound, find the max_length of a command line.
+    # Given a lower and upper bound find the max_length of a command line
     # Returns:
-    #   number of chars on the longest command line allowed.
+    #   number of chars on the longest command line allowed
     my ($lower, $upper) = (@_);
     if($lower == $upper or $lower == $upper-1) { return $lower; }
     my $middle = int (($upper-$lower)/2 + $lower);
@@ -4017,7 +4128,7 @@ sub binary_find_max_length {
 }
 
 sub is_acceptable_command_line_length {
-    # Test if a command line of this length can run.
+    # Test if a command line of this length can run
     # Returns:
     #   0 if the command line length is too long
     #   1 otherwise
@@ -4033,6 +4144,7 @@ sub is_acceptable_command_line_length {
     return not $?;
 }
 
+
 package RecordQueue;
 
 sub new {
@@ -4042,10 +4154,10 @@ sub new {
     my @unget = ();
     my $arg_sub_queue;
     if($colsep) {
-	# Open one file with colsep.
+	# Open one file with colsep
 	$arg_sub_queue = RecordColQueue->new($fhs);
     } else {
-	# Open one or more files, if multiple -a
+	# Open one or more files if multiple -a
 	$arg_sub_queue = MultifileQueue->new($fhs);
     }
     return bless {
@@ -4057,7 +4169,7 @@ sub new {
 
 sub get {
     # Returns:
-    #   reference to array of Arg-objects.
+    #   reference to array of Arg-objects
     my $self = shift;
     if(@{$self->{'unget'}}) {
 	return shift @{$self->{'unget'}};
@@ -4066,7 +4178,7 @@ sub get {
     my $ret = $self->{'arg_sub_queue'}->get();
     if(defined $Global::max_number_of_args
        and $Global::max_number_of_args == 0) {
-	::debug("Read 1 but return 0 args.\n");
+	::debug("Read 1 but return 0 args\n");
 	return [Arg->new("")];
     } else {
 	return $ret;
@@ -4093,6 +4205,7 @@ sub arg_number {
     return $self->{'arg_number'};
 }
 
+
 package RecordColQueue;
 
 sub new {
@@ -4108,7 +4221,7 @@ sub new {
 
 sub get {
     # Returns:
-    #   reference to array of Arg-objects.
+    #   reference to array of Arg-objects
     my $self = shift;
     if(@{$self->{'unget'}}) {
 	return shift @{$self->{'unget'}};
@@ -4152,7 +4265,6 @@ sub empty {
 }
 
 
-
 package MultifileQueue;
 
 @Global::unget_argv=();
@@ -4162,7 +4274,8 @@ sub new {
     my $fhs = shift;
     for my $fh (@$fhs) {
 	if(-t $fh) {
-	    print STDERR "$Global::progname: Input is tty. ".
+	    print STDERR "$Global::progname: Input is read from the terminal. ".
+		"Only experts do this on purpose. ".
 		"Press CTRL-D to exit.\n";
 	}
     }
@@ -4180,6 +4293,23 @@ sub get {
     } else {
 	return $self->nest_get();
     }
+}
+
+sub unget {
+    my $self = shift;
+    ::debug("MultifileQueue-unget '@_'\n");
+    unshift @{$self->{'unget'}}, @_;
+}
+
+sub empty {
+    my $self = shift;
+    my $empty = (not @Global::unget_argv
+		 and not @{$self->{'unget'}});
+    for my $fh (@{$self->{'fhs'}}) {
+	$empty &&= eof($fh);
+    }
+    ::debug("MultifileQueue->empty $empty\n");
+    return $empty;
 }
 
 sub xapply_get {
@@ -4216,8 +4346,8 @@ sub nest_get {
     my $empty = 1;
     my $no_of_inputs = $#{$self->{'fhs'}} + 1;
     if(not $self->{'arg_matrix'}) {
-	# Initialize @arg_matrix with one arg from each file.
-	# Read one line from each file.
+	# Initialize @arg_matrix with one arg from each file
+	# read one line from each file
 	my @first_arg_set;
 	my $all_empty = 1;
 	for (my $fhno = 0; $fhno < $no_of_inputs ; $fhno++) {
@@ -4229,7 +4359,7 @@ sub nest_get {
 	    push @first_arg_set, $self->{'arg_matrix'}[$fhno][0];
 	}
 	if($all_empty) {
-	    # All filehandles were at eof or eof-string.
+	    # All filehandles were at eof or eof-string
 	    return undef;
 	}
 	return [@first_arg_set];
@@ -4238,9 +4368,9 @@ sub nest_get {
 	if(eof($self->{'fhs'}[$fhno])) {
 	    next;
 	} else {
-	    # Read one.
+	    # read one
 	    my $arg = read_arg_from_fh($self->{'fhs'}[$fhno]);
-	    defined($arg) || next; # If we just read an EOF string: Treat this as EOF.
+	    defined($arg) || next; # If we just read an EOF string: Treat this as EOF
 	    my $len = $#{$self->{'arg_matrix'}[$fhno]} + 1;
 	    $self->{'arg_matrix'}[$fhno][$len] = $arg;
 	    # make all new combinations
@@ -4248,8 +4378,8 @@ sub nest_get {
 	    for (my $fhn = 0; $fhn < $no_of_inputs; $fhn++) {
 		push @combarg, [0, $#{$self->{'arg_matrix'}[$fhn]}];
 	    }
-	    $combarg[$fhno] = [$len,$len]; # Find only combinations with this new entry.
-	    # Map combinations.
+	    $combarg[$fhno] = [$len,$len]; # Find only combinations with this new entry
+	    # map combinations
 	    # [ 1, 3, 7 ], [ 2, 4, 1 ]
 	    # =>
 	    # [ m[0][1], m[1][3], m[3][7] ], [ m[0][2], m[1][4], m[2][1] ]
@@ -4261,21 +4391,21 @@ sub nest_get {
 		}
 		push @mapped, [@a];
 	    }
-	    # Append the mapped to the ungotten arguments.
+	    # append the mapped to the ungotten arguments
 	    push @{$self->{'unget'}}, @mapped;
-	    # Get the first.
+	    # get the first
 	    return shift @{$self->{'unget'}};
 	}
     }
-    # All are eof or at EOF string; return from the unget queue.
+    # all are eof or at EOF string; return from the unget queue
     return shift @{$self->{'unget'}};
 }
 
 sub read_arg_from_fh {
-    # Read one Arg from filehandle.
+    # Read one Arg from filehandle
     # Returns:
-    #   Arg-object with one read line.
-    #   undef, if end of file.
+    #   Arg-object with one read line
+    #   undef if end of file
     my $fh = shift;
     my $prepend = undef;
     my $arg;
@@ -4289,11 +4419,11 @@ sub read_arg_from_fh {
 	}
 	$arg = <$fh>;
 	::debug("read $arg\n");
-	# Remove delimiter.
+	# Remove delimiter
 	$arg =~ s:$/$::;
 	if($Global::end_of_file_string and
 	   $arg eq $Global::end_of_file_string) {
-	    # Ignore the rest of input file.
+	    # Ignore the rest of input file
 	    while (<$fh>) {}
 	    ::debug("EOF-string $arg\n");
 	    if(defined $prepend) {
@@ -4303,12 +4433,12 @@ sub read_arg_from_fh {
 	    }
 	}
 	if(defined $prepend) {
-	    $arg = $prepend.$arg; # For line continuation.
+	    $arg = $prepend.$arg; # For line continuation
 	    $prepend = undef; #undef;
 	}
 	if($Global::ignore_empty) {
 	    if($arg =~ /^\s*$/) {
-		redo; # Try the next line.
+		redo; # Try the next line
 	    }
 	}
 	if($Global::max_lines) {
@@ -4318,7 +4448,7 @@ sub read_arg_from_fh {
 		redo;
 	    }
 	}
-    }} while (1 == 0); # Dummy loop for redo.
+    }} while (1 == 0); # Dummy loop for redo
     if(defined $arg) {
 	return Arg->new($arg);
     } else {
@@ -4336,7 +4466,7 @@ sub expand_combinations {
     my $xmax = $$minmax_ref[1];
     my @p;
     if(@_) {
-	# If there are more columns: Compute those recursively.
+	# If there are more columns: Compute those recursively
 	my @rest = expand_combinations(@_);
 	for(my $x = $xmin; $x <= $xmax; $x++) {
 	    push @p, map { [$x, @$_] } @rest;
@@ -4349,22 +4479,6 @@ sub expand_combinations {
     return @p;
 }
 
-sub unget {
-    my $self = shift;
-    ::debug("MultifileQueue-unget '@_'\n");
-    unshift @{$self->{'unget'}}, @_;
-}
-
-sub empty {
-    my $self = shift;
-    my $empty = (not @Global::unget_argv
-		 and not @{$self->{'unget'}});
-    for my $fh (@{$self->{'fhs'}}) {
-	$empty &&= eof($fh);
-    }
-    ::debug("MultifileQueue->empty $empty\n");
-    return $empty;
-}
 
 package Arg;
 
@@ -4392,16 +4506,16 @@ sub replace {
 	if($replacement_string eq "{}") {
 	    # skip
 	} elsif($replacement_string eq "{.}") {
-	    $s =~ s:\.[^/\.]*$::; # Remove .ext from argument.
+	    $s =~ s:\.[^/\.]*$::; # Remove .ext from argument
 	} elsif($replacement_string eq "{/}") {
-	    $s =~ s:^.*/([^/]+)/?$:$1:; # Remove dir from argument. If ending in /, remove final /.
+	    $s =~ s:^.*/([^/]+)/?$:$1:; # Remove dir from argument. If ending in /, remove final /
 	} elsif($replacement_string eq "{//}") {
-	    # Only load File::Basename if actually needed.
+	    # Only load File::Basename if actually needed
 	    $Global::use{"File::Basename"} ||= eval "use File::Basename;";
 	    $s = dirname($s); # Keep dir from argument.
 	} elsif($replacement_string eq "{/.}") {
-	    $s =~ s:^.*/([^/]+)/?$:$1:; # Remove dir from argument. If ending in /, remove final /.
-	    $s =~ s:\.[^/\.]*$::; # Remove .ext from argument.
+	    $s =~ s:^.*/([^/]+)/?$:$1:; # Remove dir from argument. If ending in /, remove final /
+	    $s =~ s:\.[^/\.]*$::; # Remove .ext from argument
 	}
 	if($Global::JobQueue->quote_args()) {
 	    $s = ::shell_quote_scalar($s);
@@ -4423,7 +4537,7 @@ sub trim_of {
     # r = end
     # lr|rl = both
     # Returns:
-    #   string with white space removed as needed.
+    #   string with white space removed as needed
     my @strings = map { defined $_ ? $_ : "" } (@_);
     my $arg;
     if($Global::trim eq "n") {
@@ -4443,14 +4557,68 @@ sub trim_of {
 }
 
 
+package TimeoutQueue;
+
+sub new {
+    my $class = shift;
+    my $delta_time = shift;
+
+    return bless {
+	'queue' => [],
+	'delta_time' => $delta_time,
+    }, ref($class) || $class;
+}
+
+sub process_timeouts {
+    # Check if there was a timeout
+    my $self = shift;
+    # @Global::timeout is sorted by timeout
+    while (@{$self->{'queue'}}) {
+	my $job = $self->{'queue'}[0];
+	if($job->timedout()) {
+	    # Need to shift off queue before kill
+	    # because kill calls usleep -> process_timeouts
+	    shift @{$self->{'queue'}};
+	    $job->kill();
+	} else {
+	    # Because they are sorted by timeout
+	    last;
+	}
+    }
+}
+
+sub insert {
+    my $self = shift;
+    my $in = shift;
+    my $lower = 0;
+    my $upper = $#{$self->{'queue'}};
+    my $looking = int(($lower + $upper)/2);
+    my $in_time = $in->timeout();
+
+    # Find the position between $lower and $upper
+    while($lower < $upper) {
+	if($self->{'queue'}[$looking]->timeout() < $in_time) {
+	    # Upper half
+	    $lower = $looking+1;
+	} else {
+	    # Lower half
+	    $upper = $looking;
+	}
+	$looking = int(($lower + $upper)/2);
+    }
+    # splice at position $looking
+    splice @{$self->{'queue'}}, $looking, 0, $in;
+}
+
+
 package Semaphore;
 
-# This package provides a counting semaphore.
+# This package provides a counting semaphore
 #
-# If a process dies without releasing the semaphore, the next process
-# that needs that entry will clean up dead semaphores.
+# If a process dies without releasing the semaphore the next process
+# that needs that entry will clean up dead semaphores
 #
-# The semaphores are stored in ~/.parallel/semaphores/id-<name>. Each
+# The semaphores are stored in ~/.parallel/semaphores/id-<name> Each
 # file in ~/.parallel/semaphores/id-<name>/ is the process ID of the
 # process holding the entry. If the process dies, the entry can be
 # taken by another process.
@@ -4459,8 +4627,8 @@ sub new {
     my $class = shift;
     my $id = shift;
     my $count = shift;
-    $id=~s/([^-_a-z0-9])/unpack("H*",$1)/ige; # Convert non-word chars to hex.
-    $id="id-".$id; # To distinguish it from a process id.
+    $id=~s/([^-_a-z0-9])/unpack("H*",$1)/ige; # Convert non-word chars to hex
+    $id="id-".$id; # To distinguish it from a process id
     my $parallel_dir = $ENV{'HOME'}."/.parallel";
     -d $parallel_dir or mkdir $parallel_dir;
     my $parallel_locks = $parallel_dir."/semaphores";
@@ -4476,13 +4644,14 @@ sub new {
 	'idfile' => $lockdir."/".$id,
 	'pid' => $$,
 	'pidfile' => $lockdir."/".$$.'@'.::hostname(),
-	'count' => $count + 1 # nlinks returns a link for the 'id-' as well.
+	'count' => $count + 1 # nlinks returns a link for the 'id-' as well
     }, ref($class) || $class;
 }
 
 sub acquire {
     my $self = shift;
     my $sleep = 1; # 1 ms
+    my $start_time = time;
     while(1) {
 	$self->atomic_link_if_count_less_than() and last;
 	::debug("Remove dead locks");
@@ -4500,13 +4669,23 @@ sub acquire {
 		}
 	    }
 	}
-	# Try again.
+	# try again
 	$self->atomic_link_if_count_less_than() and last;
-	# Retry slower and slower up to 1 second.
+	# Retry slower and slower up to 1 second
 	$sleep = ($sleep < 1000) ? ($sleep * 1.1) : ($sleep);
-	# Randomize, to avoid every sleeping job waking up at the same time.
+	# Random to avoid every sleeping job waking up at the same time
 	::usleep(rand()*$sleep);
-	# TODO if timeout: last
+	if(defined($::opt_timeout) and
+	   $start_time + $::opt_timeout > time) {
+	    # Acquire the lock anyway
+	    if(not -e $self->{'idfile'}) {
+		open (A, ">", $self->{'idfile'}) or
+		    ::die_bug("write_idfile: $self->{'idfile'}");
+		close A;
+	    }
+	    link $self->{'idfile'}, $self->{'pidfile'};
+	    last;
+	}
     }
     ::debug("acquired $self->{'pid'}\n");
 }
@@ -4515,7 +4694,7 @@ sub release {
     my $self = shift;
     unlink $self->{'pidfile'};
     if($self->nlinks() == 1) {
-	# This is the last link, so atomic cleanup.
+	# This is the last link, so atomic cleanup
 	$self->lock();
 	if($self->nlinks() == 1) {
 	    unlink $self->{'idfile'};
@@ -4526,9 +4705,8 @@ sub release {
     ::debug("released $self->{'pid'}\n");
 }
 
-
 sub atomic_link_if_count_less_than {
-    # Link $file1 to $file2 if nlinks to $file1 < $count.
+    # Link $file1 to $file2 if nlinks to $file1 < $count
     my $self = shift;
     my $retval = 0;
     $self->lock();
@@ -4562,13 +4740,13 @@ sub lock {
     my $sleep = 100; # 100 ms
     open $self->{'lockfh'}, ">", $self->{'lockfile'}
 	or ::die_bug("Can't open semaphore file $self->{'lockfile'}: $!");
-    chmod 0666, $self->{'lockfile'}; # assuming you want it a+rw.
+    chmod 0666, $self->{'lockfile'}; # assuming you want it a+rw
     $Global::use{"Fcntl"} ||= eval "use Fcntl qw(:DEFAULT :flock);";
     while(not flock $self->{'lockfh'}, LOCK_EX()|LOCK_NB()) {
 	::debug("Cannot lock $self->{'lockfile'}");
 	# TODO if timeout: last
 	$sleep = ($sleep < 1000) ? ($sleep * 1.1) : ($sleep);
-	# Randomize, to avoid every sleeping job waking up at the same time.
+	# Random to avoid every sleeping job waking up at the same time
 	::usleep(rand()*$sleep);
     }
     ::debug("locked $self->{'lockfile'}");
