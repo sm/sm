@@ -61,7 +61,6 @@ find_extension_action()
 
   local _action_params=("$@") _action_path _new_action_path
   local _rest_params=() _param_temp _action_params_length
-
   local _actions_root="${extensions_path}/${extension}/bin"
   local _map="${extensions_path}/${extension}/map"
   local _modules_root="${extensions_path}/${extension}/shell"
@@ -71,7 +70,7 @@ find_extension_action()
   initialize_map_cache
   initialize_modules_actions_cache
 
-  debug_cache
+  debug search "actions_cache: ${_actions_cache[*]}"
 
   if [[ ! -f "${_map}" ]]
   then
