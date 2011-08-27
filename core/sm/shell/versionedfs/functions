@@ -229,7 +229,7 @@ _versionedfs_activate()
   read -r _strategy < "${_path}/.versionedfs/strategy"
   read -r _method < "${_path}/.versionedfs/method"
 
-  core_log_step "${_name} ${_version} ~ activate"
+  core_log_step "${_name} ${_version}"
 
   case "${_strategy}" in
     (fhs)
@@ -240,12 +240,12 @@ _versionedfs_activate()
           for _file in "${_files[@]}"
           do
             (( _index++ )) || true
-            printf "\r  [ ] ${_name} ${_version} ~ activate (${_index}/${_count})...    "
+            printf "\r  [ ] ${_name} ${_version} ~ linking (${_index}/${_count})..."
             _target="${_active_path}/${_file##${_version_path}/}"
             [[ -d "${_target%/*}" ]] || mkdir -p "${_target%/*}"
             ln -sf "${_file}" "${_target}"
           done
-          printf "\r  [o] %-40s" "${_name} ${_version} ~ activate"
+          printf "\r  [o] %-40s" "${_name} ${_version}"
           ;;
         (copy)
           cp -Rf "${_version_path}"/* "${_active_path}"
