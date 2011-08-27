@@ -432,7 +432,9 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
       package_preinstall
   fi
 
-  ensure_paths_exist "${install_path}"
+  versionedfs add \
+    path "${packages_path}" name "${package_name}" version "${package_version}" \
+    source "${install_path}"
 
   if command_exists "${package_name}_install"
   then
@@ -467,10 +469,6 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
     log_step "${package_name} ${package_version} ~ postactivate" \
       "${package_name}_postactivate"
   fi
-
-  versionedfs add \
-    path "${packages_path}" name "${package_name}" version "${package_version}" \
-    source "${install_path}"
 
   package_setup
 }
