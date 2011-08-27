@@ -4,16 +4,11 @@
 # ## modules\_installed()
 modules_installed()
 {
-  local _module _modules
-
-  _modules=($(
-  find "${modules_path}" -mindepth 1 -maxdepth 1 -type d |
-  sed -e 's#.*/##g' -e '/\..*/d'
-  ))
-
-  for _module in ${_modules[@]}
+  local _module
+  for _module in "${modules_path}"/*
   do
-    printf "%s\n" "${_module}"
+    [[ -d "${_module}" ]] || continue
+    printf "%s\n" "${_module##*/}"
   done
 }
 
@@ -287,37 +282,34 @@ modules_docgen()
   # TODO: Replace with,
   # for file in modules/*/functions ; do (name=${file%%\/functions}; shocco $file > html/${name//*\/}.html)& done ; wait
 
-  local _module _modules _function _functions
+  local _module _modules _function _functions _name
   local _prefix="${core_development_path}/html/shell"
   local _path="${site_development_path}"
 
-  variable_is_nonempty core_development_path &&
-    path_exists "${core_development_path}" ||
+  if variable_is_nonempty core_development_path
+  then
+    paths exists "${core_development_path}" ||
     error "Set core_development_path in ~/.smrc, and clone the sm core "\
      "repository into it, to run docgen."\
      "For more information, see https://bdsm.beginrescueend.com/development/core."
+  fi
 
-  ensure_paths_exist "${_prefix}"
+  paths create "${_prefix}"
 
-  log "<html><body><h2>SM Module Documentation</h2><ul>" \
-    > "${_prefix}/index.html"
+  write "<html><body><h2>SM Module Documentation</h2><ul>" \
+    to "${_prefix}/index.html"
 
-  _modules=($(
-  find "${core_development_path}/shell" -mindepth 1 -maxdepth 1  -type d |
-    sed -e 's#.*/##g' -e '/\..*/d'
-  ))
-
-  ensure_paths_exist "${_prefix}"
-
-  for _module in "${_modules[@]}"
+  for _module in "${core_development_path}"/shell/*
   do
+    [[ -d "${_module}" ]] || continue
+    _name="${_module##*/}"
     (
-    _base="${_prefix}/${_module}"
+    _base="${_prefix}/${_name}"
     log "Generating ${_base}.html"
-    module_docs "${_module}" > "${_base}.html"
+    module_docs "${_name}" > "${_base}.html"
 
-    log "<li><a href=\"./${_module}.html\">${_module}</a></li>" \
-      >> "${_prefix}/index.html"
+    write "<li><a href=\"./${_name}.html\">${_name}</a></li>" \
+      append to "${_prefix}/index.html"
 
     # Replace the shocco generated css url with a local filesystem css file,
     # so that a network request is not required in order to have styling when
@@ -328,7 +320,7 @@ modules_docgen()
   done
   wait
 
-  log "  </ul></body></html>" >> "${_prefix}/index.html"
+  write "  </ul></body></html>" append to "${_prefix}/index.html"
   log "Modules documentation content generated in ${_prefix}."
 }
 
@@ -338,7 +330,7 @@ modules_docopen()
   # TODO: Replace with,
   # for file in modules/*/functions ; do (name=${file%%\/functions}; shocco $file > html/${name//*\/}.html)& done ; wait
   variable_is_nonempty core_development_path &&
-    path_exists "${core_development_path}" ||
+    paths exists "${core_development_path}" ||
     error "To run docopen, set core_development_path in ~/.smrc, and clone the sm core "\
     "repository into it."
 
@@ -354,28 +346,26 @@ modules_site_docgen()
   # TODO: Replace with,
   # for file in modules/*/functions ; do (name=${file%%\/functions}; shocco $file > html/${name//*\/}.html)& done ; wait
 
-  local _module _modules _function _functions
+  local _module _modules _function _functions _name _file
   local _prefix="${core_development_path}/html/shell"
   local _path="${site_development_path}"
 
-  path_exists "${core_development_path}" ||
+  paths exists "${core_development_path}" ||
     fail "Set core_development_path in ~/.smrc, to run docgen."
 
-  log "<html><body><h2>SM Module Documentation</h2><ul>" \
-    > "${_prefix}/index.html"
+  write "<html><body><h2>SM Module Documentation</h2><ul>" \
+    to "${_prefix}/index.html"
 
-  _modules=($(
-  find "${core_development_path}/shell" -mindepth 1 -maxdepth 1 \
-    -type d | sed -e 's#.*/##g' -e '/\..*/d'
-  ))
-  for _module in "${_modules[@]}"
+  for _module in "${core_development_path}"/shell/*
   do
+    [[ -d "${_module}" ]] || continue
+    _name="${_module##*/}"
     (
-    ensure_paths_exist "${_prefix}/${_module}"
-    _base="${_prefix}/${_module}"
+    paths create "${_prefix}/${_name}"
+    _base="${_prefix}/${_name}"
     log "Generating ${_base}.html"
-    module_docs "${_module}" > "${_base}.html"
-    log "<li><a href=\"./${_module}.html\">${_module}</a></li>" \
+    module_docs "${_name}" > "${_base}.html"
+    log "<li><a href=\"./${_name}.html\">${_name}</a></li>" \
       >> "${_prefix}/index.html"
     )&
   done
@@ -383,21 +373,18 @@ modules_site_docgen()
   log "  </ul></body></html>" >> "${_prefix}/index.html"
   log "Modules documentation content has been generated in ${_prefix}."
 
-  path_exists "${site_development_path}" ||
+  paths exists "${site_development_path}" ||
     fail "Set site_development_path in ~/.smrc, to run docgen."
 
   # TODO: Extract this section into a separate location.
   # Copy the generated files into the proper site content dir.
-  files=($(
-  find "${_prefix}" -mindepth 1 -iname '*.haml'
-  ))
-  for file in "${files[@]}"
+  for _file in "${_prefix}"/*.haml
   do
     (
-    name=${file##*\/}
+    name=${_file##*\/}
     name=${name%.haml}
 
-    ensure_paths_exist "${site_development_path}/content/shell/${name}"
+    paths create "${site_development_path}/content/shell/${name}"
 
     log "Building ${name} functions from generated docs."
     cat > "${site_development_path}/content/shell/${name}/functions.haml" <<Header
@@ -419,7 +406,7 @@ modules_site_docgen()
     Module ${name}
 
 Header
-    cat $file >> "${site_development_path}/content/shell/${name}/functions.haml"
+    cat $_file >> "${site_development_path}/content/shell/${name}/functions.haml"
 
     html2haml "${_base}.html" \
       >> "${site_development_path}/content/shell/${name}/functions.haml"

@@ -2,15 +2,15 @@
 
 extension_path()
 {
-  local path extension="${1:-}"
+  local _path extension="${1:-}"
   shift || fail "Cannot process extension path;"\
     " No extension name was given."
 
-  for path in ${extensions_search_paths[@]}
+  for _path in ${extensions_search_paths[@]}
   do
-    if [[ -d "${path}/${extension}/bin" || -d "${path}/${extension}/shell" ]]
+    if [[ -d "${_path}/${extension}/bin" || -d "${_path}/${extension}/shell" ]]
     then
-      extension_path="${path}/${extension}"
+      extension_path="${_path}/${extension}"
       return 0
     fi
   done
@@ -20,13 +20,8 @@ extension_path()
 extension_is_valid()
 {
   local _path="${1:-}"
-
-  shift || fail "Cannot check if extension is valid;"\
-    " No extension path was given."
-
-  [[ -n "${_path}" ]] ||
-    fail "Cannot determine if an extension is valid, as the path to the extension was not given."
-
+  shift || fail "No extension path was given to check validity."
+  [[ -n "${_path}" ]] || fail "Path to the extension was not given."
   [[ -d "${_path}/bin" || -d "${_path}/shell" ]]
 }
 

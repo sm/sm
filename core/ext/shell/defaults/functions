@@ -115,36 +115,44 @@ settings_search()
 {
   trace_filter settings_search
 
-  local extension=$1 setting=$2 path paths
+  local extension=$1 setting=$2 _path paths
 
   paths=( "/etc/sm/${extension}" "$HOME/.sm/${extension}" ) # Standard paths
 
-  ! extension_path "${extension}" ||
+  if extension_path "${extension}"
+  then
     paths+=( "${extension_path}/config" )
+  fi
 
-  for path in "${settings_search_path_append[@]}"
+  for _path in "${settings_search_path_append[@]}"
   do # Additional paths
-    settings_search_path_update "${path}"
-    paths+=( "${path}/${extension}" )
+    settings_search_path_update "${_path}"
+    paths+=( "${_path}/${extension}" )
   done
 
-  for path in "${paths[@]}"
+  for _path in "${paths[@]}"
   do # Print existing paths.
-    if path_exists "${path}" && file_is_nonempty "${path}/${setting}"
+    if paths exist "${_path}" && file_is_nonempty "${_path}/${setting}"
     then
-      printf "${path}/${setting}\n"
+      printf "${_path}/${setting}\n"
     fi
   done
 }
 
 settings_search_path_update()
 {
-  local path=$1
+  local path=$1 _uri
 
-  ! string_contains "${settings_search_path_cache[*]}" "${path}" || return 0
+  if string_contains "${settings_search_path_cache[*]}" "${path}"
+  then
+    return 0
+  fi
 
-  ! file_exists "${path}/.uri" ||
-    fetch_uri "$(cat "${path}/.uri")" "${path}" >&2
+  if file_exists "${path}/.uri" && file_is_nonempty "${_path}/.uri"
+  then
+    read -r _uri < "${path}/.uri"
+    fetch_uri "${_uri}" "${path}" >&2
+  fi
 
   settings_search_path_cache+=( "${path}" )
 }

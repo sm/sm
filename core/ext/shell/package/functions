@@ -289,11 +289,11 @@ package_init()
 
   fhs_dirs=( bin etc include lib libexec sbin share man )
 
-  ensure_paths_exist "${active_path}"
+  paths create "${active_path}"
 
   for dir in ${fhs_dirs}
   do
-    ensure_paths_exist "${active_path}/${fhs_dirs}"
+    paths create "${active_path}/${fhs_dirs}"
   done
 
   if user_is_root
@@ -349,9 +349,9 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
 
   true "${package_dir:="${package_name}-${package_version}"}"
 
-  ensure_paths_exist "${source_path}"
+  paths create "${source_path}"
 
-  enter "${source_path}"
+  paths enter "${source_path}"
 
   if command_exists "${package_name}_dependencies"
   then
@@ -377,7 +377,7 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
       package_fetch
   fi
 
-  enter "${source_path}/${package_dir}"
+  paths enter "${source_path}/${package_dir}"
 
   if command_exists "${package_name}_postfetch"
   then
@@ -432,7 +432,7 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
       package_preinstall
   fi
 
-  ensure_paths_exist "${install_path}"
+  paths create "${install_path}"
 
   if command_exists "${package_name}_install"
   then
@@ -654,7 +654,7 @@ package_activate_if_first()
   shift || fail "Package name must be given as first parameter."
   shift || fail "Package version must be given as second parameter."
 
-  if path_exists "${install_path}"
+  if paths exist "${install_path}"
   then
     symlink_exists "${packages_path}/versions/${_package}/active" ||
       package_activate "${_package}" "${_version}"
@@ -668,7 +668,7 @@ package_ldconfig()
   local _package="${1:-${package_name}}" _path _files _ldconfig="/sbin/ldconfig"
   [[ -n "${_package}" ]] || fail "Package name must be given."
 
-  #  path_exists "${packages_path}/versions/${_package}/active/lib" ||
+  #  paths exist "${packages_path}/versions/${_package}/active/lib" ||
   #    return 0 # no lib/ directory for activated package, no need to update ldconfig
 
   user_is_root || return 0
@@ -676,7 +676,7 @@ package_ldconfig()
   # TODO: Figure out if solaris and freebsd have an analog to this?
   if os_is_linux
   then
-    if path_exists "/etc/ld.so.conf.d"
+    if paths exist "/etc/ld.so.conf.d"
     then
       write "${active_path}/lib\n" to "/etc/ld.so.conf.d/sm.conf"
       chmod_files 0444 "/etc/ld.so.conf.d/sm.conf"
@@ -711,7 +711,7 @@ package_profile_d()
 
   log_step "Updating shell profile for ${_package}"
 
-  ensure_paths_exist "${profile_d_path}"
+  paths create "${profile_d_path}"
   ensure_files_exist "${profile_path}"
 
   install_template "profile.d" to "${profile_d_path}/${_package}.sh" mode 0755
@@ -730,7 +730,7 @@ package_uninstall()
 
   log_step "${package_name} ${package_version} ~ uninstall"
 
-  remove_paths "${install_path}"
+  paths remove "${install_path}"
 
   ! module_is_loaded service || service_uninstall # Remove any service reminants
 
@@ -749,10 +749,8 @@ package_patch()
 
   for _path in "${_paths[@]}"
   do
-    path_exists "${_path}" || continue # No patch path
-    _patches=($(find "${_path}" -mindepth 1 -maxdepth 1 -iname '*.patch' -type f))
-    (( ${#_patches[@]} > 0 )) || continue # No patches
-    package_apply_patches "${_patches[@]}"
+    path exists "${_path}" || continue # No patch path
+    package_apply_patches "${_path}"/*.patch
   done
 }
 
@@ -763,6 +761,7 @@ package_apply_patches()
 
   for _patch in "${_patches[@]}"
   do
+    [[ -f "${_patch}" && -s "${_patch}" ]] || continue
     error "TODO: patch application is NIY (see package_patch())"
   done
 }
@@ -906,7 +905,7 @@ package_info()
   [[ -n "${package_md5}" ]] || read_config "${package_name}" md5 "${package_file}" as package_md5
 
   log "package_name: ${package_name}"
-  if path_exists "${_path}"
+  if paths exist "${_path}"
   then
     local _installed=($( package_installed_versions ${package_name} ${package_version} ))
     log "  versions_installed: ${_installed[*]}"
@@ -939,7 +938,7 @@ package_man()
 
   MANPATH="${package_path}/man"
 
-  path_exists $MANPATH ||
+  paths exist $MANPATH ||
     error "No man page available for package ${package_name} ${package_version}"
 
   man ${extension_actions[@]:-${package_name}} || true

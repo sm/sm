@@ -12,7 +12,7 @@ install_initialize()
 
 perform()
 {
-  enter "${initial_pwd}"
+  paths enter "${initial_pwd}"
   "$*"
 }
 
@@ -20,15 +20,15 @@ prepare_for_installation()
 {
   local directory _path
 
-  log_step "Ensuring that installation target path exists (${install_path})" \
-    ensure_paths_exist "${install_path}"
-
-  enter "${install_path}"
+  log_step "Ensuring that installation target path exists (${install_path})"
+  paths create "${install_path}"
+  paths enter "${install_path}"
+  log_step success
 
   for directory in "${cleanse_paths[@]}"
   do
     _path="${install_path}/${directory}"
-    if path_exists "${_path}"
+    if paths exists "${_path}"
     then
       log_step "Removing old sm component path (${_path})"\
         rm -rf "${_path}"
@@ -36,32 +36,37 @@ prepare_for_installation()
   done
 
   log_step "Creating install path directories (${directories[*]} ${aux_paths[*]})" \
-  ensure_paths_exist "${directories[@]}" "${aux_paths[@]}"
+  paths create "${directories[@]}" "${aux_paths[@]}"
 }
 
-with_clean()
+cleanse_targets()
 {
-  local command="$1" target="$3" entity
-  shift 3 || fail "Usage:\n\n  with_clean copy_{files,paths} to <target> list of files/paths"
-  for entity in "$@"
+  local _path="$1" _entity
+  shift || fail "Usage:\n\n  cleanse_targets {target} {paths/files under target}"
+  for _entity in "$@"
   do
-    rm -rf "${target}/${entity}"
+    rm -rf "${_path}/${_entity}"
   done
-  "${command}" to "${target}" "$@"
 }
 
 install_core()
 {
   local _dir
 
-  log_step "Installing core directories (${directories[*]})" \
-    with_clean copy_paths to "${install_path}/" "${directories[@]}"
+  log_step "Installing core directories (${directories[*]})"
+  cleanse_targets "${install_path}" "${directories[@]}"
+  paths copy to "${install_path}/" "${directories[@]}"
+  log_step success
 
-  log_step "Installing core files (${files[*]})" \
-    with_clean copy_files to "${install_path}" ${files[@]}
+  log_step "Installing core files (${files[*]})"
+  cleanse_targets "${install_path}" ${files[@]}
+  copy_files to "${install_path}" ${files[@]}
+  log_step success
 
-  log_step "Installing core extension set" \
-    with_clean copy_paths to "${install_path}/" "core"
+  log_step "Installing core extension set"
+  cleanse_targets "${install_path}/" "core"
+  paths copy to "${install_path}/" "core"
+  log_step success
 }
 
 install_configuration_files()
@@ -78,7 +83,7 @@ setup_shell_completion()
 {
   local _prefix="/etc" _mode _name
 
-  path_exists "${_prefix}/bash_completion.d" || return 0
+  paths exists "${_prefix}/bash_completion.d" || return 0
 
   completion_prefix="${_prefix}/bash_completion.d"
   _name="sm.bash"
@@ -95,7 +100,7 @@ setup_shell_completion()
 
 setup_profile_d()
 {
-  ensure_paths_exist "${profile_d_path}"
+  paths create "${profile_d_path}"
 
   if user_is_root
   then

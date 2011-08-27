@@ -13,11 +13,9 @@ initialize_filesystem_cache()
 
   if [[ -d "${_actions_root}" ]]
   then
-    for _action_path in $( find "${_actions_root}" -type f )
+    for _action_path in "${_actions_root}"/*
     do
-      # Ignore not executable files
-      [[ -x "${_action_path}" ]] || continue
-
+      [[ -f "${_action_path}" && -x "${_action_path}" ]] || continue
       _action_path="${_action_path#${_actions_root}\/}"
       _file_name="${_action_path##*/}"
 
@@ -55,7 +53,7 @@ detect_module_actions()
 initialize_modules_actions_cache()
 {
   trace_filter action_detection
-  local _module_path _module_name _action_pair
+  local _modules _module_path _module_name _action_pair
 
   if [[ ! -d "${_modules_root}" ]]
   then
@@ -63,8 +61,16 @@ initialize_modules_actions_cache()
     return 0
   fi
 
-  for _module_path in $( find "${_modules_root}" -name includes -type f )
+  _modules=(
+  "${_modules_root}"/*/*/includes
+  "${_modules_root}"/*/*/*/includes
+  "${_modules_root}"/*/*/*/*/includes
+  )
+
+  for _module_path in "${_modules[@]}"
   do
+    [[ "${_module_path##*/}" == "includes" ]] || continue
+
     _module_name="${_module_path#${_modules_root}\/}"
     _module_name="${_module_name%includes}"
     _module_name="${_module_name%\/}"

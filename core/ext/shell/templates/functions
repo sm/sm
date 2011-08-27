@@ -169,11 +169,11 @@ install_template()
   _template="${template_path}"
   _name="$(basename "${_name}")"
 
-  ensure_paths_exist "$(dirname "${_target}")"
+  paths create "$(dirname "${_target}")"
 
-  if path_exists "${_target}"
+  if paths exist "${_target}"
   then
-    if path_exists "${_target}/${_name}"
+    if paths exist "${_target}/${_name}"
     then
       fail "Cannot install the template '${_template}' to ${_target}/${_name},"\
         " as it is a directory."

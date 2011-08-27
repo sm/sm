@@ -3,7 +3,7 @@
 array_is_nonempty extension_args ||
   fail "src: You must specify at least one extension name."
 
-if path_exists "${extensions_development_path}/${extension_args[0]}"
+if paths exists "${extensions_development_path}/${extension_args[0]}"
 then
   printf "${extensions_development_path}/${extension_args[0]}"
 else

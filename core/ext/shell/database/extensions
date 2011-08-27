@@ -7,9 +7,9 @@ database_extension_setup()
   shift || fail "Module must be given as the second parameter."
   shift || fail "Path must be given as the third parameter."
 
-  enter "${path}"
+  paths enter "${path}"
 
-  ensure_paths_exist "modules/${module}" "bin/${module}"
+  paths create "modules/${module}" "bin/${module}"
 
   # Setup modules/package/{functions,initialize,cli}
   for file in functions initialize cli

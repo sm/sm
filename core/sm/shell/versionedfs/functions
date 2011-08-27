@@ -67,11 +67,11 @@ versionedfs()
         ;;
       (version)
         _version="${1}"
-        shift || fail "Version path must follow keyword 'version'"
+        shift || fail "Version string must follow keyword 'version'"
         ;;
       (strategy)
         _strategy="${1}"
-        shift || fail "Strategy path must follow keyword 'strategy'"
+        shift || fail "Strategy string must follow keyword 'strategy'"
         case "${_strategy}" in
           (fhs|name) true ;;
           (*) fail "Strategy must be one of {fhs,name}" ;;
@@ -79,7 +79,7 @@ versionedfs()
         ;;
       (method)
         _method="${1}"
-        shift || fail "method path must follow keyword 'method'"
+        shift || fail "method string must follow keyword 'method'"
         case "${_method}" in
           (link|copy) true ;;
           (*) fail "Method must be one of {link,copy}" ;;
@@ -87,7 +87,7 @@ versionedfs()
         ;;
       (activate)
         _activate="${1}"
-        shift || fail "activate path must follow keyword 'activate'"
+        shift || fail "activate string must follow keyword 'activate'"
         case "${_activate}" in
           (first|newest) true ;;
           (*) fail "Activate must be one of {first,newest}" ;;
@@ -95,7 +95,7 @@ versionedfs()
         ;;
       (keep)
         _keep="${1}"
-        shift || fail "activate path must follow keyword 'activate'"
+        shift || fail "keep number must follow keyword 'activate'"
         case "${_keep}" in
           (+([[:digit]]))
             (( _keep > 0)) || fail "Keep must be a positive integer." ;;
@@ -115,33 +115,33 @@ versionedfs()
 
   case "${_action}" in
     (create)
-      _versionedfs_create "${_path}"
+      __sm.versionedfs.create "${_path}"
       ;;
     (add)
       [[ -n "${_name}" && -n "${_source}" ]] ||
         fail "Name and Source must be given."
       [[ -n "${_version}" ]] || _version="$(date +"%Y%m%d%H%M%S")"
-      _versionedfs_add "${_path}" "${_name}" "${_version}" "${_source}"
-      _versionedfs_activate "${_path}" "${_name}" "${_version}"
+      __sm.versionedfs.add "${_path}" "${_name}" "${_version}" "${_source}"
+      __sm.versionedfs.activate "${_path}" "${_name}" "${_version}"
       ;;
     (remove)
       [[ -n "${_name}" ]]    || fail "Name must be given."
-      _versionedfs_remove "${_path}" "${_name}" "${_version}"
+      __sm.versionedfs.remove "${_path}" "${_name}" "${_version}"
       ;;
     (activate)
       [[ -n "${_name}" && -n "${_version}" ]] ||
         fail "Name and Version must be given."
-      _versionedfs_activate "${_path}" "${_name}" "${_version}"
+      __sm.versionedfs.activate "${_path}" "${_name}" "${_version}"
       ;;
     (deactivate)
       [[ -n "${_name}" ]]    || fail "Name must be given."
-      _versionedfs_deactivate "${_path}" "${_name}" "${_version}"
+      __sm.versionedfs.deactivate "${_path}" "${_name}" "${_version}"
       ;;
     (versions)
-      _versionedfs_list versions "${_path}" "${_name}" "${_version}"
+      __sm.versionedfs.list versions "${_path}" "${_name}" "${_version}"
       ;;
     (active)
-      _versionedfs_list active "${_path}" "${_name}" "${_version}"
+      __sm.versionedfs.list active "${_path}" "${_name}" "${_version}"
       ;;
     (*)
       fail "Unknown versionedfs action '${_action}'"
@@ -149,7 +149,7 @@ versionedfs()
   esac
 }
 
-_versionedfs_create()
+__sm.versionedfs.create()
 {
   local _path="$1"
   mkdir -p "${_path}/"{.versionedfs,versions,active} ||
@@ -161,7 +161,7 @@ _versionedfs_create()
 
 }
 
-_versionedfs_add()
+__sm.versionedfs.add()
 {
   local _path="$1" _name="$2" _version="${3}" _source="$4"
 
@@ -180,12 +180,12 @@ _versionedfs_add()
   fi
 }
 
-_versionedfs_remove()
+__sm.versionedfs.remove()
 {
   local _path="$1" _name="${2}" _version="${3}"
   local _version_path="${_path}/versions/${_name}/${_version}"
 
-  _versionedfs_deactivate "${_path}" "${_name}" "${_version}"
+  __sm.versionedfs.deactivate "${_path}" "${_name}" "${_version}"
 
   if [[ -d "${_version_path}" ]]
   then
@@ -193,7 +193,7 @@ _versionedfs_remove()
   fi
 }
 
-_versionedfs_activate()
+__sm.versionedfs.activate()
 {
   local _path="$1" _name="${2}" _version="${3}" _target
   local _version_path="${_path}/versions/${_name}/${_version}"
@@ -203,7 +203,7 @@ _versionedfs_activate()
   then # Deactivate if active version.
     if [[ "$(readlink "${_path}/versions/${_name}/active")" != "${_version_path}" ]]
     then
-      _versionedfs_deactivate "${_path}" "${_name}"
+      __sm.versionedfs.deactivate "${_path}" "${_name}"
     else
       return 0 # Success if the given name/version is already active.
     fi
@@ -235,6 +235,7 @@ _versionedfs_activate()
     (fhs)
       case "${_method}" in
         (link)
+          # TODO: Switch this to using shell globbing builtin?
           _files=($( find "${_version_path}" -type f ))
           _count="${#_files[@]}"
           for _file in "${_files[@]}"
@@ -268,7 +269,7 @@ _versionedfs_activate()
   # TODO: Add to active 'db'
 }
 
-_versionedfs_deactivate()
+__sm.versionedfs.deactivate()
 {
   local _path="$1" _name="${2}" _version="${3:-}"
   local _name_path="${_path}/versions/${_name}"
@@ -289,6 +290,7 @@ _versionedfs_deactivate()
 
   case "${_strategy}" in
     (fhs)
+      # TODO: Switch this to using shell globbing builtin?
       _files=($( find "${_version_path}" -type f ))
       _count="${#_files[@]}"
       echo
@@ -308,7 +310,7 @@ _versionedfs_deactivate()
   # Remove from active metadata
 }
 
-_versionedfs_list()
+__sm.versionedfs.list()
 {
   local _method=$1 _path="$2" _name="${3:-}" __path __name __version
 

@@ -64,17 +64,23 @@ database_usage() {
 
 database_setup()
 {
-  ensure_paths_exist "${data_base_path}"
+  paths create "${data_base_path}"
 
-  ! template_exists "/etc/conf.d/${service}.conf" ||
+  if template_exists "/etc/conf.d/${service}.conf"
+  then
     seed_template "/etc/conf.d/${service}.conf" \
       data_path "${data_path}"
+  fi
 
-  !  command_exists "${extension}_database_setup" ||
+  if command_exists "${extension}_database_setup"
+  then
     "${extension}_database_setup"
+  fi
 
-  ! command_exists "${extension}_initialize" ||
+  if command_exists "${extension}_initialize"
+  then
     "${extension}_initialize"
+  fi
 }
 
 # TODO: Should 'service_db_path' in service_{activate,deactivate} be moved into

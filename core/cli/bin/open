@@ -3,7 +3,7 @@
 array_is_nonempty extension_args ||
   fail "open: You must specify at least one extension name."
 
-path_exists "${extensions_development_path}/${extension_args[0]}" ||
+path exists "${extensions_development_path}/${extension_args[0]}" ||
   error "open: Failed to open '${extension_args[0]}'; it appears to not be installed."
 
 os_open "${extensions_development_path}/${extension_args[0]}"

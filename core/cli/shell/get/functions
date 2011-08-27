@@ -53,7 +53,7 @@ install_release()
       rm -f "$archives_path/sm-${version}.tar.gz"
   fi
 
-  ensure_paths_exist "${archives_path}"
+  paths create "${archives_path}"
 
   #TODO make use of fetch_uri
   curl -s -L "${releases_url}/sm-${version}.tar.gz" -o "$archive"
@@ -71,7 +71,7 @@ Halting installation.
 
   tar zxf "${archives_path}/sm-${version}.tar.gz" -C "$src_path/"
 
-  enter "$src_path/sm-${version}"
+  paths enter "$src_path/sm-${version}"
 
   ensure_files_are_executable "install"
 
@@ -96,7 +96,7 @@ install_sm_scm()
   # TODO: This should update to/from repos path and/or archives path...
   fetch_uri "${repo}" "${src_path}/${dir}"
 
-  enter "${src_path}/${dir}/"
+  paths enter "${src_path}/${dir}/"
 
   chmod 0755 ${PWD}/install ${PWD}/bin/*
 

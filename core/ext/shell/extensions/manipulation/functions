@@ -144,21 +144,22 @@ extension_license()
 extension_actions()
 {
   local _extension="${1:-}" _files _file _actions=()
-
   shift || fail "No extension was given."
+  [[ -d "${extension_bin_path}" ]] || return 0
 
-  path_exists "${extension_bin_path}" || return 0
-
-  _files=($(
-  find "${extension_bin_path}" -mindepth 1 -type f -perm -o+rx
-  ))
+  _files=(
+  "${extension_bin_path}"/*
+  "${extension_bin_path}"/*/*
+  "${extension_bin_path}"/*/*/*
+  )
 
   for _file in "${_files[@]}"
   do
-    _actions+=("${_file#${extension_bin_path}}")
+    [[ ! -d "${_file}" ]] || continue
+    [[ -s "${_file}" && -x "${_file}" ]] || continue
+    _actions+=("${_file#${extension_bin_path}/}")
   done
-  _actions="${_actions[@]}" # Convert from array to string.
-  printf "${_actions}"
+  echo "${_actions[@]}"
 }
 
 #
@@ -206,10 +207,13 @@ extension_install()
 
   log "Installing ${_extension}"
 
-  ! path_exists "${sm_path}/exts/${_extension}" ||
-    remove_paths "${sm_path}/exts/${_extension}"
+  if paths exists "${sm_path}/exts/${_extension}"
+  then
+    paths remove "${sm_path}/exts/${_extension}"
+  fi
 
-  copy_path "${extensions_src_path}/${_src}" \
+  paths copy \
+    from "${extensions_src_path}/${_src}" \
     to "${sm_path}/exts/${_extension}"
 
   write "${extension_uri}" to "${sm_path}/exts/${_extension}/.uri"
@@ -254,9 +258,10 @@ extensions_installed()
 
   [[ -n ${_paths:-} ]] || {
     _paths=( "${sm_path}/sets" "${sm_path}/exts" )
-    ensure_paths_exist "${_paths[@]}"
+    paths create "${_paths[@]}"
   }
 
+  # TODO: convert this to in-process via shell globbing and looping.
   _modules=($( find "${_paths[@]}" -mindepth 2 -name "includes" -type f ))
 
   _excludes="${_excludes[*]:-'#'}"

@@ -75,7 +75,7 @@ ext_service_initialize()
   local _path
   for _path in  "${install_path}/bin" "${install_path}/sbin"
   do
-    if path_exists "$_path"
+    if paths exist "$_path"
     then
       export PATH="${_path}:$PATH"
     fi
@@ -162,20 +162,20 @@ service_setup()
     # TODO: create an 'user_exists' function and use it here.
     user_create_if_missing "${service_user}" with group "${service_user}" >/dev/null 2>&1
 
-    ensure_paths_exist "${service_root_paths[@]}"
+    paths create "${service_root_paths[@]}"
 
-    chown_paths --recursively "${service_user}:${service_user}" "${service_root_paths[@]}"
+    paths chown recursive "${service_user}:${service_user}" "${service_root_paths[@]}"
   fi
 
-  ensure_paths_exist "${service_paths[@]}" "${install_path}"
+  paths create "${service_paths[@]}" "${install_path}"
 
   for _path in "${service_paths[@]}"
   do
     if variable_is_nonempty _path
     then
-      if path_exists "${_path}"
+      if paths exist "${_path}"
       then
-        chown_paths --recursively "${service_user}:${service_user}" "${_path}"
+        paths chown recursive "${service_user}:${service_user}" "${_path}"
       else
         warn "While chowning paths it was discovered that '${_path}' is in"\
           "fact nonexistent on the filesystem; this might indicate an error."
@@ -419,14 +419,14 @@ service_pid()
   local _path="${run_path:="/var/run"}/${service}"
   local _pid=0
 
-  ensure_paths_exist "${_path}"
+  paths create "${_path}"
 
   if file_is_nonempty "${_path}/${service}.pid"
   then
     read -r _pid < "${_path}/${service}.pid"
     if os_is_linux
     then # Sanity check.
-      if ! path_exists "/proc/${pid}"
+      if ! paths exist "/proc/${pid}"
       then
         _pid=0
         rm -f "${_path}/${service}.pid"
@@ -450,12 +450,12 @@ service_install_init_d()
 
   variables_must_be_nonempty _service
 
-  path_exists "${init_scripts_path}" ||
+  paths exist "${init_scripts_path}" ||
     return 0 # No bin/ dir, no need for it to be in the path.
 
   if user_is_root
   then
-    ensure_paths_exist "/etc/conf.d" "${init_scripts_path}"
+    paths create "/etc/conf.d" "${init_scripts_path}"
 
     # TODO: Install the service init script...
     if template_exists "${_service}"
@@ -742,10 +742,12 @@ service_activate()
 
   variables_must_be_nonempty _service _version
 
-  ! symlink_exists "${service_db_path}/active" ||
+  if symlink_exists "${service_db_path}/active"
+  then # TODO: use versionedfs to check if a version is active.
     service_deactivate "${_service}"
+  fi
 
-  if path_exists "${service_db_path}/${_version}"
+  if paths exist "${service_db_path}/${_version}"
   then
     log "Activating service ${_service} version ${_version}."
 

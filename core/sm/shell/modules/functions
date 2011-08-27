@@ -174,7 +174,7 @@ extensions_in()
       fi
     done
   else
-    debug search "No extensions in '${_path}'; path does not exist."
+    debug search "Path '${_path}' does not exist."
     return 1
   fi
 }
@@ -182,14 +182,14 @@ extensions_in()
 in_search_paths()
 {
   trace_filter search
-  local callback="${1:-}" path
+  local callback="${1:-}" _path
   shift || fail "Callback name must be given ast the first parameter."
 
   if [[ -n "$1" ]] # do search if params given
   then
-    for path in "${extensions_search_paths[@]}"
+    for _path in "${extensions_search_paths[@]}"
     do
-      "${callback}" "${path}" "$@" || continue
+      "${callback}" "${_path}" "$@" || continue
       return 0
     done
   fi

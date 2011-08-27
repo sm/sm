@@ -45,7 +45,7 @@ extension_is_installed "${_source}" ||
   error "clone: The target extension '${_target}' already exists; "\
     "cannot create it from ${_source}."
 
-copy_path \
+path copy \
   from "${extensions_development_path}/${_source}" \
   to "${extensions_development_path}/${_target}"
 

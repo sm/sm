@@ -37,8 +37,7 @@ action_cache_check()
       _candidate="${_candidate%%=*}"
       _candidates+=( "sm ${extension} ${_candidate//\// } ${_rest_params[@]}\n" )
     done
-    local screen_height=$LINES
-    : ${screen_height:=20}
+    local screen_height=${LINES:-20}
     if (( ${#_found_actions[@]} + 4  > screen_height ))
     then
       error "More than one matching action found;\n\nDid you mean:\n ${_candidates[*]}\n" 2>&1 | less

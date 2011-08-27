@@ -1,20 +1,232 @@
 #!/bin/sh
 
-# ### Usage Examples
 #
-#     user$ ls -a
-#     . ..
-#     user$ ensure_paths_exist a b c
-#     user$ ls -a
-#     . .. a b c
+# SM Framework Core Module ~ Versioned FileSystem (versionedfs)
 #
-ensure_paths_exist()
+# API Version: 1.0.0
+#
+# paths *
+#
+# TODO: Finish this API documentation below
+#
+#           paths move source target mode owner
+#     user$ paths move "freetds-0.91rc"* to "freetds-0.91"
+#
+#
+#     user$ paths enter "/usr/local/src"
+#
+#
+#     user$ paths exist /bin/sm
+#     user$ echo $?
+#     0
+#
+#     user$ paths exist /bin/asdfasdf
+#     user$ echo $?
+#     1
+#
+#
+#     user$ cd ; sm call paths expand test
+#     /home/user/test
+#
+#     user$ paths copy "freetds-0.91rc"* to "freetds-0.91"
+#
+#     user$ paths create a b c
+#     user$ ls
+#     a b c
+#
+#     user$ paths remove /tmp/somedir /tmp/someotherdir
+#
+#     user$ paths copy to "$HOME/backup/" "$HOME/bin" "$HOME/projects"
+#
+#     user$ paths_chown $USER "$HOME" "/usr/local"
+#
+#
+#     user$ paths_chmod $USER "$HOME" "/usr/local"
+#
+
+paths()
 {
   trace_filter filesystem
+  local _action _path _paths=() _source _target _mode _owner _flags
 
+  while (( $# > 0 ))
+  do
+    token="$1" && shift
+    case "${token}" in
+      (to)
+        _target="${1}"
+        shift || fail "Target path must be provided after keyword 'to'"
+        ;;
+      (from)
+        _source="${1}"
+        shift || fail "Source path must be provided after keyword 'from'"
+        ;;
+      (mode|permissions)
+        _mode="${1}"
+        shift || Fail "Mode must follow keywords 'mode|permissions'"
+        ;;
+      (owner)
+        _owner="${1}"
+        shift || fail "Owner must be provided after keyword 'owner'"
+        ;;
+      (recursive|recursively)
+        _flags+=(-R)
+        shift # Remove the recursive flag parameter.
+        ;;
+      (*)
+        if [[ -z "${_action}" ]]
+        then
+          _action="$token"
+        else
+          _paths+=("$token")
+        fi
+        ;;
+    esac
+  done
+
+  case "${_action}" in
+    (chown)
+      [[ -n "${_identity}" ]] || fail "'identity {user}[:{group}]' was not given."
+      [[ -n "${_paths}" ]]    || fail "Paths must be given."
+      __sm.paths.chown "${_identity}" "${_flags[*]}" "${_paths[@]}"
+      ;;
+    (chmod)
+      [[ -n "${_mode}" ]] || fail "'mode {file mode}' must be given."
+      [[ -n "${_paths}" ]]    || fail "Paths to chmod must be given."
+      __sm.paths.chmod "${_mode}" "${_flags[*]}" "${_paths[@]}"
+      ;;
+    (create)
+      [[ -n "${_paths}" ]] || fail "Paths to create must be given."
+      __sm.paths.create "${_paths[@]}"
+      ;;
+    (remove)
+      [[ -n "${_paths}" ]] || fail "Paths to remove must be given."
+      __sm.paths.remove "${_paths[@]}"
+      ;;
+    (copy)
+      [[ -n "${_target}" ]] || fail "Target path (to) for copying into must be given."
+      __sm.paths.copy "${_target}" "${_flags[*]}" "${_paths[@]}"
+      ;;
+    (in)
+      [[ -n "${_paths}" ]] || fail "Path to list paths in must be given."
+      __sm.paths.in "${_paths[@]}"
+      ;;
+    (search)
+      [[ -n "${_paths}" ]] || fail "Path to search paths under must be given."
+      __sm.paths.search
+      ;;
+    (enter)
+      [[ -n "${_paths}" ]] || fail "Path to enter must be given."
+      __sm.paths.enter "${_paths[@]}"
+      ;;
+    (exist|exists)
+      [[ -n "${_paths}" ]] || fail "Path to enter must be given."
+      __sm.paths.exists "${_paths[@]}"
+      ;;
+    (join)
+      [[ -n "${_paths}" ]] || fail "Path to join must be given."
+      __sm.paths.join "${_paths[@]}"
+      ;;
+    (expand)
+      [[ -n "${_paths}" ]] || fail "Path to expand must be given."
+      __sm.paths.expand "${_paths[@]}"
+      ;;
+    (move)
+      [[ -n "${_source}" ]] || fail "Source must be given to copy (from x). "
+      [[ -n "${_target}" ]] || fail "Target must be given to copy (to y). "
+      __sm.paths.move "${_source}" "${_target}"
+      ;;
+    (copy)
+      [[ -n "${_source}" ]] || fail "Source must be given to copy (from x)."
+      [[ -n "${_target}" ]] || fail "Target must be given to copy (to y)."
+      __sm.paths.copy "${_source}" "${_target}"
+      ;;
+    (*)
+      fail "Unknown action for paths: '${_action}' "\
+        "A paths action must be specified as the first parameter: "\
+        "{chown,chmod,create,remove,copy,in,search,enter,exist,join,expand,move,copy}"
+      ;;
+  esac
+}
+
+__sm.paths.move()
+{
+  local _source="$1" _target="$2" _mode="$3" _owner="$4"
+
+  mv "${_source}" "${_target}" ||
+    fail "Could not move '${_source}' to '${_target}',"\
+    "as the 'chmod -R' command failed with error code '$?'."
+
+  if [[ -n "${_mode}" ]]
+  then
+    chmod -R "${_mode}" "${_target}" ||
+    fail "Could not recursively change mode of '${_target}' to"\
+    "${_mode}, as the 'chmod -R' command failed with error code '$?'."
+  fi
+
+  if [[ -n "${_owner}" ]]
+  then
+    chown -R "${_owner}" "${_target}" ||
+    fail "Could not recursively change ownership of '${_target}' to"\
+    "${_owner}, as the 'chown -R' command failed with error code '$?'."
+  fi
+}
+
+__sm.paths.copy()
+{
+  local _source="$1" _target="$2" _mode="$3" _owner="$4"
+
+  cp -Rf "${_source}" "${_target}" ||
+    fail "Could not copy '${_source}' to '${_target}',"\
+      "as the 'cp' command failed with error code '$?'."
+
+  if [[ -n "${_mode}" ]]
+  then
+    chmod -R "${_mode}" "${_target}" ||
+    fail "Could not recursively change mode of '${_target}' to"\
+    "${_mode}, as the 'chmod -R' command failed with error code '$?'."
+  fi
+
+  if [[ -n "${_owner}" ]]
+  then
+    chown -R "${_owner}" "${_target}" ||
+    fail "Could not recursively change ownership of '${_target}' to"\
+    "${_owner}, as the 'chown -R' command failed with error code '$?'."
+  fi
+}
+
+__sm.paths.enter()
+{
+  local _path="$1"
+  [[ -d "${_path}" ]] || fail "Path '${_path}' does not exist."
+  builtin cd "${_path}" ||
+    fail "Could not cd into the given path '${_path}'; "\
+      "'cd' command failed with error code '$?'."
+}
+
+__sm.paths.exists()
+{
+  local _path="${1}"
+  [[ -d "$_path" ]]
+}
+
+#
+__sm.paths.join()
+{
+  local IFS='/'
+  printf "$*"
+}
+
+__sm.paths.expand()
+{
+  local _path="$1"
+  [[ -d "${_path}" ]] || fail "Path '${_path}' does not exist."
+  ( builtin cd "${_path}" ; echo $PWD )
+}
+
+__sm.paths.create()
+{
   local _path _paths=("$@")
-
-  shift || fail "Cannot ensure paths exist; No paths were given."
 
   for _path in "${_paths[@]}"
   do
@@ -33,16 +245,9 @@ ensure_paths_exist()
   done
 }
 
-# ### Usage Examples
-#
-#     user$ {{ setup the scenario }}
-#     user$ function_name {{ parameters }}
-#     user$ {{ demonstrate the results}}
-remove_paths()
+__sm.paths.remove()
 {
-  trace_filter filesystem
   local _path _paths=("$@")
-  shift || fail "No paths were given."
 
   removed_paths=()
   nonexistant_paths=()
@@ -70,232 +275,62 @@ remove_paths()
   done
 }
 
-# ### Usage Examples
-#
-#     user$ move_path "freetds-0.91rc"* to "freetds-0.91"
-#
-move_path()
+__sm.paths.copy()
 {
-  trace_filter filesystem
-  local _source _target _mode _owner
+  local _target="$1" _flags="$2" _path
+  shift 2
+  local _paths=("$@")
 
-  while (( $# > 0 ))
-  do
-    token="$1"
-    shift
-
-    case "${token}" in
-      to)
-        _target="${1}"
-        shift || fail "Target path must be provided after keyword 'to'"
-        ;;
-
-      from)
-        _source="${1}"
-        shift || fail "Source path must be provided after keyword 'from'"
-        ;;
-
-      mode)
-        _mode="${1}"
-        shift || fail "Mode must be provided after keyword 'mode'"
-        ;;
-
-      owner)
-        _owner="${1}"
-        shift || fail "Owner must be provided after keyword 'owner'"
-        ;;
-
-      *) # If the token is unknown
-        if [[ -z "${_source}" ]]
-        then
-          _source="$token"
-
-        elif [[ -z "${_target}" ]]
-        then
-          _target="$token"
-        fi
-        ;;
-    esac
-  done
-
-  [[ -n "${_source}" ]] || fail "Source must be given. "
-  [[ -n "${_target}" ]] || fail "Target must be given. "
-
-  mv "${_source}" "${_target}" ||
-    fail "Could not move '${_source}' to '${_target}',"\
-    "as the 'chmod -R' command failed with error code '$?'."
-
-  [[ -z "${_mode}" ]] ||
-    chmod -R "${_mode}" "${_target}" ||
-    fail "Could not recursively change mode of '${_target}' to"\
-    "${_mode}, as the 'chmod -R' command failed with error code '$?'."
-
-  [[ -z "${_owner}" ]] ||
-    chown -R "${_owner}" "${_target}" ||
-    fail "Could not recursively change ownership of '${_target}' to"\
-    "${_owner}, as the 'chown -R' command failed with error code '$?'."
-}
-
-# ### Usage Examples
-#
-#     user$ copy_paths to "$HOME/backup/" "$HOME/bin" "$HOME/projects"
-#
-copy_paths()
-{
-  trace_filter filesystem
-  local _target _path _force_flag=0 _directories=()
-
-  while (( $# > 0 ))
-  do
-    token="$1"
-    shift
-    case "${token}" in
-      to)
-        _target="${1}"
-        shift || fail "Target path must be given after keyword 'from'"
-        ;;
-
-      from)
-        _directories+=( "${1}" )
-        shift || fail "Source path must be given after keyword 'from'"
-        ;;
-
-      *)
-        _directories+=( "${token}" )
-        ;;
-    esac
-  done
-
-  [[ -n "${_target}" ]] || fail "Target must be given."
-  array_is_nonempty _directories || fail "Directories must be given."
-
-  ensure_paths_exist "${_target}"
-
-  for _path in "${_directories[@]}"
-  do
-    [[ -d "${_path}" ]] ||
-      error "Cannot copy path ${_path} to ${_target},"\
-      "as path (directory) '${_path}' does not exist (in '$PWD')."
-
-    cp -Rf "${_path}" "${_target}/" ||
-      fail "Could not copy the entity '${_entity}',"\
-      "as the 'cp -Rf' command failed with error code '$?'."
-  done
-}
-
-# ### Usage Examples
-#
-#     user$ copy_path "freetds-0.91rc"* to "freetds-0.91"
-#
-copy_path()
-{
-  trace_filter filesystem
-  local _source _target
-
-  while (( $# > 0 ))
-  do
-    token="$1"
-    shift
-    case "${token}" in
-      to)
-      _target="${1}"
-      shift || fail "Target path must be given after keyword 'from'"
-      ;;
-      from)
-      _source="${1}"
-      shift || fail "Source path must be given after keyword 'from'"
-      ;;
-      *)
-        if [[ -z "${_source}" ]]
-        then
-          _source="$token"
-
-        elif [[ -z "${_target}" ]]
-        then
-          _target="$token"
-        fi
-        ;;
-    esac
-  done
-
-  [[ -n "${_source}" ]] || fail "Cannot move file; Source must be given."
-  [[ -n "${_target}" ]] || fail "Cannot move file, Target must be given."
-
-  cp -Rf "${_source}" "${_target}" ||
-    fail "Could not copy '${_source}' to '${_target}',"\
-      "as the 'cp' command failed with error code '$?'."
-}
-
-# ### Usage Examples
-#
-#     user$ chown_paths $USER "$HOME" "/usr/local"
-#
-chown_paths()
-{
-  trace_filter filesystem
-  local _identity _path _recursive_flag=0 _command _flags=() _paths=()
-
-  case "${1:-}" in
-    (recursive|--recursive*)
-      _flags+=(-R)
-      shift # Remove the recursive flag parameter.
-      ;;
-    (*)
-      _identity="${1:-}"
-      ;;
-  esac
-
-  _identity="${1:-}"
-  shift || fail "user[:group] was not given as the first parameter"
-
-  _paths=("$@")
-  shift || fail "No paths given after user and group first parameter"
+  __sm.paths.create "${_target}"
 
   for _path in "${_paths[@]}"
+  do
+    if [[ ! -d "${_path}" ]]
+    then
+      error "Cannot copy path ${_path} to ${_target};"\
+      "Path '${_path}' does not exist (in '$PWD')."
+    fi
+
+    cp -Rf "${_path}" "${_target}/" ||
+      fail "Could not copy the entity '${_entity}';"\
+      "As the 'cp -Rf' command failed with error code '$?'."
+  done
+}
+
+__sm.paths.chown()
+{
+  trace_filter filesystem
+  local _identity="$1" _flags="$2" _path _command
+  shift 2
+  for _path in "$@"
   do
     [[ -n "${_path}" ]] || continue
 
-    [[ -e "${_path}" ]] ||
-      fail "Cannot chown path ${_path} to ${_identity},"\
-      "as the path (directory) does not exist."
+    if [[ ! -e "${_path}" ]]
+    then
+      fail "Path '${_path}' does not exist."
+    fi
 
     chown ${_flags[*]} ${_identity} "${_path}" ||
-      fail "Could not chown the path '${_path}' to '${_identity},"\
-      "as the 'chown' command failed with error code '$?'."
+      fail "Could not chown the path '${_path}' to '${_identity};"\
+      " 'chown' command failed with error code '$?'."
   done
 }
 
-# ### Usage Examples
-#
-#     user$ chmod_paths $USER "$HOME" "/usr/local"
-#
-chmod_paths()
+__sm.paths.chmod()
 {
   trace_filter filesystem
-  local _permissions="${1:-}" _path _recursive_flag=0 _command _flags=()
-
-  if [[ "${1:-}" == "--recursive" ]]
-  then
-    _recursive_flag=1
-    shift
-    _permissions="${1}"
-  fi
-
-  (( _recursive_flag == 0 )) || _flags+=(-R)
-
-  shift || fail "Cannot chmod paths; user[:group] was not given as the first parameter."
-
-  local _paths=("$@") # Set the paths array to the remaining parameters.
-
-  array_is_nonempty _paths || fail "No files were given."
-
-  for _path in "${_paths[@]}"
+  local _mode="$1" _flags="$2"
+  shift 2
+  for _path in "$@"
   do
-    [[ -d "${_path}" ]] ||
+    if [[ ! -d "${_path}" ]]
+    then
       fail "Cannot chmod path ${_path} to ${_permissions},"\
       "as the path (directory) does not exist."
+    fi
 
-    chmod ${_flags[*]} ${_permissions} "${_path}" ||
+    chmod ${_flags[@]} ${_mode} "${_path}" ||
       fail "Could not chmod the file '${_file}' to "\
       "'${_target}/${_file//*\/},"\
       "as the 'chmod' command failed with error code '$?'."
@@ -303,125 +338,22 @@ chmod_paths()
   done
 }
 
-# Examples
-#
-#     user$ enter "/usr/local/src"
-#
-enter()
+__sm.paths.in()
 {
-  trace_filter filesystem
-  local _path="${1:-}"
-
-  shift || fail "No path was given."
-
-  [[ -d "${_path}" ]] || fail "Cannot enter path '${_path}'; Path does not exist."
-
-  builtin cd "${_path}" ||
-    fail "Could not cd into the given path '${_path}'; "\
-      "'cd' command failed with error code '$?'."
-}
-
-# Examples
-#
-#     user$ path_exists /bin/sm
-#     user$ echo $?
-#     0
-#
-#     user$ path_exists /bin/asdfasdf
-#     user$ echo $?
-#     1
-#
-path_exists()
-{
-  trace_filter filesystem
-  local _path="${1:-}"
-  shift || fail "No name/path was given."
-  [[ -d "$_path" ]]
-}
-
-# Examples
-#
-#     user$ path_does_not_exist /bin/sm
-#     user$ echo $?
-#     1
-#
-#     user$ path_does_not_exist /bin/asdfasdf
-#     user$ echo $?
-#     1
-#
-path_does_not_exist()
-{
-  trace_filter filesystem
-  local _path="${1:-}"
-  shift || fail "No name/path was given."
-  [[ ! -d "$_path" ]]
-}
-
-# Examples
-#
-path_join()
-{
-  trace_filter filesystem
-  local IFS='/'
-  printf "$*"
-}
-
-# Examples
-#
-#     user$ {{ setup the scenario }}
-#     user$ function_name {{ parameters }}
-#     user$ {{ demonstrate the results}}
-directories_in()
-{
-  trace_filter filesystem
-  local _path="${1:-}"
-  shift || fail "path name was not given!"
-
-  [[ -d "${_path}" ]] || fail "'${_path}' is not a path!"
-
-  find "${_path}" -mindepth 1 -maxdepth 1 -type d
-}
-
-#
-# Examples
-#
-#
-directories_in_matching()
-{
-  trace_filter filesystem
-  local _pattern _path="${1:-}"
-  shift     || fail "Path was not given!"
-  [[ -d "${_path}" ]]    || fail "'${_path}' is not a path!"
-
-  local _pattern="${2:-}"
-  shift  || fail "'${_path}' is not a path!"
-
-  find "${_path}" -mindepth 1 -maxdepth 1 -type d
-}
-
-#
-# Examples
-#
-#
-directories_under()
-{
-  trace_filter filesystem
   local _path="${1:-}"
   shift  || fail "Path was not given!"
-
   [[ -d "${_path}" ]] || fail "'${_path}' is not a path!"
-
-  find "${_path}" -mindepth 1 -type d
+  for dir in "${_path}"/*
+  do
+    [[ -d "${dir}" ]] || continue
+    echo "${dir}"
+    paths in "${dir}"
+  done
 }
 
-#
-# Examples
-#
-#
-directories_under_matching()
+__sm.paths.search()
 {
-  trace_filter filesystem
-  local _path="${1:-}"
+  local _path="${1:-}" _line
   shift || fail "Path was not given as the first parameter."
 
   local _pattern="${1:-}"
@@ -430,67 +362,10 @@ directories_under_matching()
   [[ -n "${_pattern}" ]] || fail "'${_path}' is not a path!"
   [[ -d "${_path}" ]]    || fail "'${_path}' is not a directory!"
 
-  find "${_path}" -mindepth 1 -iname "${_pattern}" -type d
-}
-
-#
-# Examples
-#
-#
-directory_empty()
-{
-  trace_filter filesystem
-  local _path="${1:-}"
-  shift || fail "Path was not given as the first parameter."
-
-  [[ -d "${_path}" ]] || fail "'${_path}' is not a directory!"
-
-  for f in "${_path}"/*
+  while read _line
   do
-    case "$f" in
-      (*/\*) return 0 ;;
-      (*) return 1 ;;
-    esac
-  done
-  return 1
-}
-
-#
-# Examples
-#
-#
-directory_nonempty()
-{
-  trace_filter filesystem
-  local _path="${1:-}"
-  shift || fail "Path was not given as the first parameter."
-
-  [[ -d "${_path}" ]] || fail "'${_path}' is not a directory!"
-
-  for f in "${_path}"/*
-  do
-    case "$f" in
-      (*/\*) return 1 ;;
-      (*) return 0 ;;
-    esac
-  done
-  return 1
-}
-
-# Examples
-#
-# user$ cd ; sm call full_path test
-# /home/user/test
-#
-full_path()
-{
-  trace_filter filesystem
-  local _path="$1"
-  shift || fail "Cannot go to path; No path was given."
-  [[ -d "${_path}" ]] || fail "Path '${_path}' does not exist."
-  (
-  builtin cd "${_path}"
-  pwd
-  )
+    [[ "${_line}" == ${_pattern} ]] || continue
+    echo "${_line}"
+  done < <(paths in "${_path}")
 }
 

@@ -1,10 +1,12 @@
 #!/bin/sh
 
-shopt -s extglob # Extended globs must always be on for BDSM.
+# The following shell options must be enabled for the SM Framework.
+shopt -s extglob
+shopt -s nullglob
 
 saved_sm_path="${sm_path:-"/sm"}"
 
-# Load System BDSM Configuration, if it exists.
+# Load SM Framework configuration files, if they exist.
 for file in /etc/smrc "$HOME/.smrc"
 do
   if [[ -s "${file}" ]]

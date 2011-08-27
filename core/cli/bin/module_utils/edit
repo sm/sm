@@ -4,16 +4,16 @@ if (( ${#extension_args[@]} == 0 ))
 then # edit core
   _path="${core_development_path:="$source_path/sm"}"
 
-  enter "${_path}"
+  paths enter "${_path}"
 
   exec ${EDITOR:-vi} .
 else # edit extension
-  path_exists "${extensions_development_path}/${extension_args[0]}" ||
+  paths exists "${extensions_development_path}/${extension_args[0]}" ||
     error \
     "Failed to edit '${extension_args[0]}'; it appears to not be installed."\
     "To see installed extensions, run:\n  sm list"
 
-  enter "${extensions_development_path}/${extension_args[0]}"
+  paths enter "${extensions_development_path}/${extension_args[0]}"
 
   exec ${EDITOR:-vi} .
 fi

@@ -46,6 +46,7 @@ p()
 
   if [[ -n "${regex1}" ]]
   then
+    # TODO: Switch to using shell globbing search.
     _path=$(
     find "$projects_path" -mindepth 1 -maxdepth ${project_search_maxdepth} -iname "${regex1}*" -type d |
     head -1

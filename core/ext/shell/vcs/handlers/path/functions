@@ -1,6 +1,9 @@
 #!/bin/sh
 
-# ## directory\_get()
+#
+# TODO: This should be merged into path module or renamed not "path_" ~ Wayne
+#
+# ## path\_get()
 #
 #
 #
