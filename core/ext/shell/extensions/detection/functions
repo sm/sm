@@ -70,6 +70,7 @@ find_extension_action()
   initialize_filesystem_cache
   initialize_map_cache
   initialize_modules_actions_cache
+
   debug_cache
 
   if [[ ! -f "${_map}" ]]

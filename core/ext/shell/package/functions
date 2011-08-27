@@ -432,7 +432,9 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
       package_preinstall
   fi
 
-  paths create "${install_path}"
+  versionedfs add \
+    path "${packages_path}" name "${package_name}" version "${package_version}" \
+    source "${install_path}"
 
   if command_exists "${package_name}_install"
   then
@@ -467,10 +469,6 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
     log_step "${package_name} ${package_version} ~ postactivate" \
       "${package_name}_postactivate"
   fi
-
-  versionedfs add \
-    path "${packages_path}" name "${package_name}" version "${package_version}" \
-    source "${install_path}"
 
   package_setup
 }
@@ -656,8 +654,7 @@ package_activate_if_first()
 
   if paths exist "${install_path}"
   then
-    symlink_exists "${packages_path}/versions/${_package}/active" ||
-      package_activate "${_package}" "${_version}"
+    package_activate "${_package}" "${_version}"
   else
     log "'${install_path}' not found; skipping activation."
   fi
