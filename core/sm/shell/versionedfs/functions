@@ -234,12 +234,8 @@ __sm.versionedfs.activate()
     (fhs)
       case "${_method}" in
         (link)
-<<<<<<< HEAD
           # TODO: Switch this to using shell globbing builtin?
-          _files=($( find "${_version_path}" -type f ))
-=======
           _files=($( find "${_version_path}" -mindepth 1 ))
->>>>>>> 928893bb6a8313a2a6f4f69aa62a0dc48a43d097
           _count="${#_files[@]}"
           for _file in "${_files[@]}"
           do
@@ -301,12 +297,8 @@ __sm.versionedfs.deactivate()
 
   case "${_strategy}" in
     (fhs)
-<<<<<<< HEAD
       # TODO: Switch this to using shell globbing builtin?
-      _files=($( find "${_version_path}" -type f ))
-=======
       _files=($( find "${_version_path}" -mindepth 1 | sort -r ))
->>>>>>> 928893bb6a8313a2a6f4f69aa62a0dc48a43d097
       _count="${#_files[@]}"
       echo
       for _file in "${_files[@]}"
