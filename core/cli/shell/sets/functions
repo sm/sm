@@ -98,9 +98,18 @@ set_install()
 
   if fetch_uri "${_uri}" "${src_path}/${_identifier}" "$@"
   then
+    local _version="head"
+    if [[ "${_name}" == *:* ]]
+    then
+      _version="${_name/*:}"
+    fi
+
     versionedfs add \
-      path "${sets_user_path}" name "${_name}" version "" \
+      path "${sets_user_path}" name "${_name}" version "${_version}" \
       source "${src_path}/${_identifier}"
+
+    versionedfs activate \
+      path "${sets_user_path}" name "${_name}" version "${_version}"
   else
     return $?
   fi
