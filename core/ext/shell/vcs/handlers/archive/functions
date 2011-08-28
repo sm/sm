@@ -15,13 +15,13 @@ archive_get()
 
   case "${_uri}" in
     # fix github archive names
-    *github.com/*/tarball/*)
+    (*github.com/*/tarball/*)
       _archive="${_uri#*github.com/}"
       _archive="${_archive%/tarball*}"
       _archive="${archives_path}/${_archive//\//_}_${_uri##*/}.tar.gz"
       debug vcs "github tarball archive name ${_archive}."
       ;;
-    *github.com/*/zipball/*)
+    (*github.com/*/zipball/*)
       _archive="${_uri#*github.com/}"
       _archive="${_archive%/zipball*}"
       _archive="${archives_path}/${_archive//\//_}_${_uri##*/}.zip"
@@ -68,13 +68,13 @@ Please read 'sm man curl' for instructions how to solve this problem.\n"
   builtin cd "${_final_target}"
 
   case "${_uri}" in
-    *.tar) # tar
+    (*.tar) # tar
       tar xf "${_archive}" || fetch_error extracting_archive_failed
       ;;
-    *.tar.gz|*.tgz) # gzip
+    (*.tar.gz|*.tgz) # gzip
       tar zxf "${_archive}" || fetch_error extracting_archive_failed
       ;;
-    *github.com/*/tarball/*)
+    (*github.com/*/tarball/*)
       tar zxf "${_archive}" || fetch_error extracting_archive_failed
       local name_pattern="${_uri#https://github.com/}"
       name_pattern="${name_pattern%tarball/*}"
@@ -82,17 +82,17 @@ Please read 'sm man curl' for instructions how to solve this problem.\n"
       mv ${name_pattern}*/* .
       rm -rf ${name_pattern}*
       ;;
-    *.tar.bz2|*.tbz2) # bzip
+    (*.tar.bz2|*.tbz2) # bzip
       tar jxf "${_archive}" || fetch_error extracting_archive_failed
       ;;
-    *.tar.xz) # LZMA
+    (*.tar.xz) # LZMA
       # TODO: if 'xz' command exists, use that, otherwise use tar J
       tar Jxf "${_archive}" || fetch_error extracting_archive_failed
       ;;
-    *.zip)
+    (*.zip)
       unzip -q "${_archive}" || fetch_error extracting_archive_failed
       ;;
-    *github.com/*/zipball/*)
+    (*github.com/*/zipball/*)
       unzip -q "${_archive}" || fetch_error extracting_archive_failed
       local name_pattern="${_uri#https://github.com/}"
       name_pattern="${name_pattern%zipball/*}"
@@ -100,7 +100,7 @@ Please read 'sm man curl' for instructions how to solve this problem.\n"
       mv ${name_pattern}*/* .
       rm -rf ${name_pattern}*
       ;;
-    *)
+    (*)
       #TODO: add detection based on $( file ${_archive} ) type
       fetch_error unknown_archive_format
       ;;

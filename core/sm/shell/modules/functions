@@ -35,6 +35,8 @@ modules_core_initialize()
 
 init_extensions_search_paths()
 {
+  local _paths=()
+
   if [[ -z "${extensions_search_paths[*]}" ]]
   then
     extensions_search_paths=()
@@ -51,7 +53,10 @@ init_extensions_search_paths()
     # User extension sets
     if [[ "${sets_system_path}" != "${sets_user_path}" ]]
     then
-      for _extension_set_path in "${sets_user_path}"/active/*
+      shopt -s nullglob
+      _paths=( "${sets_user_path}"/active/* )
+      shopt -u nullglob
+      for _extension_set_path in "${_paths[@]}"
       do
         if [[ -d "${_extension_set_path}" ]]
         then
@@ -62,8 +67,10 @@ init_extensions_search_paths()
 
     # System extension sets
     local _extension_set_path
-
-    for _extension_set_path in ${sets_system_path}/active/*
+    shopt -s nullglob
+    _paths=( "${sets_system_path}"/active/* )
+    shopt -u nullglob
+    for _extension_set_path in "${_paths[@]}"
     do
       if [[ -d "${_extension_set_path}" ]]
       then
@@ -166,7 +173,10 @@ extensions_in()
 
   if [[ -d "${_path}" ]]
   then
-    for _extension in "${_path}"/*
+    shopt -s nullglob
+    local _paths=( "${_path}"/* )
+    shopt -u nullglob
+    for _extension in "${_paths[@]}"
     do
       if [[ -d "${_extension}/bin" || -d "${_extension}/shell" ]]
       then

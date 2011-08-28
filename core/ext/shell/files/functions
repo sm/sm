@@ -1454,7 +1454,10 @@ files_in()
   local _path="${1:-}" _file
   shift || fail "Directory name/path was not given! "
   [[ -d "${_path}" ]] || fail "'${_path}' is not a directory! "
-  for _file in "${_path}"/*
+  shopt -s nullglob
+  local _paths=( "${_path}"/* )
+  shopt -u nullglob
+  for _file in "${_paths[@]}"
   do
     [[ -f "${_file}" ]] || continue
     echo "${_file}"

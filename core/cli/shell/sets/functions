@@ -155,8 +155,11 @@ sets_update()
 
 sets_update_all()
 {
-  local _name
-  for _name in ${sets_user_path}/*
+  shopt -s nullglob
+  local _name _sets=( "${sets_user_path}"/* )
+  shopt -u nullglob
+
+  for _name in "${_sets[@]}"
   do
     [[ -d "${sets_user_path}/active/${_name}"  ]] || continue
 

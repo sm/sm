@@ -2,7 +2,6 @@
 
 # The following shell options must be enabled for the SM Framework.
 shopt -s extglob
-shopt -s nullglob
 
 saved_sm_path="${sm_path:-"/sm"}"
 

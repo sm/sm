@@ -519,7 +519,7 @@ package_fetch()
 
   local _args=()
 
-  : \
+  true \
     "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
     "${package_url:="${package_base_url}/${package_file}"}"
 
@@ -536,8 +536,11 @@ package_fetch()
 
   [[ -d "${source_path}/${package_dir}/${package_dir}" ]] || return 0
 
-  mv "${source_path}/${package_dir}/${package_dir}"/* \
-    "${source_path}/${package_dir}/"
+  shopt -s nullglob
+  local _entries=( "${source_path}/${package_dir}/${package_dir}"/*  )
+  shopt -u nullglob
+
+  mv "${_entries[@]}" "${source_path}/${package_dir}/"
 
   rm -rf "${source_path}/${package_dir}/${package_dir}/"
 }
@@ -747,7 +750,10 @@ package_patch()
   for _path in "${_paths[@]}"
   do
     path exists "${_path}" || continue # No patch path
-    package_apply_patches "${_path}"/*.patch
+    shopt -s nullglob
+    _patches=( "${_path}"/*.patch )
+    shopt -u nullglob
+    package_apply_patches "${_patches[@]}"
   done
 }
 

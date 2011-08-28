@@ -150,8 +150,14 @@ ext_update()
 
 ext_update_all()
 {
-  local _name
-  for _name in ${exts_user_path}/*
+  local _name _entries
+  shopt -s nullglob
+  _entries=(
+  "${exts_user_path}"/*
+  )
+  shopt -u nullglob
+
+  for _name in  "${_entries[@]}"
   do
     [[ -d "${sets_user_path}/active/${_name}"  ]] || continue
 

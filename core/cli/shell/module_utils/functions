@@ -4,8 +4,14 @@
 # ## modules\_installed()
 modules_installed()
 {
-  local _module
-  for _module in "${modules_path}"/*
+  local _module _modules
+  shopt -s nullglob
+  _modules=(
+  "${modules_path}"/*
+  )
+  shopt -u nullglob
+
+  for _module in "${_modules[@]}"
   do
     [[ -d "${_module}" ]] || continue
     printf "%s\n" "${_module##*/}"
@@ -299,7 +305,13 @@ modules_docgen()
   write "<html><body><h2>SM Module Documentation</h2><ul>" \
     to "${_prefix}/index.html"
 
-  for _module in "${core_development_path}"/shell/*
+  shopt -s nullglob
+  _modules=(
+  "${core_development_path}"/shell/*
+  )
+  shopt -u nullglob
+
+  for _module in "${_modules[@]}"
   do
     [[ -d "${_module}" ]] || continue
     _name="${_module##*/}"
@@ -356,7 +368,12 @@ modules_site_docgen()
   write "<html><body><h2>SM Module Documentation</h2><ul>" \
     to "${_prefix}/index.html"
 
-  for _module in "${core_development_path}"/shell/*
+  shopt -s nullglob
+  _modules=(
+  "${core_development_path}"/shell/*
+  )
+  shopt -u nullglob
+  for _module in "${_modules[@]}"
   do
     [[ -d "${_module}" ]] || continue
     _name="${_module##*/}"

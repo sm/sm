@@ -343,7 +343,10 @@ __sm.paths.in()
   local _path="${1:-}"
   shift  || fail "Path was not given!"
   [[ -d "${_path}" ]] || fail "'${_path}' is not a path!"
-  for dir in "${_path}"/*
+  shopt -s nullglob
+  local _paths=( "${_path}"/* )
+  shopt -u nullglob
+  for dir in "${_paths[@]}"
   do
     [[ -d "${dir}" ]] || continue
     echo "${dir}"

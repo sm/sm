@@ -147,11 +147,13 @@ extension_actions()
   shift || fail "No extension was given."
   [[ -d "${extension_bin_path}" ]] || return 0
 
+  shopt -s nullglob
   _files=(
   "${extension_bin_path}"/*
   "${extension_bin_path}"/*/*
   "${extension_bin_path}"/*/*/*
   )
+  shopt -u nullglob
 
   for _file in "${_files[@]}"
   do

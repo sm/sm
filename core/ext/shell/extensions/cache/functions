@@ -9,11 +9,15 @@ actions_cache_add()
 initialize_filesystem_cache()
 {
   trace_filter action_detection
-  local _action_path _file_name
+  local _action_path _file_name _paths
 
   if [[ -d "${_actions_root}" ]]
   then
-    for _action_path in "${_actions_root}"/*
+    shopt -s nullglob
+    _paths=( "${_actions_root}"/* )
+    shopt -u nullglob
+
+    for _action_path in "${_paths[@]}"
     do
       [[ -f "${_action_path}" && -x "${_action_path}" ]] || continue
       _action_path="${_action_path#${_actions_root}\/}"
@@ -61,11 +65,13 @@ initialize_modules_actions_cache()
     return 0
   fi
 
+  shopt -s nullglob
   _modules=(
   "${_modules_root}"/*/*/includes
   "${_modules_root}"/*/*/*/includes
   "${_modules_root}"/*/*/*/*/includes
   )
+  shopt -u nullglob
 
   for _module_path in "${_modules[@]}"
   do
@@ -125,15 +131,6 @@ action_cache_find_matching()
         fail "Unknown search method, use 'only_one', 'allow_many', 'starting'."
         ;;
     esac
-  done
-}
-
-debug_cache()
-{
-  local _entry
-  for _entry in "${_actions_cache[@]}"
-  do
-    debug search "cache: ${_entry}"
   done
 }
 
