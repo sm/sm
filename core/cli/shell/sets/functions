@@ -96,14 +96,14 @@ set_install()
 
   local _identifier="$(scm_identifier "${_uri}")"
 
+  local _version="head"
+  if [[ "${_name}" == *:* ]]
+  then
+    _version="${_name/*:}"
+  fi
+
   if fetch_uri "${_uri}" "${src_path}/${_identifier}" "$@"
   then
-    local _version="head"
-    if [[ "${_name}" == *:* ]]
-    then
-      _version="${_name/*:}"
-    fi
-
     versionedfs add \
       path "${sets_user_path}" name "${_name}" version "${_version}" \
       source "${src_path}/${_identifier}"

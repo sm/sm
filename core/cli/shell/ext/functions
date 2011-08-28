@@ -89,13 +89,22 @@ extension_install()
   [[ -n "${_uri}" ]] ||
     error "uri not given and cannot find ${_name} in known extensions."
 
+  local _version="head"
+  if [[ "${_name}" == *:* ]]
+  then
+    _version="${_name/*:}"
+  fi
+
   local _identifier="$(scm_identifier "${_uri}")"
 
   if fetch_uri "${_uri}" "${src_path}/${_identifier}" "$@"
   then
     versionedfs add \
-      path "${exts_user_path}" name "${_name}" version "" \
+      path "${exts_user_path}" name "${_name}" version "${_version}" \
       source "${src_path}/${_identifier}"
+
+    versionedfs add \
+      path "${exts_user_path}" name "${_name}" version "${_version}"
   else
     return $?
   fi
