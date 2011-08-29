@@ -61,11 +61,10 @@ user_create_if_missing()
         ;;
 
       *)
-        if variable_is_empty _user
+        if [[ -z "${_user}" ]]
         then
           _user="${_token}"
-
-        elif variable_is_empty _group
+        elif [[ -z "${_group}" ]]
         then
           _group="${_token}"
         fi
@@ -73,7 +72,7 @@ user_create_if_missing()
     esac
   done
 
-  variable_is_nonempty _group || _group="${_user}"
+  [[ -n "${_group}" ]] || _group="${_user}"
 
   (( UID == 0 )) || # root user has id 0
     fail "Users and groups may be manipulated only by the super-user (root), via su or sudo."
@@ -193,7 +192,7 @@ user_delete()
         ;;
 
       *)
-        if variable_is_empty _user
+        if [[ -z "${_user}" ]]
         then
           _user="${_token}"
           break

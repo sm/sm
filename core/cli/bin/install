@@ -1,5 +1,5 @@
 #!/bin/sh
 
-modules base/package
+modules api/package
 
 package_install "${extension_args[@]}"

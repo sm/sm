@@ -240,7 +240,7 @@ ematch()
 #
 #     user$ cat test
 #     #!/bin/sm
-#     modules base/trace base/variables # Load the trace module.
+#     modules api/trace api/variables # Load the trace module.
 #     unset HOME
 #     variables_must_be_nonempty HOME
 #

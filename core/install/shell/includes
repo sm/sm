@@ -1,7 +1,7 @@
-base/files
-base/paths
-base/vcs
-base/users
+api/files
+api/paths
+api/vcs
+api/users
 cli/sets
-base/extensions/cache
-base/templates
+api/extensions/cache
+api/templates

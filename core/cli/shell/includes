@@ -1,5 +1,5 @@
-base/os
-base/filesystem
-base/environment
-base/vcs
+api/os
+api/filesystem
+api/environment
+api/vcs
 cli/module_utils

@@ -970,7 +970,7 @@ packages_active()
 
 packages_available()
 {
-  extensions_installed module "base/package" "$@"
+  extensions_installed module "api/package" "$@"
 }
 
 packages_list()

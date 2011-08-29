@@ -134,7 +134,7 @@ extension_run()
       ;;
 
     (shell)
-      [[ "${action##*/}" != help ]] || modules base/help
+      [[ "${action##*/}" != help ]] || modules api/help
 
       _namespaces=${_path##${extension_bin_path}}
       extension_modules_load ${_namespaces//\// }

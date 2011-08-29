@@ -338,7 +338,7 @@ separator()
 #
 #     user$ cat ./test
 #     #!/bin/sm
-#     modules base/trace # Load the trace module.
+#     modules api/trace # Load the trace module.
 #
 #     functiona()
 #     {

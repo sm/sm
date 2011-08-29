@@ -34,7 +34,7 @@ ext_time_initialize()
 #
 #     user$ cat ./test
 #     #!/bin/sm
-#     modules base/trace base/time # Load the trace module.
+#     modules api/trace api/time # Load the trace module.
 #
 #     timestamp_set
 #     echo $timestamp
@@ -80,7 +80,7 @@ timestamp_set()
 #
 #     user$ cat ./test
 #     #!/bin/sm
-#     modules base/trace base/time # Load the trace module.
+#     modules api/trace api/time # Load the trace module.
 #
 #     timestamp
 #     echo

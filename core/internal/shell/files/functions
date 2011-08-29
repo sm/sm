@@ -322,7 +322,7 @@ ensure_files_are_executable()
 
     _path="${_file%\/*}"
 
-    variable_is_nonempty _path && [[ -d "${_path}" ]] ||
+    [[ -n "${_path}" ]] && [[ -d "${_path}" ]] ||
       fail "Cannot make the file '${_file} executable;"\
       " '${_path}' does not exist."
 
@@ -393,11 +393,11 @@ link()
         ;;
 
       (*) # If the token is unknown
-        if variable_is_empty _source
+        if [[ -z "${_source}" ]]
         then
           _source="$token"
 
-        elif variable_is_empty _target
+        elif [[ -z "${_target}" ]]
         then
           _target="$token"
         fi
@@ -486,11 +486,11 @@ move_file()
         ;;
 
       *)
-        if variable_is_empty _source
+        if [[ -z "${_source}" ]]
         then
           _source="$token"
 
-        elif variable_is_empty _target
+        elif [[ -z "${_target}" ]]
         then
           _target="$token"
 
@@ -502,21 +502,21 @@ move_file()
     esac
   done
 
-  variable_is_nonempty _source || fail "Cannot move file; Source must be given."
-  variable_is_nonempty _target || fail "Cannot move file; Target must be given."
+  [[ -n "${_source}" ]] || fail "Cannot move file; Source must be given."
+  [[ -n "${_target}" ]] || fail "Cannot move file; Target must be given."
 
   mv -f "${_source}" "${_target}" ||
     fail "There was an error ($?) moving the source '${_source}'" \
       "to the target '${_target}'."
 
-  if variable_is_nonempty _mode
+  if [[ -n "${_mode}" ]]
   then
     chmod "${_mode}" "${_target}" ||
       warn "There was an error ($?) changing the "\
       "target's '${_target}' mode to '${_mode}'."
   fi
 
-  if variable_is_nonempty _owner
+  if [[ -n "${_owner}" ]]
   then
     chown "${_owner}" "${_target}" ||
       warn "There was an error ($?) changing the "\
@@ -587,11 +587,11 @@ copy_file()
         shift || fail "Owner path must be provided after keyword 'owner'"
         ;;
       *)
-        if variable_is_empty _source
+        if [[ -z "${_source}" ]]
         then
           _source="$token"
 
-        elif variable_is_empty _target
+        elif [[ -z "${_target}" ]]
         then
           _target="$token"
         fi
@@ -601,8 +601,8 @@ copy_file()
 
   (( _force_flag == 0 )) || _flags+=(-f)
 
-  variable_is_nonempty _source || fail "Cannot move file; Source path must be given."
-  variable_is_nonempty _target || fail "Cannot move file; Target path must be given."
+  [[ -n "${_source}" ]] || fail "Cannot move file; Source path must be given."
+  [[ -n "${_target}" ]] || fail "Cannot move file; Target path must be given."
 
   cp ${_flags[*]} "${_source}" "${_target}" ||
     fail "Could not copy '${_source}' to '${_target}';"\
@@ -774,7 +774,7 @@ move_files()
 
   for _file in "${_files[@]}"
   do
-    variable_is_empty _source || _file="${_source}/${_file}"
+    [[ -z "${_source}" ]] || _file="${_source}/${_file}"
 
     if  [[ -f "${_file}" ]]
     then
@@ -834,7 +834,7 @@ chown_files()
         _flags+=(-R)
         ;;
       *)
-        if variable_is_empty _identity
+        if [[ -z "${_identity}" ]]
         then
           _identity="${token}"
         else
@@ -973,7 +973,7 @@ hash_file()
       sed -i.tmp "s#^${_key}=.*\$##" "${_file}"
       ;;
     *)
-      if variable_is_empty value
+      if [[ -z "${value}" ]]
       then
         awk -F= '/^'"${_key}"'=/{print $2}' "${_file}"
       else
@@ -1348,7 +1348,7 @@ file_is_empty_or_missing()
 #     user$ cat "$HOME/test"
 #     #!/bin/sm
 #
-#     modules base/filesystem
+#     modules api/filesystem
 #
 #     if file_contains "$HOME/.smrc" ".*w00t.*"
 #     then
@@ -1789,10 +1789,10 @@ write()
     esac
   done
 
-  variable_is_nonempty _message || fail "Cannot log a message;"\
+  [[ -n "${_message}" ]] || fail "Cannot log a message;"\
     " No message was given."
 
-  if variable_is_nonempty _file
+  if [[ -n "${_file}" ]]
   then
     if [[ "${_user}" == "root" ]]
     then

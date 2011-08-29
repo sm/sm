@@ -138,7 +138,7 @@ find_extension_action()
 #
 #     $ cat $HOME/test
 #     #!/bin/sm
-#     modules base/extensions/detection
+#     modules api/extensions/detection
 #     extension_action ext list
 #
 #     $  $HOME/test

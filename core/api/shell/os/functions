@@ -741,7 +741,7 @@ os_open()
     xdg-open "${_uri}"
 
   else
-    modules base/interactive
+    modules api/interactive
     if shell_is_interactive
     then
       if [[ "${_uri}" == file* ]]

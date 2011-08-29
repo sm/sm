@@ -96,7 +96,7 @@ __sm.array.shift()
   local _name="${1:-}" index _variable="${2:-}"
   shift || fail "Array name was not given."
 
-  variable.is.empty _variable || eval "${_variable}=\${${_name}[${__sm_array_start}]}"
+  [[ -z "${_variable}" ]] || eval "${_variable}=\${${_name}[${__sm_array_start}]}"
 
   # TODO: Account for zsh vs bash
   unset "${_name}[${__sm_array_start}]"

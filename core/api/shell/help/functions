@@ -129,7 +129,7 @@ description()
 #
 #     user$ cat $HOME/test
 #     #!/bin/sm
-#     modules base/help
+#     modules api/help
 #
 #     description "This extension handles X Y and Z."
 #     description "It also handles A B and C."
@@ -339,7 +339,7 @@ resource()
 #
 #     user$ cat $HOME/test
 #     #!/bin/sm
-#     modules base/help
+#     modules api/help
 #
 #     action "help" "Displays the help output for the ${extension} extension."
 #     action "install" "Installs Z redis package."
@@ -408,7 +408,7 @@ help_actions()
 #
 #     user$ cat $HOME/test
 #     #!/bin/sm
-#     modules base/help
+#     modules api/help
 #
 #     note "Don't forget the milk! "
 #     note "... and cookies... mmm...."

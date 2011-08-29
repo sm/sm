@@ -2,7 +2,7 @@
 
 sets_help()
 {
-  modules base/help
+  modules api/help
 
   description "BDSM extension sets management"
 

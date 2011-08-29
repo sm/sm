@@ -22,7 +22,7 @@ extension_cli()
         archive_format="${extension_args[$((++index))]}"
         ;;
       --licence)
-        modules base/extensions/manipulation
+        modules api/extensions/manipulation
         extension_license
         exit 0
         ;;

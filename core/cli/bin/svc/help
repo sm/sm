@@ -2,7 +2,7 @@
 
 description "SM Service extension."
 
-action "list" "List services installed through SM extensions which are using the base/service module."
+action "list" "List services installed through SM extensions which are using the api/service module."
 action "active" "List active services versions."
 action "activate" " Activate a given service and version."
 action "deactivate" "Deactivate a given service."

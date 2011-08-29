@@ -1,2 +1,2 @@
-base/vcs/detection
-base/vcs/errors
+api/vcs/detection
+api/vcs/errors

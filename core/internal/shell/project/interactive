@@ -5,9 +5,9 @@
 #
 # The following example sources the file only if it exists and is nonempty:
 #
-# if [[ -s /opt/sm/core/base/shell/project/interactive ]]
+# if [[ -s /opt/sm/core/api/shell/project/interactive ]]
 # then
-#   . /opt/sm/core/base/shell/project/interactive
+#   . /opt/sm/core/api/shell/project/interactive
 # fi
 #
 true "${project_search_maxdepth:="3"}"

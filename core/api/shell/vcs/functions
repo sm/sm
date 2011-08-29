@@ -43,7 +43,7 @@ fetch_uri()
 
   case "${scm_type}" in
     (path|archive|github|git|svn|hg|fossil)
-      module base/vcs/handlers/${scm_type}
+      module api/vcs/handlers/${scm_type}
       "${scm_type}_get" "${_args[@]}"
       ;;
     (*)
@@ -56,7 +56,7 @@ fetch_uri()
 
 # Example:
 #
-#  $ ./local --debug=vcs --call=base/vcs/fetch_uris /root ~/tmp/test_uris --fallback-uri /root/test,mpapis/mpapis_test
+#  $ ./local --debug=vcs --call=api/vcs/fetch_uris /root ~/tmp/test_uris --fallback-uri /root/test,mpapis/mpapis_test
 #
 #  DEBUG vcs: type: path, params: /root /home/mpapis/tmp/test_uris.
 #  DEBUG vcs: Copying from '/root' to '/home/mpapis/tmp/test_uris' failed.

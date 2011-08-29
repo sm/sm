@@ -2,7 +2,7 @@
 
 ext_help()
 {
-  modules base/help
+  modules api/help
 
   description "BDSM extension ext management"
 

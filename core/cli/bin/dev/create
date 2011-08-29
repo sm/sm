@@ -13,11 +13,11 @@ do
     "at ${target_path}/${extension}."
   fi
 
-  paths exists "${sm_path}/core/cli/templates/base/" ||
+  paths exists "${sm_path}/core/cli/templates/api/" ||
     fail "create: Extension template files are missing from "\
-      "$target_path/core/cli/templates/base/"
+      "$target_path/core/cli/templates/api/"
 
-  paths enter "${sm_path}/core/cli/templates/base/"
+  paths enter "${sm_path}/core/cli/templates/api/"
 
   _path="${target_path}/${extension}"
 

@@ -82,9 +82,9 @@ read_config()
     esac
   done
 
-  if variable_is_empty variable
+  if [[ -z "${variable}" ]]
   then
-    if variable_is_nonempty prefix
+    if [[ -n "${prefix}" ]]
     then
       true "${variable:="${prefix:-}_$key"}"
     else

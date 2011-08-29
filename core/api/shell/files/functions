@@ -1348,7 +1348,7 @@ file_is_empty_or_missing()
 #     user$ cat "$HOME/test"
 #     #!/bin/sm
 #
-#     modules base/filesystem
+#     modules api/filesystem
 #
 #     if file_contains "$HOME/.smrc" ".*w00t.*"
 #     then
