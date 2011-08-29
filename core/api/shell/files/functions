@@ -648,7 +648,7 @@ copy_file()
 #
 # ### Usage Examples
 #
-#     user$ copy_files "$HOME/.bashrc" "$HOME/.bash_profile" \
+#     user$ copy files "$HOME/.bashrc" "$HOME/.bash_profile" \
 #             to "$HOME/backup"
 #
 copy_files()
@@ -682,7 +682,7 @@ copy_files()
     esac
   done
 
-  [[ -n "${_target }"]] || fail "Cannot move file; Target must be specified."
+  [[ -n "${_target}" ]] || fail "Cannot move file; Target must be specified."
   [[ -n "${_files}" ]]  || fail "Cannot copy files; No files were given."
 
   paths create "${_target}"

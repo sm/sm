@@ -423,7 +423,7 @@ help_notes()
 {
   local _index
 
-  [[ -n "${help_notes}"]] || return 0
+  [[ -n "${help_notes}" ]] || return 0
 
   help_section "Notes"
 
@@ -507,7 +507,7 @@ help_resources()
 {
   local _index
 
-  [[ -n "${help_resources}"]] || return 0
+  [[ -n "${help_resources}" ]] || return 0
 
   help_section "Resources"
 
