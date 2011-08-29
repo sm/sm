@@ -2,7 +2,7 @@
 
 sm_version
 
-case "${extension_args[${__sm.array.start}]}" in
+case "${extension_args[${__sm_array_start}]}" in
   -v|-V) # Only echo version information.
     succeed "${sm_version:-"?.?.?"}"
     ;;

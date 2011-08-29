@@ -38,7 +38,7 @@ __sm.array.first()
   local _name="${1}" _element _length
   eval "_length=\"\${#${_name}[@]}\""
   (( _length )) || return 1
-  eval "_element=\"\${${_name}[${__sm.array.start}]}\""
+  eval "_element=\"\${${_name}[${__sm_array_start}]}\""
   printf "${_element}"
 }
 
@@ -96,10 +96,10 @@ __sm.array.shift()
   local _name="${1:-}" index _variable="${2:-}"
   shift || fail "Array name was not given."
 
-  variable.is.empty _variable || eval "${_variable}=\${${_name}[${__sm.array.start}]}"
+  variable.is.empty _variable || eval "${_variable}=\${${_name}[${__sm_array_start}]}"
 
   # TODO: Account for zsh vs bash
-  unset "${_name}[${__sm.array.start}]"
+  unset "${_name}[${__sm_array_start}]"
   eval "${_name}=( \"\${${_name}[@]}\" ) "
 }
 

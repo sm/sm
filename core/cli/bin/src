@@ -3,11 +3,11 @@
 [[ -n "${extension_args}" ]] ||
   fail "src: You must specify at least one extension name."
 
-if paths exists "${extensions_development_path}/${extension_args[${__sm.array.start}]}"
+if paths exists "${extensions_development_path}/${extension_args[${__sm_array_start}]}"
 then
-  printf "${extensions_development_path}/${extension_args[${__sm.array.start}]}"
+  printf "${extensions_development_path}/${extension_args[${__sm_array_start}]}"
 else
   printf "." # Stay put!
-  error "Failed to edit '${extension_args[${__sm.array.start}]}'; it appears to not be installed."
+  error "Failed to edit '${extension_args[${__sm_array_start}]}'; it appears to not be installed."
 fi
 

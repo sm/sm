@@ -40,7 +40,7 @@ first()
   local _array=("$@")
   shift  || fail "No parameters given; cannot return the first one."
 
-  printf "%s" "${_array[${__sm.array.start}]}"
+  printf "%s" "${_array[${__sm_array_start}]}"
 }
 
 #

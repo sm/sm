@@ -3,6 +3,6 @@
 [[ -n "${extension_args}" ]] ||
   fail "open: You must specify at least one extension name."
 
-paths enter "${extensions_development_path}/${extension_args[${__sm.array.start}]}/"
+paths enter "${extensions_development_path}/${extension_args[${__sm_array_start}]}/"
 
 os_open "$PWD"

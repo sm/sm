@@ -116,7 +116,7 @@ array()
       __sm.array.unique "${_name}"
       ;;
     (start)
-      echo ${__sm.array.start}
+      echo ${__sm_array_start}
       ;;
     (*)
       fail "Unknown array action '${_action}'"

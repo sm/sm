@@ -215,7 +215,7 @@ core_trace_filter()
       trace_filter_stack=( "$1" "${trace_filter_stack[@]}" )
       ;;
     stop)
-      old="${trace_filter_stack[${__sm.array.start}]}"
+      old="${trace_filter_stack[${__sm_array_start}]}"
       old="${old%%=*}"
       if [[ "${FUNCNAME[2]}" == "${old}" ]]
       then
@@ -228,7 +228,7 @@ core_trace_filter()
       ;;
   esac
 
-  filter="${trace_filter_stack[${__sm.array.start}]}"
+  filter="${trace_filter_stack[${__sm_array_start}]}"
 
   if [[ -n "$filter" ]]
   then

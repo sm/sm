@@ -15,7 +15,7 @@ action_cache_check()
       #TODO: allow user to choice what to do if interactive shell ?
       if (( ${#_found_actions[@]} > 1 ))
       then
-        _found_actions=( "${_found_actions[${__sm.array.start}]}" )
+        _found_actions=( "${_found_actions[${__sm_array_start}]}" )
       fi
       ;;
   esac
@@ -157,20 +157,20 @@ extension_action()
   unset extension action
 
   #TODO: Should be moved to core/cli?
-  case "${extension_args[${__sm.array.start}]}" in
+  case "${extension_args[${__sm_array_start}]}" in
     (*=*) # exact version specifier
-      package_name="${extension_args[${__sm.array.start}]}"
+      package_name="${extension_args[${__sm_array_start}]}"
       export package_version="${package_name##*=}"
       export package_name="${package_name%%=*}"
       export extension="${package_name}"
-      extension_args[${__sm.array.start}]="${extension}"
+      extension_args[${__sm_array_start}]="${extension}"
       ;;
     (*:*)
-      package_name="${extension_args[${__sm.array.start}]}"
+      package_name="${extension_args[${__sm_array_start}]}"
       export package_version="${package_name##*:}"
       export package_name="${package_name%%:*}"
       export extension="${package_name}"
-      extension_args[${__sm.array.start}]="${extension}"
+      extension_args[${__sm_array_start}]="${extension}"
       ;;
   esac
 

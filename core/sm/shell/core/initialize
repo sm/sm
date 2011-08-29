@@ -62,11 +62,11 @@ true \
 
 if [[ -n "${ZSH_VERSION:-}" ]]
 then
-  __sm.array.start=1
+  __sm_array_start=1
 else
-  __sm.array.start=0
+  __sm_array_start=0
 fi
-export __sm.array.start
+export __sm_array_start
 
 user_shell=$(which $(ps -eo pid,comm | awk "{ if ($PPID == \$1) print \$2}") 2>/dev/null ) || true
 

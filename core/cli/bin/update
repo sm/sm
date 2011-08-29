@@ -3,7 +3,7 @@
 NYI "sm update"
 # What is this code intended to do?
 
-#extension_action=${extension_args[${__sm.array.start}]}
+#extension_action=${extension_args[${__sm_array_start}]}
 #
 #case "$extension_action" in
 #  repo|repository)

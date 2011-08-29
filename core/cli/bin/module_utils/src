@@ -3,5 +3,5 @@
 [[ -n "${extension_args}" ]] ||
   fail "src: You must specify at least one extension name."
 
-printf "${extensions_development_path}/${extension_args[${__sm.array.start}]}/"
+printf "${extensions_development_path}/${extension_args[${__sm_array_start}]}/"
 

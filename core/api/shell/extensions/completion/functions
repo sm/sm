@@ -70,7 +70,7 @@ extension_action_completion()
   last_char="${extension_args:${#extension_args}-1:1}"
   local _args=( ${extension_args} )
 
-  unset _args[${__sm.array.start}]
+  unset _args[${__sm_array_start}]
   _args=( ${_args[@]} )
   show_word=${#_args[@]}
 
