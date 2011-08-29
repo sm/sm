@@ -35,7 +35,7 @@ modules_core_initialize()
 
 init_extensions_search_paths()
 {
-  local _paths=()
+  local _paths=() _extension_set_path
 
   if [[ -z "${extensions_search_paths[*]}" ]]
   then
@@ -66,7 +66,6 @@ init_extensions_search_paths()
     fi
 
     # System extension sets
-    local _extension_set_path
     shopt -s nullglob
     _paths=( "${sets_system_path}"/active/* )
     shopt -u nullglob
