@@ -30,7 +30,7 @@ ext_list()
 {
   local extensions COLUMNS=80
 
-  if extensions_in "${exts_system_path}"
+  if extensions_in "${exts_system_path}/active"
   then
     log "exts: #system"
     echo ${found_extensions[@]} | xargs -s ${COLUMNS} | xargs -I '{}' echo "  - {}"
@@ -40,7 +40,7 @@ ext_list()
 
   if [[ "${exts_system_path}" != "${exts_user_path}" ]]
   then
-    if extensions_in "${exts_user_path}"
+    if extensions_in "${exts_user_path}/active"
     then
       log "exts: #user"
       echo ${found_extensions[@]} | xargs -s ${COLUMNS} | xargs -I '{}' echo "  - {}"
@@ -97,13 +97,13 @@ extension_install()
 
   local _identifier="$(scm_identifier "${_uri}")"
 
+  versionedfs add \
+    path "${exts_user_path}" name "${_name}" version "${_version}" \
+    source "${src_path}/${_identifier}"
+
   if fetch_uri "${_uri}" "${src_path}/${_identifier}" "$@"
   then
-    versionedfs add \
-      path "${exts_user_path}" name "${_name}" version "${_version}" \
-      source "${src_path}/${_identifier}"
-
-    versionedfs add \
+    versionedfs activate \
       path "${exts_user_path}" name "${_name}" version "${_version}"
   else
     return $?
