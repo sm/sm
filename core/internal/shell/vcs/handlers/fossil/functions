@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# ## fossil\_get()
+#
+#
+#
+# Code Walkthrough
+fossil_get()
+{
+  NIY "fossil scm_update"
+}

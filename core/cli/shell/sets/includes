@@ -1,3 +1,3 @@
-ext/extensions/cache
-ext/extensions/common
-ext/vcs
+base/extensions/cache
+base/extensions/common
+base/vcs

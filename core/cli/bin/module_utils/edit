@@ -8,12 +8,12 @@ then # edit core
 
   exec ${EDITOR:-vi} .
 else # edit extension
-  paths exists "${extensions_development_path}/${extension_args[0]}" ||
+  paths exists "${extensions_development_path}/${extension_args[${__sm.array.start}]}" ||
     error \
-    "Failed to edit '${extension_args[0]}'; it appears to not be installed."\
+    "Failed to edit '${extension_args[${__sm.array.start}]}'; it appears to not be installed."\
     "To see installed extensions, run:\n  sm list"
 
-  paths enter "${extensions_development_path}/${extension_args[0]}"
+  paths enter "${extensions_development_path}/${extension_args[${__sm.array.start}]}"
 
   exec ${EDITOR:-vi} .
 fi

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-array_is_nonempty extension_args ||
+[[ -n "${extension_args}" ]] ||
   fail "create: You must specify at least one extension name."
 
 target_path="${extensions_development_path:-"$initial_pwd"}"
@@ -13,11 +13,11 @@ do
     "at ${target_path}/${extension}."
   fi
 
-  paths exists "${sm_path}/core/cli/templates/ext/" ||
+  paths exists "${sm_path}/core/cli/templates/base/" ||
     fail "create: Extension template files are missing from "\
-      "$target_path/core/cli/templates/ext/"
+      "$target_path/core/cli/templates/base/"
 
-  paths enter "${sm_path}/core/cli/templates/ext/"
+  paths enter "${sm_path}/core/cli/templates/base/"
 
   _path="${target_path}/${extension}"
 

@@ -1,0 +1,1815 @@
+#!/bin/sh
+
+#
+# # Filesystem Module
+#
+
+#
+# ## source\_files
+#
+# Safely source files only if they exist, and are nonempty.
+#
+# ### Input Parameters
+#
+# One or more files.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# Nonempty files given will be sourced into the calling environment.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# Fails if no files are given to sources.
+#
+# ### Usage Examples
+#
+#     user$ source_files "$HOME/.dotfiles/scripts/functions"
+#
+# ### Code Walkthrough
+source_files()
+{
+  trace_filter filesystem
+  local _file _files=("$@")
+  shift || fail "Cannot source files; No files were given."
+
+  for _file in "${_files[@]}"
+  do
+    _file=${_file/\~\//$HOME\/} # Expand ~/ to full value of $HOME
+
+    if file_is_nonempty "${_file}"
+    then
+      bash -n "${_file}" ||
+        fail "Cannot source the file '${_file}'; Invalid syntax."
+
+      source "${_file}" ||
+        fail "There was an error sourcing the file '${_file}'."
+    fi
+  done
+}
+
+#
+# ## nonempty\_files
+#
+# Outputs a subset of the named files that are nonempty.
+#
+# ### Input Parameters
+#
+# One or more files.
+#
+# ### Stream Outputs
+#
+# Each nonempty filename parameter will be printed to STDOUT of the calling
+# environment.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# Fails if no file names are given as arguments.
+#
+# ### Usage Examples
+#
+#     user$ nonempty_files a $HOME/.bdmsrc c
+#     /Users/sm/.smrc
+#
+nonempty_files()
+{
+  trace_filter filesystem
+  local _file _files=("$@")
+  shift || fail "Cannot return nonempty files; No files were given."
+
+  _file=${_file/\~\//$HOME\/} # Expand ~/ to full value of $HOME
+
+  for _file in "${_files[@]}"
+  do
+    file_is_nempty "${_file}" || printf "${_file}\n"
+  done
+}
+
+#
+# ## remove\_files
+#
+# Removes the given files, if they exist.
+#
+# ### Input Parameters
+#
+# One or more file names/paths.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# The named files will no longer exist on the system, if they existed to begin
+# with.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# Fails if no files were named.
+# Fails if a named file is a directory.
+# Fails if a named file exists but is not a file.
+#
+# ### Usage Examples
+#
+#     user$ touch a b c
+#     user$ ls -a
+#     . .. a b c
+#     user$ remove_files a b c
+#     user$ ls
+#     . ..
+#
+remove_files()
+{
+  trace_filter filesystem
+  # TODO: add from parameter to remove_files
+
+  local _file _files=("$@")
+  shift || fail "Cannot remove files, as no files were given to remove."
+
+  for _file in "${_files[@]}"
+  do
+    if [[ -f "${_file}" || -L "${_file}" ]]
+    then
+      rm -f "${_file}"
+
+    elif [[ -d "${_file}" ]]
+    then
+      fail "Cannot remove the file ${_file}, as it is a directory."
+
+    elif [[ -e "${_file}" ]]
+    then
+      fail "Failed to remove the file from the filesystem, "\
+        "as the file exists as an unknown/unhandled filesystem entity type:"\
+        "$(file "${_file}")."
+    else
+      return 0
+    fi
+  done
+}
+
+#
+# ## remove
+#
+# Removes the given filesystem entries, if they exist.
+#
+# ### Input Parameters
+#
+# One or more file, directory or symlink names/paths.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# The named files will no longer exist on the system, if they existed to begin
+# with.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# Fails if no files were named.
+#
+# ### Usage Examples
+#
+#     user$ touch a
+#     user$ mkdir b
+#     user$ ln -s b c
+#     user$ ls -a
+#     . .. a b c
+#     user$ remove a b c
+#     user$ ls
+#     . ..
+#
+remove()
+{
+  trace_filter filesystem
+  local _entity _entities=("$@")
+  shift || fail "Cannot remove entities; No filesystem entities were given."
+
+  for _entity in "${_entities[@]}"
+  do
+    if [[ -e "${_entity}" ]]
+    then
+      rm -rf "${_entity}" || fail "Cannot not remove entity '${_entity}';"\
+          " 'rm' command failed with error code '$?'."
+    fi
+  done
+}
+
+#
+# ## ensure\_files\_exist
+#
+# Iterates over the list of given files, creates the directory if it
+# does not exist.
+#
+# ### Input Parameters
+#
+# A list of files to create if missing.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# files that were given but do not exist will be created.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# Fails if no files were given to.
+#
+# ### Usage Examples
+#
+#     user$ ls -a
+#     . ..
+#     user$ ensure_files_exist a b c
+#     user$ ls -a
+#     . .. a b c
+#
+ensure_files_exist()
+{
+  trace_filter filesystem
+  local _file _path _files=("$@")
+  shift || fail "Cannot ensure files exist; No files were given."
+
+  for _file in "${_files[@]}"
+  do
+    ! [[ -f "${_file}" ]] || continue
+    _path="${_file%\/*}"
+    paths create "${_path}"
+    touch "${_file}" ||
+      fail "Error creating the file '${_file}' on the filesystem; "\
+      " touch command returned error code '$?'."
+  done
+}
+
+#
+# ## ensure\_files\_are\_executable
+#
+# Sets the executable bits on a file if it is not executable.
+#
+# ### Input Parameters
+#
+# One or more file name/paths
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# Files that were given and not executable will have their execute bits set.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# Fails if no files were given as parameters.
+# Fails if one of the files given was a directory.
+# Fails if one of the files given does not exist.
+# Fails if one of the files paths does not exist.
+#
+# ### Usage Examples
+#
+#     user$ ensure_files_are_executable /etc/rc.d/postgresql
+#
+# TODO: change this to be a  fail function if one is not
+#       make this into make_files_executable or some such
+ensure_files_are_executable()
+{
+  trace_filter filesystem
+  local _file _path _files=("$@")
+  shift || fail "Cannot ensure files are executable; No files were given."
+
+  for _file in "${_files[@]}"
+  do
+    ! [[ -d "${_file}" ]] ||
+      fail "Cannot make the file '${_file}' executable;"\
+      "The file is unexpectedly a directory."
+
+    [[ -f "${_file}" ]] ||
+      fail "Cannot make the file '${_file}' executable;"\
+      "The file does not exist."
+
+    _path="${_file%\/*}"
+
+    variable_is_nonempty _path && [[ -d "${_path}" ]] ||
+      fail "Cannot make the file '${_file} executable;"\
+      " '${_path}' does not exist."
+
+    chmod +x "${_file}" ||
+      fail "Could not make the file '${_file}' executable,"\
+      "as the 'chmod +x' command failed with error code '$?'."
+  done
+}
+
+#
+# ## link
+#
+# Create a symlink from source to target.
+#
+# ### Input Parameters
+#
+# First parameter is the source
+# Second parameter is the target
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# Symlink is created if no failure conditions are triggered.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# Fails if target exists and is a file.
+# Fails if target exists and is a directory.
+#
+# ### Usage Examples
+#
+# The following usages are equivalent
+#
+#     user$ link from /home/user/.vim/vimrc to /home/user/.vimrc
+#     user$ link /home/user/.vim/vimrc to /home/user/.vimrc
+#     user$ link /home/user/.vim/vimrc /home/user/.vimrc
+#
+link()
+{
+  trace_filter filesystem
+  local token _source _target _force_flag=0 _path
+
+  while (( $# > 0 ))
+  do
+    token="$1"
+    shift
+
+    case "${token}" in
+      (to)
+        _target="${1}"
+        shift || fail "Target path must be provided after keyword 'to'"
+        ;;
+
+      (from)
+        _source="${1}"
+        shift || fail "Source path must be provided after keyword 'from'"
+        ;;
+
+      (--force|force)
+        _force_flag=1
+        ;;
+
+      (*) # If the token is unknown
+        if variable_is_empty _source
+        then
+          _source="$token"
+
+        elif variable_is_empty _target
+        then
+          _target="$token"
+        fi
+        ;;
+    esac
+  done
+
+  (( _force_flag == 0 )) || remove "${_target}"
+
+  [[ ! -f "${_target}" ]] || fail "Cannot link ${_source} to ${_target} which exists as a file!"
+  [[ ! -d "${_target}" ]] || fail "Cannot link ${_source} to ${_target} which exists as a directory"
+
+  _path="${_target%\/*}"
+
+  if [[ -n "${_path}" ]]
+  then
+    [[ -d "${_path}" ]] || mkdir -p "${_path}"
+  fi
+
+  ln -fs "${_source}" "${_target}" ||
+    fail "Failed to create a symbolic link from '${_source}' to '${_target}';"\
+    "'ln -fs' command failed with error code '$?'."
+}
+
+#
+# ## move\_file
+#
+# Moves a file from one location to another.
+# (This is also used to rename a file.)
+#
+# ### Input Parameters
+#
+# The first parameter is the source file name.
+# The second parameter is the target file name.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# If successful, a file is renamed (moved).
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# Fails if the source file is not specified.
+# Fails if the target file is not specified.
+#
+# ### Usage Examples
+#
+#     user$ move_file "$HOME/.bashrc" to "$HOME/.bashrc.orig"
+#
+# ### Code Walkthrough
+move_file()
+{
+  trace_filter filesystem
+
+  local _source _target _mode _owner token
+
+  while (( $# > 0 ))
+  do
+    token="$1"
+    shift
+    case "${token}" in
+      to)
+        _target="${1}"
+        shift || fail "Target path must be provided after keyword 'to'"
+        ;;
+
+      from)
+        _source="${1}"
+        shift || fail "Source path must be provided after keyword 'from'"
+        ;;
+
+      mode)
+        _mode="${1}"
+        shift || fail "Mode must be provided after keyword 'mode'"
+        ;;
+      owner)
+        _owner="${1}"
+        shift || fail "Owner must be provided after keyword 'owner'"
+        ;;
+
+      *)
+        if variable_is_empty _source
+        then
+          _source="$token"
+
+        elif variable_is_empty _target
+        then
+          _target="$token"
+
+        else
+          fail "The source '${_source}' and target '${_target}' have been set,"\
+            "and the current token is unknown'${token}'."
+        fi
+        ;;
+    esac
+  done
+
+  variable_is_nonempty _source || fail "Cannot move file; Source must be given."
+  variable_is_nonempty _target || fail "Cannot move file; Target must be given."
+
+  mv -f "${_source}" "${_target}" ||
+    fail "There was an error ($?) moving the source '${_source}'" \
+      "to the target '${_target}'."
+
+  if variable_is_nonempty _mode
+  then
+    chmod "${_mode}" "${_target}" ||
+      warn "There was an error ($?) changing the "\
+      "target's '${_target}' mode to '${_mode}'."
+  fi
+
+  if variable_is_nonempty _owner
+  then
+    chown "${_owner}" "${_target}" ||
+      warn "There was an error ($?) changing the "\
+      "target's '${_target}' owner to '${_owner}'."
+  fi
+}
+
+#
+# ## copy\_file
+#
+# Copys a file from one location to another.
+# (This is also used to rename a file.)
+#
+# ### Input Parameters
+#
+# The first parameter is the source file name.
+# The second parameter is the target file name.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# If successful, a file is renamed (copyd).
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# Fails if the source file is not specified.
+# Fails if the target file is not specified.
+#
+# ### Usage Examples
+#
+#     user$ copy_file "$HOME/.bashrc" to "$HOME/.bashrc.orig"
+#
+copy_file()
+{
+  trace_filter filesystem
+  local _source _target _flags=() _force_flag
+
+  while (( $# > 0 ))
+  do
+    token="$1"
+    shift
+
+    case "${token}" in
+      to)
+        _target="${1}"
+        shift || fail "Target path must be provided after keyword 'to'"
+        ;;
+      from)
+        _source="${1}"
+        shift || fail "Source path must be provided after keyword 'from'"
+        ;;
+      --force|force)
+        _force_flag=1
+        ;;
+      mode)
+        _mode="${1}"
+        shift || fail "Mode path must be provided after keyword 'mode'"
+        ;;
+      owner)
+        _owner="${1}"
+        shift || fail "Owner path must be provided after keyword 'owner'"
+        ;;
+      *)
+        if variable_is_empty _source
+        then
+          _source="$token"
+
+        elif variable_is_empty _target
+        then
+          _target="$token"
+        fi
+        ;;
+    esac
+  done
+
+  (( _force_flag == 0 )) || _flags+=(-f)
+
+  variable_is_nonempty _source || fail "Cannot move file; Source path must be given."
+  variable_is_nonempty _target || fail "Cannot move file; Target path must be given."
+
+  cp ${_flags[*]} "${_source}" "${_target}" ||
+    fail "Could not copy '${_source}' to '${_target}';"\
+    "The 'cp' command failed with error code '$?'."
+
+  [[ -z "${_mode}" ]] ||
+    chmod "${_mode}" "${_target}" ||
+      fail "Could not change mode of '${_target}' to ${_mode};"\
+      " 'chmod' command failed with error code '$?'."
+
+  [[ -z "${_owner}" ]] ||
+    chown "${_owner}" "${_target}" ||
+      fail "Could not change ownership of '${_target}' to ${_owner};"\
+      " 'chown' command failed with error code '$?'."
+}
+
+#
+# ## copy\_files
+#
+# Copys a given list of files into the named path.
+#
+# ### Input Parameters
+#
+# The first parameter is the path to copy the files into.
+# Remaining parameters are the file name/path list.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# If successful, all named files are copied into the target path.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# Fails if no target path is given.
+# Fails if no files are given.
+#
+# ### Usage Examples
+#
+#     user$ copy_files "$HOME/.bashrc" "$HOME/.bash_profile" \
+#             to "$HOME/backup"
+#
+copy_files()
+{
+  trace_filter filesystem
+  local _source _target _file _force_flag=0 _flags=() _files=()
+
+  while (( $# > 0 ))
+  do
+    token="$1"
+    shift
+
+    case "${token}" in
+      to)
+        _target="${1}"
+        shift || fail "Target must be given after keyword 'to'"
+        ;;
+
+      from)
+        _source="${1}"
+        shift || fail "Source must be given after keyword 'to'"
+        ;;
+
+      --force|force)
+        _flags+=(-f)
+        ;;
+
+      *)
+        _files+=( "${token}" )
+        ;;
+    esac
+  done
+
+  [[ -n "${_target }"]] || fail "Cannot move file; Target must be specified."
+  [[ -n "${_files}" ]]  || fail "Cannot copy files; No files were given."
+
+  paths create "${_target}"
+
+  (( _force_flag == 0 )) || _flags+=(-f)
+
+  for _file in "${_files[@]}"
+  do
+    [[ -f "${_file}" ]] ||
+      error "Cannot copy file ${_file} to ${_target};"\
+      "The file does not exist."
+
+    cp ${_flags[@]} "${_file}" "${_target}/${_file//*\/}" ||
+      fail "Could not remove the entity '${_entity}';"\
+      " 'rm' command failed with error code '$?'."
+  done
+}
+
+#
+# ## move\_files
+#
+# Moves a given list of files into the named path.
+#
+# ### Input Parameters
+#
+# Parameters are file name/path for one or more files.
+# Target directory is specified as 'to {{path}}'.
+# Optional source directory is specified as 'from {{path}}'.
+# Optional force flag '--force' may be specified.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# If successful, all named files are copied into the target path.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# Fails if no target path is given.
+# Fails if no files are given.
+#
+# ### Usage Examples
+#
+#     user$
+#
+# Alternatively,
+#
+#     user$ move_files ".bashrc" ".bash_profile" from "$HOME" to "$HOME/backup"
+#
+# ### Code Walkthrough
+move_files()
+{
+  trace_filter filesystem
+  local _source _target _file _force_flag=0 _flags=() _files=() _if_exists_flag=0
+
+  while (( $# > 0 ))
+  do
+    token="$1"
+    shift
+    case "${token}" in
+      to)
+        _target="${1}"
+        shift || fail "Target path must be provided after keyword 'to'"
+        ;;
+      from)
+        _source="${1}"
+        shift || fail "Source path must be provided after keyword 'from'"
+        ;;
+      --if-exists|if_exists)
+        _if_exists_flag=1
+        ;;
+      --force|force)
+        _flags+=(-f)
+        ;;
+      *)
+        _files+=( "${token}" )
+        ;;
+    esac
+  done
+
+  [[ -n "${_target}" ]] || fail "Target path must be given to move to."
+  [[ -n "${_files}" ]]  || fail "No files were given to move."
+
+  for _file in "${_files[@]}"
+  do
+    variable_is_empty _source || _file="${_source}/${_file}"
+
+    if  [[ -f "${_file}" ]]
+    then
+      mv ${_flags[@]} "${_file}" "${_target}/${_file//*\/}" ||
+        fail "Could not force-move the entity '${_entity}';"\
+        " 'mv -f' command failed with error code '$?'."
+    else
+      (( _if_exists_flag )) ||
+        fail "Could not move the source file '${_file}' to the target"\
+          "'${_target}/${_file//*\/}; the source file does not exist."
+    fi
+  done
+}
+
+#
+# ## chown\_files
+#
+# Change ownership of a list of files.
+#
+# ### Input Parameters
+#
+# First parameter is the new owner[:group] of the files.
+# Remaining parameters are the file names/paths.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# Fails if no new owner[:group] was specified.
+# Fails if no list of files was given.
+#
+# ### Usage Examples
+#
+#     user$ chown_files $USER "$HOME/.bashrc" "$HOME/.bash_profile"
+#
+chown_files()
+{
+  trace_filter filesystem
+  local _identity _file _flags=()
+
+  while (( $# > 0 ))
+  do
+    token="$1"
+    shift
+    case "${token}" in
+      --recursive|recursive)
+        _flags+=(-R)
+        ;;
+      *)
+        if variable_is_empty _identity
+        then
+          _identity="${token}"
+        else
+          _files+=("${token}")
+        fi
+        ;;
+
+    esac
+  done
+
+  [[ -n "${_identity}" ]] || fail "user[:group] not given as the first parameter."
+  [[ -n "${_files}" ]]    || fail "Cannot chown files, as no files were given."
+
+  for _file in "${_files[@]}"
+  do
+    [[ -f "${_file}" ]] ||
+      fail "Cannot chown file ${_file} to ${_identity},"\
+      "as the file does not exist."
+
+    chown ${_flags[@]} ${_identity} "${_file}" ||
+      fail "Could not recursively chown the file '${_file}' to "\
+        "'${_target}/${_file//*\/},"\
+        "as the 'chown -R' command failed with error code '$?'."
+  done
+}
+
+#
+# ## chmod\_files
+#
+# Change ownership of a list of files.
+#
+# ### Input Parameters
+#
+# First parameter is the new owner[:group] of the files.
+# Remaining parameters are the file names/files.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# Fails if no new owner[:group] was specified.
+# Fails if no list of files was given.
+#
+# ### Usage Examples
+#
+#     user$ chmod_files $USER "$HOME/.bashrc" "$HOME/.bsah_profile"
+#
+chmod_files()
+{
+  trace_filter filesystem
+  local _permissions="${1:-}" _file _command
+  shift || fail "Cannot chmod files; user[:group] was not given as the first parameter"
+  local _files=("$@") # Set the files array to the remaining parameters.
+  shift || fail "Cannot chmod files; no files were given."
+
+  for _file in "${_files[@]}"
+  do
+    [[ -f "${_file}" ]] ||
+      fail "Cannot chmod ${_file} to ${_permissions};"\
+        "The entity does not exist."
+
+    chmod ${_permissions} "${_file}" ||
+      fail "Could not chmod '${_file}' to '${_target}/${_file//*\/};"\
+        "'chmod' command failed with error code '$?'."
+  done
+}
+
+#
+# ## hash\_file
+#
+# Set and get key/value pairs from a given has file.
+#
+# ### Input Parameters
+#
+# The first parameter is the file name/path for the hash file.
+# The second parameter is the key name.
+# The third (optional) parameter is the value to assign to the given key.
+#
+# ### Stream Outputs
+#
+# The value of the key retrieved is printed if no value parameter was given.
+#
+# ### Environmental effects
+#
+# If a value parameter was given the key=value pair is written to the named
+# hash file.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# Fails if no file name/path was provided.
+# Fails if no key name was given.
+# Fails if the file path does not exist.
+#
+# ### Usage Examples
+#
+#     user$ hash_file /sm/extensions/core/config/defaults website_url
+#     https://bdsm.beginrescueend.com/
+#
+hash_file()
+{
+  trace_filter filesystem
+  local _message _key _value _file="${1:-}"
+  shift || fail "File path/name not given.\n"\
+  " => Usage: $0 <filename> <key> [value]"
+
+  local _key="${1:-}"
+  shift || fail "Key not given.\n"\
+    " => Usage: $0 <filename> <key> [value]"
+
+  local _path=$(dirname "${_file}") # Note this will be '.' only if a file name was given.
+
+  [[ -d "${_path}" ]] || fail "{$_message[*]}"\
+    "Cannot access the database file '${_file}'; "\
+    "'${_path}' does not exist on the filesystem."
+
+  ensure_files_exist "$_file"
+
+  value="$*"
+
+  case "$value" in
+    unset|delete)
+      sed -i.tmp "s#^${_key}=.*\$##" "${_file}"
+      ;;
+    *)
+      if variable_is_empty value
+      then
+        awk -F= '/^'"${_key}"'=/{print $2}' "${_file}"
+      else
+        if ! awk -F= "/^'"${_key}"'=/{print $2}" "${_file}" >/dev/null 2>&1
+        then
+          echo "${_key}=$value" >> "${_file}"
+        else # Overwrite.
+          sed -i.tmp "s#^${_key}=.*\$#${_key}=$value#" "${_file}"
+        fi
+      fi
+      ;;
+  esac
+}
+
+#
+# ## file\_is\_executable
+#
+# Check if a file name/path is executable.
+#
+# ### Input Parameters
+#
+# First parameter is a file name/path.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 if the named file is executable.
+# 1 if the named file is not executable or does not exist.
+#
+# ### Failure Scenarios
+#
+# Fails if no file name/path was given.
+#
+# ### Usage Examples
+#
+#     user$ file_is_executable /bin/bash
+#     user$ echo $?
+#     0
+#
+#     user$ file_is_executable /bin/asdfasdf
+#     user$ echo $?
+#     1
+#
+file_is_executable()
+{
+  trace_filter filesystem
+  local _file="${1:-}"
+  shift || fail "Cannot check if a file is executable;"\
+    " No file path/name was given."
+
+  [[ -r "${_file}" && -x "${_file}" ]]
+}
+
+#
+# ## file\_exists
+#
+# Check if a file name/path exists.
+#
+# ### Input Parameters
+#
+# First parameter is a file name/path.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 if the named file exists.
+# 1 if the named file does not exist or does not exist.
+#
+# ### Failure Scenarios
+#
+# Fails if no file name/path was given.
+#
+# ### Usage Examples
+#
+#     user$ file_exists /bin/bash
+#     user$ echo $?
+#     0
+#
+#     user$ file_exists /bin/asdfasdf
+#     user$ echo $?
+#     1
+#
+file_exists()
+{
+  trace_filter filesystem
+  local _file="${1:-}"
+  shift || fail "Cannot check to see if a file exists;"\
+    " No name/path was given."
+  [[ -f "${_file}" ]]
+}
+
+#
+# ## file\_does\_not\_exist
+#
+# Check if a file name/path exists.
+#
+# ### Input Parameters
+#
+# First parameter is a file name/path.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 if the named file does not exist.
+# 1 if the named file exists.
+#
+# ### Failure Scenarios
+#
+# Fails if no file name/path was given.
+#
+# ### Usage Examples
+#
+#     user$ file_does_not_exist /bin/bash
+#     user$ echo $?
+#     1
+#
+#     user$ file_does_not_exist /bin/asdfasdf
+#     user$ echo $?
+#     0
+#
+file_does_not_exist()
+{
+  trace_filter filesystem
+  local _file="${1:-}"
+  shift || fail "Cannot check to see if a file exists;"\
+    " No file name/path was given."
+
+  [[ ! -f "${_file}" ]]
+}
+
+#
+# ## file\_is\_nonempty
+#
+# Check if a file name/path is nonempty.
+#
+# ### Input Parameters
+#
+# First parameter is a file name/path.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 if the named file is nonempty.
+# 1 if the named file is empty or does not exist.
+#
+# ### Failure Scenarios
+#
+# Fails if no file name/path was given.
+#
+# ### Usage Examples
+#
+#     user$ file_is_nonempty /bin/bash
+#     user$ echo $?
+#     0
+#
+#     user$ file_is_nonempty /bin/asdfasdf
+#     user$ echo $?
+#     1
+#
+file_is_nonempty()
+{
+  trace_filter filesystem
+  local _file="${1:-}"
+  shift || fail "Cannot check if file is nonempty;"\
+    " No file path/name was given."
+
+  [[ ! -d "${_file}" ]] ||
+    error "When checking whether the file '${_file}' is nonempty,"\
+    " a directory was found in its place."
+
+  [[ -s "${_file}" ]]
+}
+
+#
+# ## file\_is\_empty
+#
+# Check if a file name/path is empty.
+#
+# ### Input Parameters
+#
+# First parameter is a file name/path.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 if the named file is empty.
+# 1 if the named file is not empty or does not exist.
+#
+# ### Failure Scenarios
+#
+# Fails if no file name/path was given.
+#
+# ### Usage Examples
+#
+#     user$ file_is_empty /bin/bash
+#     user$ echo $?
+#     1
+#
+#     user$ file_is_empty /bin/asdfasdf
+#     user$ echo $?
+#     0
+#
+file_is_empty()
+{
+  trace_filter filesystem
+  local _file="${1:-}"
+  shift || fail "Cannot check if a file is empty;"\
+    " No file path/name was given."
+
+  [[ -f "${_file}" && ! -s "${_file}" ]]
+}
+
+#
+# ## file\_is\_missing
+#
+# Check if a file name/path is missing.
+#
+# ### Input Parameters
+#
+# First parameter is a file name/path.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 if the named file is missing.
+# 1 if the named file is not missing or does not exist.
+#
+# ### Failure Scenarios
+#
+# Fails if no file name/path was given.
+#
+# ### Usage Examples
+#
+#     user$ file_is_missing /bin/bash
+#     user$ echo $?
+#     1
+#
+#     user$ file_is_missing /bin/asdfasdf
+#     user$ echo $?
+#     0
+#
+file_is_missing()
+{
+  trace_filter filesystem
+  local _file="${1:-}"
+  shift || fail "Cannot check if file is missing;"\
+    " No file path/name was given."
+
+  [[ ! -f "${_file}" ]]
+}
+
+#
+# ## file\_is\_empty\_or\_missing()
+#
+# Check if a file name/path is empty or missing.
+#
+# ### Input Parameters
+#
+# First parameter is a file name/path.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 if the named file is empty or missing.
+# 1 if the named file exists or is nonempty.
+#
+# ### Failure Scenarios
+#
+# Fails if no file name/path was given.
+#
+# ### Usage Examples
+#
+#     user$ file_is_missing /bin/bash
+#     user$ echo $?
+#     1
+#
+#     user$ file_is_missing /bin/asdfasdf
+#     user$ echo $?
+#     0
+#
+file_is_empty_or_missing()
+{
+  trace_filter filesystem
+  local _file="${1:-}"
+
+  shift || fail "Cannot check if file is empty or missing;"\
+    " No file path/name was given."
+
+  [[ ! -f "${_file}" || ! -s "${_file}" ]]
+}
+
+#
+# ## file\_contains()
+#
+# Checks if a named file contains a given string/unix regexp pattern.
+#
+# ### Input Parameters
+#
+# First parameter is the file name/path.
+# Second parameter is the pattern to match.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 if the given file contains the given pattern.
+# 1 if the given file does not contain the given pattern.
+#
+# ### Failure Scenarios
+#
+# Fails if the file path/name was not given
+# Fails if the pattern is not given.
+# Fails if the file path/name given either does not exist or is not a file.
+#
+# ### Usage Examples
+#
+#     user$ cat "$HOME/test"
+#     #!/bin/sm
+#
+#     modules base/filesystem
+#
+#     if file_contains "$HOME/.smrc" ".*w00t.*"
+#     then
+#       echo "w00t! "
+#     else
+#       echo "no w00t :("
+#     fi
+#
+#
+file_contains()
+{
+  trace_filter filesystem
+  local _file="${1:-}" _message
+  shift || fail "File path/name must be given."
+
+  local _pattern="${1:-}"
+  shift || fail "String pattern for search was not given!"
+
+  [[ -f "${_file}" ]] || fail "First parameter must be a file;"\
+    " '${_file}' does not appear to be a file."
+
+  grep "${_pattern}" "${_file}" >/dev/null 2>&1
+}
+
+#
+# ## symlink\_exists()
+#
+# Check if a symlink name/path exists.
+#
+# ### Input Parameters
+#
+# First parameter is a symlink name/path.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 if the named symlink exists.
+# 1 if the named symlink does not exist or does not exist.
+#
+# ### Failure Scenarios
+#
+# Fails if no symlink name/path was given.
+#
+# ### Usage Examples
+#
+#     user$ symlink_exists /bin/sm
+#     user$ echo $?
+#     0
+#
+#     user$ symlink_exists /bin/asdfasdf
+#     user$ echo $?
+#     1
+#
+symlink_exists()
+{
+  trace_filter filesystem
+  local _file="${1:-}"
+  shift || fail "No path was given to check."
+  [[ -L "${_file}" ]]
+}
+
+#
+# ## files\_in()
+#
+# Function Description
+#
+# ### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ### Failure Scenarios
+#
+# Fails if ...
+#
+# ### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
+files_in()
+{
+  trace_filter filesystem
+  local _path="${1:-}" _file
+  shift || fail "Directory name/path was not given! "
+  [[ -d "${_path}" ]] || fail "'${_path}' is not a directory! "
+  shopt -s nullglob
+  local _paths=( "${_path}"/* )
+  shopt -u nullglob
+  for _file in "${_paths[@]}"
+  do
+    [[ -f "${_file}" ]] || continue
+    echo "${_file}"
+  done
+}
+
+#
+# ## files\_under()
+#
+# Function Description
+#
+# ### Input Parameters
+#
+# Positional Parameter listing and descriptions.
+#
+# ### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ### Failure Scenarios
+#
+# Fails if ...
+#
+# ### Usage Examples
+#
+#     user$ {{ setup the scenario }}
+#     user$ function_name {{ parameters }}
+#     user$ {{ demonstrate the results}}
+files_under()
+{
+  trace_filter filesystem
+  local _path="${1:-}"
+  shift || fail "Directory name/path was not given!"
+
+  [[ -d "${_path}" ]] || fail "'${_path}' is not a directory!"
+
+  find "${_path}" -mindepth 1 -type f
+}
+
+#
+# ## files\_in\_path\_matching()
+#
+# Find all files in given path matching a given name glob pattern.
+#
+# ### Input Parameters
+#
+# First parameter is the path to search in
+# Second parameter is the pattern to match in
+#
+# ### Stream Outputs
+#
+# What gets printed to STDOUT and STDERROR. 'None.' if nothing is output.
+#
+# ### Environmental effects
+#
+# What, if any, environmental side effects this function causes. 'None.' for none.
+#
+# ### Return Codes
+#
+# 0 if ...
+# 1 if ...
+#
+# ### Failure Scenarios
+#
+# Fails if ...
+#
+# ### Usage Examples
+#
+#     user$ files_in_path_matching ...
+#
+files_in_path_matching()
+{
+  trace_filter filesystem
+  local _path="${1:-}" _file
+  shift || fail "Path was not given as the first parameter."
+
+  _pattern="${1:-}"
+  shift || fail "Pattern name/path was not given as the second parameter.!"
+
+  [[ -d "${_path}" ]]    || fail "'${_path}' is not a directory!"
+  [[ -n "${_pattern}" ]] || fail "Filename or pattern was not given."
+
+  # TODO: convert this to in-process via shell globbing.
+  find "${_path}" -mindepth 1 -iname "${_pattern}" -type f
+}
+
+#
+# ## replace\_content()
+#
+# Replaces a given (sed compatable) pattern with given replacement text in a
+# file.
+#
+# ### Input Parameters
+#
+# First parameter is the pattern.
+# [optional 'with']
+# Second parameter is the replacement content.
+# [optional 'in']
+# Third parameter is the file name/path.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# The pattern will be matched against the file name/path content and the
+# replacement text will be put in place.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# Fails if no pattern was given.
+# Fails if replacement content was not given.
+# Fails if filename was not given.
+# Fails if the file does not exist.
+#
+# ### Usage Examples
+#
+# # Replace contents in a file with a given (sed) regex pattern.
+#
+#     replace_content "^PREFIX =.*" with "${install_path}" in Makefile
+#
+replace_content()
+{
+  trace_filter filesystem
+  local _token _pattern _content _file _message
+
+  while (( $# > 0 ))
+  do
+    _token="$1"
+    shift
+
+    case "${_token}" in
+      (with)
+        _content="${1:-}"
+        shift
+        ;;
+      (in)
+        _file="${1}"
+        shift
+        ;;
+      (*)
+        if [[ -z "${_pattern}" ]]
+        then
+          _pattern="${_token}"
+        else
+          fail "Unknown token '${_token}' passed as a parameter.'"
+        fi
+        ;;
+    esac
+  done
+
+  [[ -n "${_pattern:-}" ]] || fail "Cannot replace content;"\
+    " no pattern was given."
+
+  [[ -n "${_content:-}" ]] || fail "Cannot replace content;"\
+    " replacement content was not given; specify by 'with \"replacement text\"'."
+
+  [[ -n "${_file:-}" ]] || fail "Cannot file content;"\
+    " the filename was not given; specify by 'in \"/path/to/filename\"'."
+
+  [[ -f "${_file:-}" ]] || fail "Cannot replace file content;"\
+    " The file does not exist."
+
+  sed "s#${_pattern//\#/\\#}#${_content//\#/\\#}#g" "${_file}" \
+    > "${_file}.new" && mv  "${_file}.new" "${_file}"
+}
+
+#
+# ## file\_matches\_md5()
+#
+# Checks to see if the given file matches the given MD5 checksum.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# none.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 if the file matches the md5sum.
+# 1 if the file does not match the md5sum.
+# 1 if the file is empty or missing.
+#
+# ### Failure Scenarios
+#
+# Fails if no file name/path was given.
+# Fails if no md5 string was given.
+#
+# ### Usage Examples
+#
+# Example Usage:
+#
+# user$ file_matches_md5
+#
+# ### Notes
+#
+file_matches_md5()
+{
+  trace_filter filesystem
+  local _file="${1:-}" _md5="${2:-}" _file_md5
+  shift || fail "Cannot check if file matches MD5; no file was given."
+  shift || fail "Cannot check if file matches MD5; no MD5 was given."
+
+  [[ -s "${_file}" ]] || return 1
+
+  _file_md5="$(file_md5 "${_file}")"
+
+  [[ "${_file_md5// *}" = "$_md5" ]]
+}
+
+#
+# ## file\_md5()
+#
+#
+#
+file_md5()
+{
+  trace_filter filesystem
+  local _file="${1:-}" _command _md5
+
+  shift || fail "Cannot calculate MD5 checksum;"\
+    " No file name/path was given."
+
+  if os_is_darwin
+  then
+    _command="/sbin/md5 -q"
+
+  else
+    if command_exists "md5sum"
+    then
+      _command="md5sum"
+
+    elif command_exists md5
+    then
+      _command="md5"
+
+    else
+      error "Could not find a suitable MD5 command in the path."
+    fi
+  fi
+
+  if _md5="$(${_command} "$_file" 2>/dev/null)"
+  then
+    printf "${_md5// *}"
+
+  else # Should this be error ?
+    warn "There was an unknown error computing the MD5 value."
+    return 1
+  fi
+}
+
+#
+# ## write()
+#
+# Write arguments to the given file.
+#
+# ### Input Parameters
+#
+# Strings to be written.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# Fails if no arguments are given.
+#
+# ### Usage Examples
+#
+# user$ write "Hello there! " to /some/file
+# user$ cat /some/file
+# Hello there!
+#
+write()
+{
+  trace_filter filesystem
+  local _token _file _message _append_flag=0 _user="" _prefix=""
+
+  while (( $# > 0 ))
+  do
+    _token="$1"
+    shift
+
+    case "${_token}" in
+      (append|--append)
+        _append_flag=1
+        ;;
+      (to)
+        _file="${1}"
+        shift || fail "File to write to must be given after 'to'"
+        ;;
+      (as)
+        _user="${1}"
+        shift || fail "User to write as must be given after 'as'"
+        ;;
+      (*)
+        _message="${_token}"
+        ;;
+    esac
+  done
+
+  variable_is_nonempty _message || fail "Cannot log a message;"\
+    " No message was given."
+
+  if variable_is_nonempty _file
+  then
+    if [[ "${_user}" == "root" ]]
+    then
+      _prefix="sudo"
+    elif [[ -n "${_user}" ]]
+    then
+      _prefix="sudo su ${_user}"
+    fi
+
+    if (( _append_flag == 1 ))
+    then
+      printf "${_message}\n" | ${_prefix} tee -a "${_file}" >/dev/null
+    else
+      printf "${_message}\n" | ${_prefix} tee "${_file}" >/dev/null
+    fi
+  else
+    printf "${_message}\n"
+  fi
+}
+

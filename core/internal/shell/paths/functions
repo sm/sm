@@ -1,0 +1,374 @@
+#!/bin/sh
+
+#
+# SM Framework Core Module ~ Versioned FileSystem (versionedfs)
+#
+# API Version: 1.0.0
+#
+# paths *
+#
+# TODO: Finish this API documentation below
+#
+#           paths move source target mode owner
+#     user$ paths move "freetds-0.91rc"* to "freetds-0.91"
+#
+#
+#     user$ paths enter "/usr/local/src"
+#
+#
+#     user$ paths exist /bin/sm
+#     user$ echo $?
+#     0
+#
+#     user$ paths exist /bin/asdfasdf
+#     user$ echo $?
+#     1
+#
+#
+#     user$ cd ; sm call paths expand test
+#     /home/user/test
+#
+#     user$ paths copy "freetds-0.91rc"* to "freetds-0.91"
+#
+#     user$ paths create a b c
+#     user$ ls
+#     a b c
+#
+#     user$ paths remove /tmp/somedir /tmp/someotherdir
+#
+#     user$ paths copy to "$HOME/backup/" "$HOME/bin" "$HOME/projects"
+#
+#     user$ paths_chown $USER "$HOME" "/usr/local"
+#
+#
+#     user$ paths_chmod $USER "$HOME" "/usr/local"
+#
+
+paths()
+{
+  trace_filter filesystem
+  local _action _path _paths=() _source _target _mode _owner _flags
+
+  while (( $# > 0 ))
+  do
+    token="$1" && shift
+    case "${token}" in
+      (to)
+        _target="${1}"
+        shift || fail "Target path must be provided after keyword 'to'"
+        ;;
+      (from)
+        _source="${1}"
+        shift || fail "Source path must be provided after keyword 'from'"
+        ;;
+      (mode|permissions)
+        _mode="${1}"
+        shift || Fail "Mode must follow keywords 'mode|permissions'"
+        ;;
+      (owner)
+        _owner="${1}"
+        shift || fail "Owner must be provided after keyword 'owner'"
+        ;;
+      (recursive|recursively)
+        _flags+=(-R)
+        shift # Remove the recursive flag parameter.
+        ;;
+      (*)
+        if [[ -z "${_action}" ]]
+        then
+          _action="$token"
+        else
+          _paths+=("$token")
+        fi
+        ;;
+    esac
+  done
+
+  case "${_action}" in
+    (chown)
+      [[ -n "${_identity}" ]] || fail "'identity {user}[:{group}]' was not given."
+      [[ -n "${_paths}" ]]    || fail "Paths must be given."
+      __sm.paths.chown "${_identity}" "${_flags[*]}" "${_paths[@]}"
+      ;;
+    (chmod)
+      [[ -n "${_mode}" ]] || fail "'mode {file mode}' must be given."
+      [[ -n "${_paths}" ]]    || fail "Paths to chmod must be given."
+      __sm.paths.chmod "${_mode}" "${_flags[*]}" "${_paths[@]}"
+      ;;
+    (create)
+      [[ -n "${_paths}" ]] || fail "Paths to create must be given."
+      __sm.paths.create "${_paths[@]}"
+      ;;
+    (remove)
+      [[ -n "${_paths}" ]] || fail "Paths to remove must be given."
+      __sm.paths.remove "${_paths[@]}"
+      ;;
+    (copy)
+      [[ -n "${_target}" ]] || fail "Target path (to) for copying into must be given."
+      __sm.paths.copy "${_target}" "${_flags[*]}" "${_paths[@]}"
+      ;;
+    (in)
+      [[ -n "${_paths}" ]] || fail "Path to list paths in must be given."
+      __sm.paths.in "${_paths[@]}"
+      ;;
+    (search)
+      [[ -n "${_paths}" ]] || fail "Path to search paths under must be given."
+      __sm.paths.search
+      ;;
+    (enter)
+      [[ -n "${_paths}" ]] || fail "Path to enter must be given."
+      __sm.paths.enter "${_paths[@]}"
+      ;;
+    (exist|exists)
+      [[ -n "${_paths}" ]] || fail "Path to enter must be given."
+      __sm.paths.exists "${_paths[@]}"
+      ;;
+    (join)
+      [[ -n "${_paths}" ]] || fail "Path to join must be given."
+      __sm.paths.join "${_paths[@]}"
+      ;;
+    (expand)
+      [[ -n "${_paths}" ]] || fail "Path to expand must be given."
+      __sm.paths.expand "${_paths[@]}"
+      ;;
+    (move)
+      [[ -n "${_source}" ]] || fail "Source must be given to copy (from x). "
+      [[ -n "${_target}" ]] || fail "Target must be given to copy (to y). "
+      __sm.paths.move "${_source}" "${_target}"
+      ;;
+    (copy)
+      [[ -n "${_source}" ]] || fail "Source must be given to copy (from x)."
+      [[ -n "${_target}" ]] || fail "Target must be given to copy (to y)."
+      __sm.paths.copy "${_source}" "${_target}"
+      ;;
+    (*)
+      fail "Unknown action for paths: '${_action}' "\
+        "A paths action must be specified as the first parameter: "\
+        "{chown,chmod,create,remove,copy,in,search,enter,exist,join,expand,move,copy}"
+      ;;
+  esac
+}
+
+__sm.paths.move()
+{
+  local _source="$1" _target="$2" _mode="$3" _owner="$4"
+
+  mv "${_source}" "${_target}" ||
+    fail "Could not move '${_source}' to '${_target}',"\
+    "as the 'chmod -R' command failed with error code '$?'."
+
+  if [[ -n "${_mode}" ]]
+  then
+    chmod -R "${_mode}" "${_target}" ||
+    fail "Could not recursively change mode of '${_target}' to"\
+    "${_mode}, as the 'chmod -R' command failed with error code '$?'."
+  fi
+
+  if [[ -n "${_owner}" ]]
+  then
+    chown -R "${_owner}" "${_target}" ||
+    fail "Could not recursively change ownership of '${_target}' to"\
+    "${_owner}, as the 'chown -R' command failed with error code '$?'."
+  fi
+}
+
+__sm.paths.copy()
+{
+  local _source="$1" _target="$2" _mode="$3" _owner="$4"
+
+  cp -Rf "${_source}" "${_target}" ||
+    fail "Could not copy '${_source}' to '${_target}',"\
+      "as the 'cp' command failed with error code '$?'."
+
+  if [[ -n "${_mode}" ]]
+  then
+    chmod -R "${_mode}" "${_target}" ||
+    fail "Could not recursively change mode of '${_target}' to"\
+    "${_mode}, as the 'chmod -R' command failed with error code '$?'."
+  fi
+
+  if [[ -n "${_owner}" ]]
+  then
+    chown -R "${_owner}" "${_target}" ||
+    fail "Could not recursively change ownership of '${_target}' to"\
+    "${_owner}, as the 'chown -R' command failed with error code '$?'."
+  fi
+}
+
+__sm.paths.enter()
+{
+  local _path="$1"
+  [[ -d "${_path}" ]] || fail "Path '${_path}' does not exist."
+  builtin cd "${_path}" ||
+    fail "Could not cd into the given path '${_path}'; "\
+      "'cd' command failed with error code '$?'."
+}
+
+__sm.paths.exists()
+{
+  local _path="${1}"
+  [[ -d "$_path" ]]
+}
+
+#
+__sm.paths.join()
+{
+  local IFS='/'
+  printf "$*"
+}
+
+__sm.paths.expand()
+{
+  local _path="$1"
+  [[ -d "${_path}" ]] || fail "Path '${_path}' does not exist."
+  ( builtin cd "${_path}" ; echo $PWD )
+}
+
+__sm.paths.create()
+{
+  local _path _paths=("$@")
+
+  for _path in "${_paths[@]}"
+  do
+    if [[ -d "${_path}" ]] || [[ -L "${_path}" && -d "$(readlink "${_path}")" ]]
+    then
+      continue
+    fi
+
+    if [[ -f "${_path}" || -L "${_path}" ]]
+    then
+      warn "Could not ensure path '${_path}' exists as the path is a file."
+    else
+      mkdir -p "${_path}" || fail "Could not create the path '${_path}',"\
+        "as the 'mkdir' command failed with error code '$?'."
+    fi
+  done
+}
+
+__sm.paths.remove()
+{
+  local _path _paths=("$@")
+
+  removed_paths=()
+  nonexistant_paths=()
+
+  for _path in "${_paths[@]}"
+  do
+    if [[ -L "${_path}" ]]
+    then
+      rm -f "${_path}" || fail "Could not remove the entity '${_entity}';"\
+          "'rm' command failed with error code '$?'."
+      removed_paths+=("${_path}")
+    elif [[ -d "${_path}" ]]
+    then
+      rm -rf "${_path}" || fail "Could not remove the entity '${_entity}';"\
+          "'rm' command failed with error code '$?'."
+      removed_paths+=("${_path}")
+
+    elif [[ -e "${_path}" ]]
+    then
+      fail "Cannot remove the path '${_path}', as it is a file."
+
+    else
+      nonexistant_paths+=("${_path}")
+    fi
+  done
+}
+
+__sm.paths.copy()
+{
+  local _target="$1" _flags="$2" _path
+  shift 2
+  local _paths=("$@")
+
+  __sm.paths.create "${_target}"
+
+  for _path in "${_paths[@]}"
+  do
+    if [[ ! -d "${_path}" ]]
+    then
+      error "Cannot copy path ${_path} to ${_target};"\
+      "Path '${_path}' does not exist (in '$PWD')."
+    fi
+
+    cp -Rf "${_path}" "${_target}/" ||
+      fail "Could not copy the entity '${_entity}';"\
+      "As the 'cp -Rf' command failed with error code '$?'."
+  done
+}
+
+__sm.paths.chown()
+{
+  trace_filter filesystem
+  local _identity="$1" _flags="$2" _path _command
+  shift 2
+  for _path in "$@"
+  do
+    [[ -n "${_path}" ]] || continue
+
+    if [[ ! -e "${_path}" ]]
+    then
+      fail "Path '${_path}' does not exist."
+    fi
+
+    chown ${_flags[*]} ${_identity} "${_path}" ||
+      fail "Could not chown the path '${_path}' to '${_identity};"\
+      " 'chown' command failed with error code '$?'."
+  done
+}
+
+__sm.paths.chmod()
+{
+  trace_filter filesystem
+  local _mode="$1" _flags="$2"
+  shift 2
+  for _path in "$@"
+  do
+    if [[ ! -d "${_path}" ]]
+    then
+      fail "Cannot chmod path ${_path} to ${_permissions},"\
+      "as the path (directory) does not exist."
+    fi
+
+    chmod ${_flags[@]} ${_mode} "${_path}" ||
+      fail "Could not chmod the file '${_file}' to "\
+      "'${_target}/${_file//*\/},"\
+      "as the 'chmod' command failed with error code '$?'."
+
+  done
+}
+
+__sm.paths.in()
+{
+  local _path="${1:-}"
+  shift  || fail "Path was not given!"
+  [[ -d "${_path}" ]] || fail "'${_path}' is not a path!"
+  shopt -s nullglob
+  local _paths=( "${_path}"/* )
+  shopt -u nullglob
+  for dir in "${_paths[@]}"
+  do
+    [[ -d "${dir}" ]] || continue
+    echo "${dir}"
+    paths in "${dir}"
+  done
+}
+
+__sm.paths.search()
+{
+  local _path="${1:-}" _line
+  shift || fail "Path was not given as the first parameter."
+
+  local _pattern="${1:-}"
+  shift || fail "Pattern was not given as the second parameter."
+
+  [[ -n "${_pattern}" ]] || fail "'${_path}' is not a path!"
+  [[ -d "${_path}" ]]    || fail "'${_path}' is not a directory!"
+
+  while read _line
+  do
+    [[ "${_line}" == ${_pattern} ]] || continue
+    echo "${_line}"
+  done < <(paths in "${_path}")
+}
+

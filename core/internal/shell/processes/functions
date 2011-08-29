@@ -1,0 +1,98 @@
+#!/bin/sh
+
+ext_process_initialize()
+{
+  process_exit_commands=()
+}
+
+#
+# ## process\_lockfile\_lock()
+#
+# If the current process is the first to write to the lockfile, then the process
+# continues processing past the line calling lockfile_lock "{file path/name}".
+#
+# Otherwise lockfile_lock causes the process to exit with a message and status
+# code 0.
+#
+# If the lock is obtained then lockfile_lock ensures that.
+#
+# Usage Examples:
+#
+#     lockfile_lock /var/run/my_script.pid
+#
+# ## Code Walkthrough.
+process_lockfile_lock()
+{
+  local _lockfile="${1:-}"
+  shift || fail "Cannot lock lockfile;"\
+      "No lockfile was specified as the first parameter."
+
+  printf "$$" >> "${_lockfile}" # *Append* current process's pid to the lockfile
+
+  # Now read in the first pidfile from the lockfile.  This means that the first
+  # instance that successfully writes its pid to the lockfile obtains the lock.
+  read -r _pid < "${_lockfile}"
+
+  # If the pidfile read in matches the pid of the current process, then
+  [[ "${_pid}" == "$$" ]] ||
+    error "Another process already owns the lockfile; exiting."
+
+  # The currently running process has the lock; immediately add an on-exit
+  # hook that removes the lockfile when the process exits, thus relinquishing
+  # the filesystem-level lock. This also preserves existing EXIT code.
+  on_exit "rm -f ${_lockfile}"
+
+  return 0 # The lock has been obtained! Proceed with nefarious things!
+}
+
+#
+# ## process\_on\_exit()
+#
+# ### Input
+#
+# Code to be run when the current process exits.
+#
+# ### Code Walkthrough
+process_on_exit()
+{
+  local _process_exit_code _code="$*"
+
+  _process_exit_code="$(trap)"
+  _process_exit_code="$(
+  echo "${_process_exit_code}" | awk '/ EXIT$/' |
+  sed -e "s#' EXIT##" -e "s#.*'##"
+  )"
+
+  if [[ "${_process_exit_code}" != *process_exit_commands* ]]
+  then
+    # ensure that process_exit_commands() is called on exit, while preserving
+    # any original on-exit code.
+    trap "process_exit_commands;${_process_exit_code}" EXIT
+  fi
+
+  # Append the code passed to process_on_exit() to the end of the
+  # on_exit_commands array variable.
+  process_exit_commands+=( "${_code}" )
+}
+
+#
+# ## process\_exit\_commands()
+#
+# ### Input
+#
+# None.
+#
+# ### Code Walkthrough
+process_exit_commands()
+{
+  local _result="$?" _command
+
+  for _command in "${on_exit_commands[@]}"
+  do
+    eval "${_command}" ||
+      warn "process_on_exit() command failed > '${_command}'"
+  done
+
+  return "${_result}" # Return the original process exit status.
+}
+

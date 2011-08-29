@@ -1,3 +1,3 @@
-ext/extensions/cache
-ext/extensions/manipulation
-ext/vcs
+base/extensions/cache
+base/extensions/manipulation
+base/vcs

@@ -1,0 +1,120 @@
+#!/bin/sh
+
+#
+# # VCS (SCM) Module
+#
+
+# ## detect\_uri()
+#
+#
+#
+# Code Walkthrough
+detect_uri()
+{
+  local extensions_path="${1:-}" _uri_path
+
+  shift || fail "extensions_path must be given as first parameter."
+
+  rebuild_path ".uri" $extensions_path $@
+
+  _uri_path="${rebuilded_path}"
+
+  if [[ -s "${_uri_path}" ]]
+  then
+    uri_path="${_uri_path}"
+    return 0
+  else
+    return 1
+  fi
+}
+
+# ## scm\_identifier()
+#
+#
+#
+# Code Walkthrough
+scm_identifier()
+{
+  local _uri="${1:-}"
+
+  shift || fail "url must be given as first parameter."
+
+  if [[ -d "${_uri}" ]]
+  then
+    _uri=$( builtin cd "${_uri}"; pwd )
+  fi
+
+  printf "${_uri//\//_}"
+}
+
+# ## is\_github\_uri()
+#
+#
+#
+# Code Walkthrough
+is_github_uri()
+{
+  local _uri="${1:-}"
+  shift || fail "uri must be given as first parameter."
+
+  if ematch "${_uri}" "^[[:alnum:]_-]+\/[[:alnum:]_-]+$"
+  then
+    if curl -s -f -I -L "https://github.com/${_uri}" >/dev/null 2>&1
+    then
+      return 0
+    else
+      if (( $? == 60 ))
+      then
+        if curl -s -k -f -I -L "https://github.com/${_uri}" >/dev/null 2>&1
+        then
+          return 0
+        fi
+      fi
+    fi
+    debug vcs "Uri '${_uri}' looks like github one, but github claims it is not."
+  fi
+  return 1
+}
+
+is_archive_uri()
+{
+  local _uri="${1:-}"
+  shift || fail "uri must be given as first parameter."
+  case "${_uri}" in
+    *.tar|*.tgz|*.txz|*.tbz2|*.xz|*.bz2|*.gz|*.zip|*.lzma|*github.com/*/*ball/*)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+fetch_uri_detect_scm_type()
+{
+  local _uri="${1:-}"
+
+  shift || fail "uri must be given as first parameter."
+
+  if [[ -d "${_uri}" ]] # check for directory
+  then
+    scm_type="path"
+  elif is_archive_uri "${_uri}" # check for packages
+  then
+    scm_type="archive"
+  elif is_github_uri "${_uri}" # check for pattern user/repository from github
+  then
+    scm_type="github"
+  else
+    case "${_uri}" in
+      (*git*)    scm_type="git" ;;
+      (*svn*)    scm_type="svn" ;;
+      (*hg*)     scm_type="hg"     ;;
+      (*fossil*) scm_type="fossil" ;;
+      (*)
+        return 1
+        ;;
+    esac
+  fi
+  return 0
+}

@@ -1,0 +1,15 @@
+#!/bin/sh
+
+service_extension_setup()
+{
+  local extension="${1}" module="${2}" path="${3}" ${language:=shell}
+  shift || fail "Extension name not given as first parameter."
+  shift || fail "Module name not given as second parameter."
+  shift || fail "Path not given as third parameter."
+
+  for action in start stop restart status list
+  do
+    write "${action}=${module}_${action}()" append to "${path}/map"
+  done
+}
+

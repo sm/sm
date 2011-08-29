@@ -1,6 +1,6 @@
 #!/bin/sh
 
-array_is_nonempty extension_args ||
+[[ -n "${extension_args}" ]] ||
   error "package: You must specify at least one extension name for packaging."
 
 for extension in "${extension_args[@]}"

@@ -3,7 +3,7 @@
 NYI
 # extension_is_installed removed, as it was not working already.
 
-array_is_nonempty extension_args ||
+[[ -n "${extension_args}" ]] ||
   error "clone: An extension name must be specified."
 
 for (( index = 0 ; index < ${#extension_args[@]} ; index++ ))

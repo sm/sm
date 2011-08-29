@@ -1,0 +1,36 @@
+#!/bin/sh
+
+#
+# # Hash in file Module
+#
+# Allows manipulation of multiline values and keyss containing - and \.
+#
+
+# Read keys from given file($1)
+hash_keys()
+{
+  local file="${1:-}" valid_keys='^[^ ^=]+'
+  shift || fail "Cannot read keys from hash file; Filename not given."
+  echo -n $(grep -E "${valid_keys}=" $file | grep -Eo "${valid_keys}")
+}
+
+# Read value from given file($1) for given key($2), and assign it to a variable($3).
+hash_read()
+{
+  local file="${1:-}" key="${2:-}" variable="${3:-}" valid_keys='^[^ ^=]+'
+
+  shift || fail "Cannot read values from hash file; Filename was not given."
+  shift || fail "Cannot read values from hash file; Key name was not given."
+  shift || fail "Cannot read values from hash file; Variable was not given."
+  eval "${variable}=$(
+    awk \
+      -v key="^${key}=" \
+      -v valid_keys="${valid_keys}=" \
+      '{
+        if ($0 ~ valid_keys) found=0;
+        if ($0 ~ key) {found=1; gsub(key,"");};
+        if (found == 1) print $0
+      }' \
+      $file
+  )"
+}

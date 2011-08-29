@@ -1,0 +1,87 @@
+#!/bin/sh
+
+fetch_error_initialize()
+{
+  fetch_params=( "$@" )
+  unset fetch_error_handler __vcs_failed
+}
+
+fetch_error()
+{
+  local _message="${1:-}" _pair
+  shift || fail "Message must be given as first parameter."
+
+  for _pair in "$@"
+  do
+    eval "local ${_pair#--}"
+  done
+
+  : "${fetch_error_handler:=log}"
+  case "${fetch_error_handler}" in
+    debug|error|fail|true|log)
+      fetch_error_default_handler "${_message}" "${fetch_params[@]}"
+      ;;
+    *)
+      "${fetch_error_handler}" "${_message}" "${fetch_params[@]}"
+    ;;
+  esac
+}
+
+fetch_error_default_handler()
+{
+  local _message="${1:-}"
+  shift || fail "Message must be given as first parameter."
+
+   __vcs_failed="${_message}"
+  case "${_message}" in
+    (unknown_scm)
+      _message="Unknown SCM type (${scm_type:-"not found"}) for url '${uri}'." ;;
+    (copy_failed)
+      _message="Copying from '${from}' to '${to}' failed." ;;
+    (download_failed)
+      _message="Downloading from '${from}' to '${to}' failed." ;;
+    (extracting_archive_failed)
+      _message="There was an error while extracting the archive '${_archive}'." ;;
+    (unknown_archive_format)
+      _message="Unknown archive format for ${_archive}." ;;
+    (empty_archive)
+      _message="Empty archive ${_archive}." ;;
+    (remote_branch_not_found)
+      _message="$remote $branch remote branch not found." ;;
+    (cannot_checkout_branch)
+      _message="Unable to checkout $branch." ;;
+    (pull_failed)
+      _message="${scm_type} pull failed." ;;
+    (cannot_clone)
+      _message="There was an error while cloning the repository from the url '${uri}.'" ;;
+    (cannot_remove)
+      _message="Cannot remove ${path}." ;;
+    (all_uris_failed)
+      _message="All given uris failed." ;;
+    (*)
+      fail "VCS unknown error("${_message}") for params $*." ;;
+  esac
+
+  fetch_log "${_message}"
+
+  case "${fetch_error_handler}" in
+    true)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+fetch_log()
+{
+  case "${fetch_error_handler}" in
+    debug|true)
+      debug vcs "${_message}" >&2
+      ;;
+    error|fail|log)
+      "${fetch_error_handler}" "${_message}"
+      ;;
+  esac
+}

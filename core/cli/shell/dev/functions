@@ -83,7 +83,7 @@ sm_development_update()
 
 extension_package()
 {
-  local _name="${1:-}" _path _version file
+  local _name="${1:-}" _path _version file _archiver
   shift || fail "Cannot package an extension; no extension name was given."
 
   _path="${extensions_development_path:-"$extensions_src_path"}"
@@ -98,14 +98,13 @@ extension_package()
   log "Packaging extension ${_name}"
   log "${_name}-${_version}:"
 
-  for archiver in "gzip" "bzip2 -z" "xz -z"
+  for _archiver in "gzip" "bzip2 -z" "xz -z"
   do
-    if command_exists ${archiver// *}
+    if command_exists ${_archiver// *}
     then
       tar cf "${_name}-${_version}.tar" "${_name}/" ||
         error "Error during packaging ($?) whilst trying to create a tar of the '${_name}' directory."
-
-      ${archiver} -f -9 "${_name}-${_version}.tar" # TODO: parallelize this.
+      ${_archiver} -f -9 "${_name}-${_version}.tar" # TODO: use sm-ll for this.
     fi
 
     paths create "${_path}/pkg"
@@ -124,10 +123,10 @@ extension_package()
 
 extension_publish()
 {
-  local _name="${1:-}" _path _version
+  local _name="${1:-}" _path _version _file
   shift || fail "Cannot publish an extension; no extension name was given."
 
-  NIY "Extension publishing locally, to extensions. beginrescueend.com has not yet been implemented."
+  NIY "Extension publishing locally and to extensions.beginrescueend.com has not yet been implemented."
 
   _path="${extensions_development_path:-"$extensions_src_path"}"
 
@@ -140,20 +139,16 @@ extension_publish()
   log "Packaging extension ${_name}"
   log "${_name}-${_version}:"
 
-  for formats in ".tar.gz" ".tar.bz2" ".tar.xz"
-  do
-    paths exists "${_path}/pkg/" ||
+  paths exists "${_path}/pkg/" ||
     error "The local package path '${_path}' does not exist; did you run"\
-      "'extension package ${_name}' before 'extension publish ${_name}'?"
+    "'extension package ${_name}' before 'extension publish ${_name}'?"
 
-    log "publishing ${_name}-${_version}"
+  log "publishing ${_name}-${_version}"
 
-    for file in "${_pth}/${_name}-${_version}".tar.{gz,xz,bz2}
-    do
-      log "  - ${file}"
-      log "  - ${file}.md5"
-      NIY "publishing"
-    done
+  for _file in "${_pth}/${_name}-${_version}".{tar.gz,tar.xz,tar.bz2,zip}
+  do
+    log_step "  - ${_file}"
+    log_step "  - ${_file}.md5"
   done
 
   log "Packaging complete. (Packages are located in '${_path}/pkg' )"

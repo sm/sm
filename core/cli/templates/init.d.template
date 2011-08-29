@@ -19,7 +19,7 @@
 # Set the service extension name
 export service="{{service}}"
 
-modules ext/service # Load the service module.
+modules base/service # Load the service module.
 
 service_init_d
 

@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# ## svn\_get()
+#
+#
+#
+# Code Walkthrough
+svn_get()
+{
+  NIY "Subversion scm_update"
+  local initial_pwd="$PWD" _uri="${1:-}" _target="${2:-}"
+
+  shift || fail "url must be specified as the first parameter."
+  shift || fail "target path must be specified as the second parameter."
+
+  if [[ -d "${_target}" ]]
+  then # TODO: ensure this works...
+    builtin cd "${_target}"
+    svn update
+  else
+    svn checkout "${_uri}" "${_target}"
+  fi
+}

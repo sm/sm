@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# ## shell\_is\_interactive()
+#
+# Test if the current shell is an interactive shell.
+#
+# Usage Examples:
+#
+#     if shell_is_interactive
+#     then
+#       ${PAGER} somefile
+#     else
+#       cat -v somefile
+#     fi
+#
+shell_is_interactive()
+{
+  [[ -t 0 ]]
+}
+
+if shell_is_interactive
+then
+  # Interactive functions will be loaded here, only if shell is interactive.
+  # TODO: Add BDSM interactive functions :)
+  true
+fi

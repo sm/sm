@@ -1,7 +1,7 @@
-ext/files
-ext/paths
-ext/vcs
-ext/users
+base/files
+base/paths
+base/vcs
+base/users
 cli/sets
-ext/extensions/cache
-ext/templates
+base/extensions/cache
+base/templates

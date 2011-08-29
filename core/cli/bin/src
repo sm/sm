@@ -1,13 +1,13 @@
 #!/bin/sh
 
-array_is_nonempty extension_args ||
+[[ -n "${extension_args}" ]] ||
   fail "src: You must specify at least one extension name."
 
-if paths exists "${extensions_development_path}/${extension_args[0]}"
+if paths exists "${extensions_development_path}/${extension_args[${__sm.array.start}]}"
 then
-  printf "${extensions_development_path}/${extension_args[0]}"
+  printf "${extensions_development_path}/${extension_args[${__sm.array.start}]}"
 else
   printf "." # Stay put!
-  error "Failed to edit '${extension_args[0]}'; it appears to not be installed."
+  error "Failed to edit '${extension_args[${__sm.array.start}]}'; it appears to not be installed."
 fi
 

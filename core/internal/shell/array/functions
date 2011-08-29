@@ -1,0 +1,174 @@
+#!/bin/sh
+
+__sm.array.is.nonempty()
+{
+  local _name="${1}"
+  eval "(( \${#${_name}[@]} > 0 ))"
+}
+
+__sm.array.is.empty()
+{
+  local _name="${1}"
+  eval "(( \${#${_name}[@]} == 0 ))"
+}
+
+__sm.array.is.even()
+{
+  local _name="${1}"
+  eval "(( ( \${#${_name}[@]} % 2 ) == 0 ))"
+}
+
+__sm.array.length()
+{
+  local _name="${1}" _length
+  eval "_length=\${#${_name}[@]}"
+  printf ${_length}
+}
+
+__sm.array.last()
+{
+  local _name="${1}" _length _element
+  eval "_length=\${#${_name}[@]}"
+  eval "_element=\"\${${_name}[${_length}]}\""
+  printf "%{_element}"
+}
+
+__sm.array.first()
+{
+  local _name="${1}" _element _length
+  eval "_length=\"\${#${_name}[@]}\""
+  (( _length )) || return 1
+  eval "_element=\"\${${_name}[${__sm.array.start}]}\""
+  printf "${_element}"
+}
+
+__sm.array.push()
+{
+  local _name="${1}"
+  shift
+  if eval "(( \${#${_name}[@]} > 0 ))"
+  then
+    local _element _elements=("$@")
+
+    (( ${#_elements[@]} )) || fail "No elements were given."
+
+    for _element in "${_elements[@]}"
+    do
+      eval "${_name}+=(\"\${_element}\")"
+    done
+  fi
+}
+
+__sm.array.append()
+{
+  local _name="${1}"
+  shift
+  local _element _elements=("$@")
+
+  (( ${#_elements[@]} )) || fail "No elements were given."
+
+  for _element in "${_elements[@]}"
+  do
+    eval "${_name}+=(\"\${_element}\")}"
+  done
+}
+
+__sm.array.pop()
+{
+  local _name="${1}" _variable="${2:-}" index
+  shift || fail "Array name was not given."
+
+  eval "(( \${#${_name}[@]} ))" || fail "Array '${_name}' was empty."
+
+  # TODO: Account for zsh vs bash
+  if [[ -n "${_variable}" ]]
+  then
+    eval "${_variable}=\${${_name}[\${#${_name}[@]}-1]}"
+  fi
+
+  eval "unset ${_name}[\${#${_name}[@]}-1]"
+  #TODO: check if this one is required:
+  eval "${_name}=( \"\${${_name}[@]}\" ) "
+}
+
+__sm.array.shift()
+{
+  local _name="${1:-}" index _variable="${2:-}"
+  shift || fail "Array name was not given."
+
+  variable.is.empty _variable || eval "${_variable}=\${${_name}[${__sm.array.start}]}"
+
+  # TODO: Account for zsh vs bash
+  unset "${_name}[${__sm.array.start}]"
+  eval "${_name}=( \"\${${_name}[@]}\" ) "
+}
+
+__sm.array.unshift()
+{
+  local _name="${1:-}"
+  shift || fail "Array name was given."
+
+  local _elements=("$@")
+
+  (( ${#_elements[@]} )) || fail "No elements were given."
+
+  eval "${_name}=(\"${_elements[@]}\" \"\${${_name}[@]}\")"
+}
+
+__sm.array.join()
+{
+  local _name="${1:-}"
+  shift || fail "Array name was not given."
+  local IFS=${1:-' '}
+  eval "printf \"\${${_name}[*]}\""
+}
+
+__sm.array.largest()
+{
+  local _name="${1:-}" _index _largest=""
+  shift || fail "No array variable name was given."
+
+  eval "
+  for (( _index=0 ; _index < \${#${_name}[@]} ; _index++ ))
+  do
+    if (( \${#${_name}[\${_index}]} > \${#_largest} ))
+    then
+      _largest=\${${_name}[\${_index}]}
+    fi
+  done
+  "
+  printf "%s" "${_largest}"
+}
+
+__sm.array.sort_desc()
+{
+  local _name="${1:-}" _index _largest=""
+  shift || fail "Array variable name was not given."
+
+  eval "${_name}=(\$(
+  echo \"\${${_name}[@]}\" | sed -e 's/\s/\n/g' | sort -r
+  ))"
+}
+
+__sm.array.sort_asc()
+{
+  local _name="${1:-}" _index _largest=""
+
+  shift || fail "Array variable name was not given."
+
+  eval "${_name}=(\$(
+  echo \"\${${_name}[@]}\" | tr ' ' \"\n\" | sort
+  ))"
+}
+
+__sm.array.unique()
+{
+  local _name="${1:-}" _index _largest=""
+  shift || fail "Array variable name was not given."
+
+  eval "${_name}=(\$(
+  echo \" \${${_name}[@]} \" |
+  awk -v RS=' ' -v ORS=' ' '!(\$0 in a){a[\$0];print}'
+  ))"
+}
+

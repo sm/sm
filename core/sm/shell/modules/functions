@@ -323,7 +323,7 @@ modules_reinitialize()
 {
   local _module _modules=("$@") _loaded_modules _module_path _initialize_path
 
-  array_is_nonempty _modules ||
+  [[ -n "${_modules}" ]] ||
     fail "Cannot load a module; No module name was given."
 
   _loaded_modules=" ${modules[*]} "

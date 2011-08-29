@@ -215,7 +215,7 @@ core_trace_filter()
       trace_filter_stack=( "$1" "${trace_filter_stack[@]}" )
       ;;
     stop)
-      old="${trace_filter_stack[0]}"
+      old="${trace_filter_stack[${__sm.array.start}]}"
       old="${old%%=*}"
       if [[ "${FUNCNAME[2]}" == "${old}" ]]
       then
@@ -228,7 +228,7 @@ core_trace_filter()
       ;;
   esac
 
-  filter="${trace_filter_stack[0]}"
+  filter="${trace_filter_stack[${__sm.array.start}]}"
 
   if [[ -n "$filter" ]]
   then
@@ -338,7 +338,7 @@ separator()
 #
 #     user$ cat ./test
 #     #!/bin/sm
-#     modules ext/trace # Load the trace module.
+#     modules base/trace # Load the trace module.
 #
 #     functiona()
 #     {
@@ -408,7 +408,7 @@ backtrace()
 
   # Loop over the function names in the function array stack, to determine
   # which is longest.
-  # Note that we do not use array_largest here, as we are inside an error function.
+  # Note that we do not use array largest here, as we are inside an error function.
   for (( _index=0 ; _index < ${#FUNCNAME[@]} ; _index++ ))
   do
     # For each function name in the stack, if the function name is longer than
@@ -421,7 +421,7 @@ backtrace()
   done
 
   # Loop over the bash source files array, to find the longest element.
-  # Note that we do not use array_largest here, as we are in an error function.
+  # Note that we do not use array largest here, as we are in an error function.
   for (( _index=0 ; _index < ${#BASH_SOURCE[@]} ; _index++ ))
   do
     # For each source file in the source files array, if the file name/path

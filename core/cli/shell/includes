@@ -1,6 +1,5 @@
-ext/os
-ext/files
-ext/files
-ext/environment
-ext/vcs
+base/os
+base/filesystem
+base/environment
+base/vcs
 cli/module_utils

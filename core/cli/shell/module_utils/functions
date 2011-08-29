@@ -53,7 +53,7 @@ module_functions()
 {
   local _function _functions _modules="${@:-}"
 
-  array_is_nonempty _modules ||
+  [[ -n "${_modules}" ]] ||
     fail "Cannot print the functions for module(s); No module names given."
 
   local _path="${modules_path}/${_module}"
@@ -95,22 +95,6 @@ module_functions()
 # ### Failure Scenarios
 #
 # No failure scenarios currently.
-#
-# ### Usage Examples
-#
-#     user$ modules_list
-#     array
-#
-#       array_is_nonempty()
-#       array_length()
-#       array_last_element()
-#       array_first_element()
-#       array_push()
-#       array_append()
-#       array_shift()
-#       array_unshift()
-#       array_join()
-#     ... longish output ...
 #
 modules_list()
 {
@@ -266,22 +250,6 @@ module_docs()
 # ### Failure Scenarios
 #
 # No failure scenarios currently.
-#
-# ### Usage Examples
-#
-#     user$ modules_list
-#     array
-#
-#       array_is_nonempty()
-#       array_length()
-#       array_last_element()
-#       array_first_element()
-#       array_push()
-#       array_append()
-#       array_shift()
-#       array_unshift()
-#       array_join()
-#     ... longish output ...
 #
 modules_docgen()
 {

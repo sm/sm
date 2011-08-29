@@ -1,10 +1,10 @@
 #!/bin/sh
 
-array_is_nonempty extension_args ||
+[[ -n "${extension_args}" ]] ||
   fail "open: You must specify at least one extension name."
 
-path exists "${extensions_development_path}/${extension_args[0]}" ||
-  error "open: Failed to open '${extension_args[0]}'; it appears to not be installed."
+path exists "${extensions_development_path}/${extension_args[${__sm.array.start}]}" ||
+  error "open: Failed to open '${extension_args[${__sm.array.start}]}'; it appears to not be installed."
 
-os_open "${extensions_development_path}/${extension_args[0]}"
+os_open "${extensions_development_path}/${extension_args[${__sm.array.start}]}"
 

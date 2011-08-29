@@ -1,0 +1,36 @@
+#!/bin/sh
+
+extension_path()
+{
+  local _path extension="${1:-}"
+  shift || fail "Cannot process extension path;"\
+    " No extension name was given."
+
+  for _path in ${extensions_search_paths[@]}
+  do
+    if [[ -d "${_path}/${extension}/bin" || -d "${_path}/${extension}/shell" ]]
+    then
+      extension_path="${_path}/${extension}"
+      return 0
+    fi
+  done
+  return 1
+}
+
+extension_is_valid()
+{
+  local _path="${1:-}"
+  shift || fail "No extension path was given to check validity."
+  [[ -n "${_path}" ]] || fail "Path to the extension was not given."
+  [[ -d "${_path}/bin" || -d "${_path}/shell" ]]
+}
+
+detect_extension_existence()
+{
+  extensions_path="${1:-}" extension="${2:-}"
+  shift || fail "Cannot detect extension existence;"\
+    " No extension path was given."
+  shift || fail "Cannot detect extension existence;"\
+    " No extension name was given."
+  extension_is_valid $extensions_path/$extension
+}

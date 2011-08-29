@@ -1,0 +1,91 @@
+#!/bin/sh
+
+ext_database_initialize()
+{
+  if user_is_root
+  then
+    true \
+      "${data_base_path:="/var/db/${package_name}"}" \
+      "${database_user:="${package_user:-"${extension}"}"}"
+  else
+    true \
+      "${data_base_path:="${active_path}/db/${package_name}"}" \
+      "${database_user:="${package_user:-"$USER"}"}"
+  fi
+
+  true "${data_path:="${data_base_path}/${package_version}"}"
+}
+
+database_cli()
+{
+  local _ignored_args=() args_count=${#extension_args[@]}
+
+  for (( index=0 ; index < $args_count ; index++ ))
+  do
+    token="${extension_args[$index]}"
+
+    case "$token" in
+      --data)
+        data_path="${extension_args[$((++index))]}"
+        ;;
+      --trace)
+        set -o xtrace
+        ;;
+      --help)
+        database_usage
+        ;;
+      *)
+        _ignored_args+=("${token}")
+        ;;
+    esac
+
+  done
+
+  extension_args=( "${_ignored_args[@]}" )
+
+  # Explicitly reload the database module, to pickup any CLI overrides.
+  modules_reinitialize database
+}
+
+database_usage() {
+  printf "
+  Usage:
+
+  $0 [options]
+
+  options:
+
+  --data)    - specify data directory.
+  --help)    - view this usage information.
+
+  "
+  return 0
+}
+
+database_setup()
+{
+  paths create "${data_base_path}"
+
+  if template_exists "/etc/conf.d/${service}.conf"
+  then
+    seed_template "/etc/conf.d/${service}.conf" \
+      data_path "${data_path}"
+  fi
+
+  if command_exists "${extension}_database_setup"
+  then
+    "${extension}_database_setup"
+  fi
+
+  if command_exists "${extension}_initialize"
+  then
+    "${extension}_initialize"
+  fi
+}
+
+# TODO: Should 'service_db_path' in service_{activate,deactivate} be moved into
+# here with database_activate / database_deactivate.
+database_activate()
+{
+  true # NIY
+}

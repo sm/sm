@@ -51,7 +51,7 @@ true \
   "${branch:="master"}" \
   "${language:="shell"}" \
   "${user:=$USER}" \
-  "${user_sm_path:=$HOME/.sm}" \
+  "${sm_user_path:=$HOME/.sm}" \
   "${keep_releases:=4}" \
   "${hooks_flag:=1}" \
   "${PAGER:="less"}" \
@@ -59,6 +59,14 @@ true \
   "${packages_path:="${sm_path}/pkg"}" \
   "${active_path:="${packages_path}/active"}" \
   "${extension_args:=""}"
+
+if [[ -n "${ZSH_VERSION:-}" ]]
+then
+  __sm.array.start=1
+else
+  __sm.array.start=0
+fi
+export __sm.array.start
 
 user_shell=$(which $(ps -eo pid,comm | awk "{ if ($PPID == \$1) print \$2}") 2>/dev/null ) || true
 
@@ -77,7 +85,7 @@ then
   then
     sets_user_path="${sets_system_path}"
   else
-    sets_user_path="${user_sm_path}/sets"
+    sets_user_path="${sm_user_path}/sets"
   fi
 fi
 
@@ -87,7 +95,7 @@ then
   then
     exts_user_path="${exts_system_path}"
   else
-    exts_user_path="${user_sm_path}/exts"
+    exts_user_path="${sm_user_path}/exts"
   fi
 fi
 
@@ -112,8 +120,10 @@ modules_core_initialize
 
 modules sm/versionedfs # Used for pkg, extensions and modules.
 
-[[ "$OSTYPE" != *solaris* ]] || # custom compilations + g*
+if [[ "$OSTYPE" == *solaris* ]]
+then # custom compilations + g*
   export PATH="/bin:/opt/local/bin:/usr/sfw/bin:/usr/sbin:/usr/bin:${PATH}"
+fi
 
 # Ensure that any variables you wish export to extensions actually *are* exported.
 sm_exports
@@ -141,7 +151,7 @@ then
       ${sm_path}/bin/smp ${extension_args[@]}
       ;;
     *)
-      modules ext/extensions/detection ext/extensions/execution
+      modules base/extensions/detection base/extensions/execution
       extension_action
       detect_action_type
       extension_run

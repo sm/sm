@@ -1,0 +1,136 @@
+#!/bin/sh
+
+actions_cache_add()
+{
+  string_contains "${_actions_cache[*]}" "$1" || _actions_cache+=( "$1" )
+}
+
+# Step 1 collect direct filesystem mapping
+initialize_filesystem_cache()
+{
+  trace_filter action_detection
+  local _action_path _file_name _paths
+
+  if [[ -d "${_actions_root}" ]]
+  then
+    shopt -s nullglob
+    _paths=( "${_actions_root}"/* )
+    shopt -u nullglob
+
+    for _action_path in "${_paths[@]}"
+    do
+      [[ -f "${_action_path}" && -x "${_action_path}" ]] || continue
+      _action_path="${_action_path#${_actions_root}\/}"
+      _file_name="${_action_path##*/}"
+
+      # Ignore hidden files
+      case "${_file_name}" in
+        (.*) continue ;;
+      esac
+
+      actions_cache_add "${_action_path}=${_action_path}"
+    done
+  fi
+}
+
+# Step 2 read map
+initialize_map_cache()
+{
+  trace_filter action_detection
+  local _mapping
+  if [[ -f "${_map}" ]]
+  then
+    for _mapping in $( grep -v "^#" < "${_map}" || true )
+    do actions_cache_add "${_mapping}"
+    done
+  fi
+}
+
+detect_module_actions()
+{
+  detect_module "$@" &&
+    [[ -f "${module_path}/actions" ]] &&
+    [[ -s "${module_path}/actions" ]]
+}
+
+# Step 3 collect dependent modules mapping
+initialize_modules_actions_cache()
+{
+  trace_filter action_detection
+  local _modules _module_path _module_name _action_pair
+
+  if [[ ! -d "${_modules_root}" ]]
+  then
+    debug search "missing modules dir '${_modules_root}'?"
+    return 0
+  fi
+
+  shopt -s nullglob
+  _modules=(
+  "${_modules_root}"/*/*/includes
+  "${_modules_root}"/*/*/*/includes
+  "${_modules_root}"/*/*/*/*/includes
+  )
+  shopt -u nullglob
+
+  for _module_path in "${_modules[@]}"
+  do
+    [[ "${_module_path##*/}" == "includes" ]] || continue
+
+    _module_name="${_module_path#${_modules_root}\/}"
+    _module_name="${_module_name%includes}"
+    _module_name="${_module_name%\/}"
+
+    while read _module_dep
+    do
+      if in_search_paths detect_module_actions "${_module_dep}"
+      then
+        log_search "actiondep" "${extension}${_module_name:+/}${_module_name}" "${module_path#${sm_path}\/}/actions"
+        while read _action_pair
+        do
+          if [[ "${_action_pair}" == [[:alpha:]]* ]]
+          then
+            actions_cache_add "${_module_name:+${_module_name}/}${_action_pair/=*}=${_module_name:+${_module_name}/}${_action_pair/*=}"
+          fi
+        done < "${module_path}/actions"
+      fi
+    done < ${_module_path}
+  done
+}
+
+action_cache_find_matching()
+{
+  local _method="$1" _name="$2"
+  shift || fail "No method and action name was given for search"
+  shift || fail "No action name was given for search"
+  for _item in "${_actions_cache[@]}"
+  do
+    case "${_method}" in
+      (only_one)
+        case "${_item}" in
+          (${_name}=*)
+            _found_actions+=("${_item}")
+            ;;
+        esac
+        ;;
+      (allow_many)
+        case "${_item}" in
+          (*${_name}*=*)
+            _found_actions+=("${_item}")
+            ;;
+        esac
+        ;;
+      (starting)
+        case "${_item}" in
+          (${_name}*=*)
+            _found_actions+=("${_item}")
+            ;;
+        esac
+        ;;
+      (*)
+        fail "Unknown search method, use 'only_one', 'allow_many', 'starting'."
+        ;;
+    esac
+  done
+}
+

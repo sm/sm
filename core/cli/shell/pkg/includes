@@ -1,3 +1,2 @@
-ext/files
-ext/paths
-ext/package
+base/filesystem
+base/package

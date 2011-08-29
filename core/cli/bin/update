@@ -3,7 +3,7 @@
 NYI "sm update"
 # What is this code intended to do?
 
-#extension_action=${extension_args[0]}
+#extension_action=${extension_args[${__sm.array.start}]}
 #
 #case "$extension_action" in
 #  repo|repository)
@@ -19,7 +19,7 @@ NYI "sm update"
 #    extensions=($(extensions_in ...)) #missing path
 #
 #    # TODO: Updates for released extensions instead of only from repository.
-#    if array_is_nonempty extension_args
+#    if [[ -n "${extension_args}" ]]
 #    then
 #      fetch_extensions_git_repository
 #

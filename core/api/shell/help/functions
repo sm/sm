@@ -1,0 +1,635 @@
+#!/bin/sh
+
+ext_help_initialize()
+{
+  declare -a help_descriptions
+  declare -a help_action_names
+  declare -a help_action_descriptions
+  declare -a help_notes
+  declare -a help_dependencies
+  declare -a help_resources
+
+  help_usage="sm ${extension} ${namespace:-"[namespace]"} {action} [arguments...]"
+}
+
+#
+# ## show\_help()
+#
+# Display help for the current extension based on settings declared in the help
+# action.
+#
+# ### Input Parameters
+#
+# First parameter is the help section to display, default is all sections 'usage'.
+#
+# ### Stream Outputs
+#
+# Prints out formatted help sections to the calling environments STDOUT stream.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user$ show_help usage
+#
+show_help()
+{
+  local _help_command _token
+
+  while (( $# > 0 )) ; do
+    _token="$1" ; shift
+    case "${_token}" in
+      desc*|description)
+        _help_command="description"
+        ;;
+      actions)
+        _help_command="actions"
+        ;;
+      usage)
+        _help_command="usage"
+        ;;
+    esac
+  done
+
+  "${_help_command:-usage}"
+}
+
+#
+# ## description()
+#
+# Set the string that will be printed when the actions help section is output.
+#
+# ### Input Parameters
+#
+# First parameter is a string containing a description of the extension.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# Fails if no description is given.
+#
+# ### Usage Examples
+#
+#     user$ description "This extension handles X Y and Z."
+#
+description()
+{
+  local _description="$*"
+  shift || fail "Cannot add description to help; description given."
+  help_descriptions+=("$*")
+}
+
+#
+# ## help_description()
+#
+# Outputs the collected help description.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# Prints the help description output.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# None.
+#
+# ### Usage Examples
+#
+#     user$ cat $HOME/test
+#     #!/bin/sm
+#     modules base/help
+#
+#     description "This extension handles X Y and Z."
+#     description "It also handles A B and C."
+#
+#     help_description
+#
+#     user$ "$HOME/test"
+#     Description
+#
+#       This extension handles X Y and Z.
+#       It also handles A B and C.
+#
+help_description()
+{
+  [[ -n "${help_descriptions}" ]] || return 0
+
+  local _description
+
+  help_section "Description"
+
+  for _description in "${help_descriptions[@]}"
+  do
+    printf "  %s\n" "${_description}"
+  done
+}
+
+#
+# ## action()
+#
+# Adds an action definition for help output.
+#
+# ### Input Parameters
+#
+# First parameter is the name of the extension action
+# Second parameter is the description of the extension action
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# The action description will be stored for use on help output.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# Fails if an action name is not given.
+# Fails if a description is not provided.
+#
+# ### Usage Examples
+#
+#     user$ action "install"  "Installs the extension..."
+#
+action()
+{
+  local _name="${1:-}" _description="${2:-}"
+  shift || fail "An action name must be provided:\naction {name} {description}."
+  shift || fail "An description must be provided:\naction {name} {description}."
+
+  help_action_names+=( "${_name}" )
+  help_action_descriptions+=( "${_description}" )
+}
+
+action_separator()
+{
+  help_action_names+=( "" )
+  help_action_descriptions+=( "${1:-}" )
+}
+
+#
+# ## note()
+#
+# Adds a note definition for help Notes section.
+#
+# ### Input Parameters
+#
+# First parameter is a string containing any note for the notes section of
+# the current extension's help output.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user$ note "Help for this extension can be found in #beginrescueend on irc.freenode.net"
+#
+note()
+{
+  help_notes+=("$*")
+}
+
+#
+# ## dependencies()
+#
+# Specify content for the dependencies section of the help command.
+#
+# ### Input Parameters
+#
+# First parameter is a string containing any dependencies for the dependencies
+# section of the current extension's help output.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user$ dependencies " * pcre"
+#
+dependencies()
+{
+  help_dependencies="$*"
+}
+
+#
+# ## resource()
+#
+# Add a resource for the Resources section of the help command.
+#
+# ### Input Parameters
+#
+# First parameter is a string containing any resources for the resources
+# section of the current extension's help output.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user$ resource "website: ..."
+#
+resource()
+{
+  help_resources+=("$*")
+}
+
+#
+# ## help\_actions()
+#
+# Outputs the help actions in a formatted manner.
+# Outputs a message if there are no actions.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# Prints a formatted listing of the actions and their descriptions to the
+# calling environment's STDOUT.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user$ cat $HOME/test
+#     #!/bin/sm
+#     modules base/help
+#
+#     action "help" "Displays the help output for the ${extension} extension."
+#     action "install" "Installs Z redis package."
+#     action "uninstall" "Uninstalls Z redis package."
+#
+#     help_actions
+#
+#     user$ "$HOME/test"
+#     help      - Displays the help output for the redis extension.
+#     install   - Installs Z redis package.
+#     uninstall - Uninstalls Z redis package.
+#
+help_actions()
+{
+  local _largest _index
+
+  if [[ -n "${help_action_names}" ]]
+  then
+    _largest=$( array largest help_action_names ) # Use the array DSL to grab largest
+    _largest=$(( ${#_largest} + 1 ))
+
+    help_section "Actions"
+
+    for (( _index=0 ; _index < ${#help_action_names[@]} ; _index++ ))
+    do
+      if [[ -n "${help_action_names[${_index}]}" ]]
+      then
+        printf "  %-$((_largest + 2))s - %s\n" \
+          "${help_action_names[${_index}]}" "${help_action_descriptions[${_index}]}"
+      else
+        printf "%s\n" "${help_action_descriptions[${_index}]}"
+      fi
+    done
+  else
+    log "# No help has been defined for ${extension} actions."
+  fi
+}
+
+#
+# ## help\_notes()
+#
+# Outputs the help notes in a formatted manner.
+# Outputs a message if there are no notes.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# Prints a formatted listing of the notes to the calling environment's STDOUT.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user$ cat $HOME/test
+#     #!/bin/sm
+#     modules base/help
+#
+#     note "Don't forget the milk! "
+#     note "... and cookies... mmm...."
+#
+#     help_notes
+#
+#     user$ "$HOME/test"
+#     * Don't forget the milk!
+#     * ... and cookies... mmm....
+#
+help_notes()
+{
+  [[ -n "${help_notes}" ]] || return 0
+
+  local _index
+
+  help_section "Notes"
+
+  for (( _index=0 ; _index < ${#help_notes[@]} ; _index++ ))
+  do
+    printf "  * %s\n" "${help_notes[${_index}]}"
+  done
+}
+
+#
+# ## help\_dependencies()
+#
+# Outputs the help dependencies in a formatted manner.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# Prints a formatted listing of the current extension-defined dependencies to
+# the calling environment's STDOUT.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+help_dependencies()
+{
+  local _index
+
+  [[ -n "${help_dependencies}" ]] || return 0
+
+  help_section "Dependencies"
+
+  for (( _index=0 ; _index < ${#help_dependencies[@]} ; _index++ ))
+  do
+    printf " * %s\n" "${help_dependencies[${_index}]}"
+  done
+}
+
+#
+# ## help\_resources()
+#
+# Outputs the help notes in a formatted manner.
+# Outputs a message if there are no notes.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# Prints a formatted listing of the defined resources to the calling
+# environment's STDOUT.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+help_resources()
+{
+  [[ -n "${help_resources}" ]] || return 0
+
+  local _index
+
+  help_section "Resources"
+
+  for (( _index=0 ; _index < ${#help_resources[@]} ; _index++ ))
+  do
+    printf " * %s\n" "${help_resources[${_index}]}"
+  done
+}
+
+#
+# ## help\_section()
+#
+# Displays a help section header.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# Prints the given string as a help section header.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user$ help_section Usage
+#
+help_section()
+{
+  log ""
+  log "$*"
+  log ""
+}
+
+#
+# ## help\_usage()
+#
+# Display the CLI signature.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# Prints the CLI command signature.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user$ help_usage
+#     sm core {action} [arguments...]
+#
+help_usage()
+{
+  help_section "Usage"
+  log "  ${help_usage}"
+}
+
+#
+# ## usage()
+#
+# Display the usage help output of the command. This displays all help sections.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# Prints all help sections to the STDOUT of the calling environment.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user$ usage
+#
+usage()
+{
+  sm_version
+
+  log "SM Framework ${sm_version} https://sm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)"
+
+  sections=( usage description actions notes dependencies resources )
+  for section in "${sections[@]}"
+  do
+    "help_${section}"
+  done
+
+  echo ""
+}
+

@@ -1,0 +1,758 @@
+#!/bin/sh
+
+#
+# # Bash System Module DSL
+#
+:
+# ## init\_scripts\_path()
+#
+# Returns the system init scripts path (eg. /etc/init.d /etc/rc.d)
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# The system init scripts path is printed to the calling environment's STDOUT.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# Fails the OS is not of a (yet) recognized type.
+#
+# ### Usage Examples
+#
+#     user@archlinux$ init_scripts_path
+#     /etc/rc.d
+#
+# ### Code Walkthrough
+init_scripts_path()
+{
+  if (( UID == 0 ))
+  then
+    case "$OSTYPE" in
+      *darwin*)
+        printf "/etc/init.d"
+        ;;
+
+      *linux*|*)
+        if [[ -d "/etc/init.d" ]]
+        then
+          printf "/etc/init.d"
+        elif [[ -d "/etc/rc.d" ]]
+        then
+          printf "/etc/rc.d"
+        else
+          fail "Unknown init scripts directory (/etc/init.d or /etc/rc.d not found)."
+        fi
+        ;;
+    esac
+  else
+    printf "$HOME/.init.d"
+  fi
+}
+
+#
+# ## confd\_path()
+#
+# Return the system conf.d path.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# Prints the conf.d path for the current system and user.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     root# confd_path
+#     /etc/conf.d
+#
+# ### Code Walkthrough
+confd_path()
+{
+  if (( UID == 0 ))
+  then
+    printf "/etc/conf.d"
+  else
+    printf "$HOME/.conf.d"
+  fi
+}
+
+#
+# ## os\_is\_linux()
+#
+# Tests if the operating system the process is running on is Linux.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 if the operating system is Linux.
+# 1 if the operating system is not Linux.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     root@archlinux# os_is_linux
+#     root@archlinux# echo $?
+#     0
+#
+# ### Code Walkthrough
+os_is_linux()
+{
+  [[ "$OSTYPE" = *linux* ]]
+}
+
+#
+# ## os\_is\_darwin()
+#
+# Tests if the operating system the process is running on is darwin.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 if the operating system is darwin.
+# 1 if the operating system is not darwin.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user@OSX# os_is_darwin
+#     user@OSX# echo $?
+#     0
+#
+# ### Code Walkthrough
+os_is_darwin()
+{
+  [[ "$OSTYPE" = *darwin* ]]
+}
+
+#
+# ## os\_is\_bsd()
+#
+# Tests if the operating system the process is running on is bsd.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 if the operating system is bsd.
+# 1 if the operating system is not bsd.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     root@bsd# os_is_bsd
+#     root@bsd# echo $?
+#     0
+#
+# ### Code Walkthrough
+os_is_bsd()
+{
+  [[ "$OSTYPE" = *bsd* ]]
+}
+
+#
+# ## os\_is\_solaris()
+#
+# Tests if the operating system the process is running on is solaris.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 if the operating system is linux.
+# 1 if the operating system is not linux.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     root@linux# os_is_linux
+#     root@linux# echo $?
+#     0
+#
+# ### Code Walkthrough
+os_is_solaris()
+{
+  [[ "$OSTYPE" = *solaris* ]]
+}
+
+#
+# ## os\_is\_aix()
+#
+# Tests if the operating system the process is running on is aix.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 if the operating system is aix.
+# 1 if the operating system is not aix.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     root@aix# os_is_aix
+#     root@aix# echo $?
+#     0
+#
+# ### Code Walkthrough
+os_is_aix()
+{
+  [[ "$OSTYPE" = *aix* ]]
+}
+
+#
+# ## os\_type()
+#
+# Print out the OS category / type based on the detected machine type.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# Prints the OS category/type to the calling environment's STDOUT.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     root@archlinux# os_type
+#     linux
+#
+#     user@osx# os_type
+#     darwin
+#
+# ### Code Walkthrough
+os_type()
+{
+  case "$OSTYPE" in
+    (*linux*)
+      printf "%s" "linux"
+      ;;
+    (*darwin*)
+      printf "%s" "darwin"
+      ;;
+    (*bsd*)
+      printf "%s" "bsd"
+      ;;
+    (*solaris*)
+      printf "%s" "solaris"
+      ;;
+    (*aix*)
+      printf "%s" "aix"
+      ;;
+    (*)
+      # If the machine type is an unknown category then simply echo it.
+      printf "%s" "$OSTYPE"
+      ;;
+  esac
+}
+
+#
+# ## os\_arch\_type()
+#
+# Print out the OS architecture type based on the detected machine type.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# Prints out the architecture type string of the system that is running the
+# current process.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user$ os_arch_type
+#     x86_64
+#
+# ### Code Walkthrough
+os_arch_type()
+{
+  case "${MACHTYPE//-*}" in
+    # The machine type is 32 bit.
+    # Note that this accounts for Solaris 32 bit as well (i86pc).
+    (i386|i686|i86pc)
+      printf "%s" "i386"
+      ;;
+    # The machine type is 64 bit.
+    (*x86_64*)
+      printf "%s" "x86_64"
+      ;;
+    # The machine type is PowerPC.
+    (*ppc*)
+      printf "%s" "ppc"
+      ;;
+  esac
+}
+
+#
+# ## os\_arch()
+#
+# Prints out the full OS machine type string.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# Print the OS machine type string to STDOUT of the calling environment.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user@OSX# os_arch
+#     i386-apple-darwin10.7.0
+#
+# ### Code Walkthrough
+os_arch()
+{
+  printf '%s' "${MACHTYPE//-*}"
+}
+
+#
+# ## os\_arch\_capable()
+#
+# Tests if the operating system the process is running on is Linux.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# None.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 if the operating system is linux.
+# 1 if the operating system is not linux.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user@OSX$ os_arch_capable
+#     x86_64
+#
+# ### Code Walkthrough
+os_arch_capable()
+{
+  if os_is_darwin
+  then
+    local _string
+    read -r _string < <(sysctl hw.cpu64bit_capable)
+    if (( ${_string//* } == 1 ))
+    then
+      printf "%s" "x86_64"
+    else
+      os_arch_type
+    fi
+  else
+    os_arch_type
+  fi
+}
+
+#
+# ## os\_cpu\_count()
+#
+# Print the number of cpu cores on the current system to STDOUT.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# An integer representing the number of CPU cores or 1 if unknown.
+#
+# ### Environmental effects
+#
+# None.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user$ os_cpu_count
+#     24
+#
+# ### Code Walkthrough
+os_cpu_count()
+{
+  local _cpu_count=1
+
+  if os_is_darwin
+  then
+    read -r _cpu_count < <(/usr/sbin/sysctl hw.ncpu)
+    _cpu_count="${_cpu_count//* }"
+
+  elif os_is_linux
+  then
+    _cpu_count=$(awk '/^processor/{count++} END{print count}' /proc/cpuinfo 2>&1)
+
+  elif os_is_solaris
+  then
+    warn "CPU counting for Solaris has not yet been implemented; returning 1."
+
+  elif os_is_bsd
+  then
+    warn "CPU counting for BSD has not yet been implemented; returning 1."
+
+  elif os_is_aix
+  then
+    warn "CPU counting for AIX has not yet been implemented; returning 1."
+  fi
+
+  (( _cpu_count > 0 )) || _cpu_count=1 # Sanity Check
+
+  printf "%d" ${_cpu_count}
+}
+
+#
+# ## os\_version()
+#
+# Prints the OS version to STDOUT and sets the 'os_version' variable
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# The OS (Kernel) Version is printed to STDOUT.
+#
+# ### Environmental effects
+#
+# After running this function the os version is stored in the 'os_version'
+# variable.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user@archlinux$ os_version
+#     2.6.38
+#
+#     user@osx$ os_version
+#     10.7.0
+#
+# ### Code Walkthrough
+os_version()
+{
+  read -r os_version < <(uname -r)
+  os_version=${os_version//-*}
+  printf "%s" "${os_version}"
+}
+
+#
+# ## os\_version\_major()
+#
+# Prints the OS major version to STDOUT and sets the 'os_version_major' variable.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# The OS Major Version is printed to STDOUT.
+#
+# ### Environmental effects
+#
+# After running this function the os major version is stored in the
+# 'os_version_major' variable.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user@archlinux$ os_version
+#     2.6.38
+#
+#     user@osx$ os_version_major
+#     2
+#
+# ### Code Walkthrough
+os_version_major()
+{
+  os_version_major=$(os_version)
+  os_version_major="${os_version_major//\.*}"
+  printf "${os_version_major}"
+}
+
+#
+# ## os\_version\_minor()
+#
+# Prints the OS minor version to STDOUT and sets the 'os_version_minor' variable.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# The OS minor Version is printed to STDOUT.
+#
+# ### Environmental effects
+#
+# After running this function the os minor version is stored in the
+# 'os_version_minor' variable.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user@archlinux$ os_version
+#     2.6.38
+#
+#     user@osx$ os_version_minor
+#     6
+#
+# ### Code Walkthrough
+os_version_minor()
+{
+  os_version_minor=$(os_version)
+  os_version_minor="${os_version_minor#*\.}"
+  os_version_minor="${os_version_minor%\.*}"
+  printf "${os_version_minor}"
+}
+
+#
+# ## os\_version\_patch()
+#
+# Prints the OS patch version to STDOUT and sets the 'os_version_patch' variable.
+#
+# ### Input Parameters
+#
+# None.
+#
+# ### Stream Outputs
+#
+# The OS patch Version is printed to STDOUT.
+#
+# ### Environmental effects
+#
+# After running this function the os patch version is stored in the
+# 'os_version_patch' variable.
+#
+# ### Return Codes
+#
+# 0 for success.
+#
+# ### Failure Scenarios
+#
+# No failure scenarios currently.
+#
+# ### Usage Examples
+#
+#     user@archlinux$ os_version
+#     2.6.38
+#
+#     user@osx$ os_version_patch
+#     38
+#
+# ### Code Walkthrough
+os_version_patch()
+{
+  os_version_patch=$(os_version)
+  os_version_patch="${os_version_patch//*\.}"
+  printf "${os_version_patch}"
+}
+
+#
+# ## os\_open()
+#
+# Opens given URI via whatever OS mechanism can be found.
+#
+# ### Input Parameters
+#
+# The first parameter is a URI.
+#
+# ### Code Walkthrough
+os_open()
+{
+  local _uri="${1:-}"
+  shift || fail "Cannot open URI; No uri was given."
+
+  if command_exists open
+  then
+    open "${_uri}"
+
+  elif command_exists xdg-open
+  then
+    xdg-open "${_uri}"
+
+  else
+    modules base/interactive
+    if shell_is_interactive
+    then
+      if [[ "${_uri}" == file* ]]
+      then
+        ${EDITOR:-less} "${_uri}"
+      else
+        curl -s "${_uri}"
+      fi
+    else
+      echo "$_uri"
+    fi
+  fi
+}
+

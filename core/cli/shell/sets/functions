@@ -2,7 +2,7 @@
 
 sets_help()
 {
-  modules ext/help
+  modules base/help
 
   description "BDSM extension sets management"
 
@@ -75,7 +75,7 @@ sets_install()
 
   _names=(${_names//,/ })
   _extension_namespace="${sets_user_path#${sm_path}\/}"
-  _extension_namespace="${_extension_namespace#${user_sm_path}\/}"
+  _extension_namespace="${_extension_namespace#${sm_user_path}\/}"
 
   for _name in ${_names[@]}
   do

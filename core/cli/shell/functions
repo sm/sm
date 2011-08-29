@@ -22,7 +22,7 @@ extension_cli()
         archive_format="${extension_args[$((++index))]}"
         ;;
       --licence)
-        modules ext/extensions/manipulation
+        modules base/extensions/manipulation
         extension_license
         exit 0
         ;;
@@ -38,3 +38,47 @@ extension_cli()
 
   extension_args=( "${_ignored_args[@]}" )
 }
+
+#
+# actions maps build {paths...}
+# actions maps lookup {command}
+#
+actions()
+{
+  local _action="$1"
+  shift || fail "Actions command not given."
+
+  while (( $# ))
+  do
+    _token="$1" && shift
+    case "${_token}" in
+      (maps)
+        _token="$1" && shift
+        case "${_token}" in
+          (build)
+            __sm.actions.maps.build "$@"
+            ;;
+          (search)
+            ;;
+          (*)
+            fail "Unknown command maps '${_token}'"
+            ;;
+        esac
+      (*)
+        fail "Unknown command '${_token}'"
+        ;;
+    esac
+  done
+}
+
+__sm.actions.maps.build()
+{
+  local _path _paths=($@) _extensions
+  for _path in "${_paths[@]}"
+  do
+    _extensions=()
+  done
+
+}
+
+
