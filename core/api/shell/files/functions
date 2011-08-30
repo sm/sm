@@ -158,13 +158,16 @@ files()
       __sm.files.source "${_files[@]}"
       ;;
     (nonempty)
-      __sm.files.nonempty
+      [[ -n "${_files}" ]] || fail "files must be given."
+      __sm.files.nonempty "${_files[@]}"
       ;;
     (exist)
-      __sm.files.exist
+      [[ -n "${_files}" ]] || fail "files must be given."
+      __sm.files.exist "${_files[@]}"
       ;;
     (remove)
-      __sm.files.remove
+      [[ -n "${_files}" ]] || fail "files must be given."
+      __sm.files.remove "${_files[@]}"
       ;;
     (create)
       [[ -n "${_files}" ]] || fail "files to create must be given."
