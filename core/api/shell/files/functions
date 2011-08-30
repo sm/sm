@@ -13,13 +13,13 @@ files()
 {
   trace_filter filesystem
 
-  local _command _subcommand _path _file _files=() _source _target _mode _owner \
+  local _token _command _subcommand _path _file _files=() _source _target _mode _owner \
     _flags _string _regex _content
 
   while (( $# > 0 ))
   do
-    token="$1" && shift
-    case "${token}" in
+    _token="$1" && shift
+    case "${_token}" in
       (are|is)
         _subcommand="$1"
         shift
@@ -95,10 +95,11 @@ files()
       (force)
         _flags+=( -f )
         ;;
-#      (contain|containing|replace)
-#        _subcommand="$1"
-#        shift
-#        case "${_subcommand}" in
+      (contain|containing|replace)
+        if [[ -z "${_command}" ]] ; then _command="${_token}" ; fi
+        _subcommand="$1"
+        shift
+        case "${_subcommand}" in
           (string)
             _content="$1"
             shift || fail "A string must be followed by keyword 'string'"
@@ -107,13 +108,13 @@ files()
             _regex="$1"
             shift || fail "A regex must be followed by keyword 'regex'"
             ;;
-#          (*)
-#            fail "Unknown subcommand '${1}' for '${_command}'"
-#            ;;
-#        esac
-#        [[ -n "${_string}" || -n "${_regex}" ]] ||
-#          fail "A string or regex must be given after keyword 'containing'."
-#        ;;
+          (*)
+            fail "Unknown subcommand '${1}' for '${_command}'"
+            ;;
+        esac
+        [[ -n "${_string}" || -n "${_regex}" ]] ||
+          fail "A string or regex must be given after keyword 'containing'."
+        ;;
       (key)
         _key="$1"
         shift || fail "A key name must follow keyword 'key'"
@@ -129,9 +130,9 @@ files()
       (*)
         if [[ -z "${_command}" ]]
         then
-          _command="$token"
+          _command="${_token}"
         else
-          _files+=("$token")
+          _files+=("${_token}")
         fi
         ;;
     esac
