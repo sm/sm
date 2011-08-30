@@ -52,8 +52,8 @@ man_display()
     shift
   fi
 
-  if in_search_paths detect_man "$@" ||
-    in_cli_path detect_man "$@"
+  if __sm.extensions.in.paths detect_man "$@" ||
+    __sm.cli.in.path detect_man "$@"
   then
     if man $man_file
     then

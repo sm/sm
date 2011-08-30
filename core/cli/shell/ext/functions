@@ -30,7 +30,7 @@ ext_list()
 {
   local extensions COLUMNS=80
 
-  if extensions_in "${exts_system_path}/active"
+  if __sm.extensions.in "${exts_system_path}/active"
   then
     log "exts: #system"
     echo ${found_extensions[@]} | xargs -s ${COLUMNS} | xargs -I '{}' echo "  - {}"
@@ -40,7 +40,7 @@ ext_list()
 
   if [[ "${exts_system_path}" != "${exts_user_path}" ]]
   then
-    if extensions_in "${exts_user_path}/active"
+    if __sm.extensions.in "${exts_user_path}/active"
     then
       log "exts: #user"
       echo ${found_extensions[@]} | xargs -s ${COLUMNS} | xargs -I '{}' echo "  - {}"

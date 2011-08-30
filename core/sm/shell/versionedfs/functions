@@ -51,7 +51,7 @@ versionedfs()
 
   while (( $# ))
   do
-    _token="${1}" ; shift
+    _token="${1}" && shift
     case "${_token}" in
       (path)
         _path="${1}"
@@ -97,7 +97,7 @@ versionedfs()
         _keep="${1}"
         shift || fail "keep number must follow keyword 'activate'"
         case "${_keep}" in
-          (+([[:digit]]))
+          (+([[:digit:]]))
             (( _keep > 0)) || fail "Keep must be a positive integer." ;;
           (*) fail "Keep must be an integer." ;;
         esac
@@ -373,7 +373,7 @@ __sm.versionedfs.list()
     then
       __name="${__path%/*}"
       __name="${__name##*/}"
-      if [[ -n "${_name}" ]] && ! string_contains "${_name}" "${__name}"
+      if [[ -n "${_name}" ]] && ! string contains "${__name}" "${_name}"
       then
         __name=""
       fi

@@ -3,9 +3,9 @@
 package_extension_setup()
 {
   local extension="${1:-}" module="${2:-}" path="${3:-}" ${language:=shell}
-  shift || fail "Cannot setup package extension; no extension name given."
-  shift || fail "Cannot setup package extension; no module name given."
-  shift || fail "Cannot setup package extension; no path given."
+  shift || fail "No extension name given."
+  shift || fail "No module name given."
+  shift || fail "No path given."
 
   for action in install uninstall update activate deactivate
   do

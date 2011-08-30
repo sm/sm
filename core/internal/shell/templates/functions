@@ -61,7 +61,7 @@ template_exists()
 {
   trace_filter template
 
-  if in_search_paths detect_template "$@" || in_cli_path detect_template "$@"
+  if __sm.extensions.in.paths detect_template "$@" || __sm.cli.in.path detect_template "$@"
   then
     log_search "template" "$template_name" "${template_path##${sm_path}\/}"
     return 0

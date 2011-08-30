@@ -4,36 +4,228 @@
 # SM Framework Core Module ~ Modules (modules)
 #
 
-modules_core_initialize()
+modules()
 {
-  (( ! ${modules_initialized:=0} )) || return 0
+  local _token _command _subcommand _modules=()
 
-  true $((modules_initialized++))
+  while (( $# ))
+  do
+    _token="$1" && shift
+    case "${_token}" in
+      (core)
+        _command="${_token}"
+        _subcommand="$1"
+        shift || fail "Command must follow keyword 'core'; modules core <initialize>"
+        case "${_subcommand}" in
+          (initialize)
+            continue
+            ;;
+          (*)
+            "Unknown command following keyword 'core'; modules core <initialize>"
+            ;;
+        esac
+        ;;
+      (*)
+        if [[ -z "${_command}" ]]
+        then
+          _command="${_token}"
+        else
+          _modules+=("${_token}")
+        fi
+        ;;
+    esac
+  done
 
-  init_extensions_search_paths #initialize search paths
+  case "${_command}" in
+    (core)
+      case "${_subcommand}" in
+        (initialize)
+          __sm.modules.core.initialize
+          ;;
+      esac
+        ;;
+    (reinitialize)
+      [[ -n "${_modules}" ]] || fail "No modules given to reinitialize."
+      __sm.modules.reinitialize "${_modules[@]}"
+      ;;
+    (include|load)
+      [[ -n "${_modules}" ]] || fail "No modules given to include."
+      __sm.modules.include "${_modules[@]}"
+      ;;
+    (*)
+      fail "Unknown modules command '${_command}'"
+      ;;
+  esac
+}
+
+__sm.modules.core.initialize()
+{
+  (( ! ${__sm_modules_initialized:=0} )) || return 0
+
+  true $((__sm_modules_initialized++))
+
+  local _module _name _path
+
+  __sm.extensions.paths.initialize
 
   #core is loaded as BDSM starts
-  modules=(
+  __sm_modules_loaded=(
     "sm/core=core/sm/shell/core"
     "sm/string=core/sm/shell/string"
     "sm/logging=core/sm/shell/logging"
     "sm/modules=core/sm/shell/modules"
   )
 
-  for module_def in ${modules[@]}
+  for _module in ${__sm_modules_loaded[@]}
   do
-    module_name="${module_def//=*}"
-    module_path="${module_def//*=}"
-    log_search preload "$module_name" "${module_path}"
+    _name="${_module//=*}"
+    _path="${_module//*=}"
+    log_search preload "$_name" "${_path}"
   done
 
-  for module in ${preload_modules[@]}
+  for _module in ${preload_modules[@]}
   do
-    module_or_error ${module} "Cannot preload module: ${module}."
+    modules include ${_module} || error "Cannot preload module: ${_module}."
   done
 }
 
-init_extensions_search_paths()
+__sm.modules.include()
+{
+  local _module _sm _extension _path _file _modules=("$@")
+
+  for _module in "${_modules[@]}"
+  do
+    if __sm.module.include "${_module}"
+    then
+      continue
+    else
+      fail "Could not find module path for ${_module}."
+    fi
+  done
+}
+
+__sm.module.include()
+{
+  local _module="$1" _file _module_dependency _module_path _hook _function
+
+  if __sm.module.is.loaded "${_module}"
+  then
+    return 0
+  fi
+
+  # Search for module.
+  if __sm.extensions.in.paths __sm.module.detect "${_module}"
+  then
+    log_search module "$module_name" "${module_path##${sm_path}\/}"
+    __sm_modules_loaded+=("${module_name}=${module_path##${sm_path}\/}")
+  else
+    log_search module "${_module}" "Not found !!!"
+    return 1
+  fi
+
+  # store path, so dependencies do not overwrite it.
+  _module_path="${module_path}"
+
+  # Load env before dependencies, so they can use env settings.
+  if [[ -s "${_module_path}/env" ]]
+  then
+    source "${_module_path}/env" # TODO: should we check for errors here ?!?!?!
+  fi
+
+  # Load module dependencies.
+  if [[ -s "${module_path}/includes" ]]
+  then
+    while read -r _module_dependency
+    do
+      if ! __sm.module.load "${_module_dependency}"
+      then
+        error "Could not find module dependency '${_module_dependency}' "\
+          "from '${_module_path##${sm_path}\/}/includes'."
+      fi
+    done < "${_module_path}/includes"
+  fi
+
+  # Load module
+  for _file in functions cli initialize
+  do
+    if [[ -s "${_module_path}/${_file}" ]]
+    then
+      #TODO: should we check for errors here ?!?!?!
+      source "${_module_path}/${_file}"
+    fi
+  done
+
+  _function="${_module//\//_}"
+  _function="${_function/_shell/_}"
+
+  for _hook in initialize # options, etc... ?
+  do
+    if command -v "${_function}_${_hook}" > /dev/null 2>&1
+    then
+      "${_function}_${_hook}"
+    fi
+  done
+
+  return 0
+}
+
+__sm.modules.reinitialize()
+{
+  local _module _modules=("$@") _loaded_modules _module_path _initialize_path
+
+  _loaded_modules=" ${__sm_modules_loaded[*]} "
+  for _module in "${_modules[@]}"
+  do
+    _module_path="${_loaded_modules##* ${_module}=}"
+    _module_path="${_module_path%% *}"
+    [[ -n "${_module_path}" ]] ||
+      fail "Can not reinitialize module as it was not yet loaded"
+
+    _initialize_path="${sm_path}/${_module_path}/initialize"
+    [[ ! -s "${_initialize_path}" ]] || source "${_initialize_path}"
+  done
+}
+
+__sm.module.is.loaded()
+{
+  local _name="${1}"
+  case " ${__sm_modules_loaded[*]} " in
+    (*[[:space:]]${_name}=*)
+      return 0
+      ;;
+    (*)
+      return 1
+      ;;
+  esac
+}
+
+__sm.extensions.in.paths()
+{
+  trace_filter search
+  local callback="${1:-}" _path
+  shift || fail "Callback name must be given ast the first parameter."
+
+  if [[ -n "$1" ]] # do search if params given
+  then
+    for _path in "${extensions_search_paths[@]}"
+    do
+      "${callback}" "${_path}" "$@" || continue
+      return 0
+    done
+  fi
+  return 1
+}
+
+__sm.cli.in.path()
+{
+  trace_filter search
+  local callback="${1:-}"
+  shift || fail "Callback name must be given ast the first parameter."
+
+  "${callback}" "${sm_path}/core" "cli" "$@"
+}
+
+__sm.extensions.paths.initialize()
 {
   local _paths=() _extension_set_path
 
@@ -78,9 +270,10 @@ init_extensions_search_paths()
     done
   fi
 
-  # Core is required to run, add it if not found
-  string_contains "${extensions_search_paths[*]}" "${sm_path}/core" ||
+  if ! string contains "${sm_path}/core" "${extensions_search_paths[*]}"
+  then # Core is required to run, add it if not found
     extensions_search_paths+=( "${sm_path}/core" )
+  fi
 
   debug search "sets_user_path:${sets_user_path}:"
   debug search "exts_user_path:${exts_user_path}:"
@@ -88,7 +281,7 @@ init_extensions_search_paths()
   export extensions_search_paths
 }
 
-reorder_path()
+__sm.extensions.path.reorder()
 {
   local part="${1:-}" extensions_path="${2:-}" extension="${3:-}"
   shift || fail "Path part must be given as the first parameter."
@@ -99,32 +292,29 @@ reorder_path()
   rebuilded_path="${output// //}"
 }
 
-rebuild_path()
+__sm.extensions.path.rebuild()
 {
   local part="$1" extensions_path="$2"
   shift || fail "Path part must be given as the first parameter."
   shift || fail "Extensions path must be given as the second parameter."
 
   local params="$*"
-  reorder_path "${part}" "${extensions_path}" ${params//\// }
+  __sm.extensions.path.reorder "${part}" "${extensions_path}" ${params//\// }
 }
 
-is_module()
-{
-  [[ -s "$1/functions" && ! -d "$1/functions" ]] || [[ -s "$1/includes" && ! -d "$1/includes" ]]
-}
-
-detect_module()
+__sm.module.detect()
 {
   local extensions_path=$1 _module_path
   shift || fail "Extensions path must be given as the first parameter."
 
-  rebuild_path "shell" $extensions_path $@
+  __sm.extensions.path.rebuild "shell" $extensions_path $@
   _module_path=${rebuilded_path}
 
   debug search_module_path ":${_module_path}:"
 
-  if is_module "${_module_path}"
+  [[ -d "${_modules_path}/functions" ]] || return 1
+
+  if [[ -s "${_modules_path}/functions" || -s "${_modules_path}/includes" ]]
   then
     module_path=${_module_path}
     module_name="$*"
@@ -133,234 +323,5 @@ detect_module()
   else
     return 1
   fi
-}
-
-#
-# ## extensions\_in()
-#
-# Lists the extensions in a given directory.
-#
-# ### Input Parameters
-#
-# First parameter is a full path for a BDSM extensions directory.
-#   (example: /sm/exts)
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# The names of the extensions in the given directory are set in found_extensions.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# No failure scenarios currently.
-#
-# ### Usage Examples
-#
-#     $ sm call extensions_in /sm/sets/gnu
-#
-extensions_in()
-{
-  local _path="$1" _extension
-  found_extensions=()
-
-  if [[ -d "${_path}" ]]
-  then
-    shopt -s nullglob
-    local _paths=( "${_path}"/* )
-    shopt -u nullglob
-    for _extension in "${_paths[@]}"
-    do
-      if [[ -d "${_extension}/bin" || -d "${_extension}/shell" ]]
-      then
-        found_extensions+=( "${_extension##${_path}\/}" )
-      fi
-    done
-  else
-    debug search "Path '${_path}' does not exist."
-    return 1
-  fi
-}
-
-in_search_paths()
-{
-  trace_filter search
-  local callback="${1:-}" _path
-  shift || fail "Callback name must be given ast the first parameter."
-
-  if [[ -n "$1" ]] # do search if params given
-  then
-    for _path in "${extensions_search_paths[@]}"
-    do
-      "${callback}" "${_path}" "$@" || continue
-      return 0
-    done
-  fi
-  return 1
-}
-
-in_cli_path()
-{
-  trace_filter search
-  local callback="${1:-}"
-  shift || fail "Callback name must be given ast the first parameter."
-
-  "${callback}" "${sm_path}/core" "cli" "$@"
-}
-
-# Examples
-#
-#    if module backup
-#    then
-#       log "module backup found; please backup your system"
-#    else
-#       error "could not find backup module"
-#    fi
-#
-module()
-{
-  local _module="${1:-}" _file _module_dependency _module_path _hook _function
-  shift || fail "No module name was given as the first parameter."
-
-  if module_is_loaded "${_module}"
-  then
-    return 0 # Return if module is loaded.
-  fi
-
-  # Search for module.
-  if in_search_paths detect_module "${_module}"
-  then
-    log_search module "$module_name" "${module_path##${sm_path}\/}"
-    modules+=("${module_name}=${module_path##${sm_path}\/}")
-  else
-    log_search module "${_module}" "Not found !!!"
-    return 1
-  fi
-
-  # store path, so dependencies do not overwrite it.
-  _module_path="${module_path}"
-
-  # Load env before dependencies, so they can use env settings.
-  if [[ -s "${_module_path}/env" ]]
-  then
-    source "${_module_path}/env" # TODO: should we check for errors here ?!?!?!
-  fi
-
-  # Load module dependencies.
-  if [[ -s "${module_path}/includes" ]]
-  then
-    for _module_dependency in $( cat "${_module_path}/includes" )
-    do
-      module_or_error "${_module_dependency}" \
-        "Could not find module dependency '${_module_dependency}' from '${_module_path##${sm_path}\/}/includes'."
-    done
-  fi
-
-  # Load module
-  for _file in functions cli initialize
-  do
-    if [[ -s "${_module_path}/${_file}" ]]
-    then
-      #TODO: should we check for errors here ?!?!?!
-      source "${_module_path}/${_file}"
-    fi
-  done
-
-  _function="${_module//\//_}"
-  _function="${_function/_shell/_}"
-
-  for _hook in initialize # options, etc... ?
-  do
-    if command -v "${_function}_${_hook}" > /dev/null 2>&1
-    then
-      "${_function}_${_hook}"
-    fi
-  done
-
-  return 0
-}
-
-# load module; or show error msg if module is not available.
-module_or_error()
-{
-  module "$1" || error "$2"
-}
-
-# Examples
-#
-#     user$ modules array system
-#
-#  modules x y z
-#
-#  if x,y or z do not contain a '/', then prefix core/.
-#  if x contains a '/', then load directly.
-#
-#
-modules()
-{
-  local _module _sm _extension _path _file _modules=("$@")
-
-  (( ${#_modules[@]} )) || fail "No modules given to load."
-
-  for _module in "${_modules[@]}"
-  do
-    module "${_module}" || fail "Could not find module path for ${_module}."
-  done
-}
-
-# Examples
-#
-#     user$ module_reinitialize package
-#
-modules_reinitialize()
-{
-  local _module _modules=("$@") _loaded_modules _module_path _initialize_path
-
-  [[ -n "${_modules}" ]] ||
-    fail "Cannot load a module; No module name was given."
-
-  _loaded_modules=" ${modules[*]} "
-  for _module in "${_modules[@]}"
-  do
-    _module_path="${_loaded_modules##* ${_module}=}"
-    _module_path="${_module_path%% *}"
-    [[ -n "${_module_path}" ]] ||
-      fail "Can not reinitialize module as it was not yet loaded"
-
-    _initialize_path="${sm_path}/${_module_path}/initialize"
-    [[ ! -s "${_initialize_path}" ]] || source "${_initialize_path}"
-  done
-}
-
-# Examples
-#
-#     user$ module_is_loaded package
-#     user$ echo $?
-#     1
-#     user$ modules package
-#     user$ module_is_loaded package
-#     0
-#
-module_is_loaded()
-{
-  local _name="${1:-}"
-
-  [[ -n "${_name:-}" ]] ||
-    fail "Cannot determine if a module is loaded; No module was given."
-
-  case " ${modules[*]} " in
-    (*[[:space:]]${_name}=*)
-      return 0
-      ;;
-    (*)
-      return 1
-      ;;
-  esac
 }
 

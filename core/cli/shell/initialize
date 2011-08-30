@@ -17,7 +17,7 @@ for config in "${sm_path}/core/sm/config/defaults" "${sm_path}/core/sm/config/de
 do
   if files exist "$config"
   then
-    true "${releases_url:=$(hash_file "${config}" "releases_url")}"
+    true ${releases_url:=$(hash read key "releases_url" from "${config}")}
   fi
 done
 

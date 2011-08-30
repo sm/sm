@@ -203,11 +203,11 @@ module_docs()
   variable_is_nonempty _module ||
     fail "Cannot glean documentation for a module; no module name given."
 
-  command_exists shocco ||
+  command exists shocco ||
     fail "Cannot generate documentation for '${_module}';"\
     " 'shocco' was not found in the PATH, install shocco and try again."
 
-  command_exists pygmentize ||
+  command exists pygmentize ||
     fail "Cannot generate documentation for '${_module}';"\
       " 'pygmentize' was not found in the PATH, install pygmentize and try again."
 

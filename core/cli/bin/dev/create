@@ -35,7 +35,7 @@ do
     if files exist "${sm_path}/core/cli/shell/${_module}/extensions"
     then
       files source "${sm_path}/core/cli/shell/${_module}/extensions"
-      if command_exists "${_module}_extension_setup"
+      if command exists "${_module}_extension_setup"
       then
         "${_module}_extension_setup" "${extension}" "${_module}" "${_path}"
         #unset -f "${_module}_extension_setup"

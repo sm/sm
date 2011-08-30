@@ -44,7 +44,7 @@ templates_targets()
   [[ "$1" == "${1/_*./_.}" && -f "$1" ]] ||
     error "'${1}' is not a valid template name!"
 
-  for target in $(hash_keys $1.settings)
+  for target in $(hash keys from "$1.settings")
   do
     if [[ -f $target ]]
     then
@@ -103,11 +103,12 @@ templates_apply_one()
 {
   local target="$1" target_new="$1.$$"
   local key="$1" template="${1/_*./_.}"
-  local settings="${template}.settings" replacements
+  local settings="${template}.settings" # replacements
 
   cp -f $template $target_new
-  hash_read $settings $key replacements
-  seed_template $target_new "${replacements[@]}" | grep -v "WARNING: Template Seeding (replacing defaults) has not yet been fully implemented." || true
+  hash read key $key from "$settings" # replacements
+  seed_template $target_new "${replacements[@]}" |
+    grep -v "WARNING: Template Seeding (replacing defaults) has not yet been fully implemented." || true
 
   if [[ ! -f $target ]] || ! diff -q $target_new $target > /dev/null
   then
@@ -127,7 +128,7 @@ templates_apply_all()
 
   if [[ "$first" == "${first/_*./_.}" && -f "$first" ]]
   then
-    list=( $(hash_keys ${first}.settings) )
+    list=( $(hash keys from "${first}.settings") )
   else
     list=( $( ls -1d $@ ) )
   fi
@@ -150,8 +151,9 @@ templates_apply_diff()
   local settings="${template}.settings" replacements
 
   cp -f $template $target_new
-  hash_read $settings $key replacements
-  seed_template $target_new "${replacements[@]}" | grep -v "WARNING: Template Seeding (replacing defaults) has not yet been fully implemented." || true
+  hash read key "$key" from "$settings" replacements
+  seed_template $target_new "${replacements[@]}" |
+    grep -v "WARNING: Template Seeding (replacing defaults) has not yet been fully implemented." || true
 
   diff -u $target $target_new || true
   rm -rf $target_new
@@ -165,7 +167,7 @@ templates_apply_diffs()
 
   if [[ "$1" == "${1/_*./_.}" && -f "$1" ]]
   then
-    list=( $(hash_keys $1.settings) )
+    list=( $(hash keys from "$1.settings") )
   else
     list=( $( ls -1d $@ ) )
   fi

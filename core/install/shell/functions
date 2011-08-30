@@ -102,9 +102,9 @@ setup_profile_d()
 {
   paths create "${profile_d_path}"
 
-  if user_is_root
+  if user is root
   then
-    if os_is_darwin
+    if os is darwin
     then
       if ! files contain string "/etc/profile" "${profile_d_path}"
       then
@@ -202,7 +202,7 @@ install_sm()
 
   perform setup_profile_d
 
-  if user_is_root
+  if user is root
   then
     log_step "Setting up sm shell completion (${completion_prefix}/${_name})" \
       perform setup_shell_completion

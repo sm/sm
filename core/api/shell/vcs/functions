@@ -1,6 +1,6 @@
 #!/bin/sh
 
-ext_vcs_initialize()
+api_vcs_initialize()
 {
   if [[ ! -w $sm_path ]]
   then
@@ -43,7 +43,7 @@ fetch_uri()
 
   case "${scm_type}" in
     (path|archive|github|git|svn|hg|fossil)
-      module api/vcs/handlers/${scm_type}
+      modules include api/vcs/handlers/${scm_type}
       "${scm_type}_get" "${_args[@]}"
       ;;
     (*)
@@ -105,8 +105,7 @@ fetch_uri_parse_args()
 
   while (( $# > 0 ))
   do
-    _token="$1"
-    shift
+    _token="$1" && shift
     for _allowed_arg in branch remote revision scm_type md5
     do
       case "${_token}" in
@@ -117,6 +116,7 @@ fetch_uri_parse_args()
           ;;
       esac
     done
+
     case "${_token}" in
       (--on-fail)
         fetch_error_handler=$1

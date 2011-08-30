@@ -5,15 +5,15 @@ __sm.os.open()
   local _uri="${1:-}"
   shift || fail "Cannot open URI; No uri was given."
 
-  if command_exists open
+  if command exists open
   then
     open "${_uri}"
-  elif command_exists xdg-open
+  elif command exists xdg-open
   then
     xdg-open "${_uri}"
   else
-    modules api/interactive
-    if shell_is_interactive
+    modules include api/interactive
+    if shell is interactive
     then
       if [[ "${_uri}" == file* ]]
       then

@@ -232,8 +232,7 @@ extensions_installed()
 
   while (( $# > 0 ))
   do
-    _token="$1"
-    shift
+    _token="$1" && shift
     case "${_token}" in
       (sets|exts)
         _paths+=("${sm_path}/${_token}")

@@ -1,0 +1,26 @@
+#!/bin/sh
+
+__sm.extensions.in()
+{
+  local _path="$1" _extension
+
+  found_extensions=()
+
+  if [[ -d "${_path}" ]]
+  then
+    shopt -s nullglob
+    local _paths=( "${_path}"/* )
+    shopt -u nullglob
+    for _extension in "${_paths[@]}"
+    do
+      if [[ -d "${_extension}/bin" || -d "${_extension}/shell" ]]
+      then
+        found_extensions+=( "${_extension##${_path}\/}" )
+      fi
+    done
+  else
+    debug search "Path '${_path}' does not exist."
+    return 1
+  fi
+}
+

@@ -47,7 +47,7 @@
 paths()
 {
   trace_filter filesystem
-  local _action _path _paths=() _source _target _mode _owner _flags
+  local _action _path _paths=() _source _target _mode _owner _flags _glob
 
   while (( $# > 0 ))
   do
@@ -55,11 +55,11 @@ paths()
     case "${token}" in
       (to)
         _target="${1}"
-        shift || fail "Target path must be provided after keyword 'to'"
+        shift || fail "Target path must be given after keyword 'to'"
         ;;
       (from)
         _source="${1}"
-        shift || fail "Source path must be provided after keyword 'from'"
+        shift || fail "Source path must be given after keyword 'from'"
         ;;
       (mode|permissions)
         _mode="${1}"
@@ -67,11 +67,21 @@ paths()
         ;;
       (owner)
         _owner="${1}"
-        shift || fail "Owner must be provided after keyword 'owner'"
+        shift || fail "Owner must be given after keyword 'owner'"
         ;;
       (recursive|recursively)
         _flags+=(-R)
         shift # Remove the recursive flag parameter.
+        ;;
+      (matching|regex|glob)
+        _regex="$1"
+        shift ||
+          fail "Shell glob pattern string must b given after keyword '${_token}'"
+        ;;
+      (in)
+        [[ -n "${_command}" ]] || _command=in
+        _paths+=("$1")
+        shift || fail "A path is expected following keyword 'in'"
         ;;
       (*)
         if [[ -z "${_action}" ]]
@@ -113,7 +123,8 @@ paths()
       ;;
     (search)
       [[ -n "${_paths}" ]] || fail "Path to search paths under must be given."
-      __sm.paths.search
+      [[ -n "${_glob}" ]]  || fail "Glob pattern was not given (matches {glob})."
+      __sm.paths.search "${_regex}" "${_paths}"
       ;;
     (enter)
       [[ -n "${_paths}" ]] || fail "Path to enter must be given."

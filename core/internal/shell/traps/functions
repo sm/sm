@@ -1,0 +1,14 @@
+#!/bin/sh
+
+__sm.traps.on.exit()
+{
+  local _result="$?" _command
+  for _command in "${on_exit_commands[@]}"
+  do
+    if ! eval "${_command}"
+    then
+      warn "traps on exit; command failed: '${_command}'"
+    fi
+  done
+  return "${_result}" # Return the original process exit status.
+}

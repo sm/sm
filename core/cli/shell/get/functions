@@ -10,10 +10,10 @@ md5_match()
 { # TODO: switch this to using system module's os_* DSL
   local _archive="$1" _path
 
-  if command_exists md5
+  if command exists md5
   then
     read archive_md5 < <( md5 -q "${_archive}" )
-  elif command_exists md5sum
+  elif command exists md5sum
   then
     read archive_md5 < <( md5sum "${_archive}" )
     archive_md5="${archive_md5/* = }"

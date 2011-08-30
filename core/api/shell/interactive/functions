@@ -1,26 +1,36 @@
 #!/bin/sh
 
-# ## shell\_is\_interactive()
-#
-# Test if the current shell is an interactive shell.
-#
-# Usage Examples:
-#
-#     if shell_is_interactive
-#     then
-#       ${PAGER} somefile
-#     else
-#       cat -v somefile
-#     fi
-#
-shell_is_interactive()
+shell()
 {
-  [[ -t 0 ]]
+  while (( $# ))
+  do
+    _token="$1" && shift
+    case "${_token}" in
+      (is)
+        _command=is
+        _subcommand="${1}"
+        shift || fail "A command must follow keyword 'is'"
+        case "${_subcommand}" in
+          (interactive)
+            [[ -t 0 ]]
+            ;;
+          (*)
+            fail "Unknown command following keyword 'is'; shell is <interactive>"
+            ;;
+        esac
+      (*)
+        [[ -z "${_command}" ]]
+        ;;
+    esac
+  done
+
 }
 
-if shell_is_interactive
+if shell is interactive
 then
   # Interactive functions will be loaded here, only if shell is interactive.
-  # TODO: Add BDSM interactive functions :)
+  # TODO: Add interactive functionality + interactive sm hooks loading for each
+  # module
   true
 fi
+

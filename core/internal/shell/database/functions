@@ -1,8 +1,8 @@
 #!/bin/sh
 
-ext_database_initialize()
+api_database_initialize()
 {
-  if user_is_root
+  if user is root
   then
     true \
       "${data_base_path:="/var/db/${package_name}"}" \
@@ -44,7 +44,7 @@ database_cli()
   extension_args=( "${_ignored_args[@]}" )
 
   # Explicitly reload the database module, to pickup any CLI overrides.
-  modules_reinitialize database
+  modules reinitialize database
 }
 
 database_usage() {
@@ -72,12 +72,12 @@ database_setup()
       data_path "${data_path}"
   fi
 
-  if command_exists "${extension}_database_setup"
+  if command exists "${extension}_database_setup"
   then
     "${extension}_database_setup"
   fi
 
-  if command_exists "${extension}_initialize"
+  if command exists "${extension}_initialize"
   then
     "${extension}_initialize"
   fi

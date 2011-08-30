@@ -1,6 +1,7 @@
 #!/bin/sh
 
-ext_help_initialize()
+# TODO: remove help api and replace with man api.
+api_help_initialize()
 {
   declare -a help_descriptions
   declare -a help_action_names
@@ -47,7 +48,7 @@ show_help()
   local _help_command _token
 
   while (( $# > 0 )) ; do
-    _token="$1" ; shift
+    _token="$1" && shift
     case "${_token}" in
       desc*|description)
         _help_command="description"

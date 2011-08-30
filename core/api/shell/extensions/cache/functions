@@ -2,7 +2,7 @@
 
 actions_cache_add()
 {
-  string_contains "${_actions_cache[*]}" "$1" || _actions_cache+=( "$1" )
+  string contains "$1" "${_actions_cache[*]}" || _actions_cache+=( "$1" )
 }
 
 # Step 1 collect direct filesystem mapping
@@ -48,7 +48,7 @@ initialize_map_cache()
 
 detect_module_actions()
 {
-  detect_module "$@" &&
+  __sm.module.detect "$@" &&
     [[ -f "${module_path}/actions" ]] &&
     [[ -s "${module_path}/actions" ]]
 }
@@ -83,7 +83,7 @@ initialize_modules_actions_cache()
 
     while read _module_dep
     do
-      if in_search_paths detect_module_actions "${_module_dep}"
+      if __sm.extensions.in.paths detect_module_actions "${_module_dep}"
       then
         log_search "actiondep" "${extension}${_module_name:+/}${_module_name}" "${module_path#${sm_path}\/}/actions"
         while read _action_pair

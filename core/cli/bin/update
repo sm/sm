@@ -16,7 +16,7 @@ NYI "sm update"
 #  ;;
 #
 #  all)
-#    extensions=($(extensions_in ...)) #missing path
+#    extensions=($(__sm.extensions.in ...)) #missing path
 #
 #    # TODO: Updates for released extensions instead of only from repository.
 #    if [[ -n "${extension_args}" ]]

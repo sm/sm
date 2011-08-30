@@ -46,7 +46,7 @@ sets_list()
       log "${_path##$sm_path\/}:"
     fi
 
-    if extensions_in "$_path"
+    if __sm.extensions.in "$_path"
     then
       extensions=( ${found_extensions[@]} )
       echo ${extensions[@]} | xargs -s ${COLUMNS} | xargs -I '{}' echo "  - {}"
@@ -137,7 +137,7 @@ sets_update()
   do
     if [[ ! -d "${sets_user_path}/active/${_name}" ]]
     then
-      if in_search_paths detect_extension_existence "${_name}"
+      if __sm.extensions.in.paths detect_extension_existence "${_name}"
       then
         error "Extension set ${_name} is installed system wide and can not be updated by user."
       else
@@ -194,7 +194,7 @@ sets_uninstall()
 
   if [[ ! -d "${sets_user_path}/active/${_name}" ]]
   then
-    if in_search_paths detect_extension_existence "${_name}"
+    if __sm.extensions.in.paths detect_extension_existence "${_name}"
     then
       error "Extension set ${_name} is installed system wide and can not be uninstaled by user."
     else

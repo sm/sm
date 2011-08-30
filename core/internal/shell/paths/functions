@@ -194,9 +194,11 @@ __sm.paths.in()
   local _path="${1:-}"
   shift  || fail "Path was not given!"
   [[ -d "${_path}" ]] || fail "'${_path}' is not a path!"
+
   shopt -s nullglob
   local _paths=( "${_path}"/* )
   shopt -u nullglob
+
   for dir in "${_paths[@]}"
   do
     [[ -d "${dir}" ]] || continue
@@ -205,20 +207,29 @@ __sm.paths.in()
   done
 }
 
+__sm.paths.within()
+{
+  local _path _paths=("$@")
+
+  while read -r _path
+  do
+    [[ -d "${_path}" ]] || continue
+    __sm.paths.within "${_path}"
+  done < <(__sm.paths.in "${_paths[@]}")
+}
+
 __sm.paths.search()
 {
-  local _path="${1:-}" _line
-  shift || fail "Path was not given as the first parameter."
+  local _glob="$1"
+  shift
+  _paths=("$@")
 
-  local _pattern="${1:-}"
-  shift || fail "Pattern was not given as the second parameter."
-
-  [[ -n "${_pattern}" ]] || fail "'${_path}' is not a path!"
+  [[ -n "${_glob}" ]] || fail "'${_path}' is not a path!"
   [[ -d "${_path}" ]]    || fail "'${_path}' is not a directory!"
 
   while read _line
   do
-    [[ "${_line}" == ${_pattern} ]] || continue
+    [[ "${_line}" == ${_glob} ]] || continue
     echo "${_line}"
   done < <(paths in "${_path}")
 }
