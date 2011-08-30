@@ -115,9 +115,10 @@ source "${modules_path}/string/functions"
 source "${modules_path}/logging/functions"
 source "${modules_path}/logging/initialize"
 source "${modules_path}/modules/functions"
+source "${modules_path}/extensions/functions"
 
-modules_core_initialize
-
+modules core initialize
+modules sm/command
 modules sm/versionedfs # Used for pkg, extensions and modules.
 
 if [[ "$OSTYPE" == *solaris* ]]

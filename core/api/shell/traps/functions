@@ -1,0 +1,46 @@
+#!/bin/sh
+
+traps()
+{
+  local _token _signal _code __traps_code
+
+  if [[ -z "${__sm_traps_exit_commands:-}" ]]
+  then
+    __sm_traps_exit_commands=()
+  fi
+
+  while (( $# ))
+  do
+    _token="$1" && shift
+    case "${_token}" in
+      (on)
+        _signal="$1"
+        shift || fail "A signal must follow keyword 'on'"
+        case "${_signal}" in
+          (exit|EXIT)
+            _code="$*"
+            shift || fail "The code to be run on EXIT must be given after keyword 'EXIT'."
+            __traps_code="$(trap)"
+            __traps_code="$( echo "${__traps_code}" | awk '/ EXIT$/' |
+                             sed -e "s#' EXIT##" -e "s#.*'##")"
+
+            if [[ "${__traps_code}" != *__sm.process.exit* ]]
+            then
+              # ensure that process_exit_commands() is called on exit
+              # whilst preserving any original on-exit code.
+              trap "__sm.process.exit;${__traps_code}" EXIT
+            fi
+
+            # Append the code passed to process_on_exit()
+            __sm_traps_exit_commands+=( "${_code}" )
+            ;;
+          (*)
+            fail "Unknown signal '${_signal}'"
+            ;;
+        esac
+      (*)
+        fail "_unknown command "${_token}
+        ;;
+    esac
+  done
+}

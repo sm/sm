@@ -2,7 +2,7 @@
 
 ext_logging_initialize()
 {
-  if user_is_root
+  if user is root
   then
     true "${log_path:="${sm_path}/log"}"
   else

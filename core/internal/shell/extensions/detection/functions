@@ -175,7 +175,7 @@ extension_action()
   esac
 
   local _extension_found=0 _action_found=0
-  if in_search_paths detect_extension_existence "${extension_args[@]}"
+  if __sm.extensions.in.paths detect_extension_existence "${extension_args[@]}"
   then
     _extension_found=1
     log_search extension "$extension" "$extensions_path"
@@ -186,7 +186,7 @@ extension_action()
   fi
 
   if (( ! _action_found )) &&
-    in_cli_path find_extension_action "${extension_args[@]}"
+    __sm.cli.in.path find_extension_action "${extension_args[@]}"
   then
     _action_found=1
   fi

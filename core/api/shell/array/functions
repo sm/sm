@@ -5,8 +5,8 @@
 #
 # API Version: 1.0.0
 #
-# array {action} {params...}
-# where action is one of:
+# array {command} {params...}
+# where command is one of:
 # is
 #   empty
 #   nonempty
@@ -29,15 +29,15 @@
 array()
 {
   trace_filter array
-  local _action="$1" _subaction _name _variable
-  shift || fail "Array action must be given as the first parameter."
+  local _command="$1" _subcommand _name _variable
+  shift || fail "Array command must be given as the first parameter."
 
-  case "${_action}" in
+  case "${_command}" in
     (is)
-      _subaction="$1" _name="$2"
-      shift 2 || fail "Subaction and array name missing;"\
+      _subcommand="$1" _name="$2"
+      shift 2 || fail "subcommand and array name missing;"\
         " array is <empty,nonempty,even> {name}"
-      case "${_subaction}" in
+      case "${_subcommand}" in
         (empty)
           __sm.array.is.empty "${_name}"
           ;;
@@ -48,7 +48,7 @@ array()
           __sm.array.is.even "${_name}"
           ;;
         (*)
-          fail "Unknown '${_subaction}'; array is <empty,nonempty,even> {name}"
+          fail "Unknown '${_subcommand}'; array is <empty,nonempty,even> {name}"
           ;;
       esac
       ;;
@@ -105,10 +105,10 @@ array()
       __sm.array.largest "${_name}"
       ;;
     (sort)
-      _subaction="$1" _name="$2"
-      shift 2 || fail "Subaction and array name missing;"\
+      _subcommand="$1" _name="$2"
+      shift 2 || fail "subcommand and array name missing;"\
         " array sort <desc,asc> {name}."
-      __sm.array.sort "${_name}" "${_subaction}"
+      __sm.array.sort "${_name}" "${_subcommand}"
       ;;
     (unique)
       _name="$1"
@@ -119,7 +119,7 @@ array()
       echo ${__sm_array_start}
       ;;
     (*)
-      fail "Unknown array action '${_action}'"
+      fail "Unknown array command '${_command}'"
       ;;
   esac
 }

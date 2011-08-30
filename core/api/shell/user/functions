@@ -1,0 +1,93 @@
+#!/bin/sh
+
+user()
+{
+  trace_filter users
+
+  local _command _subcommand _user _group _source _flags=() _value
+
+  while (( $# > 0 ))
+  do
+    _token="$1" && shift
+    case "${_token}" in
+      (is)
+        _subcommand="$1" && shift
+        case "${_subcommand}"
+          (root)
+            if (( UID == 0 )) ; then return 0 ; else return 1 ; fi
+            ;;
+          (privileged)
+            if (( UID < 500 )) ; then return 0 ; else return 1 ; fi
+            ;;
+          (unprivileged)
+            if (( UID > 499 )) ; then return 0 ; else return 1 ; fi
+            ;;
+          (*)
+            fail "Unknown command '${_subcommand}'; user is <root|privileged>"
+            ;;
+        esac
+        ;;
+      (set)
+        _subcommand="$1"
+        shift || fail "A command must follow keyword 'set'; user set <shell|home>"
+        case "${_subcommand}" in
+          (home)
+            _value="$1"
+            shift || fail "A home path must follow keyword 'home';"\
+              "user set home /home/{username} user {username}"
+            ;;
+          (shell)
+            _value="$1"
+            shift || fail "A home path must follow keyword 'home'"\
+              "user set shell /bin/zsh user {username}"
+            ;;
+          (*)
+            fail "Unrecognized command '${_subcommand}' following keyword 'set';"\
+              " user set <shell|home> user {username}"
+            ;;
+        esac
+        ;;
+      (add)
+        ;;
+      (remove)
+        ;;
+      (login)
+        _flags+=( - )
+        ;;
+      (user)
+        _user="$1"
+        shift || fail "User name must follow keyword 'user'"
+        ;;
+      (group)
+        _group="${1:-}"
+        shift || fail "Group name must follow keyword 'group'"
+        ;;
+      (from)
+        _source="${1:-}"
+        shift || fail "from source name must follow keyword 'from'"
+        ;;
+      (force)
+        _flags+=(-f)
+        ;;
+      (*)
+        fail "Unhandled token '${_token}'"
+        ;;
+    esac
+  done
+
+  case "${_command}" in
+    (home)
+      __sm.user.home ${_user}
+      ;;
+    (shell)
+      __sm.user.shell ${_user}
+      ;;
+    (set)
+      __sm.user.set.${_subcommand} ${_user} ${_value}
+      ;;
+    (*)
+      fail "Unknown command '${_command}'"
+      ;;
+  esac
+}
+

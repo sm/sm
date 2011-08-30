@@ -105,7 +105,7 @@ package_configure_flags()
   local _flag
   for _flag in "$@"
   do
-    string_contains "${configure_flags[*]}" "${_flag}" ||
+    string contains "${configure_flags[*]}" "${_flag}" ||
       configure_flags+=( "${_flag}" )
   done
 }
@@ -113,7 +113,7 @@ package_configure_flags()
 package_configure_flag_add_key()
 {
   local _flag=$1 _value=$2
-  string_contains_key "${configure_flags[*]}" "${_flag}" ||
+  string contains "${configure_flags[*]}" "${_flag}=" ||
     configure_flags+=( "${_flag}=${_value}" )
 }
 
@@ -231,9 +231,9 @@ package_init()
       ;;
   esac
 
-  if command_exists "${package_name}_initialize"
+  if command exists "${package_name}_initialize"
   then
-    string_contains "${FUNCNAME[*]}" "${package_name}_initialize" ||
+    string contains "${FUNCNAME[*]}" "${package_name}_initialize" ||
       "${package_name}_initialize"
   fi
 
@@ -296,7 +296,7 @@ package_init()
     paths create "${active_path}/${fhs_dirs}"
   done
 
-  if user_is_root
+  if user is root
   then
     true \
       "${log_path:="/var/log/${package_name}"}" \
@@ -353,7 +353,7 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
 
   paths enter "${source_path}"
 
-  if command_exists "${package_name}_dependencies"
+  if command exists "${package_name}_dependencies"
   then
     log_step "${package_name} ${package_version} ~ dependencies" \
       "${package_name}_dependencies"
@@ -362,13 +362,13 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
       package_dependencies
   fi
 
-  if command_exists "${package_name}_prefetch"
+  if command exists "${package_name}_prefetch"
   then
     log_step "${package_name} ${package_version} ~ prefetch" \
       "${package_name}_prefetch"
   fi
 
-  if command_exists "${package_name}_fetch"
+  if command exists "${package_name}_fetch"
   then
     log_step "${package_name} ${package_version} ~ download" \
       "${package_name}_fetch"
@@ -379,13 +379,13 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
 
   paths enter "${source_path}/${package_dir}"
 
-  if command_exists "${package_name}_postfetch"
+  if command exists "${package_name}_postfetch"
   then
     log_step "${package_name} ${package_version} ~ postfetch" \
       "${package_name}_postfetch"
   fi
 
-  if command_exists "${package_name}_patch"
+  if command exists "${package_name}_patch"
   then
     log_step "${package_name} ${package_version} ~ patch" \
       "${package_name}_patch"
@@ -394,13 +394,13 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
       package_patch
   fi
 
-  if command_exists "${package_name}_preconfigure"
+  if command exists "${package_name}_preconfigure"
   then
     log_step "${package_name} ${package_version} ~ preconfigure" \
       "${package_name}_preconfigure"
   fi
 
-  if command_exists "${package_name}_configure"
+  if command exists "${package_name}_configure"
   then
     "${package_name}_configure"
   else
@@ -408,13 +408,13 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
       package_configure
   fi
 
-  if command_exists "${package_name}_postconfigure"
+  if command exists "${package_name}_postconfigure"
   then
     log_step "${package_name} ${package_version} ~ postconfigure" \
       "${package_name}_postconfigure"
   fi
 
-  if command_exists "${package_name}_build"
+  if command exists "${package_name}_build"
   then
     log_step "${package_name} ${package_version} ~ build" \
       "${package_name}_build"
@@ -423,7 +423,7 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
       package_build
   fi
 
-  if command_exists "${package_name}_preinstall"
+  if command exists "${package_name}_preinstall"
   then
     log_step "${package_name} ${package_version} ~ preinstall" \
       "${package_name}_preinstall"
@@ -436,7 +436,7 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
     path "${packages_path}" name "${package_name}" version "${package_version}" \
     source "${install_path}"
 
-  if command_exists "${package_name}_install"
+  if command exists "${package_name}_install"
   then
     log_step "${package_name} ${package_version} ~ install" \
       "${package_name}_install"
@@ -448,7 +448,7 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
    from "${source_path}/${package_dir}" \
    to "${install_path}/src"
 
-  if command_exists "${package_name}_postinstall"
+  if command exists "${package_name}_postinstall"
   then
     log_step "${package_name} ${package_version} ~ postinstall" \
       "${package_name}_postinstall"
@@ -457,7 +457,7 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
       package_postinstall
   fi
 
-  if ! string_contains "${FUNCNAME[*]}" 'package_update'
+  if ! string contains "${FUNCNAME[*]}" 'package_update'
   then
     package_activate_if_first "${package_name}" "${package_version}"
   fi
@@ -466,7 +466,7 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
     from "${source_path}/${package_dir}" \
     to "${install_path}/src"
 
-  if command_exists "${package_name}_postactivate"
+  if command exists "${package_name}_postactivate"
   then
     log_step "${package_name} ${package_version} ~ postactivate" \
       "${package_name}_postactivate"
@@ -647,7 +647,7 @@ package_deactivate()
 
   log_step success
 
-  string_contains "${FUNCNAME[*]}" 'package_activate' ||
+  string contains "${FUNCNAME[*]}" 'package_activate' ||
     package_ldconfig "${_package}"
 }
 
@@ -673,7 +673,7 @@ package_ldconfig()
   #  paths exist "${packages_path}/versions/${_package}/active/lib" ||
   #    return 0 # no lib/ directory for activated package, no need to update ldconfig
 
-  user_is_root || return 0
+  user is root || return 0
 
   # TODO: Figure out if solaris and freebsd have an analog to this?
   if os is linux
@@ -684,13 +684,13 @@ package_ldconfig()
       files chmod mode 0444 "/etc/ld.so.conf.d/sm.conf"
     fi
 
-    if [[ -d /selinux ]] && command_exists restorecon
+    if [[ -d /selinux ]] && command exists restorecon
     then
       restorecon -R "${active_path}/lib" # -v ~ verbose
       restorecon -R "${packages_path}/versions/${package_name}" # -v ~ verbose
     fi
 
-    command_exists "${_ldconfig}" || ldconfig="ldconfig"
+    command exists "${_ldconfig}" || ldconfig="ldconfig"
 
     log_step "${package_name} ${package_version} ~ ldconfig" \
       "${_ldconfig}" "${active_path}/lib"

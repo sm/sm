@@ -1,12 +1,9 @@
 #!/bin/sh
 
-ext_date_initialize()
+date()
 {
-  true # date_format="%Y-%m-%d"
-}
+  true ${date_format:="%Y-%m-%dT%H:%M:%S"}
 
-date_range()
-{
   local _start _end _date _step="day" \
     _format_in="%Y-%m-%d" _format_out="%Y-%m-%d"
 

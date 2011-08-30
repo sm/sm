@@ -74,7 +74,7 @@ extension_action_completion()
   _args=( ${_args[@]} )
   show_word=${#_args[@]}
 
-  if in_search_paths detect_extension_existence "${_args[@]}"
+  if __sm.extensions.in.paths detect_extension_existence "${_args[@]}"
   then
     show_word=$(( show_word - 1 ))
     _extension_found=1
@@ -92,10 +92,10 @@ extension_action_completion()
   {
     if (( ${#_args[@]} == 0 ))
     then
-      in_search_paths show_extension_names "unused" "${_args}" || true
+      __sm.extensions.in.paths show_extension_names "unused" "${_args}" || true
     elif (( ${#_args[@]} == 1 )) && [[ "${last_char}" != " " ]]
     then
-      in_search_paths show_extension_names "unused" "${_args}" || true
+      __sm.extensions.in.paths show_extension_names "unused" "${_args}" || true
     else
       if (( _extension_found )) &&
         find_starting_action "${_extension_found_path}" "${_args[@]}"
@@ -106,7 +106,7 @@ extension_action_completion()
 
     if (( ! _action_found ))
     then
-      in_cli_path find_starting_action "${_args[@]}" || true
+      __sm.cli.in.path find_starting_action "${_args[@]}" || true
     fi
   } | cut -d ' ' -f ${show_word} | sort -u | grep -v '^$' || true
   return 0

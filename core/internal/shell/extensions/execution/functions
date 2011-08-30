@@ -73,7 +73,7 @@ extension_modules_load()
   local _token _namespace=""
 
   module_name="${extension}"
-  module "$module_name"
+  modules include "$module_name"
 
   while (( $# > 0 ))
   do
@@ -81,7 +81,7 @@ extension_modules_load()
     shift
 
     module_name="${extension}${_namespace}"
-    module "$module_name" || true
+    modules include "$module_name" || true
   done
 }
 
@@ -95,19 +95,19 @@ extension_action_prerequisites()
    ${action}_initialize
   )
 
-  string_contains "${_pre[*]}" "${action%%_*}_cli" || _pre+=(
+  string contains "${_pre[*]}" "${action%%_*}_cli" || _pre+=(
    ${action%%_*}_cli
    ${action%%_*}_initialize
   )
 
-  string_contains "${_pre[*]}" "${extension}_cli" || _pre+=(
+  string contains "${_pre[*]}" "${extension}_cli" || _pre+=(
    ${extension}_cli
    ${extension}_initialize
   )
 
   for _name in ${_pre[@]}
   do
-    if command_exists "${_name}"
+    if command exists "${_name}"
     then
       "${_name}" "${extension_args[@]}"
     fi

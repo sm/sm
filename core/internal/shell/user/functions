@@ -1,0 +1,180 @@
+#!/bin/sh
+
+__sm.user.home()
+{
+  local _user="$1" _line
+  NIY "Printing out User home, based on OS."
+  if os is darwin
+    NIY "Determining user home on solaris."
+  then
+  elif os is linux
+  then
+    NIY "Determining user home on darwin."
+  elif os is solaris
+  then
+    NIY "Determining user home on solaris."
+  else
+    NIY "Determining user home for ${OSTYPE}."
+  fi
+  while read -r _line
+  do
+    if [[ "${_line}" == ${_user}:* ]]
+    then
+      true # extract and print out home
+      break
+    fi
+  done < /etc/passwd
+}
+
+__sm.user.shell()
+{
+  local _user="$1" _line
+  NIY "Printing out User shell, based on OS."
+  if os is darwin
+  then
+    NIY "Determining user shell on darwin."
+  elif os is linux
+  then
+    NIY "Determining user shell on linux"
+    while read -r _line
+    do
+      if [[ "${_line}" == ${_user}:* ]]
+      then
+        echo "${_line//*:}"
+        true # extract and print out shell
+        break
+      fi
+    done < /etc/passwd
+  elif os is solaris
+  then
+    NIY "Determining user shell on solaris."
+  else
+    NIY "Determining user shell for ${OSTYPE}."
+  fi
+}
+
+__sm.user.set.shell()
+{
+  local _user="$1" _value="$2"
+  # validate via /etc/shells, lines starting with '^/'
+  NIY "Setting user's shell."
+}
+
+__sm.user.set.home()
+{
+  local _user="$1" _value="$2"
+  NIY "Setting user's home."
+}
+
+__sm.user.add()
+{
+  local _user="$1" _group="$2" _flags=($3)
+
+  [[ -n "${_group}" ]] || _group="${_user}"
+
+  (( UID == 0 )) || # root user has id 0
+    fail "Users and groups may be manipulated only by the super-user (root), via su or sudo."
+
+  # ##### TODO: Use the os is X functions here instead.
+  case "$(uname)" in
+    "OpenBSD")
+      groupadd "$_group"
+      useradd -g "$_user" "$_user" -s /bin/bash
+      usermod -s /bin/bash "$_user"
+      ;;
+
+    "FreeBSD")
+      pw groupadd -q "$_user"
+      ;;
+
+    "Linux")
+      # groupadd nginx
+      # useradd -G nginx -M nginx
+      if [[ -f "/etc/SuSE-release" ]] ; then
+        groupadd "$_group"
+      else
+        groupadd -f "$_group"
+      fi
+
+      useradd -g "${_user}" "${_user}" #TODO: add system users only !
+      usermod -d "${data_path%\/*}" "${_user}"
+      usermod -s /bin/bash "${_user}"
+    ;;
+
+    "Darwin")
+      current_max_gid=$(dscl . -list /Groups gid | awk '{print $2}' | sort -g -r | head -1)
+      next_gid=$((current_max_gid+1))
+
+      current_max_uid=$(dscl . -list /Users UniqueID | awk '{print $2}' | sort -g -r | head -1)
+      next_uid=$((current_max_uid+1))
+
+      if ! dscl . -list /Users | grep -q "^${_user}$" ; then
+        dscl . -create "/Groups/$_group"
+        dscl . -create "/Groups/$_group" gid "$next_gid"
+        dscl . -create "/Users/${_user}"
+        dscl . -create "/Users/${_user}" PrimaryGroupID "$gid" # UserShell /bin/bash
+        dscl . -create "/Users/${_user}" uid "$next_uid"
+        dscl . -create "/Users/${_user}" realname "Postgresql User"
+        dscl . -create "/Users/${_user}" home "${data_path%\/*}"
+        dscl . -create "/Users/${_user}" shell "/bin/bash"
+        dscl . -create "/Users/${_user}" gid "$gid"
+        dscl . -create "/Users/${_user}" passwd "*"
+      fi
+    ;;
+
+    "SunOS")
+      groupadd "$_group"
+      useradd -g "$_user" -s /bin/bash -d "${data_path}" "$_user"
+      usermod -s /bin/bash "$_user"
+      ;;
+  esac
+}
+
+__sm.user.remove()
+{
+  local _user="$1" _flags=($2)
+  local ....
+  (( UID == 0 )) || # root user has id 0
+    fail "Users and groups may be manipulated only by the super-user (root), via su or sudo."
+  (
+  # Switch based on the os type.
+  # TODO: Switch these to use the os is X system module DSL
+  case "$(uname)" in
+    "Linux")
+      userdel "${package_user}"
+    ;;
+    "OpenBSD")
+      groupdel "$package_user"
+      userdel -g "$package_user" "$package_user"
+      ;;
+
+    "FreeBSD")
+      pw groupdel -q "$package_user"
+      ;;
+
+    "Darwin")
+      gid="501" # only gids > 500 show up in user preferences.
+
+      # Find an open gid
+      while true; do
+        name=$(dscl . search /groups PrimaryGroupID $gid | cut -f1 -s)
+        if [ -z "$name" ] ; then
+          break
+        fi
+        gid=$[$gid +1]
+      done
+
+      # Create the group
+      dscl . -delete "/Users/${package_user}" PrimaryGroupID "$gid" # UserShell /bin/bash
+      dscl . -delete "/Groups/$package_user"
+      dscl . -delete "/Groups/$package_user" gid "$gid"
+    ;;
+
+    "SunOS")
+      groupdel "$package_user"
+      userdel "$package_user"
+      ;;
+  esac
+  ) || true # Ignore failures with this for now...
+}
+

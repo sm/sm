@@ -4,47 +4,62 @@
 # SM Framework Core Module ~ String (string)
 #
 
-# ## string\_contains()
-# Validate if second string is part of first string.
-# Return 0 if found.
-string_contains()
+string()
 {
-  [[ " $1 " =~ " $2 " ]]
+  trace_filter string
+
+  local _token _command _string _search _regex
+
+  while (( $# ))
+  do
+    case "${_token}"
+      (from)
+        _search="$1"
+        shift || fail "From source string must follow keyword 'from'"
+        ;;
+      (to)
+        _string="$1"
+        ;;
+      (contains)
+        _search="$1"
+        shift || fail "Search (glob) string must follow keyword 'contains'"
+        ;;
+      (*)
+        if [[ -z "${_string}" ]]
+        then
+          _string="${_token}"
+        elif [[ -z "${_search}" ]]
+          _search="${_token}"
+        fi
+        ;;
+    esac
+  done
+
+  case "${_command}" in
+    (contains)
+      if [[ "${_string}" =~ "${_search}" ]] ; then return 0 ; else return 1 ; fi
+      ;;
+    (append)
+      printf "${_string}"
+      if ! [[ "${_string}" =~ "${_search}" ]] ; then printf " ${_search}" ; fi
+      ;;
+    (prepend)
+      if ! [[ "${_string}" =~ "${_search}" ]] ; then printf " ${_search}" ; fi
+      printf "${_string}"
+      ;;
+    (remove)
+      _string=" ${_string} "               # wrap with spaces.
+      _string="${_string// ${_search} / }" # remove second string.
+      _string="${_string## }"              # remove spaces from beginning.
+      _string="${_string%% }"              # remove spaces from end.
+      printf "${_string}"
+      ;;
+    (truncate)
+      printf ""
+      ;;
+    (*)
+      fail "Unknown string command '${_command}'"
+      ;;
+  esac
 }
 
-# ## string\_contains()
-# Validate if second string is key in first string.
-# Return 0 if found.
-string_contains_key()
-{
-  [[ " $1 " =~ " $2=" ]]
-}
-
-# ## string\_append()
-# Append second string to first string if not already present.
-# Prints new string.
-string_append()
-{
-  printf "$1" # always use string
-  string_contains "$1" "$2" || printf " $2" # append if does not exist.
-}
-
-# ## string\_remove()
-# Removes second string from first string, if present.
-# Prints new string.
-string_remove()
-{
-  local string=" $1 "        # wrap with spaces.
-  string="${string// $2 / }" # remove second string.
-  string="${string## }"      # remove spaces from beginning.
-  string="${string%% }"      # remove spaces from end.
-  printf "${string}"
-}
-
-options_check()
-{
-  # Do not use brackets; they slow things down a lot.
-  ! string_contains "$1" "$2" || return 0
-
-  string_contains "$1" "all" && ! string_contains "$1" "-$2"
-}

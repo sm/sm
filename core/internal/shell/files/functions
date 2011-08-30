@@ -441,10 +441,10 @@ __sm.files.md5()
 {
   local _files=("$@") _file _command _md5
 
-  if command_exists "md5sum"
+  if command exists "md5sum"
   then
     _command="md5sum"
-  elif command_exists md5
+  elif command exists md5
   then
     _command="md5"
   else

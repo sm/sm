@@ -10,7 +10,7 @@ ${user_shell} --rcfile <(echo "
   [[ -s ~/.bash_profile ]] && source ~/.bash_profile
   [[ -s ~/.profile ]] && source ~/.profile
   source ${sm_path}/core/sm/shell/core/initialize
-  module api/vcs
+  modules include api/vcs
   fail() { backtrace \"\$*\" no_exit ; }
   error() { printf \"\\nERROR: \$*\\n\" >&2 ; }
   exit() { builtin exit 0 ; }

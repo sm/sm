@@ -43,7 +43,7 @@ fetch_uri()
 
   case "${scm_type}" in
     (path|archive|github|git|svn|hg|fossil)
-      module api/vcs/handlers/${scm_type}
+      modules include api/vcs/handlers/${scm_type}
       "${scm_type}_get" "${_args[@]}"
       ;;
     (*)

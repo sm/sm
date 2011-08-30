@@ -19,12 +19,12 @@
 set -o errexit # exit on errors in early stage before logging is initialized
 set -o nounset # do not allow unset variables processing
 
-initial_pwd="$PWD"         # record where the script was run from right away.
-sm_path="$PWD"             # SM framework path
+initial_pwd="$PWD"
+sm_path="$PWD"
 modules_path="${sm_path}/core/sm/shell"
 
 export initial_pwd sm_path modules_path initial_pwd
 
-. "${modules_path}/core/cli"        # basic options parsing
-. "${modules_path}/core/initialize" # initialize SM
+. "${modules_path}/core/cli"
+. "${modules_path}/core/initialize"
 

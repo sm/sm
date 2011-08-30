@@ -100,7 +100,7 @@ extension_package()
 
   for _archiver in "gzip" "bzip2 -z" "xz -z"
   do
-    if command_exists ${_archiver// *}
+    if command exists ${_archiver// *}
     then
       tar cf "${_name}-${_version}.tar" "${_name}/" ||
         error "Error during packaging ($?) whilst trying to create a tar of the '${_name}' directory."
