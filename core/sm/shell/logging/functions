@@ -249,6 +249,7 @@ core_trace_filter()
 
 trace_filter()
 {
+  # return 0
   set +o xtrace
   if [[ -n "$1" ]]
   then
@@ -598,7 +599,10 @@ clean_tmp_logs()
 __sm.logging.options.check()
 {
   # Do not use brackets; they slow things down a lot.
-  ! string contains "$2" "$1" || return 0
+  if string contains "$2" "$1"
+  then
+    return 0
+  fi
 
-  string contains "all" "$1" && ! string contains "$1" "-$2"
+  string contains "all" "$1" && ! string contains "-$2" "$1"
 }
