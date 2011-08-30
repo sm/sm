@@ -58,11 +58,21 @@ files()
         _source="${1}"
         shift || fail "Source path must be provided after keyword 'from'"
         ;;
-      (chmod|mode|permissions)
+      (mode|permissions)
         _mode="${1}"
         shift || Fail "Mode must follow keywords 'mode|permissions'"
         ;;
-      (chown|owner)
+      (chmod)
+        _command=chmod
+        _mode="${1}"
+        shift || Fail "Mode must follow keywords 'mode|permissions'"
+        ;;
+      (owner)
+        _owner="${1}"
+        shift || fail "Owner must be provided after keyword 'owner'"
+        ;;
+      (chown)
+        _command=chown
         _owner="${1}"
         shift || fail "Owner must be provided after keyword 'owner'"
         ;;
@@ -247,9 +257,12 @@ files()
       __sm.files.open "${_files[@]}"
       ;;
     (*)
-      fail "Unknown command for files: '${_command}' "\
-        "A files command must be specified as the first parameter: "\
-        "{chown,chmod,create,remove,copy,in,search,enter,exist,join,expand,move,copy}"
+      if [[ -z "${_owner}" && -z "${_mode}" ]]
+      then
+        fail "Unknown command for files: '${_command}' "\
+          "A files command must be specified as the first parameter: "\
+          "{chown,chmod,create,remove,copy,in,search,enter,exist,join,expand,move,copy}"
+      fi
       ;;
   esac
 
