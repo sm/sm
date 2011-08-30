@@ -6,8 +6,6 @@
 
 string()
 {
-  trace_filter string
-
   local _token _command _string _search _regex
 
   while (( $# ))
