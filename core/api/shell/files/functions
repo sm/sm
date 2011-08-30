@@ -14,7 +14,7 @@ files()
   trace_filter filesystem
 
   local _token _command _subcommand _path _file _files=() _source _target _mode _owner \
-    _flags _string _regex _content
+    _flags _string _regex
 
   while (( $# > 0 ))
   do
@@ -101,7 +101,7 @@ files()
         shift
         case "${_subcommand}" in
           (string)
-            _content="$1"
+            _string="$1"
             shift || fail "A string must be followed by keyword 'string'"
             ;;
           (regex)
@@ -109,11 +109,17 @@ files()
             shift || fail "A regex must be followed by keyword 'regex'"
             ;;
           (*)
-            fail "Unknown subcommand '${1}' for '${_command}'"
+            fail "Unknown command '${1}' for '${_command}'"
             ;;
         esac
-        [[ -n "${_string}" || -n "${_regex}" ]] ||
-          fail "A string or regex must be given after keyword 'containing'."
+        if [[ -z "${_string}" && -z "${_regex}" ]]
+        then
+          fail "A string or regex must be given after keyword '${_subcommand}'."
+        fi
+        ;;
+      (in)
+        _files+=("$1")
+        shift || fail "A file name must follow keyword 'in'"
         ;;
       (key)
         _key="$1"
@@ -124,7 +130,7 @@ files()
         shift || fail "A value must follow keyword 'value'"
         ;;
       (with)
-        _content="$1"
+        _string="$1"
         shift || fail "A content string must follow keyword 'with'"
         ;;
       (*)
@@ -165,13 +171,13 @@ files()
       __sm.files.sha.${_subcommand} "${_files[@]}"
       ;;
     (contain)
-      __sm.files.contain "${_content}" "${_regex}" "${_files[@]}"
+      __sm.files.contain "${_string}" "${_regex}" "${_files[@]}"
       ;;
     (containing)
-      __sm.files.containing "${_content}" "${_regex}" "${_files[@]}"
+      __sm.files.containing "${_string}" "${_regex}" "${_files[@]}"
       ;;
     (replace)
-      __sm.files.replace "${_content}" "${_regex}" "${_files[@]}"
+      __sm.files.replace "${_string}" "${_regex}" "${_files[@]}"
       ;;
     (source)
       [[ -n "${_files}" ]] || fail "files must be given."
@@ -258,9 +264,9 @@ files()
         "${_owner}" "${_files[@]}"
       ;;
     (write)
-      [[ -n "${_content}" ]] || fail "String must be given; string 'string'."
+      [[ -n "${_string}" ]] || fail "String must be given; string 'string'."
       [[ -n "${_target}" ]] || fail "Target must be given;  to {file name}."
-      __sm.files.write "${_content}" "${_target}" "${_flags[*]}"
+      __sm.files.write "${_string}" "${_target}" "${_flags[*]}"
       ;;
     (open)
       [[ -n "${_files[@]}" ]] || fail "Files must be given."
