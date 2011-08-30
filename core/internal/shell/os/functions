@@ -27,7 +27,7 @@ __sm.os.open()
   fi
 }
 
-__sm.os.type
+__sm.os.type()
 {
   case "$OSTYPE" in
     (*linux*)

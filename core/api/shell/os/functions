@@ -90,7 +90,6 @@ os()
         (*)
           ;;
       esac
-    esac
       ;;
     (*)
       fail "Unknown command for os: '${_command}' "\

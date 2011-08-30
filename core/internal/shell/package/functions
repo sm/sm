@@ -680,8 +680,9 @@ package_ldconfig()
   then
     if paths exist "/etc/ld.so.conf.d"
     then
-      files write string "${active_path}/lib\n" to "/etc/ld.so.conf.d/sm.conf"
-      files chmod mode 0444 "/etc/ld.so.conf.d/sm.conf"
+      files write string "${active_path}/lib\n" \
+        to "/etc/ld.so.conf.d/sm.conf" \
+        mode 0444
     fi
 
     if [[ -d /selinux ]] && command_exists restorecon

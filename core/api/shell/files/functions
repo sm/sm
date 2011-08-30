@@ -58,11 +58,11 @@ files()
         _source="${1}"
         shift || fail "Source path must be provided after keyword 'from'"
         ;;
-      (mode|permissions)
+      (chmod|mode|permissions)
         _mode="${1}"
         shift || Fail "Mode must follow keywords 'mode|permissions'"
         ;;
-      (owner)
+      (chown|owner)
         _owner="${1}"
         shift || fail "Owner must be provided after keyword 'owner'"
         ;;
@@ -158,13 +158,13 @@ files()
       __sm.files.source "${_files[@]}"
       ;;
     (nonempty)
-      __sm.files.nonempty()
+      __sm.files.nonempty
       ;;
     (exist)
-      __sm.files.exist()
+      __sm.files.exist
       ;;
     (remove)
-      __sm.files.remove()
+      __sm.files.remove
       ;;
     (create)
       [[ -n "${_files}" ]] || fail "files to create must be given."
@@ -179,16 +179,6 @@ files()
         fail "Cannot link ${_source} to ${_target} which exists as a directory"
       __sm.files.link "${_source}" "${_target}" "${_flags[*]}"
       ;;
-    (chown)
-      [[ -n "${_owner}" ]] || fail "'owner {user}[:{group}]' was not given."
-      [[ -n "${_files}" ]]    || fail "files must be given."
-      __sm.files.chown "${_owner}" "${_flags[*]}" "${_files[@]}"
-      ;;
-    (chmod)
-      [[ -n "${_mode}" ]]  || fail "'mode {permissions mode}' must be given."
-      [[ -n "${_files}" ]] || fail "files to chmod must be given."
-      __sm.files.chmod "${_mode}" "${_flags[*]}" "${_files[@]}"
-      ;;
     (hash)
       [[ -e "${_source}" && -n "${_key}" ]] ||
         fail "Source and key must both be given;"\
@@ -201,7 +191,7 @@ files()
       ;;
     (copy)
       [[ -n "${_target}" ]] || fail "Target path (to) for copying into must be given."
-      __sm.files.copy "${_target}" "${_flags[*]}" "${_files[@]}"
+      __sm.files.copy "${_source:-.}" "${_target}" "${_flags[*]}" "${_files[@]}"
       ;;
     (in)
       [[ -n "${_files}" ]] || fail "Path to list files in must be given."
@@ -253,5 +243,21 @@ files()
         "{chown,chmod,create,remove,copy,in,search,enter,exist,join,expand,move,copy}"
       ;;
   esac
+
+  if [[ -n "${_owner}" ]]
+  then
+    [[ -n "${_files}"  ]] || fail "files must be given."
+    [[ -z "${_target}" ]] || pushd "${_target}" >/dev/null 2>&1
+    __sm.files.chown "${_owner}" "${_flags[*]}" "${_files[@]}"
+    [[ -z "${_target}" ]] || popd >/dev/null 2>&1
+  fi
+
+  if [[ -n "${_mode}" ]]
+  then
+    [[ -n "${_files}"  ]] || fail "files to chmod must be given."
+    [[ -z "${_target}" ]] || pushd "${_target}" >/dev/null 2>&1
+    __sm.files.chmod "${_mode}" "${_flags[*]}" "${_files[@]}"
+    [[ -z "${_target}" ]] || popd >/dev/null 2>&1
+  fi
 }
 

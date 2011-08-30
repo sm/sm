@@ -60,7 +60,7 @@ install_core()
 
   log_step "Installing core files (${files[*]})"
   cleanse_targets "${install_path}" ${files[@]}
-  copy_files to "${install_path}" ${files[@]}
+  files copy to "${install_path}" ${files[@]}
   log_step success
 
   log_step "Installing core extension set"
@@ -95,7 +95,7 @@ setup_shell_completion()
   seed_template "${completion_prefix}/${_name}" \
     sm_path "${install_path}"
 
-  chmod_files "${_mode}" "${completion_prefix}/${_name}"
+  files chmod "${_mode}" "${completion_prefix}/${_name}"
 }
 
 setup_profile_d()
@@ -145,7 +145,7 @@ setup_profile_d()
       files write \
         string "PATH=\"\${PATH}:${install_path}/bin:${install_path}/pkg/active/bin:${install_path}/pkg/active/sbin\"" \
         to "${profile_d_path}/sm.sh"
-      files chmod mode 0755 "${profile_d_path}/sm.sh"
+      files chmod 0755 "${profile_d_path}/sm.sh"
     fi
   fi
 }
@@ -170,7 +170,7 @@ make_binaries_executable()
   local _binary
   for _binary in "${binaries[@]}"
   do
-    chmod_files 0755 "${install_path}/bin/${_binary}"
+    files chmod 0755 "${install_path}/bin/${_binary}"
   done
 }
 

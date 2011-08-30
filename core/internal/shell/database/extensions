@@ -22,8 +22,9 @@ database_extension_setup()
   # setup bin/package/{...}
   for action in help initialize
   do
-    files write string '#!/bin/sh' to "bin/${module}/${action}"
-    files chmod mode 0755 "bin/${module}/${action}"
+    files write string '#!/bin/sh' \
+      to "bin/${module}/${action}" \
+      mode 0755
   done
 
   files write append \

@@ -483,9 +483,8 @@ service_install_init_d()
 
     files write \
       string "PATH=\"\$PATH:${prefix_path}/${_service}/active/bin\";export PATH;\n" \
-      append to "/etc/profile.d/${_service}.sh"
-
-    files chmod mode 0755 "/etc/profile.d/${_service}.sh"
+      append to "/etc/profile.d/${_service}.sh" \
+      mode 0755
   fi
 }
 
