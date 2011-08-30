@@ -484,13 +484,13 @@ __sm.files.md5()
   done
 }
 
-__sm.files.replace()
-{
-  local _regex="$1"
-  shift 1
-  local _files=("$@")
-
-}
+#__sm.files.replace()
+#{
+#  local _regex="$1"
+#  shift 1
+#  local _files=("$@")
+#
+#}
 
 __sm.files.replace()
 {
@@ -500,7 +500,7 @@ __sm.files.replace()
 
   for _file in "${_files[@]}"
   do
-    sed "s#${_pattern//\#/\\#}#${_content//\#/\\#}#g" "${_file}" \
+    sed "s#${_regex//\#/\\#}#${_string//\#/\\#}#g" "${_file}" \
       > "${_file}.replaced" && mv "${_file}.replaced" "${_file}"
   done
 }
