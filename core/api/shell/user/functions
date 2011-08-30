@@ -12,7 +12,7 @@ user()
     case "${_token}" in
       (is)
         _subcommand="$1" && shift
-        case "${_subcommand}"
+        case "${_subcommand}" in
           (root)
             if (( UID == 0 )) ; then return 0 ; else return 1 ; fi
             ;;

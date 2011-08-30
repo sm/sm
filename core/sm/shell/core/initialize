@@ -118,8 +118,7 @@ source "${modules_path}/modules/functions"
 source "${modules_path}/extensions/functions"
 
 modules core initialize
-modules sm/command
-modules sm/versionedfs # Used for pkg, extensions and modules.
+modules load sm/command sm/versionedfs # Used for pkg, extensions and modules.
 
 if [[ "$OSTYPE" == *solaris* ]]
 then # custom compilations + g*

@@ -137,7 +137,7 @@ __sm.module.include()
   then
     while read -r _module_dependency
     do
-      if ! __sm.module.load "${_module_dependency}"
+      if ! __sm.module.include "${_module_dependency}"
       then
         error "Could not find module dependency '${_module_dependency}' "\
           "from '${_module_path##${sm_path}\/}/includes'."
@@ -312,9 +312,12 @@ __sm.module.detect()
 
   debug search_module_path ":${_module_path}:"
 
-  [[ -d "${_modules_path}/functions" ]] || return 1
+  if [[ -d "${_module_path}/functions" ]]
+  then
+    return 1
+  fi
 
-  if [[ -s "${_modules_path}/functions" || -s "${_modules_path}/includes" ]]
+  if [[ -s "${_module_path}/functions" || -s "${_module_path}/includes" ]]
   then
     module_path=${_module_path}
     module_name="$*"

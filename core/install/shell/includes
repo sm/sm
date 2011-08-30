@@ -1,7 +1,7 @@
 api/files
 api/paths
 api/vcs
-api/users
+api/user
 cli/sets
 api/extensions/cache
 api/templates
