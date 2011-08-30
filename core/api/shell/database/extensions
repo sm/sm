@@ -14,29 +14,30 @@ database_extension_setup()
   # Setup modules/package/{functions,initialize,cli}
   for file in functions initialize cli
   do
-    write '#!/bin/sh' to "modules/${module}/${file}"
+    files write string '#!/bin/sh' to "modules/${module}/${file}"
   done
 
-  write "\n${module}_cli\n" append to "modules/${module}/cli"
+  files write append string "\n${module}_cli\n" to "modules/${module}/cli"
 
   # setup bin/package/{...}
   for action in help initialize
   do
-    write '#!/bin/sh' to "bin/${module}/${action}"
+    files write string '#!/bin/sh' to "bin/${module}/${action}"
     chmod_files 0755 "bin/${module}/${action}"
   done
 
-  write "
+  files write append string "
 description \"Extension for managing ${extension} (${website_url}).\"
 
 action \"initialize\" \"Initialize ${extension} database.\"
 
 show_help usage
-" append to "bin/${module}/help"
+" to "bin/${module}/help"
 
   for action in initialize
   do
-    write "\n${module}_${action}\n" append to "bin/${module}/${action}"
+    files write append string "\n${module}_${action}\n" \
+      to "bin/${module}/${action}"
   done
 }
 

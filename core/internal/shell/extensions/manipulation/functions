@@ -36,7 +36,7 @@ extension_version()
     " No extension was given."
   true ${extension_path:="${extensions_path}/${_extension}"}
 
-  if file_exists "${extension_path}/VERSION"
+  if files exist "${extension_path}/VERSION"
   then
     read -r extension_version < "${extension_path}/VERSION"
   else
@@ -218,7 +218,8 @@ extension_install()
     from "${extensions_src_path}/${_src}" \
     to "${sm_path}/exts/${_extension}"
 
-  write "${extension_uri}" to "${sm_path}/exts/${_extension}/.uri"
+  files write string  "${extension_uri}" \
+    to "${sm_path}/exts/${_extension}/.uri"
 
   #
   # TODO: Process extension dependencies...

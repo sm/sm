@@ -11,7 +11,7 @@ package_error()
   local _message="${1:-}" _log="${2:-}"
   shift || fail "No message was provided."
 
-  if [[ -n ${_log} ]] && file_exists ${_log}
+  if [[ -n ${_log} ]] && files exist ${_log}
   then # Append tail of error log to the error message.
     local _num_lines=${3:-25} # Default the number of lines to 25
     _message="${_message}\n\nTail of ${_log}:\n$( tail -n ${_num_lines} ${_log} )"
@@ -444,8 +444,9 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
     package_make_install
   fi
 
-  link --force "${source_path}/${package_dir}" \
-    to "${install_path}/src"
+ files link symbolic force \
+   from "${source_path}/${package_dir}" \
+   to "${install_path}/src"
 
   if command_exists "${package_name}_postinstall"
   then
@@ -461,7 +462,8 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
     package_activate_if_first "${package_name}" "${package_version}"
   fi
 
-  link --force "${source_path}/${package_dir}" \
+  files link symbolic force \
+    from "${source_path}/${package_dir}" \
     to "${install_path}/src"
 
   if command_exists "${package_name}_postactivate"
@@ -558,7 +560,7 @@ package_configure()
     package_configure_flag_add_key --prefix "${install_path}"
     _command="./configure ${configure_flags[*]}"
 
-    file_is_executable "configure" || return 0
+    [[ -x "${configure}" ]] || return 0
   fi
 
   debug package "package_configure: ${_command}"
@@ -678,8 +680,8 @@ package_ldconfig()
   then
     if paths exist "/etc/ld.so.conf.d"
     then
-      write "${active_path}/lib\n" to "/etc/ld.so.conf.d/sm.conf"
-      chmod_files 0444 "/etc/ld.so.conf.d/sm.conf"
+      files write string "${active_path}/lib\n" to "/etc/ld.so.conf.d/sm.conf"
+      files chmod mode 0444 "/etc/ld.so.conf.d/sm.conf"
     fi
 
     if [[ -d /selinux ]] && command_exists restorecon
@@ -712,7 +714,7 @@ package_profile_d()
   log_step "Updating shell profile for ${_package}"
 
   paths create "${profile_d_path}"
-  ensure_files_exist "${profile_path}"
+  files create "${profile_path}"
 
   install_template "profile.d" to "${profile_d_path}/${_package}.sh" mode 0755
 

@@ -82,9 +82,9 @@ read_config()
     esac
   done
 
-  if variable_is_empty variable
+  if [[ -z "${variable}" ]]
   then
-    if variable_is_nonempty prefix
+    if [[ -n "${prefix}" ]]
     then
       true "${variable:="${prefix:-}_$key"}"
     else
@@ -97,9 +97,9 @@ read_config()
 
   for _file in  $( settings_search ${_extension} "${_config_file}" )
   do
-    if file_is_nonempty "${_file}"
+    if ! files are empty "${_file}"
     then
-      _temp="$(hash_file "${_file}" "${key}")"
+      _temp="$(files hash from "${_file}" key "${key}")"
 
       if [[ -n "${_temp}" ]]
       then
@@ -132,7 +132,7 @@ settings_search()
 
   for _path in "${paths[@]}"
   do # Print existing paths.
-    if paths exist "${_path}" && file_is_nonempty "${_path}/${setting}"
+    if paths exist "${_path}" && ! files are empty "${_path}/${setting}"
     then
       printf "${_path}/${setting}\n"
     fi
@@ -148,7 +148,7 @@ settings_search_path_update()
     return 0
   fi
 
-  if file_exists "${path}/.uri" && file_is_nonempty "${_path}/.uri"
+  if files exist "${path}/.uri" && ! files are empty "${_path}/.uri"
   then
     read -r _uri < "${path}/.uri"
     fetch_uri "${_uri}" "${path}" >&2

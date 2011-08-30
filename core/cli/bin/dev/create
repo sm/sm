@@ -32,9 +32,9 @@ do
     extension_module_add "${extension}" "${_module}" "${_path}"
 
     # Run the module's extension setup function, if it exists.
-    if file_exists "${sm_path}/core/cli/shell/${_module}/extensions"
+    if files exist "${sm_path}/core/cli/shell/${_module}/extensions"
     then
-      source_files "${sm_path}/core/cli/shell/${_module}/extensions"
+      files source "${sm_path}/core/cli/shell/${_module}/extensions"
       if command_exists "${_module}_extension_setup"
       then
         "${_module}_extension_setup" "${extension}" "${_module}" "${_path}"

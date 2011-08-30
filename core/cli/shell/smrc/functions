@@ -4,7 +4,7 @@ smrc_install()
 {
   template_exists "cli/smrc" || fail "The template core cli/smrc is missing."
 
-  if file_exists "$HOME/.smrc"
+  if files exist "$HOME/.smrc"
   then
     timestamp_set
 
@@ -12,7 +12,8 @@ smrc_install()
     log "Renaming it as ${HOME}/.smrc.${timestamp} to retain it."
     log "Please examine the file, and if it is no longer needed, delete it."
 
-    move_file "$HOME/.smrc" to "$HOME/.smrc.$timestamp"
+    files move from "$PWD" to "$HOME/.smrc.$timestamp" \
+      "$HOME/.smrc"
   fi
 
   # TODO: Read project, repository_url and environment from defaults file.
@@ -37,7 +38,7 @@ smrc_update()
   local template="cli/smrc" target="$HOME/.smrc" \
     backup="$HOME/.smrc.$timestamp" incoming="$HOME/.smrc.incoming.$$"
 
-  if ! file_exists "${target}"
+  if ! files exist "${target}"
   then
     log "File not found ${target}; installing new."
     smrc_install
@@ -57,7 +58,7 @@ smrc_update()
   if [[ -s "${incoming}" ]]
   then
     log "Backup ${backup}."
-    copy_file "${target}" to "${backup}"
+    files copy from "${target}" to "${backup}"
     log "Incoming settings:"
     printf "\n" >> "${target}"
     tee -a "${target}" < "${incoming}"

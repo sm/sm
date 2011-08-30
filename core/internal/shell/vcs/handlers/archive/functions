@@ -31,7 +31,8 @@ archive_get()
 
   [[ -d "${archives_path}" ]] || mkdir -p "${archives_path}"
 
-  if [[ -f "${_archive}" ]] && ! file_matches_md5 "${_archive}" "${_package_md5}"
+  # TOD: shasum default instead
+  if [[ -f "${_archive}" && "$(files md5 "${_archive}")" != "${_package_md5}" ]]
   then
     debug vcs "${_uri##*/} does not match MD5 checksum ${_package_md5}; removing and downloading."
     rm -f "${_archive}"
@@ -41,8 +42,10 @@ archive_get()
   then
     if [[ -f "${_uri}" ]]
     then
-      copy_file --force "${_uri}" to "${_archive}" || \
+      if ! files copy force from "${_uri}" to "${_archive}"
+      then
         fetch_error copy_failed from=${_uri} to=${_archive}
+      fi
     else
       if curl -s -L "${_uri}" -o "${_archive}"
       then
@@ -110,6 +113,6 @@ Please read 'sm man curl' for instructions how to solve this problem.\n"
 
   ls -d * >/dev/null 2>&1 || fetch_error empty_archive
 
-  write "${_uri}" to "${_final_target}/.uri"
+  files write string "${_uri}" to "${_final_target}/.uri"
 }
 

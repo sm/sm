@@ -2,7 +2,7 @@
 
 rvm_initialize()
 {
-  source_files "/etc/rvmrc" "$HOME/.rvmrc"
+  files source "/etc/rvmrc" "$HOME/.rvmrc"
 
   rvm_files=(
   "$rvm_path/scripts/rvm"
@@ -10,9 +10,9 @@ rvm_initialize()
   "/usr/local/rvm/scripts/rvm"
   )
 
-  files=( $(nonempty_files "${rvm_files[@]}") )
+  files=( $(files nonempty "${rvm_files[@]}") )
 
-  [[ -n "${files}" ]] || source_files $(array first files)
+  [[ -n "${files}" ]] || files source $(array first files)
 }
 
 #
@@ -52,7 +52,7 @@ rvm_install()
   curl -L -sk "$url" -o rvm-installer
   chmod +x "rvm-installer"
   ./rvm-installer --version ${_version}
-  remove_files "rvm-installer"
+  files remove "rvm-installer"
 }
 
 #

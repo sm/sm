@@ -9,7 +9,7 @@ package_extension_setup()
 
   for action in install uninstall update activate deactivate
   do
-    write "${action}=${module}_${action}()" append to "${path}/map"
+    files write append string "${action}=${module}_${action}()" to "${path}/map"
   done
 }
 

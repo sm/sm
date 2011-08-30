@@ -46,10 +46,10 @@ install_release()
 
   md5=$(curl -s "${releases_url}/sm-${version}.tar.gz.md5" 2>/dev/null)
 
-  if file_exists "${archive}" && ! md5_match
+  if files exist "${archive}" && ! md5_match
   then
     # Remove old installs, if they exist and have incorrect MD5 checksums.
-    file_exists "$archives_path/sm-${version}.tar.gz" &&
+    files exist "$archives_path/sm-${version}.tar.gz" &&
       rm -f "$archives_path/sm-${version}.tar.gz"
   fi
 
@@ -58,7 +58,8 @@ install_release()
   #TODO make use of fetch_uri
   curl -s -L "${releases_url}/sm-${version}.tar.gz" -o "$archive"
 
-  file_matches_md5 "${archive}" "${md5}" ||
+  # TODO: shasum default instead
+  [[ "$(files md5 "${archive}")" == "${md5}" ]] ||
     fail "
 Archive package downloaded does not match its calculated MD5 checksum ${md5}:
 

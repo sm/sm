@@ -56,7 +56,7 @@ detect_action_type()
       ;;
 
     (*)
-      if file_is_executable "${_path}"
+      if [[ -x "${_path}" ]]
       then
         action_type="binary"
       else

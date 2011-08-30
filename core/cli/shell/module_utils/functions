@@ -270,7 +270,7 @@ modules_docgen()
 
   paths create "${_prefix}"
 
-  write "<html><body><h2>SM Module Documentation</h2><ul>" \
+  files write string "<html><body><h2>SM Module Documentation</h2><ul>" \
     to "${_prefix}/index.html"
 
   shopt -s nullglob
@@ -288,19 +288,23 @@ modules_docgen()
     log "Generating ${_base}.html"
     module_docs "${_name}" > "${_base}.html"
 
-    write "<li><a href=\"./${_name}.html\">${_name}</a></li>" \
-      append to "${_prefix}/index.html"
+    files write append \
+      string "<li><a href=\"./${_name}.html\">${_name}</a></li>" \
+      to "${_prefix}/index.html"
 
     # Replace the shocco generated css url with a local filesystem css file,
     # so that a network request is not required in order to have styling when
     # viewing the documentation offline.
-    replace_content "http://jashkenas.github.com/docco/resources/docco" \
-      with "../css/shocco" in "${_base}.html"
+    files replace \
+      string "http://jashkenas.github.com/docco/resources/docco" \
+      with "../css/shocco" \
+      in "${_base}.html"
     )&
   done
   wait
 
-  write "  </ul></body></html>" append to "${_prefix}/index.html"
+  files write append string "  </ul></body></html>" to "${_prefix}/index.html"
+
   log "Modules documentation content generated in ${_prefix}."
 }
 
@@ -314,7 +318,7 @@ modules_docopen()
     error "To run docopen, set core_development_path in ~/.smrc, and clone the sm core "\
     "repository into it."
 
-  file_exists "${core_development_path}/html/shell/index.html" ||
+  files exist "${core_development_path}/html/shell/index.html" ||
     error "Run '$ sm mod docgen' before trying docopen."
 
   os_open "${core_development_path}/html/shell/index.html"
@@ -333,7 +337,7 @@ modules_site_docgen()
   paths exists "${core_development_path}" ||
     fail "Set core_development_path in ~/.smrc, to run docgen."
 
-  write "<html><body><h2>SM Module Documentation</h2><ul>" \
+  files write string "<html><body><h2>SM Module Documentation</h2><ul>" \
     to "${_prefix}/index.html"
 
   shopt -s nullglob

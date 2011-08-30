@@ -49,7 +49,7 @@ ext_project_initialize()
 
   if module_is_loaded rvm
   then
-    if variable_is_nonempty release_path && file_is_nonempty "${release_path}/.rvmrc"
+    if [[ -n "${release_path}" ]] && ! file is empty "${release_path}/.rvmrc"
     then
       source "${release_path}/.rvmrc"
     fi
@@ -79,6 +79,6 @@ ext_project_initialize()
     true "${database_name:="${project}_${environment}"}"
 
     # And source the project name rc file, if they exist
-    source_files ".${project}rc"
+    files source ".${project}rc"
   fi
 }

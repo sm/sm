@@ -9,13 +9,13 @@ true \
   "${repository_url:="git://github.com/sm/bdsm"}"
 
 true \
-  "${extensions_url:=$(hash_file "$config_path/defaults" "extensions_url")}" \
+  "${extensions_url:=$(files hash from "$config_path/defaults" key "extensions_url")}" \
   ${remote:="origin"} \
   ${branch:="master"}
 
 for config in "${sm_path}/core/sm/config/defaults" "${sm_path}/core/sm/config/defaults"
 do
-  if file_exists "$config"
+  if files exist "$config"
   then
     true "${releases_url:=$(hash_file "${config}" "releases_url")}"
   fi

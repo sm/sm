@@ -74,7 +74,7 @@ install_configuration_files()
   log_step "Ensuring configuration files exist (${configs[*]})"
   for config_file in "${configs[@]}"
   do
-    ensure_files_exist "${install_path}/config/${config_file}"
+    files create "${install_path}/config/${config_file}"
   done
   log_step success
 }
@@ -106,48 +106,63 @@ setup_profile_d()
   then
     if os_is_darwin
     then
-      file_contains /etc/profile "${profile_d_path}" || {
+      if ! files contain string "/etc/profile" "${profile_d_path}"
+      then
         install_template install/etc_profile to /etc/profile
         seed_template /etc/profile profile_d_path "${profile_d_path}"
-      }
+      fi
     fi
   else
-    ensure_files_exist "$HOME/.profile" "$HOME/.bashrc" "$HOME/.bash_profile"
+    files create "$HOME/.profile" "$HOME/.bashrc" "$HOME/.bash_profile"
 
-    file_contains "$HOME/.bashrc" "$HOME/.profile" ||
-      write "if test -s \"$HOME/.profile\" ; then . \"$HOME/.profile\" ; fi"\
-        append to "$HOME/.bashrc"
+    if ! files contain string "$HOME/.bashrc" "$HOME/.profile"
+    then
+      files write appnd \
+        string "if test -s \"$HOME/.profile\" ; then . \"$HOME/.profile\" ; fi"\
+        to "$HOME/.bashrc"
+    fi
 
-    file_contains "$HOME/.bash_profile" "$HOME/.bashrc" ||
-      write "if test -s \"$HOME/.bashrc\" ; then . \"$HOME/.bashrc\" ; fi"\
-        append to "$HOME/.bash_profile"
+    if ! files contain string "$HOME/.bash_profile" "$HOME/.bashrc"
+    then
+      files write append \
+        string "if test -s \"$HOME/.bashrc\" ; then . \"$HOME/.bashrc\" ; fi"\
+        to "$HOME/.bash_profile"
+    fi
 
-    file_contains "$HOME/.profile" "${profile_d_path}" ||
-      write "\nif test -d '${profile_d_path}' ; then for profile in \"${profile_d_path}\"/*.sh ; do if test -x \"\$profile\" ; then . \"\$profile\" ; fi ; done ; unset profile ; fi" \
-        append to "$HOME/.profile"
+    if ! files contain string "$HOME/.profile" "${profile_d_path}"
+    then
+      files write append \
+        string "\nif test -d '${profile_d_path}' ; then for profile in \"${profile_d_path}\"/*.sh ; do if test -x \"\$profile\" ; then . \"\$profile\" ; fi ; done ; unset profile ; fi" \
+        to "$HOME/.profile"
+    fi
   fi
 
-  file_exists "${profile_d_path}/sm.sh" &&
-     file_contains "${profile_d_path}/sm.sh" "${install_path}/pkg/active/sbin" ||
-     {
-       # To prepend or postpend??? Because of selinux issues prepend for now.
-       write "PATH=\"\${PATH}:${install_path}/bin:${install_path}/pkg/active/bin:${install_path}/pkg/active/sbin\"" \
-         to "${profile_d_path}/sm.sh"
-
-       chmod_files 0755 "${profile_d_path}/sm.sh"
-     }
+  if files exist "${profile_d_path}/sm.sh"
+  then
+    if ! files contain string "${profile_d_path}/sm.sh" "${install_path}/pkg/active/sbin"
+    then
+      # To prepend or postpend??? Because of selinux issues prepend for now.
+      files write \
+        string "PATH=\"\${PATH}:${install_path}/bin:${install_path}/pkg/active/bin:${install_path}/pkg/active/sbin\"" \
+        to "${profile_d_path}/sm.sh"
+      files chmod mode 0755 "${profile_d_path}/sm.sh"
+    fi
+  fi
 }
 
 set_sm_path()
 {
-  replace_content "^sm_path=.*" with "sm_path=\"${install_path}\"" \
-    in "${install_path}/bin/sm"
+  files replace regex "^sm_path=.*" \
+    with "sm_path=\"${install_path}\"" \
+    "${install_path}/bin/sm"
 
-  replace_content "^sm_path=.*" with "sm_path=\"${install_path}\"" \
-    in "${install_path}/bin/smp"
+  files replace regex "^sm_path=.*" \
+    with "sm_path=\"${install_path}\"" \
+    "${install_path}/bin/smp"
 
-  replace_content "^saved_sm_path=.*" with "saved_sm_path=\"\${sm_path:-${install_path}}\"" \
-    in "${install_path}/core/sm/shell/core/initialize"
+  files replace regex "^saved_sm_path=.*" \
+    with "saved_sm_path=\"\${sm_path:-${install_path}}\"" \
+    "${install_path}/core/sm/shell/core/initialize"
 }
 
 make_binaries_executable()

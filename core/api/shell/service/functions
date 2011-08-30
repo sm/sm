@@ -99,11 +99,11 @@ ext_service_initialize()
 
   export service_paths service_actions service_flags
 
-  if file_is_nonempty "${service_pid_file}"
+  if files are empty "${service_pid_file}"
   then
-    read -r service_pid < "${service_pid_file}"
-  else
     service_pid=0
+  else
+    read -r service_pid < "${service_pid_file}"
   fi
 
   export PATH="/bin:/usr/bin:${prefix_path}/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin:${PATH}"
@@ -155,7 +155,7 @@ service_setup()
 
   local _path _file
 
-  source_files "${extension_path}"/shell/{functions,initialize,cli}
+  files source "${extension_path}"/shell/{functions,initialize,cli}
 
   if user_is_root
   then
@@ -421,7 +421,7 @@ service_pid()
 
   paths create "${_path}"
 
-  if file_is_nonempty "${_path}/${service}.pid"
+  if ! file is empty "${_path}/${service}.pid"
   then
     read -r _pid < "${_path}/${service}.pid"
     if os_is_linux
@@ -441,7 +441,7 @@ service_pid()
 
 service_load_conf_d()
 {
-  source_files "${confd_path}/${service}.conf"
+  files source "${confd_path}/${service}.conf"
 }
 
 service_install_init_d()
@@ -477,13 +477,15 @@ service_install_init_d()
     service_activate "${service}" "${package_version}"
 
     # TODO: Replace this with install_template + seed_template
-    write "%s\n" "[ -d \"${prefix_path}/${_service}/active/bin\" ] && " \
+    files write \
+      string "%s\n" "[ -d \"${prefix_path}/${_service}/active/bin\" ] && " \
       to "/etc/profile.d/${_service}.sh"
 
-    write "%s\n" "PATH=\"\$PATH:${prefix_path}/${_service}/active/bin\" ; export PATH; " \
+    files write \
+      string "PATH=\"\$PATH:${prefix_path}/${_service}/active/bin\";export PATH;\n" \
       append to "/etc/profile.d/${_service}.sh"
 
-    chmod_files 0755 "/etc/profile.d/${_service}.sh"
+    files chmod mode 0755 "/etc/profile.d/${_service}.sh"
   fi
 }
 
@@ -679,7 +681,7 @@ service_init_d()
   service_load_conf_d # Load the configuration file.
 
   # Sanity checks go here.
-  file_is_executable "${service_binary}" ||
+  [[ -x "${service_binary}" ]] ||
     fail "Could not find ${service_binary}, or ${service_binary} is not executable."
 
   service_pid
@@ -696,7 +698,7 @@ service_deactivate()
   [[ -n "${_service}" ]] ||
     fail "A service name must be set or passed in to deactivate a service."
 
-  if file_exists "${init_scripts_path}/${_service}"
+  if files exist "${init_scripts_path}/${_service}"
   then
     chmod_files 0644 "${init_scripts_path}/${_service}"
 
@@ -719,11 +721,14 @@ service_deactivate()
       #  svc ${service} on # TODO: daemontools start on boot
 
       else # Fall back on rc.local to start redis at system startup.
-        if file_exists "/etc/rc.local" &&
-          ! file_contains "/etc/rc.local" "${service} start"
+        if files exist "/etc/rc.local"
         then
-          write "${init_scripts_path}/${service} start" \
-            append to /etc/rc.local
+          if ! files contain string "/etc/rc.local" "${service} start"
+          then
+            files write append \
+              string "${init_scripts_path}/${service} start" \
+              to /etc/rc.local
+          fi
         fi
       fi
     fi
@@ -742,7 +747,7 @@ service_activate()
 
   variables_must_be_nonempty _service _version
 
-  if symlink_exists "${service_db_path}/active"
+  if files are symlinks "${service_db_path}/active"
   then # TODO: use versionedfs to check if a version is active.
     service_deactivate "${_service}"
   fi
@@ -751,9 +756,11 @@ service_activate()
   then
     log "Activating service ${_service} version ${_version}."
 
-    link --force "${service_db_path}/${_version}" to "${service_db_path}/active"
+    files link symbolic force \
+      from "${service_db_path}/${_version}" \
+      to "${service_db_path}/active"
 
-    if file_exists "${init_scripts_path}/${service}"
+    if files exist "${init_scripts_path}/${service}"
     then
       chmod_files 0755 "${init_scripts_path}/${service}"
 
@@ -775,19 +782,23 @@ service_activate()
             #  TODO: daemontools remove start on boot
 
           else # Fall back on rc.local to start redis at system startup.
-            file_contains "/etc/rc.local" "${service} start" ||
+            if ! files contain string "/etc/rc.local" "${service} start"
+            then
               sed -i -e "d#${init_scripts_path}/${service} start#" /etc/rc.local
+            fi
           fi
         fi
       elif os_is_darwin
       then
         true # TODO: launchctl
       else # ::shrug::
-        if file_exists "/etc/rc.local" &&
-          ! file_contains "/etc/rc.local" "${service} start"
+        if files exist "/etc/rc.local"
         then
-          # TODO: change this to use replace_content
-          sed -i -e "d#${init_scripts_path}/${service} start#" /etc/rc.local
+          if ! files contain string "/etc/rc.local" "${service} start"
+          then
+            # TODO: change this to use replace_content
+            sed -i -e "d#${init_scripts_path}/${service} start#" /etc/rc.local
+          fi
         fi
       fi
     fi

@@ -50,8 +50,8 @@ date_range()
     esac
   done
 
-  variable_is_nonempty _start || fail "start date must be specified."
-  variable_is_nonempty _end   || fail "end date must be specified."
+  [[ -n "${_start}" ]] || fail "start date must be specified."
+  [[ -n "${_end}" ]]   || fail "end date must be specified."
 
   case "${_step}" in
     minute)

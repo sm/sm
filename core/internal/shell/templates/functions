@@ -179,15 +179,12 @@ install_template()
         " as it is a directory."
     fi
 
-    copy_file "${_template}" to "${_target}/${_name}"
-
-    variable_is_empty _mode  || chmod "${_mode}" "${_target}/${_name}"
-    variable_is_empty _owner || chown "${_owner}" "${_target}/${_name}"
+    files copy from "${_template}" to "${_target}/${_name}" \
+      mode "${_mode}" owner "${_owner}"
   else
-    copy_file --force "${_template}" to "${_target}"
-
-    variable_is_empty _mode  || chmod_files "${_mode}" "${_target}"
-    variable_is_empty _owner || chown_files "${_owner}" "${_target}"
+    files copy force \
+      from "${_template}" to "${_target}" \
+      mode "${_mode}" owner "${_owner}"
   fi
 }
 
@@ -244,7 +241,7 @@ seed_template()
 
   local _hash=("$@") _strings=() temporary=${_template}.${timestamp}.$$
 
-  file_exists "${_template}" || fail "Cannot seed template;"\
+  files exist "${_template}" || fail "Cannot seed template;"\
     " template file '${_template}' does not exist."
 
   [[ -n "${_hash}" ]] || fail "Cannot seed template '${_template}';"\
@@ -262,7 +259,7 @@ seed_template()
     error "There was an error (?) seeding the template '${_template}';" \
     " Most often this is due to filesystem permissions / disk full."
 
-  file_exists "${temporary}" || fail "Something went very wrong;"\
+  files exist "${temporary}" || fail "Something went very wrong;"\
     " the template intermediate file '${temporary}' does not exist?! "
 
   move_file "${temporary}" "${_template}"
