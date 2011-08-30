@@ -62,7 +62,7 @@ ext_service_initialize()
 
   if user_is_root
   then
-    if os_is_darwin
+    if os is darwin
     then
       true "${service_user:="_${service}"}"
     else
@@ -424,7 +424,7 @@ service_pid()
   if ! file is empty "${_path}/${service}.pid"
   then
     read -r _pid < "${_path}/${service}.pid"
-    if os_is_linux
+    if os is linux
     then # Sanity check.
       if ! paths exist "/proc/${pid}"
       then
@@ -704,7 +704,7 @@ service_deactivate()
 
     if user_is_root
     then # Add service to system startup
-      if os_is_darwin
+      if os is darwin
       then
         true # TODO: launchctl
 
@@ -764,7 +764,7 @@ service_activate()
     then
       chmod_files 0755 "${init_scripts_path}/${service}"
 
-      if os_is_linux
+      if os is linux
       then
         if user_is_root
         then # Add service to system startup
@@ -788,7 +788,7 @@ service_activate()
             fi
           fi
         fi
-      elif os_is_darwin
+      elif os is darwin
       then
         true # TODO: launchctl
       else # ::shrug::
@@ -818,7 +818,7 @@ service_status()
     log "  version: ${service_version}"
     log "  process: "
     log "    pid: ${pid}"
-    if os_is_linux
+    if os is linux
     then
       log "    parent_pid: $(awk  '/^PPid:/{print $2}' /proc/${pid}/status)"
       log "    state: $(printf "$ps" | awk '{print $1}')"

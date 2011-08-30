@@ -441,20 +441,14 @@ __sm.files.md5()
 {
   local _files=("$@") _file _command _md5
 
-  if os_is_darwin
+  if command_exists "md5sum"
   then
-    _command="/sbin/md5 -q"
+    _command="md5sum"
+  elif command_exists md5
+  then
+    _command="md5"
   else
-    if command_exists "md5sum"
-    then
-      _command="md5sum"
-
-    elif command_exists md5
-    then
-      _command="md5"
-    else
-      error "Could not find a suitable MD5 command (md5/md5sum) in PATH."
-    fi
+    error "Could not find a suitable MD5 command (md5/md5sum) in PATH."
   fi
 
   for file in "${_files[@]}"
@@ -488,5 +482,11 @@ __sm.files.replace()
     sed "s#${_pattern//\#/\\#}#${_content//\#/\\#}#g" "${_file}" \
       > "${_file}.replaced" && mv "${_file}.replaced" "${_file}"
   done
+}
+
+__sm.files.open()
+{
+  local _files=("$@")
+  os open "${_files[@]}"
 }
 

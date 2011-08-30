@@ -5,4 +5,4 @@
 
 paths enter "${extensions_development_path}/${extension_args[${__sm_array_start}]}/"
 
-os_open "$PWD"
+os open "$PWD"

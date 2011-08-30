@@ -6,5 +6,5 @@
 path exists "${extensions_development_path}/${extension_args[${__sm_array_start}]}" ||
   error "open: Failed to open '${extension_args[${__sm_array_start}]}'; it appears to not be installed."
 
-os_open "${extensions_development_path}/${extension_args[${__sm_array_start}]}"
+os open "${extensions_development_path}/${extension_args[${__sm_array_start}]}"
 

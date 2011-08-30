@@ -321,7 +321,7 @@ modules_docopen()
   files exist "${core_development_path}/html/shell/index.html" ||
     error "Run '$ sm mod docgen' before trying docopen."
 
-  os_open "${core_development_path}/html/shell/index.html"
+  os open "${core_development_path}/html/shell/index.html"
 }
 
 # ## modules_site_docopen()

@@ -92,6 +92,6 @@ po()
   # Project open function; use the project switch function in addition to
   # opening the filesystem directory.
   p $*
-  os_open
+  os open
 }
 

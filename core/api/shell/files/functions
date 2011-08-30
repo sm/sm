@@ -243,6 +243,10 @@ files()
       [[ -n "${_target}" ]] || fail "Target must be given;  to {file name}."
       __sm.files.write "${_string}" "${_target}" "${_flags[*]}"
       ;;
+    (open)
+      [[ -n "${_files[@]}" ]] || fail "Files must be given."
+      __sm.files.open "${_files[@]}"
+      ;;
     (*)
       fail "Unknown command for files: '${_command}' "\
         "A files command must be specified as the first parameter: "\

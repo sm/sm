@@ -246,7 +246,7 @@ package_init()
     gnu)
       LDFLAGS="-L${active_path}/lib ${LDFLAGS:-}"
       CFLAGS="-I${active_path}/include ${CFLAGS:-} "
-      if os_is_darwin && [[ -x /usr/bin/gcc-4.2 ]]
+      if os is darwin && [[ -x /usr/bin/gcc-4.2 ]]
       then
         export CC=/usr/bin/gcc-4.2
       fi
@@ -577,7 +577,7 @@ package_build()
   then
     _command="${build_command}"
   else
-    _command="make ${make_flags[@]:-"-j$(os_cpu_count)"}"
+    _command="make ${make_flags[@]:-"-j$(os cpu count)"}"
   fi
 
   debug package "package_build: ${_command}"
@@ -676,7 +676,7 @@ package_ldconfig()
   user_is_root || return 0
 
   # TODO: Figure out if solaris and freebsd have an analog to this?
-  if os_is_linux
+  if os is linux
   then
     if paths exist "/etc/ld.so.conf.d"
     then
@@ -695,7 +695,7 @@ package_ldconfig()
     log_step "${package_name} ${package_version} ~ ldconfig" \
       "${_ldconfig}" "${active_path}/lib"
 
-  elif os_is_darwin
+  elif os is darwin
   then # Cluster Fuck!
     true
     # This should be handled by the profile.d?
@@ -745,8 +745,8 @@ package_patch()
 
   _paths=(
   "${extension_patches_path}"
-  "${extension_patches_path}/$(os_type)"
-  "${extension_patches_path}/$(os_type)/${package_version}"
+  "${extension_patches_path}/$(os type)"
+  "${extension_patches_path}/$(os type)/${package_version}"
   )
 
   for _path in "${_paths[@]}"
@@ -828,12 +828,12 @@ packages_must_be_active()
 
 package_docs()
 {
-  os_open "${package_docs_url}"
+  os open "${package_docs_url}"
 }
 
 package_website()
 {
-  os_open "${package_website_url}"
+  os open "${package_website_url}"
 }
 
 package_dependencies()

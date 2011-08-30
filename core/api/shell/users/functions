@@ -78,7 +78,7 @@ user_create_if_missing()
   (( UID == 0 )) || # root user has id 0
     fail "Users and groups may be manipulated only by the super-user (root), via su or sudo."
 
-  # ##### TODO: Use the os_is_X functions here instead.
+  # ##### TODO: Use the os is X functions here instead.
   case "$(uname)" in
     "OpenBSD")
       groupadd "$_group"
@@ -206,7 +206,7 @@ user_delete()
     fail "Users and groups may be manipulated only by the super-user (root), via su or sudo."
   (
   # Switch based on the os type.
-  # TODO: Switch these to use the os_is_X system module DSL
+  # TODO: Switch these to use the os is X system module DSL
   case "$(uname)" in
     "Linux")
       userdel "${package_user}"
