@@ -265,5 +265,29 @@ files()
       fi
       ;;
   esac
+
+  if [[ -n "${_owner}" ]]
+  then
+    if [[ -n "${_files[*]}"  ]]
+    then
+      [[ -z "${_target}" ]] || pushd "${_target}" >/dev/null 2>&1
+      __sm.files.chown "${_owner}" "${_flags[*]}" "${_files[@]}"
+      [[ -z "${_target}" ]] || popd >/dev/null 2>&1
+    else
+      __sm.files.chown "${_owner}" "${_flags[*]}" "${_target}"
+    fi
+  fi
+
+  if [[ -n "${_mode}" ]]
+  then
+    if [[ -n "${_files[*]}"  ]]
+    then
+      [[ -z "${_target}" ]] || pushd "${_target}" >/dev/null 2>&1
+      __sm.files.chmod "${_mode}" "${_flags[*]}" "${_files[@]}"
+      [[ -z "${_target}" ]] || popd >/dev/null 2>&1
+    else
+      __sm.files.chmod "${_mode}" "${_flags[*]}" "${_target}"
+    fi
+  fi
 }
 
