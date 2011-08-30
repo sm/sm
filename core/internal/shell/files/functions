@@ -303,20 +303,24 @@ __sm.files.are.empty()
 
 __sm.files.contain()
 {
+
   local _string="$1" _regex="$2"
   shift 2
-  _files=("$@")
+  local _file _files=("$@")
 
-  [[ -f "${_file}" ]] || fail "'${_file}' is not a file."
+  for _file in ${_files[@]}
+  do
+    [[ -f "${_file}" ]] || fail "'${_file}' is not a file."
+  done
 
   if [[ -n "${_regex}" ]]
   then
-    for file in "${_files[@]}"
+    for _file in "${_files[@]}"
     do
       grep "${_regex}" "${_file}" >/dev/null 2>&1 || return 1
     done
   else
-    for file in "${_files[@]}"
+    for _file in "${_files[@]}"
     do
       grep "${_string}" "${_file}" >/dev/null 2>&1 || return 1
     done
