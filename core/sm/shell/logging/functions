@@ -282,7 +282,7 @@ var_debug_callback()
     eval "
       if [[ \"\${${_variable}[*]}\" != \"\${${_variable}_previous_value[*]}\" ]]
       then
-        if string contains \"x\" \"$-\"
+        if [[ -o xtrace ]]
         then
           log \"var debug '${_variable}' change from '\${${_variable}_previous_value[*]}' to '\${${_variable}[*]}'.\"
         elif [[ \"${var_debug_type_flag}\" == \"short\" ]]
@@ -599,10 +599,10 @@ clean_tmp_logs()
 __sm.logging.options.check()
 {
   # Do not use brackets; they slow things down a lot.
-  if string contains "$2" "$1"
+  if string contains "$1" "$2"
   then
     return 0
   fi
 
-  string contains "all" "$1" && ! string contains "-$2" "$1"
+  string contains "$1" "all" && ! string contains "$1" "-$2"
 }
