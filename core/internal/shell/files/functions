@@ -141,52 +141,73 @@ __sm.files.move()
   fi
 }
 
+#__sm.files.copy()
+#{
+#  local _source="$1" _target="$2" _flags=($3) _mode="$4" _owner="$5"
+#  shift 5
+#  local _file _files=("$@")
+#
+#  if [[ -n "${_files}" ]]
+#  then
+#    for _file in "${_files[@]}"
+#    do
+#      cp ${_flags[@]} "${_source}/${_file}" "${_target}/${_file}" ||
+#        fail "There was an error ($?) moving the source '${_source}/${_file}'" \
+#        "to the target '${_target}/${_file}'."
+#
+#      if [[ -n "${_mode}" ]]
+#      then
+#        chmod "${_mode}" "${_target}/${_file}" ||
+#          warn "There was an error ($?) changing"\
+#          " target's '${_target}' mode to '${_mode}'."
+#      fi
+#
+#      if [[ -n "${_owner}" ]]
+#      then
+#        chown "${_owner}" "${_target}/${_file}" ||
+#          warn "There was an error ($?) changing"\
+#          " target's '${_target}' owner to '${_owner}'."
+#      fi
+#    done
+#  else # moving single file
+#    cp ${_flags[@]} "${_source}" "${_target}/" ||
+#      fail "There was an error ($?) moving the source '${_source}'" \
+#      "to the target '${_target}'."
+#
+#    if [[ -n "${_mode}" ]]
+#    then
+#      chmod "${_mode}" "${_target}" ||
+#        warn "There was an error ($?) changing"\
+#        " target's '${_target}' mode to '${_mode}'."
+#    fi
+#
+#    if [[ -n "${_owner}" ]]
+#    then
+#      chown "${_owner}" "${_target}" ||
+#        warn "There was an error ($?) changing"\
+#        " target's '${_target}' owner to '${_owner}'."
+#    fi
+#  fi
+#}
+
 __sm.files.copy()
 {
-  local _source="$1" _target="$2" _flags=($3) _mode="$4" _owner="$5"
-  shift 5
+  local _source="$1" _target="$2" _flags=($3)
+  shift 3
   local _file _files=("$@")
 
-  if [[ -n "${_files}" ]]
+  if [[ -n "${_files[*]}" ]]
   then
     for _file in "${_files[@]}"
     do
       cp ${_flags[@]} "${_source}/${_file}" "${_target}/${_file}" ||
         fail "There was an error ($?) moving the source '${_source}/${_file}'" \
         "to the target '${_target}/${_file}'."
-
-      if [[ -n "${_mode}" ]]
-      then
-        chmod "${_mode}" "${_target}/${_file}" ||
-          warn "There was an error ($?) changing"\
-          " target's '${_target}' mode to '${_mode}'."
-      fi
-
-      if [[ -n "${_owner}" ]]
-      then
-        chown "${_owner}" "${_target}/${_file}" ||
-          warn "There was an error ($?) changing"\
-          " target's '${_target}' owner to '${_owner}'."
-      fi
     done
   else # moving single file
     cp ${_flags[@]} "${_source}" "${_target}/" ||
       fail "There was an error ($?) moving the source '${_source}'" \
       "to the target '${_target}'."
-
-    if [[ -n "${_mode}" ]]
-    then
-      chmod "${_mode}" "${_target}" ||
-        warn "There was an error ($?) changing"\
-        " target's '${_target}' mode to '${_mode}'."
-    fi
-
-    if [[ -n "${_owner}" ]]
-    then
-      chown "${_owner}" "${_target}" ||
-        warn "There was an error ($?) changing"\
-        " target's '${_target}' owner to '${_owner}'."
-    fi
   fi
 }
 
