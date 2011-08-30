@@ -45,7 +45,7 @@ string()
       if ! [[ "${_string}" =~ "${_search}" ]] ; then printf " ${_search}" ; fi
       ;;
     (prepend)
-      if ! [[ "${_string}" =~ "${_search}" ]] ; then printf " ${_search}" ; fi
+      if ! [[ "${_string}" =~ "${_search}" ]] ; then printf "${_search} " ; fi
       printf "${_string}"
       ;;
     (remove)
