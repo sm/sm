@@ -207,6 +207,9 @@ install_sm()
 
   perform install_configuration_files
 
+  log_step "Ensuring that binaries are executable" \
+    make_binaries_executable
+
   perform setup_profile_d
 
   if user is root
@@ -214,9 +217,6 @@ install_sm()
     log_step "Setting up sm shell completion (${completion_prefix}/${_name})" \
       perform setup_shell_completion
   fi
-
-  log_step "Ensuring that binaries are executable" \
-    make_binaries_executable
 
   succeed "S{cripting,ystem,tack} Management (SM) Framework (Core) installed."
 }
