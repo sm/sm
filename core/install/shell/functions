@@ -134,21 +134,21 @@ setup_profile_d()
     # TODO: Provide a way to do this through the cli but outside the install:
     #files create "$HOME/.profile" "$HOME/.bashrc" "$HOME/.bash_profile"
 
-    #if ! files contain string "$HOME/.bashrc" "$HOME/.profile"
+    #if ! files contain string "$HOME/.profile" "$HOME/.bashrc"
     #then
     #  files write appnd \
     #    string "if test -s \"$HOME/.profile\" ; then . \"$HOME/.profile\" ; fi"\
     #    to "$HOME/.bashrc"
     #fi
 
-    #if ! files contain string "$HOME/.bash_profile" "$HOME/.bashrc"
+    #if ! files contain string  "$HOME/.bashrc" "$HOME/.bash_profile"
     #then
     #  files write append \
     #    string "if test -s \"$HOME/.bashrc\" ; then . \"$HOME/.bashrc\" ; fi"\
     #    to "$HOME/.bash_profile"
     #fi
 
-    #if ! files contain string "$HOME/.profile" "${profile_d_path}"
+    #if ! files contain string "${profile_d_path}" "$HOME/.profile"
     #then
     #  files write append \
     #    string "\nif test -d '${profile_d_path}' ; then for profile in \"${profile_d_path}\"/*.sh ; do if test -x \"\$profile\" ; then . \"\$profile\" ; fi ; done ; unset profile ; fi" \

@@ -12,7 +12,7 @@ sm_development_setup()
   log "=> configuration"
   log "${_separator// /=}"
 
-  if files contain string "$HOME/.bash_profile" "projects_path="
+  if files contain string "projects_path=" "$HOME/.bash_profile"
   then
     log "  * projects_path is already set in $HOME/.bash_profile."
   else
@@ -22,7 +22,7 @@ sm_development_setup()
     log "  * Setting projects_path in $HOME/.bash_profile."
   fi
 
-  if files contain string "$HOME/.bash_profile" "modules/bash/project/interactive"
+  if files contain string "modules/bash/project/interactive" "$HOME/.bash_profile"
   then
     log "  * project functions are setup in $HOME/.bash_profile."
   else
@@ -41,7 +41,7 @@ sm_development_setup()
   do
     log "=> ${_component}"
     log "${_separator// /=}"
-    if files contain string "$HOME/.smrc" "${_component}_development_path"
+    if files contain string "${_component}_development_path" "$HOME/.smrc"
     then
       log "  * ${_component}_development_path is already set in .smrc"
     else
@@ -159,7 +159,7 @@ extension_module_add()
   local _extension="${1}" _module="${2}" _path
   _path="${3:-"${extensions_development_path}/${_extension}"}"
 
-  if ! files contain string "${_path}/shell/includes" "${_module}"
+  if ! files contain string "${_module}" "${_path}/shell/includes"
   then
     files write append string "\n${_module}" to "${_path}/shell/includes"
   fi

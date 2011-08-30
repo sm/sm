@@ -712,7 +712,7 @@ service_deactivate()
       else # Fall back on rc.local to start redis at system startup.
         if files exist "/etc/rc.local"
         then
-          if ! files contain string "/etc/rc.local" "${service} start"
+          if ! files contain string "${service} start" "/etc/rc.local"
           then
             files write append \
               string "${init_scripts_path}/${service} start" \
@@ -771,7 +771,7 @@ service_activate()
             #  TODO: daemontools remove start on boot
 
           else # Fall back on rc.local to start redis at system startup.
-            if ! files contain string "/etc/rc.local" "${service} start"
+            if ! files contain string "${service} start" "/etc/rc.local"
             then
               sed -i -e "d#${init_scripts_path}/${service} start#" /etc/rc.local
             fi
@@ -783,7 +783,7 @@ service_activate()
       else # ::shrug::
         if files exist "/etc/rc.local"
         then
-          if ! files contain string "/etc/rc.local" "${service} start"
+          if ! files contain string "${service} start" "/etc/rc.local"
           then
             # TODO: change this to use replace_content
             sed -i -e "d#${init_scripts_path}/${service} start#" /etc/rc.local
