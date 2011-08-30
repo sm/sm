@@ -182,6 +182,16 @@ files()
         fail "Cannot link ${_source} to ${_target} which exists as a directory"
       __sm.files.link "${_source}" "${_target}" "${_flags[*]}"
       ;;
+    (chown)
+      [[ -n "${_owner}" ]] || fail "'identity {user}[:{group}]' was not given."
+      [[ -n "${_paths}" ]]    || fail "Paths must be given."
+      __sm.files.chown "${_owner}" "${_flags[*]}" "${_paths[@]}"
+      ;;
+    (chmod)
+      [[ -n "${_mode}" ]] || fail "'mode {file mode}' must be given."
+      [[ -n "${_paths}" ]]    || fail "Paths to chmod must be given."
+      __sm.files.chmod "${_mode}" "${_flags[*]}" "${_paths[@]}"
+      ;;
     (hash)
       [[ -e "${_source}" && -n "${_key}" ]] ||
         fail "Source and key must both be given;"\

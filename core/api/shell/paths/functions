@@ -47,12 +47,12 @@
 paths()
 {
   trace_filter filesystem
-  local _action _path _paths=() _source _target _mode _owner _flags _glob
+  local _token _command _path _paths=() _source _target _mode _owner _flags _glob
 
-  while (( $# > 0 ))
+  while (( $# ))
   do
-    token="$1" && shift
-    case "${token}" in
+    _token="$1" && shift
+    case "${_token}" in
       (to)
         _target="${1}"
         shift || fail "Target path must be given after keyword 'to'"
@@ -63,7 +63,7 @@ paths()
         ;;
       (mode|permissions)
         _mode="${1}"
-        shift || Fail "Mode must follow keywords 'mode|permissions'"
+        shift || Fail "Mode must follow keyword '${_token}'"
         ;;
       (owner)
         _owner="${1}"
@@ -84,17 +84,17 @@ paths()
         shift || fail "A path is expected following keyword 'in'"
         ;;
       (*)
-        if [[ -z "${_action}" ]]
+        if [[ -z "${_command}" ]]
         then
-          _action="$token"
+          _command="${_token}"
         else
-          _paths+=("$token")
+          _paths+=("${_token}")
         fi
         ;;
     esac
   done
 
-  case "${_action}" in
+  case "${_command}" in
     (chown)
       [[ -n "${_identity}" ]] || fail "'identity {user}[:{group}]' was not given."
       [[ -n "${_paths}" ]]    || fail "Paths must be given."
@@ -153,8 +153,8 @@ paths()
       __sm.paths.copy "${_source}" "${_target}"
       ;;
     (*)
-      fail "Unknown action for paths: '${_action}' "\
-        "A paths action must be specified as the first parameter: "\
+      fail "Unknown command for paths: '${_command}' "\
+        "A paths command must be specified as the first parameter: "\
         "{chown,chmod,create,remove,copy,in,search,enter,exist,join,expand,move,copy}"
       ;;
   esac

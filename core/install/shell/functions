@@ -125,10 +125,11 @@ setup_profile_d()
       fi
     fi
   else
-    log "You are installing as a user ($USER), in order to ensure that the 'sm' "\
+    log "\nNOTE:\n"\
+    "Since you are installing as a user ($USER), in order to ensure that the 'sm' "\
     "command is available to you add the following to your startup profile:\n"\
-    "export PATH='${_PATH}'\n"\
-    "Then either close the current shell or source the profile file."
+    "    export PATH='${_PATH}'\n"\
+    "Then either close the current shell or source the profile file.\n"
 
     # TODO: Provide a way to do this through the cli but outside the install:
     #files create "$HOME/.profile" "$HOME/.bashrc" "$HOME/.bash_profile"
@@ -176,7 +177,7 @@ make_binaries_executable()
   local _binary
   for _binary in "${binaries[@]}"
   do
-    files chmod 0755 "${install_path}/bin/${_binary}"
+    files chmod mode 0755 "${install_path}/bin/${_binary}"
   done
 }
 

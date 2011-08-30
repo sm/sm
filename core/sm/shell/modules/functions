@@ -85,7 +85,10 @@ __sm.modules.core.initialize()
 
   for _module in ${preload_modules[@]}
   do
-    modules include ${_module} || error "Cannot preload module: ${_module}."
+    if ! modules include ${_module}
+    then
+      error "Cannot preload module: ${_module}."
+    fi
   done
 }
 
