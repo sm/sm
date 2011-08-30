@@ -1,26 +1,10 @@
-#!/bin/sh
+
 
 ext_process_initialize()
 {
   process_exit_commands=()
 }
 
-#
-# ## process\_lockfile\_lock()
-#
-# If the current process is the first to write to the lockfile, then the process
-# continues processing past the line calling lockfile_lock "{file path/name}".
-#
-# Otherwise lockfile_lock causes the process to exit with a message and status
-# code 0.
-#
-# If the lock is obtained then lockfile_lock ensures that.
-#
-# Usage Examples:
-#
-#     lockfile_lock /var/run/my_script.pid
-#
-# ## Code Walkthrough.
 process_lockfile_lock()
 {
   local _lockfile="${1:-}"
@@ -45,14 +29,6 @@ process_lockfile_lock()
   return 0 # The lock has been obtained! Proceed with nefarious things!
 }
 
-#
-# ## process\_on\_exit()
-#
-# ### Input
-#
-# Code to be run when the current process exits.
-#
-# ### Code Walkthrough
 process_on_exit()
 {
   local _process_exit_code _code="$*"
@@ -67,7 +43,7 @@ process_on_exit()
   then
     # ensure that process_exit_commands() is called on exit, while preserving
     # any original on-exit code.
-    trap "process_exit_commands;${_process_exit_code}" EXIT
+    trap "__sm.process.exit;${_process_exit_code}" EXIT
   fi
 
   # Append the code passed to process_on_exit() to the end of the
@@ -75,15 +51,7 @@ process_on_exit()
   process_exit_commands+=( "${_code}" )
 }
 
-#
-# ## process\_exit\_commands()
-#
-# ### Input
-#
-# None.
-#
-# ### Code Walkthrough
-process_exit_commands()
+__sm.process.exit()
 {
   local _result="$?" _command
 

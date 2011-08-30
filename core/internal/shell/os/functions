@@ -153,38 +153,3 @@ __sm.os.arch.capable()
   fi
 }
 
-init_scripts_path()
-{
-  if (( UID == 0 ))
-  then
-    case "$OSTYPE" in
-      *darwin*)
-        printf "/etc/init.d"
-        ;;
-      *linux*|*)
-        if [[ -d "/etc/init.d" ]]
-        then
-          printf "/etc/init.d"
-        elif [[ -d "/etc/rc.d" ]]
-        then
-          printf "/etc/rc.d"
-        else
-          fail "Unknown init scripts directory (/etc/init.d or /etc/rc.d not found)."
-        fi
-        ;;
-    esac
-  else
-    printf "$HOME/.init.d"
-  fi
-}
-
-confd_path()
-{
-  if (( UID == 0 ))
-  then
-    printf "/etc/conf.d"
-  else
-    printf "$HOME/.conf.d"
-  fi
-}
-
