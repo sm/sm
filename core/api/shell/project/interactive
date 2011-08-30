@@ -31,37 +31,60 @@ export projects_path
 #
 p()
 {
-  local _path regex1 regex2
+  local _path _regex1="${1:-}" _regex2="${2:-}"
+  true "${projects_path:="$HOME/projects"}"
 
-  if [[ "$PS4" = "+ " ]]
+  if [[ -z "${_regex1}" ]]
+  then
+    cd "${projects_path}"
+    return 0
+  fi
+
+  if [[ -n "${BASH_VERSION}" && "$PS4" = "+ " ]]
   then
     PS4="+ \${BASH_SOURCE##\${sm_path}} \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO} > "
     export PS4
   fi
 
-  regex1="${1:-}"
-  regex2="${2:-}"
-
-  true "${projects_path:="$HOME/projects"}"
-
   if [[ -n "${regex1}" ]]
   then
-    # TODO: Switch to using shell globbing search.
-    _path=$(
-    find "$projects_path" -mindepth 1 -maxdepth ${project_search_maxdepth} -iname "${regex1}*" -type d |
-    head -1
-    )
+    # TODO: add concept of depth to paths search.
+    _paths=$( paths search in "${projects_path}" matching "${_regex1}*" )
+    #_paths=$(
+    #find "$projects_path" -mindepth 1 -maxdepth ${project_search_maxdepth} -iname "${regex1}*" -type d |
+    #head -1
+    #)
+    if (( "${#_paths}" == 0 ))
+    then
+      echo "No paths found matching ${_regex1}"
+      return 1
+    elif (( "${#_paths}" > 1 ))
+    then
+      echo "More than one prefix path found matching, please choose one:"
+      _path="${_paths}" # TODO: select
+    fi
 
-    cd "$_path"
+    cd "${_path}"
 
     if [[ -n "${regex2}" ]]
     then
-      _path=$(
-      find "$_path" -mindepth 1 -maxdepth ${project_search_maxdepth} -iname "${regex2}*" -type d |
-      head -1
-      )
+      _paths=$( paths search in "${projects_path}" matching "${_regex2}*" )
+      #_path=$(
+      #find "$_path" -mindepth 1 -maxdepth ${project_search_maxdepth} -iname "${regex2}*" -type d |
+      #head -1
+      #)
 
-      cd "$_path"
+      if (( "${#_paths}" == 0 ))
+      then
+        echo "No paths found matching ${_regex1}"
+        return 1
+      elif (( "${#_paths}" > 1 ))
+      then
+        echo "More than one prefix path found matching, please choose one:"
+        _path="${_paths}" # TODO: select
+      fi
+
+      cd "${_path}"
     fi
   else
     echo "A project name or directory must be specified as the first parameter.";

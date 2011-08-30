@@ -1,6 +1,6 @@
 #!/bin/sh
 
-ext_logging_initialize()
+api_logging_initialize()
 {
   if user is root
   then

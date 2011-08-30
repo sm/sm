@@ -1,6 +1,6 @@
 #!/bin/sh
 
-ext_database_initialize()
+api_database_initialize()
 {
   if user is root
   then

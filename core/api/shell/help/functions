@@ -1,6 +1,7 @@
 #!/bin/sh
 
-ext_help_initialize()
+# TODO: remove help api and replace with man api.
+api_help_initialize()
 {
   declare -a help_descriptions
   declare -a help_action_names

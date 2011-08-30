@@ -26,7 +26,7 @@ modules()
         esac
         ;;
       (*)
-        if [[ -z "${_command}"]]
+        if [[ -z "${_command}" ]]
         then
           _command="${_token}"
         else
@@ -183,7 +183,7 @@ __sm.modules.reinitialize()
   done
 }
 
-__sm.module.is.loaded
+__sm.module.is.loaded()
 {
   local _name="${1}"
   case " ${__sm_modules_loaded[*]} " in

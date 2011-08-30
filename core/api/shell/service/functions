@@ -4,7 +4,7 @@
 # SM Framework Extended Module ~ Service Module
 #
 
-ext_service_initialize()
+api_service_initialize()
 {
   variable_is_nonempty init_scripts_path || init_scripts_path="$(init_scripts_path)"
   variable_is_nonempty confd_path        || confd_path="$(confd_path)"
@@ -411,7 +411,7 @@ service_cli()
 
   extension_args=( "${_ignored_args[@]}" )
 
-  ext_service_initialize "${extension_args[@]}"
+  api_service_initialize "${extension_args[@]}"
 }
 
 service_pid()

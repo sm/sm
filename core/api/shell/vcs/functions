@@ -1,6 +1,6 @@
 #!/bin/sh
 
-ext_vcs_initialize()
+api_vcs_initialize()
 {
   if [[ ! -w $sm_path ]]
   then

@@ -1,39 +1,9 @@
 #!/bin/sh
 
 #
-# ## project\_initialize()
-#
 # Initializes paths and environment for the logical concept of a 'project'.
 #
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# Environmental variable settings, such as {shared,release}_path, environment,
-# etc...
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# No failure scenarios currently.
-#
-# ### Usage Examples
-#
-#     user$ project_initialize
-#     user$ echo $environment
-#     production
-#
-# ### Code Walkthrough
-ext_project_initialize()
+api_project_initialize()
 {
   # TODO: Read project and project_path from defaults file first.
   if user is root
@@ -49,14 +19,14 @@ ext_project_initialize()
 
   if module_is_loaded rvm
   then
-    if [[ -n "${release_path}" ]] && ! file is empty "${release_path}/.rvmrc"
+    if [[ -n "${release_path}" ]] && ! files are empty "${release_path}/.rvmrc"
     then
       source "${release_path}/.rvmrc"
     fi
   fi
 
   # If the project_path variable is nonempty
-  if variable_is_nonempty project_path
+  if [[ -n "${project_path}" ]]
   then
     # then ensure that the shared_path, release_path, environment and vcs
     # varaibles are set.
@@ -73,7 +43,7 @@ ext_project_initialize()
   fi
 
   # If the project variable is nonempty
-  if variable_is_nonempty project
+  if [[ -n "${project}" ]]
   then
     # then ensure the database_name is set
     true "${database_name:="${project}_${environment}"}"
@@ -82,3 +52,4 @@ ext_project_initialize()
     files source ".${project}rc"
   fi
 }
+

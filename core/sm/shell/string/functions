@@ -12,7 +12,7 @@ string()
 
   while (( $# ))
   do
-    case "${_token}"
+    case "${_token}" in
       (from)
         _search="$1"
         shift || fail "From source string must follow keyword 'from'"
@@ -29,6 +29,7 @@ string()
         then
           _string="${_token}"
         elif [[ -z "${_search}" ]]
+        then
           _search="${_token}"
         fi
         ;;

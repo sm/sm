@@ -1,6 +1,6 @@
 #!/bin/sh
 
-ext_steps_initialize()
+api_steps_initialize()
 {
   steps_started=()
 }
