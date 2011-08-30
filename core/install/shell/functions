@@ -177,7 +177,7 @@ make_binaries_executable()
   local _binary
   for _binary in "${binaries[@]}"
   do
-    files chmod mode 0755 "${install_path}/bin/${_binary}"
+    files chmod 0755 "${install_path}/bin/${_binary}"
   done
 }
 

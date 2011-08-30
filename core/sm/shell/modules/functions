@@ -161,6 +161,7 @@ __sm.module.include()
   _function="${_module//\//_}"
   _function="${_function/_shell/_}"
 
+  set -x
   for _hook in initialize # options, etc... ?
   do
     if command -v "${_function}_${_hook}" > /dev/null 2>&1
@@ -170,6 +171,7 @@ __sm.module.include()
   done
 
   return 0
+  set +x
 }
 
 __sm.modules.reinitialize()

@@ -61,7 +61,8 @@ paths()
         _source="${1}"
         shift || fail "Source path must be given after keyword 'from'"
         ;;
-      (mode|permissions)
+      (chmod|mode|permissions)
+        _command=chmod
         _mode="${1}"
         shift || Fail "Mode must follow keyword '${_token}'"
         ;;

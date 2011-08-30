@@ -213,10 +213,9 @@ __sm.files.copy()
 
 __sm.files.chown()
 {
-  local _owner="$1" #_flags=($2)
-  shift #2
+  local _owner="$1" _flags=($2)
+  shift 2
   local _file _files=("$@")
-
   chown ${_flags[@]} "${_owner}" "${_files[@]}" ||
     fail "There was an error ($?) chowning"\
     " files '${_files[@]}' owner to '${_owner}'."
@@ -224,13 +223,15 @@ __sm.files.chown()
 
 __sm.files.chmod()
 {
-  local _mode="$1" #_flags=($2)
-  shift #2
+  local _mode="$1" _flags=($2)
+  shift 2
   local _file _files=("$@")
 
-  chown ${_flags[@]} "${_mode}" "${_files[@]}" ||
-    fail "There was an error ($?) chowning"\
-    " files '${_files[@]}' owner to '${_owner}'."
+  if ! chmod ${_flags[@]} ${_mode} "${_files[@]}"
+  then
+    fail "There was an error ($?) chmodding"\
+      " files '${_files[*]}' owner to '${_owner}'."
+  fi
 }
 
 __sm.files.hash()
