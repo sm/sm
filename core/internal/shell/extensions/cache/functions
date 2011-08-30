@@ -2,7 +2,7 @@
 
 actions_cache_add()
 {
-  string contains "${_actions_cache[*]}" "$1" || _actions_cache+=( "$1" )
+  string contains "$1" "${_actions_cache[*]}" || _actions_cache+=( "$1" )
 }
 
 # Step 1 collect direct filesystem mapping

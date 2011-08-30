@@ -12,6 +12,7 @@ string()
 
   while (( $# ))
   do
+    _token="$1" && shift
     case "${_token}" in
       (from)
         _search="$1"
@@ -21,6 +22,7 @@ string()
         _string="$1"
         ;;
       (contains)
+        _command=contains
         _search="$1"
         shift || fail "Search (glob) string must follow keyword 'contains'"
         ;;

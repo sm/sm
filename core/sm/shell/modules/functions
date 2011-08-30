@@ -32,15 +32,18 @@ modules()
         else
           _modules+=("${_token}")
         fi
-        fail "Unrecognized module command '${_token}'"
         ;;
     esac
   done
 
   case "${_command}" in
-    (initialize)
-      __sm.modules.core.initialize
-      ;;
+    (core)
+      case "${_subcommand}" in
+        (initialize)
+          __sm.modules.core.initialize
+          ;;
+      esac
+        ;;
     (reinitialize)
       [[ -n "${_modules}" ]] || fail "No modules given to reinitialize."
       __sm.modules.reinitialize "${_modules[@]}"
@@ -82,7 +85,7 @@ __sm.modules.core.initialize()
 
   for _module in ${preload_modules[@]}
   do
-    modules load ${_module} || error "Cannot preload module: ${_module}."
+    modules include ${_module} || error "Cannot preload module: ${_module}."
   done
 }
 
@@ -267,9 +270,10 @@ __sm.extensions.paths.initialize()
     done
   fi
 
-  # Core is required to run, add it if not found
-  string contains "${extensions_search_paths[*]}" "${sm_path}/core" ||
+  if ! string contains "${sm_path}/core" "${extensions_search_paths[*]}"
+  then # Core is required to run, add it if not found
     extensions_search_paths+=( "${sm_path}/core" )
+  fi
 
   debug search "sets_user_path:${sets_user_path}:"
   debug search "exts_user_path:${exts_user_path}:"

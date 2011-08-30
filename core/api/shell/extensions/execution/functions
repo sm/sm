@@ -95,12 +95,12 @@ extension_action_prerequisites()
    ${action}_initialize
   )
 
-  string contains "${_pre[*]}" "${action%%_*}_cli" || _pre+=(
+  string contains "${action%%_*}_cli" "${_pre[*]}" || _pre+=(
    ${action%%_*}_cli
    ${action%%_*}_initialize
   )
 
-  string contains "${_pre[*]}" "${extension}_cli" || _pre+=(
+  string contains "${extension}_cli" "${_pre[*]}" || _pre+=(
    ${extension}_cli
    ${extension}_initialize
   )

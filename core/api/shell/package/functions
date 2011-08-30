@@ -202,7 +202,7 @@ package_init()
 
   if command exists "${package_name}_initialize"
   then
-    string contains "${FUNCNAME[*]}" "${package_name}_initialize" ||
+    string contains "${package_name}_initialize" "${FUNCNAME[*]}" ||
       "${package_name}_initialize"
   fi
 
@@ -426,7 +426,7 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
       package_postinstall
   fi
 
-  if ! string contains "${FUNCNAME[*]}" 'package_update'
+  if ! string contains 'package_update' "${FUNCNAME[*]}"
   then
     package_activate_if_first "${package_name}" "${package_version}"
   fi
@@ -622,7 +622,7 @@ package_deactivate()
 
   log_step success
 
-  string contains "${FUNCNAME[*]}" 'package_activate' ||
+  string contains 'package_activate' "${FUNCNAME[*]}" ||
     package_ldconfig "${_package}"
 }
 

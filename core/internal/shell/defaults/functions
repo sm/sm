@@ -143,7 +143,7 @@ settings_search_path_update()
 {
   local path=$1 _uri
 
-  if string contains "${settings_search_path_cache[*]}" "${path}"
+  if string contains "${path}" "${settings_search_path_cache[*]}"
   then
     return 0
   fi
