@@ -10,6 +10,7 @@ modules()
 
   while (( $# ))
   do
+    _token="$1" && shift
     case "${_token}" in
       (core)
         _command="${_token}"

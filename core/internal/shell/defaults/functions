@@ -99,7 +99,7 @@ read_config()
   do
     if ! file is empty "${_file}"
     then
-      _temp="$(hash_file "${_file}" "${key}")"
+      _temp="$(hash file read key "${key}" from "${_file}")"
 
       if [[ -n "${_temp}" ]]
       then

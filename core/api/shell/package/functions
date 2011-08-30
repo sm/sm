@@ -1,122 +1,92 @@
 #!/bin/sh
 
-package_initialize()
+package()
 {
-  declare -a package_dependencies
-  declare -a configure_flags
-}
+  local _token _command _logfile _lines=50 _params=()
 
-package_error()
-{
-  local _message="${1:-}" _log="${2:-}"
-  shift || fail "No message was provided."
-
-  if [[ -n ${_log} ]] && files exist ${_log}
-  then # Append tail of error log to the error message.
-    local _num_lines=${3:-25} # Default the number of lines to 25
-    _message="${_message}\n\nTail of ${_log}:\n$( tail -n ${_num_lines} ${_log} )"
-  fi
-  error "${_message}"
-}
-
-#
-# ## package\_definition
-#
-# ### Usage Examples
-#
-# user$ package_definition \
-#         name "bash" \
-#         version "4.2" \
-#         url "ftp.gnu.org/gnu/bash/"
-#
-package_definition()
-{
-  while (( $# > 0 ))
+  while (( $# ))
   do
-    key="$1"
-    shift
-    value="$1"
-    if ! shift
-    then
-      if echo "$key" | grep '='
-      then
-        fail "Invalid key '${key}'; Most likely the '=' is supposed to be a space?"
-      else
-        fail "Value not specified for key '${key}'; They should be specified in key/value pairs :)"
-      fi
-    fi
-
-    case "$key" in
-      name)
-        package_name="${value}"
+    _token="$1" && shift
+    case "${_token}" in
+      (log)
+        _log="$1"
+        shift || fail "Log file path/name must be given following keyword 'log'"
         ;;
-      version)
-        package_version="${value}"
+      (lines)
+        _lines="$1"
+        shift || fail "Number of lines to show must be given following keyword 'lines'"
         ;;
-      file)
-        package_file="${value}"
-        ;;
-      dir)
-        package_dir="${value}"
-        ;;
-      url)
-        package_url="${value}"
-        ;;
-      base_url)
-        package_base_url="${value}"
-        ;;
-      docs_url)
-        package_docs_url="${value}"
-        ;;
-      patches_url)
-        package_patches_url="${value}"
-        ;;
-      md5_url)
-        package_md5_url="${value}"
-        ;;
-      bin_path)
-        bin_path="${value}"
-        ;;
-      packages_path)
-        packages_path="${value}"
-        ;;
-      source_path)
-        source_path="${value}"
-        ;;
-      target_path)
-        target_path="${value}"
-        ;;
-      archive_format)
-        archive_format="${value}"
-        ;;
-      # TODO: Simplify into
-      #(+([[[:alnum:]]|])_path|name|version|url|md5_url)
-      #  eval "${key}=${value}"
-      #  ;;
-      *)
-        fail "Unknown key '${key}' (value: ${value})."
+      (message)
+        _message="$1"
+        shift || fail "Message must be given following keyword 'message'"
       ;;
+      (configure)
+        _command=configure
+        case "$1" in
+          (flag)
+            _subcommand="$1"
+            _params+=("$1")
+            ;;
+          (flags)
+            _subcommand="$1"
+            _params+=("$@")
+            break
+            ;;
+          (*)
+            continue
+            ;;
+        esac
+        ;;
+      (key)
+        _key="$1"
+        shift || fail "Key name must follow keyword 'key'"
+        ;;
+      (*)
+        if [[ -z "${_command}" ]]
+        then
+          _command="${_token}"
+        else
+          _params+=("${_token}")
+        fi
+        ;;
     esac
   done
-}
 
-package_configure_flags()
-{
-  local _flag
-  for _flag in "$@"
-  do
-    string contains "${configure_flags[*]}" "${_flag}" ||
-      configure_flags+=( "${_flag}" )
-  done
+  case "${_command}" in
+    (configure)
+      case "${_subcommand}" in
+        (flag)
+          __sm.package.configure.flag "${_key}" "${_params[@]}"
+          ;;
+        (flags)
+          __sm.package.configure.flags "${_params[@]}"
+          ;;
+        (*)
+          package_configure
+          ;;
+      esac
+      ;;
+    (define)
+      [[ -n "${_params}" ]] || fail "No '{key} {value}' pairs given."
+      if array is even _params
+      then
+        __sm.package.define "${_params[@]}"
+      else
+        fail "Every key must have an associated value."
+      fi
+      ;;
+    (initialize)
+      declare -a package_dependencies
+      declare -a configure_flags
+      ;;
+    (error)
+      [[ -n "${_message}" ]] || fail "Message must be given for package error."
+      __sm.package.error "${_params[@]}" "${_log}" "${_lines}"
+      ;;
+    (*)
+      fail "Unknown package command '${_token}'"
+  esac
 }
-
-package_configure_flag_add_key()
-{
-  local _flag=$1 _value=$2
-  string contains "${configure_flags[*]}" "${_flag}=" ||
-    configure_flags+=( "${_flag}=${_value}" )
-}
-
 
 package_cli()
 {
@@ -126,7 +96,6 @@ package_cli()
   for (( index=0 ; index < $number_of_args ; index++ ))
   do
     _token="${_package_args[$index]}"
-
     case "${_token}" in
       prefix)
         packages_path="${_package_args[$((++index))]}"
@@ -182,12 +151,12 @@ package_cli()
         force_flag=1
         ;;
       static)
-        package_configure_flags --static
         static_flag=1
+        __sm.package.configure.flags --static
         ;;
       shared)
         shared_flag=1
-        package_configure_flags --enable-shared
+        __sm.package.configure.flags --enable-shared
         ;;
       licence)
         extension_license
@@ -198,7 +167,7 @@ package_cli()
         succeed
         ;;
       --with*|--enable*|--disable*)
-        package_configure_flags "${_token}"
+        __sm.package.configure.flags "${_token}"
         ;;
       *)
         _ignored_args+=("${_token}")
@@ -270,9 +239,9 @@ package_init()
 
   local default_configure_flags _flag
   [[ -n "${default_configure_flags}" ]] || read_default configure_flags prefix default for ${package_name}
-  package_configure_flags "${default_configure_flags[@]}"
+  __sm.package.configure.flags "${default_configure_flags[@]}"
 
-  : \
+  true \
     "${package_version:="${package_default_version}"}" \
     "${init_scripts_path:="$(init_scripts_path)"}" \
     "${archive_format:=tar.gz}" \
@@ -280,7 +249,7 @@ package_init()
     "${install_base_path:="${packages_path}/versions/${package_name}"}" \
     "${install_path:="${install_base_path}/${package_version}"}"
 
-  package_configure_flag_add_key --prefix "${install_path}"
+  package configure flag key --prefix "${install_path}"
 
   # This check should only happen in places that require a version...
   #[[ -n "${package_version}" ]] ||
@@ -557,7 +526,7 @@ package_configure()
   else
     export PREFIX="${install_base_path}/${package_version}"
 
-    package_configure_flag_add_key --prefix "${install_path}"
+    package configure flag key --prefix "${install_path}"
     _command="./configure ${configure_flags[*]}"
 
     [[ -x "${configure}" ]] || return 0
@@ -566,7 +535,9 @@ package_configure()
   debug package "package_configure: ${_command}"
 
   ${_command} > configure.log 2>&1 ||
-    package_error "Configuration of ${package_name} ${package_version} failed." "configure.log"
+    package error \
+    message "Configuration of ${package_name} ${package_version} failed." \
+    log "configure.log"
 }
 
 package_build()
@@ -583,7 +554,9 @@ package_build()
   debug package "package_build: ${_command}"
 
   ${_command} > build.log 2>&1 ||
-    package_error "Compilation of ${package_name} ${package_version} failed! " "build.log"
+    package error \
+      message "Compilation of ${package_name} ${package_version} failed! " \
+      log "build.log"
 }
 
 package_preinstall()
@@ -604,7 +577,9 @@ package_make_install()
 
   log_step "${package_name} ${package_version} ~ install"
   ${_command} > make.install.log 2>&1 ||
-    package_error "Installation of ${package_name} ${package_version} failed! " "make.install.log"
+    package error \
+      message "Installation of ${package_name} ${package_version} failed! " \
+      log "make.install.log"
   log_step success
 
 }

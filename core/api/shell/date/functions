@@ -9,9 +9,7 @@ date()
 
   while (( $# > 0 ))
   do
-    _token="$1"
-    shift
-
+    _token="$1" && shift
     case "${_token}" in
       (step)
         _step="${1:-}"

@@ -10,7 +10,6 @@ extension_cli()
   for (( index=0 ; index < $number_of_args ; index++ ))
   do
     _token="${extension_args[$index]}"
-
     case "${_token}" in
       --uri|--url)
         extension_uri="${extension_args[$((++index))]}"
