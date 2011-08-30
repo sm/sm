@@ -161,17 +161,16 @@ __sm.module.include()
   _function="${_module//\//_}"
   _function="${_function/_shell/_}"
 
-  set -x
   for _hook in initialize # options, etc... ?
   do
-    if command -v "${_function}_${_hook}" > /dev/null 2>&1
+    # TODO: This may need to be adjusted for zsh.
+    if [[ "$(declare -F "${_function}_${_hook}")" == "${_function}_${_hook}" ]]
     then
       "${_function}_${_hook}"
     fi
   done
 
   return 0
-  set +x
 }
 
 __sm.modules.reinitialize()
