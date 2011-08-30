@@ -20,6 +20,7 @@ os()
     token="$1" && shift
     case "${token}" in
       (is)
+        _command="$token"
         _os="${1}"
         shift || fail "lowercase operating system name must follow keyword 'os';"\
           "os is <linux|darwin|bsd|solaris|aix>"
