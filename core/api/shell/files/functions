@@ -54,6 +54,15 @@ files()
         _target="${1}"
         shift || fail "Target path must be provided after keyword 'to'"
         ;;
+      (in)
+        if [[ -z "${_command}" ]]
+        then
+          _command=in
+        else
+          _target="${1}"
+          shift || fail "Target path must be provided after keyword 'to'"
+        fi
+        ;;
       (from)
         _source="${1}"
         shift || fail "Source path must be provided after keyword 'from'"
@@ -193,16 +202,16 @@ files()
         fail "Cannot link ${_source} to ${_target} which exists as a directory"
       __sm.files.link "${_source}" "${_target}" "${_flags[*]}"
       ;;
-    (chown)
-      [[ -n "${_owner}" ]] || fail "'identity {user}[:{group}]' was not given."
-      [[ -n "${_files[*]}" ]] || fail "files must be given."
-      __sm.files.chown "${_owner}" "${_flags[*]}" "${_files[@]}"
-      ;;
-    (chmod)
-      [[ -n "${_mode}" ]]     || fail "'mode {file mode}' must be given."
-      [[ -n "${_files[*]}" ]] || fail "files to chmod must be given."
-      __sm.files.chmod "${_mode}" "${_flags[*]}" "${_files[@]}"
-      ;;
+#    (chown)
+#      [[ -n "${_owner}" ]] || fail "'identity {user}[:{group}]' was not given."
+#      [[ -n "${_files[*]}" ]] || fail "files must be given."
+#      __sm.files.chown "${_owner}" "${_flags[*]}" "${_files[@]}"
+#      ;;
+#    (chmod)
+#      [[ -n "${_mode}" ]]     || fail "'mode {file mode}' must be given."
+#      [[ -n "${_files[*]}" ]] || fail "files to chmod must be given."
+#      __sm.files.chmod "${_mode}" "${_flags[*]}" "${_files[@]}"
+#      ;;
     (hash)
       [[ -e "${_source}" && -n "${_key}" ]] ||
         fail "Source and key must both be given;"\
@@ -265,6 +274,11 @@ files()
           "{chown,chmod,create,remove,copy,in,search,enter,exist,join,expand,move,copy}"
       fi
       ;;
+  esac
+
+  case "${_command}" in
+    (chown|chmod) true ;;
+    (*) _flags=() ;;
   esac
 
   if [[ -n "${_owner}" ]]

@@ -174,11 +174,11 @@ set_sm_path()
 
 make_binaries_executable()
 {
-  local _binary
-  for _binary in "${binaries[@]}"
-  do
-    files chmod 0755 "${install_path}/bin/${_binary}"
-  done
+#  local _binary
+#  for _binary in "${binaries[@]}"
+#  do
+    files chmod 0755 in "${install_path}/bin" "${binaries[@]}"
+#  done
 }
 
 create_versionedfs_paths()
