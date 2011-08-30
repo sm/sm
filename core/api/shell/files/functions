@@ -193,6 +193,7 @@ files()
       __sm.files.remove "${_files[@]}"
       ;;
     (copy)
+      [[ -n "${_source}" ]] || [[ -n "${_files[*]}" ]] || fail "Source must be given to copy (from x)."
       [[ -n "${_target}" ]] || fail "Target path (to) for copying into must be given."
       __sm.files.copy "${_source:-.}" "${_target}" "${_flags[*]}" "${_files[@]}"
       ;;
@@ -226,11 +227,6 @@ files()
       __sm.files.move "${_source}" "${_target}" "${_flags[*]}" "${_mode}" \
         "${_owner}" "${_files[@]}"
       ;;
-    (copy)
-      [[ -n "${_source}" ]] || fail "Source must be given to copy (from x)."
-      [[ -n "${_target}" ]] || fail "Target must be given to copy (to y)."
-      __sm.files.copy "${_source}" "${_target}"
-      ;;
     (write)
       [[ -n "${_content}" ]] || fail "String must be given; string 'string'."
       [[ -n "${_target}" ]] || fail "Target must be given;  to {file name}."
@@ -249,18 +245,26 @@ files()
 
   if [[ -n "${_owner}" ]]
   then
-    [[ -n "${_files}"  ]] || fail "files must be given."
-    [[ -z "${_target}" ]] || pushd "${_target}" >/dev/null 2>&1
-    __sm.files.chown "${_owner}" "${_flags[*]}" "${_files[@]}"
-    [[ -z "${_target}" ]] || popd >/dev/null 2>&1
+    if [[ -n "${_files[*]}"  ]]
+    then
+      [[ -z "${_target}" ]] || pushd "${_target}" >/dev/null 2>&1
+      __sm.files.chown "${_owner}" "${_files[@]}"
+      [[ -z "${_target}" ]] || popd >/dev/null 2>&1
+    else
+      __sm.files.chown "${_owner}" "${_target}"
+    fi
   fi
 
   if [[ -n "${_mode}" ]]
   then
-    [[ -n "${_files}"  ]] || fail "files to chmod must be given."
-    [[ -z "${_target}" ]] || pushd "${_target}" >/dev/null 2>&1
-    __sm.files.chmod "${_mode}" "${_flags[*]}" "${_files[@]}"
-    [[ -z "${_target}" ]] || popd >/dev/null 2>&1
+    if [[ -n "${_files[*]}"  ]]
+    then
+      [[ -z "${_target}" ]] || pushd "${_target}" >/dev/null 2>&1
+      __sm.files.chmod "${_mode}" "${_files[@]}"
+      [[ -z "${_target}" ]] || popd >/dev/null 2>&1
+    else
+      __sm.files.chmod "${_mode}" "${_target}"
+    fi
   fi
 }
 

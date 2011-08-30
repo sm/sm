@@ -205,7 +205,7 @@ __sm.files.copy()
         "to the target '${_target}/${_file}'."
     done
   else # moving single file
-    cp ${_flags[@]} "${_source}" "${_target}/" ||
+    cp ${_flags[@]} "${_source}" "${_target}" ||
       fail "There was an error ($?) moving the source '${_source}'" \
       "to the target '${_target}'."
   fi
@@ -213,8 +213,8 @@ __sm.files.copy()
 
 __sm.files.chown()
 {
-  local _owner="$1" _flags=($2)
-  shift 2
+  local _owner="$1" #_flags=($2)
+  shift #2
   local _file _files=("$@")
 
   chown ${_flags[@]} "${_owner}" "${_files[@]}" ||
@@ -224,8 +224,8 @@ __sm.files.chown()
 
 __sm.files.chmod()
 {
-  local _mode="$1" _flags=($2)
-  shift 2
+  local _mode="$1" #_flags=($2)
+  shift #2
   local _file _files=("$@")
 
   chown ${_flags[@]} "${_mode}" "${_files[@]}" ||

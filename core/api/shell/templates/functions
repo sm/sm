@@ -183,7 +183,7 @@ install_template()
       mode "${_mode}" owner "${_owner}"
   else
     files copy force \
-      from "${_template}" to "${_target}"
+      from "${_template}" to "${_target}" \
       mode "${_mode}" owner "${_owner}"
   fi
 }
