@@ -43,8 +43,7 @@ database_cli()
 
   extension_args=( "${_ignored_args[@]}" )
 
-  # Explicitly reload the database module, to pickup any CLI overrides.
-  modules reinitialize database
+  api_database_initialize
 }
 
 database_usage() {

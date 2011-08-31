@@ -6,56 +6,15 @@
 
 modules()
 {
-  local _token _command _subcommand _modules=()
-
-  while (( $# ))
-  do
-    _token="$1" && shift
-    case "${_token}" in
-      (core)
-        _command="${_token}"
-        _subcommand="$1"
-        shift || fail "Command must follow keyword 'core'; modules core <initialize>"
-        case "${_subcommand}" in
-          (initialize)
-            continue
-            ;;
-          (*)
-            "Unknown command following keyword 'core'; modules core <initialize>"
-            ;;
-        esac
-        ;;
-      (*)
-        if [[ -z "${_command}" ]]
-        then
-          _command="${_token}"
-        else
-          _modules+=("${_token}")
-        fi
-        ;;
-    esac
-  done
-
-  case "${_command}" in
-    (core)
-      case "${_subcommand}" in
-        (initialize)
-          __sm.modules.core.initialize
-          ;;
-      esac
-        ;;
-    (reinitialize)
-      [[ -n "${_modules}" ]] || fail "No modules given to reinitialize."
-      __sm.modules.reinitialize "${_modules[@]}"
-      ;;
+  case "$1" in
     (include|load)
-      [[ -n "${_modules}" ]] || fail "No modules given to include."
-      __sm.modules.include "${_modules[@]}"
-      ;;
-    (*)
-      fail "Unknown modules command '${_command}'"
+      shift #compatibility mode
       ;;
   esac
+
+  [[ -n "$*" ]] || fail "No modules given to include."
+
+  __sm.modules.include "$@"
 }
 
 __sm.modules.core.initialize()
@@ -86,7 +45,7 @@ __sm.modules.core.initialize()
 
   for _module in ${preload_modules[@]}
   do
-    if ! modules include ${_module}
+    if ! __sm.module.include ${_module}
     then
       error "Cannot preload module: ${_module}."
     fi
@@ -174,6 +133,7 @@ __sm.module.include()
   return 0
 }
 
+#TODO: remove - deprecated
 __sm.modules.reinitialize()
 {
   local _module _modules=("$@") _loaded_modules _module_path _initialize_path
