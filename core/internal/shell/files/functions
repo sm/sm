@@ -388,7 +388,7 @@ __sm.files.sha.512()
 __sm.files.write()
 {
   local _string="$1" _target="$2" _flags=($3)
-  printf "${_string}\n" | tee ${_flags[@]} "${_file}" >/dev/null
+  printf "${_string}\n" | tee ${_flags[@]} "${_target}" >/dev/null
 }
 
 __sm.files.in()
