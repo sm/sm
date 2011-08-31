@@ -273,6 +273,10 @@ files()
       [[ -n "${_files[@]}" ]] || fail "Files must be given."
       __sm.files.open "${_files[@]}"
       ;;
+    (md5)
+      [[ -n "${_files[@]}" ]] || fail "Files must be given."
+      __sm.files.md5 "${_files[@]}"
+      ;;
     (*)
       if [[ -z "${_owner}" && -z "${_mode}" ]]
       then
