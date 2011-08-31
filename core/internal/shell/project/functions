@@ -17,7 +17,7 @@ api_project_initialize()
   export project environment project_path shared previous_path release_path \
     stage_path log_path
 
-  if module_is_loaded rvm
+  if __sm.module.is.loaded rvm
   then
     if [[ -n "${release_path}" ]] && ! files are empty "${release_path}/.rvmrc"
     then
