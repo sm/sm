@@ -71,7 +71,7 @@ __sm.modules.core.initialize()
   #core is loaded as BDSM starts
   __sm_modules_loaded=(
     "sm/core=core/sm/shell/core"
-    "sm/string=core/sm/shell/string"
+    "sm/string=core/internal/shell/string"
     "sm/logging=core/sm/shell/logging"
     "sm/modules=core/sm/shell/modules"
   )

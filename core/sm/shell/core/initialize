@@ -116,7 +116,8 @@ source "${modules_path}/logging/initialize"
 source "${modules_path}/modules/functions"
 source "${modules_path}/extensions/functions"
 
-modules core initialize
+__sm.modules.core.initialize
+
 modules include internal/string sm/command sm/versionedfs
 
 if [[ "$OSTYPE" == *solaris* ]]
