@@ -96,28 +96,17 @@ files()
       (force)
         _flags+=( -f )
         ;;
-#      (contain|containing|replace)
-#        if [[ -z "${_command}" ]] ; then _command="${_token}" ; fi
-#        _subcommand="$1"
-#        shift
-#        case "${_subcommand}" in
-          (string)
-            _string="$1"
-            shift || fail "A string must be followed by keyword 'string'"
-            ;;
-          (regex)
-            _regex="$1"
-            shift || fail "A regex must be followed by keyword 'regex'"
-            ;;
-#          (*)
-#            fail "Unknown command '${1}' for '${_command}'"
-#            ;;
-#        esac
-#        if [[ -z "${_string}" && -z "${_regex}" ]]
-#        then
-#          fail "A string or regex must be given after keyword '${_subcommand}'."
-#        fi
-#        ;;
+      (contain|containing|replace)
+        if [[ -z "${_command}" ]] ; then _command="${_token}" ; fi
+        ;;
+      (string)
+        _string="$1"
+        shift || fail "A string must be followed by keyword 'string'"
+        ;;
+      (regex)
+        _regex="$1"
+        shift || fail "A regex must be followed by keyword 'regex'"
+        ;;
       (in)
         _files+=("$1")
         shift || fail "A file name must follow keyword 'in'"
