@@ -373,7 +373,7 @@ __sm.versionedfs.list()
     then
       __name="${__path%/*}"
       __name="${__name##*/}"
-      if [[ -n "${_name}" ]] && ! string contains "${__name}" "${_name}"
+      if [[ -n "${_name}" ]] && ! __sm.string.contains "${__name}" "${_name}"
       then
         __name=""
       fi

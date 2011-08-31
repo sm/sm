@@ -599,10 +599,10 @@ clean_tmp_logs()
 __sm.logging.options.check()
 {
   # Do not use brackets; they slow things down a lot.
-  if string contains "$1" "$2"
+  if __sm.string.contains "$1" "$2"
   then
     return 0
   fi
 
-  string contains "$1" "all" && ! string contains "$1" "-$2"
+  __sm.string.contains "$1" "all" && ! __sm.string.contains "$1" "-$2"
 }

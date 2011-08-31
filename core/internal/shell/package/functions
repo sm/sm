@@ -87,7 +87,7 @@ __sm.package.configure.flags()
 
   for _flag in "$@"
   do
-    if ! string contains "${_flag}" "${configure_flags[*]}"
+    if ! __sm.string.contains "${_flag}" "${configure_flags[*]}"
     then
       configure_flags+=( "${_flag}" )
     fi
@@ -98,7 +98,7 @@ __sm.package.configure.flag()
 {
   local _key="$1" _value="$2"
 
-  if ! string contains "${_key}=" "${configure_keys[*]}"
+  if ! __sm.string.contains "${_key}=" "${configure_keys[*]}"
   then
     configure_keys+=( "${_key}=${_value}" )
   fi

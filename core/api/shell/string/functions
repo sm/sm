@@ -38,7 +38,7 @@ string()
 
   case "${_command}" in
     (contains)
-      if [[ "${_string}" =~ "${_search}" ]] ; then return 0 ; else return 1 ; fi
+      __sm.string.contains "${_search}" "${_string}"
       ;;
     (append)
       printf "${_string}"

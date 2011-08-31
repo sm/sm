@@ -118,7 +118,7 @@ source "${modules_path}/modules/functions"
 source "${modules_path}/extensions/functions"
 
 modules core initialize
-modules include sm/command sm/versionedfs # Used for pkg, extensions and modules.
+modules include internal/string sm/command sm/versionedfs
 
 if [[ "$OSTYPE" == *solaris* ]]
 then # custom compilations + g*

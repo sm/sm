@@ -1,0 +1,6 @@
+#!/bin/sh
+
+__sm.string.contains()
+{
+  [[ " $2 " =~ " $1 " ]]
+}
