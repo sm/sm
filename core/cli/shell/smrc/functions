@@ -32,7 +32,7 @@ smrc_install()
 
 smrc_update()
 {
-  template_exists "cli/smrc" || fail "The template core sm/smrc is missing."
+  templates exist "cli/smrc" || fail "The template core sm/smrc is missing."
 
   timestamp_set
   local template="cli/smrc" target="$HOME/.smrc" \
@@ -50,7 +50,7 @@ smrc_update()
   : \
     "${repository_url:="username/repository"}"
 
-  update_seed_template "${template}" "${target}" "${incoming}" \
+  __sm.templates.update "${template}" "${target}" "${incoming}" \
     project "$project" \
     repository_url "$repository_url" \
     environment "$environment"

@@ -1,9 +1,7 @@
 #!/bin/sh
 
-detect_template()
+__sm.templates.find()
 {
-  trace_filter template
-
   local _extensions_path="$1" _extension _template_path _params_path
 
   shift || fail "No extensions path and extension name given."
@@ -28,40 +26,10 @@ detect_template()
   return 1
 }
 
-#
-# ## template_exists()
-#
-# Checks if a named template file exists in the extension_templates_path.
-#
-# ### Input Parameters
-#
-# First parameter must be the name of a template file, eg. a string.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 if the named template file exists and is nonempty.
-# 1 if the named template file does not exist or is empty.
-#
-# ### Failure Scenarios
-#
-# Fails if no template name is given.
-#
-# ### Usage Examples
-#
-#     user$ {{ setup the scenario }}
-#     user$ function_name {{ parameters }}
-#     user$ {{ demonstrate the results}}
-#
-# ### Code Walkthrough
-template_exists()
+__sm.templates.exist()
 {
-  trace_filter template
-
-  if __sm.extensions.in.paths detect_template "$@" || __sm.cli.in.path detect_template "$@"
+  if __sm.extensions.in.paths __sm.templates.find "$@" ||
+    __sm.cli.in.path __sm.templates.find "$@"
   then
     log_search "template" "$template_name" "${template_path##${sm_path}\/}"
     return 0
@@ -70,99 +38,9 @@ template_exists()
   fi
 }
 
-#
-# ## install_template()
-#
-# Installs a named template to a given location.
-#
-# ### Input Parameters
-#
-# The first parameter should be the template name.
-# Remaining parameters specify the target, mode and owner:
-#   owner "<<user>>[:<<group>>]"
-#   mode 0755
-#   to "/path/to/new/file"
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 if successful.
-# 1 otherwise.
-#
-# ### Failure Scenarios
-#
-# Fails if no template name was given.
-# Fails if the template name given is a directory.
-#
-# ### Usage Examples
-#
-#     user$ install_template "nginx.conf" \
-#           to "${nginx_path}/nginx.conf" \
-#           mode 0644 owner "${nginx_user}"
-#
 # ### Code Walkthrough
-install_template()
+__sm.templates.install()
 {
-  trace_filter template
-  # Declare function local variables, also set source mode and owner defaults
-  local _template _name _target _source="${extension_templates_path}" \
-    _mode=0644 _owner=$USER
-
-  # While there are still function parameters left, store the first parameter
-  # as the token and remove it from the parameter list.
-  #
-  # Then switch based on what the parameter contains.
-  #
-  # If the parameter is 'to', then the next parameter contains the target,
-  # store it in the target variable and remove it from the parameters list.
-  #
-  # If the next parameter contains the mode, store it in the mode variable
-  # and remove the mode from the parameters list.
-  #
-  # If the next parameter contains the owner, store it in the owner variable
-  # and remove the owner from the parameters list.
-  #
-  # If the next parameter contains 'from', then store it in the source
-  # variable and remove it from the parameters list.
-  #
-  # If we do not know what the token is, and
-  # If a name has not yet been set, then the token must be the name.
-  # Store it in the name variable. Otherwise, if the target has not yet been
-  # set, then the token must be the target; store it in the target variable.
-  while (( $# > 0 ))
-  do
-    token="${1}"
-    shift
-    case "${token}" in
-      to)
-        _target="$1"
-        shift || fail "target path must follow keyword 'to'"
-        ;;
-      mode)
-        _mode="$1"
-        shift || fail "mode must follow keyword 'mode'"
-        ;;
-      owner)
-        _owner="$1"
-        shift || fail "owner must follow keyword 'owner'"
-        ;;
-      from)
-        fail "'from' keyword is no longer supported"
-        ;;
-      *)
-        if variable_is_empty _name
-        then
-          _name="$token"
-        elif variable_is_empty _target
-        then
-          _target="$token"
-        fi
-        ;;
-    esac
-  done
 
   template_exists "${_name}" || fail "No template found matching '${_name}'."
 
@@ -178,8 +56,8 @@ install_template()
       fail "Cannot install the template '${_template}' to ${_target}/${_name},"\
         " as it is a directory."
     fi
-
-    files copy from "${_template}" to "${_target}/${_name}" \
+    files copy \
+      from "${_template}" to "${_target}/${_name}" \
       mode "${_mode}" owner "${_owner}"
   else
     files copy force \
@@ -188,61 +66,16 @@ install_template()
   fi
 }
 
-#
-# ## seed_template()
-#
-# Seed a template file replacing all given keys with given values.
-#
-# ### Input Parameters
-#
-# First parameter must be the template filename to seed.
-# Remaining parameters must come in pairs; the first of each pair specifies
-# the key to search and replace in the template file, and the second is the
-# value to replace {{$key}} with.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if no template filename is given.
-# Fails if the template given does not exist.
-# Fails if no key/value pairs are given.
-# Fails if for every key there is no associated value.
-# Fails if the intermediate template file does not exist...
-#
-# ### Usage Examples
-#
-#    user$ seed_template "/etc/conf.d/${extension}.conf" \
-#      prefix_path "${prefix_path}" \
-#      init_scripts_path "${init_scripts_path}" \
-#      modules_path "${modules_path}" \
-#      data_path "${data_path}" \
-#      confd_path "${confd_path}" \
-#      extension "${extension}"
-#
-# Note that if you wish to eliminate all unset strings, pass the pair
-#     ".*" ""
-# as the last pair of arguments to seed_template.
-#
-# ### Code Walkthrough
-seed_template()
+__sm.templates.seed()
 {
-  trace_filter template
-
   local _template="${1:-}"
-  shift || fail "Cannot seed template;"\
-    " No template name was given as the first parameter."
-
+  shift || fail "No template name was given."
   local _hash=("$@") _strings=() temporary=${_template}.${timestamp}.$$
 
-  files exist "${_template}" || fail "Cannot seed template;"\
-    " template file '${_template}' does not exist."
+  if ! files exist "${_template}"
+  then
+    fail "template file '${_template}' does not exist."
+  fi
 
   [[ -n "${_hash}" ]] || fail "Cannot seed template '${_template}';"\
     " No replacement keys were specified."
@@ -259,15 +92,17 @@ seed_template()
     error "There was an error (?) seeding the template '${_template}';" \
     " Most often this is due to filesystem permissions / disk full."
 
-  files exist "${temporary}" || fail "Something went very wrong;"\
-    " the template intermediate file '${temporary}' does not exist?! "
+  if ! files exist "${temporary}"
+  then
+    fail "Something went very wrong;"\
+      " the template intermediate file '${temporary}' does not exist?! "
+  fi
 
-  move_file "${temporary}" "${_template}"
+  files move from "${temporary}" to "${_template}"
 }
 
-update_seed_template()
+__sm.templates.udpate()
 {
-  trace_filter template
 
   local _template="${1:-}" _target="${2:-}"
   shift || fail "Cannot update seed template;"\
