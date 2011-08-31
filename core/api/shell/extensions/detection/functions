@@ -8,7 +8,7 @@ action_cache_check()
   shift || fail "No method and action name was given for search"
   shift || fail "No action name was given for search"
 
-  action_cache_find_matching "${_method}" "${_name}"
+  __sm.cache.map.find.matching "${_method}" "${_name}"
 
   case "${_method}" in
     (only_one)

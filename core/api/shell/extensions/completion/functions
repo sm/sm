@@ -25,7 +25,7 @@ find_starting_action()
   then
     _action_path="${_action_params[*]}"
     _action_path="${_action_path// //}"
-    if action_cache_find_matching starting "${_action_path}"
+    if __sm.cache.map.find.matching starting "${_action_path}"
     then
       local _candidate
       for _candidate in "${_found_actions[@]}"

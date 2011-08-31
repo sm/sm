@@ -99,7 +99,7 @@ __sm.cache.map.modules.initialize()
   done
 }
 
-action_cache_find_matching()
+__sm.cache.map.find.matching()
 {
   local _method="$1" _name="$2"
   shift || fail "No method and action name was given for search"
