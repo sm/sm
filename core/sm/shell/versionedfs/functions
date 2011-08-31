@@ -44,6 +44,8 @@
 #
 versionedfs()
 {
+  trace_filter versionedfs
+
   local _token _path _paths _source _name _version _strategy _method _activate
   local _action="${1:-}"
   shift || fail "Usage: versionedfs path \"{versionedfs root path}\" "\
