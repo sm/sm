@@ -2,7 +2,7 @@
 
 smrc_install()
 {
-  template_exists "cli/smrc" || fail "The template core cli/smrc is missing."
+  templates exist "cli/smrc" || fail "The template core cli/smrc is missing."
 
   if files exist "$HOME/.smrc"
   then
@@ -18,12 +18,12 @@ smrc_install()
 
   # TODO: Read project, repository_url and environment from defaults file.
   #       ~/.sm/project/config/defaults
-  : \
+  true \
     "${repository_url:="username/repository"}"
 
-  install_template "cli/smrc" to "$HOME/.smrc"
+  templates install "cli/smrc" to "$HOME/.smrc"
 
-  seed_template "$HOME/.smrc" \
+  templates seed "$HOME/.smrc" \
     project "$project" \
     repository_url "$repository_url" \
     environment "$environment" \
@@ -32,7 +32,7 @@ smrc_install()
 
 smrc_update()
 {
-  template_exists "cli/smrc" || fail "The template core sm/smrc is missing."
+  templates exist "cli/smrc" || fail "The template core sm/smrc is missing."
 
   timestamp_set
   local template="cli/smrc" target="$HOME/.smrc" \
@@ -50,7 +50,7 @@ smrc_update()
   : \
     "${repository_url:="username/repository"}"
 
-  update_seed_template "${template}" "${target}" "${incoming}" \
+  __sm.templates.update "${template}" "${target}" "${incoming}" \
     project "$project" \
     repository_url "$repository_url" \
     environment "$environment"

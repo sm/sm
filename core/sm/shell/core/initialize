@@ -127,7 +127,7 @@ then # custom compilations + g*
 fi
 
 # Ensure that any variables you wish export to extensions actually *are* exported.
-sm_exports
+__sm.exports
 
 if [[ -n $sm_script ]]
 then
@@ -135,7 +135,7 @@ then
   then # Sourcing needed for loading from bash 3, for now, set sm_script='/'
     true # Skip any actions, stop with the framework simply loaded.
   else
-    action_source $sm_script "${extension_args[@]}" # load script
+    __sm.actions.source $sm_script "${extension_args[@]}" # load script
   fi
 elif [[ -n "${call_action}" ]]
 then
@@ -143,7 +143,7 @@ then
   then
     error "${call_action} is not a valid function name"
   else
-    action_call "${call_action}" "${extension_args[@]}"
+    __sm.actions.call "${call_action}" "${extension_args[@]}"
   fi
 elif set | grep '^extension_args=(' >/dev/null
 then
@@ -153,9 +153,9 @@ then
       ;;
     *)
       modules include api/extensions/detection api/extensions/execution
-      extension_action
-      detect_action_type
-      extension_run
+      __sm.extensions.action
+      __sm.extensions.actions.type
+      __sm.extensions.run
   esac
 fi
 

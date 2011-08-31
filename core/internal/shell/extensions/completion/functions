@@ -17,15 +17,15 @@ find_starting_action()
   local _modules_root="${extensions_path}/${extension}/shell"
   local _actions_cache=() _found_actions=()
 
-  initialize_filesystem_cache
-  initialize_map_cache
-  initialize_modules_actions_cache
+  __sm.cache.map.filesystem.initialize
+  __sm.cache.map.actions.initialize
+  __sm.cache.map.modules.initialize
 
   if (( ${#_actions_cache[@]} ))
   then
     _action_path="${_action_params[*]}"
     _action_path="${_action_path// //}"
-    if action_cache_find_matching starting "${_action_path}"
+    if __sm.cache.map.find.matching starting "${_action_path}"
     then
       local _candidate
       for _candidate in "${_found_actions[@]}"
@@ -74,7 +74,7 @@ extension_action_completion()
   _args=( ${_args[@]} )
   show_word=${#_args[@]}
 
-  if __sm.extensions.in.paths detect_extension_existence "${_args[@]}"
+  if __sm.extensions.in.paths __sm.extensions.find "${_args[@]}"
   then
     show_word=$(( show_word - 1 ))
     _extension_found=1

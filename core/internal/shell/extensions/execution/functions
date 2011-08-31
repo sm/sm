@@ -1,6 +1,6 @@
 #!/bin/sh
 
-detect_action_type()
+__sm.extensions.actions.type()
 {
   local _path="${action_path:-}"
 
@@ -68,7 +68,7 @@ detect_action_type()
   return $?
 }
 
-extension_modules_load()
+__sm.extensions.modules.include()
 {
   local _token _namespace=""
 
@@ -85,7 +85,7 @@ extension_modules_load()
   done
 }
 
-extension_action_prerequisites()
+__sm.extensions.action.prerequisites()
 {
   trace_filter action_pre
   local _pre _name
@@ -114,7 +114,7 @@ extension_action_prerequisites()
   done
 }
 
-extension_run()
+__sm.extensions.run()
 {
   trace_filter extension_run
 
@@ -126,27 +126,23 @@ extension_run()
   case "${_type}" in
     (function)
       _namespaces=${_path##${extension_bin_path}}
-      extension_modules_load ${_namespaces//\// }
-
+      __sm.extensions.modules.include ${_namespaces//\// }
       action=${action%%(*}
-      extension_action_prerequisites
-      action_call "${action}" "${extension_args[@]}"
+      __sm.extensions.action.prerequisites
+      __sm.actions.call "${action}" "${extension_args[@]}"
       ;;
 
     (shell)
       [[ "${action##*/}" != help ]] || modules api/help
-
       _namespaces=${_path##${extension_bin_path}}
-      extension_modules_load ${_namespaces//\// }
-
-      extension_action_prerequisites
-      action_source "${_path}/${action}" "${extension_args[@]}"
+      __sm.extensions.modules.include ${_namespaces//\// }
+      __sm.extensions.action.prerequisites
+      __sm.actions.source "${_path}/${action}" "${extension_args[@]}"
       ;;
 
     (ruby)
       # Allow env settings via _initialize
-      extension_modules_load ${_namespaces//\// }
-
+      __sm.extensions.modules.include ${_namespaces//\// }
       requires=()
       for script in functions initialize
       do

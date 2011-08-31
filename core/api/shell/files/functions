@@ -96,28 +96,17 @@ files()
       (force)
         _flags+=( -f )
         ;;
-#      (contain|containing|replace)
-#        if [[ -z "${_command}" ]] ; then _command="${_token}" ; fi
-#        _subcommand="$1"
-#        shift
-#        case "${_subcommand}" in
-          (string)
-            _string="$1"
-            shift || fail "A string must be followed by keyword 'string'"
-            ;;
-          (regex)
-            _regex="$1"
-            shift || fail "A regex must be followed by keyword 'regex'"
-            ;;
-#          (*)
-#            fail "Unknown command '${1}' for '${_command}'"
-#            ;;
-#        esac
-#        if [[ -z "${_string}" && -z "${_regex}" ]]
-#        then
-#          fail "A string or regex must be given after keyword '${_subcommand}'."
-#        fi
-#        ;;
+      (contain|containing|replace)
+        if [[ -z "${_command}" ]] ; then _command="${_token}" ; fi
+        ;;
+      (string)
+        _string="$1"
+        shift || fail "A string must be followed by keyword 'string'"
+        ;;
+      (regex)
+        _regex="$1"
+        shift || fail "A regex must be followed by keyword 'regex'"
+        ;;
       (in)
         _files+=("$1")
         shift || fail "A file name must follow keyword 'in'"
@@ -149,16 +138,20 @@ files()
     (are|is)
       case "${_subcommand}" in
         (empty)
-          __sm.files.are.empty "${_files[@]}"
+          if __sm.files.are.empty "${_files[@]}"
+          then return 0 ; else return 1 ; fi
           ;;
         (executable)
-          __sm.files.are.executable "${_files[@]}"
+          if __sm.files.are.executable "${_files[@]}"
+          then return 0 ; else return 1 ; fi
           ;;
         (missing)
-          __sm.files.are.missing "${_files[@]}"
+          if __sm.files.are.missing "${_files[@]}"
+          then return 0 ; else return 1 ; fi
           ;;
         (symlinks)
-          __sm.files.are.symlinks "${_files[@]}"
+          if __sm.files.are.symlinks "${_files[@]}"
+          then return 0 ; else return 1 ; fi
           ;;
       esac
       ;;
@@ -172,7 +165,8 @@ files()
       __sm.files.sha.${_subcommand} "${_files[@]}"
       ;;
     (contain)
-      __sm.files.contain "${_string}" "${_regex}" "${_files[@]}"
+      if __sm.files.contain "${_string}" "${_regex}" "${_files[@]}"
+      then return 0 ; else return 1 ; fi
       ;;
     (containing)
       __sm.files.containing "${_string}" "${_regex}" "${_files[@]}"
@@ -186,11 +180,13 @@ files()
       ;;
     (nonempty)
       [[ -n "${_files}" ]] || fail "files must be given."
-      __sm.files.nonempty "${_files[@]}"
+      if __sm.files.nonempty "${_files[@]}"
+      then return 0 ; else return 1 ; fi
       ;;
     (exist)
       [[ -n "${_files}" ]] || fail "files must be given."
-      __sm.files.exist "${_files[@]}"
+      if __sm.files.exist "${_files[@]}"
+      then return 0 ; else return 1 ; fi
       ;;
     (remove)
       [[ -n "${_files}" ]] || fail "files must be given."

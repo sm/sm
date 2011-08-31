@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# TODO: Rework this into a 1.0.0 module API
+
 api_defaults_initialize()
 {
   settings_search_path_cache=()
@@ -119,7 +121,7 @@ settings_search()
 
   paths=( "/etc/sm/${extension}" "$HOME/.sm/${extension}" ) # Standard paths
 
-  if extension_path "${extension}"
+  if __sm.extensions.path "${extension}"
   then
     paths+=( "${extension_path}/config" )
   fi

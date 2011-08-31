@@ -1,6 +1,6 @@
 #!/bin/sh
 
-extension_path()
+__sm.extensions.path()
 {
   local _path extension="${1:-}"
   shift || fail "Cannot process extension path;"\
@@ -17,7 +17,7 @@ extension_path()
   return 1
 }
 
-extension_is_valid()
+__sm.extensions.are.valid()
 {
   local _path="${1:-}"
   shift || fail "No extension path was given to check validity."
@@ -25,12 +25,12 @@ extension_is_valid()
   [[ -d "${_path}/bin" || -d "${_path}/shell" ]]
 }
 
-detect_extension_existence()
+__sm.extensions.find()
 {
   extensions_path="${1:-}" extension="${2:-}"
   shift || fail "Cannot detect extension existence;"\
     " No extension path was given."
   shift || fail "Cannot detect extension existence;"\
     " No extension name was given."
-  extension_is_valid $extensions_path/$extension
+  __sm.extensions.are.valid $extensions_path/$extension
 }

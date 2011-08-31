@@ -91,7 +91,7 @@ extension_package()
   paths create "${_path}"
   paths enter "${_path}"
 
-  extension_is_valid "${_path}/${_name}" ||
+  __sm.extensions.are.valid "${_path}/${_name}" ||
     error "Cannot package extension '${_name}'; the extension is not valid."
 
   _version="$(cat "${_name}/VERSION")"
@@ -132,7 +132,7 @@ extension_publish()
 
   paths enter "${_path}"
 
-  extension_is_valid "${_path}/${_name}" ||
+  __sm.extensions.are.valid "${_path}/${_name}" ||
     error "Cannot package extension '${_name}'; the extension is not valid."
 
   _version="$(cat "${_name}/VERSION")"

@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# TODO: Rework this into a 1.0.0 module API
+
 package()
 {
   local _token _command _logfile _lines=50 _params=()
@@ -684,14 +686,14 @@ package_profile_d()
   local _package="${1:-${package_name}}"
   [[ -n "${_package}" ]] || fail "Package name must be given."
 
-  template_exists "profile.d.template" || return 0
+  templates exist "profile.d.template" || return 0
 
   log_step "Updating shell profile for ${_package}"
 
   paths create "${profile_d_path}"
   files create "${profile_path}"
 
-  install_template "profile.d" to "${profile_d_path}/${_package}.sh" mode 0755
+  templates install "profile.d" to "${profile_d_path}/${_package}.sh" mode 0755
 
   log_step success
 }
@@ -947,7 +949,7 @@ packages_active()
 
 packages_available()
 {
-  extensions_installed module "api/package" "$@"
+  __sm.extensions.installed module "api/package" "$@"
 }
 
 packages_list()

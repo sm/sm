@@ -1,12 +1,15 @@
 #!/bin/sh
 
-actions_cache_add()
+__sm.cache.map.add()
 {
-  __sm.string.contains "$1" "${_actions_cache[*]}" || _actions_cache+=( "$1" )
+  if ! __sm.string.contains "$1" "${_actions_cache[*]}"
+  then
+    _actions_cache+=( "$1" )
+  fi
 }
 
 # Step 1 collect direct filesystem mapping
-initialize_filesystem_cache()
+__sm.cache.map.filesystem.initialize()
 {
   trace_filter action_detection
   local _action_path _file_name _paths
@@ -28,25 +31,25 @@ initialize_filesystem_cache()
         (.*) continue ;;
       esac
 
-      actions_cache_add "${_action_path}=${_action_path}"
+      __sm.cache.map.add "${_action_path}=${_action_path}"
     done
   fi
 }
 
 # Step 2 read map
-initialize_map_cache()
+__sm.cache.map.actions.initialize()
 {
   trace_filter action_detection
   local _mapping
   if [[ -f "${_map}" ]]
   then
     for _mapping in $( grep -v "^#" < "${_map}" || true )
-    do actions_cache_add "${_mapping}"
+    do __sm.cache.map.add "${_mapping}"
     done
   fi
 }
 
-detect_module_actions()
+__sm.module.detect.actions()
 {
   __sm.module.detect "$@" &&
     [[ -f "${module_path}/actions" ]] &&
@@ -54,7 +57,7 @@ detect_module_actions()
 }
 
 # Step 3 collect dependent modules mapping
-initialize_modules_actions_cache()
+__sm.cache.map.modules.initialize()
 {
   trace_filter action_detection
   local _modules _module_path _module_name _action_pair
@@ -83,14 +86,14 @@ initialize_modules_actions_cache()
 
     while read _module_dep
     do
-      if __sm.extensions.in.paths detect_module_actions "${_module_dep}"
+      if __sm.extensions.in.paths __sm.module.detect.actions "${_module_dep}"
       then
         log_search "actiondep" "${extension}${_module_name:+/}${_module_name}" "${module_path#${sm_path}\/}/actions"
         while read _action_pair
         do
           if [[ "${_action_pair}" == [[:alpha:]]* ]]
           then
-            actions_cache_add "${_module_name:+${_module_name}/}${_action_pair/=*}=${_module_name:+${_module_name}/}${_action_pair/*=}"
+            __sm.cache.map.add "${_module_name:+${_module_name}/}${_action_pair/=*}=${_module_name:+${_module_name}/}${_action_pair/*=}"
           fi
         done < "${module_path}/actions"
       fi
@@ -98,7 +101,7 @@ initialize_modules_actions_cache()
   done
 }
 
-action_cache_find_matching()
+__sm.cache.map.find.matching()
 {
   local _method="$1" _name="$2"
   shift || fail "No method and action name was given for search"

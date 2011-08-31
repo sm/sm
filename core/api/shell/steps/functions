@@ -1,14 +1,6 @@
 #!/bin/sh
 
-api_steps_initialize()
-{
-  steps_started=()
-}
-
-start_step()
-{
-  steps_started+=( "$1" )
-}
+# TODO: Rework this into a 1.0.0 module API
 
 step()
 {
@@ -40,6 +32,16 @@ steps()
   done
 }
 
+api_steps_initialize()
+{
+  steps_started=()
+}
+
+start_step()
+{
+  steps_started+=( "$1" )
+}
+
 retreat()
 {
   local step
@@ -63,3 +65,4 @@ retreat()
     fi
   done
 }
+

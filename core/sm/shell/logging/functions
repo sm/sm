@@ -259,13 +259,13 @@ trace_filter()
   fi
 }
 
-action_call()
+__sm.actions.call()
 {
   trace_filter action
   "$@"
 }
 
-action_source()
+__sm.actions.source()
 {
   local script="$1"
   shift || fail "No script was given as the first parameter."
@@ -274,7 +274,7 @@ action_source()
   source "$script"
 }
 
-var_debug_callback()
+__sm.debug.variables.callback()
 {
   local _variable
   for _variable in ${var_debug_flags[@]}
@@ -302,7 +302,7 @@ var_debug_callback()
   done
 }
 
-var_debug_callback_initialize()
+__sm.debug.variables.callback.initialize()
 {
   local _variable
   for _variable in "${var_debug_flags[@]}"
