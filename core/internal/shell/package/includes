@@ -4,4 +4,4 @@ api/filesystem
 api/os
 api/defaults
 api/templates
-api/users
+api/user

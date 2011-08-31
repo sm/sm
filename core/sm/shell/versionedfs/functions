@@ -202,12 +202,12 @@ __sm.versionedfs.activate()
 
   if [[ -L "${_path}/versions/${_name}/active" ]]
   then # Deactivate if active version.
-    if [[ "$(readlink "${_path}/versions/${_name}/active")" != "${_version_path}" ]]
-    then
+#    if [[ "$(readlink "${_path}/versions/${_name}/active")" != "${_version_path}" ]]
+#    then
       __sm.versionedfs.deactivate "${_path}" "${_name}"
-    else
-      return 0 # Success if the given name/version is already active.
-    fi
+#    else
+#      return 0 # Success if the given name/version is already active.
+#    fi
   fi
 
   local _activate _active_version_path _index=0 _count _active_path

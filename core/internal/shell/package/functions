@@ -1,6 +1,6 @@
 #!/bin/sh
 
-__sm.package.error
+__sm.package.error()
 {
   local _message="$1" _log="$2" _lines="$3"
 
