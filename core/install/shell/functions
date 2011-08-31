@@ -89,10 +89,10 @@ setup_shell_completion()
   _name="sm.bash"
   _mode="0644"
 
-  install_template "install/sm-completion.sh" \
+  templates install "install/sm-completion.sh" \
     to "${completion_prefix}/${_name}"
 
-  seed_template "${completion_prefix}/${_name}" \
+  templates seed "${completion_prefix}/${_name}" \
     sm_path "${install_path}"
 
   files chmod "${_mode}" "${completion_prefix}/${_name}"
@@ -110,8 +110,8 @@ setup_profile_d()
       if ! files exist "/etc/profile" ||
         ! files contain string "${profile_d_path}" "/etc/profile"
       then
-        install_template install/etc_profile to /etc/profile
-        seed_template /etc/profile profile_d_path "${profile_d_path}"
+        templates install install/etc_profile to /etc/profile
+        templates seed /etc/profile profile_d_path "${profile_d_path}"
       fi
     fi
 

@@ -460,7 +460,7 @@ service_install_init_d()
     # TODO: Install the service init script...
     if template_exists "${_service}"
     then
-      install_template "${_service}" to "${init_scripts_path}/${_service}" \
+      templates install "${_service}" to "${init_scripts_path}/${_service}" \
         mode 0755
     else
       # Use core svc init.d template

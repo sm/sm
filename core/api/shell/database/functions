@@ -65,9 +65,9 @@ database_setup()
 {
   paths create "${data_base_path}"
 
-  if template_exists "/etc/conf.d/${service}.conf"
+  if templates exist "/etc/conf.d/${service}.conf"
   then
-    seed_template "/etc/conf.d/${service}.conf" \
+    templates seed "/etc/conf.d/${service}.conf" \
       data_path "${data_path}"
   fi
 

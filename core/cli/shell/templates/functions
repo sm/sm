@@ -1,5 +1,6 @@
 #!/bin/sh
 
+# TODO: ... merge this into templates api?
 templates_help()
 {
   echo "
@@ -107,7 +108,7 @@ templates_apply_one()
 
   cp -f $template $target_new
   hash read key $key from "$settings" # replacements
-  seed_template $target_new "${replacements[@]}" |
+  templates seed $target_new "${replacements[@]}" |
     grep -v "WARNING: Template Seeding (replacing defaults) has not yet been fully implemented." || true
 
   if [[ ! -f $target ]] || ! diff -q $target_new $target > /dev/null
@@ -152,7 +153,7 @@ templates_apply_diff()
 
   cp -f $template $target_new
   hash read key "$key" from "$settings" replacements
-  seed_template $target_new "${replacements[@]}" |
+  templates seed $target_new "${replacements[@]}" |
     grep -v "WARNING: Template Seeding (replacing defaults) has not yet been fully implemented." || true
 
   diff -u $target $target_new || true

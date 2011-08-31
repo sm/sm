@@ -460,16 +460,16 @@ service_install_init_d()
     paths create "/etc/conf.d" "${init_scripts_path}"
 
     # TODO: Install the service init script...
-    if template_exists "${_service}"
+    if templates exist "${_service}"
     then
-      install_template "${_service}" to "${init_scripts_path}/${_service}" \
+      templates install "${_service}" to "${init_scripts_path}/${_service}" \
         mode 0755
     else
       # Use core svc init.d template
-      install_template "cli/init.d" \
+      templates install "cli/init.d" \
         to "${init_scripts_path}/${_service}" mode 0755
 
-      seed_template "${init_scripts_path}/${_service}" \
+      templates seed "${init_scripts_path}/${_service}" \
         modules_path "${modules_path}" \
         service "${service}" \
         service_user "${service_user}" \
@@ -478,7 +478,7 @@ service_install_init_d()
 
     service_activate "${service}" "${package_version}"
 
-    # TODO: Replace this with install_template + seed_template
+    # TODO: Replace this with templates install + templates seed
     files write \
       string "%s\n" "[ -d \"${prefix_path}/${_service}/active/bin\" ] && " \
       to "/etc/profile.d/${_service}.sh"
@@ -629,14 +629,14 @@ service_init_info()
 service_conf_d()
 {
   # TODO: Install a default conf.d template if extension does not define one.
-  template_exists "conf.d" || return 0
+  tempaltes exist "conf.d" || return 0
 
-  install_template "conf.d.template" to "/etc/conf.d/${service}.conf" \
+  templates install "conf.d.template" to "/etc/conf.d/${service}.conf" \
     mode 0644 owner "${service_user}:${service_user}"
 
-  if template_exists "/etc/conf.d/${service}.conf"
+  if templates exist "/etc/conf.d/${service}.conf"
   then
-    seed_template "/etc/conf.d/${service}.conf" \
+    templates seed "/etc/conf.d/${service}.conf" \
       prefix_path "${prefix_path}" \
       init_scripts_path "${init_scripts_path}" \
       modules_path "${modules_path}" \

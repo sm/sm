@@ -686,14 +686,14 @@ package_profile_d()
   local _package="${1:-${package_name}}"
   [[ -n "${_package}" ]] || fail "Package name must be given."
 
-  template_exists "profile.d.template" || return 0
+  templates exist "profile.d.template" || return 0
 
   log_step "Updating shell profile for ${_package}"
 
   paths create "${profile_d_path}"
   files create "${profile_path}"
 
-  install_template "profile.d" to "${profile_d_path}/${_package}.sh" mode 0755
+  templates install "profile.d" to "${profile_d_path}/${_package}.sh" mode 0755
 
   log_step success
 }

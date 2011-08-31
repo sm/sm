@@ -17,15 +17,14 @@
 #
 # Note that if you wish to eliminate all unset strings, pass the pair
 #     ".*" ""
-# as the last pair of arguments to seed_template.
+# as the last pair of arguments to templates seed.
 #
-
 templates()
 {
   trace_filter templates
 
   local _command _name _target _source="${extension_templates_path}" \
-    _mode=0644 _owner=$USER _templates=()
+    _mode=0644 _owner=$USER _template _params=()
 
   while (( $# > 0 ))
   do
@@ -65,16 +64,16 @@ templates()
 
   case "${_command}" in
     (exist)
-      __sm.templates.exist "${_templates[@]}"
+      __sm.templates.exist "${_params[@]}"
       ;;
     (install)
-      __sm.templates.install "${_templates[@]}"
+      __sm.templates.install "${_name}" "${_params[@]}"
       ;;
     (seed)
-      __sm.templates.seed "${_templates[@]}"
+      __sm.templates.seed "${_name}" "${_params[@]}"
       ;;
     (update)
-      __sm.templates.update "${_templates[@]}"
+      __sm.templates.update "${_name}" "${_params[@]}"
       ;;
     (*)
       fail "Unknown command '${_command}' for templates API."
