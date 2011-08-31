@@ -2,14 +2,7 @@
 
 actions_cache_add()
 {
-  case "${_actions_cache[*]}" in
-    (*${1}*)
-      return 0
-      ;;
-    (*)
-      _actions_cache+=( "$1" )
-      ;;
-  esac
+  string contains "$1" "${_actions_cache[*]}" || _actions_cache+=( "$1" )
 }
 
 # Step 1 collect direct filesystem mapping

@@ -598,10 +598,11 @@ clean_tmp_logs()
 
 __sm.logging.options.check()
 {
-  case "${2}" in
-    (*$1*)
-      return 0
-      ;;
-  esac
+  # Do not use brackets; they slow things down a lot.
+  if string contains "$1" "$2"
+  then
+    return 0
+  fi
+
   string contains "$1" "all" && ! string contains "$1" "-$2"
 }

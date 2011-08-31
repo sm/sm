@@ -143,11 +143,10 @@ settings_search_path_update()
 {
   local path=$1 _uri
 
-  case "${settings_search_path_cache[*]}" in
-    (*${path}*)
-      return 0
-      ;;
-  esac
+  if string contains "${path}" "${settings_search_path_cache[*]}"
+  then
+    return 0
+  fi
 
   if files exist "${path}/.uri" && ! files are empty "${_path}/.uri"
   then
