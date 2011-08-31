@@ -1,6 +1,6 @@
 #!/bin/sh
 
-action_cache_check()
+__sm.cache.map.check()
 {
   trace_filter action_detection
 
@@ -84,8 +84,8 @@ find_extension_action()
       _action_path="${_action_params[*]}"
       _action_path="${_action_path// //}"
 
-      if action_cache_check only_one "${_action_path}" ||
-        action_cache_check allow_many "${_action_path}"
+      if __sm.cache.map.check only_one "${_action_path}" ||
+        __sm.cache.map.check allow_many "${_action_path}"
       then
         return 0
       fi
