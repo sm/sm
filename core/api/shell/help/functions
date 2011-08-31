@@ -1,5 +1,6 @@
 #!/bin/sh
 
+# TODO: Rework this into a 1.0.0 module API
 # TODO: remove help api and replace with man api.
 api_help_initialize()
 {

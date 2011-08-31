@@ -4,6 +4,8 @@
 # SM Framework Extended Module ~ Service Module
 #
 
+# TODO: Rework this into a 1.0.0 module API
+
 api_service_initialize()
 {
   variable_is_nonempty init_scripts_path || init_scripts_path="$(init_scripts_path)"

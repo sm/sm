@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# TODO: Rework this into a 1.0.0 module API
+
 #
 # ## first()
 #

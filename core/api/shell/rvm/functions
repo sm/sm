@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# TODO: Remove this, it does not belong in SM Framework.
+
 rvm_initialize()
 {
   files source "/etc/rvmrc" "$HOME/.rvmrc"
