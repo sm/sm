@@ -71,9 +71,10 @@ __sm.cache.map.modules.initialize()
 
   shopt -s nullglob
   _modules=(
+  "${_modules_root}"/includes
+  "${_modules_root}"/*/includes
   "${_modules_root}"/*/*/includes
   "${_modules_root}"/*/*/*/includes
-  "${_modules_root}"/*/*/*/*/includes
   )
   shopt -u nullglob
 
