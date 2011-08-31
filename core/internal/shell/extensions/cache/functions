@@ -34,7 +34,7 @@ initialize_filesystem_cache()
 }
 
 # Step 2 read map
-initialize_map_cache()
+__sm.actions.cache.map.initialize()
 {
   trace_filter action_detection
   local _mapping

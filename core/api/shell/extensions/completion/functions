@@ -18,7 +18,7 @@ find_starting_action()
   local _actions_cache=() _found_actions=()
 
   initialize_filesystem_cache
-  initialize_map_cache
+  __sm.actions.cache.map.initialize
   initialize_modules_actions_cache
 
   if (( ${#_actions_cache[@]} ))

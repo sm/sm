@@ -67,7 +67,7 @@ find_extension_action()
   local _actions_cache=()
 
   initialize_filesystem_cache
-  initialize_map_cache
+  __sm.actions.cache.map.initialize
   initialize_modules_actions_cache
 
   debug search "actions_cache: ${_actions_cache[*]}"
