@@ -17,9 +17,9 @@ find_starting_action()
   local _modules_root="${extensions_path}/${extension}/shell"
   local _actions_cache=() _found_actions=()
 
-  initialize_filesystem_cache
-  __sm.actions.cache.map.initialize
-  __sm.modules.cache.map.initialize
+  __sm.cache.map.filesystem.initialize
+  __sm.cache.map.actions.initialize
+  __sm.cache.map.modules.initialize
 
   if (( ${#_actions_cache[@]} ))
   then

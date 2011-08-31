@@ -66,9 +66,9 @@ find_extension_action()
   local _modules_root="${extensions_path}/${extension}/shell"
   local _actions_cache=()
 
-  initialize_filesystem_cache
-  __sm.actions.cache.map.initialize
-  __sm.modules.cache.map.initialize
+  __sm.cache.map.filesystem.initialize
+  __sm.cache.map.actions.initialize
+  __sm.cache.map.modules.initialize
 
   debug search "actions_cache: ${_actions_cache[*]}"
 

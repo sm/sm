@@ -6,7 +6,7 @@ actions_cache_add()
 }
 
 # Step 1 collect direct filesystem mapping
-initialize_filesystem_cache()
+__sm.cache.map.filesystem.initialize()
 {
   trace_filter action_detection
   local _action_path _file_name _paths
@@ -34,7 +34,7 @@ initialize_filesystem_cache()
 }
 
 # Step 2 read map
-__sm.actions.cache.map.initialize()
+__sm.cache.map.actions.initialize()
 {
   trace_filter action_detection
   local _mapping
@@ -54,7 +54,7 @@ __sm.module.detect.actions()
 }
 
 # Step 3 collect dependent modules mapping
-__sm.modules.cache.map.initialize()
+__sm.cache.map.modules.initialize()
 {
   trace_filter action_detection
   local _modules _module_path _module_name _action_pair
