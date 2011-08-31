@@ -74,6 +74,7 @@ __sm.modules.core.initialize()
     "sm/string=core/internal/shell/string"
     "sm/logging=core/sm/shell/logging"
     "sm/modules=core/sm/shell/modules"
+    "sm/extensions=core/sm/shell/extensions"
   )
 
   for _module in ${__sm_modules_loaded[@]}
