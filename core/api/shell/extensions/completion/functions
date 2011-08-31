@@ -19,7 +19,7 @@ find_starting_action()
 
   initialize_filesystem_cache
   __sm.actions.cache.map.initialize
-  initialize_modules_actions_cache
+  __sm.modules.cache.map.initialize
 
   if (( ${#_actions_cache[@]} ))
   then

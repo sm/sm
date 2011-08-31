@@ -54,7 +54,7 @@ __sm.module.detect.actions()
 }
 
 # Step 3 collect dependent modules mapping
-initialize_modules_actions_cache()
+__sm.modules.cache.map.initialize()
 {
   trace_filter action_detection
   local _modules _module_path _module_name _action_pair
