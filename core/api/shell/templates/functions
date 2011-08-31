@@ -48,15 +48,15 @@ templates()
       *)
         if [[ -z "${_command}" ]]
         then
-          _comand="${_token}"
+          _command="${_token}"
         elif [[ -z "${_name}" ]]
         then
           _name="${_token}"
-        elif [[ -z "${_target}" ]]
-        then
-          _target="${_token}"
+#        elif [[ -z "${_target}" ]]
+#        then
+#          _target="${_token}"
         else
-          _templates+=("${token}")
+          _params+=("${token}")
         fi
         ;;
     esac
@@ -64,7 +64,7 @@ templates()
 
   case "${_command}" in
     (exist)
-      __sm.templates.exist "${_params[@]}"
+      __sm.templates.exist "${_name}" "${_params[@]}"
       ;;
     (install)
       __sm.templates.install "${_name}" "${_params[@]}"

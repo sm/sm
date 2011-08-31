@@ -41,8 +41,7 @@ __sm.templates.exist()
 # ### Code Walkthrough
 __sm.templates.install()
 {
-
-  template_exists "${_name}" || fail "No template found matching '${_name}'."
+  __sm.templates.exist "${_name}" || fail "No template found matching '${_name}'."
 
   _template="${template_path}"
   _name="$(basename "${_name}")"
@@ -114,7 +113,7 @@ __sm.templates.udpate()
   shift || true
   local _hash=("$@") _strings=() _variables="${_target}.var.$$"
 
-  template_exists "${_template}" || fail "Cannot update seed template;"\
+  __sm.templates.exist "${_template}" || fail "Cannot update seed template;"\
     " No template was found matching '${_name}'."
 
   _template="${template_path}"
