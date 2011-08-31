@@ -113,7 +113,7 @@ api_service_initialize()
 
 services_avilable()
 {
-  extensions_installed module "api/service" "$@"
+  __sm.extensions.installed module "api/service" "$@"
 }
 
 services_list()

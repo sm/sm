@@ -947,7 +947,7 @@ packages_active()
 
 packages_available()
 {
-  extensions_installed module "api/package" "$@"
+  __sm.extensions.installed module "api/package" "$@"
 }
 
 packages_list()

@@ -30,8 +30,8 @@ set -o functrace
 
 if [[ -n "${var_debug_flags[*]}" ]]
 then
-  var_debug_callback_initialize
-  trap var_debug_callback DEBUG
+  __sm.debug.variables.callback.initialize
+  trap __sm.debug.variables.callback DEBUG
 fi
 
 # Those two break error handling

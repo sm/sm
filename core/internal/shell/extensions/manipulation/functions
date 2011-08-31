@@ -104,44 +104,19 @@ extension_license()
 }
 
 #
-# ## extension\_actions()
-#
-# Lists actions exposed by the named extension.
-#
-# ### Input Parameters
-#
-# First parameter is the name of the extension to list actions for.
-#
-# ### Stream Outputs
-#
-# The names of the extensions in the given directory are printed to the
-# calling environment's STDOUT.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if no extension name is given.
-#
 # ### Usage Examples
 #
 #      $ cat $HOME/test
 #      #!/bin/sm
 #      modules api/extensions/manipulation
-#      extension_actions "postgresql"
+#      __sm.extensions.actions "postgresql"
 #
 #      $ $HOME/test
 #      backup configure help initialize install restart start status stop uninstall upgrade
 #
 #
 #
-extension_actions()
+__sm.extensions.actions()
 {
   local _extension="${1:-}" _files _file _actions=()
   shift || fail "No extension was given."
@@ -193,9 +168,9 @@ extension_actions()
 #
 # ### Usage Examples
 #
-#     user$ extension_install backup mpapis_sm_backup
+#     user$ __sm.extensions.install backup mpapis_sm_backup
 #
-extension_install()
+__sm.extensions.install()
 {
   # TODO: This should likely be removed now with sets/ext ?
 
@@ -203,7 +178,7 @@ extension_install()
   shift || fail "Cannot install extension;"\
     " No extension name was given."
 
-  extension_is_valid "${extensions_src_path}/${_src}" ||
+  __sm.extensions.are.valid "${extensions_src_path}/${_src}" ||
     error "${extensions_src_path}/${_src} is not a valid extension;"\
     "It is missing modules/ and/or bin/ files."
 
@@ -226,7 +201,7 @@ extension_install()
   #
 }
 
-extensions_installed()
+__sm.extensions.installed()
 {
   local _token _type _modules _paths=() _excludes=() _exclude
 
