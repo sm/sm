@@ -10,11 +10,9 @@ do
     (--trace|trace)
       extension_args+=("--trace=all")
       ;;
-
     (--prefix=*)
       prefix_path="${token/*=}"
       ;;
-
     (--prefix|prefix)
       prefix_path="$1"
       if ! shift
@@ -23,11 +21,9 @@ do
         exit 1
       fi
       ;;
-
     (DESTROOT=)
       DESTROOT="${token/*=}"
       ;;
-
     (DESTROOT)
       DESTROOT="$1"
       if ! shift
@@ -36,7 +32,6 @@ do
         exit 1
       fi
       ;;
-
     (*)
       extension_args+=("$token")
       ;;

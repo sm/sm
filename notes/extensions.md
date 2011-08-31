@@ -65,8 +65,30 @@ routes directly to shell functions (map).
 
 ### Actions
 
+Extension 'actions' are executation points that become exposed via the
+sm command line interface. Actions may come from one of three sources:
+1. Executable files located in the bin/ directory within the extension.
+2. Shell functions mapped from map file located in extension root.
+3. Complex modules loaded by the extension. Ex: package,service.
+
 ### Mapped Actions
+
+Each extension may contain a map file in the root folder of the
+extension. Within this file an action mapping to either bin scripts
+with parameters or shell functions may be given, one per line. For
+example if we have an extension called 'hello'; in order to give 
+access from the command line to a shell function called 'hello_world()'.
+Then in the map file we put,
+    world=hello_world()
+Which once this extension is installed can be called from the cli as:
+    sm hello world
+Which will run the hello_world() shell function located in the
+extension directory shell/functions
 
 ### Config
 
+The config/ directory is used for specifying default configuration 
+For example if your extension requires the package module you will set 
+in the config/defaults file the version and base_url for where to
+download your packge from.
 
