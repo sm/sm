@@ -285,33 +285,25 @@ __sm.files.are.executable()
 
 __sm.files.exist()
 {
-  trace_filter filesystem
-  local _file="${1:-}"
-  shift || fail "Cannot check to see if a file exists;"\
-    " No name/path was given."
+  local _file="$1"
   [[ -f "${_file}" ]]
 }
 
 __sm.files.are.empty()
 {
-  trace_filter filesystem
-  local _file="${1:-}"
-  shift || fail "Cannot check if a file is empty;"\
-    " No file path/name was given."
-
+  local _file="$1"
   [[ -f "${_file}" && ! -s "${_file}" ]]
 }
 
 __sm.files.contain()
 {
-
   local _string="$1" _regex="$2"
   shift 2
   local _file _files=("$@")
 
   for _file in ${_files[@]}
   do
-    [[ -f "${_file}" ]] || fail "'${_file}' is not a file."
+    [[ -f "${_file}" ]] || return 1
   done
 
   if [[ -n "${_regex}" ]]

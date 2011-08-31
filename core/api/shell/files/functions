@@ -138,16 +138,20 @@ files()
     (are|is)
       case "${_subcommand}" in
         (empty)
-          __sm.files.are.empty "${_files[@]}"
+          if __sm.files.are.empty "${_files[@]}"
+          then return 0 ; else return 1 ; fi
           ;;
         (executable)
-          __sm.files.are.executable "${_files[@]}"
+          if __sm.files.are.executable "${_files[@]}"
+          then return 0 ; else return 1 ; fi
           ;;
         (missing)
-          __sm.files.are.missing "${_files[@]}"
+          if __sm.files.are.missing "${_files[@]}"
+          then return 0 ; else return 1 ; fi
           ;;
         (symlinks)
-          __sm.files.are.symlinks "${_files[@]}"
+          if __sm.files.are.symlinks "${_files[@]}"
+          then return 0 ; else return 1 ; fi
           ;;
       esac
       ;;
@@ -161,7 +165,8 @@ files()
       __sm.files.sha.${_subcommand} "${_files[@]}"
       ;;
     (contain)
-      __sm.files.contain "${_string}" "${_regex}" "${_files[@]}"
+      if __sm.files.contain "${_string}" "${_regex}" "${_files[@]}"
+      then return 0 ; else return 1 ; fi
       ;;
     (containing)
       __sm.files.containing "${_string}" "${_regex}" "${_files[@]}"
@@ -175,11 +180,13 @@ files()
       ;;
     (nonempty)
       [[ -n "${_files}" ]] || fail "files must be given."
-      __sm.files.nonempty "${_files[@]}"
+      if __sm.files.nonempty "${_files[@]}"
+      then return 0 ; else return 1 ; fi
       ;;
     (exist)
       [[ -n "${_files}" ]] || fail "files must be given."
-      __sm.files.exist "${_files[@]}"
+      if __sm.files.exist "${_files[@]}"
+      then return 0 ; else return 1 ; fi
       ;;
     (remove)
       [[ -n "${_files}" ]] || fail "files must be given."

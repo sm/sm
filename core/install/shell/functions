@@ -107,23 +107,25 @@ setup_profile_d()
     paths create "${profile_d_path}"
     if os is darwin
     then
-      if ! files contain string "${profile_d_path}" "/etc/profile"
+      if ! files exist "/etc/profile" ||
+        ! files contain string "${profile_d_path}" "/etc/profile"
       then
         install_template install/etc_profile to /etc/profile
         seed_template /etc/profile profile_d_path "${profile_d_path}"
       fi
     fi
+
     if files exist "${profile_d_path}/sm.sh"
     then
       if ! files contain string "${install_path}/pkg/active/sbin" "${profile_d_path}/sm.sh"
       then
-        # To prepend or postpend??? Because of selinux issues prepend for now.
-        files write \
-          string "${_PATH}" \
-          to "${profile_d_path}/sm.sh" \
-          mode 0755
+        files write string "${_PATH}" to "${profile_d_path}/sm.sh"
       fi
+    else
+      files write string "${_PATH}" to "${profile_d_path}/sm.sh"
     fi
+
+    files chmod 0644 "${profile_d_path}/sm.sh"
   else
     log "\nNOTE:\n"\
     "Since you are installing as a user ($USER), in order to ensure that the 'sm' "\
