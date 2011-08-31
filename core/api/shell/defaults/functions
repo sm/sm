@@ -97,15 +97,15 @@ read_config()
 
   for _file in  $( settings_search ${_extension} "${_config_file}" )
   do
-    if ! files are empty "${_file}"
-    then
+#    if ! files are empty "${_file}"
+#    then
       _temp="$(files hash from "${_file}" key "${key}")"
 
       if [[ -n "${_temp}" ]]
       then
         value="${_temp}"
       fi
-    fi
+#    fi
   done
 
   eval "${variable}=\"${value}\""

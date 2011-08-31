@@ -21,6 +21,7 @@ files()
     _token="$1" && shift
     case "${_token}" in
       (are|is)
+        _command="${_token}"
         _subcommand="$1"
         shift
         case "${_subcommand}" in

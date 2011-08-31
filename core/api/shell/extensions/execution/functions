@@ -81,7 +81,7 @@ extension_modules_load()
     shift
 
     module_name="${extension}${_namespace}"
-    modules include "$module_name" || true
+    __sm.module.include "$module_name" || true
   done
 }
 
