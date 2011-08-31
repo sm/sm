@@ -132,7 +132,8 @@ settings_search()
 
   for _path in "${paths[@]}"
   do # Print existing paths.
-    if paths exist "${_path}" && ! files are empty "${_path}/${setting}"
+#    if paths exist "${_path}" && ! files are empty "${_path}/${setting}"
+    if [[ -d "${_path}" &&  -f "${_path}/${setting}" && -s "${_path}/${setting}" ]]
     then
       printf "${_path}/${setting}\n"
     fi

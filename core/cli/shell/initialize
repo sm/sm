@@ -8,8 +8,8 @@ true \
   "${package_name:=${extension}}" \
   "${repository_url:="git://github.com/sm/bdsm"}"
 
-[[ -n "$extensions_url" ]] || read_config cli defaults extensions_url
-[[ -n "$releases_url"   ]] || read_config sm  defaults releases_url
+[[ -n "$extensions_url" ]] || read_config sm defaults extensions_url
+[[ -n "$releases_url"   ]] || read_config sm defaults releases_url
 
 true \
   ${remote:="origin"} \
