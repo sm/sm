@@ -1,13 +1,15 @@
 # SM Framework Extension Development Notes
 
+## Requirements
+
 SM Framework Extensions must:
 
   Never rely on or use SM Framework internal functions.
 
-  Use as many api's as they can to get the job done thereby taking advantage of
-  all of the carefully thought out checks provided by the core APIs
+  Use as many api's as possible to get the job done. This takes advantage of the
+  carefully thought out checks provided by the core APIs
 
-## Single Extensions (one)
+## Distributing Single Extensions (one)
 
 Single extensions are stored, packaged and distributed with the following format:
 
@@ -30,7 +32,7 @@ then use the deploy extension:
     user$ sm deploy
 
 
-## Sets of Extensions (many)
+## Distributing Sets of Extensions (many)
 
 Sets of extensions (many) Single extensions are stored, packaged and distributed with the following format:
 
@@ -54,4 +56,17 @@ run, a user may then use any of the extensions provided within the set:
 
     root# sm nginx install
     root# sm nginx start
+
+## Extension Basics
+
+Fundamentially an extension is nothing more than a namespaced collection
+(directory) of binary files and/or shell scripts with the ability to map cli
+routes directly to shell functions (map).
+
+### Actions
+
+### Mapped Actions
+
+### Config
+
 

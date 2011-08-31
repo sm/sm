@@ -1,5 +1,7 @@
 # SM Framework Core Development Notes/Rules
 
+## Requirements
+
 SM Framework Core APIs must:
 
   Validate every possible input combination

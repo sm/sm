@@ -1,12 +1,14 @@
 # SM Framework Core Development Notes/Rules
 
+## Requirements
+
 SM Framework Core must:
 
   Never rely on functions which contain argument parsing (example: public api)
 
   Validate only input which does not come from within the core system
 
-  Only call internal functions ( _\_sm... )
+  Only call internal functions
 
   Use shell primitives everywhere possible unless very good reasons not to are
   stated in comments around where it is not done.
