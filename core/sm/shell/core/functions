@@ -4,11 +4,7 @@
 # SM Framework Core Module ~ Core (core)
 #
 
-# Examples
-#
-#     user$ sm_exports
-#
-sm_exports()
+__sm.exports()
 { # TODO: Filter this list of exports down.
   export sm_path modules_path action archives_path branch config_path database database_name debug_flag environment error_message extension extension_action extension_args extension_bin_path extension_config_path extension_modules_path extension_path extension_templates_path flags framework head_flag hooks_flag keep_releases old_releases parse_break paths previous_path project project_path release_path remote repository result revision shared_path src_path templates_path timestamp tmp_path trace_flag user extension_log_path packages_path
 }

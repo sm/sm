@@ -127,7 +127,7 @@ then # custom compilations + g*
 fi
 
 # Ensure that any variables you wish export to extensions actually *are* exported.
-sm_exports
+__sm.exports
 
 if [[ -n $sm_script ]]
 then

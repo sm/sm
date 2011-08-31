@@ -184,5 +184,5 @@ __sm.extensions.action()
   extension_bin_path=${extension_bin_path}
   extension_log_path=${extension_log_path}"
 
-  sm_exports
+  __sm.exports
 }
