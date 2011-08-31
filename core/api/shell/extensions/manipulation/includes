@@ -1,3 +1,1 @@
-api/variables
-api/filesystem
-api/extensions/common
+internal/extensions/manipulation

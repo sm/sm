@@ -1,2 +1,2 @@
-api/extensions/common
-api/extensions/cache
+internal/extensions/common
+internal/extensions/cache

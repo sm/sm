@@ -2,7 +2,10 @@
 
 __sm.cache.map.add()
 {
-  __sm.string.contains "$1" "${_actions_cache[*]}" || _actions_cache+=( "$1" )
+  if ! __sm.string.contains "$1" "${_actions_cache[*]}"
+  then
+    _actions_cache+=( "$1" )
+  fi
 }
 
 # Step 1 collect direct filesystem mapping

@@ -73,7 +73,7 @@ __sm.extensions.modules.include()
   local _token _namespace=""
 
   module_name="${extension}"
-  modules include "$module_name"
+  __sm.module.include "$module_name"
 
   while (( $# > 0 ))
   do
@@ -81,7 +81,7 @@ __sm.extensions.modules.include()
     shift
 
     module_name="${extension}${_namespace}"
-    modules include "$module_name" || true
+    __sm.module.include "$module_name" || true
   done
 }
 
@@ -107,7 +107,7 @@ __sm.extensions.action.prerequisites()
 
   for _name in ${_pre[@]}
   do
-    if command exists "${_name}"
+    if __sm.command.exists "${_name}"
     then
       "${_name}" "${extension_args[@]}"
     fi

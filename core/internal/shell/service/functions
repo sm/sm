@@ -83,9 +83,9 @@ ext_service_initialize()
 
   if variable_is_empty service_binary
   then
-    if command exists ${service}
+    if __sm.command.exists ${service}
     then
-      service_binary="$(command -v ${service})"
+      service_binary="$(__sm.command.full.name ${service})"
     fi
   fi
 
@@ -183,7 +183,7 @@ service_setup()
     fi
   done
 
-  ! command exists "${service}_service_setup" || "${service}_service_setup"
+  ! __sm.command.exists "${service}_service_setup" || "${service}_service_setup"
 
   service_install_init_d "${service}"
 }
@@ -202,7 +202,7 @@ service_start()
 
   [[ -n "${service}" ]] || fail "To start a service, you must set the 'service' variable."
 
-  if command exists "${service}_start"
+  if __sm.command.exists "${service}_start"
   then
     log_step "Starting ${service}..." "${service}_start"
   else
@@ -215,7 +215,7 @@ service_stop()
   variable_is_nonempty service ||
     fail "To start a service, you must set the 'service' variable."
 
-  if command exists "${service}_stop"
+  if __sm.command.exists "${service}_stop"
   then
     log_step "Stopping ${service}..." "${service}_stop"
   else
@@ -230,7 +230,7 @@ service_reload()
   variable_is_nonempty service ||
     fail "To start a service, you must set the 'service' variable."
 
-  if command exists "${service}_reload"
+  if __sm.command.exists "${service}_reload"
   then
     "${service}_reload"
   else
@@ -245,7 +245,7 @@ service_restart()
   variable_is_nonempty service ||
     fail "To start a service, you must set the 'service' variable."
 
-  if command exists "${service}_restart"
+  if __sm.command.exists "${service}_restart"
   then
     log_step "Restarting ${service}..." "${service}_restart"
   else
@@ -255,7 +255,7 @@ service_restart()
 
 service_init_restart()
 {
-  if command exists "${service}_restart"
+  if __sm.command.exists "${service}_restart"
   then
     log_step "Restarting ${service}..." "${service}_restart"
   else
@@ -272,7 +272,7 @@ service_status()
   variable_is_nonempty service ||
     fail "To start a service, you must set the 'service' variable."
 
-  if command exists "${service}_status"
+  if __sm.command.exists "${service}_status"
   then
     "${service}_status"
   else
@@ -287,7 +287,7 @@ service_logtail()
   variable_is_nonempty service ||
     fail "To start a service, you must set the 'service' variable."
 
-  if command exists "${service}_logtail"
+  if __sm.command.exists "${service}_logtail"
   then
     "${service}_logtail"
   else
@@ -302,7 +302,7 @@ service_info()
   [[ -n "${service}" ]] ||
     fail "In order to get info on a service, the 'service' variable must be set."
 
-  if command exists "${service}_info"
+  if __sm.command.exists "${service}_info"
   then
     "${service}_info"
   else
@@ -317,7 +317,7 @@ service_configcheck()
   variable_is_nonempty service ||
     fail "To configcheck a service, the 'service' variable must be set."
 
-  if command exists "${service}_configcheck"
+  if __sm.command.exists "${service}_configcheck"
   then
     "${service}_configcheck"
   else
@@ -516,7 +516,7 @@ service_init_start()
       error "${service} failed to start."
     fi
   else
-    if command run as "${service_user}" "${_command[*]}"
+    if __sm.command.run.as "${service_user}" "" "${_command[*]}"
     then
       succeed "${service} successfully started."
     else
@@ -532,7 +532,7 @@ service_init_stop()
 {
   (( service_pid > 0 )) || error "Service pid has not been set, or is zero."
   log_step "Stopping ${service}..."
-  if command exists "${service}_stop"
+  if __sm.command.exists "${service}_stop"
   then
     "${service}_stop"
   else
@@ -573,7 +573,7 @@ service_init_status()
       error "failed check status of ${service}."
     fi
   else
-    if command run as "${service_user}" "${_command[*]}"
+    if __sm.command.run.as "${service_user}" "" "${_command[*]}"
     then
       touch "$service_pid_file"
       succeed
@@ -599,7 +599,7 @@ service_init_reload()
     _command+=("${service_flags[@]}")
   fi
 
-  if command run as "${service_user}" "${_command[*]}"
+  if __sm.command.run.as "${service_user}" "" "${_command[*]}"
   then
     touch "$service_pid_file"
   else
@@ -651,7 +651,7 @@ service_init_action()
 
   service_load_conf_d
 
-  if command exists "${service}_${action}"
+  if __sm.command.exists "${service}_${action}"
   then
     "${service}_${action}"
   else
@@ -698,15 +698,15 @@ service_deactivate()
       then
         true # TODO: launchctl
 
-      elif command exists rc-update
+      elif __sm.command.exists rc-update
       then
         rc-update add ${service} default
 
-      elif command exists chkconfig
+      elif __sm.command.exists chkconfig
       then
         chkconfig ${service} on
 
-      #elif command exists svc
+      #elif __sm.command.exists svc
       #then
       #  svc ${service} on # TODO: daemontools start on boot
 
@@ -757,15 +757,15 @@ service_activate()
       then
         if user is root
         then # Add service to system startup
-          if command exists rc-update
+          if __sm.command.exists rc-update
           then
             rc-update remove ${service} default
 
-          elif command exists chkconfig
+          elif __sm.command.exists chkconfig
           then
             chkconfig ${service} off
 
-            #elif command exists svc
+            #elif __sm.command.exists svc
             #then
             #  svc ${service} off
             #  TODO: daemontools remove start on boot
@@ -814,7 +814,7 @@ service_status()
       log "    vsz: $(printf "$ps" | awk '{print $3}')"
     fi
 
-    if command exists lsof
+    if __sm.command.exists lsof
     then
       local cwd= binary= libraries=() tcp_ports=() udp_ports=() sockets=() \
         logs=() string
@@ -898,7 +898,7 @@ service_status()
     log "  status: not running."
   fi
 
-  if command exists "${service}_status"
+  if __sm.command.exists "${service}_status"
   then # Run the service specific status function, if it exists
     "${service}_status"
   fi

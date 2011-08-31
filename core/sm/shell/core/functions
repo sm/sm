@@ -78,7 +78,7 @@ then
     # If a function named 'command_missing' is defined then call it with the
     # parameters of the unknown command and name otherwise call
     # 'command_not_found' for default behavior.
-    if command -v command_missing
+    if builtin command -v command_missing
     then
       command_missing "$@"
     else

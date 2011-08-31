@@ -5,10 +5,10 @@ __sm.os.open()
   local _uri="${1:-}"
   shift || fail "Cannot open URI; No uri was given."
 
-  if command exists open
+  if __sm.command.exists open
   then
     open "${_uri}"
-  elif command exists xdg-open
+  elif __sm.command.exists xdg-open
   then
     xdg-open "${_uri}"
   else

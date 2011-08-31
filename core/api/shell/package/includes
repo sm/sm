@@ -1,4 +1,5 @@
 internal/package
+api/command
 api/environment
 api/extensions/manipulation
 api/filesystem

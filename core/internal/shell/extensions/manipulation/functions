@@ -1,34 +1,5 @@
 #!/bin/sh
 
-#
-# ## extension\_version()
-#
-# Outputs the named extension's version.
-#
-# ### Input Parameters
-#
-# First parameter must be the name of an extension.
-#
-# ### Stream Outputs
-#
-# The version string for the named extension.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if the extension name is not given.
-#
-# ### Usage Examples
-#
-#     user$ extension_version
-#
 extension_version()
 {
   local _extension="${1:-}"
@@ -46,31 +17,6 @@ extension_version()
   log "${extension}-${extension_version}"
 }
 
-#
-# ## extension\_licence()
-#
-# Emits the extension's license file, if it exists.
-#
-# ### Input Parameters
-#
-# First parameter may optionally be an extension name.
-#
-# ### Stream Outputs
-#
-# If the extension has a LICENSE file, then it will be printed to STDOUT.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# No failure scenarios currently exist.
-#
 # ### Usage Examples
 #
 #     $ cat $HOME/test
@@ -96,14 +42,12 @@ extension_license()
 {
   local _extension="${1:-${extension}}"
 
-  variable_is_nonempty _extension ||
-    fail "Cannot display extension license;"\
+  [[ -n "${_extension}" ]] || fail "Cannot display extension license;"\
     " Extension name was not given."
 
   cat -v "${extensions_path}/${_extension}/LICENSE"
 }
 
-#
 # ### Usage Examples
 #
 #      $ cat $HOME/test
@@ -139,33 +83,6 @@ __sm.extensions.actions()
   echo "${_actions[@]}"
 }
 
-#
-# ## extension\_install()
-#
-# Installs the given external extension.
-#
-# ### Input Parameters
-#
-# First parameter is the name of the extension to install.
-# Second parameter is the src_path of the extension to install.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# The named extension will be installed to the filesystem in the BDSM
-# external extension directory.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if no extension are passed in to install.
-#
 # ### Usage Examples
 #
 #     user$ __sm.extensions.install backup mpapis_sm_backup
@@ -193,8 +110,7 @@ __sm.extensions.install()
     from "${extensions_src_path}/${_src}" \
     to "${sm_path}/exts/${_extension}"
 
-  files write string  "${extension_uri}" \
-    to "${sm_path}/exts/${_extension}/.uri"
+  files write string "${extension_uri}" to "${sm_path}/exts/${_extension}/.uri"
 
   #
   # TODO: Process extension dependencies...

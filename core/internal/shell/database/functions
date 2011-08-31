@@ -71,12 +71,12 @@ database_setup()
       data_path "${data_path}"
   fi
 
-  if command exists "${extension}_database_setup"
+  if __sm.command.exists "${extension}_database_setup"
   then
     "${extension}_database_setup"
   fi
 
-  if command exists "${extension}_initialize"
+  if __sm.command.exists "${extension}_initialize"
   then
     "${extension}_initialize"
   fi

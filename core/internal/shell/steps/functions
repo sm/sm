@@ -19,14 +19,14 @@ step()
 
   start_step "$name"
 
-  if command exists before_step
+  if __sm.command.exists before_step
   then
     before_step "$name" "$@"
   fi
 
   "$name" "$@"
 
-  if command exists after_step
+  if __sm.command.exists after_step
   then
     after_step "$name" "$@"
   fi
@@ -52,12 +52,12 @@ retreat()
   while [[ -n "${steps_started}" ]]
   do
     array pop steps_started step
-    if command exists "fail_${step}"
+    if __sm.command.exists "fail_${step}"
     then
       "fail_${step}"
     fi
 
-    if command exists after_step
+    if __sm.command.exists after_step
     then
       after_step "fail_${step}"
     fi
