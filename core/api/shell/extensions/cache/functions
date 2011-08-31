@@ -1,8 +1,11 @@
 #!/bin/sh
 
-actions_cache_add()
+__sm.cache.map.add()
 {
-  __sm.string.contains "$1" "${_actions_cache[*]}" || _actions_cache+=( "$1" )
+  if ! __sm.string.contains "$1" "${_actions_cache[*]}"
+  then
+    _actions_cache+=( "$1" )
+  fi
 }
 
 # Step 1 collect direct filesystem mapping
@@ -28,7 +31,7 @@ __sm.cache.map.filesystem.initialize()
         (.*) continue ;;
       esac
 
-      actions_cache_add "${_action_path}=${_action_path}"
+      __sm.cache.map.add "${_action_path}=${_action_path}"
     done
   fi
 }
@@ -41,7 +44,7 @@ __sm.cache.map.actions.initialize()
   if [[ -f "${_map}" ]]
   then
     for _mapping in $( grep -v "^#" < "${_map}" || true )
-    do actions_cache_add "${_mapping}"
+    do __sm.cache.map.add "${_mapping}"
     done
   fi
 }
@@ -90,7 +93,7 @@ __sm.cache.map.modules.initialize()
         do
           if [[ "${_action_pair}" == [[:alpha:]]* ]]
           then
-            actions_cache_add "${_module_name:+${_module_name}/}${_action_pair/=*}=${_module_name:+${_module_name}/}${_action_pair/*=}"
+            __sm.cache.map.add "${_module_name:+${_module_name}/}${_action_pair/=*}=${_module_name:+${_module_name}/}${_action_pair/*=}"
           fi
         done < "${module_path}/actions"
       fi
