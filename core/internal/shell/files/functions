@@ -261,7 +261,7 @@ __sm.files.hash()
     *)
       if [[ -z "${value}" ]]
       then
-        awk -F= '/^'"${_key}"'=/{print $2}' "${_file}"
+        awk '/^'"${_key}"'=/ {gsub("'"${_key}"'=",""); print $0}' "${_file}"
       else
         if ! awk -F= "/^'"${_key}"'=/{print $2}" "${_file}" >/dev/null 2>&1
         then
