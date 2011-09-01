@@ -25,14 +25,9 @@ package()
       (configure)
         _command=configure
         case "$1" in
-          (flag)
+          (flag|flags)
             _subcommand="$1"
             shift
-            ;;
-          (flags)
-            _subcommand="$1"
-            shift
-            break
             ;;
           (*)
             fail "Unknown configure param '$1'."
