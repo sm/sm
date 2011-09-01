@@ -3,7 +3,7 @@
 #
 # Initializes paths and environment for the logical concept of a 'project'.
 #
-api_project_initialize()
+internal_project_initialize()
 {
   # TODO: Read project and project_path from defaults file first.
   if user is root
