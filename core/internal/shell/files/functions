@@ -304,6 +304,16 @@ __sm.files.exist()
   [[ -f "${_file}" ]]
 }
 
+__sm.files.exists()
+{
+  local _file
+  for _file in "$@"
+  do
+    [[ -f "${_file}" ]] || return 1
+  done
+  return 0
+}
+
 __sm.files.contain()
 {
   local _string="$1" _regex="$2"
