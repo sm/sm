@@ -9,3 +9,21 @@ __sm.string.contains.key()
 {
   [[ " $2 " =~ " $1=" ]]
 }
+
+__sm.string.ematch()
+{
+  local _value="$1" _regex="$2" _result
+
+  # Use grep for extended regexp.
+  echo "${_value}" | grep -qE "${_regex}"
+  _result=$?
+  case ${result} in
+    0|1)
+      # 0 & 1 are correct results.
+      return ${_result}
+      ;;
+    *)
+      fail "grep returned unknown error code: $result"
+      ;;
+  esac
+}

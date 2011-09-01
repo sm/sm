@@ -1,0 +1,43 @@
+#!/bin/sh
+
+__sm.services.available()
+services_avilable()
+{
+  __sm.extensions.installed module "api/service" "$@"
+}
+
+__sm.services.list()
+services_list()
+{
+  local _action="${1:-}" _args
+
+  shift || true
+
+  case "${_action}" in
+    (active)
+      services_active "$@"
+      ;;
+
+    (available)
+      services_available "$@"
+      ;;
+
+    (installed|*)
+      services_installed "$@"
+      ;;
+  esac
+}
+
+__sm.services.installed()
+services_installed()
+{
+  # Notify that the services_installed() function has not yet been implemented.
+  NIY "Installed services has not yet been implemented."
+}
+
+__sm.services.available()
+services_available()
+{
+  # Notify that the services_available() function has not yet been implemented.
+  NIY "Installed services has not yet been implemented."
+}

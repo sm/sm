@@ -32,10 +32,10 @@ date()
         shift || fail "end must follow keyword 'end'"
         ;;
       (*)
-        if variable_is_empty _start
+        if [[ -z "${_start}" ]]
         then
           _start="${_token}"
-        elif variable_is_empty _end
+        elif [[ -z "${_end}" ]]
         then
           _end="${_token}"
         else

@@ -31,10 +31,10 @@ do
 done
 
 # Sanity checks.
-variable_is_nonempty _source ||
+[[ -n "${_source}" ]] ||
   error "clone: A source extension name must be specified."
 
-variable_is_nonempty _target ||
+[[ -n "${_target}" ]] ||
   error "clone: A target extension name must be specified."
 
 extension_is_installed "${_source}" ||

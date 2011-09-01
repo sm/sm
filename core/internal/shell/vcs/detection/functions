@@ -57,7 +57,7 @@ is_github_uri()
   local _uri="${1:-}"
   shift || fail "uri must be given as first parameter."
 
-  if ematch "${_uri}" "^[[:alnum:]_-]+\/[[:alnum:]_-]+$"
+  if __sm.string.ematch "${_uri}" "^[[:alnum:]_-]+\/[[:alnum:]_-]+$"
   then
     if curl -s -f -I -L "https://github.com/${_uri}" >/dev/null 2>&1
     then

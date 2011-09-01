@@ -92,7 +92,7 @@ install_sm_scm()
 
   modules api/vcs
 
-  ematch "${repo}" "^[[:alnum:]_-]+\/[[:alnum:]_-]+$" || repo="${repo}/sm"
+  __sm.string.ematch "${repo}" "^[[:alnum:]_-]+\/[[:alnum:]_-]+$" || repo="${repo}/sm"
 
   # TODO: This should update to/from repos path and/or archives path...
   fetch_uri "${repo}" "${src_path}/${dir}"

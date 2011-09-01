@@ -4,10 +4,10 @@
 
 SM Framework Extensions must:
 
-  Never rely on or use SM Framework internal functions.
+Never rely on or use SM Framework internal functions.
 
-  Use as many api's as possible to get the job done. This takes advantage of the
-  carefully thought out checks provided by the core APIs
+Use as many api's as possible to get the job done. This takes advantage of the
+carefully thought out checks provided by the core APIs
 
 ## Distributing Single Extensions (one)
 
@@ -34,7 +34,8 @@ then use the deploy extension:
 
 ## Distributing Sets of Extensions (many)
 
-Sets of extensions (many) Single extensions are stored, packaged and distributed with the following format:
+Sets of extensions (many) Single extensions are stored, packaged and
+distributed with the following format:
 
     sm-{extension name}-{extension version}
 

@@ -31,7 +31,7 @@ NYI "sm update"
 #
 #  *)
 #    # TODO: Updates for released extensions instead of only from repository.
-#    if variable_is_nonempty extension_action
+#    if variables are nonempty extension_action
 #    then
 #      fetch_extensions_git_repository
 #      extensions_install "${extension_args[@]}"

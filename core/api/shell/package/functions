@@ -81,6 +81,9 @@ package()
       [[ -n "${_message}" ]] || fail "Message must be given for package error."
       __sm.package.error "${_params[@]}" "${_log}" "${_lines}"
       ;;
+    (cli)
+      package_cli
+      ;;
     (*)
       fail "Unknown package command '${_token}'"
   esac
@@ -601,8 +604,15 @@ package_setup()
 
   package_profile_d "${_package}"
 
-  ! __sm.module.is.loaded "service"  || service_setup "${_package}"
-  ! __sm.module.is.loaded "database" || database_setup "${_package}"
+  if  __sm.module.is.loaded "service"
+  then
+    __sm.service.setup "${_package}"
+  fi
+
+  if __sm.module.is.loaded "database"
+  then
+    __sm.database.setup "${_package}"
+  fi
 }
 
 package_deactivate()

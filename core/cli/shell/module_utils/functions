@@ -200,7 +200,7 @@ module_docs()
     esac
   done
 
-  variable_is_nonempty _module ||
+  variables are nonempty _module ||
     fail "Cannot glean documentation for a module; no module name given."
 
   command exists shocco ||
@@ -260,7 +260,7 @@ modules_docgen()
   local _prefix="${core_development_path}/html/shell"
   local _path="${site_development_path}"
 
-  if variable_is_nonempty core_development_path
+  if [[ -n "${core_development_path}" ]]
   then
     paths exists "${core_development_path}" ||
     error "Set core_development_path in ~/.smrc, and clone the sm core "\
@@ -313,7 +313,7 @@ modules_docopen()
 {
   # TODO: Replace with,
   # for file in modules/*/functions ; do (name=${file%%\/functions}; shocco $file > html/${name//*\/}.html)& done ; wait
-  variable_is_nonempty core_development_path &&
+  variables are nonempty core_development_path &&
     paths exists "${core_development_path}" ||
     error "To run docopen, set core_development_path in ~/.smrc, and clone the sm core "\
     "repository into it."

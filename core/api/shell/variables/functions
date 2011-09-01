@@ -1,410 +1,45 @@
 #!/bin/sh
 
-# TODO: Rework this into a 1.0.0 module API
-
-#
-# ## first()
-#
-# Returns the first parameter.
-#
-# ### Input Parameters
-#
-# One or more parameters.
-#
-# ### Stream Outputs
-#
-# Prints the first positional parameter to STDOUT of the calling environment.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if no parameters are passed.
-#
-# ### Usage Examples
-#
-#     user$ first one two three
-#     one
-#
-#     user$ array=($(ls $HOME))
-#     user$ first ${array[@]}
-#     Desktop
-#
-first()
+variables()
 {
   trace_filter variables
-  local _array=("$@")
-  shift  || fail "No parameters given; cannot return the first one."
 
-  printf "%s" "${_array[${__sm_array_start}]}"
-}
+  local _token _command _variables=()
 
-#
-# ## last()
-#
-# Returns the last parameter.
-#
-# ### Input Parameters
-#
-# One or more parameters.
-#
-# ### Stream Outputs
-#
-# Prints the last positional parameter to STDOUT of the calling environment.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if no parameters are passed.
-#
-# ### Usage Examples
-#
-#     user$ last one two three
-#     one
-#
-#     user$ array=($(ls $HOME))
-#     user$ last ${array[@]}
-#     tmp
-#
-last()
-{
-  trace_filter variables
-  local _array=("$@")
-  shift || fail "No parameters given; cannot return the last one."
+  while (( $# ))
+  do
+    _token="$1" && shift
+    case "${_token}" in
+      (are)
+        _command=are
+        _subcommand="$1"
+        shift || fail "A command must follow keyword 'are' <epty|nonempty>"
+        ;;
+      (*)
+        if [[ -z "${_command}" ]]
+        then
+          _command="${_token}"
+        else
+          _variables+=("${_token}")
+        fi
+    esac
+  done
 
-  printf "%s" "${_array[$((${#_array[@]} - 1))]}"
-}
-
-#
-# ## match()
-#
-# Tests to see if a value matches a given regex (shell extended glob pattern).
-#
-# ### Input Parameters
-#
-# Positional Parameter value and regexp.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 if the value matches the regex (shell extended glob pattern).
-# 1 if the value does not match the regex (shell extended glob pattern).
-#
-# ### Failure Scenarios
-#
-# Fails if no value is given.
-# Fails if no regex is given.
-#
-# ### Usage Examples
-#
-#     user$ match "The quick brown fox jumped over the lazy dog." "*fox*"
-#     user$ echo $?
-#     0
-#
-#     user$ match "The quick brown fox jumped over the lazy dog." "*smurf*"
-#     user$ echo $?
-#     1
-#
-match()
-{
-  trace_filter variables
-  local _value="${1:-}"
-  shift || fail "A value and regex must be specified in order to match."
-
-  local _regex="${1:-}"
-  shift || fail "A regex must be specified in order to match ${_value} against it."
-
-  # Ensure that extended shell globbing (bash) is turned on.
-  shopt -s extglob
-  # Use a case statement for pattern matching the regex against the value.
-  # If the value matches the given regex pattern then return true, 0.
-  # Otherwise the value does not match the given regex pattern,
-  # so return false, 1.
-  case "${_value}" in
-    (${_regex})
-      return 0
+  # TODO: Think through variables more...
+  case "${_command}" in
+    (are)
+      case "${_subcommand}" in
+        (empty|nonempty)
+          __sm.variables.are.${_subcommand} "${_variables}"
+          ;;
+        (*)
+          fail "A valid command must follow keyword 'are' <empty|nonempty>"
+          ;;
+      esac
       ;;
     (*)
-      return 1
+      fail "Unknown variables command '${_command}'"
       ;;
   esac
-}
-
-#
-# ## ematch()
-#
-# Tests to see if a value matches a given extended regex.
-#
-# ### Input Parameters
-#
-# Positional Parameter value and regexp.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 if the value matches the regex (shell extended glob pattern).
-# 1 if the value does not match the regex (shell extended glob pattern).
-#
-# ### Failure Scenarios
-#
-# Fails if no value is given.
-# Fails if no regex is given.
-#
-# ### Usage Examples
-#
-#     user$ ematch "The quick brown fox jumped over the lazy dog." "fox.*jumped"
-#     user$ echo $?
-#     0
-#
-#     user$ ematch "The quick brown fox jumped over the lazy dog." "^fox"
-#     user$ echo $?
-#     1
-#
-ematch()
-{
-  trace_filter variables
-  local _value="${1:-}"
-  shift || fail "A value and regex must be specified in order to match."
-
-  local _regex="${1:-}"
-  shift || fail "A regex must be specified in order to match ${_value} against it."
-
-  # Use grep for extended regexp.
-  echo "${_value}" | grep -qE "${_regex}"
-  local result=$?
-  case $result in
-    0|1)
-      # 0 & 1 are correct results.
-      return $result
-      ;;
-    *)
-      # Any other result means an error in grep.
-      fail "grep returned unknown code: $result"
-      ;;
-  esac
-}
-
-#
-# ## variables_must_be_nonempty()
-#
-# Halts the program with a fail message if any of the named variables are empty
-# or undefined.
-#
-# ### Input Parameters
-#
-# One or more parameters specifying the names of variables.
-#
-# ### Stream Outputs
-#
-# None if all are [are what??].
-#
-# ### Environmental effects
-#
-# What, if any, environmental side effects this function causes. 'None.' for none.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if no variable names were given.
-# Fails if any of the named variables are empty.
-#
-# ### Usage Examples
-#
-#     user$ cat test
-#     #!/bin/sm
-#     modules api/trace api/variables # Load the trace module.
-#     unset HOME
-#     variables_must_be_nonempty HOME
-#
-#     user$ $PWD/test
-#     ERROR: Required variable 'HOME' is not set.
-#     ERROR: A command has returned an unhandled error code (nonzero return value).
-#     Backtrace:
-#        Trace   Line Function             File
-#           3.     37 fail()               /sm/extensions/builtin/core/shell/logging/functions
-#           2.    192 variables_must_be_nonempty() /sm/extensions/builtin/core/shell/variables/functions
-#           1.      6 main()               /Users/sm/test
-#      > modules/logging/functions fail() 38 $ exit 1
-#
-variables_must_be_nonempty()
-{
-  trace_filter variables
-  local _variable _variables=("$@")
-  shift || fail "Cannot ensure variables are nonempty; No variables were given."
-
-  for _variable in "${_variables}"
-  do
-    variable_is_nonempty "${_variable}" ||
-      fail "Required variable '$_variable' is not set."
-  done
-}
-
-#
-# ## variable_is_nonempty()
-#
-# Test to see if a variable is empty.
-#
-# ### Input Parameters
-#
-# First parameter is a string containing a variable name.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if no variable name was given as the first argument.
-#
-# ### Usage Examples
-#
-#     user$ variable_is_nonempty asdf
-#     user$ echo $?
-#     1
-#
-#     user$ asdf="w00t! "
-#     user$ variable_is_nonempty asdf
-#     user$ echo $?
-#     0
-#
-variable_is_nonempty()
-{
-  trace_filter variables
-  local _variable="${1:-}"
-  shift || fail "Cannot check if variable is nonempty; no variable was given."
-
-  eval "[[ -n \"\${${_variable}:-}\" ]]"
-}
-
-#
-# ## variable_is_empty()
-#
-# Test to see if a variable is empty.
-#
-# ### Input Parameters
-#
-# First parameter is a string containing a variable name.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if no variable name was given as the first argument.
-#
-# ### Usage Examples
-#
-#     user$ variable_is_empty asdf
-#     user$ echo $?
-#     1
-#
-#     user$ asdf="w00t! "
-#     user$ variable_is_empty asdf
-#     user$ echo $?
-#     0
-#
-variable_is_empty()
-{
-  trace_filter variables
-  local _variable="${1:-}"
-  shift || fail "Cannot check if variable is empty, as no variable was given."
-  eval "[[ -z \"\${${_variable}:-}\" ]]"
-}
-
-#
-# ## variables_are_nonempty()
-#
-# Test to see if any of a given list of variables are empty.
-#
-# ### Input Parameters
-#
-# First parameter is a string containing a variable name.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 if all variables given are nonempty.
-# 1 if any variable given is nonempty.
-#
-# ### Failure Scenarios
-#
-# Fails if no variable names were given as arguments.
-#
-# ### Usage Examples
-#
-#     user$ variables_are_nonempty BASH_VERSION asdf
-#     user$ echo $?
-#     1
-#
-#     user$ asdf="w00t! "
-#     user$ variables_are_nonempty BASH_VERSION asdf
-#     user$ echo $?
-#     0
-#
-variables_are_nonempty()
-{
-  trace_filter variables
-  local _variable _variables=("$@")
-  shift || fail "Cannot check if variables are nonempty; No variables were given."
-
-  for _variable in "${_variables}"
-  do
-    eval "[[ -n \"\${${_variable}:-}\" ]]" || return 1
-  done
-  return 0
 }
 
