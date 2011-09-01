@@ -8,10 +8,10 @@ internal_project_initialize()
   # TODO: Read project and project_path from defaults file first.
   if user is root
   then
-    true "${project:="$USER"}" "${project_path:="$HOME"}"
-  else
     # TODO: When run as root, we must ensure that project and project_path are set.
-    true
+    false
+  else
+    true "${project:="$USER"}" "${project_path:="$HOME"}"
   fi
 
   export project environment project_path shared previous_path release_path \
