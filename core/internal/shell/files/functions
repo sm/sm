@@ -23,13 +23,28 @@ __sm.files.source()
 __sm.files.nonempty()
 {
   local _file _files=("$@")
-  shift || fail "Cannot return nonempty files; No files were given."
-
-  _file=${_file/\~\//$HOME\/} # Expand ~/ to full value of $HOME
 
   for _file in "${_files[@]}"
   do
-    file_is_nempty "${_file}" || printf "${_file}\n"
+    _file=${_file/\~\//$HOME\/} # Expand ~/ to full value of $HOME
+    if [[ -s "${_file}" ]]
+    then
+      printf "${_file}\n"
+    fi
+  done
+}
+
+__sm.files.empty()
+{
+  local _file _files=("$@")
+
+  for _file in "${_files[@]}"
+  do
+    _file=${_file/\~\//$HOME\/} # Expand ~/ to full value of $HOME
+    if [[ -f "${_file}" && ! -s "${_file}" ]]
+    then
+      printf "${_file}\n"
+    fi
   done
 }
 
@@ -287,12 +302,6 @@ __sm.files.exist()
 {
   local _file="$1"
   [[ -f "${_file}" ]]
-}
-
-__sm.files.are.empty()
-{
-  local _file="$1"
-  [[ -f "${_file}" && ! -s "${_file}" ]]
 }
 
 __sm.files.contain()

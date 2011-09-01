@@ -517,13 +517,17 @@ package_configure()
 {
   local _command
 
+  command exists gcc || command exists cc || fail "No C compiler found."
+
   if [[ -n "${configure_command}" ]]
   then
     _command="${configure_command}"
   else
     export PREFIX="${install_base_path}/${package_version}"
 
-    package configure flag key --prefix "${install_path}"
+    # package configure flag key --prefix "${install_path}"
+    __sm.package.configure.flag "--prefix" "${install_path}"
+
     _command="./configure ${configure_flags[*]}"
 
     [[ -x "${_command%% *}" ]] || return 0

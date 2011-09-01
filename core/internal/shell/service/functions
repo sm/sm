@@ -94,10 +94,9 @@ __sm.service.initialize()
 
   export service_paths service_actions service_flags
 
-  if file is empty "${service_pid_file}"
+  service_pid=0
+  if files exist "${service_pid_file}" && files are nonempty "${service_pid_file}"
   then
-    service_pid=0
-  else
     read -r service_pid < "${service_pid_file}"
   fi
 
@@ -172,8 +171,10 @@ __sm.service.start()
 
 __sm.service.stop()
 {
-  variables are nonempty service ||
+  if variables are empty service
+  then
     fail "To start a service, you must set the 'service' variable."
+  fi
 
   if __sm.command.exists "${service}_stop"
   then
@@ -367,7 +368,7 @@ __sm.service.pid()
 
   paths create "${_path}"
 
-  if ! file is empty "${_path}/${service}.pid"
+  if ! files are empty "${_path}/${service}.pid"
   then
     read -r _pid < "${_path}/${service}.pid"
     if os is linux
@@ -721,6 +722,7 @@ __sm.service.activate()
         if files exist "/etc/rc.local"
         then
           if ! files contain string "${service} start" "/etc/rc.local"
+          then
             # TODO: change this to use replace_content
             sed -i -e "d#${init_scripts_path}/${service} start#" /etc/rc.local
           fi

@@ -25,7 +25,7 @@ files()
         _subcommand="$1"
         shift
         case "${_subcommand}" in
-          (empty|executable|missing|symlinks)
+          (empty|nonempty|executable|missing|symlinks)
             continue
             ;;
           (*)
@@ -143,7 +143,7 @@ files()
       if __sm.files.${_command} "${_string}" "${_regex}" "${_files[@]}"
       then return 0 ; else return 1 ; fi
       ;;
-    (open|md5|enter|join|expand|search|within|in|source|nonempty|exist|exists|remove|create)
+    (open|md5|enter|join|expand|search|within|in|source|empty|nonempty|exist|exists|remove|create)
       [[ -n "${_files}" ]] || fail "files must be given for 'files ${_command}'."
       if __sm.files.${_command} "${_files[@]}"
       then return 0 ; else return 1 ; fi

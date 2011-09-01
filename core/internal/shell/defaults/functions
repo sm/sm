@@ -97,7 +97,7 @@ read_config()
 
   for _file in  $( settings_search ${_extension} "${_config_file}" )
   do
-    if ! file is empty "${_file}"
+    if ! files are empty "${_file}"
     then
       _temp="$(hash file read key "${key}" from "${_file}")"
 
@@ -132,7 +132,7 @@ settings_search()
 
   for _path in "${paths[@]}"
   do # Print existing paths.
-    if paths exist "${_path}" && ! file is empty "${_path}/${setting}"
+    if paths exist "${_path}" && ! files are empty "${_path}/${setting}"
     then
       printf "${_path}/${setting}\n"
     fi
@@ -148,7 +148,7 @@ settings_search_path_update()
     return 0
   fi
 
-  if files exist "${path}/.uri" && ! file is empty "${_path}/.uri"
+  if files exist "${path}/.uri" && ! files are empty "${_path}/.uri"
   then
     read -r _uri < "${path}/.uri"
     fetch_uri "${_uri}" "${path}" >&2
