@@ -125,24 +125,17 @@ versionedfs()
       [[ -n "${_version}" ]] || _version="$(date +"%Y%m%d%H%M%S")"
       __sm.versionedfs.add "${_path}" "${_name}" "${_version}" "${_source}"
       ;;
-    (remove)
-      [[ -n "${_name}" ]]    || fail "Name must be given."
-      __sm.versionedfs.remove "${_path}" "${_name}" "${_version}"
-      ;;
     (activate)
       [[ -n "${_name}" && -n "${_version}" ]] ||
         fail "Name and Version must be given."
       __sm.versionedfs.activate "${_path}" "${_name}" "${_version}"
       ;;
-    (deactivate)
-      [[ -n "${_name}" ]]    || fail "Name must be given."
-      __sm.versionedfs.deactivate "${_path}" "${_name}" "${_version}"
+    (remove|deactivate)
+      [[ -n "${_name}" ]] || fail "Name must be given."
+      __sm.versionedfs.${_action} "${_path}" "${_name}" "${_version}"
       ;;
-    (versions)
-      __sm.versionedfs.list versions "${_path}" "${_name}" "${_version}"
-      ;;
-    (active)
-      __sm.versionedfs.list active "${_path}" "${_name}" "${_version}"
+    (versions|active)
+      __sm.versionedfs.list "${_action}" "${_path}" "${_name}" "${_version}"
       ;;
     (*)
       fail "Unknown versionedfs action '${_action}'"
