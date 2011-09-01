@@ -536,9 +536,9 @@ package_configure()
   debug package "package_configure: ${_command}"
 
   ${_command} > configure.log 2>&1 ||
-    package error \
-    message "Configuration of ${package_name} ${package_version} failed." \
-    log "configure.log"
+    __sm.package.error \
+    "Configuration of ${package_name} ${package_version} failed." \
+    "configure.log"
 }
 
 package_build()
