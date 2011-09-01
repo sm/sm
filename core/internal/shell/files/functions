@@ -9,7 +9,7 @@ __sm.files.source()
   do
     _file=${_file/\~\//$HOME\/} # Expand ~/ to full value of $HOME
 
-    if ! file is empty "${_file}"
+    if [[ -f  "${_file}" && -s  "${_file}" ]]
     then
       bash -n "${_file}" ||
         fail "Cannot source the file '${_file}'; Invalid syntax."
