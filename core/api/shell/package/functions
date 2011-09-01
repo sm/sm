@@ -531,7 +531,7 @@ package_configure()
     package configure flag key --prefix "${install_path}"
     _command="./configure ${configure_flags[*]}"
 
-    [[ -x "${configure}" ]] || return 0
+    [[ -x "${_command%% *}" ]] || return 0
   fi
 
   debug package "package_configure: ${_command}"
@@ -657,8 +657,10 @@ package_ldconfig()
   then
     if paths exist "/etc/ld.so.conf.d"
     then
-      files write string "${active_path}/lib\n" to "/etc/ld.so.conf.d/sm.conf"
-      chmod_files 0444 "/etc/ld.so.conf.d/sm.conf"
+      files write \
+        string "${active_path}/lib\n" \
+        to "/etc/ld.so.conf.d/sm.conf" \
+        mode 0444
     fi
 
     if [[ -d /selinux ]] && command exists restorecon
@@ -728,7 +730,7 @@ package_patch()
 
   for _path in "${_paths[@]}"
   do
-    path exists "${_path}" || continue # No patch path
+    paths exists "${_path}" || continue # No patch path
     shopt -s nullglob
     _patches=( "${_path}"/*.patch )
     shopt -u nullglob
