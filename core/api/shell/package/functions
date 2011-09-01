@@ -27,14 +27,15 @@ package()
         case "$1" in
           (flag)
             _subcommand="$1"
-            _params+=("$1")
+            shift
             ;;
           (flags)
             _subcommand="$1"
-            _params+=("$@")
+            shift
             break
             ;;
           (*)
+            fail "Unknown configure param '$1'."
             continue
             ;;
         esac

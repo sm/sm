@@ -98,9 +98,9 @@ __sm.package.configure.flag()
 {
   local _key="$1" _value="$2"
 
-  if ! __sm.string.contains "${_key}=" "${configure_keys[*]}"
+  if ! __sm.string.contains.key "${_key}" "${configure_flags[*]}"
   then
-    configure_keys+=( "${_key}=${_value}" )
+    configure_flags+=( "${_key}=${_value}" )
   fi
 }
 

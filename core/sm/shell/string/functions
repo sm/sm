@@ -4,3 +4,8 @@ __sm.string.contains()
 {
   [[ " $2 " =~ " $1 " ]]
 }
+
+__sm.string.contains.key()
+{
+  [[ " $2 " =~ " $1=" ]]
+}
