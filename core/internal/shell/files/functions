@@ -527,3 +527,30 @@ __sm.files.open()
   os open "${_files[@]}"
 }
 
+__sm.files.absolute.path()
+{
+  local _path _paths=("$@") _recorded_path=$PWD \
+    _amount=$# _index _file_name
+
+  for (( _index=0 ; _index < _amount ; _index++ ))
+  do
+    _path=${_paths[_index]}
+
+    if (( _index == _amount -1 ))
+    then
+      _file_name=$( basename ${_path} )
+      _path=$( dirname ${_path} )
+    fi
+
+    if [[ -d "${_path}" ]]
+    then
+      builtin cd "${_path}"
+    else
+      error "The given path '${_path}' is not a valid directory in the following list '$@'."
+    fi
+  done
+
+  printf "$( pwd )/${_file_name}\n"
+
+  builtin cd "${_recorded_path}"
+}

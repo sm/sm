@@ -34,6 +34,20 @@ files()
             ;;
         esac
         ;;
+      (absolute)
+        _command="absolute"
+        _subcommand="$1"
+        shift
+        case "${_subcommand}" in
+          (path)
+            continue
+            ;;
+          (*)
+            fail "Invalid command following keyword '${_command}';"\
+              "Usage: files '${_command}' <path>"
+            ;;
+        esac
+        ;;
       (sha)
         command -v shasum > /dev/null 2>&1 ||
           fail "shasum command missing, cannot use 'files sha'"
@@ -135,7 +149,7 @@ files()
   done
 
   case "${_command}" in
-    (are|sha)
+    (are|sha|absolute)
       if __sm.files.${_command}."${_subcommand}" "${_files[@]}"
       then return 0 ; else return 1 ; fi
       ;;
