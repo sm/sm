@@ -56,7 +56,7 @@ templates()
 #        then
 #          _target="${_token}"
         else
-          _params+=("${token}")
+          _params+=("${_token}")
         fi
         ;;
     esac
