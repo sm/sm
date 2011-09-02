@@ -225,7 +225,7 @@ __sm.paths.search()
   _paths=("$@")
 
   [[ -n "${_glob}" ]] || fail "'${_path}' is not a path!"
-  [[ -d "${_path}" ]]    || fail "'${_path}' is not a directory!"
+  [[ -d "${_path}" ]] || fail "'${_path}' is not a directory!"
 
   while read _line
   do
@@ -234,3 +234,21 @@ __sm.paths.search()
   done < <(paths in "${_path}")
 }
 
+__sm.paths.absolute()
+{
+  local _path _paths=("$@") _recorded_path=$PWD
+
+  for _path in "$@"
+  do
+    if [[ -d "${_path}" ]]
+    then
+      builtin cd "${_path}"
+    else
+      error "The given path '${_path}' is not a valid directory in the following list '$@'."
+    fi
+  done
+
+  pwd
+
+  builtin cd "${_recorded_path}"
+}

@@ -153,6 +153,10 @@ paths()
       [[ -n "${_target}" ]] || fail "Target must be given to copy (to y)."
       __sm.paths.copy "${_source}" "${_target}"
       ;;
+    (absolute)
+      [[ -n "${_paths}" ]] || fail "Path to expand must be given."
+      __sm.paths.absolute "${_paths[@]}"
+      ;;
     (*)
       fail "Unknown command for paths: '${_command}' "\
         "A paths command must be specified as the first parameter: "\
