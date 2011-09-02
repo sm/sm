@@ -63,17 +63,8 @@ templates()
   done
 
   case "${_command}" in
-    (exist)
-      __sm.templates.exist "${_name}" "${_params[@]}"
-      ;;
-    (install)
-      __sm.templates.install "${_name}" "${_params[@]}"
-      ;;
-    (seed)
-      __sm.templates.seed "${_name}" "${_params[@]}"
-      ;;
-    (update)
-      __sm.templates.update "${_name}" "${_params[@]}"
+    (exist|install|seed|update)
+      __sm.templates.${_command} "${_name}" "${_params[@]}"
       ;;
     (*)
       fail "Unknown command '${_command}' for templates API."
