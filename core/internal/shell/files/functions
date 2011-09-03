@@ -289,15 +289,6 @@ __sm.files.hash()
   esac
 }
 
-__sm.files.are.executable()
-{
-  local _file _files="${$@}"
-  for _file in "${_files[@]}"
-  do
-    [[ -r "${_file}" && -x "${_file}" ]] || return 1
-  done
-}
-
 __sm.files.exist()
 {
   local _file="$1"
@@ -367,12 +358,42 @@ __sm.files.containing()
   fi
 }
 
-__sm.files.are.symlinks()
+__sm.files.are.empty()
 {
   local _file _files=("$@")
+
   for _file in "${_files[@]}"
   do
-    [[ -L "${_file}" ]] || return 1
+    _file=${_file/\~\//$HOME\/} # Expand ~/ to full value of $HOME
+    if ! [[ -f "${_file}" && ! -s "${_file}" ]]
+    then
+      return 1
+    fi
+  done
+  return 0
+}
+
+__sm.files.are.nonempty()
+{
+  local _file _files=("$@")
+
+  for _file in "${_files[@]}"
+  do
+    _file=${_file/\~\//$HOME\/} # Expand ~/ to full value of $HOME
+    if ! [[ -f "${_file}" && -s "${_file}" ]]
+    then
+      return 1
+    fi
+  done
+  return 0
+}
+
+__sm.files.are.executable()
+{
+  local _file _files="${$@}"
+  for _file in "${_files[@]}"
+  do
+    [[ -r "${_file}" && -x "${_file}" ]] || return 1
   done
 }
 
@@ -387,6 +408,15 @@ __sm.files.are.missing()
     fi
   done
   return 1
+}
+
+__sm.files.are.symlinks()
+{
+  local _file _files=("$@")
+  for _file in "${_files[@]}"
+  do
+    [[ -L "${_file}" ]] || return 1
+  done
 }
 
 __sm.files.sha.256()
