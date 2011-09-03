@@ -390,7 +390,7 @@ __sm.files.are.nonempty()
 
 __sm.files.are.executable()
 {
-  local _file _files="${$@}"
+  local _file _files=( "$@" )
   for _file in "${_files[@]}"
   do
     [[ -r "${_file}" && -x "${_file}" ]] || return 1
