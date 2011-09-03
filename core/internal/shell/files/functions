@@ -376,6 +376,19 @@ __sm.files.are.symlinks()
   done
 }
 
+__sm.files.are.missing()
+{
+  local _file
+  for _file in "$@"
+  do
+    if [[ -f "${_file}" ]]
+    then
+      return 1
+    fi
+  done
+  return 1
+}
+
 __sm.files.sha.256()
 {
   local _sum _files=("$@")
