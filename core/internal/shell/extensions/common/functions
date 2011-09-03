@@ -34,3 +34,25 @@ __sm.extensions.find()
     " No extension name was given."
   __sm.extensions.are.valid $extensions_path/$extension
 }
+
+__sm.extensions.sets.iterator()
+{
+  local _path="$1" _command="$2"
+  shift 2
+  "${_command}" "${_path}" "$@"
+  return 1
+}
+
+__sm.extensions.iterator()
+{
+  local _path="$1" _command="$2" _ext_path _ext_paths
+  shift 2
+  shopt -s nullglob
+  _ext_paths=( "${_path}"/* )
+  shopt -u nullglob
+  for  _ext_path in ${_ext_paths[@]}
+  do
+    "${_command}" "${_ext_path}" "$@"
+  done
+  return 1
+}

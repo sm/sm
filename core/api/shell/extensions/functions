@@ -4,3 +4,53 @@ api_extensions_initialize()
 {
   true "${extensions_development_path:="${extensions_src_path}"}"
 }
+
+extension()
+{
+  trace_filter extensions
+
+  local _command _params=()
+
+  if __sm.string.starts.with.one.off  "$* " \
+    "in extension sets do " \
+    "in extensions do "
+  then
+    _command=$( __sm.string.to.function.name "${__sm_string_starts_with}" )
+    shift $( __sm.string.number.of.words "${__sm_string_starts_with}" )
+  else
+    _command="$1"
+    shift || fail "Usage: extension <command> ..."
+  fi
+
+  _params+=( "$@" )
+  shift $#
+#  while (( $# ))
+#  do
+#    case "$1" in
+#      (*)
+#        _params+=( "$1" )
+#        shift
+#        ;;
+#    esac
+#  done
+
+  case "${_command}" in
+    (search|find)
+      if __sm.extensions.in.paths __sm.extensions.find "${_params[@]}"
+      then
+        printf "${extensions_path}/${extension}\n"
+      else
+        error "Extension '${_params[@]}' not found!"
+      fi
+      ;;
+    (in.extension.sets.do)
+      __sm.extensions.in.paths __sm.extensions.sets.iterator "${_params[@]}" || true
+      return 0
+      ;;
+    (in.extensions.do)
+      __sm.extensions.in.paths __sm.extensions.iterator "${_params[@]}" || true
+      return 0
+      ;;
+    (*) error "Unknown command for extension '${_command}'."
+  esac
+}
