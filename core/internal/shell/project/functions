@@ -32,7 +32,7 @@ internal_project_initialize()
     # varaibles are set.
     : \
       "${shared_path:=${project_path}/shared}" \
-      "${release_path:=${project_path}/current}" \
+      "${release_path:=${project_path}/active/${project}}" \
       "${environment:="production"}"
 
     # Set the project log path into the shared path's log directory
@@ -49,7 +49,10 @@ internal_project_initialize()
     true "${database_name:="${project}_${environment}"}"
 
     # And source the project name rc file, if they exist
-    files source ".${project}rc"
+    if files exist ".${project}rc"
+    then
+      files source ".${project}rc"
+    fi
   fi
 }
 
