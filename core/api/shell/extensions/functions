@@ -9,11 +9,12 @@ extension()
 {
   trace_filter extensions
 
-  local _command _params=()
+  local _command _params=() _name _uri
 
   if __sm.string.starts.with.one.off  "$* " \
     "in extension sets do " \
-    "in extensions do "
+    "in extensions do " \
+    "get uri "
   then
     _command=$( __sm.string.to.function.name "${__sm_string_starts_with}" )
     shift $( __sm.string.number.of.words "${__sm_string_starts_with}" )
@@ -22,25 +23,43 @@ extension()
     shift || fail "Usage: extension <command> ..."
   fi
 
-  _params+=( "$@" )
-  shift $#
-#  while (( $# ))
-#  do
-#    case "$1" in
-#      (*)
-#        _params+=( "$1" )
-#        shift
-#        ;;
-#    esac
-#  done
+  while (( $# ))
+  do
+    case "$1" in
+      (name|for|as)
+        _name=$2
+        shift 2 || fail "Extension name was not given after <$1> param."
+        ;;
+      (uri|from)
+        _uri=$2
+        shift 2 || fail "Extension uri was not given after <$1> param."
+        ;;
+      (*)
+        _params+=( "$1" )
+        shift
+        ;;
+    esac
+  done
 
   case "${_command}" in
+    (get.uri)
+      [[ -n "${_name}" ]] || error "Extension name was not given for get uri."
+      if __sm.extension.get.uri "${_name}"
+      then return 0 ; else return $? ; fi
+      ;;
+    (install)
+      [[ -n "${_name}" ]] || error "Extension name was not given for install."
+      __sm.modules.include internal/extensions/manipulation
+      if __sm.extension.install "${_name}" "${_uri}"
+      then return 0 ; else return $? ; fi
+      ;;
     (search|find)
-      if __sm.extension.in.paths __sm.extension.find "${_params[@]}"
+      [[ -n "${_name}" ]] || error "Extension name was not given for search."
+      if __sm.extension.in.paths __sm.extension.find "${_name}"
       then
         printf "${extensions_path}/${extension}\n"
       else
-        error "Extension '${_params[@]}' not found!"
+        error "Extension '${_name}' not found!"
       fi
       ;;
     (in.extension.sets.do)

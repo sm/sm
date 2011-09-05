@@ -63,24 +63,11 @@ extension_license()
 #
 __sm.extension.actions()
 {
+  NIY
   local _extension="${1:-}" _files _file _actions=()
   shift || fail "No extension was given."
   [[ -d "${extension_bin_path}" ]] || return 0
-
-  shopt -s nullglob
-  _files=(
-  "${extension_bin_path}"/*
-  "${extension_bin_path}"/*/*
-  "${extension_bin_path}"/*/*/*
-  )
-  shopt -u nullglob
-
-  for _file in "${_files[@]}"
-  do
-    [[ ! -d "${_file}" ]] || continue
-    [[ -s "${_file}" && -x "${_file}" ]] || continue
-    _actions+=("${_file#${extension_bin_path}/}")
-  done
+  #TODO: build actions cache and use it to display actions
   echo "${_actions[@]}"
 }
 
@@ -94,7 +81,7 @@ __sm.extension.install()
   shift || fail "No extension name was given."
 
   local _uri="${1:-}"
-  shift || _uri=$( awk -F= "/^${_name}=/ {print \$2 }" < "${sm_path}/core/cli/config/known_ext" | tail -n 1 )
+  shift || _uri=$( __sm.extension.get.uri "${_name}" )
 
   [[ -n "${_uri}" ]] ||
     error "uri not given and cannot find ${_name} in known extensions."

@@ -56,3 +56,8 @@ __sm.extension.iterator()
   done
   return 1
 }
+
+__sm.extension.get.uri()
+{
+  awk -F= "/^$1=/ {print \$2 }" < "${sm_path}/core/cli/config/known_ext" | tail -n 1
+}
