@@ -20,3 +20,49 @@ __sm.variables.are.empty()
   shift || fail "Cannot check if variable is empty, as no variable was given."
   eval "[[ -z \"\${${_variable}:-}\" ]]"
 }
+
+__sm.variables.filter()
+{
+  trace_filter variables
+  __sm_variables_empty=()
+  __sm_variables_nonempty=()
+
+  local _variable
+  for _variable in "$@"
+  do
+    if eval "[[ -z \"\${${_variable}:-}\" ]]"
+    then
+      __sm_variables_empty+=( "${_variable}" )
+    else
+      __sm_variables_nonempty+=( "${_variable}" )
+    fi
+  done
+}
+
+__sm.variables.must.be.nonempty()
+{
+  trace_filter variables
+  local _error="$1" IFS=','
+  shift
+
+  __sm.variables.filter "$@"
+
+  if (( ${#__sm_variables_empty[@]} ))
+  then
+    ${_error} "Variables '${__sm_variables_empty[@]}' are suposed to be not empty but are not."
+  fi
+}
+
+__sm.variables.must.be.empty()
+{
+  trace_filter variables
+  local _error="$1" IFS=','
+  shift
+
+  __sm.variables.filter "$@"
+
+  if (( ${#__sm_variables_nonempty[@]} ))
+  then
+    ${_error} "Variables '${__sm_variables_nonempty[@]}' are suposed to be empty but are not."
+  fi
+}
