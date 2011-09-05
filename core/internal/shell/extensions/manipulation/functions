@@ -81,7 +81,8 @@ __sm.extension.install()
   shift || fail "No extension name was given."
 
   local _uri="${1:-}"
-  shift || _uri=$( __sm.extension.get.uri "${_name}" )
+  shift || true
+  [[ -n "${_uri}" ]] || _uri=$( __sm.extension.get.uri "${_name}" )
 
   [[ -n "${_uri}" ]] ||
     error "uri not given and cannot find ${_name} in known extensions."
