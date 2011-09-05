@@ -119,7 +119,7 @@ settings_search()
 
   paths=( "/etc/sm/${extension}" "$HOME/.sm/${extension}" ) # Standard paths
 
-  if __sm.extensions.path "${extension}"
+  if __sm.extension.path "${extension}"
   then
     paths+=( "${extension_path}/config" )
   fi

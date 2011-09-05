@@ -1,6 +1,6 @@
 #!/bin/sh
 
-__sm.extensions.in()
+__sm.extension.in()
 {
   local _path="$1" _extension
 

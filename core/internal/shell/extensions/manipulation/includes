@@ -1,3 +1,4 @@
 api/variables
 api/filesystem
+api/vcs
 internal/extensions/common

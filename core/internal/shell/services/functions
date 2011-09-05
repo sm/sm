@@ -3,7 +3,7 @@
 __sm.services.available()
 services_avilable()
 {
-  __sm.extensions.installed module "api/service" "$@"
+  __sm.extension.installed module "api/service" "$@"
 }
 
 __sm.services.list()

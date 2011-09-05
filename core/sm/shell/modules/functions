@@ -25,7 +25,7 @@ __sm.modules.core.initialize()
 
   local _module _name _path
 
-  __sm.extensions.paths.initialize
+  __sm.extension.paths.initialize
 
   #core is loaded as BDSM starts
   __sm_modules_loaded=(
@@ -77,7 +77,7 @@ __sm.module.include()
   fi
 
   # Search for module.
-  if __sm.extensions.in.paths __sm.module.detect "${_module}"
+  if __sm.extension.in.paths __sm.module.detect "${_module}"
   then
     log_search module "$module_name" "${module_path##${sm_path}\/}"
     __sm_modules_loaded+=("${module_name}=${module_path##${sm_path}\/}")
@@ -164,7 +164,7 @@ __sm.module.is.loaded()
   esac
 }
 
-__sm.extensions.in.paths()
+__sm.extension.in.paths()
 {
   local callback="${1:-}" _path
   shift || fail "Callback name must be given ast the first parameter."
@@ -188,7 +188,7 @@ __sm.cli.in.path()
   "${callback}" "${sm_path}/core" "cli" "$@"
 }
 
-__sm.extensions.paths.initialize()
+__sm.extension.paths.initialize()
 {
   local _paths=() _extension_set_path
 
@@ -248,7 +248,7 @@ __sm.extensions.paths.initialize()
   export extensions_search_paths
 }
 
-__sm.extensions.path.reorder()
+__sm.extension.path.reorder()
 {
   local part="${1:-}" extensions_path="${2:-}" extension="${3:-}"
   shift || fail "Path part must be given as the first parameter."
@@ -259,14 +259,14 @@ __sm.extensions.path.reorder()
   rebuilded_path="${output// //}"
 }
 
-__sm.extensions.path.rebuild()
+__sm.extension.path.rebuild()
 {
   local part="$1" extensions_path="$2"
   shift || fail "Path part must be given as the first parameter."
   shift || fail "Extensions path must be given as the second parameter."
 
   local params="$*"
-  __sm.extensions.path.reorder "${part}" "${extensions_path}" ${params//\// }
+  __sm.extension.path.reorder "${part}" "${extensions_path}" ${params//\// }
 }
 
 __sm.module.detect()
@@ -274,7 +274,7 @@ __sm.module.detect()
   local extensions_path=$1 _module_path
   shift || fail "Extensions path must be given as the first parameter."
 
-  __sm.extensions.path.rebuild "shell" $extensions_path $@
+  __sm.extension.path.rebuild "shell" $extensions_path $@
   _module_path=${rebuilded_path}
 
   debug search_module_path ":${_module_path}:"

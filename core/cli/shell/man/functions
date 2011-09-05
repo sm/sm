@@ -52,7 +52,7 @@ man_display()
     shift
   fi
 
-  if __sm.extensions.in.paths detect_man "$@" ||
+  if __sm.extension.in.paths detect_man "$@" ||
     __sm.cli.in.path detect_man "$@"
   then
     if man $man_file

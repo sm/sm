@@ -51,7 +51,7 @@ __sm.cache.map.check()
   return 1
 }
 
-__sm.extensions.actions.find()
+__sm.extension.actions.find()
 {
   trace_filter action_detection
   extensions_path="$1" extension="$2"
@@ -105,7 +105,7 @@ __sm.extensions.actions.find()
   return 1
 }
 
-__sm.extensions.action()
+__sm.extension.action()
 {
   trace_filter action_detection
 
@@ -135,18 +135,18 @@ __sm.extensions.action()
   esac
 
   local _extension_found=0 _action_found=0
-  if __sm.extensions.in.paths __sm.extensions.find "${extension_args[@]}"
+  if __sm.extension.in.paths __sm.extension.find "${extension_args[@]}"
   then
     _extension_found=1
     log_search extension "$extension" "$extensions_path"
-    if __sm.extensions.actions.find "$extensions_path" "${extension_args[@]}"
+    if __sm.extension.actions.find "$extensions_path" "${extension_args[@]}"
     then
       _action_found=1
     fi
   fi
 
   if (( ! _action_found )) &&
-    __sm.cli.in.path __sm.extensions.actions.find "${extension_args[@]}"
+    __sm.cli.in.path __sm.extension.actions.find "${extension_args[@]}"
   then
     _action_found=1
   fi

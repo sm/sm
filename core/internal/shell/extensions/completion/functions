@@ -74,7 +74,7 @@ extension_action_completion()
   _args=( ${_args[@]} )
   show_word=${#_args[@]}
 
-  if __sm.extensions.in.paths __sm.extensions.find "${_args[@]}"
+  if __sm.extension.in.paths __sm.extension.find "${_args[@]}"
   then
     show_word=$(( show_word - 1 ))
     _extension_found=1
@@ -92,10 +92,10 @@ extension_action_completion()
   {
     if (( ${#_args[@]} == 0 ))
     then
-      __sm.extensions.in.paths show_extension_names "unused" "${_args}" || true
+      __sm.extension.in.paths show_extension_names "unused" "${_args}" || true
     elif (( ${#_args[@]} == 1 )) && [[ "${last_char}" != " " ]]
     then
-      __sm.extensions.in.paths show_extension_names "unused" "${_args}" || true
+      __sm.extension.in.paths show_extension_names "unused" "${_args}" || true
     else
       if (( _extension_found )) &&
         find_starting_action "${_extension_found_path}" "${_args[@]}"

@@ -36,7 +36,7 @@ extension()
 
   case "${_command}" in
     (search|find)
-      if __sm.extensions.in.paths __sm.extensions.find "${_params[@]}"
+      if __sm.extension.in.paths __sm.extension.find "${_params[@]}"
       then
         printf "${extensions_path}/${extension}\n"
       else
@@ -44,11 +44,11 @@ extension()
       fi
       ;;
     (in.extension.sets.do)
-      __sm.extensions.in.paths __sm.extensions.sets.iterator "${_params[@]}" || true
+      __sm.extension.in.paths __sm.extension.sets.iterator "${_params[@]}" || true
       return 0
       ;;
     (in.extensions.do)
-      __sm.extensions.in.paths __sm.extensions.iterator "${_params[@]}" || true
+      __sm.extension.in.paths __sm.extension.iterator "${_params[@]}" || true
       return 0
       ;;
     (*) error "Unknown command for extension '${_command}'."

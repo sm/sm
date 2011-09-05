@@ -88,7 +88,7 @@ __sm.cache.map.modules.initialize()
 
     while read _module_dep
     do
-      if __sm.extensions.in.paths __sm.module.detect.actions "${_module_dep}"
+      if __sm.extension.in.paths __sm.module.detect.actions "${_module_dep}"
       then
         log_search "actiondep" "${extension}${_module_name:+/}${_module_name}" "${module_path#${sm_path}\/}/actions"
         while read _action_pair

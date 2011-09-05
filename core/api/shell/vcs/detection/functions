@@ -15,7 +15,7 @@ detect_uri()
 
   shift || fail "extensions_path must be given as first parameter."
 
-  __sm.extensions.path.rebuild ".uri" $extensions_path $@
+  __sm.extension.path.rebuild ".uri" $extensions_path $@
 
   _uri_path="${rebuilded_path}"
 

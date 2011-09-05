@@ -153,9 +153,9 @@ then
       ;;
     *)
       modules include api/extensions/detection api/extensions/execution
-      __sm.extensions.action
-      __sm.extensions.actions.type
-      __sm.extensions.run
+      __sm.extension.action
+      __sm.extension.actions.type
+      __sm.extension.run
   esac
 fi
 

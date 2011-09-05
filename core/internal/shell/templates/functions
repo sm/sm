@@ -28,7 +28,7 @@ __sm.templates.find()
 
 __sm.templates.exist()
 {
-  if __sm.extensions.in.paths __sm.templates.find "$@" ||
+  if __sm.extension.in.paths __sm.templates.find "$@" ||
     __sm.cli.in.path __sm.templates.find "$@"
   then
     log_search "template" "$template_name" "${template_path##${sm_path}\/}"
