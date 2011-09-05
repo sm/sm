@@ -100,7 +100,7 @@ __sm.templates.seed()
   files move from "${temporary}" to "${_template}"
 }
 
-__sm.templates.udpate()
+__sm.templates.update()
 {
 
   local _template="${1:-}" _target="${2:-}"

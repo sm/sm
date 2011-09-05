@@ -50,7 +50,7 @@ smrc_update()
   : \
     "${repository_url:="username/repository"}"
 
-  __sm.templates.update "${template}" "${target}" "${incoming}" \
+  templates update "${template}" "${target}" "${incoming}" \
     project "$project" \
     repository_url "$repository_url" \
     environment "$environment"
