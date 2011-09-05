@@ -26,13 +26,14 @@ variables()
         case "$2" in
           (log|error|fail)
             _type=$2
+            shift 2
             ;;
           ("")
-            shift 2 || fail "Variable output type was not given after 'type'. " \
+            fail "Variable output type was not given after 'type'. " \
               "Valid types are: log, error, fail"
             ;;
           (*)
-            shift 2 || fail "Variable output type '$2' in not valid. " \
+            fail "Variable output type '$2' in not valid. " \
               "Valid types are: log, error, fail"
             ;;
         esac
