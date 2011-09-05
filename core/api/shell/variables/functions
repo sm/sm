@@ -39,7 +39,7 @@ variables()
         esac
         ;;
       (*)
-        _variables+=("${_token}")
+        _variables+=( "$1" )
         shift
         ;;
     esac
