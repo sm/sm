@@ -106,11 +106,17 @@ __sm.package.configure.flag()
 
 __sm.package.set.cflags()
 {
-  export CFLAGS="-I${active_path}/include ${CFLAGS:-} "
+  if ! __sm.string.contains "-I${active_path}/include" "${CFLAGS}"
+  then
+    export CFLAGS="-I${active_path}/include ${CFLAGS:-} "
+  fi
 }
 
 __sm.package.set.ldflags()
 {
-  export LDFLAGS="-L${active_path}/lib ${LDFLAGS:-}"
+  if ! __sm.string.contains "-L${active_path}/lib" "${LDFLAGS}"
+  then
+    export LDFLAGS="-L${active_path}/lib ${LDFLAGS:-}"
+  fi
 }
 
