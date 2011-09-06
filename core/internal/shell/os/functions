@@ -29,72 +29,85 @@ __sm.os.open()
 
 __sm.os.type()
 {
+  local _type="$1"
   case "$OSTYPE" in
     (*linux*)
-      printf "linux"
+      _type="linux"
       ;;
     (*darwin*)
-      printf "darwin"
+      _type="darwin"
       ;;
     (*bsd*)
-      printf "bsd"
+      _type="bsd"
       ;;
     (*solaris*)
-      printf "solaris"
+      _type="solaris"
       ;;
     (*aix*)
-      printf "aix"
+      _type="aix"
       ;;
     (*)
-      # If the machine type is an unknown category then simply echo it.
-      printf "$OSTYPE"
+      # If the machine type is an unknown category then simply use it.
+      _type="$OSTYPE"
       ;;
   esac
+
+  if [[ -n "${1}" ]]
+  then
+    [[ "${_type}" == "${1}" ]]
+  else
+    printf "%s\n" "${_type}"
+  fi
+}
+
+__sm.os.type.is()
+{
+  __sm.os.type "$1"
 }
 
 __sm.os.cpu.count()
 {
   local _cpu_count=1
 
-  if os_is_darwin
+  if __sm.os.type.is darwin
   then
     read -r _cpu_count < <(/usr/sbin/sysctl hw.ncpu)
     _cpu_count="${_cpu_count//* }"
 
-  elif os_is_linux
+  elif __sm.os.type.is linux
   then
     _cpu_count=$(awk '/^processor/{count++} END{print count}' /proc/cpuinfo 2>&1)
 
-  elif os_is_solaris
+  elif __sm.os.type.is solaris
   then
     warn "CPU counting for Solaris has not yet been implemented; returning 1."
 
-  elif os_is_bsd
+  elif __sm.os.type.is bsd
   then
     warn "CPU counting for BSD has not yet been implemented; returning 1."
 
-  elif os_is_aix
+  elif __sm.os.type.is aix
   then
     warn "CPU counting for AIX has not yet been implemented; returning 1."
   fi
 
   (( _cpu_count > 0 )) || _cpu_count=1 # Sanity Check
 
-  printf "%d" ${_cpu_count}
+  printf "%d\n" ${_cpu_count}
 }
 
 __sm.os.version()
 {
   read -r os_version < <(uname -r)
   os_version=${os_version//-*}
-  printf "%s" "${os_version}"
+  printf "%s\n" "${os_version}"
 }
 
 __sm.os.version.major()
 {
   os_version_major=$(__sm.os.version)
   os_version_major="${os_version_major//\.*}"
-  printf "${os_version_major}"
+  printf "%s\n" "${os_version_major}"
 }
 
 __sm.os.version.minor()
@@ -102,14 +115,14 @@ __sm.os.version.minor()
   os_version_minor=$(__sm.os.version)
   os_version_minor="${os_version_minor#*\.}"
   os_version_minor="${os_version_minor%\.*}"
-  printf "${os_version_minor}"
+  printf "%s\n" "${os_version_minor}"
 }
 
 __sm.os.version.patch()
 {
   os_version_patch=$(__sm.os.version)
   os_version_patch="${os_version_patch//*\.}"
-  printf "${os_version_patch}"
+  printf "%s\n" "${os_version_patch}"
 }
 
 __sm.os.arch.type()
@@ -133,12 +146,12 @@ __sm.os.arch.type()
 
 __sm.os.arch()
 {
-  printf "${MACHTYPE//-*}"
+  printf "%s\n" "${MACHTYPE//-*}"
 }
 
 __sm.os.arch.capable()
 {
-  if os_is_darwin
+  if __sm.os.type.is darwin
   then
     local _string
     read -r _string < <(sysctl hw.cpu64bit_capable)

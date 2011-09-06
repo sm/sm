@@ -25,6 +25,19 @@ os()
         shift || fail "lowercase operating system name must follow keyword 'os';"\
           "os is <linux|darwin|bsd|solaris|aix>"
         ;;
+      (cpu)
+        _command=cpu
+        _subcommand="$1"
+        shift || fail "A command must follow keyword 'cpu'; one of {count}"
+        case "${_subcommand}" in
+          (count)
+            true # all good.
+            ;;
+          (*)
+            fail "A valid command must follow keyword 'cpu'; one of {count}"
+            ;;
+        esac
+        ;;
       (*)
         if [[ -z "${_command}" ]]
         then
@@ -87,8 +100,10 @@ os()
     (cpu)
       case "${_subcommand}" in
         (count)
+          __sm.os.cpu.count
           ;;
         (*)
+      fail "Unknown command for os cpu: '${_subcommand}'; valid commands include {count} "
           ;;
       esac
       ;;
