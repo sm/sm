@@ -88,21 +88,25 @@ __sm.extension.modules.include()
 __sm.extension.action.prerequisites()
 {
   trace_filter action_pre
-  local _pre _name
+  local _pre _name _action="${action// *}" _extension="${_extension// *}"
 
   _pre=(
-   ${action}_cli
-   ${action}_initialize
+   ${_action}_cli
+   ${_action}_initialize
   )
 
-  __sm.string.contains "${action%%_*}_cli" "${_pre[*]}" || _pre+=(
-   ${action%%_*}_cli
-   ${action%%_*}_initialize
+  __sm.string.contains "${_action%%_*}.cli" "${_pre[*]}" || _pre+=(
+   ${_action%%_*}_cli
+   ${_action%%_*}_initialize
   )
 
-  __sm.string.contains "${extension}_cli" "${_pre[*]}" || _pre+=(
-   ${extension}_cli
-   ${extension}_initialize
+  __sm.string.contains "${_extension}.cli" "${_pre[*]}" || _pre+=(
+   ${_extension}_cli
+   ${_extension}_initialize
+  )
+  __sm.string.contains "__sm.${_extension}.cli" "${_pre[*]}" || _pre+=(
+   __sm.${_extension}.cli
+   __sm.${_extension}.initialize
   )
 
   for _name in ${_pre[@]}
@@ -129,7 +133,7 @@ __sm.extension.run()
       __sm.extension.modules.include ${_namespaces//\// }
       action=${action%%(*}
       __sm.extension.action.prerequisites
-      __sm.actions.call "${action}" "${extension_args[@]}"
+      __sm.actions.call ${action} "${extension_args[@]}"
       ;;
 
     (shell)

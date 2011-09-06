@@ -1,5 +1,96 @@
 #!/bin/sh
 
+__sm.package.cli()
+{
+  local _ignored_args=() _package_args=( $@ ) _token
+  local number_of_args=${#_package_args[@]} index
+
+  for (( index=0 ; index < $number_of_args ; index++ ))
+  do
+    _token="${_package_args[$index]}"
+    case "${_token}" in
+      (prefix)
+        packages_path="${_package_args[$((++index))]}"
+        [[ -n "${packages_path}" ]] ||
+          error "a path must follow keyword 'prefix'"
+        ;;
+      (src)
+        src_path="${_package_args[$((++index))]}"
+        [[ -n "${src_path}" ]] ||
+          error "a path must follow keyword 'src'"
+        ;;
+      (data)
+        data_path="${_package_args[$((++index))]}"
+        [[ -n "${data_path}" ]] ||
+          error "a path must follow keyword 'data'"
+        ;;
+      (user)
+        package_user="${_package_args[$((++index))]}"
+        [[ -n "${package_user}" ]] ||
+          error "a user name must follow keyword 'user'"
+        ;;
+      (version)
+        package_version="${_package_args[$((++index))]}"
+        [[ -n "${package_version}" ]] ||
+          error "a version number string must follow keyword 'version'"
+        ;;
+      (base_url)
+        package_base_url="${_package_args[$((++index))]}"
+        [[ -n "${package_base_url}" ]] ||
+          error "a base path url must follow keyword 'base_url'"
+        ;;
+      (file)
+        package_file="${_package_args[$((++index))]}"
+        [[ -n "${package_file}" ]] ||
+          error "a path must follow keyword 'file'"
+        ;;
+      (dir)
+        package_directory="${_package_args[$((++index))]}"
+        [[ -n "${package_directory}" ]] ||
+          error "a single extracted directory name must follow keyword 'dir'"
+        ;;
+      (archive_format)
+        archive_format="${_package_args[$((++index))]}"
+        [[ -n "${archive_format}" ]] ||
+          error "an archive format (tar.gz,tar.bz2,tar.xz,zip,...) must follow keyword 'archive_format'"
+        ;;
+      (md5)
+        package_md5="${_package_args[$((++index))]}"
+        [[ -n "${package_md5}" ]] ||
+          error "an md5 sum string must follow keyword 'md5'"
+        ;;
+      (force)
+        force_flag=1
+        ;;
+      (static)
+        static_flag=1
+        __sm.package.configure.flags --static
+        ;;
+      (shared)
+        shared_flag=1
+        __sm.package.configure.flags --enable-shared
+        ;;
+      (licence)
+        extension_license
+        succeed
+        ;;
+      (help)
+        __sm.package.usage
+        succeed
+        ;;
+      (--with*|--enable*|--disable*)
+        __sm.package.configure.flags "${_token}"
+        ;;
+      (*)
+        _ignored_args+=("${_token}")
+        ;;
+    esac
+
+  done
+
+  __sm.package.init "${_ignored_args[@]}"
+}
+
 __sm.package.error()
 {
   local _message="$1" _log="$2" _lines="$3"
@@ -118,5 +209,696 @@ __sm.package.set.ldflags()
   then
     export LDFLAGS="-L${active_path}/lib ${LDFLAGS:-}"
   fi
+}
+__sm.package.set.cc()
+{
+  if os is darwin && [[ -x /usr/bin/gcc-4.2 ]]
+  then
+    export CC=/usr/bin/gcc-4.2
+  fi
+}
+__sm.package.exports()
+{
+  export package_name packages_path package_name package_version archive_format \
+    package_file package_url package_md5_url packages_path bin_path source_path \
+    LDFLAGS CFLAGS package_default_version
+}
+
+__sm.package.gnu.install()
+{
+  (( $# == 0 )) || __sm.package.cli $@
+
+  __sm.package.set.cflags
+  __sm.package.set.cc
+  __sm.package.set.ldflags
+
+  if __sm.package.versions.installed | grep -q "${package_version}" &&
+    [[ "${force_flag}" != "1" ]]
+  then
+    log "The ${package_name} ${package_version} package is already installed.
+To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
+    exit 0
+  fi
+
+  true "${package_dir:="${package_name}-${package_version}"}"
+
+  paths create "${source_path}"
+
+  paths enter "${source_path}"
+
+  if command exists "${package_name}_dependencies"
+  then
+    log_step "${package_name} ${package_version} ~ dependencies" \
+      "${package_name}_dependencies"
+  else
+    log_step "${package_name} ${package_version} ~ dependencies" \
+      __sm.package.dependencies
+  fi
+
+  if command exists "${package_name}_prefetch"
+  then
+    log_step "${package_name} ${package_version} ~ prefetch" \
+      "${package_name}_prefetch"
+  fi
+
+  if command exists "${package_name}_fetch"
+  then
+    log_step "${package_name} ${package_version} ~ download" \
+      "${package_name}_fetch"
+  else
+    log_step "${package_name} ${package_version} ~ download" \
+      __sm.package.fetch
+  fi
+
+  paths enter "${source_path}/${package_dir}"
+
+  if command exists "${package_name}_postfetch"
+  then
+    log_step "${package_name} ${package_version} ~ postfetch" \
+      "${package_name}_postfetch"
+  fi
+
+  if command exists "${package_name}_patch"
+  then
+    log_step "${package_name} ${package_version} ~ patch" \
+      "${package_name}_patch"
+  else
+    log_step "${package_name} ${package_version} ~ patch" \
+      __sm.package.patch
+  fi
+
+  if command exists "${package_name}_preconfigure"
+  then
+    log_step "${package_name} ${package_version} ~ preconfigure" \
+      "${package_name}_preconfigure"
+  fi
+
+  if command exists "${package_name}_configure"
+  then
+    "${package_name}_configure"
+  else
+    log_step "${package_name} ${package_version} ~ configure" \
+      __sm.package.configure
+  fi
+
+  if command exists "${package_name}_postconfigure"
+  then
+    log_step "${package_name} ${package_version} ~ postconfigure" \
+      "${package_name}_postconfigure"
+  fi
+
+  if command exists "${package_name}_build"
+  then
+    log_step "${package_name} ${package_version} ~ build" \
+      "${package_name}_build"
+  else
+    log_step "${package_name} ${package_version} ~ build" \
+      __sm.package.build
+  fi
+
+  if command exists "${package_name}_preinstall"
+  then
+    log_step "${package_name} ${package_version} ~ preinstall" \
+      "${package_name}_preinstall"
+  else
+    log_step "${package_name} ${package_version} ~ preinstall" \
+      __sm.package.preinstall
+  fi
+
+  versionedfs add \
+    path "${packages_path}" name "${package_name}" version "${package_version}" \
+    source "${install_path}"
+
+  if command exists "${package_name}_install"
+  then
+    log_step "${package_name} ${package_version} ~ install" \
+      "${package_name}_install"
+  else
+    __sm.package.make.install
+  fi
+
+  files link symbolic force \
+    from "${source_path}/${package_dir}" \
+    to "${install_path}/src"
+
+  if command exists "${package_name}_postinstall"
+  then
+    log_step "${package_name} ${package_version} ~ postinstall" \
+      "${package_name}_postinstall"
+  else
+    log_step "${package_name} ${package_version} ~ postinstall" \
+      __sm.package.postinstall
+  fi
+
+  if ! __sm.string.contains '__sm.package.update' "${FUNCNAME[*]}"
+  then
+    __sm.package.activate.first "${package_name}" "${package_version}"
+  fi
+
+  if command exists "${package_name}_postactivate"
+  then
+    log_step "${package_name} ${package_version} ~ postactivate" \
+      "${package_name}_postactivate"
+  fi
+
+  __sm.package.setup
+}
+
+__sm.package.init()
+{
+  package_name="${1:-${package_name:-${extension}}}"
+
+  [[ -n "${package_name}" ]] || fail "Package name must be given.\n"
+
+  case "${package_name}" in
+    *=*) # exact version specifier
+      package_version="${package_name#*=}"
+      package_name="${package_name%%=*}"
+      ;;
+    *:*) # minimum version specifier
+      # TODO: concept of 'minimum' ;)
+      package_version="${package_name#*:}"
+      package_name="${package_name%%:*}"
+      ;;
+    *)
+      true "${package_version:="${2:-}"}" "${archive_format:="${3:-}"}"
+      ;;
+  esac
+
+  if command exists "${package_name}_initialize"
+  then
+    __sm.string.contains "${package_name}_initialize" "${FUNCNAME[*]}" ||
+      "${package_name}_initialize"
+  fi
+
+  true \
+    "${source_path:="${sm_path}/src"}" \
+    "${archives_path:="${sm_path}/archives"}" \
+    ${static_flag:=0}
+
+__sm.package.exports
+  # Ensure that package_version is set at this point
+
+  [[ -n "${package_default_version}" ]] || read_default version prefix package_default for ${package_name}
+  [[ -n "${package_base_url}" ]] || read_default base_url    prefix package for ${package_name}
+  [[ -n "${package_md5_url}"  ]] || read_default md5_url     prefix package for ${package_name}
+  [[ -n "${package_user}"  ]]    || read_default user        prefix package for ${package_name}
+  [[ -n "${website_url}"      ]] || read_default website_url prefix package for ${package_name}
+  [[ -n "${archive_format}"   ]] || read_default archive_format             for ${package_name}
+
+  local default_configure_flags _flag
+
+  [[ -n "${default_configure_flags}" ]] || read_default configure_flags prefix default for ${package_name}
+  __sm.package.configure.flags "${default_configure_flags[@]}"
+
+  true \
+    "${package_version:="${package_default_version}"}" \
+    "${init_scripts_path:="$(init_scripts_path)"}" \
+    "${archive_format:=tar.gz}" \
+    "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
+    "${install_base_path:="${packages_path}/versions/${package_name}"}" \
+    "${install_path:="${install_base_path}/${package_version}"}"
+
+  package configure flag key --prefix "${install_path}"
+
+  # This check should only happen in places that require a version...
+  #[[ -n "${package_version}" ]] ||
+  #  fail "Package version must be specified.\n"\
+  #  "(For example version=x.y.z set in extension's config/defaults file.)\n"
+
+  fhs_dirs=( bin etc include lib libexec sbin share man )
+
+  paths create "${active_path}"
+
+  for dir in ${fhs_dirs}
+  do
+    paths create "${active_path}/${fhs_dirs}"
+  done
+
+  if user is root
+  then
+    true \
+      "${log_path:="/var/log/${package_name}"}" \
+      "${package_user:="${package_name}"}"
+  else
+    true \
+      "${log_path:="${active_path}/log"}" \
+      "${package_user:="$USER"}"
+  fi
+
+  extension_patches_path="${extension_path}/patches"
+}
+
+__sm.package.binary.install()
+{
+  NIY "Binary package strategy"
+  # TODO: download, extract, copy to install path.
+}
+
+__sm.package.java.install()
+{
+  NIY "Java package strategy"
+  # TODO: download, extract, copy to install path, setup java launcher.
+}
+
+__sm.package.fetch.md5()
+{
+  (( $# == 0 )) || __sm.package.cli $@
+
+  local download_url
+
+  : \
+    "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
+    "${packge_md5_url:="${package_base_url}/${package_file}.md5"}"
+
+  [[ -n "${package_md5}" ]] || read_config "${package_name}" md5 "${package_file}" as package_md5
+  [[ -n "${package_md5}" ]] ||
+    if [[ -n "${package_md5_url}" ]]
+    then # TODO: Can this be added into fetch_uri ?
+      curl -L "${packge_md5_url}" -o "${archives_path}/${package_file}.md5" 2>/dev/null ||
+        error "Fetching MD5 checksum from '${package_md5_url}' failed."
+
+      package_md5=$(cat "${archives_path}/${package_file}.md5")
+
+      rm "${archives_path}/${package_file}.md5"
+    else
+      package_md5="" # not known.
+    fi
+}
+
+__sm.package.update()
+{
+  (( $# == 0 )) || __sm.package.cli $@
+
+  # TODO: check if newer version exists, if so then...
+  if __sm.package.versions.installed | grep -q "${package_version}" \
+  && [[ "${force_flag}" != "1" ]]
+  then
+    log "The latest version (${package_version}) of the ${package_name} package is already installed."
+  else
+    __sm.package.${package_strategy:-gnu}.install \
+      ${package_name} ${package_version:-} ${archive_format:-} force
+    __sm.package.activate ${package_name} ${package_version}
+  fi
+}
+
+__sm.package.configure()
+{
+  local _command
+
+  command exists gcc || command exists cc || fail "No C compiler found."
+
+  if [[ -n "${configure_command}" ]]
+  then
+    _command="${configure_command}"
+  else
+    export PREFIX="${install_base_path}/${package_version}"
+
+    # package configure flag key --prefix "${install_path}"
+    __sm.package.configure.flag "--prefix" "${install_path}"
+
+    _command="./configure ${configure_flags[*]}"
+
+    [[ -x "${_command%% *}" ]] || return 0
+  fi
+
+  debug package "__sm.package.configure: ${_command}"
+
+  ${_command} > configure.log 2>&1 ||
+    __sm.package.error \
+    "Configuration of ${package_name} ${package_version} failed." \
+    "configure.log"
+}
+
+__sm.package.build()
+{
+  local _command
+
+  if [[ -n ${build_command:-} ]]
+  then
+    _command="${build_command}"
+  else
+    _command="make ${make_flags[@]:-"-j$(os cpu count)"}"
+  fi
+
+  debug package "__sm.package.build: ${_command}"
+
+  ${_command} > build.log 2>&1 ||
+    package error \
+      message "Compilation of ${package_name} ${package_version} failed! " \
+      log "build.log"
+}
+
+__sm.package.preinstall()
+{
+  true # nothing to be done for now.
+}
+
+__sm.package.make.install()
+{
+  local _command
+
+  if [[ -n ${install_command:-} ]]
+  then
+    _command="${install_command}"
+  else
+    _command="make ${make_install_flags[@]:-install}"
+  fi
+
+  log_step "${package_name} ${package_version} ~ install"
+  ${_command} > make.install.log 2>&1 ||
+    package error \
+      message "Installation of ${package_name} ${package_version} failed! " \
+      log "make.install.log"
+  log_step success
+}
+
+
+__sm.package.postinstall()
+{
+  true
+}
+
+__sm.package.activate()
+{
+  (( $# == 0 )) || __sm.package.cli $@
+
+  versionedfs activate \
+    path "${packages_path}" name "${package_name}" version "${package_version}"
+
+  __sm.package.ldconfig "${package_name}"
+  __sm.package.setup "${package_name}"
+}
+
+__sm.package.setup()
+{
+  local _package="${1:-${package_name}}"
+
+  __sm.package.profile.d "${_package}"
+
+  if  __sm.module.is.loaded "service"
+  then
+    __sm.service.setup "${_package}"
+  fi
+
+  if __sm.module.is.loaded "database"
+  then
+    __sm.database.setup "${_package}"
+  fi
+}
+
+__sm.package.deactivate()
+{
+  (( $# == 0 )) || __sm.package.cli $@
+
+  log_step "${package_name} ${_version} ~ deactivate"
+
+  versionedfs deactivate \
+    path "${packages_path}" name "${package_name}"
+
+  log_step success
+
+  if ! __sm.string.contains '__sm.package.activate' "${FUNCNAME[*]}"
+  then
+    __sm.package.ldconfig "${_package}"
+  fi
+}
+
+__sm.package.activate.first()
+{
+  local _package="${1:-}" _version="${2:-}"
+  shift || fail "Package name must be given as first parameter."
+  shift || fail "Package version must be given as second parameter."
+
+  if paths exist "${install_path}"
+  then
+    __sm.package.activate "${_package}" "${_version}"
+  else
+    log "'${install_path}' not found; skipping activation."
+  fi
+}
+
+__sm.package.ldconfig()
+{
+  local _package="${1:-${package_name}}" _path _files _ldconfig="/sbin/ldconfig"
+  [[ -n "${_package}" ]] || fail "Package name must be given."
+
+  #  paths exist "${packages_path}/versions/${_package}/active/lib" ||
+  #    return 0 # no lib/ directory for activated package, no need to update ldconfig
+
+  user is root || return 0
+
+  # TODO: Figure out if solaris and freebsd have an analog to this?
+  if os is linux
+  then
+    if paths exist "/etc/ld.so.conf.d"
+    then
+      files write \
+        string "${active_path}/lib\n" \
+        to "/etc/ld.so.conf.d/sm.conf" \
+        mode 0444
+    fi
+
+    if [[ -d /selinux ]] && command exists restorecon
+    then
+      restorecon -R "${active_path}/lib" # -v ~ verbose
+      restorecon -R "${packages_path}/versions/${package_name}" # -v ~ verbose
+    fi
+
+    command exists "${_ldconfig}" || ldconfig="ldconfig"
+
+    log_step "${package_name} ${package_version} ~ ldconfig" \
+      "${_ldconfig}" "${active_path}/lib"
+
+  elif os is darwin
+  then # Cluster Fuck!
+    true
+    # This should be handled by the profile.d?
+    # _files=($(find "${packages_path}/versions/${_package}/active" -mindepth 1 -maxdepth 1 -type d))
+    # (( ${#_files[@]} > 0 )) && copy_files to "${packages_path}" "${_files[@]}"
+  fi
+}
+
+__sm.package.profile.d()
+{
+  local _package="${1:-${package_name}}"
+  [[ -n "${_package}" ]] || fail "Package name must be given."
+
+  templates exist "profile.d.template" || return 0
+
+  log_step "Updating shell profile for ${_package}"
+
+  paths create "${profile_d_path}"
+  files create "${profile_path}"
+
+  templates install "profile.d" to "${profile_d_path}/${_package}.sh" mode 0755
+
+  log_step success
+}
+
+__sm.package.uninstall()
+{
+  (( $# == 0 )) || __sm.package.cli $@
+
+  if __sm.package.is.active "${package_name}" "${package_version}"
+  then # Deactivate the package if active.
+    __sm.package.deactivate "${package_name}" "${package_version}"
+  fi
+
+  log_step "${package_name} ${package_version} ~ uninstall"
+
+  paths remove "${install_path}"
+
+  ! module_is_loaded service || service_uninstall # Remove any service reminants
+
+  log_step success
+}
+
+__sm.package.patch()
+{
+  local _patches _patch _path _paths
+
+  _paths=(
+  "${extension_patches_path}"
+  "${extension_patches_path}/$(os type)"
+  "${extension_patches_path}/$(os type)/${package_version}"
+  )
+
+  for _path in "${_paths[@]}"
+  do
+    paths exists "${_path}" || continue # No patch path
+    shopt -s nullglob
+    _patches=( "${_path}"/*.patch )
+    shopt -u nullglob
+    __sm.package.patches.apply "${_patches[@]}"
+  done
+}
+
+__sm.package.patches.apply()
+{
+  local _patch _patches=("$@")
+  shift || fail "No patches were given."
+
+  for _patch in "${_patches[@]}"
+  do
+    [[ -f "${_patch}" && -s "${_patch}" ]] || continue
+    error "TODO: patch application is NIY (see __sm.package.patch())"
+  done
+}
+
+
+__sm.package.is.active()
+{
+  local _name="${1:-}" _version="${2:-}"
+  shift || fail "No package name was given, or name is empty."
+
+  local _path="${packages_path}/versions/${_name}"
+
+  if shift
+  then # version was passed
+    [[ -d "${_path}/${_version}" ]]
+  else # version was not passed
+    [[ -L "${_path}/active" && -d $(readlink "${_path}/active") ]]
+  fi
+}
+
+__sm.package.docs()
+{
+  os open "${package_docs_url}"
+}
+
+__sm.package.website()
+{
+  os open "${package_website_url}"
+}
+
+__sm.package.dependencies()
+{
+  local dependency _dependencies=(${package_dependencies[@]}) _missing_dependencies=()
+
+  unset package_dependencies
+
+  # TODO: improve dependency management.
+  for dependency in "${_dependencies[@]}"
+  do
+    if ! __sm.package.is.active ${dependency/-/ }
+    then
+      _missing_dependencies+=( ${dependency} )
+    fi
+  done
+
+  if [[ -n "${_missing_dependencies}" ]]
+  then
+    local IFS=','
+    error "${extension} requires ${_missing_dependencies[*]}.\n
+Please install via sm package module, and retry. Typically, this can be done as follows:\n
+\tsm ${_missing_dependencies[*]} package install\n"
+  fi
+}
+
+__sm.package.info()
+{
+  (( $# == 0 )) || __sm.package.cli $@
+
+  local _installed _path="${packages_path}/versions/${package_name}" package_md5
+
+  : \
+    "${package_dir:="${package_name}-${package_version}"}" \
+    "${package_url:="${package_base_url}/${package_file}"}"
+
+  [[ -n "${package_md5}" ]] || read_config "${package_name}" md5 "${package_file}" as package_md5
+
+  log "package_name: ${package_name}"
+  if paths exist "${_path}"
+  then
+    local _installed=($( __sm.package.versions.installed ${package_name} ${package_version} ))
+    log "  versions_installed: ${_installed[*]}"
+  else
+    log "  versions_installed: none"
+  fi
+  log "  default_version: ${package_default_version}"
+
+  if [[ -d "${_path}" ]] && [[ -L "${_path}/active" ]]
+  then
+    log "  version_active: $(readlink "${_path}/active")"
+  else
+    log "  version_active: none"
+  fi
+  log "  base_url: ${package_base_url}"
+  log "  download_url: ${package_url}"
+  log "  archive_format: ${package_file}"
+  log "  stored archive_md5: ${package_md5:-}"
+  log "  source_path: ${source_path}/${package_dir}"
+
+  if [[ -n "${package_dependencies}" ]]
+  then
+    log "  dependencies: ${package_dependencies[*]}"
+  fi
+}
+
+__sm.package.man()
+{
+  (( $# == 0 )) || __sm.package.cli $@
+
+  true "${package_path:="${packages_path}/versions/${package_name}/${package_version}"}"
+
+  MANPATH="${package_path}/man"
+
+  paths exist $MANPATH ||
+    error "No man page available for package ${package_name} ${package_version}"
+
+  man ${extension_actions[@]:-${package_name}} || true
+}
+
+__sm.package.versions.installed()
+{
+  versionedfs versions path "${packages_path}" name "${package_name}"
+}
+
+__sm.packages.installed()
+{
+  versionedfs versions path "${packages_path}"
+}
+
+__sm.packages.active()
+{
+  local _name="${1:-}"
+  if [[ -n "${_name}" ]]
+  then
+    versionedfs active path "${packages_path}" name "${_name}"
+  else
+    versionedfs active path "${packages_path}"
+  fi
+}
+
+__sm.packages.available()
+{
+  __sm.extension.installed module "api/package" "$@"
+}
+
+__sm.packages.list()
+{
+  local _action="${1:-}" _args
+  shift || true
+  __sm.packages.${_action:-installed} "$@"
+}
+
+__sm.package.usage() {
+  log "
+  Usage:
+
+  $0 [options]
+
+  options:
+
+  --prefix   - specify prefix path
+  --src)     - specify source directory
+  --data)    - specify data directory
+  --user)    - specify user to install as
+  --version) - specify version to install
+  --licence) - view licence
+  --help)    - view this usage information
+
+  "
 }
 

@@ -2,4 +2,5 @@
 
 modules api/package
 
-package_install "${extension_args[@]}"
+package install "${extension_args[@]}"
+
