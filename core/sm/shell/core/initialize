@@ -143,7 +143,7 @@ then
   then
     error "${call_action} is not a valid function name"
   else
-    __sm.actions.call "${call_action}" "${extension_args[@]}"
+    __sm.actions.call ${call_action} "${extension_args[@]}"
   fi
 elif set | grep '^extension_args=(' >/dev/null
 then
