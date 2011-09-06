@@ -104,3 +104,13 @@ __sm.package.configure.flag()
   fi
 }
 
+__sm.package.set.cflags()
+{
+  export CFLAGS="-I${active_path}/include ${CFLAGS:-} "
+}
+
+__sm.package.set.ldflags()
+{
+  export LDFLAGS="-L${active_path}/lib ${LDFLAGS:-}"
+}
+

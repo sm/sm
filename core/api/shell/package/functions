@@ -364,6 +364,9 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
       package_patch
   fi
 
+  __sm.package.set.cflags
+  __sm.package.set.ldflags
+
   if command exists "${package_name}_preconfigure"
   then
     log_step "${package_name} ${package_version} ~ preconfigure" \
