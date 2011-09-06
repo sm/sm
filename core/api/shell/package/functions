@@ -74,6 +74,33 @@ package()
         _key="$1"
         shift || fail "Key name must follow keyword 'key'"
         ;;
+      (name)
+        package_name="$1"
+        shift || fail "a package name must follow keyword 'name'"
+      (version)
+        package_version="$1"
+        shift || fail "a package version must follow keyword 'version'"
+      (base_url)
+        package_base_url="$1"
+        shift || fail "a package base_url must follow keyword 'base_url'"
+      (file)
+        package_file="$1"
+        shift || fail "a package file name must follow keyword 'file'"
+      (user)
+        package_user="$1"
+        shift || fail "a package user name must follow keyword 'user'"
+      (archive_format)
+        archive_format="$1"
+        shift || fail "a package archive_format must follow keyword 'archive_format'"
+      (md5)
+        package_md5="$1"
+        shift || fail "a package md5 sum must follow keyword 'md5'"
+      (sha256)
+        package_sha256="$1"
+        shift || fail "a package sha256 key must follow keyword 'sha256'"
+      (sha512)
+        package_sha512="$1"
+        shift || fail "a package sha512 key must follow keyword 'sha512'"
       (*)
         if [[ -z "${_command}" ]]
         then
