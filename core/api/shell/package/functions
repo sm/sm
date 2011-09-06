@@ -214,8 +214,9 @@ package_init()
 
   case "${package_strategy:-gnu}" in
     gnu)
-      LDFLAGS="-L${active_path}/lib ${LDFLAGS:-}"
-      CFLAGS="-I${active_path}/include ${CFLAGS:-} "
+      __sm.package.set.cflags
+      __sm.package.set.ldflags
+
       if os is darwin && [[ -x /usr/bin/gcc-4.2 ]]
       then
         export CC=/usr/bin/gcc-4.2
@@ -363,9 +364,6 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
     log_step "${package_name} ${package_version} ~ patch" \
       package_patch
   fi
-
-  __sm.package.set.cflags
-  __sm.package.set.ldflags
 
   if command exists "${package_name}_preconfigure"
   then
