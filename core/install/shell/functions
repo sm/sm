@@ -125,7 +125,7 @@ setup_profile_d()
       files write string "${_PATH}" to "${profile_d_path}/sm.sh"
     fi
 
-    files chmod 0644 "${profile_d_path}/sm.sh"
+    files chmod 0755 "${profile_d_path}/sm.sh"
   else
     log "\nNOTE:\n"\
     "Since you are installing as a user ($USER), in order to ensure that the 'sm' "\
