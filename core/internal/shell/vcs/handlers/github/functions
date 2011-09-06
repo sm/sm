@@ -1,6 +1,6 @@
 #!/bin/sh
 
-ext_vcs_handlers_github_initialize()
+internal_vcs_handlers_github_initialize()
 {
   [[ -n "${github_resolution_order[*]}" ]] || github_resolution_order=( tgz zip git )
 }

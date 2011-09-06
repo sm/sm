@@ -1,6 +1,8 @@
 #!/bin/sh
 
-ext_vcs_initialize()
+# TODO: Rework this into a 1.0.0 module API
+
+internal_vcs_initialize()
 {
   if [[ ! -w $sm_path ]]
   then
@@ -140,7 +142,7 @@ fetch_update()
 
   if [[ -d "${_target}" ]] && [[ -s "${_target}/.uri" ]]
   then
-    _uri=$( cat "${_target}/.uri" )
+    _uri=$( __sm.vcs.read_uri "${_target}/.uri" )
     if [[ -n "${_uri}" ]]
     then
       fetch_uri "${_uri}" "${_target}" "$@"

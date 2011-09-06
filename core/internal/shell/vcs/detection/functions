@@ -1,4 +1,4 @@
-#!/bin/sh
+  #!/bin/sh
 
 #
 # # VCS (SCM) Module
@@ -25,6 +25,17 @@ detect_uri()
     return 0
   else
     return 1
+  fi
+}
+
+__sm.vcs.read_uri()
+{
+  local _uri=$(cat $1)
+  if [[ -n "${_uri}" && -d "${_uri}" && -f "${_uri}/.uri" && -s "${_uri}/.uri" ]]
+  then
+    __sm.vcs.read_uri "${_uri}/.uri"
+  else
+    printf "${_uri}\n"
   fi
 }
 

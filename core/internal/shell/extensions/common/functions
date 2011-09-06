@@ -1,6 +1,6 @@
 #!/bin/sh
 
-__sm.extension.path()
+  __sm.extension.path()
 {
   local _path extension="${1:-}"
   shift || fail "Cannot process extension path;"\

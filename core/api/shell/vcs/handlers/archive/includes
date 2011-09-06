@@ -1,2 +1,1 @@
-api/files
-api/paths
+internal/vcs/handlers/archive
