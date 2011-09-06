@@ -87,14 +87,7 @@ package()
 
   case "${_command}" in
     (install|uninstall)
-      case "${package_strategy:=gnu}" in
-        (gnu|binary|java)
-          __sm.package.${package_strategy}.${_command}
-          ;;
-        *)
-          fail "Unknown package strategy ${package_strategy}"
-          ;;
-      esac
+      __sm.package.${_command} "${_params[@]}"
       ;;
     (configure)
       case "${_subcommand}" in

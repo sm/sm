@@ -88,32 +88,38 @@ __sm.extension.modules.include()
 __sm.extension.action.prerequisites()
 {
   trace_filter action_pre
-  local _pre _name _action="${action// *}" _extension="${_extension// *}"
+  local _pre _name _action="${action// *}" _extension="${extension// *}"
 
   _pre=(
-   ${_action}_cli
-   ${_action}_initialize
+  ${_action}_cli
+  ${_action}_initialize
   )
 
   __sm.string.contains "${_action%%_*}.cli" "${_pre[*]}" || _pre+=(
-   ${_action%%_*}_cli
-   ${_action%%_*}_initialize
+  ${_action%%_*}_cli
+  ${_action%%_*}_initialize
   )
 
   __sm.string.contains "${_extension}.cli" "${_pre[*]}" || _pre+=(
-   ${_extension}_cli
-   ${_extension}_initialize
+  ${_extension}_cli
+  ${_extension}_initialize
   )
+
+  __sm.string.contains "__sm.${_action}.cli" "${_pre[*]}" || _pre+=(
+  __sm.${_action}.cli
+  __sm.${_action}.initialize
+  )
+
   __sm.string.contains "__sm.${_extension}.cli" "${_pre[*]}" || _pre+=(
-   __sm.${_extension}.cli
-   __sm.${_extension}.initialize
+  __sm.${_extension}.cli
+  __sm.${_extension}.initialize
   )
 
   for _name in ${_pre[@]}
   do
-    if __sm.command.exists "${_name}"
+    if __sm.command.exists ${_name// *}
     then
-      "${_name}" "${extension_args[@]}"
+      ${_name} "${extension_args[@]}"
     fi
   done
 }

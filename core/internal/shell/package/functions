@@ -224,6 +224,30 @@ __sm.package.exports()
     LDFLAGS CFLAGS package_default_version
 }
 
+__sm.package.install()
+{
+  case "${package_strategy:=gnu}" in
+    (gnu|binary|java)
+      __sm.package.${package_strategy}.install "$@"
+      ;;
+    *)
+      fail "Unknown package strategy ${package_strategy}"
+      ;;
+  esac
+}
+
+__sm.package.uninstall()
+{
+  case "${package_strategy:=gnu}" in
+    (gnu|binary|java)
+      __sm.package.${package_strategy}.uninstall "$@"
+      ;;
+    *)
+      fail "Unknown package strategy ${package_strategy}"
+      ;;
+  esac
+}
+
 __sm.package.gnu.install()
 {
   (( $# == 0 )) || __sm.package.cli $@
@@ -263,10 +287,10 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
 
   if command exists "${package_name}_fetch"
   then
-    log_step "${package_name} ${package_version} ~ download" \
+    log_step "${package_name} ${package_version} ~ fetch" \
       "${package_name}_fetch"
   else
-    log_step "${package_name} ${package_version} ~ download" \
+    log_step "${package_name} ${package_version} ~ fetch" \
       __sm.package.fetch
   fi
 
@@ -452,13 +476,13 @@ __sm.package.exports
 __sm.package.binary.install()
 {
   NIY "Binary package strategy"
-  # TODO: download, extract, copy to install path.
+  # TODO: fetch, extract, copy to install path.
 }
 
 __sm.package.java.install()
 {
   NIY "Java package strategy"
-  # TODO: download, extract, copy to install path, setup java launcher.
+  # TODO: fetch, extract, copy to install path, setup java launcher.
 }
 
 __sm.package.fetch.md5()
@@ -486,6 +510,38 @@ __sm.package.fetch.md5()
     fi
 }
 
+__sm.package.fetch()
+{
+  (( $# == 0 )) || __sm.package.cli $@
+
+  local _args=()
+
+  true \
+    "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
+    "${package_url:="${package_base_url}/${package_file}"}"
+
+  __sm.package.fetch.md5
+  if [[ -n "${scm_type:-}" ]]
+  then
+    _args+=( "scm_type" "${scm_type}" )
+  fi
+
+  fetch_uri "${package_url}" "${source_path}/${package_dir}" \
+    "${package_md5:-#}" ${_args[@]} || return 1
+
+  [[ -z "${__vcs_failed}" ]] || return 1
+
+  [[ -d "${source_path}/${package_dir}/${package_dir}" ]] || return 0
+
+  shopt -s nullglob
+  local _entries=( "${source_path}/${package_dir}/${package_dir}"/*  )
+  shopt -u nullglob
+
+  mv "${_entries[@]}" "${source_path}/${package_dir}/"
+
+  rm -rf "${source_path}/${package_dir}/${package_dir}/"
+}
+
 __sm.package.update()
 {
   (( $# == 0 )) || __sm.package.cli $@
@@ -496,7 +552,7 @@ __sm.package.update()
   then
     log "The latest version (${package_version}) of the ${package_name} package is already installed."
   else
-    __sm.package.${package_strategy:-gnu}.install \
+    __sm.package.${package_strategy:=gnu}.install \
       ${package_name} ${package_version:-} ${archive_format:-} force
     __sm.package.activate ${package_name} ${package_version}
   fi
