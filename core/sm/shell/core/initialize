@@ -116,11 +116,9 @@ source "${modules_path}/logging/functions"
 source "${modules_path}/logging/initialize"
 source "${modules_path}/command/functions"
 source "${modules_path}/modules/functions"
-source "${modules_path}/extensions/functions"
+source "${modules_path}/versionedfs/functions"
 
 __sm.modules.core.initialize
-
-modules include sm/versionedfs
 
 if [[ "$OSTYPE" == *solaris* ]]
 then # custom compilations + g*

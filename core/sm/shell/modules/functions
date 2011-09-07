@@ -32,8 +32,9 @@ __sm.modules.core.initialize()
     "sm/core=core/sm/shell/core"
     "sm/string=core/internal/shell/string"
     "sm/logging=core/sm/shell/logging"
+    "sm/command=core/sm/shell/command"
     "sm/modules=core/sm/shell/modules"
-    "sm/extensions=core/sm/shell/extensions"
+    "sm/versionedfs=core/sm/shell/versionedfs"
   )
 
   for _module in ${__sm_modules_loaded[@]}
