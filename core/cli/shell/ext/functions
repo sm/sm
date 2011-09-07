@@ -129,13 +129,12 @@ ext_update()
 
 ext_update_all()
 {
-  local _name _entries
+  local _name _entries=( "${exts_user_path}"/* )
 
-  shopt -s nullglob
-  _entries=( "${exts_user_path}"/* )
-  shopt -u nullglob
-
-  [[ -n "${_entries[*]}" ]] || error "No extensions found for update."
+  if (( ! "${#_entries[@]}" ))
+  then
+    error "No extensions found for update."
+  fi
 
   for _name in "${_entries[@]}"
   do

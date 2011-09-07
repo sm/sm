@@ -528,10 +528,7 @@ __sm.package.fetch()
 
   [[ -d "${source_path}/${package_dir}/${package_dir}" ]] || return 0
 
-  shopt -s nullglob
   local _entries=( "${source_path}/${package_dir}/${package_dir}"/*  )
-  shopt -u nullglob
-
   mv "${_entries[@]}" "${source_path}/${package_dir}/"
 
   rm -rf "${source_path}/${package_dir}/${package_dir}/"
@@ -778,10 +775,12 @@ __sm.package.patch()
   for _path in "${_paths[@]}"
   do
     paths exists "${_path}" || continue # No patch path
-    shopt -s nullglob
+
     _patches=( "${_path}"/*.patch )
-    shopt -u nullglob
-    __sm.package.patches.apply "${_patches[@]}"
+    if (( ${#_patches[@]} ))
+    then
+      __sm.package.patches.apply "${_patches[@]}"
+    fi
   done
 }
 

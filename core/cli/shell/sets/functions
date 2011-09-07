@@ -164,22 +164,17 @@ sets_update()
 
 sets_update_all()
 {
-  shopt -s nullglob
-  local _name _sets=( "${sets_user_path}"/* )
-  shopt -u nullglob
+  local _name _sets=( "${sets_user_path}"/active/* )
+
+  if (( ! ${#_sets[@]} ))
+  then
+    error "No extension sets found for update."
+  fi
 
   for _name in "${_sets[@]}"
   do
-    [[ -d "${sets_user_path}/active/${_name}"  ]] || continue
-
-    case "${_name##*/}" in
-      (\*)
-        error "No extension sets found for update."
-        ;;
-      (*)
-        sets_update "${_name##*/}"
-        ;;
-    esac
+    [[ -d "${_name}"  ]] || continue
+    sets_update "${_name##*/}"
   done
 }
 

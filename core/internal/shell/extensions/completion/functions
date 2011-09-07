@@ -43,17 +43,13 @@ show_extension_names()
 {
   extensions_path="$1"
   shift || fail "no path given"
-  #$1 is ignored == "unused"
-  local _patern=$2 _paths
-  shopt -s nullglob
-  _paths=( "${extensions_path}"/* )
-  shopt -u nullglob
 
-  for extension in "${_paths[@]}"
+  #$1 is ignored == "unused"
+  local _patern=$2
+  for extension in "${extensions_path}"/*
   do
     extension="${extension##*/}"
-    case "${extension##*/}" in
-      (\*) continue ;; #skip empty dirs
+    case "${extension}" in
       (.*) continue ;; #skip hidden stuff
       (${_patern}*) printf "${extension}\n" ;;
       (*) [[ -n "${_patern}" ]] || printf "${extension}\n" ;;

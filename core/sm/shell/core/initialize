@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # The following shell options must be enabled for the SM Framework.
-shopt -s extglob
+shopt -s extglob nullglob
 
 saved_sm_path="${sm_path:-"/sm"}"
 
@@ -114,12 +114,13 @@ source "${modules_path}/core/functions"
 source "${modules_path}/string/functions"
 source "${modules_path}/logging/functions"
 source "${modules_path}/logging/initialize"
+source "${modules_path}/command/functions"
 source "${modules_path}/modules/functions"
 source "${modules_path}/extensions/functions"
 
 __sm.modules.core.initialize
 
-modules include sm/command sm/versionedfs
+modules include sm/versionedfs
 
 if [[ "$OSTYPE" == *solaris* ]]
 then # custom compilations + g*
