@@ -97,7 +97,10 @@ __sm.extension.actions.find()
       #TODO: account for zsh indexes ( -1 -> -0 )
       _param_temp="${_action_params[$(( _action_params_length - 1 ))]}"
       _rest_params=( "${_param_temp}" "${_rest_params[@]}" )
+      shopt -u nullglob
       unset _action_params[$(( _action_params_length - 1 ))]
+      shopt -s nullglob
+      _action_params=( "${_action_params[@]}" ) # Just in case ... works without it
     done
   else
     error "${extensions_path}/${extension} does not have map or module dependencies with actions"
