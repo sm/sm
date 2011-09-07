@@ -6,7 +6,7 @@ variables()
 
   local _command _variables=() _type
 
-  if __sm.string.starts.with.one.off  "$* " \
+  if __sm.string.starts.with.one.of  "$* " \
     "are empty " \
     "are nonempty " \
     "must be empty " \

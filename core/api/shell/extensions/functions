@@ -11,7 +11,7 @@ extension()
 
   local _command _params=() _name _uri
 
-  if __sm.string.starts.with.one.off  "$* " \
+  if __sm.string.starts.with.one.of  "$* " \
     "in extension sets do " \
     "in extensions do " \
     "get uri "

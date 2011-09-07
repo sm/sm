@@ -18,7 +18,7 @@ __sm.string.starts()
   return 1
 }
 
-__sm.string.starts.with.one.off()
+__sm.string.starts.with.one.of()
 {
   __string=$1
   shift
