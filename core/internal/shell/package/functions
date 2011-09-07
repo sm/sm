@@ -332,7 +332,7 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
       "${package_name}_build"
   else
     log_step "${package_name} ${package_version} ~ build" \
-      __sm.package.build
+      __sm.package.gnu.make
   fi
 
   if command exists "${package_name}_preinstall"
@@ -353,7 +353,8 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
     log_step "${package_name} ${package_version} ~ install" \
       "${package_name}_install"
   else
-    __sm.package.make.install
+    log_step "${package_name} ${package_version} ~ install" \
+      __sm.package.make.install
   fi
 
   files link symbolic force \
@@ -385,7 +386,7 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
 
 __sm.package.init()
 {
-  package_name="${1:-${package_name:-${extension}}}"
+  true ${package_name:=${extension}}
 
   [[ -n "${package_name}" ]] || fail "Package name must be given.\n"
 
@@ -578,7 +579,7 @@ __sm.package.configure()
     "configure.log"
 }
 
-__sm.package.build()
+__sm.package.gnu.make()
 {
   local _command
 
@@ -589,7 +590,7 @@ __sm.package.build()
     _command="make ${make_flags[@]:-"-j$(os cpu count)"}"
   fi
 
-  debug package "__sm.package.build: ${_command}"
+  debug package "__sm.package.gnu.make: ${_command}"
 
   ${_command} > build.log 2>&1 ||
     package error \
