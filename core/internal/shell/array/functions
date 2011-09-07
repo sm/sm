@@ -80,13 +80,15 @@ __sm.array.pop()
 
   eval "(( \${#${_name}[@]} ))" || fail "Array '${_name}' was empty."
 
-  # TODO: Account for zsh vs bash
   if [[ -n "${_variable}" ]]
   then
+    # TODO: Account for zsh vs bash (-1)
     eval "${_variable}=\${${_name}[\${#${_name}[@]}-1]}"
   fi
 
+  shopt -u nullglob
   eval "unset ${_name}[\${#${_name}[@]}-1]"
+  shopt -s nullglob
   #TODO: check if this one is required:
   eval "${_name}=( \"\${${_name}[@]}\" ) "
 }
@@ -98,8 +100,9 @@ __sm.array.shift()
 
   [[ -z "${_variable}" ]] || eval "${_variable}=\${${_name}[${__sm_array_start}]}"
 
-  # TODO: Account for zsh vs bash
+  shopt -u nullglob
   unset "${_name}[${__sm_array_start}]"
+  shopt -s nullglob
   eval "${_name}=( \"\${${_name}[@]}\" ) "
 }
 
