@@ -18,11 +18,7 @@ files()
   local _token _command _subcommand _path _file _files=() _source _target _mode _owner \
     _flags _string _regex
 
-  if [[ -z "${_command}" ]]
-  then
-    _command="$1"
-    shift || fail "A command must be given."
-  fi
+  [[ -n "${_command}" ]] || _command="$1"
 
   while (( $# > 0 ))
   do
