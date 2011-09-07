@@ -9,6 +9,8 @@
 #
 # TODO: Finish this API documentation below
 #
+file() { files "$@" ; }
+
 files()
 {
   trace_filter filesystem

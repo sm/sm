@@ -34,15 +34,17 @@
 #     user$ ls
 #     a b c
 #
-#     user$ paths remove /tmp/somedir /tmp/someotherdir
+#     user$ path remove /tmp/somedir /tmp/someotherdir
 #
-#     user$ paths copy to "$HOME/backup/" "$HOME/bin" "$HOME/projects"
+#     user$ path copy to "$HOME/backup/" "$HOME/bin" "$HOME/projects"
 #
-#     user$ paths_chown $USER "$HOME" "/usr/local"
+#     user$ path chown $USER "$HOME" "/usr/local"
 #
 #
-#     user$ paths_chmod $USER "$HOME" "/usr/local"
+#     user$ path chmod $USER "$HOME" "/usr/local"
 #
+
+path() { paths "$@" ; }
 
 paths()
 {
@@ -72,7 +74,6 @@ paths()
         ;;
       (recursive|recursively)
         _flags+=(-R)
-        shift # Remove the recursive flag parameter.
         ;;
       (matching|regex|glob)
         _regex="$1"

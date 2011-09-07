@@ -135,8 +135,17 @@ package()
   done
 
   case "${_command}" in
+    (make)
+      case "$_subcommand" in
+        (install)
+          __sm.package.make.install
+          ;;
+        (*)
+          __sm.package.make "${_params[@]}"
+          ;;
+      esac
     (is)
-      case "$1" in
+      case "$_subcommand" in
         (active|installed)
           __sm.package.is.${_subcommand}
           ;;

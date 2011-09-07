@@ -415,7 +415,7 @@ __sm.package.init()
     "${archives_path:="${sm_path}/archives"}" \
     ${static_flag:=0}
 
-__sm.package.exports
+  __sm.package.exports
   # Ensure that package_version is set at this point
 
   [[ -n "${package_default_version}" ]] || read_default version prefix package_default for ${package_name}
