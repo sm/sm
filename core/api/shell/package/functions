@@ -40,12 +40,24 @@
 package()
 {
   trace_filter package
-  local _token _command _logfile _lines=50 _params=()
+  local _token _subcommand _command _logfile _lines=50 _params=()
 
   while (( $# ))
   do
     _token="$1" && shift
     case "${_token}" in
+      (is)
+        _command=is
+        case "$1" in
+          (active|installed)
+            _subcommand="$1"
+            shift
+            ;;
+          (*)
+            fail "A valid command must follow keyword is; {active|installed}"
+            ;;
+        esac
+        ;;
       (log)
         _log="$1"
         shift || fail "Log file path/name must be given following keyword 'log'"
@@ -123,6 +135,13 @@ package()
   done
 
   case "${_command}" in
+    (is)
+      case "$1" in
+        (active|installed)
+          __sm.package.is.${_subcommand}
+          ;;
+      esac
+      ;;
     (install|uninstall)
       __sm.package.${_command} "${_params[@]}"
       ;;
