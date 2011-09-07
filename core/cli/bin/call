@@ -3,9 +3,9 @@
 if (( ${#extension_args[@]} == 0 ))
 then
   log 'usage:\n  sm call function_name [function_args...]'
-elif ! declare -F "${extension_args[${__sm_array_start}]}" >/dev/null
+elif __sm.command.is.function "${extension_args[${__sm_array_start}]}" >/dev/null
 then
-  error "${extension_args[${__sm_array_start}]} is not a valid function name."
-else
   "${extension_args[@]}"
+else
+  error "${extension_args[${__sm_array_start}]} is not a valid function name."
 fi

@@ -139,11 +139,11 @@ then
   fi
 elif [[ -n "${call_action}" ]]
 then
-  if ! declare -F "${call_action}" >/dev/null
+  if __sm.command.is.function "${call_action}"
   then
-    error "${call_action} is not a valid function name"
-  else
     __sm.actions.call ${call_action} "${extension_args[@]}"
+  else
+    error "${call_action} is not a valid function name"
   fi
 elif set | grep '^extension_args=(' >/dev/null
 then

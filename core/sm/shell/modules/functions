@@ -124,7 +124,7 @@ __sm.module.include()
   for _hook in initialize # options, etc... ?
   do
     # TODO: This may need to be adjusted for zsh.
-    if declare -F "${_function}_${_hook}"
+    if __sm.command.is.function "${_function}_${_hook}"
     then
       "${_function}_${_hook}"
     fi
