@@ -150,7 +150,7 @@ settings_search_path_update()
 
   if files exist "${path}/.uri" && ! files are empty "${_path}/.uri"
   then
-    read -r _uri < "${path}/.uri"
+    _uri="$( __sm.vcs.read_uri "${path}/.uri" )"
     fetch_uri "${_uri}" "${path}" >&2
   fi
 

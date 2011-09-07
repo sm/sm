@@ -116,7 +116,7 @@ ext_update()
       continue
     fi
 
-    _uri=$( cat "${exts_user_path}/active/${_name}/.uri" )
+    _uri=$( __sm.vcs.read_uri "${exts_user_path}/active/${_name}/.uri" )
 
     if [[ -z "${_uri}" ]]
     then

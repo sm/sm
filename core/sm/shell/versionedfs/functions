@@ -171,6 +171,7 @@ __sm.versionedfs.add()
   if [[ "${_version_path}" != "${_source}" ]]
   then
     cp -Rf "${_source}"/* "${_version_path}"
+    printf "${_source}\n" > "${_version_path}/.uri"
   fi
 }
 
@@ -254,6 +255,7 @@ __sm.versionedfs.activate()
           cp -Rf "${_version_path}"/* "${_active_path}"
           ;;
       esac
+      printf "${_version_path}\n" > "${_active_path}/.uri"
       ;;
     (name)
       if [[ -d "${_active_path}/${_name}" ]]
@@ -262,6 +264,7 @@ __sm.versionedfs.activate()
       fi
       mkdir -p "${_active_path}/${_name}"
       cp -Rf "${_version_path}"/* "${_active_path}/${_name}"
+      printf "${_version_path}\n" > "${_active_path}/${_name}/.uri"
       ;;
   esac
 
