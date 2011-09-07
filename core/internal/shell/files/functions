@@ -533,7 +533,11 @@ __sm.files.md5()
 
   for file in "${_files[@]}"
   do
-    if _md5="$(${_command} "$_file" 2>/dev/null)"
+    [[ -r "${_file}" ]] || continue
+
+    _md5="$(${_command} "$_file" 2>/dev/null || true)"
+
+    if [[ -n "${_md5}" ]]
     then
       printf "${_md5// *}"
     else # Should this be error ?
