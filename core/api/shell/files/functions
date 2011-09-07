@@ -18,12 +18,17 @@ files()
   local _token _command _subcommand _path _file _files=() _source _target _mode _owner \
     _flags _string _regex
 
+  if [[ -z "${_command}" ]]
+  then
+    _command="$1"
+    shift || fail "A command must be given."
+  fi
+
   while (( $# > 0 ))
   do
     _token="$1" && shift
     case "${_token}" in
       (are|is)
-        _command="are"
         _subcommand="$1"
         shift
         case "${_subcommand}" in
@@ -37,7 +42,6 @@ files()
         esac
         ;;
       (absolute)
-        _command="absolute"
         _subcommand="$1"
         shift
         case "${_subcommand}" in
@@ -72,13 +76,8 @@ files()
         shift || fail "Target path must be provided after keyword 'to'"
         ;;
       (in)
-        if [[ -z "${_command}" ]]
-        then
-          _command=in
-        else
-          _target="${1}"
-          shift || fail "Target path must be provided after keyword 'to'"
-        fi
+        _target="${1}"
+        shift || fail "Target path must be provided after keyword 'to'"
         ;;
       (from)
         _source="${1}"
@@ -89,7 +88,6 @@ files()
         shift || Fail "Mode must follow keywords 'mode|permissions'"
         ;;
       (chmod)
-        _command=chmod
         _mode="${1}"
         shift || Fail "Mode must follow keywords 'mode|permissions'"
         ;;
@@ -98,7 +96,6 @@ files()
         shift || fail "Owner must be provided after keyword 'owner'"
         ;;
       (chown)
-        _command=chown
         _owner="${1}"
         shift || fail "Owner must be provided after keyword 'owner'"
         ;;
@@ -111,9 +108,6 @@ files()
         ;;
       (force)
         _flags+=( -f )
-        ;;
-      (contain|containing|replace)
-        if [[ -z "${_command}" ]] ; then _command="${_token}" ; fi
         ;;
       (string)
         _string="$1"
@@ -140,12 +134,7 @@ files()
         shift || fail "A content string must follow keyword 'with'"
         ;;
       (*)
-        if [[ -z "${_command}" ]]
-        then
-          _command="${_token}"
-        else
-          _files+=("${_token}")
-        fi
+        _files+=("${_token}")
         ;;
     esac
   done
