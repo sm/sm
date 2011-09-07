@@ -45,9 +45,12 @@ package()
   while (( $# ))
   do
     _token="$1" && shift
+    if [[ -z "${_command}" ]]
+    then
+      _command="${_token}"
+    fi
     case "${_token}" in
       (is)
-        _command=is
         case "$1" in
           (active|installed)
             _subcommand="$1"
@@ -71,7 +74,6 @@ package()
         shift || fail "Message must be given following keyword 'message'"
       ;;
       (configure)
-        _command=configure
         case "$1" in
           (flag|flags)
             _subcommand="$1"
@@ -83,8 +85,14 @@ package()
             ;;
         esac
         ;;
+      (make)
+        if [[ "$1" == install ]]
+        then
+          _subcommand="install"
+          shift
+        fi
+        ;;
       (activate)
-        _command=activate
         if [[ "$1" == first ]]
         then
           _subcommand=first
@@ -139,12 +147,7 @@ package()
         shift || fail "a package sha512 key must follow keyword 'sha512'"
         ;;
       (*)
-        if [[ -z "${_command}" ]]
-        then
-          _command="${_token}"
-        else
-          _params+=("${_token}")
-        fi
+        _params+=("${_token}")
         ;;
     esac
   done
