@@ -83,6 +83,21 @@ package()
             ;;
         esac
         ;;
+      (activate)
+        _command=activate
+        if [[ "$1" == first ]]
+        then
+          _subcommand=first
+          shift
+        fi
+        package_name="$1"
+        shift || fail "A package name must follow keyword 'activate'"
+        if [[ -n "${1}" ]]
+        then
+          package_version="$1"
+          shift
+        fi
+        ;;
       (key)
         _key="$1"
         shift || fail "Key name must follow keyword 'key'"
@@ -176,6 +191,13 @@ package()
         fail "Every key must have an associated value."
       fi
       ;;
+    (activate)
+      if [[ "${_subcommand}" == "first" ]]
+      then
+        __sm.package.activate.first "${package_name}" "${package_version}"
+      else
+        __sm.package.activate "${package_name}" "${package_version}"
+      fi
     (initialize)
       declare -a package_dependencies
       declare -a configure_flags
