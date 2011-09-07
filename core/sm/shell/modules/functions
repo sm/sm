@@ -190,7 +190,7 @@ __sm.cli.in.path()
 
 __sm.extension.paths.initialize()
 {
-  local _paths=() _extension_set_path
+  local _extension_set_path
 
   if [[ -z "${extensions_search_paths[*]}" ]]
   then
@@ -208,10 +208,7 @@ __sm.extension.paths.initialize()
     # User extension sets
     if [[ "${sets_system_path}" != "${sets_user_path}" ]]
     then
-      shopt -s nullglob
-      _paths=( "${sets_user_path}"/active/* )
-      shopt -u nullglob
-      for _extension_set_path in "${_paths[@]}"
+      for _extension_set_path in "${sets_user_path}"/active/*
       do
         if [[ -d "${_extension_set_path}" ]]
         then
@@ -221,10 +218,7 @@ __sm.extension.paths.initialize()
     fi
 
     # System extension sets
-    shopt -s nullglob
-    _paths=( "${sets_system_path}"/active/* )
-    shopt -u nullglob
-    for _extension_set_path in "${_paths[@]}"
+    for _extension_set_path in "${sets_system_path}"/active/*
     do
       if [[ -d "${_extension_set_path}" ]]
       then
@@ -233,8 +227,8 @@ __sm.extension.paths.initialize()
     done
   fi
 
-  case "${extensions_search_paths}" in
-    (*"${sm_path}/core"*)
+  case " ${extensions_search_paths[*]} " in
+    (*[[:space:]]${sm_path}/core[[:space:]]*)
       true
       ;;
     (*) # Core is required to run, add it if not found

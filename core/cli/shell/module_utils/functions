@@ -4,14 +4,8 @@
 # ## modules\_installed()
 modules_installed()
 {
-  local _module _modules
-  shopt -s nullglob
-  _modules=(
-  "${modules_path}"/*
-  )
-  shopt -u nullglob
-
-  for _module in "${_modules[@]}"
+  local _module
+  for _module in "${modules_path}"/*
   do
     [[ -d "${_module}" ]] || continue
     printf "%s\n" "${_module##*/}"
@@ -256,7 +250,7 @@ modules_docgen()
   # TODO: Replace with,
   # for file in modules/*/functions ; do (name=${file%%\/functions}; shocco $file > html/${name//*\/}.html)& done ; wait
 
-  local _module _modules _function _functions _name
+  local _module _function _functions _name
   local _prefix="${core_development_path}/html/shell"
   local _path="${site_development_path}"
 
@@ -273,13 +267,7 @@ modules_docgen()
   files write string "<html><body><h2>SM Module Documentation</h2><ul>" \
     to "${_prefix}/index.html"
 
-  shopt -s nullglob
-  _modules=(
-  "${core_development_path}"/shell/*
-  )
-  shopt -u nullglob
-
-  for _module in "${_modules[@]}"
+  for _module in "${core_development_path}"/shell/*
   do
     [[ -d "${_module}" ]] || continue
     _name="${_module##*/}"
@@ -330,7 +318,7 @@ modules_site_docgen()
   # TODO: Replace with,
   # for file in modules/*/functions ; do (name=${file%%\/functions}; shocco $file > html/${name//*\/}.html)& done ; wait
 
-  local _module _modules _function _functions _name _file
+  local _module _function _functions _name _file
   local _prefix="${core_development_path}/html/shell"
   local _path="${site_development_path}"
 
@@ -340,12 +328,7 @@ modules_site_docgen()
   files write string "<html><body><h2>SM Module Documentation</h2><ul>" \
     to "${_prefix}/index.html"
 
-  shopt -s nullglob
-  _modules=(
-  "${core_development_path}"/shell/*
-  )
-  shopt -u nullglob
-  for _module in "${_modules[@]}"
+  for _module in "${core_development_path}"/shell/*
   do
     [[ -d "${_module}" ]] || continue
     _name="${_module##*/}"

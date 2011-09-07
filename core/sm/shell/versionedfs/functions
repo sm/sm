@@ -309,16 +309,11 @@ __sm.versionedfs.deactivate()
           rm -f "${_target}"
         elif [[ -d "${_target}" ]]
         then
-          shopt -s nullglob
           local _targets=( "${_target}"/* )
-          shopt -u nullglob
-          for _file in "${_targets[@]}"
-          do
-            case "${_file}" in
-              (${_target}/\*) rm -rf "${_target}" ;;
-              (*) break ;;
-            esac
-          done
+          if (( ! ${#_targets[@]} ))
+          then
+            rm -rf "${_target}"
+          fi
         elif [[ -f "${_target}" ]]
         then
           fail "Unknown file type for ${_target}."
@@ -343,10 +338,7 @@ __sm.versionedfs.list()
     _name="${_name//,/ }"
   fi
 
-  shopt -s nullglob
-  local _paths=( "${_path}"/versions/*/* )
-  shopt -u nullglob
-  for __path in "${_paths[@]}"
+  for __path in "${_path}"/versions/*/*
   do
     __version="${__path##*/}"
     case "${_method}" in

@@ -8,10 +8,7 @@ __sm.extension.in()
 
   if [[ -d "${_path}" ]]
   then
-    shopt -s nullglob
-    local _paths=( "${_path}"/* )
-    shopt -u nullglob
-    for _extension in "${_paths[@]}"
+    for _extension in "${_path}"/*
     do
       if [[ -d "${_extension}/bin" || -d "${_extension}/shell" ]]
       then

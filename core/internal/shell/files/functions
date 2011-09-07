@@ -448,15 +448,12 @@ __sm.files.write()
 __sm.files.in()
 {
   local _file _paths=() _file_paths=($@)
+  #TODO: WTF ? this one can not work as main for gets empty array
   for _path in "${_paths[@]}"
   do
     [[ -d "${_path}" ]] || fail "'${_path}' is not a valid path! "
 
-    shopt -s nullglob
-    _paths=( "${_file_paths}"/* )
-    shopt -u nullglob
-
-    for _file in "${_paths[@]}"
+    for _file in "${_file_paths}"/*
     do
       [[ -f "${_file}" ]] || continue
       echo "${_file}"
@@ -490,7 +487,6 @@ __sm.files.within.matching()
   local _string="$1" _regex="$2" _file
   shift 2
   _paths=("${@}")
-  shopt -s nullglob
   for _path in "${_paths}"
   do
     for _file in "${_path}"/*
@@ -514,7 +510,6 @@ __sm.files.within.matching()
       fi
     done
   done
-  shopt -u nullglob
 }
 
 __sm.files.md5()
