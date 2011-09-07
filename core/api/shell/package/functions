@@ -39,6 +39,7 @@
 #
 package()
 {
+  trace_filter package
   local _token _command _logfile _lines=50 _params=()
 
   while (( $# ))
