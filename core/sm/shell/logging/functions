@@ -158,7 +158,7 @@ core_succeed() {
   then
     printf "$*\n"
   fi
-  exit 0
+  #exit 0
 }
 
 succeed()

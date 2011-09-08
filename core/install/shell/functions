@@ -12,7 +12,7 @@ install_initialize()
 
 perform()
 {
-  paths enter "${initial_pwd}"
+  paths enter "${sm_path}"
   "$*"
 }
 
