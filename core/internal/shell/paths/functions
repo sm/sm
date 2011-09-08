@@ -6,7 +6,7 @@ __sm.paths.move()
 
   mv "${_source}" "${_target}" ||
     fail "Could not move '${_source}' to '${_target}',"\
-    "as the 'chmod -R' command failed with error code '$?'."
+    "as the 'mv' command failed with error code '$?'."
 
   if [[ -n "${_mode}" ]]
   then
