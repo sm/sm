@@ -46,8 +46,8 @@ package()
   do
     _token="$1" && shift
     case "${_token}" in
-      (cli)
-        _command=cli
+      (cli|install|uninstall)
+        _command="${_token}"
         ;;
       (is)
         _command=is
