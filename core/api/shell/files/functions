@@ -85,14 +85,16 @@ files()
         shift || Fail "Mode must follow keywords 'mode|permissions'"
         ;;
       (chmod)
+        _command=chmod
         _mode="${1}"
-        shift || Fail "Mode must follow keywords 'mode|permissions'"
+        shift || Fail "Mode must follow keywords 'chmod'"
         ;;
-      (owner)
+      (chown)
+        _command=chown
         _owner="${1}"
         shift || fail "Owner must be provided after keyword 'owner'"
         ;;
-      (chown)
+      (owner)
         _owner="${1}"
         shift || fail "Owner must be provided after keyword 'owner'"
         ;;
