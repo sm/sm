@@ -7,20 +7,19 @@ variables()
   trace_filter variables
 
   local _command _variables=() _type
+  local __variables_commands=(
+    "is empty=are empty"
+    "is nonempty=are nonempty"
+    "must be empty"
+    "must be nonempty"
+  )
 
-  if __sm.string.starts.with.one.of  "$* " \
-    "is empty " \
-    "is nonempty " \
-    "are empty " \
-    "are nonempty " \
-    "must be empty " \
-    "must be nonempty "
+  if __sm.command.detect "$*" "${__variables_commands[@]}"
   then
-    _command=$( __sm.string.to.function.name "${__sm_string_starts_with}" )
-    shift $( __sm.string.number.of.words "${__sm_string_starts_with}" )
+    _command="${__sm_command_dotted}"
+    shift "${__sm_command_words}"
   else
-    _command="$1"
-    shift || fail "Usage: extension <command> ..."
+    fail "No command given.\nUsage:  \nvariables <command> ..."
   fi
 
   while (( $# ))
@@ -51,9 +50,9 @@ variables()
 
   # TODO: Think through variables more...
   case "${_command}" in
-    (is.empty|is.nonempty|are.empty|are.nonempty)
+    (are.empty|are.nonempty)
       [[ -n "${_variables[*]}" ]] || error "No variable names given for validation"
-      __sm.variables.${_command/#is/are} "${_variables[@]}"
+      __sm.variables.${_command} "${_variables[@]}"
       ;;
     (must.be.empty|must.be.nonempty)
       [[ -n "${_variables[*]}" ]] || error "No variable names given for validation"

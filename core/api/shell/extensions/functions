@@ -10,11 +10,13 @@ extension()
   trace_filter extensions
 
   local _command _params=() _name _uri
+  local __extension_commands=(
+    "in extension sets do=extension sets iterator"
+    "in extensions do=extension iterator"
+    "read known uri=get uri"
+  )
 
-  if __sm.command.detect "$*" \
-    "in extension sets do=extension sets iterator" \
-    "in extensions do=extension iterator" \
-    "known uri=get uri"
+  if __sm.command.detect "$*" "${__extension_commands[@]}"
   then
     _command="${__sm_command_dotted}"
     shift "${__sm_command_words}"
