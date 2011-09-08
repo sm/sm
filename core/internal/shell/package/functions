@@ -88,13 +88,13 @@ __sm.package.cli()
 
 __sm.package.error()
 {
-  local _message="$1" _log="$2" _lines="$3"
+  local _message="$1" _log="$2" _lines="${3:-50}"
 
   if [[ -n ${_log} && -s "${_log}" ]]
   then # Append tail of error log to the error message.
     _message="${_message}\n\nTail of ${_log}:\n$( tail -n ${_lines} ${_log} )"
   fi
-  error "${_message}"
+  error "\n${_message}"
 }
 
 __sm.package.define()
@@ -606,9 +606,8 @@ __sm.package.gnu.make()
   debug package "__sm.package.gnu.make: ${_command}"
 
   ${_command} > build.log 2>&1 ||
-    package error \
-      message "Compilation of ${package_name} ${package_version} failed! " \
-      log "build.log"
+    __sm.package.error \
+    "Compilation of ${package_name} ${package_version} failed! " "$PWD/build.log"
 }
 
 __sm.package.preinstall()
@@ -629,9 +628,9 @@ __sm.package.make.install()
 
   log_step "${package_name} ${package_version} ~ install"
   ${_command} > make.install.log 2>&1 ||
-    package error \
-      message "Installation of ${package_name} ${package_version} failed! " \
-      log "make.install.log"
+    __sm.package.error \
+      "Installation of ${package_name} ${package_version} failed! " \
+      "$PWD/make.install.log"
   log_step success
 }
 
