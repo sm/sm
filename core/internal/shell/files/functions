@@ -267,7 +267,7 @@ __sm.files.hash()
   [[ -d "${_path}" ]] || fail "Cannot access the database file '${_file}'; "\
     "'${_path}' does not exist on the filesystem."
 
-  files create "$_file"
+  files exist "${_file}" || return 0
 
   value="$*"
 

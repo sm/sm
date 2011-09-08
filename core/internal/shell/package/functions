@@ -421,12 +421,12 @@ __sm.package.init()
   __sm.package.exports
   # Ensure that package_version is set at this point
 
-  for variable in default_version base_url md5_url user
+  for variable in version base_url md5_url user
   do
     if variable is empty "package_${variable}"
     then
       config read file defaults from ${package_name} \
-        key ${variable} variable ${variable} prefix package
+        key ${variable} into ${variable} prefix package
     fi
   done
 
@@ -435,7 +435,7 @@ __sm.package.init()
     if variable is empty "${variable}"
     then
       config read file defaults from ${package_name} \
-        key ${variable} variable ${variable}
+        key ${variable} into ${variable}
     fi
   done
 

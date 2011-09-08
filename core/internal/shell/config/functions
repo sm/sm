@@ -6,20 +6,20 @@ __sm.config.read()
 
   if [[ -z "${_variable}" ]]
   then
-    if [[ -n "${prefix}" ]]
-    then
-      _variable="${prefix:-}_${_key}"
-    else
-      _variable="${_key}"
-    fi
+    _variable="${_key}"
+  fi
+  if [[ -n "${_prefix}" ]]
+  then
+    _variable="${_prefix}_${_variable}"
   fi
 
   # Run search in the same process to initialize cache variables.
-  __sm.config.settings.search ${_extension} "${_config_file}" > /dev/null
+  __sm.config.settings.search ${_extension} "${_file}" > /dev/null
 
-  for _file in  $( __sm.config.settings.search ${_extension} "${_config_file}" )
+  for _file in  $( __sm.config.settings.search ${_extension} "${_file}" )
   do
     _value="$(files hash from "${_file}" key "${_key}")"
+    [[ -z "${_value}" ]] || break
   done
 
   eval "${_variable}=\"${_value}\""
