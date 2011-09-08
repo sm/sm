@@ -11,16 +11,15 @@ extension()
 
   local _command _params=() _name _uri
 
-  if __sm.string.starts.with.one.of  "$* " \
-    "in extension sets do " \
-    "in extensions do " \
-    "get uri "
+  if __sm.command.detect "$*" \
+    "in extension sets do=extension sets iterator" \
+    "in extensions do=extension iterator" \
+    "known uri=get uri"
   then
-    _command=$( __sm.string.to.function.name "${__sm_string_starts_with}" )
-    shift $( __sm.string.number.of.words "${__sm_string_starts_with}" )
+    _command="${__sm_command_dotted}"
+    shift "${__sm_command_words}"
   else
-    _command="$1"
-    shift || fail "Usage: extension <command> ..."
+    fail "No command given.\nUsage:  \nextension <command> ..."
   fi
 
   while (( $# ))
@@ -62,12 +61,8 @@ extension()
         error "Extension '${_name}' not found!"
       fi
       ;;
-    (in.extension.sets.do)
-      __sm.extension.in.paths __sm.extension.sets.iterator "${_params[@]}" || true
-      return 0
-      ;;
-    (in.extensions.do)
-      __sm.extension.in.paths __sm.extension.iterator "${_params[@]}" || true
+    (extension.sets.iterator|extension.iterator)
+      __sm.extension.in.paths __sm.${_command} "${_params[@]}" || true
       return 0
       ;;
     (*) error "Unknown command for extension '${_command}'."

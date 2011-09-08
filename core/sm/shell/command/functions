@@ -27,3 +27,60 @@ __sm.command.run()
 {
   "$@"
 }
+
+__sm.command.detect()
+{
+  local __string="$1" __key __value
+  shift
+
+  # Error if no command was given
+  if [[ -z "${__string}" ]]
+  then
+    return 1
+  fi
+
+  # Iterate through all commands
+  while (( $# ))
+  do
+    __key="$1"
+
+    case "${__key}" in
+      (*=*)
+        # If command is mapping, then unwrap its key/value
+        __value="${__key#*=}"
+        __key="${__key%%=*}"
+        ;;
+      (*)
+        # When no mapping then key is value
+        __value="${__key}"
+        ;;
+    esac
+
+    case "${__string} " in
+      (${__key}[[:space:]]*)
+        # Key matches command
+        __sm_command_detected="${__key}"
+        __sm_command_dotted=$( __sm.string.to.function.name "${__value}" )
+        __sm_command_words=$( __sm.string.number.of.words "${__key}" )
+        return 0
+        ;;
+      (${__value}[[:space:]]*)
+        # Value matches command
+        __sm_command_detected="${__value}"
+        __sm_command_dotted=$( __sm.string.to.function.name "${__value}" )
+        __sm_command_words=$( __sm.string.number.of.words "${__value}" )
+        return 0
+        ;;
+    esac
+
+    # Go to next command
+    shift
+  done
+
+  # In case no long command matched grab first param as command. Todo ? allow disabling
+  __string=( ${__string} )
+  __sm_command_detected="${__string}"
+  __sm_command_dotted="${__string}"
+  __sm_command_words=1
+  return 0
+}
