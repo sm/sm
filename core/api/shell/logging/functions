@@ -26,8 +26,6 @@ logrotate()
   local _file="${1:-}"
   shift || fail "Cannot rotate a log file, as no log file was given."
 
-  timestamp_set
-
   verbose "Tailing the file in a background process into a tail logfile."
   ( tail -n 0 -f "${_file}" > ${file}.$$.log )&
 

@@ -6,8 +6,6 @@ smrc_install()
 
   if files exist "$HOME/.smrc"
   then
-    timestamp_set
-
     log "You already have a $HOME/.smrc file."
     log "Renaming it as ${HOME}/.smrc.${timestamp} to retain it."
     log "Please examine the file, and if it is no longer needed, delete it."
@@ -34,7 +32,6 @@ smrc_update()
 {
   templates exist "cli/smrc" || fail "The template core sm/smrc is missing."
 
-  timestamp_set
   local template="cli/smrc" target="$HOME/.smrc" \
     backup="$HOME/.smrc.$timestamp" incoming="$HOME/.smrc.incoming.$$"
 

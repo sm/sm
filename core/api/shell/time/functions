@@ -1,102 +1,29 @@
 #!/bin/sh
 
-# TODO: Rework this into a 1.0.0 module API
-
-api_time_initialize()
-{
-  [[ -n "${timestamp:-}" ]] || timestamp_set
-}
-
-#
-# ## timestamp_set()
-#
-# Sets the variable named 'timestamp' to the current timestamp.
-#
-# ### Input Parameters
-#
-# None.
-#
-# ### Stream Outputs
-#
-# None.
-#
-# ### Environmental effects
-#
-# Sets the variable named 'timestamp' to the current timestamp.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# No failure scenarios currently.
-#
-# ### Usage Examples
-#
-#     user$ cat ./test
-#     #!/bin/sm
-#     modules api/trace api/time # Load the trace module.
-#
-#     timestamp_set
-#     echo $timestamp
-#
-#     user$ $PWD/test
-#     2011-04-24T22:28:16
-#
-# ### Code Walkthrough
-timestamp_set()
-{
-  # Set the timestamp variable to the STDOUT of the timestamp function call.
-  timestamp="$(timestamp)"
-}
-
-#
-# ## timestamp()
-#
-# Prints out the current timestamp.
-#
-# ### Input Parameters
-#
-# None required. The first parameter may optionally specify the format to output
-# the time string in. See 'man 1 date' for formatting options.
-#
-# ### Stream Outputs
-#
-# Prints the current timestamp as a formatted datetime string to the STDOUT of
-# the calling environment.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# No failure conditions currently.
-#
-# ### Usage Examples
-#
-#     user$ cat ./test
-#     #!/bin/sm
-#     modules api/trace api/time # Load the trace module.
-#
-#     timestamp
-#     echo
-#
-#     user$ $PWD/test
-#     2011-04-24T22:31:54
-#
-# ### Code Walkthrough
 timestamp()
 {
-  # Set the format to either the first parameter, if nonempty or to the
-  # iso-something format ;) otherwise. Use the date command with the format
-  # string and print the result to the STDOUT of the calling environment.
-  local _format="${1:-"%Y-%m-%dT%H:%M:%S"}"
-  date +"${_format}"
-}
+  trace_filter timestamp
 
+  local _command _params=() _name _uri
+  local __extension_commands=(
+    "show new"
+    "show current"
+    "save=set"
+  )
+
+  if __sm.command.detect "$*" "${__timestamp_commands[@]}"
+  then
+    _command="${__sm_command_dotted}"
+    shift "${__sm_command_words}"
+  else
+    fail "No command given.\nUsage:\n  timestamp <command> ..."
+  fi
+
+  case "${_command}" in
+    (show.new|show.current|set)
+      if __sm.timestamp.${_command}
+      then return 0 ; else return $? ; fi
+      ;;
+    (*) error "Unknown command for extension '${_command}'."
+  esac
+}
