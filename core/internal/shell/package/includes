@@ -5,3 +5,5 @@ api/os
 api/defaults
 api/templates
 api/user
+api/variables
+api/config

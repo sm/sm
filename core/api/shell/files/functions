@@ -15,15 +15,16 @@ files()
 {
   trace_filter filesystem
 
-  local _token _command _subcommand _path _file _files=() _source _target _mode _owner \
-    _flags _string _regex
-
-  [[ -n "${_command}" ]] || _command="$1"
+  local _token _command _subcommand _path _file _files=() _source _target _mode \
+    _owner _flags _string _regex
 
   while (( $# > 0 ))
   do
     _token="$1" && shift
     case "${_token}" in
+      (open|md5|enter|join|expand|search|within|in|source|empty|nonempty|exist|exists|remove|create|copy|move|link|contain|containing|replace|hash|write)
+        _command="${_token}"
+      ;;
       (are|is)
         _subcommand="$1"
         shift
@@ -85,13 +86,13 @@ files()
         ;;
       (chmod)
         _mode="${1}"
-        shift || Fail "Mode must follow keywords 'mode|permissions'"
+        shift || Fail "Mode must follow keywords 'chmod'"
         ;;
-      (owner)
+      (chown)
         _owner="${1}"
         shift || fail "Owner must be provided after keyword 'owner'"
         ;;
-      (chown)
+      (owner)
         _owner="${1}"
         shift || fail "Owner must be provided after keyword 'owner'"
         ;;
@@ -182,7 +183,6 @@ files()
       [[ -n "${_target}" ]] || fail "Target must be given;  to {file name}."
       __sm.files.write "${_string}" "${_target}" "${_flags[*]}"
       ;;
-#    (chown|chmod) log "Handled bellow" ;;
     (*)
       if [[ -z "${_owner}" && -z "${_mode}" ]]
       then

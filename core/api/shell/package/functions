@@ -44,7 +44,11 @@ package()
 
   while (( $# ))
   do
+    _token="$1" && shift
     case "${_token}" in
+      (cli)
+        _command=cli
+        ;;
       (is)
         _command=is
         case "$1" in
@@ -144,8 +148,9 @@ package()
     esac
   done
 
+  true ${package_name:=${extension}}
+
   [[ -n "${package_name}" ]]    || fail "Package name must be set/given"
-  [[ -n "${package_version}" ]] || fail "Package version must be set/given"
 
   case "${_command}" in
     (make)
@@ -161,7 +166,7 @@ package()
     (is)
       case "$_subcommand" in
         (active|installed)
-          __sm.package.is.${_subcommand}
+          __sm.package.is.${_subcommand} "${_params[@]}"
           ;;
       esac
       ;;
