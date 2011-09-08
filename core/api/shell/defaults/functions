@@ -4,7 +4,7 @@
 
 api_defaults_initialize()
 {
-  settings_search_path_cache=()
+  __sm_settings_search_cache=()
   # This line needs to be commented to allow settings read from smrc.
   #settings_search_path_append=()
 }
@@ -146,7 +146,7 @@ settings_search_path_update()
 {
   local path=$1 _uri
 
-  if __sm.string.contains "${path}" "${settings_search_path_cache[*]}"
+  if __sm.string.contains "${path}" "${__sm_settings_search_cache[*]}"
   then
     return 0
   fi
@@ -157,6 +157,6 @@ settings_search_path_update()
     fetch_uri "${_uri}" "${path}" >&2
   fi
 
-  settings_search_path_cache+=( "${path}" )
+  __sm_settings_search_cache+=( "${path}" )
 }
 

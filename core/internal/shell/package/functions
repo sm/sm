@@ -386,6 +386,8 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
 
 __sm.package.init()
 {
+  local default_configure_flags _flag
+
   true ${package_name:=${extension}}
 
   [[ -n "${package_name}" ]] || fail "Package name must be given.\n"
@@ -419,16 +421,27 @@ __sm.package.init()
   __sm.package.exports
   # Ensure that package_version is set at this point
 
-  [[ -n "${package_default_version}" ]] || read_default version prefix package_default for ${package_name}
-  [[ -n "${package_base_url}" ]] || read_default base_url    prefix package for ${package_name}
-  [[ -n "${package_md5_url}"  ]] || read_default md5_url     prefix package for ${package_name}
-  [[ -n "${package_user}"  ]]    || read_default user        prefix package for ${package_name}
-  [[ -n "${website_url}"      ]] || read_default website_url prefix package for ${package_name}
-  [[ -n "${archive_format}"   ]] || read_default archive_format             for ${package_name}
+  for variable in default_version base_url md5_url user
+  do
+    if variable is empty package_${variable}
+    then
+      config read file defaults from ${package_name} \
+        key ${variable} variable ${variable} prefix package
+    fi
+  done
 
-  local default_configure_flags _flag
+  for variable in website_url archive_format
+  do
+    if variable is empty ${variable}
+    then
+      config read file defaults from ${package_name} \
+        key ${variable} variable ${variable}
+    fi
+  done
 
-  [[ -n "${default_configure_flags}" ]] || read_default configure_flags prefix default for ${package_name}
+  config read file defaults from ${package_name} \
+    key configure_flags prefix default
+
   __sm.package.configure.flags "${default_configure_flags[@]}"
 
   true \
