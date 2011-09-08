@@ -44,6 +44,7 @@ package()
 
   while (( $# ))
   do
+    _token="$1" && shift
     case "${_token}" in
       (is)
         _command=is
