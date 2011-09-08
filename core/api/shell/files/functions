@@ -85,12 +85,10 @@ files()
         shift || Fail "Mode must follow keywords 'mode|permissions'"
         ;;
       (chmod)
-        _command=chmod
         _mode="${1}"
         shift || Fail "Mode must follow keywords 'chmod'"
         ;;
       (chown)
-        _command=chown
         _owner="${1}"
         shift || fail "Owner must be provided after keyword 'owner'"
         ;;
@@ -185,7 +183,6 @@ files()
       [[ -n "${_target}" ]] || fail "Target must be given;  to {file name}."
       __sm.files.write "${_string}" "${_target}" "${_flags[*]}"
       ;;
-#    (chown|chmod) log "Handled bellow" ;;
     (*)
       if [[ -z "${_owner}" && -z "${_mode}" ]]
       then
