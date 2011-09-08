@@ -18,13 +18,11 @@ files()
   local _token _command _subcommand _path _file _files=() _source _target _mode \
     _owner _flags _string _regex
 
-  [[ -n "${_command}" ]] || _command="$1"
-
   while (( $# > 0 ))
   do
     _token="$1" && shift
     case "${_token}" in
-      (open|md5|enter|join|expand|search|within|in|source|empty|nonempty|exist|exists|remove|create|copy|move)
+      (open|md5|enter|join|expand|search|within|in|source|empty|nonempty|exist|exists|remove|create|copy|move|link|contain|containing|replace|hash|write)
         _command="${_token}"
       ;;
       (are|is)
