@@ -423,7 +423,7 @@ __sm.package.init()
 
   for variable in default_version base_url md5_url user
   do
-    if variable is empty package_${variable}
+    if variable is empty "package_${variable}"
     then
       config read file defaults from ${package_name} \
         key ${variable} variable ${variable} prefix package
@@ -432,7 +432,7 @@ __sm.package.init()
 
   for variable in website_url archive_format
   do
-    if variable is empty ${variable}
+    if variable is empty "${variable}"
     then
       config read file defaults from ${package_name} \
         key ${variable} variable ${variable}
@@ -809,7 +809,6 @@ __sm.package.patches.apply()
     error "TODO: patch application is NIY (see __sm.package.patch())"
   done
 }
-
 
 __sm.package.is.active()
 {

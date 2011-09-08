@@ -1,5 +1,7 @@
 #!/bin/sh
 
+variable() { variables "$@"; }
+
 variables()
 {
   trace_filter variables
@@ -7,6 +9,8 @@ variables()
   local _command _variables=() _type
 
   if __sm.string.starts.with.one.of  "$* " \
+    "is empty " \
+    "is nonempty " \
     "are empty " \
     "are nonempty " \
     "must be empty " \
@@ -47,9 +51,9 @@ variables()
 
   # TODO: Think through variables more...
   case "${_command}" in
-    (are.empty|are.nonempty)
+    (is.empty|is.nonempty|are.empty|are.nonempty)
       [[ -n "${_variables[*]}" ]] || error "No variable names given for validation"
-      __sm.variables.${_command} "${_variables[@]}"
+      __sm.variables.${_command/#is/are} "${_variables[@]}"
       ;;
     (must.be.empty|must.be.nonempty)
       [[ -n "${_variables[*]}" ]] || error "No variable names given for validation"
