@@ -15,8 +15,8 @@ files()
 {
   trace_filter filesystem
 
-  local _token _command _subcommand _path _file _files=() _source _target _mode _owner \
-    _flags _string _regex
+  local _token _command _subcommand _path _file _files=() _source _target _mode \
+    _owner _flags _string _regex
 
   [[ -n "${_command}" ]] || _command="$1"
 
@@ -24,6 +24,9 @@ files()
   do
     _token="$1" && shift
     case "${_token}" in
+      (open|md5|enter|join|expand|search|within|in|source|empty|nonempty|exist|exists|remove|create|copy|move)
+        _command="${_token}"
+      ;;
       (are|is)
         _subcommand="$1"
         shift
