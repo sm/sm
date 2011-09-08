@@ -272,8 +272,6 @@ __sm.module.detect()
   __sm.extension.path.rebuild "shell" $extensions_path $@
   _module_path=${rebuilded_path}
 
-  debug search_module_path ":${_module_path}:"
-
   if [[ -d "${_module_path}/functions" ]]
   then
     return 1
