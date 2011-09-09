@@ -29,7 +29,7 @@ __sm.os.open()
 
 __sm.os.type()
 {
-  local _type="$1"
+  local _type
   case "$OSTYPE" in
     (*linux*)
       _type="linux"

@@ -1,16 +1,23 @@
 #!/bin/sh
 
+user_initialize()
+{
+  __sm_user_id_root=0
+  #TODO: on linux often user ids start with 1000
+  __sm_user_id_users=500
+}
+
 __sm.user.home()
 {
   local _user="$1" _line
   NIY "Printing out User home, based on OS."
-  if os is darwin
-    NIY "Determining user home on solaris."
+  if __sm.os.type.is darwin
   then
-  elif os is linux
+    NIY "Determining user home on solaris."
+  elif __sm.os.type.is linux
   then
     NIY "Determining user home on darwin."
-  elif os is solaris
+  elif __sm.os.type.is solaris
   then
     NIY "Determining user home on solaris."
   else
@@ -30,10 +37,10 @@ __sm.user.shell()
 {
   local _user="$1" _line
   NIY "Printing out User shell, based on OS."
-  if os is darwin
+  if __sm.os.type.is darwin
   then
     NIY "Determining user shell on darwin."
-  elif os is linux
+  elif __sm.os.type.is linux
   then
     NIY "Determining user shell on linux"
     while read -r _line
@@ -45,7 +52,7 @@ __sm.user.shell()
         break
       fi
     done < /etc/passwd
-  elif os is solaris
+  elif __sm.os.type.is solaris
   then
     NIY "Determining user shell on solaris."
   else
@@ -64,6 +71,27 @@ __sm.user.set.home()
 {
   local _user="$1" _value="$2"
   NIY "Setting user's home."
+}
+
+__sm.user.exists()
+{
+  local _name _rest IFS=:
+  while read _name _rest
+  do
+    if [[ "${_name}" == "$1" ]]
+    then
+      return 0
+    fi
+  done < /etc/passwd
+  return 1
+}
+
+__sm.user.create.if.not.exists()
+{
+  if ! __sm.user.exists "$1"
+  then
+    __sm.user.add "$@"
+  fi
 }
 
 __sm.user.add()
@@ -178,3 +206,17 @@ __sm.user.remove()
   ) || true # Ignore failures with this for now...
 }
 
+__sm.user.is.root()
+{
+  (( UID == __sm_user_id_root ))
+}
+
+__sm.user.is.privileged()
+{
+  (( UID < __sm_user_id_users ))
+}
+
+__sm.user.is.unprivileged()
+{
+  (( UID >= __sm_user_id_users ))
+}
