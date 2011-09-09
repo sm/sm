@@ -116,11 +116,11 @@ __sm.service.setup()
   if user is root
   then
     # TODO: create an 'user_exists' function and use it here.
-    user create user "${service_user}" group "${service_user}" #>/dev/null 2>&1
+    user create if not exists user "${service_user}" group "${service_user}" #>/dev/null 2>&1
 
     paths create "${service_root_paths[@]}"
 
-    paths chown recursive "${service_user}:${service_user}" "${service_root_paths[@]}"
+    paths chown "${service_user}:${service_user}" recursive "${service_root_paths[@]}"
   fi
 
   paths create "${service_paths[@]}" "${install_path}"
@@ -131,7 +131,7 @@ __sm.service.setup()
     then
       if paths exist "${_path}"
       then
-        paths chown recursive "${service_user}:${service_user}" "${_path}"
+        paths chown "${service_user}:${service_user}" recursive "${_path}"
       else
         warn "While chowning paths it was discovered that '${_path}' is in"\
           "fact nonexistent on the filesystem; this might indicate an error."
