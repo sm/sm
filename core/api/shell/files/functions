@@ -17,54 +17,43 @@ files()
 
   local _token _command _subcommand _path _file _files=() _source _target _mode \
     _owner _flags _string _regex
+  local __files_commands=(
+    "is empty=are empty"
+    "is nonempty=are nonempty"
+    "is executable=are executable"
+    "is missing=are missing"
+    "is symlink=are symlinks"
+    "absolute path"
+    "sha 256"
+    "sha 512"
+  )
+
+  if __sm.command.detect "$*" "${__files_commands[@]}"
+  then
+    _command="${__sm_command_dotted}"
+    shift "${__sm_command_words}"
+  else
+    fail "No command given.\nUsage:  \nfiles <command> ..."
+  fi
+
+  case "${_command}" in
+    (sha.*)
+      command -v shasum > /dev/null 2>&1 || fail "shasum command missing, cannot use 'files sha'"
+      ;;
+    (chmod)
+      _mode="${1}"
+      shift || fail "Mode must follow keywords 'chmod'"
+      ;;
+    (chown)
+      _owner="${1}"
+      shift || fail "Owner must be provided after keyword 'owner'"
+      ;;
+  esac
 
   while (( $# > 0 ))
   do
     _token="$1" && shift
     case "${_token}" in
-      (open|md5|enter|join|expand|search|within|in|source|empty|nonempty|exist|exists|remove|create|copy|move|link|contain|containing|replace|hash|write)
-        _command="${_token}"
-      ;;
-      (are|is)
-        _subcommand="$1"
-        shift
-        case "${_subcommand}" in
-          (empty|nonempty|executable|missing|symlinks)
-            continue
-            ;;
-          (*)
-            fail "Invalid command following keyword '${_command}';"\
-              "Usage: files '${_command}' <empty,missing,executable>"
-            ;;
-        esac
-        ;;
-      (absolute)
-        _subcommand="$1"
-        shift
-        case "${_subcommand}" in
-          (path)
-            continue
-            ;;
-          (*)
-            fail "Invalid command following keyword '${_command}';"\
-              "Usage: files '${_command}' <path>"
-            ;;
-        esac
-        ;;
-      (sha)
-        command -v shasum > /dev/null 2>&1 ||
-          fail "shasum command missing, cannot use 'files sha'"
-        _subcommand="$1"
-        shift || fail "sha algorithm not given; 'files sha <256|512> {files...}'"
-        case "${_subcommand}" in
-          (256|512)
-            continue
-            ;;
-          (*)
-            fail "sha algorithm not properly given; 'files sha <256|512> {files...}'"
-            ;;
-        esac
-        ;;
       (append)
         _flags+=( -a )
         ;;
@@ -83,14 +72,6 @@ files()
       (mode|permissions)
         _mode="${1}"
         shift || Fail "Mode must follow keywords 'mode|permissions'"
-        ;;
-      (chmod)
-        _mode="${1}"
-        shift || Fail "Mode must follow keywords 'chmod'"
-        ;;
-      (chown)
-        _owner="${1}"
-        shift || fail "Owner must be provided after keyword 'owner'"
         ;;
       (owner)
         _owner="${1}"
@@ -137,12 +118,12 @@ files()
   done
 
   case "${_command}" in
-    (are|sha|absolute)
-      if __sm.files.${_command}."${_subcommand}" "${_files[@]}"
-      then return 0 ; else return 1 ; fi
-      ;;
     (contain|containing|replace)
       if __sm.files.${_command} "${_string}" "${_regex}" "${_files[@]}"
+      then return 0 ; else return 1 ; fi
+      ;;
+    (are.*|sha.*|absolute.*)
+      if __sm.files.${_command} "${_files[@]}"
       then return 0 ; else return 1 ; fi
       ;;
     (open|md5|enter|join|expand|search|within|in|source|empty|nonempty|exist|exists|remove|create)
@@ -163,7 +144,7 @@ files()
       __sm.files.link "${_source}" "${_target}" "${_flags[*]}"
       ;;
     (hash)
-      #TODO:
+      #TODO: move files to api/config
       [[ -e "${_source}" && -n "${_key}" ]] ||
         fail "Source and key must both be given;"\
         " files hash source {source} key {name}"
@@ -194,8 +175,8 @@ files()
   esac
 
   case "${_command}" in
-    (chown|chmod) true ;;
-    (*) _flags=() ;;
+    (chown|chmod) true ;; # Flags are for chown/chmod
+    (*) _flags=() ;;      # Clean flags if using mode/owner
   esac
 
   if [[ -n "${_owner}" ]]
