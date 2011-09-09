@@ -26,6 +26,8 @@ files()
     "absolute path"
     "sha 256"
     "sha 512"
+    "change owner to=chown"
+    "change rights to=chmod"
   )
 
   if __sm.command.detect "$*" "${__files_commands[@]}"

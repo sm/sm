@@ -52,6 +52,8 @@ paths()
   local _token _command _path _paths=() _source _target _mode _owner _flags _glob
 
   local __paths_commands=(
+    "change owner to=chown"
+    "change rights to=chmod"
     "exist=exists"
   )
 
