@@ -25,6 +25,20 @@ templates()
 
   local _command _name _target _source="${extension_templates_path}" \
     _mode=0644 _owner=$USER _template _params=()
+  local __templates_commands=(
+    "exists=exist"
+  )
+
+  if __sm.command.detect "$*" "${__templates_commands[@]}"
+  then
+    _command="${__sm_command_dotted}"
+    shift "${__sm_command_words}"
+  else
+    fail "No command given.\nUsage:  \npaths <command> ..."
+  fi
+
+  _name="$1"
+  shift || fail "Template name was not given"
 
   while (( $# > 0 ))
   do
@@ -46,19 +60,7 @@ templates()
         fail "'from' keyword is no longer supported"
         ;;
       *)
-        if [[ -z "${_command}" ]]
-        then
-          _command="${_token}"
-        elif [[ -z "${_name}" ]]
-        then
-          _name="${_token}"
-#        elif [[ -z "${_target}" ]]
-#        then
-#          _target="${_token}"
-        else
-          _params+=("${_token}")
-        fi
-        ;;
+        _params+=("${_token}")
     esac
   done
 

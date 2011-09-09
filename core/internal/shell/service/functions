@@ -407,7 +407,7 @@ __sm.service.initd.install()
     paths create "/etc/conf.d" "${init_scripts_path}"
 
     # TODO: Install the service init script...
-    if template_exists "${_service}"
+    if templates exists "${_service}"
     then
       templates install "${_service}" to "${init_scripts_path}/${_service}" \
         mode 0755
