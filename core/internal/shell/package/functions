@@ -504,7 +504,7 @@ __sm.package.fetch.md5()
     "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
     "${packge_md5_url:="${package_base_url}/${package_file}.md5"}"
 
-  [[ -n "${package_md5}" ]] || read_config "${package_name}" md5 "${package_file}" as package_md5
+  [[ -n "${package_md5}" ]] || __sm.config.read "${package_name}" md5 "${package_file}" package_md5
   [[ -n "${package_md5}" ]] ||
     if [[ -n "${package_md5_url}" ]]
     then # TODO: Can this be added into fetch_uri ?
@@ -868,7 +868,7 @@ __sm.package.info()
     "${package_dir:="${package_name}-${package_version}"}" \
     "${package_url:="${package_base_url}/${package_file}"}"
 
-  [[ -n "${package_md5}" ]] || read_config "${package_name}" md5 "${package_file}" as package_md5
+  [[ -n "${package_md5}" ]] || __sm.config.read "${package_name}" md5 "${package_file}" package_md5
 
   log "package_name: ${package_name}"
   if paths exist "${_path}"
