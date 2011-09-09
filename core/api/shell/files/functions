@@ -87,7 +87,7 @@ files()
       (force)
         _flags+=( -f )
         ;;
-      (string)
+      (string|content)
         _string="$1"
         shift || fail "A string must be followed by keyword 'string'"
         ;;
@@ -138,8 +138,10 @@ files()
       then
         fail "Cannot link ${_source} to ${_target} which exists as a file!"
       fi
-      [[ ! -d "${_target}" ]] ||
+      if [[ -d "${_target}" ]] && ! __sm.string.contains "-f" "${_flags[*]}"
+      then
         fail "Cannot link ${_source} to ${_target} which exists as a directory"
+      fi
       #TODO: what about the -f (force flag) to overwrite if target exists ?
       __sm.files.link "${_source}" "${_target}" "${_flags[*]}"
       ;;
