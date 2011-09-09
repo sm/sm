@@ -2,7 +2,7 @@ api/environment
 api/extensions/manipulation
 api/filesystem
 api/os
-api/defaults
+api/config
 api/templates
 api/user
 api/variables

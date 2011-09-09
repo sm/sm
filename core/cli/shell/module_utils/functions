@@ -12,37 +12,6 @@ modules_installed()
   done
 }
 
-#
-# ## module\_functions()
-#
-# Print out a list of all functions for the given module.
-#
-# ### Input Parameters
-#
-# First parameter is the module name to print out the functions for.
-#
-# ### Stream Outputs
-#
-# The named module's functions function listing is printed to the calling
-# environment's STDOUT.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if no module name was given.
-#
-# ### Usage Examples
-#
-#     user$ module_functions defaults
-#     read_default()
-#
 module_functions()
 {
   local _function _functions _modules="${@:-}"
@@ -64,32 +33,6 @@ module_functions()
   done
 }
 
-#
-# ## modules\_list()
-#
-# Lists functions for all modules.
-#
-# ### Input Parameters
-#
-# First parameter is the module name to print out the functions for.
-#
-# ### Stream Outputs
-#
-# functions function listing for each module is printed to the STDOUT of the calling
-# environment.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# No failure scenarios currently.
-#
 modules_list()
 {
   local _module _modules _function _functions
@@ -109,71 +52,6 @@ modules_list()
   done
 }
 
-#
-# ## modules\_docs()
-#
-# Output the module functions documentation for a given module name.
-#
-# ### Input Parameters
-#
-# First parameter is the module name to print out the functions documentation for.
-#
-# ### Stream Outputs
-#
-# functions documentation for every function of the named module.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# Fails if no module name is given.
-#
-# ### Usage Examples
-#
-#     user$ module_docs defaults
-#
-#     # read_default
-#
-#     Reads default values from an extension's config/defaults file.
-#
-#     ### Input Parameters
-#
-#     First parameter is the defaults file key to read (key=value).
-#     Second parameter is the variable name to store the retrieved value in.
-#     Remaining parameters are parsed out as token, value and prefix
-#       into|as <variable name>
-#       prefix <name>
-#       <variable> # If no specifier.
-#
-#     ### Stream Outputs
-#
-#     None.
-#
-#     ### Environmental effects
-#
-#     A variable will be set to the value, if the value is nonempty. If no variable
-#     name is specified, the variable will be assigned the same name as the key.
-#
-#     ### Return Codes
-#
-#     0 for success.
-#
-#     ### Failure Scenarios
-#
-#     Fails if no arguments are passed in; you need to at least specify a key.
-#
-#     ### Usage Examples
-#
-#         user$ read_default "version" prefix "package" # extension is nginx, for example.
-#         user$ echo $package_version
-#         1.0.0
-#
 module_docs()
 {
   local _function _functions _module content_flag table_flag
@@ -219,32 +97,6 @@ module_docs()
   fi
 }
 
-#
-# ## modules\_docgen()
-#
-# Lists functions for all modules.
-#
-# ### Input Parameters
-#
-# First parameter is the module name to print out the functions for.
-#
-# ### Stream Outputs
-#
-# functions function listing for each module is printed to the STDOUT of the calling
-# environment.
-#
-# ### Environmental effects
-#
-# None.
-#
-# ### Return Codes
-#
-# 0 for success.
-#
-# ### Failure Scenarios
-#
-# No failure scenarios currently.
-#
 modules_docgen()
 {
   # TODO: Replace with,

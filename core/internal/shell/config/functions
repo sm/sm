@@ -18,7 +18,8 @@ __sm.config.read()
 
   for _file in  $( __sm.config.settings.search ${_extension} "${_file}" )
   do
-    _value="$(files hash from "${_file}" key "${_key}")"
+    [[ -S "${_file}" ]] || continue
+    _value=$(awk '/^'"${_key}"'=/ {gsub("'"${_key}"'=",""); print $0}' "${_file}")
     [[ -z "${_value}" ]] || break
   done
 
@@ -28,6 +29,20 @@ __sm.config.read()
 __sm.config.write()
 {
   local _extension="$1" _file="$2" _key="$3" _value="$4"
+  # unset, delete / write, set
+  case "${value}" in
+    (unset|delete)
+      sed -i.tmp "s#^${_key}=.*\$##" "${_file}"
+      ;;
+    (*)
+      if ! awk -F= "/^'"${_key}"'=/{print $2}" "${_file}" >/dev/null 2>&1
+      then
+        echo "${_key}=${_value}" >> "${_file}"
+      else # Overwrite.
+        sed -i.tmp "s#^${_key}=.*\$#${_key}=${_value}#" "${_file}"
+      fi
+      ;;
+  esac
 }
 
 __sm.config.settings.search()

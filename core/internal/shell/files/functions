@@ -251,46 +251,6 @@ __sm.files.chmod()
   fi
 }
 
-__sm.files.hash()
-{
-  local _file="$1" _key="$2" _value="${3:-}"
-
-  shift || fail "File path/name not given.\n"\
-  " => Usage: $0 <filename> <key> [value]"
-
-  local _key="${1:-}"
-  shift || fail "Key not given.\n"\
-    " => Usage: $0 <filename> <key> [value]"
-
-  local _path=$(dirname "${_file}") # Note this will be '.' only if a file name was given.
-
-  [[ -d "${_path}" ]] || fail "Cannot access the database file '${_file}'; "\
-    "'${_path}' does not exist on the filesystem."
-
-  files exist "${_file}" || return 0
-
-  value="$*"
-
-  case "$value" in
-    unset|delete)
-      sed -i.tmp "s#^${_key}=.*\$##" "${_file}"
-      ;;
-    *)
-      if [[ -z "${value}" ]]
-      then
-        awk '/^'"${_key}"'=/ {gsub("'"${_key}"'=",""); print $0}' "${_file}"
-      else
-        if ! awk -F= "/^'"${_key}"'=/{print $2}" "${_file}" >/dev/null 2>&1
-        then
-          echo "${_key}=$value" >> "${_file}"
-        else # Overwrite.
-          sed -i.tmp "s#^${_key}=.*\$#${_key}=$value#" "${_file}"
-        fi
-      fi
-      ;;
-  esac
-}
-
 __sm.files.exist()
 {
   local _file="$1"

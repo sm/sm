@@ -143,13 +143,6 @@ files()
       #TODO: what about the -f (force flag) to overwrite if target exists ?
       __sm.files.link "${_source}" "${_target}" "${_flags[*]}"
       ;;
-    (hash)
-      #TODO: move files to api/config
-      [[ -e "${_source}" && -n "${_key}" ]] ||
-        fail "Source and key must both be given;"\
-        " files hash source {source} key {name}"
-      __sm.files.hash "${_source}" "${_key}" "${_value}"
-      ;;
     (copy|move)
       if [[ -n "${_files[*]}" ]]
       then
