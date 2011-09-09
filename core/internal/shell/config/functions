@@ -18,7 +18,7 @@ __sm.config.read()
 
   for _file in  $( __sm.config.settings.search ${_extension} "${_file}" )
   do
-    [[ -S "${_file}" ]] || continue
+    [[ -s "${_file}" ]] || continue
     _value=$(awk '/^'"${_key}"'=/ {gsub("'"${_key}"'=",""); print $0}' "${_file}")
     [[ -z "${_value}" ]] || break
   done
