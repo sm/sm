@@ -689,7 +689,7 @@ __sm.service.activate()
 
     if files exist "${init_scripts_path}/${service}"
     then
-      chmod_files 0755 "${init_scripts_path}/${service}"
+      files chmod 0755 "${init_scripts_path}/${service}"
 
       if os is linux
       then
