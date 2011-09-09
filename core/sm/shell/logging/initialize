@@ -20,12 +20,14 @@ export APP_PID=$$
 trap clean_tmp_logs EXIT
 
 # Persist ERR handler
-set -o errtrace
+if [[ -n "${ZSH_VERSION}" ]]
+then set -e; else set -o errtrace ; fi
+
 # Call backtrace on error
 trap "backtrace \"A command has returned error code '(\$?)' without being handled.\"" ERR
 
-# Persist function RETURN & DEBUG handler
-set -o functrace
+if [[ -n "${BASH_VERSION}" ]] # Persist function RETURN & DEBUG handler
+then set -o functrace ; fi
 # Do not set trap ... RETURN here, set it on first -x
 
 if [[ -n "${var_debug_flags[*]}" ]]

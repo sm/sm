@@ -45,9 +45,8 @@ NIY()
   fail "This feature has not yet been implemented.\n$*"
 }
 
-# Allow for command_missing when a command is not found during lookup.
-if (( ${BASH_VERSINFO[0]} > 3 ))
-then
+if [[ -n "${BASH_VERSINFO}" ]] && (( ${BASH_VERSINFO[0]} > 3 ))
+then # Allow for command_missing when a command is not found during lookup.
   command_not_found()
   {
     echo "bash: $1: command not found ($*)." >&2

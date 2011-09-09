@@ -183,6 +183,18 @@ make_binaries_executable()
   done
 }
 
+set_binaries_shell()
+{
+  local _binary
+  for _binary in sm smp
+  do
+    file replace \
+      regex "^#!.*$" \
+      with "#!/bin/${sm_shell}" \
+      in "${install_path}/bin/${_binary}"
+  done
+}
+
 create_versionedfs_paths()
 {
   versionedfs create \
@@ -208,6 +220,8 @@ install_sm()
   perform set_sm_path
 
   perform install_configuration_files
+
+  set_binaries_shell
 
   log_step "Ensuring that binaries are executable" \
     make_binaries_executable

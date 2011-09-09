@@ -39,8 +39,8 @@ __sm.modules.core.initialize()
 
   for _module in ${__sm_modules_loaded[@]}
   do
-    _name="${_module//=*}"
-    _path="${_module//*=}"
+    _name="${_module%%\=*}"
+    _path="${_module##*\=}"
     log_search preload "$_name" "${_path}"
   done
 
@@ -55,9 +55,8 @@ __sm.modules.core.initialize()
 
 __sm.modules.include()
 {
-  local _module _sm _extension _path _file _modules=("$@")
-
-  for _module in "${_modules[@]}"
+  local _module _sm _extension _path _file _modules
+  for _module in "$@"
   do
     if __sm.module.include "${_module}"
     then
@@ -246,9 +245,7 @@ __sm.extension.paths.initialize()
 __sm.extension.path.reorder()
 {
   local part="${1:-}" extensions_path="${2:-}" extension="${3:-}"
-  shift || fail "Path part must be given as the first parameter."
-  shift || fail "Extensions path must be given as the second parameter."
-  shift || fail "Extension name must be given as the third parameter."
+  shift 3 || fail "Path part extensions_path extnesion must be given first ."
 
   local output="$extensions_path/$extension/$part/$*"
   rebuilded_path="${output// //}"
@@ -257,8 +254,7 @@ __sm.extension.path.reorder()
 __sm.extension.path.rebuild()
 {
   local part="$1" extensions_path="$2"
-  shift || fail "Path part must be given as the first parameter."
-  shift || fail "Extensions path must be given as the second parameter."
+  shift 2 || fail "Path extensions_path part must be given first."
 
   local params="$*"
   __sm.extension.path.reorder "${part}" "${extensions_path}" ${params//\// }

@@ -198,8 +198,15 @@ set_ps4()
   # Set and export the PS4 variable, so that this script -- and called bash scripts --
   # will display more detailed and formatted trace output.
   # Finally, return true, 0, for success.
-  PS4="# \${BASH_SOURCE##\${sm_path}\/} \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO} $ "
+  if [[ -n "${BASH_VERSION}" ]]
+  then
+    PS4="# \${BASH_SOURCE##\${sm_path}\/} \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO} $ "
+  elif [[ -n "${ZSH_VERSION}" ]]
+  then
+    PS4="+%x:%I %N():%i > "
+  fi
   export PS4
+
   return 0
 }
 

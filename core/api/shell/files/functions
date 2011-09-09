@@ -61,11 +61,7 @@ files()
         ;;
       (to)
         _target="${1}"
-        shift || fail "Target path must be provided after keyword 'to'"
-        ;;
-      (in)
-        _target="${1}"
-        shift || fail "Target path must be provided after keyword 'to'"
+        shift || fail "Target path must be provided after keyword '${_token}'"
         ;;
       (from)
         _source="${1}"

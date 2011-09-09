@@ -97,9 +97,9 @@ __sm.extension.actions.find()
       #TODO: account for zsh indexes ( -1 -> -0 )
       _param_temp="${_action_params[$(( _action_params_length - 1 ))]}"
       _rest_params=( "${_param_temp}" "${_rest_params[@]}" )
-      shopt -u nullglob
+      if [[ -n "${ZSH_VERSION}" ]];then unsetopt nullglob;else shopt -u nullglob;fi
       unset _action_params[$(( _action_params_length - 1 ))]
-      shopt -s nullglob
+      if [[ -n "${ZSH_VERSION}" ]];then setopt nullglob;else shopt -s nullglob;fi
       _action_params=( "${_action_params[@]}" ) # Just in case ... works without it
     done
   else

@@ -86,9 +86,10 @@ __sm.array.pop()
     eval "${_variable}=\${${_name}[\${#${_name}[@]}-1]}"
   fi
 
-  shopt -u nullglob
+  if [[ -n "${ZSH_VERSION}" ]];then unsetopt nullglob;else shopt -u nullglob;fi
   eval "unset ${_name}[\${#${_name}[@]}-1]"
-  shopt -s nullglob
+  if [[ -n "${ZSH_VERSION}" ]];then setopt nullglob;else shopt -s nullglob;fi
+
   #TODO: check if this one is required:
   eval "${_name}=( \"\${${_name}[@]}\" ) "
 }
@@ -100,9 +101,9 @@ __sm.array.shift()
 
   [[ -z "${_variable}" ]] || eval "${_variable}=\${${_name}[${__sm_array_start}]}"
 
-  shopt -u nullglob
+  if [[ -n "${ZSH_VERSION}" ]];then unsetopt nullglob;else shopt -u nullglob;fi
   unset "${_name}[${__sm_array_start}]"
-  shopt -s nullglob
+  if [[ -n "${ZSH_VERSION}" ]];then setopt nullglob;else shopt -s nullglob;fi
   eval "${_name}=( \"\${${_name}[@]}\" ) "
 }
 

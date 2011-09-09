@@ -9,7 +9,9 @@ _ignored_args=()
 for (( index=0 ; index < ${#extension_args[@]} ; index++ ))
 do
   _token="${extension_args[$index]}"
-  shopt -s extglob
+  if [[ -n "${ZSH_VERSION}" ]]
+  then setopt extended_glob ; else shopt -s extglob ; fi
+
   case "${_token}" in
     (--trace)
       export trace_flag=1

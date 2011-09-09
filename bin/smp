@@ -14,7 +14,7 @@ os_cpu_count()
   if os is darwin
   then
     read -r _cpu_count < <(/usr/sbin/sysctl hw.ncpu)
-    _cpu_count="${_cpu_count//* }"
+    _cpu_count="${_cpu_count##* }"
   # If the operating system is Linux, gather the information directly from
   # the proc filesystem.
   elif os is linux

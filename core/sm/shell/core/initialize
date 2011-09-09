@@ -1,7 +1,8 @@
 #!/bin/sh
 
 # The following shell options must be enabled for the SM Framework.
-shopt -s extglob nullglob
+if [[ -n "${ZSH_VERSION}" ]];
+then setopt extendedglob nullglob ; else shopt -s extglob nullglob ; fi
 
 saved_sm_path="${sm_path:-"/sm"}"
 
@@ -100,7 +101,8 @@ then
 fi
 
 # Make sure preload_modules is an array.
-export preload_modules=( ${preload_modules[@]} )
+preload_modules=( ${preload_modules[@]} )
+export preload_modules
 
 if [[ -d "${active_path}/bin" ]]
 then
