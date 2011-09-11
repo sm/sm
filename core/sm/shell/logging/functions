@@ -516,6 +516,7 @@ finish_app()
 core_log_step()
 {
   local _message="${1:-}" _unicode=0
+  : ${LINES:=$(tput cols)}
 
   if [[ -z "${LANG:-}" || "${LANG}" = *UTF* || "${LANG}" = *utf8* ]]
   then
@@ -526,6 +527,7 @@ core_log_step()
     fail*)
       # if [[ -t 1 ]]
       # then
+        printf "\r%${LINES}s" " "
         if (( _unicode == 1 ))
         then
           printf "\r  [\033[31m✘\033[0m] %s\n" "${log_step_message:-"done"}!  "
@@ -540,6 +542,7 @@ core_log_step()
     succ*)
       # if [[ -t 1 ]]
       # then
+        printf "\r%${LINES}s" " "
         if (( _unicode == 1 ))
         then
           printf "\r  [\033[32m✔\033[0m] %s\n" "${log_step_message:-"done"}   "
