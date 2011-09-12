@@ -4,7 +4,8 @@ user()
 {
   trace_filter users
 
-  local _command _subcommand _user _group _source _flags=() _value
+  local _command _subcommand _user _group _source _flags=() _value _shell
+
   local __user_commands=(
     "is root"
     "is privileged"
@@ -61,6 +62,10 @@ user()
         _source="${1:-}"
         shift || fail "from source name must follow keyword 'from'"
         ;;
+      (shell)
+        _shell="${1:-}"
+        shift || fail "A user shell (/bin/{zsh,bash}) must follow keyword 'shell'"
+        ;;
       (force)
         _flags+=(-f)
         ;;
@@ -74,8 +79,11 @@ user()
     (is.*)
       if __sm.user.${_command} ; then return 0 ; else return 1 ; fi
       ;;
-    (home|shell)
-      __sm.user.${_command} ${_user}
+    (home)
+      __sm.user.${_command} ${_user} ${_home}
+      ;;
+    (shell)
+      __sm.user.${_command} ${_user} ${_shell}
       ;;
     (set.*)
       __sm.user.${_command} ${_user} ${_value}
