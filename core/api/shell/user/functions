@@ -49,7 +49,7 @@ user()
       (login)
         _flags+=( - )
         ;;
-      (user|for)
+      (name|user|for)
         _user="$1"
         shift || fail "User name must follow keyword 'user'"
         ;;
