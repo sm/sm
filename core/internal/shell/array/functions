@@ -143,25 +143,19 @@ __sm.array.largest()
   printf "%s" "${_largest}"
 }
 
-__sm.array.sort_desc()
+__sm.array.sort()
 {
-  local _name="${1:-}" _index _largest=""
-  shift || fail "Array variable name was not given."
-
-  eval "${_name}=(\$(
+  local _name="$1" _direction="${2:-"asc"}" _index _largest=""
+  if [[ "${_direction}" == "desc" ]]
+  then
+    eval "${_name}=(\$(
   echo \"\${${_name}[@]}\" | sed -e 's/\s/\n/g' | sort -r
   ))"
-}
-
-__sm.array.sort_asc()
-{
-  local _name="${1:-}" _index _largest=""
-
-  shift || fail "Array variable name was not given."
-
-  eval "${_name}=(\$(
-  echo \"\${${_name}[@]}\" | tr ' ' \"\n\" | sort
-  ))"
+  else
+    eval "${_name}=(\$(
+    echo \"\${${_name}[@]}\" | tr ' ' \"\n\" | sort
+    ))"
+  fi
 }
 
 __sm.array.unique()

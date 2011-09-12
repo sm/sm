@@ -106,7 +106,7 @@ array()
       ;;
     (sort)
       _subcommand="$1" _name="$2"
-      shift 2 || fail "subcommand and array name missing;"\
+      shift 2 || fail "sort direction and array name missing;"\
         " array sort <desc,asc> {name}."
       __sm.array.sort "${_name}" "${_subcommand}"
       ;;
