@@ -80,7 +80,7 @@ user()
     (set.*)
       __sm.user.${_command} ${_user} ${_value}
       ;;
-    (add|create.if.not.exists)
+    (add|create.unless.exists)
       __sm.user.${_command} "${_user}" "${_group}" "${_flags[*]}"
       ;;
     (remove)
