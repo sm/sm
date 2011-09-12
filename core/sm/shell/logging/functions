@@ -135,7 +135,13 @@ log_todo()
 core_error()
 {
   set +o xtrace
-  printf "ERROR(${FUNCNAME[2]}): $*\n" >&2
+  if [[ -n "${BASH_VERSION}" ]]
+  then
+    printf "ERROR(${FUNCNAME[2]}): $*\n" >&2
+  elif [[ -n "${ZSH_VERSION}" ]]
+  then
+    printf "ERROR(${funcstack[3]}): $*\n" >&2
+  fi
   set +o errtrace
   trap - ERR
   exit 1
@@ -175,7 +181,13 @@ succeed()
 core_fail()
 {
   trace_flag=0
-  backtrace "FAIL(${FUNCNAME[2]}): $*"
+  if [[ -n "${bash_version}" ]]
+  then
+    backtrace "fail(${funcname[2]}): $*"
+  elif [[ -n "${zsh_version}" ]]
+  then
+    backtrace "fail(${funcstack[3]}): $*"
+  fi
   exit 1
 }
 
@@ -219,7 +231,7 @@ set_ps4()
 # ### Code Walkthrough
 core_trace_filter()
 {
-  local _action="$1" old
+  local _action="$1" old _name
   shift || fail "Filter action {start,stop} must be specified."
 
   case "${_action}" in
@@ -229,7 +241,15 @@ core_trace_filter()
     stop)
       old="${trace_filter_stack[${__sm_array_start}]}"
       old="${old%%=*}"
-      if [[ "${FUNCNAME[2]}" == "${old}" ]]
+
+      if [[ -n "${BASH_VERSION}" ]]
+      then
+        _name="${FUNCNAME[2]}"
+      elif [[ -n "${ZSH_VERSION}" ]]
+        _name="${funcstack[3]}"
+      fi
+
+      if [[ "${_name}" == "${old}" ]]
       then
         shift || true
         trace_filter_stack=( "$@" )
@@ -265,7 +285,13 @@ trace_filter()
   set +o xtrace
   if [[ -n "$1" ]]
   then
-    core_trace_filter start $state "${FUNCNAME[1]}=$1"
+    if [[ -n "${BASH_VERSION}" ]]
+    then
+      core_trace_filter start $state "${FUNCNAME[1]}=$1"
+    elif [[ -n "${ZSH_VERSION}" ]]
+    then
+      core_trace_filter start $state "${funcstack[2]}=$1"
+    fi
   else
     core_trace_filter stop $state "${trace_filter_stack[@]}"
   fi
@@ -288,7 +314,14 @@ __sm.actions.source()
 
 __sm.debug.variables.callback()
 {
-  local _variable
+  local _variable _function_stack
+  if [[ -n "${BASH_VERSION}" ]]
+  then
+    _function_stack="${FUNCNAME[*]}"
+  elif [[ -n "${ZSH_VERSION}" ]]
+  then
+    _function_stack="${funcstack[*]}"
+  fi
   for _variable in ${var_debug_flags[@]}
   do
     eval "
@@ -299,7 +332,7 @@ __sm.debug.variables.callback()
           log \"var debug '${_variable}' change from '\${${_variable}_previous_value[*]}' to '\${${_variable}[*]}'.\"
         elif [[ \"${var_debug_type_flag}\" == \"short\" ]]
         then
-          log \"var debug '${_variable}' change from '\${${_variable}_previous_value[*]}' to '\${${_variable}[*]}' function path: ${FUNCNAME[*]}\"
+          log \"var debug '${_variable}' change from '\${${_variable}_previous_value[*]}' to '\${${_variable}[*]}' function path: ${_function_stack[*]}\"
         else
           backtrace \"var debug '${_variable}' change from '\${${_variable}_previous_value[*]}' to '\${${_variable}[*]}'.\" no_exit
         fi
@@ -396,40 +429,41 @@ separator()
 # ### Code Walkthrough
 backtrace()
 {
-  # Turn off shell tracing.
   trace_filter backtrace # backtrace is disabled by default.
 
-  # Declare separator and columns variables. Initialize columns to the terminal.
-  local _separator _columns
+  local _separator _columns _stack _trace _message _flag _source _function _line \
+    _index _largest _format _digits _longest
 
-  # If setting the columns via tput does not work, default to 80 columns.
-  _columns=$(tput cols) || _columns=80
 
-  # Set the separator variable contents to the separator, filled out to the
-  # number of columns.
+  if [[ -n "${BASH_VERSION}"]]
+  then
+    _stack=(${FUNCNAME[@]})
+    _trace=(${BASH_SOURCE[@]})
+  elif [[ -n "${}" ]]
+  then
+    _stack=(${funcstack[@]})
+    _trace=(${functrace[@]})
+  fi
+
+  _columns=$(tput cols 2>/dev/null || echo 80)
+
   printf -v _separator '%*s' "${_columns:-${COLUMNS:-80}}"
 
-  # Store the passed-in message, if given as the first parameter, in the
-  # message variable. Default to empty string.
-  local _message="${1:-}" _flag="$2"
+  _message="${1:-}" _flag="$2"
 
-  # If a message was given, print the message to the calling environment's STDERR.
   [[ -z ${_message} ]] || printf "\n${_message}\n\n" >&2
-
-  # Declare function local variables
-  local _source _function _line _index _largest _format _digits _longest
 
   # Loop over the function names in the function array stack, to determine
   # which is longest.
   # Note that we do not use array largest here, as we are inside an error function.
-  for (( _index=0 ; _index < ${#FUNCNAME[@]} ; _index++ ))
+  for (( _index=0 ; _index < ${#_stack[@]} ; _index++ ))
   do
     # For each function name in the stack, if the function name is longer than
     # the current largest, then...
-    if (( ${#FUNCNAME[${_index}]} > ${#_largest} ))
+    if (( ${#_stack[${_index}]} > ${#_largest} ))
     then
       # ...set it as the new largest element.
-      _largest=${FUNCNAME[${_index}]}
+      _largest=${_stack[${_index}]}
     fi
   done
 
@@ -454,7 +488,7 @@ backtrace()
   # Determine the format string output for the backtrace, based on your
   # set editor. If you haven't set an editor, SM defaults the editor variable to
   # the pager, or to empty string.
-  case "${EDITOR:=${PAGER:-}}" in
+  case "${EDITOR:="vi"}" in
     (mvim*|mate*)
       # Set the format based on GUI editing tools format for opening
       # a file to a given line using a file URI.
@@ -476,10 +510,10 @@ backtrace()
   printf "${_separator// /=}\n" 1>&2
 
   # Iterate over the functions array stack, skipping this backtrace function [0].
-  for (( _index=1 ; _index < ${#FUNCNAME[@]} ; ++_index ))
+  for (( _index=1 ; _index < ${#_stack[@]} ; ++_index ))
   do
     _source="${BASH_SOURCE[${_index}]}"
-    _function="${FUNCNAME[${_index}]:+${FUNCNAME[${_index}]}()}"
+    _function="${_stack[${_index}]:+${_stack[${_index}]}()}"
     _line=${BASH_LINENO[$(( _index - 1 ))]}
 
     case "$_function" in
