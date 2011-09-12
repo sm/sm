@@ -19,6 +19,7 @@
 #     ".*" ""
 # as the last pair of arguments to templates seed.
 #
+template() { templates "$@" ; }
 templates()
 {
   trace_filter templates
