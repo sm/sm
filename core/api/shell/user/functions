@@ -11,7 +11,7 @@ user()
     "is unprivileged"
     "set home"
     "set shell"
-    "create if not exists"
+    "create unless exists"
     "create=add"
     "delete=remove"
   )
