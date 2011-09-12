@@ -102,6 +102,9 @@ package()
           shift
         fi
         ;;
+      (define)
+        _command=define
+        ;;
       (key)
         _key="$1"
         shift || fail "Key name must follow keyword 'key'"

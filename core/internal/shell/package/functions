@@ -864,8 +864,7 @@ __sm.package.info()
 
   local _installed _path="${packages_path}/versions/${package_name}" package_md5
 
-  : \
-    "${package_dir:="${package_name}-${package_version}"}" \
+  true "${package_dir:="${package_name}-${package_version}"}" \
     "${package_url:="${package_base_url}/${package_file}"}"
 
   [[ -n "${package_md5}" ]] || __sm.config.read "${package_name}" md5 "${package_file}" package_md5
