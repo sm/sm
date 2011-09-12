@@ -3,7 +3,7 @@
 __sm.service.initialize()
 {
    [[ -n "${init_scripts_path}" ]] || init_scripts_path="$(init_scripts_path)"
-   [[ -n "${confd_path}" ]]        ||confd_path="$(confd_path)"
+   [[ -n "${confd_path}" ]]        || confd_path="$(confd_path)"
 
   # TODO: Account for user service installs...
   # TODO: Merge service_paths and service_root_paths...
