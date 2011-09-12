@@ -86,7 +86,7 @@ __sm.user.exists()
   return 1
 }
 
-__sm.user.create.if.not.exists()
+__sm.user.create.unless.exists()
 {
   if ! __sm.user.exists "$1"
   then
