@@ -104,6 +104,8 @@ package()
         ;;
       (define)
         _command=define
+        _params+=("$@")
+        break
         ;;
       (key)
         _key="$1"
