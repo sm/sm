@@ -2,9 +2,6 @@
 
 __sm.service.initialize()
 {
-  true "${init_scripts_path:="$(init_scripts_path)"}" \
-    "${confd_path:="$(__sm.os.confd.path)"}"
-
   # TODO: Account for user service installs...
   # TODO: Merge service_paths and service_root_paths...
   # TODO: determine root_install vs user_install...
@@ -18,6 +15,8 @@ __sm.service.initialize()
   fi
 
   true \
+    "${init_scripts_path:="$(init_scripts_path)"}" \
+    "${confd_path:="$(__sm.os.confd.path)"}" \
     "${service:="${extension:-${package_name}}"}" \
     "${service_version:="${package_version}"}" \
     "${prefix_path:="${sm_path}/active"}" \
@@ -38,21 +37,21 @@ __sm.service.initialize()
     "${service_run_as_root_flag:=0}"
 
   service_paths=(
-  "${service_bin_path}"
-  "${service_config_path}"
-  "${service_pid_path}"
-  "${service_spool_path}"
-  "${service_data_path}"
-  "${service_lock_path}"
-  "${service_log_path}"
+    "${service_bin_path}"
+    "${service_config_path}"
+    "${service_pid_path}"
+    "${service_spool_path}"
+    "${service_data_path}"
+    "${service_lock_path}"
+    "${service_log_path}"
   )
 
   service_root_paths=(
-  "${var_path}/spool/${service}"
-  "${var_path}/log/${service}"
-  "${var_path}/run/${service}"
-  "${var_path}/lock/${service}"
-  "${var_path}/db/${service}"
+    "${var_path}/spool/${service}"
+    "${var_path}/log/${service}"
+    "${var_path}/run/${service}"
+    "${var_path}/lock/${service}"
+    "${var_path}/db/${service}"
   )
 
   if user is root
