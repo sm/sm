@@ -30,7 +30,7 @@ service()
   # TODO: Think through parameters more...
   case "${_command}" in
     (start|stop|restart|reload|restart|setup|status|info|logtail|list|configcheck|usage|cli|setup|uninstall|pid|confd|initd|activate|deactivate|status|signal|initialize)
-      __sm.service.${_command} "${_parameters}"
+      __sm.service.${_command} "${_parameters[@]}"
       ;;
     (*)
       ;;
