@@ -190,6 +190,32 @@ __sm.package.configure.flag()
   fi
 }
 
+__sm.package.make.flags()
+{
+  local _flag
+
+  for _flag in "$@"
+  do
+    if ! __sm.string.contains "${_flag}" "${make_flags[*]}"
+    then
+      make_flags+=( "${_flag}" )
+    fi
+  done
+}
+
+__sm.package.package_dependencies()
+{
+  local _flag
+
+  for _flag in "$@"
+  do
+    if ! __sm.string.contains "${_flag}" "${package_dependencies[*]}"
+    then
+      package_dependencies+=( "${_flag}" )
+    fi
+  done
+}
+
 __sm.package.set.cflags()
 {
   if ! __sm.string.contains "-I${active_path}/include" "${CFLAGS}"
@@ -440,9 +466,15 @@ __sm.package.init()
   done
 
   config read file defaults from ${package_name} \
+    key package_dependencies prefix default
+  config read file defaults from ${package_name} \
     key configure_flags prefix default
+  config read file defaults from ${package_name} \
+    key make_flags prefix default
 
+  __sm.package.package_dependencies "${default_package_dependencies[@]}"
   __sm.package.configure.flags "${default_configure_flags[@]}"
+  __sm.package.make.flags "${default_make_flags[@]}"
 
   true \
     "${package_version:="${package_default_version}"}" \
