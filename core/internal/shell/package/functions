@@ -205,6 +205,7 @@ __sm.package.set.ldflags()
     export LDFLAGS="-L${active_path}/lib ${LDFLAGS:-}"
   fi
 }
+
 __sm.package.set.cc()
 {
   if os is darwin && [[ -x /usr/bin/gcc-4.2 ]]
@@ -212,6 +213,7 @@ __sm.package.set.cc()
     export CC=/usr/bin/gcc-4.2
   fi
 }
+
 __sm.package.exports()
 {
   export package_name packages_path package_name package_version archive_format \

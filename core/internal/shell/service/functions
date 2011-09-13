@@ -848,10 +848,8 @@ __sm.service.signal()
   shift || fail "Cannot signal service;"\
     " Signal must be given as the first parameter and be one of:"\
     " {KILL,QUIT,TERM,USR1,USR2,TTIN,TTOU,a digit})."
-  shift || fail "Cannot signal service;"\
-    " Module name not given as second parameter."
 
-  [[ -n "${_pid}" ]] ||
+  (( _pid )) ||
     fail "pid to signal must be passed in as the second parameter;"\
     " please check your code (see trace below.)"
 
