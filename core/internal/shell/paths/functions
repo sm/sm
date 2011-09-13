@@ -110,15 +110,11 @@ __sm.paths.remove()
       rm -f "${_path}" || fail "Could not remove the entity '${_entity}';"\
           "'rm' command failed with error code '$?'."
       removed_paths+=("${_path}")
-    elif [[ -d "${_path}" ]]
+    elif [[ -e "${_path}" ]]
     then
       rm -rf "${_path}" || fail "Could not remove the entity '${_entity}';"\
           "'rm' command failed with error code '$?'."
       removed_paths+=("${_path}")
-
-    elif [[ -e "${_path}" ]]
-    then
-      fail "Cannot remove the path '${_path}', as it is a file."
 
     else
       nonexistant_paths+=("${_path}")
