@@ -102,6 +102,9 @@ package()
           shift
         fi
         ;;
+      (initialize)
+        _command=initialize
+        ;;
       (define)
         _command=define
         _params+=("$@")
@@ -211,6 +214,7 @@ package()
     (initialize)
       declare -a package_dependencies
       declare -a configure_flags
+      __sm.package.init
       ;;
     (error)
       [[ -n "${_message}" ]] || fail "Message must be given for package error."
