@@ -19,7 +19,7 @@ variables()
     _command="${__sm_command_dotted}"
     shift "${__sm_command_words}"
   else
-    fail "No command given.\nUsage:  \nvariables <command> ..."
+    __sm.log.fail "No command given.\nUsage:  \nvariables <command> ..."
   fi
 
   while (( $# ))
@@ -32,11 +32,11 @@ variables()
             shift 2
             ;;
           ("")
-            fail "Variable output type was not given after 'type'. " \
+            __sm.log.fail "Variable output type was not given after 'type'. " \
               "Valid types are: log, error, fail"
             ;;
           (*)
-            fail "Variable output type '$2' in not valid. " \
+            __sm.log.fail "Variable output type '$2' in not valid. " \
               "Valid types are: log, error, fail"
             ;;
         esac
@@ -51,16 +51,16 @@ variables()
   # TODO: Think through variables more...
   case "${_command}" in
     (are.empty|are.nonempty)
-      [[ -n "${_variables[*]}" ]] || error "No variable names given for validation"
+      [[ -n "${_variables[*]}" ]] || __sm.log.error "No variable names given for validation"
       __sm.variables.${_command} "${_variables[@]}"
       ;;
     (must.be.empty|must.be.nonempty)
-      [[ -n "${_variables[*]}" ]] || error "No variable names given for validation"
-      [[ -n "${_type}" ]] || error "No message type given for validation"
+      [[ -n "${_variables[*]}" ]] || __sm.log.error "No variable names given for validation"
+      [[ -n "${_type}" ]] || __sm.log.error "No message type given for validation"
       __sm.variables.${_command} "${_type}" "${_variables[@]}"
       ;;
     (*)
-      fail "Unknown variables command '${_command}'"
+      __sm.log.fail "Unknown variables command '${_command}'"
       ;;
   esac
 }

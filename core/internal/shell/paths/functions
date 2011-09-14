@@ -5,21 +5,21 @@ __sm.paths.move()
   local _source="$1" _target="$2" _mode="$3" _owner="$4"
 
   mv "${_source}" "${_target}" ||
-    fail "Could not move '${_source}' to '${_target}',"\
-    "as the 'mv' command failed with error code '$?'."
+    __sm.log.fail "Could not move '${_source}' to '${_target}',"\
+    "as the 'mv' command failed with __sm.log.error code '$?'."
 
   if [[ -n "${_mode}" ]]
   then
     chmod -R "${_mode}" "${_target}" ||
-    fail "Could not recursively change mode of '${_target}' to"\
-    "${_mode}, as the 'chmod -R' command failed with error code '$?'."
+    __sm.log.fail "Could not recursively change mode of '${_target}' to"\
+    "${_mode}, as the 'chmod -R' command failed with __sm.log.error code '$?'."
   fi
 
   if [[ -n "${_owner}" ]]
   then
     chown -R "${_owner}" "${_target}" ||
-    fail "Could not recursively change ownership of '${_target}' to"\
-    "${_owner}, as the 'chown -R' command failed with error code '$?'."
+    __sm.log.fail "Could not recursively change ownership of '${_target}' to"\
+    "${_owner}, as the 'chown -R' command failed with __sm.log.error code '$?'."
   fi
 }
 
@@ -28,31 +28,31 @@ __sm.paths.copy()
   local _source="$1" _target="$2" _mode="$3" _owner="$4"
 
   cp -Rf "${_source}" "${_target}" ||
-    fail "Could not copy '${_source}' to '${_target}',"\
-      "as the 'cp' command failed with error code '$?'."
+    __sm.log.fail "Could not copy '${_source}' to '${_target}',"\
+      "as the 'cp' command failed with __sm.log.error code '$?'."
 
   if [[ -n "${_mode}" ]]
   then
     chmod -R "${_mode}" "${_target}" ||
-    fail "Could not recursively change mode of '${_target}' to"\
-    "${_mode}, as the 'chmod -R' command failed with error code '$?'."
+    __sm.log.fail "Could not recursively change mode of '${_target}' to"\
+    "${_mode}, as the 'chmod -R' command failed with __sm.log.error code '$?'."
   fi
 
   if [[ -n "${_owner}" ]]
   then
     chown -R "${_owner}" "${_target}" ||
-    fail "Could not recursively change ownership of '${_target}' to"\
-    "${_owner}, as the 'chown -R' command failed with error code '$?'."
+    __sm.log.fail "Could not recursively change ownership of '${_target}' to"\
+    "${_owner}, as the 'chown -R' command failed with __sm.log.error code '$?'."
   fi
 }
 
 __sm.paths.enter()
 {
   local _path="$1"
-  [[ -d "${_path}" ]] || fail "Path '${_path}' does not exist."
+  [[ -d "${_path}" ]] || __sm.log.fail "Path '${_path}' does not exist."
   builtin cd "${_path}" ||
-    fail "Could not cd into the given path '${_path}'; "\
-      "'cd' command failed with error code '$?'."
+    __sm.log.fail "Could not cd into the given path '${_path}'; "\
+      "'cd' command failed with __sm.log.error code '$?'."
 }
 
 __sm.paths.exists()
@@ -71,7 +71,7 @@ __sm.paths.join()
 __sm.paths.expand()
 {
   local _path="$1"
-  [[ -d "${_path}" ]] || fail "Path '${_path}' does not exist."
+  [[ -d "${_path}" ]] || __sm.log.fail "Path '${_path}' does not exist."
   ( builtin cd "${_path}" ; echo $PWD )
 }
 
@@ -88,10 +88,10 @@ __sm.paths.create()
 
     if [[ -f "${_path}" || -L "${_path}" ]]
     then
-      warn "Could not ensure path '${_path}' exists as the path is a file."
+      __sm.log.warn "Could not ensure path '${_path}' exists as the path is a file."
     else
-      mkdir -p "${_path}" || fail "Could not create the path '${_path}',"\
-        "as the 'mkdir' command failed with error code '$?'."
+      mkdir -p "${_path}" || __sm.log.fail "Could not create the path '${_path}',"\
+        "as the 'mkdir' command failed with __sm.log.error code '$?'."
     fi
   done
 }
@@ -107,13 +107,13 @@ __sm.paths.remove()
   do
     if [[ -L "${_path}" ]]
     then
-      rm -f "${_path}" || fail "Could not remove the entity '${_entity}';"\
-          "'rm' command failed with error code '$?'."
+      rm -f "${_path}" || __sm.log.fail "Could not remove the entity '${_entity}';"\
+          "'rm' command failed with __sm.log.error code '$?'."
       removed_paths+=("${_path}")
     elif [[ -e "${_path}" ]]
     then
-      rm -rf "${_path}" || fail "Could not remove the entity '${_entity}';"\
-          "'rm' command failed with error code '$?'."
+      rm -rf "${_path}" || __sm.log.fail "Could not remove the entity '${_entity}';"\
+          "'rm' command failed with __sm.log.error code '$?'."
       removed_paths+=("${_path}")
 
     else
@@ -134,13 +134,13 @@ __sm.paths.copy()
   do
     if [[ ! -d "${_path}" ]]
     then
-      error "Cannot copy path ${_path} to ${_target};"\
+      __sm.log.error "Cannot copy path ${_path} to ${_target};"\
       "Path '${_path}' does not exist (in '$PWD')."
     fi
 
     cp -Rf "${_path}" "${_target}/" ||
-      fail "Could not copy the entity '${_entity}';"\
-      "As the 'cp -Rf' command failed with error code '$?'."
+      __sm.log.fail "Could not copy the entity '${_entity}';"\
+      "As the 'cp -Rf' command failed with __sm.log.error code '$?'."
   done
 }
 
@@ -155,12 +155,12 @@ __sm.paths.chown()
 
     if [[ ! -e "${_path}" ]]
     then
-      fail "Path '${_path}' does not exist."
+      __sm.log.fail "Path '${_path}' does not exist."
     fi
 
     chown ${_flags[*]} ${_identity} "${_path}" ||
-      fail "Could not chown the path '${_path}' to '${_identity};"\
-      " 'chown' command failed with error code '$?'."
+      __sm.log.fail "Could not chown the path '${_path}' to '${_identity};"\
+      " 'chown' command failed with __sm.log.error code '$?'."
   done
 }
 
@@ -173,14 +173,14 @@ __sm.paths.chmod()
   do
     if [[ ! -d "${_path}" ]]
     then
-      fail "Cannot chmod path ${_path} to ${_permissions},"\
+      __sm.log.fail "Cannot chmod path ${_path} to ${_permissions},"\
       "as the path (directory) does not exist."
     fi
 
     chmod ${_flags[@]} ${_mode} "${_path}" ||
-      fail "Could not chmod the file '${_file}' to "\
+      __sm.log.fail "Could not chmod the file '${_file}' to "\
       "'${_target}/${_file//*\/},"\
-      "as the 'chmod' command failed with error code '$?'."
+      "as the 'chmod' command failed with __sm.log.error code '$?'."
 
   done
 }
@@ -188,8 +188,8 @@ __sm.paths.chmod()
 __sm.paths.in()
 {
   local _path="${1:-}"
-  shift  || fail "Path was not given!"
-  [[ -d "${_path}" ]] || fail "'${_path}' is not a path!"
+  shift  || __sm.log.fail "Path was not given!"
+  [[ -d "${_path}" ]] || __sm.log.fail "'${_path}' is not a path!"
 
   for dir in "${_path}"/*
   do
@@ -216,8 +216,8 @@ __sm.paths.search()
   shift
   _paths=("$@")
 
-  [[ -n "${_glob}" ]] || fail "'${_path}' is not a path!"
-  [[ -d "${_path}" ]] || fail "'${_path}' is not a directory!"
+  [[ -n "${_glob}" ]] || __sm.log.fail "'${_path}' is not a path!"
+  [[ -d "${_path}" ]] || __sm.log.fail "'${_path}' is not a directory!"
 
   while read _line
   do
@@ -236,7 +236,7 @@ __sm.paths.absolute()
     then
       builtin cd "${_path}"
     else
-      error "The given path '${_path}' is not a valid directory in the following list '$@'."
+      __sm.log.error "The given path '${_path}' is not a valid directory in the following list '$@'."
     fi
   done
 

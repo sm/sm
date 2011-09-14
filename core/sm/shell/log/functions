@@ -1,0 +1,799 @@
+#!/bin/sh
+
+#
+# SM Framework Core Module ~ Logging (logging)
+#
+
+# ## log rotate()
+#
+# Strategically rotate a logfile, minimizing data loss.
+#
+# This function uses a copy, tail and truncate strategy.
+#
+# ### Usage Examples
+#
+#     root# log rotate /var/log/my_logfile.log
+
+# ## log\_streams()
+#
+# Log streams to three files:
+#   - standard out
+#   - standard in
+#   - combined (what the user typically sees)
+#
+# ### Usage Examples
+#
+#     root# log streams "make install" prefix make
+#     cat make.out.log
+#     root#
+#     ...
+#
+# Alternatively,
+#
+#     root# log streams "make install" \
+#           out /path/to/out.log \
+#           err /path/to/err.log \
+#           mix /path/to/mix.log # both out & err as they occurred.
+#     root# cat /path/to/mix.log
+#     ...
+#
+log()
+{
+  local _token _command _message=()
+
+  while (( $# ))
+  do
+    _token="$1" && shift
+    case "${_token}" in
+      (eval|search|todo|warn|debug|error|succeed|step|rotate|streams)
+        _command="${_token}"
+        ;;
+      (*)
+        _message+=("$@{_token}")
+        ;;
+    esac
+  done
+
+  if [[ -n "${_command}" ]]
+  then
+    __sm.log.${_command} "${_message[@]}"
+  else
+    __sm.log.log "${_message[@]}"
+  fi
+}
+
+log_search()
+{
+  __sm.log.warn "log_search is depreciated, use 'log search instead'\n"
+  __sm.log.search "$@"
+}
+
+todo()
+{
+  __sm.log.warn "todo is depreciated, use 'log todo instead'\n"
+  __sm.log.todo "$@"
+}
+
+warn()
+{
+  __sm.log.warn "warn is depreciated, use 'log warn instead'\n"
+  __sm.log.warn "$@"
+}
+
+debug()
+{
+  __sm.log.warn "debug is depreciated, use 'log debug instead'\n"
+  __sm.log.debug "$@"
+}
+
+error()
+{
+  __sm.log.warn "error is depreciated, use 'log __sm.log.error instead'\n"
+  __sm.log.error "$@"
+}
+
+succeed()
+{
+  __sm.log.warn "succeed is depreciated, use 'log succeed instead'\n"
+  __sm.log.succeed "$@"
+}
+
+fail()
+{
+  __sm.log.warn "fail is depreciated, use 'log __sm.log.fail instead'\n"
+  __sm.log.fail "$@"
+}
+
+log_step()
+{
+  __sm.log.warn "log_step is depreciated, use 'log step instead'"
+  __sm.log.step "$@"
+}
+
+trace_filter()
+{
+  set +o xtrace
+  if [[ -n "$1" ]]
+  then
+    if [[ -n "${BASH_VERSION}" ]]
+    then
+      __sm.log.trace.filter start $state "${FUNCNAME[1]}=$1"
+    elif [[ -n "${ZSH_VERSION}" ]]
+    then
+      true # no-op for now
+      #__sm.log.trace.filter start $state "${funcstack[2]}=$1"
+    fi
+  else
+    __sm.log.trace.filter stop $state "${__sm_trace_filter_stack[@]}"
+  fi
+}
+
+# Examples
+#
+#     user$ cat ./test
+#     #!/bin/sm
+#     includes api/trace # Load the trace module.
+#
+#     functiona()
+#     {
+#       echo "function a"
+#       functionb
+#       echo "function a"
+#     }
+#
+#     functionb()
+#     {
+#       echo "function b"
+#       functionc
+#       echo "function b"
+#     }
+#
+#     functionc()
+#     {
+#       echo "function c"
+#       backtrace
+#       echo "function c"
+#     }
+#
+#     functiona
+#
+#     user$ $PWD/test
+#     function a
+#     function b
+#     function c
+#     __sm.log.error Backtrace:
+#        Trace   Line Function             File
+#           4.     25 functionc()          /Users/sm/test
+#           3.     18 functionb()          /Users/sm/test
+#           2.     11 functiona()          /Users/sm/test
+#           1.     29 main()               /Users/sm/test
+#      > /Users/sm/test functionc() 26 $ echo 'function c'
+#     function c
+#      > /Users/sm/test functionb() 19 $ echo 'function b'
+#     function b
+#      > /Users/sm/test functiona() 12 $ echo 'function a'
+#     function a
+#
+# ### Code Walkthrough
+backtrace()
+{
+  trace_filter backtrace # backtrace is disabled by default.
+
+  local _separator _columns _stack _trace _message _flag _source _function _line \
+    _index _largest _format _digits _longest _string \
+    _source_length=20 _function_length=20 _digits=1
+
+
+  _columns=$(tput cols 2>/dev/null || echo 80)
+  printf -v _separator '%*s' "${_columns:-${COLUMNS:-80}}"
+  _message="${1:-}" _flag="$2"
+  [[ -z ${_message} ]] || printf "\n${_message}\n\n" >&2
+
+  if [[ -n "${BASH_VERSION}" ]]
+  then
+    _stack=(${FUNCNAME[@]})
+    _trace=(${BASH_SOURCE[@]})
+
+    # Loop over the function names in the function array stack, to determine
+    # which is longest.
+    # Note that we do not use array largest here, as we are inside an __sm.log.error function.
+    for (( _index=0 ; _index < ${#_stack[@]} ; _index++ ))
+    do
+      # For each function name in the stack, if the function name is longer than
+      # the current largest, then...
+      if (( ${#_stack[${_index}]} > ${#_largest} ))
+      then
+        # ...set it as the new largest element.
+        _largest=${_stack[${_index}]}
+      fi
+    done
+
+    # Loop over the bash source files array, to find the longest element.
+    # Note that we do not use array largest here, as we are in an __sm.log.error function.
+    for (( _index=0 ; _index < ${#BASH_SOURCE[@]} ; _index++ ))
+    do
+      # For each source file in the source files array, if the file name/path
+      # is longer than the current longest, then set it as the new longest element.
+      (( ${#BASH_SOURCE[${_index}]} <= ${#_longest} )) ||
+        _longest=${BASH_SOURCE[${_index}]}
+    done
+
+    for (( _index=0 ; _index < ${#BASH_LINENO[@]} ; _index++ ))
+    do
+      # For each line number in the line numbers array, if the number of digits
+      # is greater than the current longest digits, then set it as the new largest.
+      (( ${#BASH_LINENO[${_index}]} <= ${#_digits} )) ||
+        _digits=${BASH_LINENO[${_index}]}
+    done
+
+    # Determine the format string output for the backtrace, based on your
+    # set editor. If you haven't set an editor, SM defaults the editor variable to
+    # the pager, or to empty string.
+    case "${EDITOR:="vi"}" in
+      (mvim*|mate*)
+        # Set the format based on GUI editing tools format for opening
+        # a file to a given line using a file URI.
+        _format="%-60s # %-$((${#_largest} + 2))s \n"
+        # Print the backtrace header to the calling environment's STDERR
+        printf "${_format}" "Source" "function()"  1>&2
+        ;;
+      (vi*|gvim*|emacs*|*)
+        # Set the format based on the console editing tools format for opening
+        # a file to a given line.
+        # _format="%-$((${#_largest} + 2))s $ %${#EDITOR}s +%-$((${#_digits}))s %-$((${#_longest} + 2))s %s\n"
+        _format="%${#EDITOR}s +%-$((${#_digits}))s %-$((${#_longest} + 2))s # %s %-$((${#_largest} + 2))s\n"
+        # Print the backtrace header to the calling environment's STDERR.
+        printf "${_format}" ' ' "#" "source file" "function()"  1>&2
+        ;;
+    esac
+
+    # Print the backtrace separator line.
+    printf "${_separator// /=}\n" 1>&2
+
+    # Iterate over the functions array stack, skipping this backtrace function [0].
+    for (( _index=1 ; _index < ${#_stack[@]} ; ++_index ))
+    do
+      _source="${BASH_SOURCE[${_index}]}"
+      _function="${_stack[${_index}]:+${_stack[${_index}]}()}"
+      _line=${BASH_LINENO[$(( _index - 1 ))]}
+
+      case "$_function" in
+        fail\(\)|error\(\)|command_not_found_handle\(\)|command_not_found\(\))
+          continue
+          ;;
+      esac
+
+      case "${EDITOR:-}" in
+        # Print a file with the format and content for GUI editing tools, to open a
+        # given line using a URI. Print a backtrace to calling environment's STDERR.
+        (mvim*|mate*)
+          printf "${_format}" "open ${EDITOR// *}://open?url=file://${_source}&line=${_line}" "${_function}" 1>&2
+          ;;
+        # Print a file with the format and content for console editing tools, to open a
+        # file to a given line. Print backtrace to calling environment's STDERR.
+        (vi*|gvim*|emacs*|*)
+          printf "${_format}" "${EDITOR}" "${_line}" "${_source} " "${_function}" 1>&2
+          ;;
+      esac
+    done
+
+    # Print the backtrace separator line, and if the trace flag is nonnegative,
+    # then turn tracing back on.
+    printf "${_separator// /=}\n" 1>&2
+
+  elif [[ -n "${ZSH_VERSION}" ]]
+  then
+    setopt extendedglob
+    _stack=(${funcstack[@]})
+    _trace=(${functrace[@]})
+    for (( _index=0 ; _index < ${#_stack[@]} ; _index++ ))
+    do
+      _string=${functrace[${_index}]}
+      _string="${_string%:*}"
+      if (( ${#_string} > ${_function_length} ))
+      then _function_length=${#_string} ; fi
+
+      _string=${funcfiletrace[${_index}]}
+      _string="${_string%:*}"
+      if (( ${#_string} > ${_source_length} ))
+      then _source_length=${#_string} ; fi
+
+      _string=${funcfiletrace[${_index}]}
+      _string=${_string#*:}
+      if (( ${#_string} > ${_digits} ))
+      then _digits=${#_string} ; fi
+    done
+
+    # Determine the format string output for the backtrace, based on your
+    # set editor. If you haven't set an editor, SM defaults the editor variable to
+    # the pager, or to empty string.
+    case "${EDITOR:="vi"}" in
+      (mvim*|mate*)
+        # Set the format based on GUI editing tools format for opening
+        # a file to a given line using a file URI.
+        _format="%-60s # %-$((${#_source_length} + 2))s \n"
+        # Print the backtrace header to the calling environment's STDERR
+        printf "${_format}" "Source" "function()"  1>&2
+        ;;
+      (vi*|gvim*|emacs*|*)
+        # Set the format based on the console editing tools format for opening
+        # a file to a given line.
+        # _format="%-$((${#_largest} + 2))s $ %${#EDITOR}s +%-$((${#_digits}))s %-$((${#_longest} + 2))s %s\n"
+        _format="%${#EDITOR}s +%-$((${#_digits}))s %-$((${#_source_length} + 2))s # %s %-$((${#_function_length} + 2))s\n"
+        # Print the backtrace header to the calling environment's STDERR.
+        printf "${_format}" ' ' "#" "source file" "function()"  1>&2
+        ;;
+    esac
+
+    # Print the backtrace separator line.
+    printf "${_separator// /=}\n" 1>&2
+
+    # Iterate over the functions array stack, skipping this backtrace function [0].
+    for (( _index=1 ; _index < ${#_stack[@]} ; ++_index ))
+    do
+      _string="${funcfiletrace[${_index}]}"
+      _source="${_string%:*}"
+      _source_line=${_string#*:}
+      _string="${functrace[${_index}]:+${functrace[${_index}]}}"
+      _function="${_string%:*}"
+      _function_line=${_string#*:}
+      #_line=${funcfiletrace[$(( _index - 1 ))]}
+
+      case "${_function}" in
+        (__sm*)
+          continue # Skip internal functions.
+          ;;
+      esac
+
+      case "${EDITOR:-}" in
+        # Print a file with the format and content for GUI editing tools, to open a
+        # given line using a URI. Print a backtrace to calling environment's STDERR.
+        (mvim*|mate*)
+          printf "${_format}" "open ${EDITOR// *}://open?url=file://${_source}&line=${_source_line}" "${_function}" 1>&2
+          ;;
+        # Print a file with the format and content for console editing tools, to open a
+        # file to a given line. Print backtrace to calling environment's STDERR.
+        (vi*|gvim*|emacs*|*)
+          printf "${_format}" "${EDITOR}" "${_source_line}" "${_source} " "${_function}" 1>&2
+          ;;
+      esac
+
+    done
+  fi
+
+  [[ "${_flag}" != "no_exit" ]] || return 0
+
+  __sm.seppuku
+}
+
+__sm.log.step()
+{
+  local _message="${1:-}" _output _log_file _status
+
+  if (( $# > 1 ))
+  then
+    shift
+    __sm.log.piece "${_message}"
+
+    _log_file="${TMP_PATH:-/tmp}/$$.stderr.log"
+
+    touch "${_log_file}"
+    if "$@" > "${_log_file}"
+    then
+      __sm.log.piece "succ"
+      cat "${_log_file}"
+      rm -rf "${_log_file}"
+      return 0
+    else
+      _status="$?"
+      __sm.log.piece "fail"
+      cat "${_log_file}" >&2
+      rm -rf "${_log_file}"
+      return ${_status} # pass __sm.log.error return status code up !
+    fi
+  else
+    __sm.log.piece "${_message}"
+  fi
+}
+
+__sm.log.log()
+{
+  printf "$*\n"
+}
+
+__sm.log.todo()
+{
+  if (( debug_flag )) && __sm.log.options.check "$debug_flags" "todo"
+  then
+    local file="${BASH_SOURCE[2]}" line="${BASH_LINENO[1]}"
+    printf "DEBUG todo: ${file##${sm_path}\/}:${line}:\n"
+    printf "$*" | xargs -s 72 | xargs -I {} printf "DEBUG todo: # {}\n"
+  else
+    return 0
+  fi
+}
+
+__sm.log.error()
+{
+  set +o xtrace
+  if [[ -n "${BASH_VERSION}" ]]
+  then
+    printf "ERROR(${FUNCNAME[2]}): $*\n" >&2
+    set +o errtrace
+  elif [[ -n "${ZSH_VERSION}" ]]
+  then
+    printf "ERROR(${funcstack[3]}): $*\n" >&2
+  fi
+  trap - ERR
+  exit 1
+}
+
+__sm.log.succeed()
+{
+  set +o xtrace
+  if [[ -n "$*" ]]
+  then
+    printf "$*\n"
+  fi
+  #exit 0
+}
+
+__sm.log.fail()
+{
+  trace_flag=0
+  if [[ -n "${BASH_VERSION}" ]]
+  then
+    backtrace "FAIL(${funcname[2]}): $*"
+  elif [[ -n "${ZSH_VERSION}" ]]
+  then
+    backtrace "FAIL(${funcstack[3]}): $*"
+  fi
+  exit 1
+}
+
+__sm.set.ps4()
+{
+  # Set and export the PS4 variable, so that this script -- and called bash scripts --
+  # will display more detailed and formatted trace output.
+  # Finally, return true, 0, for success.
+  if [[ -n "${BASH_VERSION}" ]]
+  then
+    PS4="# \${BASH_SOURCE##\${sm_path}\/} \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO} $ "
+  elif [[ -n "${ZSH_VERSION}" ]]
+  then
+    PS4="+%x:%I %N():%i > "
+  fi
+  export PS4
+
+  return 0
+}
+
+__sm.log.trace.filter()
+{
+  local _action="$1" old _name
+  shift || __sm.log.fail "Filter action {start,stop} must be specified."
+
+  case "${_action}" in
+    start)
+      __sm_trace_filter_stack=( "$1" "${__sm_trace_filter_stack[@]}" )
+      ;;
+    stop)
+      old="${__sm_trace_filter_stack[${__sm_array_start}]}"
+      old="${old%%=*}"
+
+      if [[ -n "${BASH_VERSION}" ]]
+      then
+        _name="${FUNCNAME[2]}"
+      elif [[ -n "${ZSH_VERSION}" ]]
+      then
+        _name="${funcstack[3]}"
+      fi
+
+      if [[ "${_name}" == "${old}" ]]
+      then
+        shift || true
+        __sm_trace_filter_stack=( "$@" )
+      fi
+      ;;
+    *)
+      __sm.log.fail "Unknown trace action ${_action}, use {start,stop}."
+      ;;
+  esac
+
+  filter="${__sm_trace_filter_stack[${__sm_array_start}]}"
+
+  if [[ -n "$filter" ]]
+  then
+    if [[ -n "${BASH_VERSION}" ]]
+      if __sm.log.options.check "$trace_flags" "${filter##*=}"
+      then
+        trap 'set +o xtrace "\$?=$?" ; trace_filter' RETURN
+      elif [[ -n "${ZSH_VERSION}" ]]
+      then
+        true # what to do...
+      fi
+      set -o xtrace
+    fi
+  else
+    # No param, restore default state
+    if (( trace_flag != 0 ))
+    then
+      if [[ -n "${BASH_VERSION}" ]]
+        trap 'set +o xtrace "\$?=$?" ; trace_filter' RETURN
+      elif [[ -n "${ZSH_VERSION}" ]]
+      then
+        true # what to do...
+      fi
+      set -o xtrace
+    fi
+  fi
+}
+
+__sm.log.warn()
+{
+  printf "WARNING: $*\n" >&2
+}
+
+__sm.log.debug()
+{
+  local type="$1"
+  shift || __sm.log.fail "Debug type must be given as the first parameter."
+
+  if (( debug_flag )) && __sm.log.options.check "$debug_flags" "$type"
+  then
+    if [[ "$1" == "-" ]]
+    then
+      printf "DEBUG $type: "
+      cat -
+      printf "\n"
+    else
+      printf "DEBUG $type: $*\n"
+    fi
+  else
+    return 0
+  fi
+}
+
+__sm.log.search()
+{
+  local name="${1:-}" value="${2:-}"
+  shift || __sm.log.fail "name must be given as the first parameter."
+  shift || __sm.log.fail "value must be given as the second parameter."
+
+  if (( debug_flag )) && __sm.log.options.check "$debug_flags" "search"
+  then
+    printf "DEBUG search: %9s %-25s in $*.\n" "$name" "$value"
+  else
+    return 0
+  fi
+}
+
+__sm.actions.call()
+{
+  trace_filter action
+  "$@"
+}
+
+__sm.actions.source()
+{
+  local script="$1"
+  shift || __sm.log.fail "No script was given as the first parameter."
+  [[ -r "$script" ]] || __sm.log.fail "Could not find script to run: $script."
+  trace_filter action
+  source "$script"
+}
+
+__sm.debug.variables.callback()
+{
+  local _variable ction_stack
+
+  if [[ -n "${BASH_VERSION}" ]]
+  then
+    _stack="${FUNCNAME[*]}"
+  elif [[ -n "${ZSH_VERSION}" ]]
+  then
+    _stack="${funcstack[*]}"
+  fi
+
+  for _variable in ${var_debug_flags[@]}
+  do
+    eval "
+      if [[ \"\${${_variable}[*]}\" != \"\${${_variable}_previous_value[*]}\" ]]
+      then
+        if [[ -o xtrace ]]
+        then
+          log \"var debug '${_variable}' change from '\${${_variable}_previous_value[*]}' to '\${${_variable}[*]}'.\"
+        elif [[ \"${var_debug_type_flag}\" == \"short\" ]]
+        then
+          log \"var debug '${_variable}' change from '\${${_variable}_previous_value[*]}' to '\${${_variable}[*]}' function path: ${_stack[*]}\"
+        else
+          backtrace \"var debug '${_variable}' change from '\${${_variable}_previous_value[*]}' to '\${${_variable}[*]}'.\" no_exit
+        fi
+        if set | grep '^${_variable}=(' >/dev/null
+        then
+          ${_variable}_previous_value=( \"\${${_variable}[@]}\" )
+        else
+          ${_variable}_previous_value=\"\${${_variable}}\"
+        fi
+      fi
+    "
+  done
+}
+
+__sm.debug.variables.callback.initialize()
+{
+  local _variable
+  for _variable in "${var_debug_flags[@]}"
+  do
+    eval "
+      if [[ \"\${${_variable}[*]}\" != \"\${${_variable}_previous_value[*]}\" ]]
+      then
+        if set | grep '^${_variable}=(' >/dev/null
+        then
+          ${_variable}_previous_value=( \"\${${_variable}[@]}\" )
+        else
+          ${_variable}_previous_value=\"\${${_variable}}\"
+        fi
+      fi
+    "
+  done
+}
+
+__sm.seppuku()
+{
+  kill -s USR2 $__sm_pid # to exit application, not current subshell.
+}
+
+__sm.log.piece()
+{
+  local _message="${1:-}" _unicode=0
+  true ${LINES:=$(tput cols)}
+
+  if [[ -z "${LANG:-}" || "${LANG}" = *UTF* || "${LANG}" = *utf8* ]]
+  then
+    _unicode=1
+  fi
+
+  case "${_message}" in
+    fail*)
+      # if [[ -t 1 ]]
+      # then
+        printf "\r%${LINES}s" " "
+        if (( _unicode == 1 ))
+        then
+          printf "\r  [\033[31m✘\033[0m] %s\n" "${log_step_message:-"done"}!  "
+        else
+          printf "\r  [\033[31mX\033[0m] %s\n" "${log_step_message:-"done"}!  "
+        fi
+      # else
+      #   printf "  failed.\n"
+      # fi
+      ;;
+
+    succ*)
+      # if [[ -t 1 ]]
+      # then
+        printf "\r%${LINES}s" " "
+        if (( _unicode == 1 ))
+        then
+          printf "\r  [\033[32m✔\033[0m] %s\n" "${log_step_message:-"done"}   "
+        else
+          printf "\r  [\033[32m@\033[0m] %s\n" "${log_step_message:-"done"}   "
+        fi
+      # else
+      #   printf "  done.\n"
+      # fi
+      ;;
+
+    *)
+      log_step_message="${_message}"
+      # if [[ -t 1 ]]
+      # then
+        printf "  [ ] %s " "${log_step_message}..."
+      # else
+      #   printf "  %s" "${log_step_message}..."
+      # fi
+      return 0
+      ;;
+  esac
+  unset log_step_message
+}
+
+__sm.tmp.logs.clean()
+{
+  local _log
+  [[ -d "${TMP_PATH:-/tmp}"/$$/logs ]] || return 0
+  for _log in "${TMP_PATH:-/tmp}"/$$/logs/*.err.log
+  do
+    rm -f "${_log}"
+  done
+}
+
+__sm.log.options.check()
+{
+  # Do not use brackets; they slow things down a lot.
+  if __sm.string.contains "$2" "$1"
+  then
+    return 0
+  fi
+
+  __sm.string.contains "all" "$1" && ! __sm.string.contains "-$2" "$1"
+}
+
+__sm.log.rotate()
+{
+  local _file="${1:-}"
+  shift || __sm.log.fail "Cannot rotate a log file, as no log file was given."
+
+  timestamp="$( date +"%Y-%m-%dT%H:%M:%S" )"
+
+  verbose "Tailing the file in a background process into a tail logfile."
+  ( tail -n 0 -f "${_file}" > ${file}.$$.log )&
+
+  local _tail_pid=$!
+
+  verbose "Copying the file's contents into a new timestamped file."
+  cp "${_file}" "${_file}.${timestamp}"
+
+  verbose "Truncating the file."
+  cp /dev/null ${_file}
+
+  verbose "Signaling the tail background process to stop."
+  kill -QUIT ${_tail_pid}
+
+  verbose "Appending the tail logfile to the new timestamped logfile."
+  cat "${file}.$$.log" >> "${file}.${timestamp}"
+
+  verbose "Compressing the timestamped file with gzip."
+  gzip -f -9 "${file}.${timestamp}"
+
+  verbose "Removing the tail logfile."
+  rm "${file}.$$.log"
+}
+
+__sm.log.streams()
+{
+  local _command="${1:-}" _prefix _err _out _mix
+
+  # TODO: allow specification of path, name prefix
+  while (( $# > 0 ))
+  do
+    _token="${1}"
+    shift
+    case "${token}" in
+      prefix)
+        _prefix="${1}."
+        ;;
+      err)
+        _stderr="${1}"
+        shift || __sm.log.fail "stderr name must follow keyword 'err'"
+        ;;
+      out)
+        _stdout="${1}"
+        shift || __sm.log.fail "stdout name must follow keyword 'out'"
+        ;;
+      mix)
+        _stdmix="${1}"
+        shift || __sm.log.fail "stdmix name must follow keyword 'mix'"
+        ;;
+      *)
+        _command="${1}"
+        shift || __sm.log.fail "A command must be given in order to log it's streams."
+        ;;
+    esac
+  done
+
+  : \
+    "${_stdout="${2:-"stdout.log"}"}" \
+    "${_stderr="${3:-"stderr.log"}"}" \
+    "${_stdmix="${4:-"stdmix.log"}"}"
+
+  # It's like fireworks~! :)
+  {
+    {
+      ${_command} 2>&1 1>&3 | tee "${_stderr}"
+    } 3>&1 1>&2 | tee "${_stdout}"
+  } > "${_stdmix}" 2>&1
+}
+
+

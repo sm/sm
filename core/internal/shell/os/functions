@@ -3,7 +3,7 @@
 __sm.os.open()
 {
   local _uri="${1:-}"
-  shift || fail "Cannot open URI; No uri was given."
+  shift || __sm.log.fail "Cannot open URI; No uri was given."
 
   if __sm.command.exists open
   then
@@ -12,7 +12,7 @@ __sm.os.open()
   then
     xdg-open "${_uri}"
   else
-    modules include api/interactive
+    __sm.includes include api/interactive
     if shell is interactive
     then
       if [[ "${_uri}" == file* ]]
@@ -80,15 +80,15 @@ __sm.os.cpu.count()
 
   elif __sm.os.type.is solaris
   then
-    warn "CPU counting for Solaris has not yet been implemented; returning 1."
+    __sm.log.warn "CPU counting for Solaris has not yet been implemented; returning 1."
 
   elif __sm.os.type.is bsd
   then
-    warn "CPU counting for BSD has not yet been implemented; returning 1."
+    __sm.log.warn "CPU counting for BSD has not yet been implemented; returning 1."
 
   elif __sm.os.type.is aix
   then
-    warn "CPU counting for AIX has not yet been implemented; returning 1."
+    __sm.log.warn "CPU counting for AIX has not yet been implemented; returning 1."
   fi
 
   (( _cpu_count > 0 )) || _cpu_count=1 # Sanity Check

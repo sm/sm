@@ -13,6 +13,17 @@ do
     (--prefix=*)
       prefix_path="${token/*=}"
       ;;
+    (shell)
+      case "$1" in
+        (bash|zsh)
+          export sm_shell="$1"
+          shift
+          ;;
+        (*)
+          echo "Shell '$1' is not allowed; Shell must be one of {bash,zsh}"
+          ;;
+      esac
+      ;;
     (--prefix|prefix)
       prefix_path="$1"
       if ! shift

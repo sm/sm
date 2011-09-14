@@ -4,9 +4,9 @@ find_starting_action()
 {
   trace_filter action_completion
   extensions_path="$1" extension="$2"
-  shift || fail "Cannot detect extension existence;"\
+  shift || __sm.log.fail "Cannot detect extension existence;"\
     " No extension path was given."
-  shift || fail "Cannot detect extension existence;"\
+  shift || __sm.log.fail "Cannot detect extension existence;"\
     " No extension name was given."
 
   local _action_params=("$@") _action_path _new_action_path
@@ -42,7 +42,7 @@ find_starting_action()
 show_extension_names()
 {
   extensions_path="$1"
-  shift || fail "no path given"
+  shift || __sm.log.fail "no path given"
 
   #$1 is ignored == "unused"
   local _patern=$2
@@ -66,9 +66,9 @@ extension_action_completion()
   last_char="${extension_args:${#extension_args}-1:1}"
   local _args=( ${extension_args} )
 
-  shopt -u nullglob
+  if [[ -n "${ZSH_VERSION}" ]];then unsetopt nullglob;else shopt -u nullglob;fi
   unset _args[${__sm_array_start}]
-  shopt -s nullglob
+  if [[ -n "${ZSH_VERSION}" ]];then setopt nullglob;else shopt -s nullglob;fi
   _args=( ${_args[@]} )
   show_word=${#_args[@]}
 

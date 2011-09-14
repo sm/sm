@@ -22,8 +22,8 @@ fetch_uri()
   fetch_error_initialize "$@"
 
   local vcs_initial_pwd="$PWD" _uri="${1:-}" _target="${2:-}" _args=()
-  shift || fail "uri must be specified as the first parameter."
-  shift || fail "target path must be specified as the second parameter."
+  shift || __sm.log.fail "uri must be specified as the first parameter."
+  shift || __sm.log.fail "target path must be specified as the second parameter."
 
   builtin cd "$initial_pwd"
 
@@ -41,11 +41,11 @@ fetch_uri()
     fi
   fi
 
-  debug vcs "type: ${scm_type}, params: ${_args[@]}."
+  __sm.log.debug vcs "type: ${scm_type}, params: ${_args[@]}."
 
   case "${scm_type}" in
     (path|archive|github|git|svn|hg|fossil)
-      modules include api/vcs/handlers/${scm_type}
+      __sm.includes include api/vcs/handlers/${scm_type}
       "${scm_type}_get" "${_args[@]}"
       ;;
     (*)
@@ -71,21 +71,21 @@ fetch_uri()
 fetch_uris()
 {
   local _uris=( "${1}" ) _target="${2:-}" _args=() _uri
-  shift || fail "uri must be specified as the first parameter."
-  shift || fail "target path must be specified as the second parameter."
+  shift || __sm.log.fail "uri must be specified as the first parameter."
+  shift || __sm.log.fail "target path must be specified as the second parameter."
 
   fetch_uri_parse_args "$@"
 
   for _uri in ${_uris[@]}
   do
-    fetch_uri "${_uri}" "${_target}" --on-fail debug ${_args[@]} || true
+    fetch_uri "${_uri}" "${_target}" --on-fail __sm.log.debug ${_args[@]} || true
     case "${__vcs_failed}" in
     (unknown_scm|copy_failed|download_failed|empty_archive|remote_branch_not_found|cannot_checkout_branch|pull_failed|cannot_clone|extracting_archive_failed)
       # in this case continue with next uri
       continue
       ;;
     ("")
-      # actually no error spawned, return ok
+      # actually no __sm.log.error spawned, return ok
       return 0
       ;;
     (*) # (unknown_archive_format|cannot_remove|all_uris_failed)
@@ -113,7 +113,7 @@ fetch_uri_parse_args()
       case "${_token}" in
         (*${_allowed_arg})
           eval "${_allowed_arg}=\"${1}\""
-          shift || fail "${_allowed_arg} must be specified after '${_token}'."
+          shift || __sm.log.fail "${_allowed_arg} must be specified after '${_token}'."
           continue 2
           ;;
       esac
@@ -122,12 +122,12 @@ fetch_uri_parse_args()
     case "${_token}" in
       (--on-fail)
         fetch_error_handler=$1
-        shift || fail "fetch error handler function must be specified after '--on-fail'."
+        shift || __sm.log.fail "fetch __sm.log.error handler function must be specified after '--on-fail'."
         continue
         ;;
       (--fallback-uri)
         _uris+=( ${1//,/ } )
-        shift || fail "comma separated lit of uris must be specified after '--fallback-uri'."
+        shift || __sm.log.fail "comma separated lit of uris must be specified after '--fallback-uri'."
         continue
         ;;
     esac
@@ -138,7 +138,7 @@ fetch_uri_parse_args()
 fetch_update()
 {
   local _uri _target="${1:-}"
-  shift || fail "target path must be specified as the second parameter."
+  shift || __sm.log.fail "target path must be specified as the second parameter."
 
   if [[ -d "${_target}" ]] && [[ -s "${_target}/.uri" ]]
   then
@@ -155,15 +155,15 @@ fetch_update()
 cli_fetch()
 {
   local _uri="${1:-}" _target="${2:-}" _args=()
-  shift || error "uri must be specified as the first parameter."
-  shift || error "target path must be specified as the second parameter."
-  fetch_uri "${_uri}" "${_target}" --on-fail error "$@"
+  shift || __sm.log.error "uri must be specified as the first parameter."
+  shift || __sm.log.error "target path must be specified as the second parameter."
+  fetch_uri "${_uri}" "${_target}" --on-fail __sm.log.error "$@"
 }
 
 cli_fetch_update()
 {
   local _target="${1:-}"
-  shift || error "target path must be specified as the second parameter."
-  fetch_update "${_target}" --on-fail error "$@"
+  shift || __sm.log.error "target path must be specified as the second parameter."
+  fetch_update "${_target}" --on-fail __sm.log.error "$@"
 }
 

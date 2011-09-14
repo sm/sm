@@ -1,31 +1,29 @@
 #!/bin/sh
 
-: \
+true \
   ${debug_flags:="-search"} ${debug_flag:=0} ${trace_flags:="-search -backtrace"} \
-  ${trace_flag:=0} ${var_debug_type_flag:="long"}
+  ${trace_flag:=0} ${var_debug_type_flag:="long"} "${log_path:="${sm_path}/log"}"
 
 declare -a var_debug_flags
 
-trace_filter_stack=()
+__sm_trace_filter_stack=()
 
-set_ps4
+__sm.set.ps4
 
-# Do not exit on error
-set +o errexit
-# Exit on USR2 (send by backtrace to $APP_PID)
-trap 'exit 1' USR2
-# Store process pid for closing from backtrace
-export APP_PID=$$
+set +o errexit     # Do not exit on error
+trap 'exit 1' USR2 # Exit on USR2 (send by backtrace to $__sm_pid)
+export __sm_pid=$$  # Store process pid for closing from backtrace
 
-trap clean_tmp_logs EXIT
+trap __sm.tmp.logs.clean EXIT
 
-# Persist ERR handler
-set -o errtrace
+if [[ -n "${ZSH_VERSION}" ]] # Persist ERR handler
+then set -e; else set -o errtrace ; fi
+
 # Call backtrace on error
 trap "backtrace \"A command has returned error code '(\$?)' without being handled.\"" ERR
 
-# Persist function RETURN & DEBUG handler
-set -o functrace
+if [[ -n "${BASH_VERSION}" ]] # Persist function RETURN & DEBUG handler
+then set -o functrace ; fi
 # Do not set trap ... RETURN here, set it on first -x
 
 if [[ -n "${var_debug_flags[*]}" ]]

@@ -14,27 +14,24 @@ os_cpu_count()
   if os is darwin
   then
     read -r _cpu_count < <(/usr/sbin/sysctl hw.ncpu)
-    _cpu_count="${_cpu_count//* }"
+    _cpu_count="${_cpu_count##* }"
   # If the operating system is Linux, gather the information directly from
   # the proc filesystem.
   elif os is linux
   then
     _cpu_count=$(awk '/^processor/{count++} END{print count}' /proc/cpuinfo 2>&1)
-
   # Warn that this function has not yet been implemented for solaris.
   elif os is solaris
   then
-    warn "CPU counting for Solaris has not yet been implemented; returning 1."
-
+    __sm.log.warn "CPU counting for Solaris has not yet been implemented; returning 1."
   # Warn that this function has not yet been implemented for bsd.
   elif os is bsd
   then
-    warn "CPU counting for BSD has not yet been implemented; returning 1."
-
+    __sm.log.warn "CPU counting for BSD has not yet been implemented; returning 1."
   # Warn that this function has not yet been implemented for aix.
   elif os is aix
   then
-    warn "CPU counting for AIX has not yet been implemented; returning 1."
+    __sm.log.warn "CPU counting for AIX has not yet been implemented; returning 1."
   fi
 
   (( _cpu_count > 0 )) || _cpu_count=1 # Sanity Check

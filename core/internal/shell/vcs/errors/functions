@@ -9,7 +9,7 @@ fetch_error_initialize()
 fetch_error()
 {
   local _message="${1:-}" _pair
-  shift || fail "Message must be given as first parameter."
+  shift || __sm.log.fail "Message must be given as first parameter."
 
   for _pair in "$@"
   do
@@ -30,7 +30,7 @@ fetch_error()
 fetch_error_default_handler()
 {
   local _message="${1:-}"
-  shift || fail "Message must be given as first parameter."
+  shift || __sm.log.fail "Message must be given as first parameter."
 
    __vcs_failed="${_message}"
   case "${_message}" in
@@ -59,7 +59,7 @@ fetch_error_default_handler()
     (all_uris_failed)
       _message="All given uris failed." ;;
     (*)
-      fail "VCS unknown error("${_message}") for params $*." ;;
+      __sm.log.fail "VCS unknown error("${_message}") for params $*." ;;
   esac
 
   fetch_log "${_message}"
@@ -77,10 +77,10 @@ fetch_error_default_handler()
 fetch_log()
 {
   case "${fetch_error_handler}" in
-    debug|true)
-      debug vcs "${_message}" >&2
+    (debug|true)
+      __sm.log.debug vcs "${_message}" >&2
       ;;
-    error|fail|log)
+    (error|fail|log)
       "${fetch_error_handler}" "${_message}"
       ;;
   esac

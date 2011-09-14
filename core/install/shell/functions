@@ -20,29 +20,29 @@ prepare_for_installation()
 {
   local directory _path
 
-  log_step "Ensuring that installation target path exists (${install_path})"
+  __sm.log.step "Ensuring that installation target path exists (${install_path})"
   paths create "${install_path}"
   paths enter "${install_path}"
-  log_step success
+  __sm.log.step success
 
   for directory in "${cleanse_paths[@]}"
   do
     _path="${install_path}/${directory}"
     if paths exists "${_path}"
     then
-      log_step "Removing old sm component path (${_path})"\
+      __sm.log.step "Removing old sm component path (${_path})"\
         rm -rf "${_path}"
     fi
   done
 
-  log_step "Creating install path directories (${directories[*]} ${aux_paths[*]})" \
+  __sm.log.step "Creating install path directories (${directories[*]} ${aux_paths[*]})" \
   paths create "${directories[@]}" "${aux_paths[@]}"
 }
 
 cleanse_targets()
 {
   local _path="$1" _entity
-  shift || fail "Usage:\n\n  cleanse_targets {target} {paths/files under target}"
+  shift || __sm.log.fail "Usage:\n\n  cleanse_targets {target} {paths/files under target}"
   for _entity in "$@"
   do
     rm -rf "${_path}/${_entity}"
@@ -53,30 +53,30 @@ install_core()
 {
   local _dir
 
-  log_step "Installing core directories (${directories[*]})"
+  __sm.log.step "Installing core directories (${directories[*]})"
   cleanse_targets "${install_path}" "${directories[@]}"
   paths copy to "${install_path}/" "${directories[@]}"
-  log_step success
+  __sm.log.step success
 
-  log_step "Installing core files (${files[*]})"
+  __sm.log.step "Installing core files (${files[*]})"
   cleanse_targets "${install_path}" ${files[@]}
   files copy to "${install_path}" ${files[@]}
-  log_step success
+  __sm.log.step success
 
-  log_step "Installing core extension set"
+  __sm.log.step "Installing core extension set"
   cleanse_targets "${install_path}/" "core"
   paths copy to "${install_path}/" "core"
-  log_step success
+  __sm.log.step success
 }
 
 install_configuration_files()
 {
-  log_step "Ensuring configuration files exist (${configs[*]})"
+  __sm.log.step "Ensuring configuration files exist (${configs[*]})"
   for config_file in "${configs[@]}"
   do
     files create "${install_path}/config/${config_file}"
   done
-  log_step success
+  __sm.log.step success
 }
 
 setup_shell_completion()
@@ -183,6 +183,18 @@ make_binaries_executable()
   done
 }
 
+set_binaries_shell()
+{
+  local _binary
+  for _binary in sm smp
+  do
+    file replace \
+      regex "^#!.*$" \
+      with "#!/bin/${sm_shell}" \
+      in "${install_path}/bin/${_binary}"
+  done
+}
+
 create_versionedfs_paths()
 {
   versionedfs create \
@@ -209,17 +221,19 @@ install_sm()
 
   perform install_configuration_files
 
-  log_step "Ensuring that binaries are executable" \
+  set_binaries_shell
+
+  __sm.log.step "Ensuring that binaries are executable" \
     make_binaries_executable
 
   perform setup_profile_d
 
   if user is root
   then
-    log_step "Setting up sm shell completion (${completion_prefix}/${_name})" \
+    __sm.log.step "Setting up sm shell completion (${completion_prefix}/${_name})" \
       perform setup_shell_completion
   fi
 
-  succeed "S{cripting,ystem,tack} Management (SM) Framework (Core) installed."
+  __sm.log.succeed "S{cripting,ystem,tack} Management (SM) Framework (Core) installed."
 }
 

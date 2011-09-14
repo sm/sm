@@ -11,25 +11,25 @@ extension_cli()
   do
     _token="${extension_args[$index]}"
     case "${_token}" in
-      --uri|--url)
+      (--uri|--url)
         extension_uri="${extension_args[$((++index))]}"
         ;;
-      --version)
+      (--version)
         extension_version="${extension_args[$((++index))]}"
         ;;
-      --archive_format)
+      (--archive_format)
         archive_format="${extension_args[$((++index))]}"
         ;;
-      --licence)
-        modules api/extensions/manipulation
+      (--licence)
+        __sm.includes api/extensions/manipulation
         extension_license
         exit 0
         ;;
-      --modules)
+      (--modules)
         _string="${extension_args[$((++index))]}"
         extension_modules=(${_string//,/ })
         ;;
-      *)
+      (*)
         _ignored_args+=("${_token}")
         ;;
     esac
@@ -45,7 +45,7 @@ extension_cli()
 actions()
 {
   local _action="$1"
-  shift || fail "Actions command not given."
+  shift || __sm.log.fail "Actions command not given."
 
   while (( $# ))
   do
@@ -60,11 +60,11 @@ actions()
           (search)
             ;;
           (*)
-            fail "Unknown command maps '${_token}'"
+            __sm.log.fail "Unknown command maps '${_token}'"
             ;;
         esac
       (*)
-        fail "Unknown command '${_token}'"
+        __sm.log.fail "Unknown command '${_token}'"
         ;;
     esac
   done

@@ -11,11 +11,11 @@ git_get()
     branch=${3:-${branch:-master}} remote=${4:-${remote:-origin}} \
     revision=${5:-${revision:-HEAD}}
 
-  shift || fail "url must be the first parameter to git_get()."
-  shift || fail "target path must be the second parameter to git_get()."
+  shift || __sm.log.fail "url must be the first parameter to git_get()."
+  shift || __sm.log.fail "target path must be the second parameter to git_get()."
 
   __sm.command.exists git ||
-    error "'git' was not found, please install git and try again.\n"\
+    __sm.log.error "'git' was not found, please install git and try again.\n"\
     "Note that git can be installed from the tools extension set:\n"\
     "sm sets install vcs ; sm git install"
 
@@ -74,7 +74,7 @@ git_get()
       [[ "${_uri_https}" != "${_uri}" ]] || fetch_error cannot_clone uri="${_uri}"
       [[ -z "${__vcs_failed}" ]] || return 0
 
-      debug vcs "git uri: ${_uri} failed, trying: ${_uri_https}"
+      __sm.log.debug vcs "git uri: ${_uri} failed, trying: ${_uri_https}"
       if git clone --depth 1 ${_uri_https} "${_target}" >/dev/null 2>&1
       then
         echo "${_uri_https}" > "${_target}/.uri"

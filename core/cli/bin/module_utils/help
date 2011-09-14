@@ -1,6 +1,6 @@
 #!/bin/sh
 
-modules help
+includes help
 
 description "SM Extension Manager."
 

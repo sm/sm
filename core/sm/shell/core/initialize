@@ -1,7 +1,8 @@
 #!/bin/sh
 
 # The following shell options must be enabled for the SM Framework.
-shopt -s extglob nullglob
+if [[ -n "${ZSH_VERSION}" ]];
+then setopt extendedglob nullglob ; else shopt -s extglob nullglob ; fi
 
 saved_sm_path="${sm_path:-"/sm"}"
 
@@ -35,7 +36,7 @@ else
 fi
 
 true \
-  "${modules_path:="${sm_path}/core/sm/shell"}" \
+  "${__sm_modules_path:="${sm_path}/core/sm/shell"}" \
   "${templates_path:="${sm_path}/templates"}" \
   "${src_path:="${sm_path}/src"}" \
   "${md5_path:="${sm_path}/md5"}" \
@@ -99,24 +100,25 @@ then
   fi
 fi
 
-# Make sure preload_modules is an array.
-export preload_modules=( ${preload_modules[@]} )
+# Make sure preload_includes is an array.
+preload_modules=( ${preload_modules[@]} )
+export preload_modules
 
 if [[ -d "${active_path}/bin" ]]
 then
   export PATH="${active_path}/bin:${active_path}/sbin:${PATH}"
 fi
 
-export sm_path modules_path initial_pwd extension_action_calls=0
+export sm_path __sm_modules_path initial_pwd extension_action_calls=0
 
 # Load module() function, then load core modules.
-source "${modules_path}/core/functions"
-source "${modules_path}/string/functions"
-source "${modules_path}/logging/functions"
-source "${modules_path}/logging/initialize"
-source "${modules_path}/command/functions"
-source "${modules_path}/modules/functions"
-source "${modules_path}/versionedfs/functions"
+source "${sm_path}/core/sm/shell/core/functions"
+source "${sm_path}/core/sm/shell/string/functions"
+source "${sm_path}/core/sm/shell/log/functions"
+source "${sm_path}/core/sm/shell/log/initialize"
+source "${sm_path}/core/sm/shell/command/functions"
+source "${sm_path}/core/sm/shell/modules/functions"
+source "${sm_path}/core/sm/shell/versionedfs/functions"
 
 __sm.modules.core.initialize
 
@@ -142,16 +144,16 @@ then
   then
     __sm.actions.call ${call_action} "${extension_args[@]}"
   else
-    error "${call_action} is not a valid function name"
+    __sm.log.error "${call_action} is not a valid function name"
   fi
 elif set | grep '^extension_args=(' >/dev/null
 then
   case "${extension_args[*]}" in
-    *,*)
+    (*,*)
       ${sm_path}/bin/smp ${extension_args[@]}
       ;;
-    *)
-      modules include api/extensions/detection api/extensions/execution
+    (*)
+      __sm.includes modules api/extensions/detection api/extensions/execution
       __sm.extension.action
       __sm.extension.actions.type
       __sm.extension.run

@@ -9,13 +9,13 @@ shell()
       (is)
         _command=is
         _subcommand="${1}"
-        shift || fail "A command must follow keyword 'is'"
+        shift || __sm.log.fail "A command must follow keyword 'is'"
         case "${_subcommand}" in
           (interactive)
             [[ -t 0 ]]
             ;;
           (*)
-            fail "Unknown command following keyword 'is'; shell is <interactive>"
+            __sm.log.fail "Unknown command following keyword 'is'; shell is <interactive>"
             ;;
         esac
       (*)

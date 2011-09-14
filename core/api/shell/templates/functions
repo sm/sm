@@ -10,7 +10,6 @@
 #    user$ templates seed "/etc/conf.d/${extension}.conf" \
 #      prefix_path "${prefix_path}" \
 #      init_scripts_path "${init_scripts_path}" \
-#      modules_path "${modules_path}" \
 #      data_path "${data_path}" \
 #      confd_path "${confd_path}" \
 #      extension "${extension}"
@@ -35,32 +34,32 @@ templates()
     _command="${__sm_command_dotted}"
     shift "${__sm_command_words}"
   else
-    fail "No command given.\nUsage:  \npaths <command> ..."
+    __sm.log.fail "No command given.\nUsage:  \npaths <command> ..."
   fi
 
   _name="$1"
-  shift || fail "Template name was not given"
+  shift || __sm.log.fail "Template name was not given"
 
   while (( $# > 0 ))
   do
     _token="${1}" && shift
     case "${_token}" in
-      to)
+      (to)
         _target="$1"
-        shift || fail "target path must follow keyword 'to'"
+        shift || __sm.log.fail "target path must follow keyword 'to'"
         ;;
-      mode)
+      (mode)
         _mode="$1"
-        shift || fail "mode must follow keyword 'mode'"
+        shift || __sm.log.fail "mode must follow keyword 'mode'"
         ;;
-      owner)
+      (owner)
         _owner="$1"
-        shift || fail "owner must follow keyword 'owner'"
+        shift || __sm.log.fail "owner must follow keyword 'owner'"
         ;;
-      from)
-        fail "'from' keyword is no longer supported"
+      (from)
+        __sm.log.fail "'from' keyword is no longer supported"
         ;;
-      *)
+      (*)
         _params+=("${_token}")
     esac
   done
@@ -70,7 +69,7 @@ templates()
       __sm.templates.${_command} "${_name}" "${_params[@]}"
       ;;
     (*)
-      fail "Unknown command '${_command}' for templates API."
+      __sm.log.fail "Unknown command '${_command}' for templates API."
       ;;
   esac
 }

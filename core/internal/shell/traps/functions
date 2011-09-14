@@ -7,7 +7,7 @@ __sm.traps.on.exit()
   do
     if ! eval "${_command}"
     then
-      warn "traps on exit; command failed: '${_command}'"
+      __sm.log.warn "traps on exit; command failed: '${_command}'"
     fi
   done
   return "${_result}" # Return the original process exit status.

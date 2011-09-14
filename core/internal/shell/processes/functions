@@ -4,7 +4,7 @@ __sm.process.lockfile.lock()
 {
   local _lockfile="${1:-}"
   shift ||
-    fail "No lockfile was specified as the first parameter."
+    __sm.log.fail "No lockfile was specified as the first parameter."
 
   printf "$$" >> "${_lockfile}" # *Append* current process's pid to the lockfile
 
@@ -15,7 +15,7 @@ __sm.process.lockfile.lock()
   # If the pidfile read in matches the pid of the current process, then
   if [[ "${_pid}" != "$$" ]]
   then
-    error "Another process already owns the lockfile; exiting."
+    __sm.log.error "Another process already owns the lockfile; exiting."
   fi
 
   # The currently running process has the lock; immediately add an on-exit

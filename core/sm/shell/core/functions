@@ -6,7 +6,7 @@
 
 __sm.exports()
 { # TODO: Filter this list of exports down.
-  export sm_path modules_path action archives_path branch config_path database database_name debug_flag environment error_message extension extension_action extension_args extension_bin_path extension_config_path extension_modules_path extension_path extension_templates_path flags framework head_flag hooks_flag keep_releases old_releases parse_break paths previous_path project project_path release_path remote repository result revision shared_path src_path templates_path timestamp tmp_path trace_flag user extension_log_path packages_path
+  export sm_path __sm_modules_path action archives_path branch config_path database database_name debug_flag environment error_message extension extension_action extension_args extension_bin_path extension_config_path extension_modules_path extension_path extension_templates_path flags framework head_flag hooks_flag keep_releases old_releases parse_break paths previous_path project project_path release_path remote repository result revision shared_path src_path templates_path timestamp tmp_path trace_flag user extension_log_path packages_path
 }
 
 # Examples
@@ -42,12 +42,11 @@ sm_version()
 #
 NIY()
 {
-  fail "This feature has not yet been implemented.\n$*"
+  __sm.log.fail "This feature has not yet been implemented.\n$*"
 }
 
-# Allow for command_missing when a command is not found during lookup.
-if (( ${BASH_VERSINFO[0]} > 3 ))
-then
+if [[ -n "${BASH_VERSINFO}" ]] && (( ${BASH_VERSINFO[0]} > 3 ))
+then # Allow for command_missing when a command is not found during lookup.
   command_not_found()
   {
     echo "bash: $1: command not found ($*)." >&2

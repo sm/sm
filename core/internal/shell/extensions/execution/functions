@@ -143,7 +143,7 @@ __sm.extension.run()
       ;;
 
     (shell)
-      [[ "${action##*/}" != help ]] || modules api/help
+      [[ "${action##*/}" != help ]] || __sm.includes api/help
       _namespaces=${_path##${extension_bin_path}}
       __sm.extension.modules.include ${_namespaces//\// }
       __sm.extension.action.prerequisites
@@ -156,19 +156,19 @@ __sm.extension.run()
       requires=()
       for script in functions initialize
       do
-        requires+=( "-r${modules_path}/ruby/core/${script}.rb" )
+        requires+=( "-r${__sm_modules_path}/ruby/core/${script}.rb" )
       done
 
-      "${binary:-ruby}" -I"${modules_path}/ruby" -I"${extension_modules_path}/ruby" \
+      "${binary:-ruby}" -I"${__sm_modules_path}/ruby" -I"${extension_modules_path}/ruby" \
         ${requires[@]} "${_path}/${action}"
       ;;
     # python|lua|javascript)
-      #   ADD "${modules_path}/${_type}/" to the lib path so the script can require "sm"
+      #   ADD "${__sm_modules_path}/${_type}/" to the lib path so the script can require "sm"
       #  "${_path}"
       #  ;;
 
     (dne|noexec)
-      fail "Processing ${action} failed; file type is unknown, file does not exist, or file is not executable."
+      __sm.log.fail "Processing ${action} failed; file type is unknown, file does not exist, or file is not executable."
       ;;
 
     (binary|*)

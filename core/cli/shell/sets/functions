@@ -2,7 +2,7 @@
 
 sets_help()
 {
-  modules api/help
+  __sm.includes api/help
 
   description "BDSM extension sets management"
 
@@ -71,7 +71,7 @@ sets_list_known()
 sets_install()
 {
   local _name _names="${1:-}" _extension_namespace
-  shift || fail "No set name was given."
+  shift || __sm.log.fail "No set name was given."
 
   _names=(${_names//,/ })
   _extension_namespace="${sets_user_path#${sm_path}\/}"
@@ -86,13 +86,13 @@ sets_install()
 set_install()
 {
   local _name="${1:-}"
-  shift || fail "No set name was given."
+  shift || __sm.log.fail "No set name was given."
 
   local _uri="${1:-}"
   shift || _uri=$( awk -F= "/^${_name}=/ {print \$2 }" < "${sm_path}/core/cli/config/known_sets" | tail -n 1 )
 
   [[ -n "${_uri}" ]] ||
-    error "uri not given and cannot find ${_name} in known extension sets."
+    __sm.log.error "uri not given and cannot find ${_name} in known extension sets."
 
   local _identifier="$(scm_identifier "${_uri}")"
 
@@ -131,7 +131,7 @@ sets_update()
 {
   local _name _uri
   (( $# > 0 )) ||
-    error "Cannot update extension sets without giving their names! "
+    __sm.log.error "Cannot update extension sets without giving their names! "
 
   for _name in "$@"
   do
@@ -139,15 +139,15 @@ sets_update()
     then
       if __sm.extension.in.paths __sm.extension.find "${_name}"
       then
-        error "Extension set ${_name} is installed system wide and can not be updated by user."
+        __sm.log.error "Extension set ${_name} is installed system wide and can not be updated by user."
       else
-        error "Extension set ${_name} does not exist."
+        __sm.log.error "Extension set ${_name} does not exist."
       fi
     fi
 
     if [[ ! -s "${sets_user_path}/active/${_name}/.uri" ]]
     then
-      warn "Extension set ${_name} does not contain stored uri."
+      __sm.log.warn "Extension set ${_name} does not contain stored uri."
       continue
     fi
 
@@ -155,7 +155,7 @@ sets_update()
 
     if [[ -z "${_uri}" ]]
     then
-      warn "Extension set ${_name} does not contain stored uri."
+      __sm.log.warn "Extension set ${_name} does not contain stored uri."
     else
       sets_install "${_name}" "${_uri}"
     fi
@@ -168,7 +168,7 @@ sets_update_all()
 
   if (( ! ${#_sets[@]} ))
   then
-    error "No extension sets found for update."
+    __sm.log.error "No extension sets found for update."
   fi
 
   for _name in "${_sets[@]}"
@@ -183,7 +183,7 @@ sets_uninstall()
   local _name="$1"
   case "${_name}" in
     */*|.|..)
-      error "Please specify a valid extension name."
+      __sm.log.error "Please specify a valid extension name."
       ;;
   esac
 
@@ -191,9 +191,9 @@ sets_uninstall()
   then
     if __sm.extension.in.paths __sm.extension.find "${_name}"
     then
-      error "Extension set ${_name} is installed system wide and can not be uninstaled by user."
+      __sm.log.error "Extension set ${_name} is installed system wide and can not be uninstaled by user."
     else
-      error "Extension set ${_name} does not exist."
+      __sm.log.error "Extension set ${_name} does not exist."
     fi
   fi
 
