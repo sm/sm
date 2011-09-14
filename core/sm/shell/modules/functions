@@ -256,7 +256,7 @@ __sm.extension.path.rebuild()
   shift 2 || __sm.log.fail "Path extensions_path part must be given first."
 
   local params="$*"
-  __sm.extension.path.reorder "${part}" "${extensions_path}" ${params//\// }
+  __sm.extension.path.reorder "${part}" "${extensions_path}" ${=params//\// }
 }
 
 __sm.module.detect()
