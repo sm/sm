@@ -5,7 +5,7 @@
 modules_installed()
 {
   local _module
-  for _module in "${modules_path}"/*
+  for _module in "${__sm_modules_path}"/*
   do
     [[ -d "${_module}" ]] || continue
     printf "%s\n" "${_module##*/}"
@@ -19,7 +19,7 @@ module_functions()
   [[ -n "${_modules}" ]] ||
     __sm.log.fail "Cannot print the functions for module(s); No module names given."
 
-  local _path="${modules_path}/${_module}"
+  local _path="${__sm_modules_path}/${_module}"
 
   _functions=($(
   find "${_path}" -mindepth 1 -maxdepth 1 -name functions -type f -print0 |

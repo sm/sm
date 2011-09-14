@@ -1,6 +1,6 @@
 #!/bin/sh
 
-modules api/package
+includes api/package
 
 package install "${extension_args[@]}"
 

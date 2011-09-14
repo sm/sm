@@ -29,7 +29,7 @@ sm_development_setup()
     log "  * project functions are now setup in $HOME/.bash_profile."
 
     files write append \
-      string "[[ -s \"${modules_path}/project/interactive\" ]] && source \"${modules_path}/project/interactive\""  \
+      string "[[ -s \"${__sm_modules_path}/project/interactive\" ]] && source \"${__sm_modules_path}/project/interactive\""  \
       to "$HOME/.bash_profile"
   fi
 

@@ -416,7 +416,7 @@ __sm.service.initd.install()
         to "${init_scripts_path}/${_service}" mode 0755
 
       templates seed "${init_scripts_path}/${_service}" \
-        modules_path "${modules_path}" \
+        modules_path "${__sm_modules_path}" \
         service "${service}" \
         service_user "${service_user}" \
         service_config_path "${service_config_path}"
@@ -585,7 +585,7 @@ __sm.service.confd()
     templates seed "/etc/conf.d/${service}.conf" \
       prefix_path "${prefix_path}" \
       init_scripts_path "${init_scripts_path}" \
-      modules_path "${modules_path}" \
+      modules_path "${__sm_modules_path}" \
       confd_path "${confd_path}" \
       extension "${service}" \
       service "${service}"

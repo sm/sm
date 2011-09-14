@@ -6,6 +6,18 @@
 
 modules()
 {
+  __sm.log.warn "modules() is depreciated, instead use includes()"
+  __sm.includes "$@"
+}
+
+# modules()
+includes()
+{
+  __sm.includes "$@"
+}
+
+__sm.includes()
+{
   case "$1" in
     (include|load)
       shift #compatibility mode

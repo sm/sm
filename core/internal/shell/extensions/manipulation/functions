@@ -21,7 +21,7 @@ extension_version()
 #
 #     $ cat $HOME/test
 #     #!/bin/sm
-#     modules api/extensions/manipulation
+#     includes api/extensions/manipulation
 #     extension_license postgresql
 #
 #     $ $HOME/test
@@ -53,7 +53,7 @@ extension_license()
 #
 #      $ cat $HOME/test
 #      #!/bin/sm
-#      modules api/extensions/manipulation
+#      includes api/extensions/manipulation
 #      __sm.extension.actions "postgresql"
 #
 #      $ $HOME/test

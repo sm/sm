@@ -97,7 +97,7 @@ trace_filter()
 #
 #     user$ cat ./test
 #     #!/bin/sm
-#     modules api/trace # Load the trace module.
+#     includes api/trace # Load the trace module.
 #
 #     functiona()
 #     {

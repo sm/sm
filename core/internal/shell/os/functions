@@ -12,7 +12,7 @@ __sm.os.open()
   then
     xdg-open "${_uri}"
   else
-    modules include api/interactive
+    __sm.includes include api/interactive
     if shell is interactive
     then
       if [[ "${_uri}" == file* ]]

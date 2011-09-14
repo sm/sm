@@ -90,7 +90,7 @@ install_sm_scm()
 {
   local remote="origin" dir="${1}" repo="${2:-sm}"
 
-  modules api/vcs
+  __sm.includes api/vcs
 
   __sm.string.ematch "${repo}" "^[[:alnum:]_-]+\/[[:alnum:]_-]+$" || repo="${repo}/sm"
 

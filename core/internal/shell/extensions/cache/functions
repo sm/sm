@@ -61,7 +61,7 @@ __sm.cache.map.modules.initialize()
 
   if [[ ! -d "${_modules_root}" ]]
   then
-    __sm.log.debug search "missing modules dir '${_modules_root}'?"
+    __sm.log.debug search "missing includes dir '${_modules_root}'?"
     return 0
   fi
 
