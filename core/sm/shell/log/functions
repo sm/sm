@@ -3,6 +3,40 @@
 #
 # SM Framework Core Module ~ Logging (logging)
 #
+
+# ## log rotate()
+#
+# Strategically rotate a logfile, minimizing data loss.
+#
+# This function uses a copy, tail and truncate strategy.
+#
+# ### Usage Examples
+#
+#     root# log rotate /var/log/my_logfile.log
+
+# ## log\_streams()
+#
+# Log streams to three files:
+#   - standard out
+#   - standard in
+#   - combined (what the user typically sees)
+#
+# ### Usage Examples
+#
+#     root# log streams "make install" prefix make
+#     cat make.out.log
+#     root#
+#     ...
+#
+# Alternatively,
+#
+#     root# log streams "make install" \
+#           out /path/to/out.log \
+#           err /path/to/err.log \
+#           mix /path/to/mix.log # both out & err as they occurred.
+#     root# cat /path/to/mix.log
+#     ...
+#
 log()
 {
   local _token _command _message=()
@@ -11,7 +45,7 @@ log()
   do
     _token="$1" && shift
     case "${_token}" in
-      (eval|search|todo|warn|debug|error|succeed|step)
+      (eval|search|todo|warn|debug|error|succeed|step|rotate|streams)
         _command="${_token}"
         ;;
       (*)
@@ -30,49 +64,49 @@ log()
 
 log_search()
 {
-  printf "log_search is depreciated, use 'log search instead'\n" >&2
+  __sm.log.warn "log_search is depreciated, use 'log search instead'\n"
   __sm.log.search "$@"
 }
 
 todo()
 {
-  printf "todo is depreciated, use 'log todo instead'\n" >&2
+  __sm.log.warn "todo is depreciated, use 'log todo instead'\n"
   __sm.log.todo "$@"
 }
 
 warn()
 {
-  printf "warn is depreciated, use 'log warn instead'\n" >&2
+  __sm.log.warn "warn is depreciated, use 'log warn instead'\n"
   __sm.log.warn "$@"
 }
 
 debug()
 {
-  printf "debug is depreciated, use 'log debug instead'\n" >&2
+  __sm.log.warn "debug is depreciated, use 'log debug instead'\n"
   __sm.log.debug "$@"
 }
 
 error()
 {
-  printf "error is depreciated, use 'log __sm.log.error instead'\n" >&2
+  __sm.log.warn "error is depreciated, use 'log __sm.log.error instead'\n"
   __sm.log.error "$@"
 }
 
 succeed()
 {
-  printf "succeed is depreciated, use 'log succeed instead'\n" >&2
+  __sm.log.warn "succeed is depreciated, use 'log succeed instead'\n"
   __sm.log.succeed "$@"
 }
 
 fail()
 {
-  printf "fail is depreciated, use 'log __sm.log.fail instead'\n" >&2
+  __sm.log.warn "fail is depreciated, use 'log __sm.log.fail instead'\n"
   __sm.log.fail "$@"
 }
 
 log_step()
 {
-  printf "log_step is depreciated, use 'log step instead'\n" >&2
+  __sm.log.warn "log_step is depreciated, use 'log step instead'"
   __sm.log.step "$@"
 }
 
@@ -86,10 +120,11 @@ trace_filter()
       __sm.log.trace.filter start $state "${FUNCNAME[1]}=$1"
     elif [[ -n "${ZSH_VERSION}" ]]
     then
-      __sm.log.trace.filter start $state "${funcstack[2]}=$1"
+      true # no-op for now
+      #__sm.log.trace.filter start $state "${funcstack[2]}=$1"
     fi
   else
-    __sm.log.trace.filter stop $state "${trace_filter_stack[@]}"
+    __sm.log.trace.filter stop $state "${__sm_trace_filter_stack[@]}"
   fi
 }
 
@@ -440,10 +475,10 @@ __sm.log.trace.filter()
 
   case "${_action}" in
     start)
-      trace_filter_stack=( "$1" "${trace_filter_stack[@]}" )
+      __sm_trace_filter_stack=( "$1" "${__sm_trace_filter_stack[@]}" )
       ;;
     stop)
-      old="${trace_filter_stack[${__sm_array_start}]}"
+      old="${__sm_trace_filter_stack[${__sm_array_start}]}"
       old="${old%%=*}"
 
       if [[ -n "${BASH_VERSION}" ]]
@@ -457,7 +492,7 @@ __sm.log.trace.filter()
       if [[ "${_name}" == "${old}" ]]
       then
         shift || true
-        trace_filter_stack=( "$@" )
+        __sm_trace_filter_stack=( "$@" )
       fi
       ;;
     *)
@@ -465,20 +500,30 @@ __sm.log.trace.filter()
       ;;
   esac
 
-  filter="${trace_filter_stack[${__sm_array_start}]}"
+  filter="${__sm_trace_filter_stack[${__sm_array_start}]}"
 
   if [[ -n "$filter" ]]
   then
-    if __sm.log.options.check "$trace_flags" "${filter##*=}"
-    then
-      trap 'set +o xtrace "\$?=$?" ; trace_filter' RETURN
+    if [[ -n "${BASH_VERSION}" ]]
+      if __sm.log.options.check "$trace_flags" "${filter##*=}"
+      then
+        trap 'set +o xtrace "\$?=$?" ; trace_filter' RETURN
+      elif [[ -n "${ZSH_VERSION}" ]]
+      then
+        true # what to do...
+      fi
       set -o xtrace
     fi
   else
     # No param, restore default state
     if (( trace_flag != 0 ))
     then
-      trap 'set +o xtrace "\$?=$?" ; trace_filter' RETURN
+      if [[ -n "${BASH_VERSION}" ]]
+        trap 'set +o xtrace "\$?=$?" ; trace_filter' RETURN
+      elif [[ -n "${ZSH_VERSION}" ]]
+      then
+        true # what to do...
+      fi
       set -o xtrace
     fi
   fi
@@ -486,7 +531,7 @@ __sm.log.trace.filter()
 
 __sm.log.warn()
 {
-  printf "WARNING: $*\n"
+  printf "WARNING: $*\n" >&2
 }
 
 __sm.log.debug()
@@ -674,3 +719,81 @@ __sm.log.options.check()
 
   __sm.string.contains "all" "$1" && ! __sm.string.contains "-$2" "$1"
 }
+
+__sm.log.rotate()
+{
+  local _file="${1:-}"
+  shift || __sm.log.fail "Cannot rotate a log file, as no log file was given."
+
+  timestamp="$( date +"%Y-%m-%dT%H:%M:%S" )"
+
+  verbose "Tailing the file in a background process into a tail logfile."
+  ( tail -n 0 -f "${_file}" > ${file}.$$.log )&
+
+  local _tail_pid=$!
+
+  verbose "Copying the file's contents into a new timestamped file."
+  cp "${_file}" "${_file}.${timestamp}"
+
+  verbose "Truncating the file."
+  cp /dev/null ${_file}
+
+  verbose "Signaling the tail background process to stop."
+  kill -QUIT ${_tail_pid}
+
+  verbose "Appending the tail logfile to the new timestamped logfile."
+  cat "${file}.$$.log" >> "${file}.${timestamp}"
+
+  verbose "Compressing the timestamped file with gzip."
+  gzip -f -9 "${file}.${timestamp}"
+
+  verbose "Removing the tail logfile."
+  rm "${file}.$$.log"
+}
+
+__sm.log.streams()
+{
+  local _command="${1:-}" _prefix _err _out _mix
+
+  # TODO: allow specification of path, name prefix
+  while (( $# > 0 ))
+  do
+    _token="${1}"
+    shift
+    case "${token}" in
+      prefix)
+        _prefix="${1}."
+        ;;
+      err)
+        _stderr="${1}"
+        shift || __sm.log.fail "stderr name must follow keyword 'err'"
+        ;;
+      out)
+        _stdout="${1}"
+        shift || __sm.log.fail "stdout name must follow keyword 'out'"
+        ;;
+      mix)
+        _stdmix="${1}"
+        shift || __sm.log.fail "stdmix name must follow keyword 'mix'"
+        ;;
+      *)
+        _command="${1}"
+        shift || __sm.log.fail "A command must be given in order to log it's streams."
+        ;;
+    esac
+  done
+
+  : \
+    "${_stdout="${2:-"stdout.log"}"}" \
+    "${_stderr="${3:-"stderr.log"}"}" \
+    "${_stdmix="${4:-"stdmix.log"}"}"
+
+  # It's like fireworks~! :)
+  {
+    {
+      ${_command} 2>&1 1>&3 | tee "${_stderr}"
+    } 3>&1 1>&2 | tee "${_stdout}"
+  } > "${_stdmix}" 2>&1
+}
+
+

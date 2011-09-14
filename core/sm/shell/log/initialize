@@ -1,12 +1,12 @@
 #!/bin/sh
 
-: \
+true \
   ${debug_flags:="-search"} ${debug_flag:=0} ${trace_flags:="-search -backtrace"} \
-  ${trace_flag:=0} ${var_debug_type_flag:="long"}
+  ${trace_flag:=0} ${var_debug_type_flag:="long"} "${log_path:="${sm_path}/log"}"
 
 declare -a var_debug_flags
 
-trace_filter_stack=()
+__sm_trace_filter_stack=()
 
 __sm.set.ps4
 
@@ -16,8 +16,7 @@ export __sm_pid=$$  # Store process pid for closing from backtrace
 
 trap __sm.tmp.logs.clean EXIT
 
-# Persist ERR handler
-if [[ -n "${ZSH_VERSION}" ]]
+if [[ -n "${ZSH_VERSION}" ]] # Persist ERR handler
 then set -e; else set -o errtrace ; fi
 
 # Call backtrace on error

@@ -112,13 +112,13 @@ fi
 export sm_path __sm_modules_path initial_pwd extension_action_calls=0
 
 # Load module() function, then load core modules.
-source "${__sm_modules_path}/core/functions"
-source "${__sm_modules_path}/string/functions"
-source "${__sm_modules_path}/logging/functions"
-source "${__sm_modules_path}/logging/initialize"
-source "${__sm_modules_path}/command/functions"
-source "${__sm_modules_path}/modules/functions"
-source "${__sm_modules_path}/versionedfs/functions"
+source "${sm_path}/core/sm/shell/core/functions"
+source "${sm_path}/core/sm/shell/string/functions"
+source "${sm_path}/core/sm/shell/log/functions"
+source "${sm_path}/core/sm/shell/log/initialize"
+source "${sm_path}/core/sm/shell/command/functions"
+source "${sm_path}/core/sm/shell/modules/functions"
+source "${sm_path}/core/sm/shell/versionedfs/functions"
 
 __sm.modules.core.initialize
 
