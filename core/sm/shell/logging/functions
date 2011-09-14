@@ -384,11 +384,11 @@ __sm.log.error()
   if [[ -n "${BASH_VERSION}" ]]
   then
     printf "ERROR(${FUNCNAME[2]}): $*\n" >&2
+    set +o errtrace
   elif [[ -n "${ZSH_VERSION}" ]]
   then
     printf "ERROR(${funcstack[3]}): $*\n" >&2
   fi
-  set +o errtrace
   trap - ERR
   exit 1
 }
