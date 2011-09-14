@@ -1,7 +1,7 @@
 #!/bin/sh
 
 (( ${#extension_args[@]} )) ||
-  error "publish: You must specify at least one extension name for packaging."
+  __sm.log.error "publish: You must specify at least one extension name for packaging."
 
 for extension in "${extension_args[@]}"
 do

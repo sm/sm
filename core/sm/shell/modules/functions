@@ -12,7 +12,7 @@ modules()
       ;;
   esac
 
-  [[ -n "$*" ]] || fail "No modules given to include."
+  [[ -n "$*" ]] || __sm.log.fail "No modules given to include."
 
   __sm.modules.include "$@"
 }
@@ -41,14 +41,14 @@ __sm.modules.core.initialize()
   do
     _name="${_module%%\=*}"
     _path="${_module##*\=}"
-    log_search preload "$_name" "${_path}"
+    __sm.log.search preload "$_name" "${_path}"
   done
 
   for _module in ${preload_modules[@]}
   do
     if ! __sm.module.include ${_module}
     then
-      error "Cannot preload module: ${_module}."
+      __sm.log.error "Cannot preload module: ${_module}."
     fi
   done
 }
@@ -62,7 +62,7 @@ __sm.modules.include()
     then
       continue
     else
-      fail "Could not find module path for ${_module}."
+      __sm.log.fail "Could not find module path for ${_module}."
     fi
   done
 }
@@ -79,10 +79,10 @@ __sm.module.include()
   # Search for module.
   if __sm.extension.in.paths __sm.module.detect "${_module}"
   then
-    log_search module "$module_name" "${module_path##${sm_path}\/}"
+    __sm.log.search module "$module_name" "${module_path##${sm_path}\/}"
     __sm_modules_loaded+=("${module_name}=${module_path##${sm_path}\/}")
   else
-    log_search module "${_module}" "Not found !!!"
+    __sm.log.search module "${_module}" "Not found !!!"
     return 1
   fi
 
@@ -102,7 +102,7 @@ __sm.module.include()
     do
       if ! __sm.module.include "${_module_dependency}"
       then
-        error "Could not find module dependency '${_module_dependency}' "\
+        __sm.log.error "Could not find module dependency '${_module_dependency}' "\
           "from '${_module_path##${sm_path}\/}/includes'."
       fi
     done < "${_module_path}/includes"
@@ -144,7 +144,7 @@ __sm.modules.reinitialize()
     _module_path="${_loaded_modules##* ${_module}=}"
     _module_path="${_module_path%% *}"
     [[ -n "${_module_path}" ]] ||
-      fail "Can not reinitialize module as it was not yet loaded"
+      __sm.log.fail "Can not reinitialize module as it was not yet loaded"
 
     _initialize_path="${sm_path}/${_module_path}/initialize"
     [[ ! -s "${_initialize_path}" ]] || source "${_initialize_path}"
@@ -167,7 +167,7 @@ __sm.module.is.loaded()
 __sm.extension.in.paths()
 {
   local callback="${1:-}" _path
-  shift || fail "Callback name must be given ast the first parameter."
+  shift || __sm.log.fail "Callback name must be given ast the first parameter."
 
   if [[ -n "$1" ]] # do search if params given
   then
@@ -183,7 +183,7 @@ __sm.extension.in.paths()
 __sm.cli.in.path()
 {
   local callback="${1:-}"
-  shift || fail "Callback name must be given ast the first parameter."
+  shift || __sm.log.fail "Callback name must be given ast the first parameter."
 
   "${callback}" "${sm_path}/core" "cli" "$@"
 }
@@ -236,16 +236,16 @@ __sm.extension.paths.initialize()
     ;;
   esac
 
-  debug search "sets_user_path:${sets_user_path}:"
-  debug search "exts_user_path:${exts_user_path}:"
-  debug search "extensions_search_paths:${extensions_search_paths[*]}:"
+  __sm.log.debug search "sets_user_path:${sets_user_path}:"
+  __sm.log.debug search "exts_user_path:${exts_user_path}:"
+  __sm.log.debug search "extensions_search_paths:${extensions_search_paths[*]}:"
   export extensions_search_paths
 }
 
 __sm.extension.path.reorder()
 {
   local part="${1:-}" extensions_path="${2:-}" extension="${3:-}"
-  shift 3 || fail "Path part extensions_path extnesion must be given first ."
+  shift 3 || __sm.log.fail "Path part extensions_path extnesion must be given first ."
 
   local output="$extensions_path/$extension/$part/$*"
   rebuilded_path="${output// //}"
@@ -254,7 +254,7 @@ __sm.extension.path.reorder()
 __sm.extension.path.rebuild()
 {
   local part="$1" extensions_path="$2"
-  shift 2 || fail "Path extensions_path part must be given first."
+  shift 2 || __sm.log.fail "Path extensions_path part must be given first."
 
   local params="$*"
   __sm.extension.path.reorder "${part}" "${extensions_path}" ${params//\// }
@@ -263,7 +263,7 @@ __sm.extension.path.rebuild()
 __sm.module.detect()
 {
   local extensions_path=$1 _module_path
-  shift || fail "Extensions path must be given as the first parameter."
+  shift || __sm.log.fail "Extensions path must be given as the first parameter."
 
   __sm.extension.path.rebuild "shell" $extensions_path $@
   _module_path=${rebuilded_path}

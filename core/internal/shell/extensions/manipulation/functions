@@ -3,7 +3,7 @@
 extension_version()
 {
   local _extension="${1:-}"
-  shift || fail "Cannot retrieve extension version;"\
+  shift || __sm.log.fail "Cannot retrieve extension version;"\
     " No extension was given."
   true ${extension_path:="${extensions_path}/${_extension}"}
 
@@ -43,7 +43,7 @@ extension_license()
   local _extension="${1:-${extension}}"
 
   variable_is_nonempty _extension ||
-    fail "Cannot display extension license;"\
+    __sm.log.fail "Cannot display extension license;"\
     " Extension name was not given."
 
   cat -v "${extensions_path}/${_extension}/LICENSE"
@@ -65,7 +65,7 @@ __sm.extension.actions()
 {
   NIY
   local _extension="${1:-}" _files _file _actions=()
-  shift || fail "No extension was given."
+  shift || __sm.log.fail "No extension was given."
   [[ -d "${extension_bin_path}" ]] || return 0
   #TODO: build actions cache and use it to display actions
   echo "${_actions[@]}"
@@ -78,14 +78,14 @@ __sm.extension.actions()
 __sm.extension.install()
 {
   local _name="${1:-}"
-  shift || fail "No extension name was given."
+  shift || __sm.log.fail "No extension name was given."
 
   local _uri="${1:-}"
   shift || true
   [[ -n "${_uri}" ]] || _uri=$( __sm.extension.get.uri "${_name}" )
 
   [[ -n "${_uri}" ]] ||
-    error "uri not given and cannot find ${_name} in known extensions."
+    __sm.log.error "uri not given and cannot find ${_name} in known extensions."
 
   local _version="head"
   if [[ "${_name}" == *:* ]]
@@ -98,7 +98,7 @@ __sm.extension.install()
   if fetch_uri "${_uri}" "${src_path}/${_identifier}" "$@"
   then
     __sm.extension.is.valid "${src_path}/${_identifier}" ||
-      error "${src_path}/${_identifier} is not a valid extension;"\
+      __sm.log.error "${src_path}/${_identifier} is not a valid extension;"\
       "It is missing modules/ and/or bin/ files."
 
     #
@@ -131,19 +131,19 @@ __sm.extension.installed()
         ;;
       (module|type)
         _type="$1"
-        shift || fail "An module type must follow the '${_token}' keyword"
+        shift || __sm.log.fail "An module type must follow the '${_token}' keyword"
         ;;
       (in)
         _paths="${1}"
-        shift || fail "A path must follow keyword 'in'"
+        shift || __sm.log.fail "A path must follow keyword 'in'"
         ;;
       (exclude)
         _exclude="${1}"
-        shift || fail "A string must follow keyword 'exclude'"
+        shift || __sm.log.fail "A string must follow keyword 'exclude'"
         _excludes+=("${_exclude//,/ }")
         ;;
       (*)
-        fail "Unkown token ${_token} given"
+        __sm.log.fail "Unkown token ${_token} given"
         ;;
     esac
   done

@@ -62,12 +62,12 @@ __sm.string.ematch()
   echo "${_value}" | grep -qE "${_regex}"
   _result=$?
   case ${_result} in
-    0|1)
+    (0|1)
       # 0 & 1 are correct results.
       return ${_result}
       ;;
-    *)
-      fail "grep returned unknown error code: ${_result}"
+    (*)
+      __sm.log.fail "grep returned unknown error code: ${_result}"
       ;;
   esac
 }

@@ -168,7 +168,7 @@ __sm.extension.run()
       #  ;;
 
     (dne|noexec)
-      fail "Processing ${action} failed; file type is unknown, file does not exist, or file is not executable."
+      __sm.log.fail "Processing ${action} failed; file type is unknown, file does not exist, or file is not executable."
       ;;
 
     (binary|*)

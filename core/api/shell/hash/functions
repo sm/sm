@@ -18,11 +18,11 @@ hash()
         ;;
       (key)
         _key="$1"
-        shift || fail "Key name must follow keyword 'key'"
+        shift || __sm.log.fail "Key name must follow keyword 'key'"
         ;;
       (variable)
         _variable="$1"
-        shift || fail "Variable name must follow keyword 'variable'"
+        shift || __sm.log.fail "Variable name must follow keyword 'variable'"
         ;;
       (*)
         if [[ -z "${_command}" ]]
@@ -37,13 +37,13 @@ hash()
 
   case "${_command}" in
     (keys)
-      [[ -n "${_file}" ]] || fail " Filename not given."
+      [[ -n "${_file}" ]] || __sm.log.fail " Filename not given."
       echo -n $(grep -E "${_valid_keys}=" "${_file}" | grep -Eo "${_valid_keys}")
       ;;
     (read)
       # Read value from given file($1) for given key($2), and assign it to a variable($3).
-      [[ -n "${_file}" ]] || fail "Filename was not given (from '{filename}')."
-      [[ -n "${_key}" ]]  || fail "Key name was not given (key '{key}')."
+      [[ -n "${_file}" ]] || __sm.log.fail "Filename was not given (from '{filename}')."
+      [[ -n "${_key}" ]]  || __sm.log.fail "Key name was not given (key '{key}')."
 
       if [[ -n "${_variable}" ]]
       then

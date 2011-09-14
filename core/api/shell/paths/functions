@@ -62,17 +62,17 @@ paths()
     _command="${__sm_command_dotted}"
     shift "${__sm_command_words}"
   else
-    fail "No command given.\nUsage:  \npaths <command> ..."
+    __sm.log.fail "No command given.\nUsage:  \npaths <command> ..."
   fi
 
   case "${_command}" in
     (chmod)
       _mode="${1}"
-      shift || fail "Mode must follow keywords 'chmod'"
+      shift || __sm.log.fail "Mode must follow keywords 'chmod'"
       ;;
     (chown)
       _owner="${1}"
-      shift || fail "Owner must be provided after keyword 'owner'"
+      shift || __sm.log.fail "Owner must be provided after keyword 'owner'"
       ;;
   esac
 
@@ -82,19 +82,19 @@ paths()
     case "${_token}" in
       (to)
         _target="${1}"
-        shift || fail "Target path must be given after keyword 'to'"
+        shift || __sm.log.fail "Target path must be given after keyword 'to'"
         ;;
       (from)
         _source="${1}"
-        shift || fail "Source path must be given after keyword 'from'"
+        shift || __sm.log.fail "Source path must be given after keyword 'from'"
         ;;
       (mode|permissions)
         _mode="${1}"
-        shift || Fail "Mode must follow keyword '${_token}'"
+        shift || __sm.log.fail "Mode must follow keyword '${_token}'"
         ;;
       (owner)
         _owner="${1}"
-        shift || fail "Owner must be given after keyword 'owner'"
+        shift || __sm.log.fail "Owner must be given after keyword 'owner'"
         ;;
       (recursive|recursively)
         _flags+=(-R)
@@ -102,11 +102,11 @@ paths()
       (matching|regex|glob)
         _regex="$1"
         shift ||
-          fail "Shell glob pattern string must b given after keyword '${_token}'"
+          __sm.log.fail "Shell glob pattern string must b given after keyword '${_token}'"
         ;;
       (in)
         _paths+=("$1")
-        shift || fail "A path is expected following keyword 'in'"
+        shift || __sm.log.fail "A path is expected following keyword 'in'"
         ;;
       (*)
         _paths+=("${_token}")
@@ -116,43 +116,43 @@ paths()
 
   case "${_command}" in
     (chown)
-      [[ -n "${_owner}" ]] || fail "'identity {user}[:{group}]' was not given."
-      [[ -n "${_paths}" ]]    || fail "Paths must be given."
+      [[ -n "${_owner}" ]] || __sm.log.fail "'identity {user}[:{group}]' was not given."
+      [[ -n "${_paths}" ]]    || __sm.log.fail "Paths must be given."
       __sm.paths.chown "${_owner}" "${_flags[*]}" "${_paths[@]}"
       ;;
     (chmod)
-      [[ -n "${_mode}" ]] || fail "'mode {file mode}' must be given."
-      [[ -n "${_paths}" ]]    || fail "Paths to chmod must be given."
+      [[ -n "${_mode}" ]] || __sm.log.fail "'mode {file mode}' must be given."
+      [[ -n "${_paths}" ]]    || __sm.log.fail "Paths to chmod must be given."
       __sm.paths.chmod "${_mode}" "${_flags[*]}" "${_paths[@]}"
       ;;
     (search)
-      [[ -n "${_paths}" ]] || fail "Path to search paths under must be given."
-      [[ -n "${_glob}" ]]  || fail "Glob pattern was not given (matches {glob})."
+      [[ -n "${_paths}" ]] || __sm.log.fail "Path to search paths under must be given."
+      [[ -n "${_glob}" ]]  || __sm.log.fail "Glob pattern was not given (matches {glob})."
       __sm.paths.search "${_regex}" "${_paths}"
       ;;
     (in)
-      [[ -n "${_paths}" ]] || fail "Path to list paths in must be given."
+      [[ -n "${_paths}" ]] || __sm.log.fail "Path to list paths in must be given."
       __sm.paths.in "${_paths[@]}"
       ;;
     (absolute)
-      [[ -n "${_paths}" ]] || fail "Path to expand must be given."
+      [[ -n "${_paths}" ]] || __sm.log.fail "Path to expand must be given."
       __sm.paths.absolute "${_paths[@]}"
       ;;
     (create|remove|enter|exists|join|expand)
-      [[ -n "${_paths}" ]] || fail "Path to ${_command} must be given."
+      [[ -n "${_paths}" ]] || __sm.log.fail "Path to ${_command} must be given."
       __sm.paths.${_command} "${_paths[@]}"
       ;;
     (copy)
-      [[ -n "${_target}" ]] || fail "Target path (to) for copying into must be given."
+      [[ -n "${_target}" ]] || __sm.log.fail "Target path (to) for copying into must be given."
       __sm.paths.copy "${_target}" "${_flags[*]}" "${_paths[@]}"
       ;;
     (move)
-      [[ -n "${_source}" ]] || fail "Source must be given to ${_command} (from x)."
-      [[ -n "${_target}" ]] || fail "Target must be given to ${_command} (to y)."
+      [[ -n "${_source}" ]] || __sm.log.fail "Source must be given to ${_command} (from x)."
+      [[ -n "${_target}" ]] || __sm.log.fail "Target must be given to ${_command} (to y)."
       __sm.paths.move "${_source}" "${_target}"
       ;;
     (*)
-      fail "Unknown command for paths: '${_command}' "\
+      __sm.log.fail "Unknown command for paths: '${_command}' "\
         "A paths command must be specified as the first parameter: "\
         "{chown,chmod,create,remove,copy,in,search,enter,exist,join,expand,move,copy}"
       ;;

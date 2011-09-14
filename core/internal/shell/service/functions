@@ -132,7 +132,7 @@ __sm.service.setup()
       then
         paths chown "${service_user}:${service_user}" recursive "${_path}"
       else
-        warn "While chowning paths it was discovered that '${_path}' is in"\
+        __sm.log.warn "While chowning paths it was discovered that '${_path}' is in"\
           "fact nonexistent on the filesystem; this might indicate an error."
       fi
     fi
@@ -158,11 +158,11 @@ __sm.service.start()
 {
   (( $# == 0 )) || __sm.service.cli "$@"
 
-  [[ -n "${service}" ]] || fail "To start a service, you must set the 'service' variable."
+  [[ -n "${service}" ]] || __sm.log.fail "To start a service, you must set the 'service' variable."
 
   if __sm.command.exists "${service}_start"
   then
-    log_step "Starting ${service}..." "${service}_start"
+    __sm.log.step "Starting ${service}..." "${service}_start"
   else
     __sm.service.init.start
   fi
@@ -172,12 +172,12 @@ __sm.service.stop()
 {
   if variables are empty service
   then
-    fail "To start a service, you must set the 'service' variable."
+    __sm.log.fail "To start a service, you must set the 'service' variable."
   fi
 
   if __sm.command.exists "${service}_stop"
   then
-    log_step "Stopping ${service}..." "${service}_stop"
+    __sm.log.step "Stopping ${service}..." "${service}_stop"
   else
     __sm.service.init.stop
   fi
@@ -188,7 +188,7 @@ __sm.service.reload()
   (( $# == 0 )) || __sm.service.cli "$@"
 
   variables are nonempty service ||
-    fail "To start a service, you must set the 'service' variable."
+    __sm.log.fail "To start a service, you must set the 'service' variable."
 
   if __sm.command.exists "${service}_reload"
   then
@@ -203,11 +203,11 @@ __sm.service.restart()
   (( $# == 0 )) || __sm.service.cli "$@"
 
   variables are nonempty service ||
-    fail "To start a service, you must set the 'service' variable."
+    __sm.log.fail "To start a service, you must set the 'service' variable."
 
   if __sm.command.exists "${service}_restart"
   then
-    log_step "Restarting ${service}..." "${service}_restart"
+    __sm.log.step "Restarting ${service}..." "${service}_restart"
   else
     __sm.service.init.restart
   fi
@@ -217,7 +217,7 @@ __sm.service.init.restart()
 {
   if __sm.command.exists "${service}_restart"
   then
-    log_step "Restarting ${service}..." "${service}_restart"
+    __sm.log.step "Restarting ${service}..." "${service}_restart"
   else
     log "Restarting ${service}..."
     __sm.service.init.stop $@
@@ -230,7 +230,7 @@ __sm.service.logtail()
   (( $# == 0 )) || __sm.service.cli "$@"
 
   variables are nonempty service ||
-    fail "To start a service, you must set the 'service' variable."
+    __sm.log.fail "To start a service, you must set the 'service' variable."
 
   if __sm.command.exists "${service}_logtail"
   then
@@ -245,7 +245,7 @@ __sm.service.info()
   (( $# == 0 )) || __sm.service.cli "$@"
 
   [[ -n "${service}" ]] ||
-    fail "In order to get info on a service, the 'service' variable must be set."
+    __sm.log.fail "In order to get info on a service, the 'service' variable must be set."
 
   if __sm.command.exists "${service}_info"
   then
@@ -260,7 +260,7 @@ __sm.service.configcheck()
   (( $# == 0 )) || __sm.service.cli "$@"
 
   variables are nonempty service ||
-    fail "To configcheck a service, the 'service' variable must be set."
+    __sm.log.fail "To configcheck a service, the 'service' variable must be set."
 
   if __sm.command.exists "${service}_configcheck"
   then
@@ -305,42 +305,42 @@ __sm.service.cli()
       (user)
         service_user="${extension_args[$((++index))]}"
         [[ -n "${service_user}" ]] ||
-          error "a user name must follow keyword 'user'"
+          __sm.log.error "a user name must follow keyword 'user'"
         ;;
       (version)
         service_version="${extension_args[$((++index))]}"
         [[ -n "${service_version}" ]] ||
-          error "a version number string must follow keyword 'version'"
+          __sm.log.error "a version number string must follow keyword 'version'"
         ;;
       (data)
         service_data_path="${_package_args[$((++index))]}"
         [[ -n "${service_data_path}" ]] ||
-          error "a path must follow keyword 'data'"
+          __sm.log.error "a path must follow keyword 'data'"
         ;;
       (pid)
         service_pid_path="${_package_args[$((++index))]}"
         [[ -n "${service_pid_path}" ]] ||
-          error "a path must follow keyword 'pid'"
+          __sm.log.error "a path must follow keyword 'pid'"
         ;;
       (log)
         service_log_path="${_package_args[$((++index))]}"
         [[ -n "${service_log_path}" ]] ||
-          error "a path must follow keyword 'log'"
+          __sm.log.error "a path must follow keyword 'log'"
         ;;
       (config)
         service_config_path="${_package_args[$((++index))]}"
         [[ -n "${service_config_path}" ]] ||
-          error "a path must follow keyword 'config'"
+          __sm.log.error "a path must follow keyword 'config'"
         ;;
       (lock)
         service_lock_path="${_package_args[$((++index))]}"
         [[ -n "${service_lock_path}" ]] ||
-          error "a path must follow keyword 'lock'"
+          __sm.log.error "a path must follow keyword 'lock'"
         ;;
       (db)
         service_db_path="${_package_args[$((++index))]}"
         [[ -n "${service_db_path}" ]] ||
-          error "a path must follow keyword 'db'"
+          __sm.log.error "a path must follow keyword 'db'"
         ;;
       (help)
         __sm.service.usage
@@ -439,7 +439,7 @@ __sm.service.initd.install()
 
 __sm.service.init.start()
 {
-  log_step "Starting ${service}..."
+  __sm.log.step "Starting ${service}..."
 
   local _result=0 _command=( "${service_binary}" ) _prefix
 
@@ -461,25 +461,25 @@ __sm.service.init.start()
     then
       true
     else
-      error "${service} failed to start."
+      __sm.log.error "${service} failed to start."
     fi
   else
     if __sm.command.run.as "${service_user}" "" "${_command[*]}"
     then
-      succeed "${service} successfully started."
+      __sm.log.succeed "${service} successfully started."
     else
       log "${service} failed to start; check ${service_log_file} for details:"
       exec tail -n 50 "${service_log_file}"
       error
     fi
   fi
-  log_step success
+  __sm.log.step success
 }
 
 __sm.service.init.stop()
 {
-  (( service_pid > 0 )) || error "Service pid has not been set, or is zero."
-  log_step "Stopping ${service}..."
+  (( service_pid > 0 )) || __sm.log.error "Service pid has not been set, or is zero."
+  __sm.log.step "Stopping ${service}..."
   if __sm.command.exists "${service}_stop"
   then
     "${service}_stop"
@@ -491,7 +491,7 @@ __sm.service.init.stop()
       return $?
     fi
   fi
-  log_step success
+  __sm.log.step success
 }
 
 __sm.service.init.status()
@@ -518,7 +518,7 @@ __sm.service.init.status()
     then
       true
     else
-      error "failed check status of ${service}."
+      __sm.log.error "failed check status of ${service}."
     fi
   else
     if __sm.command.run.as "${service_user}" "" "${_command[*]}"
@@ -526,7 +526,7 @@ __sm.service.init.status()
       touch "$service_pid_file"
       succeed
     else
-      error "failed check status of ${service}."
+      __sm.log.error "failed check status of ${service}."
     fi
   fi
 }
@@ -616,7 +616,7 @@ __sm.service.init.action()
 __sm.service.initd()
 {
   __sm.service.load.confd # Load the configuration file.
-  [[ -x "${service_binary}" ]] || fail "'${service_binary}' not found/executable."
+  [[ -x "${service_binary}" ]] || __sm.log.fail "'${service_binary}' not found/executable."
   __sm.service.pid
   __sm.service.cli
   __sm.service.init.action "${service_action}"
@@ -626,7 +626,7 @@ __sm.service.deactivate()
 {
   local _service="${1:-"${service}"}"
 
-  [[ -n "${_service}" ]] || fail "Service name must be set or given to deactivate."
+  [[ -n "${_service}" ]] || __sm.log.fail "Service name must be set or given to deactivate."
 
   if files exist "${init_scripts_path}/${_service}"
   then
@@ -668,10 +668,10 @@ __sm.service.deactivate()
 __sm.service.activate()
 {
   local _service="${1:-"${service}"}"
-  shift || fail "The service name must be set or given to activate a service."
+  shift || __sm.log.fail "The service name must be set or given to activate a service."
 
   local _version="${2:-${package_version}}"
-  [[ -n "${_version}" ]] || fail "Version must be set or given to activate a service."
+  [[ -n "${_version}" ]] || __sm.log.fail "Version must be set or given to activate a service."
 
   if files are symlinks "${service_db_path}/active"
   then # TODO: use versionedfs to check if a version is active.
@@ -845,16 +845,16 @@ __sm.service.status()
 __sm.service.signal()
 {
   local _signal="${1}" _pid="${2:-0}"
-  shift || fail "Cannot signal service;"\
+  shift || __sm.log.fail "Cannot signal service;"\
     " Signal must be given as the first parameter and be one of:"\
     " {KILL,QUIT,TERM,USR1,USR2,TTIN,TTOU,a digit})."
 
   (( _pid )) ||
-    fail "pid to signal must be passed in as the second parameter;"\
+    __sm.log.fail "pid to signal must be passed in as the second parameter;"\
     " please check your code (see trace below.)"
 
   case "${_signal}" in
-    KILL|QUIT|TERM|USR1|USR2|TTIN|TTOU|WINCH|+([[:digit:]]))
+    (KILL|QUIT|TERM|USR1|USR2|TTIN|TTOU|WINCH|+([[:digit:]]))
       if (( _pid > 0 ))
       then
         kill -${_signal} ${_pid}
@@ -862,8 +862,8 @@ __sm.service.signal()
         log "Not sending signal ${_signal} to process, as pid is 0 (process not found/running)."
       fi
       ;;
-    *)
-      fail "Signal must be one of:"\
+    (*)
+      __sm.log.fail "Signal must be one of:"\
         " {KILL,QUIT,TERM,USR1,USR2,TTIN,TTOU,a digit})."
       ;;
   esac

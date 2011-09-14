@@ -3,7 +3,7 @@
 __sm.extension.path()
 {
   local _path extension="${1:-}"
-  shift || fail "Cannot process extension path;"\
+  shift || __sm.log.fail "Cannot process extension path;"\
     " No extension name was given."
 
   for _path in ${extensions_search_paths[@]}
@@ -20,17 +20,17 @@ __sm.extension.path()
 __sm.extension.is.valid()
 {
   local _path="${1:-}"
-  shift || fail "No extension path was given to check validity."
-  [[ -n "${_path}" ]] || fail "Path to the extension was not given."
+  shift || __sm.log.fail "No extension path was given to check validity."
+  [[ -n "${_path}" ]] || __sm.log.fail "Path to the extension was not given."
   [[ -d "${_path}/bin" || -d "${_path}/shell" ]]
 }
 
 __sm.extension.find()
 {
   extensions_path="${1:-}" extension="${2:-}"
-  shift || fail "Cannot detect extension existence;"\
+  shift || __sm.log.fail "Cannot detect extension existence;"\
     " No extension path was given."
-  shift || fail "Cannot detect extension existence;"\
+  shift || __sm.log.fail "Cannot detect extension existence;"\
     " No extension name was given."
   __sm.extension.is.valid $extensions_path/$extension
 }
@@ -75,7 +75,7 @@ __sm.extension.in()
       fi
     done
   else
-    debug search "Path '${_path}' does not exist."
+    __sm.log.debug search "Path '${_path}' does not exist."
     return 1
   fi
 }

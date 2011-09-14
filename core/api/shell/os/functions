@@ -22,19 +22,19 @@ os()
       (is)
         _command="$token"
         _os="${1}"
-        shift || fail "lowercase operating system name must follow keyword 'os';"\
+        shift || __sm.log.fail "lowercase operating system name must follow keyword 'os';"\
           "os is <linux|darwin|bsd|solaris|aix>"
         ;;
       (cpu)
         _command=cpu
         _subcommand="$1"
-        shift || fail "A command must follow keyword 'cpu'; one of {count}"
+        shift || __sm.log.fail "A command must follow keyword 'cpu'; one of {count}"
         case "${_subcommand}" in
           (count)
             true # all good.
             ;;
           (*)
-            fail "A valid command must follow keyword 'cpu'; one of {count}"
+            __sm.log.fail "A valid command must follow keyword 'cpu'; one of {count}"
             ;;
         esac
         ;;
@@ -61,7 +61,7 @@ os()
           fi
           ;;
         (*)
-          fail "Unhandled os '${_os}'"
+          __sm.log.fail "Unhandled os '${_os}'"
           ;;
       esac
       ;;
@@ -103,12 +103,12 @@ os()
           __sm.os.cpu.count
           ;;
         (*)
-      fail "Unknown command for os cpu: '${_subcommand}'; valid commands include {count} "
+      __sm.log.fail "Unknown command for os cpu: '${_subcommand}'; valid commands include {count} "
           ;;
       esac
       ;;
     (*)
-      fail "Unknown command for os: '${_command}' "\
+      __sm.log.fail "Unknown command for os: '${_command}' "\
         "A os command must be specified as the first parameter: "\
         "{is,}"
       ;;
@@ -132,7 +132,7 @@ init_scripts_path()
         then
           printf "/etc/rc.d"
         else
-          fail "Unknown init scripts directory (/etc/init.d or /etc/rc.d not found)."
+          __sm.log.fail "Unknown init scripts directory (/etc/init.d or /etc/rc.d not found)."
         fi
         ;;
     esac

@@ -2,7 +2,7 @@
 
 smrc_install()
 {
-  templates exist "cli/smrc" || fail "The template core cli/smrc is missing."
+  templates exist "cli/smrc" || __sm.log.fail "The template core cli/smrc is missing."
 
   if files exist "$HOME/.smrc"
   then
@@ -30,7 +30,7 @@ smrc_install()
 
 smrc_update()
 {
-  templates exist "cli/smrc" || fail "The template core sm/smrc is missing."
+  templates exist "cli/smrc" || __sm.log.fail "The template core sm/smrc is missing."
 
   local template="cli/smrc" target="$HOME/.smrc" \
     backup="$HOME/.smrc.$timestamp" incoming="$HOME/.smrc.incoming.$$"

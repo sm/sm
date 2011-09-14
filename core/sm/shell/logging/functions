@@ -3,381 +3,95 @@
 #
 # SM Framework Core Module ~ Logging (logging)
 #
-
-core_log()
-{
-  printf "$*\n"
-}
-
-# Examples
-#
-# user$ log "Hello there! "
-# Hello there!
-#
 log()
 {
-  core_log "$@"
-}
+  local _token _command _message=()
 
-log_eval()
-{
-  eval printf "$*\\\n"
-}
+  while (( $# ))
+  do
+    _token="$1"
+    case "${_token}" in
+      (eval|search|todo|warn|debug|error|succeed|step)
+        _command="${_token}"
+        ;;
+      (*)
+        _message+=("$@{_token}")
+        ;;
+      else
+    esac
+  done
 
-core_warn()
-{
-  printf "WARNING: $*\n"
-}
-
-# Examples
-#
-# user$ info "Bad Monkeys Are Typing! "
-# WARNING: Bad Monkeys Are Typing!
-#
-warn()
-{
-  core_warn "$@"
-}
-
-# Examples
-#
-# The following appears when sm is called with --debug=[welcome|all],
-# or if you set debug_flags to welcome|all.
-# Code:
-#
-# $ debug welcome "Hello there! "
-# Output:
-#
-# DEBUG welcome: Hello there!
-#
-#
-# $ echo test > >( debug vcs - )
-#
-# DEBUG vcs: test
-#
-core_debug()
-{
-  local type="$1"
-  shift || fail "Debug type must be given as the first parameter."
-
-  if (( debug_flag )) && __sm.logging.options.check "$debug_flags" "$type"
+  if [[ -n "${_command}" ]]
   then
-    if [[ "$1" == "-" ]]
-    then
-      printf "DEBUG $type: "
-      cat -
-      printf "\n"
-    else
-      printf "DEBUG $type: $*\n"
-    fi
+    __sm.log.${_command} "${_message[@]}"
   else
-    return 0
-  fi
-}
-
-debug()
-{
-  core_debug "$@"
-}
-
-# Examples
-#
-# user$ ./install --debug=search help
-# DEBUG search:   modules include sm/help            in builtin/sm/shell/help.
-#
-core_log_search()
-{
-  local name="${1:-}" value="${2:-}"
-  shift || fail "name must be given as the first parameter."
-  shift || fail "value must be given as the second parameter."
-
-  if (( debug_flag )) && __sm.logging.options.check "$debug_flags" "search"
-  then
-    printf "DEBUG search: %9s %-25s in $*.\n" "$name" "$value"
-  else
-    return 0
+    __sm.log.log "${_message[@]}"
   fi
 }
 
 log_search()
 {
-  core_log_search "$@"
+  printf "log_search is depreciated, use 'log search instead'\n" >&2
+  __sm.log.search "$@"
 }
 
-# Examples
-#
-# user$ ./install --debug=search help
-# DEBUG search:   modules include sm/help            in builtin/sm/shell/help.
-#
-core_log_todo()
+todo()
 {
-  if (( debug_flag )) && __sm.logging.options.check "$debug_flags" "todo"
-  then
-    local file="${BASH_SOURCE[2]}" line="${BASH_LINENO[1]}"
-    printf "DEBUG todo: ${file##${sm_path}\/}:${line}:\n"
-    printf "$*" | xargs -s 72 | xargs -I {} printf "DEBUG todo: # {}\n"
-  else
-    return 0
-  fi
+  printf "todo is depreciated, use 'log todo instead'\n" >&2
+  __sm.log.todo "$@"
 }
 
-log_todo()
+warn()
 {
-  core_log_todo "$@"
+  printf "warn is depreciated, use 'log warn instead'\n" >&2
+  __sm.log.warn "$@"
 }
 
-# Examples
-#
-# user$ error "Hello there! "
-# ERROR Hello there!
-# *poof* shell closed...
-#
-core_error()
+debug()
 {
-  set +o xtrace
-  if [[ -n "${BASH_VERSION}" ]]
-  then
-    printf "ERROR(${FUNCNAME[2]}): $*\n" >&2
-  elif [[ -n "${ZSH_VERSION}" ]]
-  then
-    printf "ERROR(${funcstack[3]}): $*\n" >&2
-  fi
-  set +o errtrace
-  trap - ERR
-  exit 1
+  printf "debug is depreciated, use 'log debug instead'\n" >&2
+  __sm.log.debug "$@"
 }
 
 error()
 {
-  core_error "$@"
-}
-
-# Examples
-#
-# user$ succeed "Hello there! "
-# Hello there!
-# *poof* shell closed...
-#
-core_succeed() {
-  set +o xtrace
-  if [[ -n "$*" ]]
-  then
-    printf "$*\n"
-  fi
-  #exit 0
+  printf "error is depreciated, use 'log __sm.log.error instead'\n" >&2
+  __sm.log.error "$@"
 }
 
 succeed()
 {
-  core_succeed "$@"
-}
-
-# Examples
-#
-# user$ error "Hello there! "
-# ERROR Hello there!
-# *poof* shell closed...
-#
-core_fail()
-{
-  trace_flag=0
-  if [[ -n "${bash_version}" ]]
-  then
-    backtrace "fail(${funcname[2]}): $*"
-  elif [[ -n "${zsh_version}" ]]
-  then
-    backtrace "fail(${funcstack[3]}): $*"
-  fi
-  exit 1
+  printf "succeed is depreciated, use 'log succeed instead'\n" >&2
+  __sm.log.succeed "$@"
 }
 
 fail()
 {
-  core_fail "$@"
+  printf "fail is depreciated, use 'log __sm.log.fail instead'\n" >&2
+  __sm.log.fail "$@"
 }
 
-# Examples
-#
-#     user$ echo "'$PS4'"
-#     '+ '
-#     user$ set_ps4
-#     user$ echo "'$PS4'"
-#     ' > ${BASH_SOURCE##${sm_path}\/} ${FUNCNAME[0]:+${FUNCNAME[0]}()} ${LINENO} $ '
-#
-# ### Code Walkthrough
-set_ps4()
+log_step()
 {
-  # Set and export the PS4 variable, so that this script -- and called bash scripts --
-  # will display more detailed and formatted trace output.
-  # Finally, return true, 0, for success.
-  if [[ -n "${BASH_VERSION}" ]]
-  then
-    PS4="# \${BASH_SOURCE##\${sm_path}\/} \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO} $ "
-  elif [[ -n "${ZSH_VERSION}" ]]
-  then
-    PS4="+%x:%I %N():%i > "
-  fi
-  export PS4
-
-  return 0
-}
-
-# Examples
-#
-#     trace_filter search
-#     <search code>
-#     trace_filter
-#
-# ### Code Walkthrough
-core_trace_filter()
-{
-  local _action="$1" old _name
-  shift || fail "Filter action {start,stop} must be specified."
-
-  case "${_action}" in
-    start)
-      trace_filter_stack=( "$1" "${trace_filter_stack[@]}" )
-      ;;
-    stop)
-      old="${trace_filter_stack[${__sm_array_start}]}"
-      old="${old%%=*}"
-
-      if [[ -n "${BASH_VERSION}" ]]
-      then
-        _name="${FUNCNAME[2]}"
-      elif [[ -n "${ZSH_VERSION}" ]]
-        _name="${funcstack[3]}"
-      fi
-
-      if [[ "${_name}" == "${old}" ]]
-      then
-        shift || true
-        trace_filter_stack=( "$@" )
-      fi
-      ;;
-    *)
-      fail "Unknown trace action ${_action}, use {start,stop}."
-      ;;
-  esac
-
-  filter="${trace_filter_stack[${__sm_array_start}]}"
-
-  if [[ -n "$filter" ]]
-  then
-    if __sm.logging.options.check "$trace_flags" "${filter##*=}"
-    then
-      trap 'set +o xtrace "\$?=$?" ; trace_filter' RETURN
-      set -o xtrace
-    fi
-  else
-    # No param, restore default state
-    if (( trace_flag != 0 ))
-    then
-      trap 'set +o xtrace "\$?=$?" ; trace_filter' RETURN
-      set -o xtrace
-    fi
-  fi
+  printf "log_step is depreciated, use 'log step instead'\n" >&2
+  __sm.log.step "$@"
 }
 
 trace_filter()
 {
-  # return 0
   set +o xtrace
   if [[ -n "$1" ]]
   then
     if [[ -n "${BASH_VERSION}" ]]
     then
-      core_trace_filter start $state "${FUNCNAME[1]}=$1"
+      __sm.log.trace.filter start $state "${FUNCNAME[1]}=$1"
     elif [[ -n "${ZSH_VERSION}" ]]
     then
-      core_trace_filter start $state "${funcstack[2]}=$1"
+      __sm.log.trace.filter start $state "${funcstack[2]}=$1"
     fi
   else
-    core_trace_filter stop $state "${trace_filter_stack[@]}"
+    __sm.log.trace.filter stop $state "${trace_filter_stack[@]}"
   fi
-}
-
-__sm.actions.call()
-{
-  trace_filter action
-  "$@"
-}
-
-__sm.actions.source()
-{
-  local script="$1"
-  shift || fail "No script was given as the first parameter."
-  [[ -r "$script" ]] || fail "Could not find script to run: $script."
-  trace_filter action
-  source "$script"
-}
-
-__sm.debug.variables.callback()
-{
-  local _variable _function_stack
-  if [[ -n "${BASH_VERSION}" ]]
-  then
-    _function_stack="${FUNCNAME[*]}"
-  elif [[ -n "${ZSH_VERSION}" ]]
-  then
-    _function_stack="${funcstack[*]}"
-  fi
-  for _variable in ${var_debug_flags[@]}
-  do
-    eval "
-      if [[ \"\${${_variable}[*]}\" != \"\${${_variable}_previous_value[*]}\" ]]
-      then
-        if [[ -o xtrace ]]
-        then
-          log \"var debug '${_variable}' change from '\${${_variable}_previous_value[*]}' to '\${${_variable}[*]}'.\"
-        elif [[ \"${var_debug_type_flag}\" == \"short\" ]]
-        then
-          log \"var debug '${_variable}' change from '\${${_variable}_previous_value[*]}' to '\${${_variable}[*]}' function path: ${_function_stack[*]}\"
-        else
-          backtrace \"var debug '${_variable}' change from '\${${_variable}_previous_value[*]}' to '\${${_variable}[*]}'.\" no_exit
-        fi
-        if set | grep '^${_variable}=(' >/dev/null
-        then
-          ${_variable}_previous_value=( \"\${${_variable}[@]}\" )
-        else
-          ${_variable}_previous_value=\"\${${_variable}}\"
-        fi
-      fi
-    "
-  done
-}
-
-__sm.debug.variables.callback.initialize()
-{
-  local _variable
-  for _variable in "${var_debug_flags[@]}"
-  do
-    eval "
-      if [[ \"\${${_variable}[*]}\" != \"\${${_variable}_previous_value[*]}\" ]]
-      then
-        if set | grep '^${_variable}=(' >/dev/null
-        then
-          ${_variable}_previous_value=( \"\${${_variable}[@]}\" )
-        else
-          ${_variable}_previous_value=\"\${${_variable}}\"
-        fi
-      fi
-    "
-  done
-}
-
-separator()
-{
-  local _columns
-
-  if [[ -z "${COLUMNS}" ]]
-  then
-    _columns=$(tput cols) || _columns=80
-    export COLUMNS=${_columns}
-  fi
-
-  printf -v _separator '%*s' "${COLUMNS}"
-  printf "${_separator// /=}\n"
 }
 
 # Examples
@@ -413,7 +127,7 @@ separator()
 #     function a
 #     function b
 #     function c
-#     Error Backtrace:
+#     __sm.log.error Backtrace:
 #        Trace   Line Function             File
 #           4.     25 functionc()          /Users/sm/test
 #           3.     18 functionb()          /Users/sm/test
@@ -435,11 +149,11 @@ backtrace()
     _index _largest _format _digits _longest
 
 
-  if [[ -n "${BASH_VERSION}"]]
+  if [[ -n "${BASH_VERSION}" ]]
   then
     _stack=(${FUNCNAME[@]})
     _trace=(${BASH_SOURCE[@]})
-  elif [[ -n "${}" ]]
+  elif [[ -n "${ZSH_VERSION}" ]]
   then
     _stack=(${funcstack[@]})
     _trace=(${functrace[@]})
@@ -455,7 +169,7 @@ backtrace()
 
   # Loop over the function names in the function array stack, to determine
   # which is longest.
-  # Note that we do not use array largest here, as we are inside an error function.
+  # Note that we do not use array largest here, as we are inside an __sm.log.error function.
   for (( _index=0 ; _index < ${#_stack[@]} ; _index++ ))
   do
     # For each function name in the stack, if the function name is longer than
@@ -468,7 +182,7 @@ backtrace()
   done
 
   # Loop over the bash source files array, to find the longest element.
-  # Note that we do not use array largest here, as we are in an error function.
+  # Note that we do not use array largest here, as we are in an __sm.log.error function.
   for (( _index=0 ; _index < ${#BASH_SOURCE[@]} ; _index++ ))
   do
     # For each source file in the source files array, if the file name/path
@@ -546,15 +260,276 @@ backtrace()
 
   [[ "${_flag}" != "no_exit" ]] || return 0
 
-  finish_app
+  __sm.seppuku
 }
 
-finish_app()
+__sm.log.step "$@"
 {
-  kill -s USR2 $APP_PID # to exit application, not current subshell.
+  local _message="${1:-}" _output _log_file _status
+
+  if (( $# > 1 ))
+  then
+    shift
+    __sm.log.piece "${_message}"
+
+    _log_file="${TMP_PATH:-/tmp}/$$.stderr.log"
+
+    touch "${_log_file}"
+    if "$@" > "${_log_file}"
+    then
+      __sm.log.piece "succ"
+      cat "${_log_file}"
+      rm -rf "${_log_file}"
+      return 0
+    else
+      _status="$?"
+      __sm.log.piece "fail"
+      cat "${_log_file}" >&2
+      rm -rf "${_log_file}"
+      return ${_status} # pass __sm.log.error return status code up !
+    fi
+  else
+    __sm.log.piece "${_message}"
+  fi
 }
 
-core_log_step()
+__sm.log.log()
+{
+  printf "$*\n"
+}
+
+__sm.log.todo()
+{
+  if (( debug_flag )) && __sm.log.options.check "$debug_flags" "todo"
+  then
+    local file="${BASH_SOURCE[2]}" line="${BASH_LINENO[1]}"
+    printf "DEBUG todo: ${file##${sm_path}\/}:${line}:\n"
+    printf "$*" | xargs -s 72 | xargs -I {} printf "DEBUG todo: # {}\n"
+  else
+    return 0
+  fi
+}
+
+__sm.log.error()
+{
+  set +o xtrace
+  if [[ -n "${BASH_VERSION}" ]]
+  then
+    printf "ERROR(${FUNCNAME[2]}): $*\n" >&2
+  elif [[ -n "${ZSH_VERSION}" ]]
+  then
+    printf "ERROR(${funcstack[3]}): $*\n" >&2
+  fi
+  set +o errtrace
+  trap - ERR
+  exit 1
+}
+
+__sm.log.succeed()
+{
+  set +o xtrace
+  if [[ -n "$*" ]]
+  then
+    printf "$*\n"
+  fi
+  #exit 0
+}
+
+__sm.log.fail()
+{
+  trace_flag=0
+  if [[ -n "${bash_version}" ]]
+  then
+    backtrace "fail(${funcname[2]}): $*"
+  elif [[ -n "${zsh_version}" ]]
+  then
+    backtrace "fail(${funcstack[3]}): $*"
+  fi
+  exit 1
+}
+
+__sm.set.ps4()
+{
+  # Set and export the PS4 variable, so that this script -- and called bash scripts --
+  # will display more detailed and formatted trace output.
+  # Finally, return true, 0, for success.
+  if [[ -n "${BASH_VERSION}" ]]
+  then
+    PS4="# \${BASH_SOURCE##\${sm_path}\/} \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO} $ "
+  elif [[ -n "${ZSH_VERSION}" ]]
+  then
+    PS4="+%x:%I %N():%i > "
+  fi
+  export PS4
+
+  return 0
+}
+
+__sm.log.trace.filter()
+{
+  local _action="$1" old _name
+  shift || __sm.log.fail "Filter action {start,stop} must be specified."
+
+  case "${_action}" in
+    start)
+      trace_filter_stack=( "$1" "${trace_filter_stack[@]}" )
+      ;;
+    stop)
+      old="${trace_filter_stack[${__sm_array_start}]}"
+      old="${old%%=*}"
+
+      if [[ -n "${BASH_VERSION}" ]]
+      then
+        _name="${FUNCNAME[2]}"
+      elif [[ -n "${ZSH_VERSION}" ]]
+      then
+        _name="${funcstack[3]}"
+      fi
+
+      if [[ "${_name}" == "${old}" ]]
+      then
+        shift || true
+        trace_filter_stack=( "$@" )
+      fi
+      ;;
+    *)
+      __sm.log.fail "Unknown trace action ${_action}, use {start,stop}."
+      ;;
+  esac
+
+  filter="${trace_filter_stack[${__sm_array_start}]}"
+
+  if [[ -n "$filter" ]]
+  then
+    if __sm.log.options.check "$trace_flags" "${filter##*=}"
+    then
+      trap 'set +o xtrace "\$?=$?" ; trace_filter' RETURN
+      set -o xtrace
+    fi
+  else
+    # No param, restore default state
+    if (( trace_flag != 0 ))
+    then
+      trap 'set +o xtrace "\$?=$?" ; trace_filter' RETURN
+      set -o xtrace
+    fi
+  fi
+}
+
+__sm.log.warn()
+{
+  printf "WARNING: $*\n"
+}
+
+__sm.log.debug()
+{
+  local type="$1"
+  shift || __sm.log.fail "Debug type must be given as the first parameter."
+
+  if (( debug_flag )) && __sm.log.options.check "$debug_flags" "$type"
+  then
+    if [[ "$1" == "-" ]]
+    then
+      printf "DEBUG $type: "
+      cat -
+      printf "\n"
+    else
+      printf "DEBUG $type: $*\n"
+    fi
+  else
+    return 0
+  fi
+}
+
+__sm.log.search()
+{
+  local name="${1:-}" value="${2:-}"
+  shift || __sm.log.fail "name must be given as the first parameter."
+  shift || __sm.log.fail "value must be given as the second parameter."
+
+  if (( debug_flag )) && __sm.log.options.check "$debug_flags" "search"
+  then
+    printf "DEBUG search: %9s %-25s in $*.\n" "$name" "$value"
+  else
+    return 0
+  fi
+}
+
+__sm.actions.call()
+{
+  trace_filter action
+  "$@"
+}
+
+__sm.actions.source()
+{
+  local script="$1"
+  shift || __sm.log.fail "No script was given as the first parameter."
+  [[ -r "$script" ]] || __sm.log.fail "Could not find script to run: $script."
+  trace_filter action
+  source "$script"
+}
+
+__sm.debug.variables.callback()
+{
+  local _variable _function_stack
+  if [[ -n "${BASH_VERSION}" ]]
+  then
+    _function_stack="${FUNCNAME[*]}"
+  elif [[ -n "${ZSH_VERSION}" ]]
+  then
+    _function_stack="${funcstack[*]}"
+  fi
+  for _variable in ${var_debug_flags[@]}
+  do
+    eval "
+      if [[ \"\${${_variable}[*]}\" != \"\${${_variable}_previous_value[*]}\" ]]
+      then
+        if [[ -o xtrace ]]
+        then
+          log \"var debug '${_variable}' change from '\${${_variable}_previous_value[*]}' to '\${${_variable}[*]}'.\"
+        elif [[ \"${var_debug_type_flag}\" == \"short\" ]]
+        then
+          log \"var debug '${_variable}' change from '\${${_variable}_previous_value[*]}' to '\${${_variable}[*]}' function path: ${_function_stack[*]}\"
+        else
+          backtrace \"var debug '${_variable}' change from '\${${_variable}_previous_value[*]}' to '\${${_variable}[*]}'.\" no_exit
+        fi
+        if set | grep '^${_variable}=(' >/dev/null
+        then
+          ${_variable}_previous_value=( \"\${${_variable}[@]}\" )
+        else
+          ${_variable}_previous_value=\"\${${_variable}}\"
+        fi
+      fi
+    "
+  done
+}
+
+__sm.debug.variables.callback.initialize()
+{
+  local _variable
+  for _variable in "${var_debug_flags[@]}"
+  do
+    eval "
+      if [[ \"\${${_variable}[*]}\" != \"\${${_variable}_previous_value[*]}\" ]]
+      then
+        if set | grep '^${_variable}=(' >/dev/null
+        then
+          ${_variable}_previous_value=( \"\${${_variable}[@]}\" )
+        else
+          ${_variable}_previous_value=\"\${${_variable}}\"
+        fi
+      fi
+    "
+  done
+}
+
+__sm.seppuku()
+{
+  kill -s USR2 $__sm_pid # to exit application, not current subshell.
+}
+
+__sm.log.piece()
 {
   local _message="${1:-}" _unicode=0
   : ${LINES:=$(tput cols)}
@@ -609,43 +584,17 @@ core_log_step()
   unset log_step_message
 }
 
-log_step()
+__sm.tmp.logs.clean()
 {
-  local _message="${1:-}" _output _log_file _status
-
-  if (( $# > 1 ))
-  then
-    shift
-    core_log_step "${_message}"
-
-    _log_file="${TMP_PATH:-/tmp}/$$.stderr.log"
-
-    touch "${_log_file}"
-    if "$@" > "${_log_file}"
-    then
-      core_log_step "succ"
-      cat "${_log_file}"
-      rm -rf "${_log_file}"
-      return 0
-    else
-      _status="$?"
-      core_log_step "fail"
-      cat "${_log_file}" >&2
-      rm -rf "${_log_file}"
-      return ${_status} # pass error return status code up !
-    fi
-  else
-    core_log_step "${_message}"
-  fi
+  local _log _logs=( "${TMP_PATH:-/tmp}/$$/logs/err_*.log" )
+  for _log in "${_logs[@]}"
+  do
+    [[ -e "${_log}" ]] || continue
+    rm -f "${_log}"
+  done
 }
 
-clean_tmp_logs()
-{
-  rm -rf ${TMP_PATH:-/tmp}/err_*.log || \
-    printf "Could not clean old logs, please clean by calling:\n  sudo rm -rf ${TMP_PATH:-/tmp}/err_*.log\n"
-}
-
-__sm.logging.options.check()
+__sm.log.options.check()
 {
   # Do not use brackets; they slow things down a lot.
   if __sm.string.contains "$2" "$1"

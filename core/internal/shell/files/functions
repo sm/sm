@@ -3,7 +3,7 @@
 __sm.files.source()
 {
   local _file _files=("$@")
-  shift || fail "Cannot source files; No files were given."
+  shift || __sm.log.fail "Cannot source files; No files were given."
 
   for _file in "${_files[@]}"
   do
@@ -12,10 +12,10 @@ __sm.files.source()
     if [[ -f  "${_file}" && -s  "${_file}" ]]
     then
       bash -n "${_file}" ||
-        fail "Cannot source the file '${_file}'; Invalid syntax."
+        __sm.log.fail "Cannot source the file '${_file}'; Invalid syntax."
 
       source "${_file}" ||
-        fail "There was an error sourcing the file '${_file}'."
+        __sm.log.fail "There was an error sourcing the file '${_file}'."
     fi
   done
 }
@@ -52,7 +52,7 @@ __sm.files.remove()
 {
   # TODO: add 'from' parameter
   local _file _files=("$@")
-  shift || fail "Cannot remove files, as no files were given to remove."
+  shift || __sm.log.fail "Cannot remove files, as no files were given to remove."
 
   for _file in "${_files[@]}"
   do
@@ -62,11 +62,11 @@ __sm.files.remove()
 
     elif [[ -d "${_file}" ]]
     then
-      fail "Cannot remove the file ${_file}, as it is a directory."
+      __sm.log.fail "Cannot remove the file ${_file}, as it is a directory."
 
     elif [[ -e "${_file}" ]]
     then
-      fail "Failed to remove the file from the filesystem, "\
+      __sm.log.fail "Failed to remove the file from the filesystem, "\
         "as the file exists as an unknown/unhandled filesystem entity type:"\
         "$(file "${_file}")."
     else
@@ -79,7 +79,7 @@ __sm.files.create()
 {
   trace_filter filesystem
   local _file _path _files=("$@")
-  shift || fail "Cannot ensure files exist; No files were given."
+  shift || __sm.log.fail "Cannot ensure files exist; No files were given."
 
   for _file in "${_files[@]}"
   do
@@ -89,7 +89,7 @@ __sm.files.create()
     fi
     _path="${_file%\/*}"
     paths create "${_path}"
-    touch "${_file}" || fail "Error creating the file '${_file}'; "\
+    touch "${_file}" || __sm.log.fail "Error creating the file '${_file}'; "\
       " touch command returned error code '$?'."
   done
 }
@@ -105,7 +105,7 @@ __sm.files.link()
   fi
 
   ln ${_flags[@]} "${_source}" "${_target}" ||
-    fail "Failed to create a symbolic link from '${_source}' to '${_target}';"\
+    __sm.log.fail "Failed to create a symbolic link from '${_source}' to '${_target}';"\
     "'ln -fs' command failed with error code '$?'."
 }
 
@@ -120,39 +120,39 @@ __sm.files.move()
     for _file in "${_files[@]}"
     do
       mv ${_flags[@]} "${_source}/${_file}" "${_target}/${_file}" ||
-        fail "There was an error ($?) moving the source '${_source}/${_file}'" \
+        __sm.log.fail "There was an error ($?) moving the source '${_source}/${_file}'" \
         "to the target '${_target}/${_file}'."
 
 #      if [[ -n "${_mode}" ]]
 #      then
 #        chmod "${_mode}" "${_target}/${_file}" ||
-#          warn "There was an error ($?) changing"\
+#          __sm.log.warn "There was an error ($?) changing"\
 #          " target's '${_target}' mode to '${_mode}'."
 #      fi
 #
 #      if [[ -n "${_owner}" ]]
 #      then
 #        chown "${_owner}" "${_target}/${_file}" ||
-#          warn "There was an error ($?) changing"\
+#          __sm.log.warn "There was an error ($?) changing"\
 #          " target's '${_target}' owner to '${_owner}'."
 #      fi
     done
   else # moving single file
     mv ${_flags[@]} "${_source}" "${_target}" ||
-      fail "There was an error ($?) moving the source '${_source}'" \
+      __sm.log.fail "There was an error ($?) moving the source '${_source}'" \
       "to the target '${_target}'."
 
 #    if [[ -n "${_mode}" ]]
 #    then
 #      chmod "${_mode}" "${_target}" ||
-#        warn "There was an error ($?) changing"\
+#        __sm.log.warn "There was an error ($?) changing"\
 #        " target's '${_target}' mode to '${_mode}'."
 #    fi
 #
 #    if [[ -n "${_owner}" ]]
 #    then
 #      chown "${_owner}" "${_target}" ||
-#        warn "There was an error ($?) changing"\
+#        __sm.log.warn "There was an error ($?) changing"\
 #        " target's '${_target}' owner to '${_owner}'."
 #    fi
   fi
@@ -169,39 +169,39 @@ __sm.files.move()
 #    for _file in "${_files[@]}"
 #    do
 #      cp ${_flags[@]} "${_source}/${_file}" "${_target}/${_file}" ||
-#        fail "There was an error ($?) moving the source '${_source}/${_file}'" \
+#        __sm.log.fail "There was an error ($?) moving the source '${_source}/${_file}'" \
 #        "to the target '${_target}/${_file}'."
 #
 #      if [[ -n "${_mode}" ]]
 #      then
 #        chmod "${_mode}" "${_target}/${_file}" ||
-#          warn "There was an error ($?) changing"\
+#          __sm.log.warn "There was an error ($?) changing"\
 #          " target's '${_target}' mode to '${_mode}'."
 #      fi
 #
 #      if [[ -n "${_owner}" ]]
 #      then
 #        chown "${_owner}" "${_target}/${_file}" ||
-#          warn "There was an error ($?) changing"\
+#          __sm.log.warn "There was an error ($?) changing"\
 #          " target's '${_target}' owner to '${_owner}'."
 #      fi
 #    done
 #  else # moving single file
 #    cp ${_flags[@]} "${_source}" "${_target}/" ||
-#      fail "There was an error ($?) moving the source '${_source}'" \
+#      __sm.log.fail "There was an error ($?) moving the source '${_source}'" \
 #      "to the target '${_target}'."
 #
 #    if [[ -n "${_mode}" ]]
 #    then
 #      chmod "${_mode}" "${_target}" ||
-#        warn "There was an error ($?) changing"\
+#        __sm.log.warn "There was an error ($?) changing"\
 #        " target's '${_target}' mode to '${_mode}'."
 #    fi
 #
 #    if [[ -n "${_owner}" ]]
 #    then
 #      chown "${_owner}" "${_target}" ||
-#        warn "There was an error ($?) changing"\
+#        __sm.log.warn "There was an error ($?) changing"\
 #        " target's '${_target}' owner to '${_owner}'."
 #    fi
 #  fi
@@ -218,12 +218,12 @@ __sm.files.copy()
     for _file in "${_files[@]}"
     do
       cp ${_flags[@]} "${_source}/${_file}" "${_target}/${_file}" ||
-        fail "There was an error ($?) moving the source '${_source}/${_file}'" \
+        __sm.log.fail "There was an error ($?) moving the source '${_source}/${_file}'" \
         "to the target '${_target}/${_file}'."
     done
   else # moving single file
     cp ${_flags[@]} "${_source}" "${_target}" ||
-      fail "There was an error ($?) moving the source '${_source}'" \
+      __sm.log.fail "There was an error ($?) moving the source '${_source}'" \
       "to the target '${_target}'."
   fi
 }
@@ -234,7 +234,7 @@ __sm.files.chown()
   shift 2
   local _file _files=("$@")
   chown ${_flags[@]} "${_owner}" "${_files[@]}" ||
-    fail "There was an error ($?) chowning"\
+    __sm.log.fail "There was an error ($?) chowning"\
     " files '${_files[@]}' owner to '${_owner}'."
 }
 
@@ -246,7 +246,7 @@ __sm.files.chmod()
 
   if ! chmod ${_flags[@]} ${_mode} "${_files[@]}"
   then
-    fail "There was an error ($?) chmodding"\
+    __sm.log.fail "There was an error ($?) chmodding"\
       " files '${_files[*]}' owner to '${_owner}'."
   fi
 }
@@ -298,7 +298,7 @@ __sm.files.containing()
   shift 2
   _files=("$@") _file
 
-  [[ -f "${_file}" ]] || fail "'${_file}' is not a file."
+  [[ -f "${_file}" ]] || __sm.log.fail "'${_file}' is not a file."
 
   if [[ -n "${_regex}" ]]
   then
@@ -413,7 +413,7 @@ __sm.files.in()
   #TODO: WTF ? this one can not work as main for gets empty array
   for _path in "${_paths[@]}"
   do
-    [[ -d "${_path}" ]] || fail "'${_path}' is not a valid path! "
+    [[ -d "${_path}" ]] || __sm.log.fail "'${_path}' is not a valid path! "
 
     for _file in "${_file_paths}"/*
     do
@@ -428,7 +428,7 @@ __sm.files.within()
   local _paths=("$@")
   for _path in "${_paths[@]}"
   do
-    [[ -d "${_path}" ]] || fail "'${_path}' is not a directory!"
+    [[ -d "${_path}" ]] || __sm.log.fail "'${_path}' is not a directory!"
     for _entry in "${_path}"/*
     do
       if [[ -d "${_entry}" ]]
@@ -485,7 +485,7 @@ __sm.files.md5()
   then
     _command="md5"
   else
-    error "Could not find a suitable MD5 command (md5/md5sum) in PATH."
+   __sm.log.error "Could not find a suitable MD5 command (md5/md5sum) in PATH."
   fi
 
   for file in "${_files[@]}"
@@ -498,7 +498,7 @@ __sm.files.md5()
     then
       printf "${_md5// *}"
     else # Should this be error ?
-      warn "There was an unknown error computing the MD5 value of "${_file}"."
+      __sm.log.warn "There was an unknown error computing the MD5 value of "${_file}"."
       return 1
     fi
   done
@@ -542,7 +542,7 @@ __sm.files.absolute.path()
     then
       builtin cd "${_path}"
     else
-      error "The given path '${_path}' is not a valid directory in the following list '$@'."
+      __sm.log.error "The given path '${_path}' is not a valid directory in the following list '$@'."
     fi
   done
 

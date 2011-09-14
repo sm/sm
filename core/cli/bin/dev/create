@@ -1,7 +1,7 @@
 #!/bin/sh
 
 [[ -n "${extension_args}" ]] ||
-  fail "create: You must specify at least one extension name."
+  __sm.log.fail "create: You must specify at least one extension name."
 
 target_path="${extensions_development_path:-"$initial_pwd"}"
 
@@ -9,12 +9,12 @@ for extension in ${extension_args[@]}
 do
   if paths exists "${target_path}/${extension}"
   then
-    error "create: Extension '${extension}' already exists "\
+    __sm.log.error "create: Extension '${extension}' already exists "\
     "at ${target_path}/${extension}."
   fi
 
   paths exists "${sm_path}/core/cli/templates/api/" ||
-    fail "create: Extension template files are missing from "\
+    __sm.log.fail "create: Extension template files are missing from "\
       "$target_path/core/cli/templates/api/"
 
   paths enter "${sm_path}/core/cli/templates/api/"

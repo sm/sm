@@ -10,8 +10,8 @@ archive_get()
   local _uri="${1:-}" _final_target="${2:-}" _package_md5="${3:-${md5:-#}}" \
     _archive="${archives_path}/${_uri##*/}"
 
-  shift || fail "uri must be specified as the first parameter."
-  shift || fail "target path must be specified as the second parameter."
+  shift || __sm.log.fail "uri must be specified as the first parameter."
+  shift || __sm.log.fail "target path must be specified as the second parameter."
 
   case "${_uri}" in
     # fix github archive names
@@ -19,13 +19,13 @@ archive_get()
       _archive="${_uri#*github.com/}"
       _archive="${_archive%/tarball*}"
       _archive="${archives_path}/${_archive//\//_}_${_uri##*/}.tar.gz"
-      debug vcs "github tarball archive name ${_archive}."
+      __sm.log.debug vcs "github tarball archive name ${_archive}."
       ;;
     (*github.com/*/zipball/*)
       _archive="${_uri#*github.com/}"
       _archive="${_archive%/zipball*}"
       _archive="${archives_path}/${_archive//\//_}_${_uri##*/}.zip"
-      debug vcs "github zipball archive name ${_archive}."
+      __sm.log.debug vcs "github zipball archive name ${_archive}."
       ;;
   esac
 
@@ -34,7 +34,7 @@ archive_get()
   # TOD: shasum default instead
   if [[ -f "${_archive}" && "$(files md5 "${_archive}")" != "${_package_md5}" ]]
   then
-    debug vcs "${_uri##*/} does not match MD5 checksum ${_package_md5}; removing and downloading."
+    __sm.log.debug vcs "${_uri##*/} does not match MD5 checksum ${_package_md5}; removing and downloading."
     rm -f "${_archive}"
   fi
 
@@ -52,11 +52,11 @@ archive_get()
         : #Download worked
       else
         case $? in
-          60)
-            error "Peer certificate cannot be authenticated with known CA certificates.\n\n\
+          (60)
+            __sm.log.error "Peer certificate cannot be authenticated with known CA certificates.\n\n\
 Please read 'sm man curl' for instructions how to solve this problem.\n"
             ;;
-          *)
+          (*)
             fetch_error download_failed from=${_uri} to=${_archive}
             ;;
         esac

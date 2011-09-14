@@ -22,23 +22,23 @@ user()
     _command="${__sm_command_dotted}"
     shift "${__sm_command_words}"
   else
-    fail "No command given.\nUsage:  \nextension <command> ..."
+    __sm.log.fail "No command given.\nUsage:  \nextension <command> ..."
   fi
 
   case "${_command}" in
     (set.home)
       _value="$1"
-      shift || fail "A home path must follow keyword 'home';"\
+      shift || __sm.log.fail "A home path must follow keyword 'home';"\
         "user set home /home/{username} for {username}"
       ;;
     (set.shell)
       _value="$1"
-      shift || fail "A shell must follow keyword 'shell'"\
+      shift || __sm.log.fail "A shell must follow keyword 'shell'"\
         "user set shell /bin/zsh for {username}"
       ;;
     (exists)
       _user="$1"
-      shift || fail "A user name must follow keyword 'exists'"\
+      shift || __sm.log.fail "A user name must follow keyword 'exists'"\
         "user exists {username}"
       ;;
   esac
@@ -52,25 +52,25 @@ user()
         ;;
       (name|user|for)
         _user="$1"
-        shift || fail "User name must follow keyword 'user'"
+        shift || __sm.log.fail "User name must follow keyword 'user'"
         ;;
       (group)
         _group="${1:-}"
-        shift || fail "Group name must follow keyword 'group'"
+        shift || __sm.log.fail "Group name must follow keyword 'group'"
         ;;
       (from)
         _source="${1:-}"
-        shift || fail "from source name must follow keyword 'from'"
+        shift || __sm.log.fail "from source name must follow keyword 'from'"
         ;;
       (shell)
         _shell="${1:-}"
-        shift || fail "A user shell (/bin/{zsh,bash}) must follow keyword 'shell'"
+        shift || __sm.log.fail "A user shell (/bin/{zsh,bash}) must follow keyword 'shell'"
         ;;
       (force)
         _flags+=(-f)
         ;;
       (*)
-        fail "Unhandled token '${_token}'"
+        __sm.log.fail "Unhandled token '${_token}'"
         ;;
     esac
   done
@@ -95,7 +95,7 @@ user()
       __sm.user.${_command} "${_user}" "${_flags[*]}"
       ;;
     (*)
-      fail "Unknown command '${_command}'"
+      __sm.log.fail "Unknown command '${_command}'"
       ;;
   esac
 }

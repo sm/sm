@@ -5,8 +5,8 @@ __sm.cache.map.check()
   trace_filter action_detection
 
   local _found_actions=() _method="$1" _name="$2" _item
-  shift || fail "No method and action name was given for search"
-  shift || fail "No action name was given for search"
+  shift || __sm.log.fail "No method and action name was given for search"
+  shift || __sm.log.fail "No action name was given for search"
 
   __sm.cache.map.find.matching "${_method}" "${_name}"
 
@@ -40,13 +40,13 @@ __sm.cache.map.check()
     local screen_height=${LINES:-20}
     if (( ${#_found_actions[@]} + 4  > screen_height ))
     then
-      error "More than one matching action found;\n\nDid you mean:\n ${_candidates[*]}\n" 2>&1 | less
+      __sm.log.error "More than one matching action found;\n\nDid you mean:\n ${_candidates[*]}\n" 2>&1 | less
     else
-      error "More than one matching action found;\n\nDid you mean:\n ${_candidates[*]}\n"
+      __sm.log.error "More than one matching action found;\n\nDid you mean:\n ${_candidates[*]}\n"
     fi
     exit 1
   else
-    debug search "no actions found in '${extension}' for '${_name}'"
+    __sm.log.debug search "no actions found in '${extension}' for '${_name}'"
   fi
   return 1
 }
@@ -56,8 +56,8 @@ __sm.extension.actions.find()
   trace_filter action_detection
   extensions_path="$1" extension="$2"
 
-  shift || fail "Extension path must be given as the first parameter."
-  shift || fail "Extension name must be given as the second parameter."
+  shift || __sm.log.fail "Extension path must be given as the first parameter."
+  shift || __sm.log.fail "Extension name must be given as the second parameter."
 
   local _action_params=("$@") _action_path _new_action_path
   local _rest_params=() _param_temp _action_params_length
@@ -70,11 +70,11 @@ __sm.extension.actions.find()
   __sm.cache.map.actions.initialize
   __sm.cache.map.modules.initialize
 
-  debug search "actions_cache: ${_actions_cache[*]}"
+  __sm.log.debug search "actions_cache: ${_actions_cache[*]}"
 
   if [[ ! -f "${_map}" ]]
   then
-    log_search "missing" "map" "${_map}"
+    __sm.log.search "missing" "map" "${_map}"
   fi
 
   if [[ -f "${_map}" ]] || (( ${#_actions_cache[@]} ))
@@ -103,7 +103,7 @@ __sm.extension.actions.find()
       _action_params=( "${_action_params[@]}" ) # Just in case ... works without it
     done
   else
-    error "${extensions_path}/${extension} does not have map or module dependencies with actions"
+    __sm.log.error "${extensions_path}/${extension} does not have map or module dependencies with actions"
   fi
   return 1
 }
@@ -113,7 +113,7 @@ __sm.extension.action()
   trace_filter action_detection
 
   (( extension_action_calls == 0 )) ||
-    fail "Cannot call a 2nd time, args: ${extension_args[*]}"
+    __sm.log.fail "Cannot call a 2nd time, args: ${extension_args[*]}"
 
   extension_action_calls+=1
 
@@ -141,7 +141,7 @@ __sm.extension.action()
   if __sm.extension.in.paths __sm.extension.find "${extension_args[@]}"
   then
     _extension_found=1
-    log_search extension "$extension" "$extensions_path"
+    __sm.log.search extension "$extension" "$extensions_path"
     if __sm.extension.actions.find "$extensions_path" "${extension_args[@]}"
     then
       _action_found=1
@@ -156,13 +156,13 @@ __sm.extension.action()
 
   if (( _action_found ))
   then
-    log_search action "$action" "${action_path##${sm_path}\/} params:${extension_args[@]}"
+    __sm.log.search action "$action" "${action_path##${sm_path}\/} params:${extension_args[@]}"
   else
     if (( _extension_found ))
     then
-      error "Unknown action path: "${extension_args[@]}"\n\nUsage: \n  sm extension [namespace] [action].\n"
+      __sm.log.error "Unknown action path: "${extension_args[@]}"\n\nUsage: \n  sm extension [namespace] [action].\n"
     else
-      error "Could not find extension: "${extension_args}"\n"
+      __sm.log.error "Could not find extension: "${extension_args}"\n"
     fi
   fi
 
@@ -176,7 +176,7 @@ __sm.extension.action()
   paths=$(env | awk -F= -v ORS=' ' '/_path/{print $1}')
   flags=$(env | awk -F= -v ORS=' ' '/_flag/{print $1}')
 
-  debug search "environment:
+  __sm.log.debug search "environment:
   action=${action}
   action_path=${action_path}
   extension_args=${extension_args}

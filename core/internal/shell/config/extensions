@@ -4,7 +4,7 @@ config_extension_setup()
 {
   local extension="${1:-}" module="${2:-}" path="${3:-}" ${language:=shell}
 
-  shift 3 || fail "Extension name, module name and path must be given."
+  shift 3 || __sm.log.fail "Extension name, module name and path must be given."
 
   path create "${extension_path}/config"
   file create "${extension_path}/defaults"

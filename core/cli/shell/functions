@@ -45,7 +45,7 @@ extension_cli()
 actions()
 {
   local _action="$1"
-  shift || fail "Actions command not given."
+  shift || __sm.log.fail "Actions command not given."
 
   while (( $# ))
   do
@@ -60,11 +60,11 @@ actions()
           (search)
             ;;
           (*)
-            fail "Unknown command maps '${_token}'"
+            __sm.log.fail "Unknown command maps '${_token}'"
             ;;
         esac
       (*)
-        fail "Unknown command '${_token}'"
+        __sm.log.fail "Unknown command '${_token}'"
         ;;
     esac
   done

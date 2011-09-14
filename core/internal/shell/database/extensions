@@ -3,9 +3,9 @@
 database_extension_setup()
 {
   local extension="${1}" module="${2}" path="${3}"
-  shift || fail "Extension must be given as the first parameter."
-  shift || fail "Module must be given as the second parameter."
-  shift || fail "Path must be given as the third parameter."
+  shift || __sm.log.fail "Extension must be given as the first parameter."
+  shift || __sm.log.fail "Module must be given as the second parameter."
+  shift || __sm.log.fail "Path must be given as the third parameter."
 
   paths enter "${path}"
 

@@ -3,10 +3,10 @@
 sm_version
 
 case "${extension_args[${__sm_array_start}]}" in
-  -v|-V) # Only echo version information.
-    succeed "${sm_version:-"?.?.?"}"
+  (-v|-V) # Only echo version information.
+    __sm.log.succeed "${sm_version:-"?.?.?"}"
     ;;
-  *) # GNU-style extended version information.
-    succeed "\nSM Framework ${sm_version:-"?.?.?"} https://sm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)\n"
+  (*) # GNU-style extended version information.
+    __sm.log.succeed "\nSM Framework ${sm_version:-"?.?.?"} https://sm.beginrescueend.com/ by Wayne E. Seguin (wayneeseguin@gmail.com)\n"
     ;;
 esac

@@ -67,7 +67,7 @@ sm_development_setup()
 
       # TODO: Switch to using fetch_uri here.
       git clone ${_url} ${_component} ||
-        error "There was an error cloning ${_component} repository from ${_url} into ${PWD}/${_component}."
+        __sm.log.error "There was an __sm.log.error cloning ${_component} repository from ${_url} into ${PWD}/${_component}."
 
       log "  * ${_component} repository successfully cloned into $PWD/${_component}/."
     fi
@@ -84,7 +84,7 @@ sm_development_update()
 extension_package()
 {
   local _name="${1:-}" _path _version file _archiver
-  shift || fail "Cannot package an extension; no extension name was given."
+  shift || __sm.log.fail "Cannot package an extension; no extension name was given."
 
   _path="${extensions_development_path:-"$extensions_src_path"}"
 
@@ -92,7 +92,7 @@ extension_package()
   paths enter "${_path}"
 
   __sm.extension.is.valid "${_path}/${_name}" ||
-    error "Cannot package extension '${_name}'; the extension is not valid."
+    __sm.log.error "Cannot package extension '${_name}'; the extension is not valid."
 
   _version="$(cat "${_name}/VERSION")"
   log "Packaging extension ${_name}"
@@ -103,7 +103,7 @@ extension_package()
     if command exists ${_archiver// *}
     then
       tar cf "${_name}-${_version}.tar" "${_name}/" ||
-        error "Error during packaging ($?) whilst trying to create a tar of the '${_name}' directory."
+        __sm.log.error "Error during packaging ($?) whilst trying to create a tar of the '${_name}' directory."
       ${_archiver} -f -9 "${_name}-${_version}.tar" # TODO: use sm-ll for this.
     fi
 
@@ -124,7 +124,7 @@ extension_package()
 extension_publish()
 {
   local _name="${1:-}" _path _version _file
-  shift || fail "Cannot publish an extension; no extension name was given."
+  shift || __sm.log.fail "Cannot publish an extension; no extension name was given."
 
   NIY "Extension publishing locally and to extensions.beginrescueend.com has not yet been implemented."
 
@@ -133,22 +133,22 @@ extension_publish()
   paths enter "${_path}"
 
   __sm.extension.is.valid "${_path}/${_name}" ||
-    error "Cannot package extension '${_name}'; the extension is not valid."
+    __sm.log.error "Cannot package extension '${_name}'; the extension is not valid."
 
   _version="$(cat "${_name}/VERSION")"
   log "Packaging extension ${_name}"
   log "${_name}-${_version}:"
 
   paths exists "${_path}/pkg/" ||
-    error "The local package path '${_path}' does not exist; did you run"\
+    __sm.log.error "The local package path '${_path}' does not exist; did you run"\
     "'extension package ${_name}' before 'extension publish ${_name}'?"
 
   log "publishing ${_name}-${_version}"
 
   for _file in "${_pth}/${_name}-${_version}".{tar.gz,tar.xz,tar.bz2,zip}
   do
-    log_step "  - ${_file}"
-    log_step "  - ${_file}.md5"
+    __sm.log.step "  - ${_file}"
+    __sm.log.step "  - ${_file}.md5"
   done
 
   log "Packaging complete. (Packages are located in '${_path}/pkg' )"

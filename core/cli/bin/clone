@@ -4,7 +4,7 @@ NYI
 # extension_is_installed removed, as it was not working already.
 
 [[ -n "${extension_args}" ]] ||
-  error "clone: An extension name must be specified."
+  __sm.log.error "clone: An extension name must be specified."
 
 for (( index = 0 ; index < ${#extension_args[@]} ; index++ ))
 do
@@ -32,17 +32,17 @@ done
 
 # Sanity checks.
 [[ -n "${_source}" ]] ||
-  error "clone: A source extension name must be specified."
+  __sm.log.error "clone: A source extension name must be specified."
 
 [[ -n "${_target}" ]] ||
-  error "clone: A target extension name must be specified."
+  __sm.log.error "clone: A target extension name must be specified."
 
 extension_is_installed "${_source}" ||
-  error "clone: The extension '${_source}' was not found installed; "\
+  __sm.log.error "clone: The extension '${_source}' was not found installed; "\
     "cannot create a new extension from it."
 
 ! extension_is_installed "${_target}" ||
-  error "clone: The target extension '${_target}' already exists; "\
+  __sm.log.error "clone: The target extension '${_target}' already exists; "\
     "cannot create it from ${_source}."
 
 path copy \

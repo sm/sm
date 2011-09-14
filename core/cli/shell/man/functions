@@ -48,17 +48,15 @@ man_display()
   if __sm.extension.in.paths detect_man "$@" ||
     __sm.cli.in.path detect_man "$@"
   then
-    if man $man_file
+    if ! man $man_file
     then
-      :
-    else
       local status=$?
       case $status in
-        16)
+        (16)
           #Not found page - ignore
           ;;
-        *)
-          error "Man returned unknown status $status"
+        (*)
+          __sm.log.error "Man returned unknown status $status"
       esac
     fi
   else

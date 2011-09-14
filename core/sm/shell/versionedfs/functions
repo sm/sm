@@ -48,7 +48,7 @@ versionedfs()
 
   local _token _path _paths _source _name _version _strategy _method _activate
   local _action="${1:-}"
-  shift || fail "Usage: versionedfs path \"{versionedfs root path}\" "\
+  shift || __sm.log.fail "Usage: versionedfs path \"{versionedfs root path}\" "\
     "strategy \"{fhs,name}\" method \"{link,copy}\" activate \"{newest,first}\""
 
   while (( $# ))
@@ -57,62 +57,62 @@ versionedfs()
     case "${_token}" in
       (path)
         _path="${1}"
-        shift || fail "versionedfs path must follow keyword 'path'"
+        shift || __sm.log.fail "versionedfs path must follow keyword 'path'"
         ;;
       (source)
         _source="${1}"
-        shift || fail "Source path must follow keyword 'source'"
+        shift || __sm.log.fail "Source path must follow keyword 'source'"
         ;;
       (name)
         _name="${1}"
-        shift || fail "Name must follow keyword 'name'"
+        shift || __sm.log.fail "Name must follow keyword 'name'"
         ;;
       (version)
         _version="${1}"
-        shift || fail "Version string must follow keyword 'version'"
+        shift || __sm.log.fail "Version string must follow keyword 'version'"
         ;;
       (strategy)
         _strategy="${1}"
-        shift || fail "Strategy string must follow keyword 'strategy'"
+        shift || __sm.log.fail "Strategy string must follow keyword 'strategy'"
         case "${_strategy}" in
           (fhs|name) true ;;
-          (*) fail "Strategy must be one of {fhs,name}" ;;
+          (*) __sm.log.fail "Strategy must be one of {fhs,name}" ;;
         esac
         ;;
       (method)
         _method="${1}"
-        shift || fail "method string must follow keyword 'method'"
+        shift || __sm.log.fail "method string must follow keyword 'method'"
         case "${_method}" in
           (link|copy) true ;;
-          (*) fail "Method must be one of {link,copy}" ;;
+          (*) __sm.log.fail "Method must be one of {link,copy}" ;;
         esac
         ;;
       (activate)
         _activate="${1}"
-        shift || fail "activate string must follow keyword 'activate'"
+        shift || __sm.log.fail "activate string must follow keyword 'activate'"
         case "${_activate}" in
           (first|newest) true ;;
-          (*) fail "Activate must be one of {first,newest}" ;;
+          (*) __sm.log.fail "Activate must be one of {first,newest}" ;;
         esac
         ;;
       (keep)
         _keep="${1}"
-        shift || fail "keep number must follow keyword 'activate'"
+        shift || __sm.log.fail "keep number must follow keyword 'activate'"
         case "${_keep}" in
           (+([[:digit:]]))
-            (( _keep > 0)) || fail "Keep must be a positive integer." ;;
-          (*) fail "Keep must be an integer." ;;
+            (( _keep > 0)) || __sm.log.fail "Keep must be a positive integer." ;;
+          (*) __sm.log.fail "Keep must be an integer." ;;
         esac
         ;;
       (*)
-        fail "Unknown parameter '${_token}'"
+        __sm.log.fail "Unknown parameter '${_token}'"
     esac
   done
 
-  [[ -n "${_path}" ]] || fail "A versionedfs root path must be given."
+  [[ -n "${_path}" ]] || __sm.log.fail "A versionedfs root path must be given."
 
   [[ "${_action}" == create || -d "${_path}/.versionedfs" ]] ||
-    fail "${_path} is not a versionedfs root path; "\
+    __sm.log.fail "${_path} is not a versionedfs root path; "\
     "Use 'versionedfs create path {path}' to initialize."
 
   case "${_action}" in
@@ -121,24 +121,24 @@ versionedfs()
       ;;
     (add)
       [[ -n "${_name}" && -n "${_source}" ]] ||
-        fail "Name and Source must be given."
+        __sm.log.fail "Name and Source must be given."
       [[ -n "${_version}" ]] || _version="$(date +"%Y%m%d%H%M%S")"
       __sm.versionedfs.add "${_path}" "${_name}" "${_version}" "${_source}"
       ;;
     (activate)
       [[ -n "${_name}" && -n "${_version}" ]] ||
-        fail "Name and Version must be given."
+        __sm.log.fail "Name and Version must be given."
       __sm.versionedfs.activate "${_path}" "${_name}" "${_version}"
       ;;
     (remove|deactivate)
-      [[ -n "${_name}" ]] || fail "Name must be given."
+      [[ -n "${_name}" ]] || __sm.log.fail "Name must be given."
       __sm.versionedfs.${_action} "${_path}" "${_name}" "${_version}"
       ;;
     (versions|active)
       __sm.versionedfs.list "${_action}" "${_path}" "${_name}" "${_version}"
       ;;
     (*)
-      fail "Unknown versionedfs action '${_action}'"
+      __sm.log.fail "Unknown versionedfs action '${_action}'"
       ;;
   esac
 }
@@ -147,7 +147,7 @@ __sm.versionedfs.create()
 {
   local _path="$1"
   mkdir -p "${_path}/"{.versionedfs,versions,active} ||
-    fail "Could not create paths ${_path}/{.versionedfs,versions,active}"
+    __sm.log.fail "Could not create paths ${_path}/{.versionedfs,versions,active}"
 
   echo "${_strategy}" > "${_path}/.versionedfs/strategy"
   echo "${_method}"   > "${_path}/.versionedfs/method"
@@ -224,7 +224,7 @@ __sm.versionedfs.activate()
   read -r _strategy < "${_path}/.versionedfs/strategy"
   read -r _method < "${_path}/.versionedfs/method"
 
-  core_log_step "${_name} ${_version}"
+  __sm.log.step "${_name} ${_version}"
 
   case "${_strategy}" in
     (fhs)
@@ -268,7 +268,7 @@ __sm.versionedfs.activate()
       ;;
   esac
 
-  core_log_step success
+  __sm.log.step success
 
   ln -sf "${_version_path}" "${_path}/versions/${_name}/active"
   # TODO: Add to active 'db'
@@ -287,7 +287,7 @@ __sm.versionedfs.deactivate()
 
   if [[ -n "${_version}" && "${_version_path}" == "${_name_path}/${_version}" ]]
   then
-    debug package "A different version than the one given is active; Skipping deactivation."
+    __sm.log.debug package "A different version than the one given is active; Skipping deactivation."
     return 0 #
   fi
 
@@ -316,7 +316,7 @@ __sm.versionedfs.deactivate()
           fi
         elif [[ -f "${_target}" ]]
         then
-          fail "Unknown file type for ${_target}."
+          __sm.log.fail "Unknown file type for ${_target}."
         fi
       done
       ;;

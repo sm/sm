@@ -42,7 +42,7 @@ sm_version()
 #
 NIY()
 {
-  fail "This feature has not yet been implemented.\n$*"
+  __sm.log.fail "This feature has not yet been implemented.\n$*"
 }
 
 if [[ -n "${BASH_VERSINFO}" ]] && (( ${BASH_VERSINFO[0]} > 3 ))

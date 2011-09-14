@@ -14,7 +14,7 @@ step()
 {
   local name="$1"
 
-  shift || fail "Cannot take step as no step name given;"\
+  shift || __sm.log.fail "Cannot take step as no step name given;"\
     "step [name] <- missing name."
 
   start_step "$name"

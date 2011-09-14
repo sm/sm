@@ -61,7 +61,7 @@ __sm.cache.map.modules.initialize()
 
   if [[ ! -d "${_modules_root}" ]]
   then
-    debug search "missing modules dir '${_modules_root}'?"
+    __sm.log.debug search "missing modules dir '${_modules_root}'?"
     return 0
   fi
 
@@ -84,7 +84,7 @@ __sm.cache.map.modules.initialize()
     do
       if __sm.extension.in.paths __sm.module.detect.actions "${_module_dep}"
       then
-        log_search "actiondep" "${extension}${_module_name:+/}${_module_name}" "${module_path#${sm_path}\/}/actions"
+        __sm.log.search "actiondep" "${extension}${_module_name:+/}${_module_name}" "${module_path#${sm_path}\/}/actions"
         while read _action_pair
         do
           if [[ "${_action_pair}" == [[:alpha:]]* ]]
@@ -100,8 +100,8 @@ __sm.cache.map.modules.initialize()
 __sm.cache.map.find.matching()
 {
   local _method="$1" _name="$2"
-  shift || fail "No method and action name was given for search"
-  shift || fail "No action name was given for search"
+  shift || __sm.log.fail "No method and action name was given for search"
+  shift || __sm.log.fail "No action name was given for search"
   for _item in "${_actions_cache[@]}"
   do
     case "${_method}" in
@@ -127,7 +127,7 @@ __sm.cache.map.find.matching()
         esac
         ;;
       (*)
-        fail "Unknown search method, use 'only_one', 'allow_many', 'starting'."
+        __sm.log.fail "Unknown search method, use 'only_one', 'allow_many', 'starting'."
         ;;
     esac
   done

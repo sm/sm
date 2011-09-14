@@ -3,7 +3,7 @@
 fetch_version()
 {
   version=$(curl -s "${releases_url}/latest-version.txt" 2>/dev/null) ||
-    fail "Unable to fetch version from ${releases_url}/latest-version.txt"
+    __sm.log.fail "Unable to fetch version from ${releases_url}/latest-version.txt"
 }
 
 md5_match()
@@ -60,7 +60,7 @@ install_release()
 
   # TODO: shasum default instead
   [[ "$(files md5 "${archive}")" == "${md5}" ]] ||
-    fail "
+    __sm.log.fail "
 Archive package downloaded does not match its calculated MD5 checksum ${md5}:
 
   $archives_path/sm-${version}.tar.gz

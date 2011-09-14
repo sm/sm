@@ -57,21 +57,21 @@ package()
             shift
             ;;
           (*)
-            fail "A valid command must follow keyword is; {active|installed}"
+            __sm.log.fail "A valid command must follow keyword is; {active|installed}"
             ;;
         esac
         ;;
       (log)
         _log="$1"
-        shift || fail "Log file path/name must be given following keyword 'log'"
+        shift || __sm.log.fail "Log file path/name must be given following keyword 'log'"
         ;;
       (lines)
         _lines="$1"
-        shift || fail "Number of lines to show must be given following keyword 'lines'"
+        shift || __sm.log.fail "Number of lines to show must be given following keyword 'lines'"
         ;;
       (message)
         _message="$1"
-        shift || fail "Message must be given following keyword 'message'"
+        shift || __sm.log.fail "Message must be given following keyword 'message'"
       ;;
       (configure)
         _command=configure
@@ -81,7 +81,7 @@ package()
             shift
             ;;
           (*)
-            fail "Unknown configure param '$1'."
+            __sm.log.fail "Unknown configure param '$1'."
             continue
             ;;
         esac
@@ -112,43 +112,43 @@ package()
         ;;
       (key)
         _key="$1"
-        shift || fail "Key name must follow keyword 'key'"
+        shift || __sm.log.fail "Key name must follow keyword 'key'"
         ;;
       (name)
         package_name="$1"
-        shift || fail "a package name must follow keyword 'name'"
+        shift || __sm.log.fail "a package name must follow keyword 'name'"
         ;;
       (version)
         package_version="$1"
-        shift || fail "a package version must follow keyword 'version'"
+        shift || __sm.log.fail "a package version must follow keyword 'version'"
         ;;
       (base_url)
         package_base_url="$1"
-        shift || fail "a package base_url must follow keyword 'base_url'"
+        shift || __sm.log.fail "a package base_url must follow keyword 'base_url'"
         ;;
       (file)
         package_file="$1"
-        shift || fail "a package file name must follow keyword 'file'"
+        shift || __sm.log.fail "a package file name must follow keyword 'file'"
         ;;
       (user)
         package_user="$1"
-        shift || fail "a package user name must follow keyword 'user'"
+        shift || __sm.log.fail "a package user name must follow keyword 'user'"
         ;;
       (archive_format)
         archive_format="$1"
-        shift || fail "a package archive_format must follow keyword 'archive_format'"
+        shift || __sm.log.fail "a package archive_format must follow keyword 'archive_format'"
         ;;
       (md5)
         package_md5="$1"
-        shift || fail "a package md5 sum must follow keyword 'md5'"
+        shift || __sm.log.fail "a package md5 sum must follow keyword 'md5'"
         ;;
       (sha256)
         package_sha256="$1"
-        shift || fail "a package sha256 key must follow keyword 'sha256'"
+        shift || __sm.log.fail "a package sha256 key must follow keyword 'sha256'"
         ;;
       (sha512)
         package_sha512="$1"
-        shift || fail "a package sha512 key must follow keyword 'sha512'"
+        shift || __sm.log.fail "a package sha512 key must follow keyword 'sha512'"
         ;;
       (*)
         _params+=("${_token}")
@@ -158,7 +158,7 @@ package()
 
   true ${package_name:=${extension}}
 
-  [[ -n "${package_name}" ]]    || fail "Package name must be set/given"
+  [[ -n "${package_name}" ]]    || __sm.log.fail "Package name must be set/given"
 
   case "${_command}" in
     (make)
@@ -195,12 +195,12 @@ package()
       esac
       ;;
     (define)
-      [[ -n "${_params}" ]] || fail "No '{key} {value}' pairs given."
+      [[ -n "${_params}" ]] || __sm.log.fail "No '{key} {value}' pairs given."
       if array is even _params
       then
         __sm.package.define "${_params[@]}"
       else
-        fail "Every key must have an associated value."
+        __sm.log.fail "Every key must have an associated value."
       fi
       ;;
     (activate)
@@ -217,14 +217,14 @@ package()
       __sm.package.init
       ;;
     (error)
-      [[ -n "${_message}" ]] || fail "Message must be given for package error."
+      [[ -n "${_message}" ]] || __sm.log.fail "Message must be given for package error."
       __sm.package.error "${_params[@]}" "${_log}" "${_lines}"
       ;;
     (cli)
       __sm.package.cli "${_params[@]}"
       ;;
     (*)
-      fail "Unknown package command '${_token}'"
+      __sm.log.fail "Unknown package command '${_token}'"
   esac
 }
 

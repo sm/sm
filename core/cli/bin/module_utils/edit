@@ -9,7 +9,7 @@ then # edit core
   exec ${EDITOR:-vi} .
 else # edit extension
   paths exists "${extensions_development_path}/${extension_args[${__sm_array_start}]}" ||
-    error \
+    __sm.log.error \
     "Failed to edit '${extension_args[${__sm_array_start}]}'; it appears to not be installed."\
     "To see installed extensions, run:\n  sm list"
 

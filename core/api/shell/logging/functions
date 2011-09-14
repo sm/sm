@@ -24,7 +24,7 @@ api_logging_initialize()
 logrotate()
 {
   local _file="${1:-}"
-  shift || fail "Cannot rotate a log file, as no log file was given."
+  shift || __sm.log.fail "Cannot rotate a log file, as no log file was given."
 
   verbose "Tailing the file in a background process into a tail logfile."
   ( tail -n 0 -f "${_file}" > ${file}.$$.log )&
@@ -88,19 +88,19 @@ log_streams()
         ;;
       err)
         _stderr="${1}"
-        shift || fail "stderr name must follow keyword 'err'"
+        shift || __sm.log.fail "stderr name must follow keyword 'err'"
         ;;
       out)
         _stdout="${1}"
-        shift || fail "stdout name must follow keyword 'out'"
+        shift || __sm.log.fail "stdout name must follow keyword 'out'"
         ;;
       mix)
         _stdmix="${1}"
-        shift || fail "stdmix name must follow keyword 'mix'"
+        shift || __sm.log.fail "stdmix name must follow keyword 'mix'"
         ;;
       *)
         _command="${1}"
-        shift || fail "A command must be given in order to log it's streams."
+        shift || __sm.log.fail "A command must be given in order to log it's streams."
         ;;
     esac
   done

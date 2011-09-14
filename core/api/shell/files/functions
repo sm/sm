@@ -35,20 +35,20 @@ files()
     _command="${__sm_command_dotted}"
     shift "${__sm_command_words}"
   else
-    fail "No command given.\nUsage:  \nfiles <command> ..."
+    __sm.log.fail "No command given.\nUsage:  \nfiles <command> ..."
   fi
 
   case "${_command}" in
     (sha.*)
-      command -v shasum > /dev/null 2>&1 || fail "shasum command missing, cannot use 'files sha'"
+      command -v shasum > /dev/null 2>&1 || __sm.log.fail "shasum command missing, cannot use 'files sha'"
       ;;
     (chmod)
       _mode="${1}"
-      shift || fail "Mode must follow keywords 'chmod'"
+      shift || __sm.log.fail "Mode must follow keywords 'chmod'"
       ;;
     (chown)
       _owner="${1}"
-      shift || fail "Owner must be provided after keyword 'owner'"
+      shift || __sm.log.fail "Owner must be provided after keyword 'owner'"
       ;;
   esac
 
@@ -61,19 +61,19 @@ files()
         ;;
       (to)
         _target="${1}"
-        shift || fail "Target path must be provided after keyword '${_token}'"
+        shift || __sm.log.fail "Target path must be provided after keyword '${_token}'"
         ;;
       (from)
         _source="${1}"
-        shift || fail "Source path must be provided after keyword 'from'"
+        shift || __sm.log.fail "Source path must be provided after keyword 'from'"
         ;;
       (mode|permissions)
         _mode="${1}"
-        shift || Fail "Mode must follow keywords 'mode|permissions'"
+        shift || __sm.log.fail "Mode must follow keywords 'mode|permissions'"
         ;;
       (owner)
         _owner="${1}"
-        shift || fail "Owner must be provided after keyword 'owner'"
+        shift || __sm.log.fail "Owner must be provided after keyword 'owner'"
         ;;
       (recursive|recursively)
         _flags+=(-R)
@@ -87,27 +87,27 @@ files()
         ;;
       (string|content)
         _string="$1"
-        shift || fail "A string must be followed by keyword 'string'"
+        shift || __sm.log.fail "A string must be followed by keyword 'string'"
         ;;
       (regex)
         _regex="$1"
-        shift || fail "A regex must be followed by keyword 'regex'"
+        shift || __sm.log.fail "A regex must be followed by keyword 'regex'"
         ;;
       (in)
         _files+=("$1")
-        shift || fail "A file name must follow keyword 'in'"
+        shift || __sm.log.fail "A file name must follow keyword 'in'"
         ;;
       (key)
         _key="$1"
-        shift || fail "A key name must follow keyword 'key'"
+        shift || __sm.log.fail "A key name must follow keyword 'key'"
         ;;
       (value)
         _value="$1"
-        shift || fail "A value must follow keyword 'value'"
+        shift || __sm.log.fail "A value must follow keyword 'value'"
         ;;
       (with)
         _string="$1"
-        shift || fail "A content string must follow keyword 'with'"
+        shift || __sm.log.fail "A content string must follow keyword 'with'"
         ;;
       (*)
         _files+=("${_token}")
@@ -125,20 +125,20 @@ files()
       then return 0 ; else return 1 ; fi
       ;;
     (open|md5|enter|join|expand|search|within|in|source|empty|nonempty|exist|exists|remove|create)
-      [[ -n "${_files}" ]] || fail "files must be given for 'files ${_command}'."
+      [[ -n "${_files}" ]] || __sm.log.fail "files must be given for 'files ${_command}'."
       if __sm.files.${_command} "${_files[@]}"
       then return 0 ; else return 1 ; fi
       ;;
     (link)
       [[ -e "${_source}" ]]   ||
-        fail "Cannot link ${_source} to ${_target}, source does not exist!"
+        __sm.log.fail "Cannot link ${_source} to ${_target}, source does not exist!"
       if [[ -f "${_target}" ]] && ! __sm.string.contains "-f" "${_flags[*]}"
       then
-        fail "Cannot link ${_source} to ${_target} which exists as a file!"
+        __sm.log.fail "Cannot link ${_source} to ${_target} which exists as a file!"
       fi
       if [[ -d "${_target}" ]] && ! __sm.string.contains "-f" "${_flags[*]}"
       then
-        fail "Cannot link ${_source} to ${_target} which exists as a directory"
+        __sm.log.fail "Cannot link ${_source} to ${_target} which exists as a directory"
       fi
       #TODO: what about the -f (force flag) to overwrite if target exists ?
       __sm.files.link "${_source}" "${_target}" "${_flags[*]}"
@@ -146,21 +146,21 @@ files()
     (copy|move)
       if [[ -n "${_files[*]}" ]]
       then
-        [[ -n "${_source}" || -n "${_target}" ]] || fail "Source or target path (to/from) for ${_command}ing files must be given."
+        [[ -n "${_source}" || -n "${_target}" ]] || __sm.log.fail "Source or target path (to/from) for ${_command}ing files must be given."
       else
-        [[ -n "${_source}" && -n "${_target}" ]] || fail "Source and target path (to/from) for ${_command}ing file must be given."
+        [[ -n "${_source}" && -n "${_target}" ]] || __sm.log.fail "Source and target path (to/from) for ${_command}ing file must be given."
       fi
       __sm.files.${_command} "${_source:-.}" "${_target:-.}" "${_flags[*]}" "${_files[@]}"
       ;;
     (write)
-      [[ -n "${_string}" ]] || fail "String must be given; string 'string'."
-      [[ -n "${_target}" ]] || fail "Target must be given;  to {file name}."
+      [[ -n "${_string}" ]] || __sm.log.fail "String must be given; string 'string'."
+      [[ -n "${_target}" ]] || __sm.log.fail "Target must be given;  to {file name}."
       __sm.files.write "${_string}" "${_target}" "${_flags[*]}"
       ;;
     (*)
       if [[ -z "${_owner}" && -z "${_mode}" ]]
       then
-        fail "Unknown command for files: '${_command}' "\
+        __sm.log.fail "Unknown command for files: '${_command}' "\
           "A files command must be specified as the first parameter: "\
           "{chown,chmod,create,remove,copy,in,search,enter,exist,join,expand,move,copy}"
       fi

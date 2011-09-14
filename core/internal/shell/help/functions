@@ -96,7 +96,7 @@ show_help()
 description()
 {
   local _description="$*"
-  shift || fail "Cannot add description to help; description given."
+  shift || __sm.log.fail "Cannot add description to help; description given."
   help_descriptions+=("$*")
 }
 
@@ -190,8 +190,8 @@ help_description()
 action()
 {
   local _name="${1:-}" _description="${2:-}"
-  shift || fail "An action name must be provided:\naction {name} {description}."
-  shift || fail "An description must be provided:\naction {name} {description}."
+  shift || __sm.log.fail "An action name must be provided:\naction {name} {description}."
+  shift || __sm.log.fail "An description must be provided:\naction {name} {description}."
 
   help_action_names+=( "${_name}" )
   help_action_descriptions+=( "${_description}" )

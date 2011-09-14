@@ -16,7 +16,7 @@ timestamp()
     _command="${__sm_command_dotted}"
     shift "${__sm_command_words}"
   else
-    fail "No command given.\nUsage:\n  timestamp <command> ..."
+    __sm.log.fail "No command given.\nUsage:\n  timestamp <command> ..."
   fi
 
   case "${_command}" in
@@ -24,6 +24,6 @@ timestamp()
       if __sm.timestamp.${_command}
       then return 0 ; else return $? ; fi
       ;;
-    (*) error "Unknown command for extension '${_command}'."
+    (*) __sm.log.error "Unknown command for extension '${_command}'."
   esac
 }

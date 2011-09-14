@@ -8,16 +8,13 @@ declare -a var_debug_flags
 
 trace_filter_stack=()
 
-set_ps4
+__sm.set.ps4
 
-# Do not exit on error
-set +o errexit
-# Exit on USR2 (send by backtrace to $APP_PID)
-trap 'exit 1' USR2
-# Store process pid for closing from backtrace
-export APP_PID=$$
+set +o errexit     # Do not exit on error
+trap 'exit 1' USR2 # Exit on USR2 (send by backtrace to $__sm_pid)
+export __sm_pid=$$  # Store process pid for closing from backtrace
 
-trap clean_tmp_logs EXIT
+trap __sm.tmp.logs.clean EXIT
 
 # Persist ERR handler
 if [[ -n "${ZSH_VERSION}" ]]

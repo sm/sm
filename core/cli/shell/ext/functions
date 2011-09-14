@@ -65,7 +65,7 @@ ext_list_known()
 ext_install()
 {
   local _name _names="$1" _uri="$2"
-  shift || fail "No extension name was given."
+  shift || __sm.log.fail "No extension name was given."
 
   _names=(${_names//,/ })
 
@@ -75,7 +75,7 @@ ext_install()
 
   for _name in ${_names[@]}
   do
-    log_step "Installing ${_name} in ${_extension_namespace//\// }" \
+    __sm.log.step "Installing ${_name} in ${_extension_namespace//\// }" \
       extension install as "${_name}" ${_uri:+from} ${_uri}
   done
 }
@@ -96,7 +96,7 @@ ext_update()
 {
   local _name _uri
   (( $# > 0 )) ||
-    error "Cannot update extension ext without name."
+    __sm.log.error "Cannot update extension ext without name."
 
   for _name in "$@"
   do
@@ -104,15 +104,15 @@ ext_update()
     then
       if [[ -d "${exts_system_path}/active/${_name}" ]]
       then
-        error "Extension ${_name} is in system exts and cannot be updated."
+        __sm.log.error "Extension ${_name} is in system exts and cannot be updated."
       else
-        error "Extension ${_name} does not exist."
+        __sm.log.error "Extension ${_name} does not exist."
       fi
     fi
 
     if [[ ! -s "${exts_user_path}/active/${_name}/.uri" ]]
     then
-      warn "Extension ${_name} does not contain stored uri."
+      __sm.log.warn "Extension ${_name} does not contain stored uri."
       continue
     fi
 
@@ -120,7 +120,7 @@ ext_update()
 
     if [[ -z "${_uri}" ]]
     then
-      warn "Extension ${_name} does not contain stored uri."
+      __sm.log.warn "Extension ${_name} does not contain stored uri."
     else
       ext_install "${_name}" "${_uri}"
     fi
@@ -133,7 +133,7 @@ ext_update_all()
 
   if (( ! "${#_entries[@]}" ))
   then
-    error "No extensions found for update."
+    __sm.log.error "No extensions found for update."
   fi
 
   for _name in "${_entries[@]}"
@@ -148,7 +148,7 @@ ext_uninstall()
   local _name="$1"
   case "${_name}" in
     */*|.|..)
-      error "Please specify a valid extension name."
+      __sm.log.error "Please specify a valid extension name."
       ;;
   esac
 
@@ -156,9 +156,9 @@ ext_uninstall()
   then
     if [[ -d "${exts_system_path}/active/${_name}" ]]
     then
-      error "Extension ${_name} is in system exts and cannot be uninstalled."
+      __sm.log.error "Extension ${_name} is in system exts and cannot be uninstalled."
     else
-      error "Extension ${_name} does not exist."
+      __sm.log.error "Extension ${_name} does not exist."
     fi
   fi
 

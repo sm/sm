@@ -4,7 +4,7 @@ __sm.templates.find()
 {
   local _extensions_path="$1" _extension _template_path _params_path
 
-  shift || fail "No extensions path and extension name given."
+  shift || __sm.log.fail "No extensions path and extension name given."
 
   _params_path="$*"
   _params_path="${_params_path// //}"
@@ -31,7 +31,7 @@ __sm.templates.exist()
   if __sm.extension.in.paths __sm.templates.find "$@" ||
     __sm.cli.in.path __sm.templates.find "$@"
   then
-    log_search "template" "$template_name" "${template_path##${sm_path}\/}"
+    __sm.log.search "template" "$template_name" "${template_path##${sm_path}\/}"
     return 0
   else
     return 1
@@ -41,7 +41,7 @@ __sm.templates.exist()
 # ### Code Walkthrough
 __sm.templates.install()
 {
-  __sm.templates.exist "${_name}" || fail "No template found matching '${_name}'."
+  __sm.templates.exist "${_name}" || __sm.log.fail "No template found matching '${_name}'."
 
   _template="${template_path}"
   _name="$(basename "${_name}")"
@@ -52,7 +52,7 @@ __sm.templates.install()
   then
     if paths exist "${_target}/${_name}"
     then
-      fail "Cannot install the template '${_template}' to ${_target}/${_name},"\
+      __sm.log.fail "Cannot install the template '${_template}' to ${_target}/${_name},"\
         " as it is a directory."
     fi
     files copy \
@@ -68,18 +68,18 @@ __sm.templates.install()
 __sm.templates.seed()
 {
   local _template="${1:-}"
-  shift || fail "No template name was given."
+  shift || __sm.log.fail "No template name was given."
   local _hash=("$@") _strings=() temporary=${_template}.${timestamp}.$$
 
   if ! files exist "${_template}"
   then
-    fail "template file '${_template}' does not exist."
+    __sm.log.fail "template file '${_template}' does not exist."
   fi
 
-  [[ -n "${_hash}" ]] || fail "Cannot seed template '${_template}';"\
+  [[ -n "${_hash}" ]] || __sm.log.fail "Cannot seed template '${_template}';"\
     " No replacement keys were specified."
 
-  array is even _hash || fail "Cannot seed template;"\
+  array is even _hash || __sm.log.fail "Cannot seed template;"\
     " Every replacement key must have a replacement value."
 
   for (( index=0 ; index < ${#_hash[@]} ; index++ ))
@@ -88,12 +88,12 @@ __sm.templates.seed()
   done
 
   sed "${_strings[@]}" ${_template} > ${temporary} ||
-    error "There was an error (?) seeding the template '${_template}';" \
+    __sm.log.error "There was an error (?) seeding the template '${_template}';" \
     " Most often this is due to filesystem permissions / disk full."
 
   if ! files exist "${temporary}"
   then
-    fail "Something went very wrong;"\
+    __sm.log.fail "Something went very wrong;"\
       " the template intermediate file '${temporary}' does not exist?! "
   fi
 
@@ -104,16 +104,16 @@ __sm.templates.update()
 {
 
   local _template="${1:-}" _target="${2:-}"
-  shift || fail "Cannot update seed template;"\
+  shift || __sm.log.fail "Cannot update seed template;"\
     " Template name was not given as the first parameter."
-  shift || fail "Cannot update seed template;"\
+  shift || __sm.log.fail "Cannot update seed template;"\
     " Template target was not given as the second parameter."
 
   local  _incoming="${1:-${_target}.incoming}"
   shift || true
   local _hash=("$@") _strings=() _variables="${_target}.var.$$"
 
-  __sm.templates.exist "${_template}" || fail "Cannot update seed template;"\
+  __sm.templates.exist "${_template}" || __sm.log.fail "Cannot update seed template;"\
     " No template was found matching '${_name}'."
 
   _template="${template_path}"

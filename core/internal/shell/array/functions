@@ -50,7 +50,7 @@ __sm.array.push()
   then
     local _element _elements=("$@")
 
-    (( ${#_elements[@]} )) || fail "No elements were given."
+    (( ${#_elements[@]} )) || __sm.log.fail "No elements were given."
 
     for _element in "${_elements[@]}"
     do
@@ -65,7 +65,7 @@ __sm.array.append()
   shift
   local _element _elements=("$@")
 
-  (( ${#_elements[@]} )) || fail "No elements were given."
+  (( ${#_elements[@]} )) || __sm.log.fail "No elements were given."
 
   for _element in "${_elements[@]}"
   do
@@ -76,9 +76,9 @@ __sm.array.append()
 __sm.array.pop()
 {
   local _name="${1}" _variable="${2:-}" index
-  shift || fail "Array name was not given."
+  shift || __sm.log.fail "Array name was not given."
 
-  eval "(( \${#${_name}[@]} ))" || fail "Array '${_name}' was empty."
+  eval "(( \${#${_name}[@]} ))" || __sm.log.fail "Array '${_name}' was empty."
 
   if [[ -n "${_variable}" ]]
   then
@@ -97,7 +97,7 @@ __sm.array.pop()
 __sm.array.shift()
 {
   local _name="${1:-}" index _variable="${2:-}"
-  shift || fail "Array name was not given."
+  shift || __sm.log.fail "Array name was not given."
 
   [[ -z "${_variable}" ]] || eval "${_variable}=\${${_name}[${__sm_array_start}]}"
 
@@ -110,11 +110,11 @@ __sm.array.shift()
 __sm.array.unshift()
 {
   local _name="${1:-}"
-  shift || fail "Array name was given."
+  shift || __sm.log.fail "Array name was given."
 
   local _elements=("$@")
 
-  (( ${#_elements[@]} )) || fail "No elements were given."
+  (( ${#_elements[@]} )) || __sm.log.fail "No elements were given."
 
   eval "${_name}=(\"${_elements[@]}\" \"\${${_name}[@]}\")"
 }
@@ -122,7 +122,7 @@ __sm.array.unshift()
 __sm.array.join()
 {
   local _name="${1:-}"
-  shift || fail "Array name was not given."
+  shift || __sm.log.fail "Array name was not given."
   local IFS=${1:-' '}
   eval "printf \"\${${_name}[*]}\""
 }
@@ -130,7 +130,7 @@ __sm.array.join()
 __sm.array.largest()
 {
   local _name="${1:-}" _index _largest=""
-  shift || fail "No array variable name was given."
+  shift || __sm.log.fail "No array variable name was given."
 
   eval "
   for (( _index=0 ; _index < \${#${_name}[@]} ; _index++ ))
@@ -162,7 +162,7 @@ __sm.array.sort()
 __sm.array.unique()
 {
   local _name="${1:-}" _index _largest=""
-  shift || fail "Array variable name was not given."
+  shift || __sm.log.fail "Array variable name was not given."
 
   eval "${_name}=(\$(
   echo \" \${${_name}[@]} \" |

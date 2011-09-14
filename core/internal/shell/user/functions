@@ -101,7 +101,7 @@ __sm.user.add()
   [[ -n "${_group}" ]] || _group="${_user}"
 
   (( UID == 0 )) || # root user has id 0
-    fail "Users and groups may be manipulated only by the super-user (root), via su or sudo."
+    __sm.log.fail "Users and groups may be manipulated only by the super-user (root), via su or sudo."
 
   # ##### TODO: Use the os is X functions here instead.
   case "$(uname)" in
@@ -163,7 +163,7 @@ __sm.user.remove()
   local _user="$1" _flags=($2)
   local ....
   (( UID == 0 )) || # root user has id 0
-    fail "Users and groups may be manipulated only by the super-user (root), via su or sudo."
+    __sm.log.fail "Users and groups may be manipulated only by the super-user (root), via su or sudo."
   (
   # Switch based on the os type.
   # TODO: Switch these to use the os is X system module DSL

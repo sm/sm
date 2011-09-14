@@ -7,5 +7,5 @@ elif __sm.command.is.function "${extension_args[${__sm_array_start}]}" >/dev/nul
 then
   "${extension_args[@]}"
 else
-  error "${extension_args[${__sm_array_start}]} is not a valid function name."
+  __sm.log.error "${extension_args[${__sm_array_start}]} is not a valid function name."
 fi

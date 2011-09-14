@@ -17,7 +17,7 @@ module_functions()
   local _function _functions _modules="${@:-}"
 
   [[ -n "${_modules}" ]] ||
-    fail "Cannot print the functions for module(s); No module names given."
+    __sm.log.fail "Cannot print the functions for module(s); No module names given."
 
   local _path="${modules_path}/${_module}"
 
@@ -73,14 +73,14 @@ module_docs()
   done
 
   variables are nonempty _module ||
-    fail "Cannot glean documentation for a module; no module name given."
+    __sm.log.fail "Cannot glean documentation for a module; no module name given."
 
   command exists shocco ||
-    fail "Cannot generate documentation for '${_module}';"\
+    __sm.log.fail "Cannot generate documentation for '${_module}';"\
     " 'shocco' was not found in the PATH, install shocco and try again."
 
   command exists pygmentize ||
-    fail "Cannot generate documentation for '${_module}';"\
+    __sm.log.fail "Cannot generate documentation for '${_module}';"\
       " 'pygmentize' was not found in the PATH, install pygmentize and try again."
 
   local _path="${core_development_path}/shell/${_module}"
@@ -109,7 +109,7 @@ modules_docgen()
   if [[ -n "${core_development_path}" ]]
   then
     paths exists "${core_development_path}" ||
-    error "Set core_development_path in ~/.smrc, and clone the sm core "\
+    __sm.log.error "Set core_development_path in ~/.smrc, and clone the sm core "\
      "repository into it, to run docgen."\
      "For more information, see https://bdsm.beginrescueend.com/development/core."
   fi
@@ -155,11 +155,11 @@ modules_docopen()
   # for file in modules/*/functions ; do (name=${file%%\/functions}; shocco $file > html/${name//*\/}.html)& done ; wait
   variables are nonempty core_development_path &&
     paths exists "${core_development_path}" ||
-    error "To run docopen, set core_development_path in ~/.smrc, and clone the sm core "\
+    __sm.log.error "To run docopen, set core_development_path in ~/.smrc, and clone the sm core "\
     "repository into it."
 
   files exist "${core_development_path}/html/shell/index.html" ||
-    error "Run '$ sm mod docgen' before trying docopen."
+    __sm.log.error "Run '$ sm mod docgen' before trying docopen."
 
   os open "${core_development_path}/html/shell/index.html"
 }
@@ -175,7 +175,7 @@ modules_site_docgen()
   local _path="${site_development_path}"
 
   paths exists "${core_development_path}" ||
-    fail "Set core_development_path in ~/.smrc, to run docgen."
+    __sm.log.fail "Set core_development_path in ~/.smrc, to run docgen."
 
   files write string "<html><body><h2>SM Module Documentation</h2><ul>" \
     to "${_prefix}/index.html"
@@ -198,7 +198,7 @@ modules_site_docgen()
   log "Modules documentation content has been generated in ${_prefix}."
 
   paths exists "${site_development_path}" ||
-    fail "Set site_development_path in ~/.smrc, to run docgen."
+    __sm.log.fail "Set site_development_path in ~/.smrc, to run docgen."
 
   # TODO: Extract this section into a separate location.
   # Copy the generated files into the proper site content dir.

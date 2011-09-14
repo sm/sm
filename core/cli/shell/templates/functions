@@ -40,10 +40,10 @@ templates_targets()
 {
   local target
 
-  (( $# )) || error "Please provide a template name!"
+  (( $# )) || __sm.log.error "Please provide a template name!"
 
   [[ "$1" == "${1/_*./_.}" && -f "$1" ]] ||
-    error "'${1}' is not a valid template name!"
+    __sm.log.error "'${1}' is not a valid template name!"
 
   for target in $(hash keys from "$1.settings")
   do
@@ -91,7 +91,7 @@ templates_list_all() {
       ;;
   esac
 
-  (( ${#templates[@]} )) || error "No templates found.\n"
+  (( ${#templates[@]} )) || __sm.log.error "No templates found.\n"
 
   for template in ${templates[@]}
   do
@@ -125,7 +125,7 @@ templates_apply_all()
 {
   local list template first="$1"
 
-  (( $# )) || error "Please provide a template or target name!"
+  (( $# )) || __sm.log.error "Please provide a template or target name!"
 
   if [[ "$first" == "${first/_*./_.}" && -f "$first" ]]
   then
@@ -164,7 +164,7 @@ templates_apply_diffs()
 {
   local list template
 
-  (( $# )) || error "Please provide a template or target name!"
+  (( $# )) || __sm.log.error "Please provide a template or target name!"
 
   if [[ "$1" == "${1/_*./_.}" && -f "$1" ]]
   then
