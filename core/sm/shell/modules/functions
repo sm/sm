@@ -56,12 +56,11 @@ __sm.modules.core.initialize()
 __sm.modules.include()
 {
   local _module _sm _extension _path _file _modules
+
   for _module in "$@"
   do
-    if __sm.module.include "${_module}"
+    if ! __sm.module.include "${_module}"
     then
-      continue
-    else
       __sm.log.fail "Could not find module path for ${_module}."
     fi
   done
