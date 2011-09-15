@@ -40,7 +40,9 @@
 package()
 {
   trace_filter package
-  typeset _token _subcommand _command _logfile _lines=50 _params=()
+  typeset _token _subcommand _command _logfile _lines _params
+  _lines=50
+  _params=()
 
   while (( $# ))
   do

@@ -4,8 +4,9 @@ timestamp()
 {
   trace_filter timestamp
 
-  typeset _command _params=() _name _uri
-  typeset __extension_commands=(
+  typeset _command _params=() _name _uri __extension_commands
+  _params=()
+  __extension_commands=(
     "show new"
     "show current"
     "save=set"

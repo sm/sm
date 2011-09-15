@@ -3,7 +3,8 @@
 command()
 {
   trace_filter command
-  typeset _command _subcommand _token _user _code _flags=()
+  typeset _command _subcommand _token _user _code _flags
+  _flags=()
 
   while (( $# ))
   do

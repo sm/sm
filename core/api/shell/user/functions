@@ -4,9 +4,9 @@ user()
 {
   trace_filter users
 
-  typeset _command _subcommand _user _group _source _flags=() _value _shell
-
-  typeset __user_commands=(
+  typeset _command _subcommand _user _group _source _flags _value _shell __user_commands
+  _flags=()
+  __user_commands=(
     "is root"
     "is privileged"
     "is unprivileged"

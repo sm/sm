@@ -11,7 +11,8 @@ service()
 {
   trace_filter service
 
-  typeset _token _command _parameters=()
+  typeset _token _command _parameters
+  _parameters=()
 
   while (( $# ))
   do
