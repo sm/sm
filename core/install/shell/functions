@@ -41,7 +41,8 @@ prepare_for_installation()
 
 cleanse_targets()
 {
-  typeset _path="$1" _entity
+  typeset _path _entity
+  _path="$1"
   shift || __sm.log.fail "Usage:\n\n  cleanse_targets {target} {paths/files under target}"
   for _entity in "$@"
   do
@@ -81,7 +82,8 @@ install_configuration_files()
 
 setup_shell_completion()
 {
-  typeset _prefix="/etc" _mode _name
+  typeset _prefix _mode _name
+  _prefix="/etc"
 
   paths exists "${_prefix}/bash_completion.d" || return 0
 
@@ -100,7 +102,8 @@ setup_shell_completion()
 
 setup_profile_d()
 {
-  typeset _PATH="PATH=\"\${PATH}:${install_path}/bin:${install_path}/pkg/active/bin:${install_path}/pkg/active/sbin\""
+  typeset _PATH
+  _PATH="PATH=\"\${PATH}:${install_path}/bin:${install_path}/pkg/active/bin:${install_path}/pkg/active/sbin\""
 
   if user is root
   then
