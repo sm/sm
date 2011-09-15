@@ -2,57 +2,51 @@
 
 __sm.array.is.nonempty()
 {
-  typeset _name="${1}"
-  eval "(( \${#${_name}[@]} > 0 ))"
+  eval "(( \${#$1} > 0 ))"
 }
 
 __sm.array.is.empty()
 {
-  typeset _name="${1}"
-  eval "(( \${#${_name}[@]} == 0 ))"
+  eval "(( \${#$1} == 0 ))"
 }
 
 __sm.array.is.even()
 {
-  typeset _name="${1}"
-  eval "(( ( \${#${_name}[@]} % 2 ) == 0 ))"
+  eval "(( ( \${#$1} % 2 ) == 0 ))"
 }
 
 __sm.array.length()
 {
-  typeset _name="${1}" _length
-  eval "_length=\${#${_name}[@]}"
+  typeset _length
+  eval "_length=\${#$1}"
   printf ${_length}
 }
 
 __sm.array.last()
 {
-  typeset _name="${1}" _length _element
-  eval "_length=\${#${_name}[@]}"
-  eval "_element=\"\${${_name}[${_length}]}\""
-  printf "%{_element}"
+  typeset _element
+  eval "_element=\"\${$1[-1]}\""
+  printf "${_element}"
 }
 
 __sm.array.first()
 {
-  typeset _name="${1}" _element _length
-  eval "_length=\"\${#${_name}[@]}\""
-  (( _length )) || return 1
-  eval "_element=\"\${${_name}[${__sm_array_start}]}\""
+  typeset _element
+  eval "_element=\"\${$1[1]}\""
   printf "${_element}"
 }
 
 __sm.array.push()
 {
-  typeset _name="${1}"
+  typeset _name
+  _name="${1}"
   shift
-  if eval "(( \${#${_name}[@]} > 0 ))"
+  if eval "(( \${#${_name}} > 0 ))"
   then
-    typeset _element _elements=("$@")
+    (( $# )) || __sm.log.fail "No elements were given."
 
-    (( ${#_elements[@]} )) || __sm.log.fail "No elements were given."
-
-    for _element in "${_elements[@]}"
+    typeset _element
+    for _element in "$@"
     do
       eval "${_name}+=(\"\${_element}\")"
     done
@@ -61,13 +55,13 @@ __sm.array.push()
 
 __sm.array.append()
 {
-  typeset _name="${1}"
+  typeset _name
+  _name="${1}"
   shift
-  typeset _element _elements=("$@")
+  (( $# )) || __sm.log.fail "No elements were given."
 
-  (( ${#_elements[@]} )) || __sm.log.fail "No elements were given."
-
-  for _element in "${_elements[@]}"
+  typeset _element
+  for _element in "$@"
   do
     eval "${_name}+=(\"\${_element}\")}"
   done
@@ -75,7 +69,9 @@ __sm.array.append()
 
 __sm.array.pop()
 {
-  typeset _name="${1}" _variable="${2:-}" index
+  typeset _name _variable index
+  _name="${1}"
+  _variable="${2:-}"
   shift || __sm.log.fail "Array name was not given."
 
   eval "(( \${#${_name}[@]} ))" || __sm.log.fail "Array '${_name}' was empty."
@@ -96,7 +92,9 @@ __sm.array.pop()
 
 __sm.array.shift()
 {
-  typeset _name="${1:-}" index _variable="${2:-}"
+  typeset _name index _variable
+  _name="${1:-}"
+  _variable="${2:-}"
   shift || __sm.log.fail "Array name was not given."
 
   [[ -z "${_variable}" ]] || eval "${_variable}=\${${_name}[${__sm_array_start}]}"
@@ -109,27 +107,31 @@ __sm.array.shift()
 
 __sm.array.unshift()
 {
-  typeset _name="${1:-}"
+  typeset _name
+  _name="${1:-}"
   shift || __sm.log.fail "Array name was given."
 
   typeset _elements=("$@")
 
-  (( ${#_elements[@]} )) || __sm.log.fail "No elements were given."
+  (( $# )) || __sm.log.fail "No elements were given."
 
-  eval "${_name}=(\"${_elements[@]}\" \"\${${_name}[@]}\")"
+  eval "${_name}=(\"$@\" \"\${${_name}[@]}\")"
 }
 
 __sm.array.join()
 {
-  typeset _name="${1:-}"
+  typeset _name IFS
+  _name="${1:-}"
   shift || __sm.log.fail "Array name was not given."
-  typeset IFS=${1:-' '}
+  IFS=${1:-' '}
   eval "printf \"\${${_name}[*]}\""
 }
 
 __sm.array.largest()
 {
-  typeset _name="${1:-}" _index _largest=""
+  typeset _name _index _largest
+  _name="${1:-}"
+  _largest=""
   shift || __sm.log.fail "No array variable name was given."
 
   eval "
@@ -146,7 +148,10 @@ __sm.array.largest()
 
 __sm.array.sort()
 {
-  typeset _name="$1" _direction="${2:-"asc"}" _index _largest=""
+  typeset _name _direction _index _largest
+  _name="$1"
+  _direction="${2:-"asc"}"
+  _largest=""
   if [[ "${_direction}" == "desc" ]]
   then
     eval "${_name}=(\$(
@@ -161,7 +166,8 @@ __sm.array.sort()
 
 __sm.array.unique()
 {
-  typeset _name="${1:-}" _index _largest=""
+  typeset _name
+  _name="${1:-}"
   shift || __sm.log.fail "Array variable name was not given."
 
   eval "${_name}=(\$(
@@ -169,4 +175,3 @@ __sm.array.unique()
   awk -v RS=' ' -v ORS=' ' '!(\$0 in a){a[\$0];print}'
   ))"
 }
-

@@ -21,7 +21,11 @@ fetch_uri()
   trace_filter vcs
   fetch_error_initialize "$@"
 
-  typeset vcs_initial_pwd="$PWD" _uri="${1:-}" _target="${2:-}" _args=()
+  typeset vcs_initial_pwd _uri _target _args
+  vcs_initial_pwd="$PWD"
+  _uri="${1:-}"
+  _target="${2:-}"
+  _args=()
   shift || __sm.log.fail "uri must be specified as the first parameter."
   shift || __sm.log.fail "target path must be specified as the second parameter."
 
@@ -70,7 +74,10 @@ fetch_uri()
 #
 fetch_uris()
 {
-  typeset _uris=( "${1}" ) _target="${2:-}" _args=() _uri
+  typeset _uris _target _args _uri
+  _uris=( "${1}" )
+  _target="${2:-}"
+  _args=()
   shift || __sm.log.fail "uri must be specified as the first parameter."
   shift || __sm.log.fail "target path must be specified as the second parameter."
 
@@ -137,7 +144,8 @@ fetch_uri_parse_args()
 
 fetch_update()
 {
-  typeset _uri _target="${1:-}"
+  typeset _uri _target
+  _target="${1:-}"
   shift || __sm.log.fail "target path must be specified as the second parameter."
 
   if [[ -d "${_target}" ]] && [[ -s "${_target}/.uri" ]]
@@ -154,7 +162,10 @@ fetch_update()
 
 cli_fetch()
 {
-  typeset _uri="${1:-}" _target="${2:-}" _args=()
+  typeset _uri _target _args
+  _uri="${1:-}"
+  _target="${2:-}"
+  _args=()
   shift || __sm.log.error "uri must be specified as the first parameter."
   shift || __sm.log.error "target path must be specified as the second parameter."
   fetch_uri "${_uri}" "${_target}" --on-fail __sm.log.error "$@"
@@ -162,8 +173,8 @@ cli_fetch()
 
 cli_fetch_update()
 {
-  typeset _target="${1:-}"
+  typeset _target
+  _target="${1:-}"
   shift || __sm.log.error "target path must be specified as the second parameter."
   fetch_update "${_target}" --on-fail __sm.log.error "$@"
 }
-

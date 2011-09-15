@@ -2,7 +2,8 @@
 
 __sm.extension.actions.type()
 {
-  typeset _path="${action_path:-}"
+  typeset _path
+  _path="${action_path:-}"
 
   case "${action}" in
     (*\(\))
@@ -70,7 +71,8 @@ __sm.extension.actions.type()
 
 __sm.extension.modules.include()
 {
-  typeset _token _namespace=""
+  typeset _token _namespace
+  _namespace=""
 
   module_name="${extension}"
   __sm.module.include "$module_name"
@@ -88,31 +90,33 @@ __sm.extension.modules.include()
 __sm.extension.action.prerequisites()
 {
   trace_filter action_pre
-  typeset _pre _name _action="${action// *}" _extension="${extension// *}"
+  typeset _pre _name _action _extension
+  _action="${action// *}"
+  _extension="${extension// *}"
 
   _pre=(
-  ${_action}_cli
-  ${_action}_initialize
+    ${_action}_cli
+    ${_action}_initialize
   )
 
   __sm.string.contains "${_action%%_*}.cli" "${_pre[*]}" || _pre+=(
-  ${_action%%_*}_cli
-  ${_action%%_*}_initialize
+    ${_action%%_*}_cli
+    ${_action%%_*}_initialize
   )
 
   __sm.string.contains "${_extension}.cli" "${_pre[*]}" || _pre+=(
-  ${_extension}_cli
-  ${_extension}_initialize
+    ${_extension}_cli
+    ${_extension}_initialize
   )
 
   __sm.string.contains "__sm.${_action}.cli" "${_pre[*]}" || _pre+=(
-  __sm.${_action}.cli
-  __sm.${_action}.initialize
+    __sm.${_action}.cli
+    __sm.${_action}.initialize
   )
 
   __sm.string.contains "__sm.${_extension}.cli" "${_pre[*]}" || _pre+=(
-  __sm.${_extension}.cli
-  __sm.${_extension}.initialize
+    __sm.${_extension}.cli
+    __sm.${_extension}.initialize
   )
 
   for _name in ${_pre[@]}
@@ -128,7 +132,9 @@ __sm.extension.run()
 {
   trace_filter extension_run
 
-  typeset _type="${action_type:-}" _path="${action_path:-}" _namespaces
+  typeset _type _path _namespaces
+  _type="${action_type:-}"
+  _path="${action_path:-}"
 
   builtin cd "${initial_pwd}"
 

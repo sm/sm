@@ -2,7 +2,8 @@
 
 __sm.os.open()
 {
-  typeset _uri="${1:-}"
+  typeset _uri
+  _uri="${1:-}"
   shift || __sm.log.fail "Cannot open URI; No uri was given."
 
   if __sm.command.exists open
@@ -67,7 +68,8 @@ __sm.os.type.is()
 
 __sm.os.cpu.count()
 {
-  typeset _cpu_count=1
+  typeset _cpu_count
+  _cpu_count=1
 
   if __sm.os.type.is darwin
   then

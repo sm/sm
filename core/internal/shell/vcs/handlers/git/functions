@@ -7,9 +7,13 @@
 # Code Walkthrough
 git_get()
 {
-  typeset initial_pwd="$PWD" _uri="${1:-}" _final_target="${2:-}" \
-    branch=${3:-${branch:-master}} remote=${4:-${remote:-origin}} \
-    revision=${5:-${revision:-HEAD}}
+  typeset initial_pwd _uri _final_target branch remote revision _target _uri_https
+  initial_pwd="$PWD"
+  _uri="${1:-}"
+  _final_target="${2:-}"
+  branch=${3:-master}
+  remote=${4:-origin}
+  revision=${5:-HEAD}
 
   shift || __sm.log.fail "url must be the first parameter to git_get()."
   shift || __sm.log.fail "target path must be the second parameter to git_get()."
@@ -19,7 +23,7 @@ git_get()
     "Note that git can be installed from the tools extension set:\n"\
     "sm sets install vcs ; sm git install"
 
-  typeset _target="${scm_path}/$( scm_identifier "${_uri}" )"
+  _target="${scm_path}/$( scm_identifier "${_uri}" )"
 
   # v v v this looks slightly freakish... ~ Wayne
   _final_target=$(
@@ -70,7 +74,7 @@ git_get()
     then
       echo "${_uri}" > "${_target}/.uri"
     else
-      typeset _uri_https="${_uri/git:\/\//https://}"
+      _uri_https="${_uri/git:\/\//https://}"
       [[ "${_uri_https}" != "${_uri}" ]] || fetch_error cannot_clone uri="${_uri}"
       [[ -z "${__vcs_failed}" ]] || return 0
 

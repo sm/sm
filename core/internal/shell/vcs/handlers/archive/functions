@@ -7,9 +7,11 @@
 # Code Walkthrough
 archive_get()
 {
-  typeset _uri="${1:-}" _final_target="${2:-}" _package_md5="${3:-${md5:-#}}" \
-    _archive="${archives_path}/${_uri##*/}"
-
+  typeset _uri _final_target _package_md5 _archive
+  _uri="${1:-}"
+  _final_target="${2:-}"
+  _package_md5="${3:-${md5:-#}}"
+  _archive="${archives_path}/${_uri##*/}"
   shift || __sm.log.fail "uri must be specified as the first parameter."
   shift || __sm.log.fail "target path must be specified as the second parameter."
 

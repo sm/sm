@@ -2,7 +2,8 @@
 
 __sm.templates.find()
 {
-  typeset _extensions_path="$1" _extension _template_path _params_path
+  typeset _extensions_path _extension _template_path _params_path
+  _extensions_path="$1"
 
   shift || __sm.log.fail "No extensions path and extension name given."
 
@@ -67,9 +68,12 @@ __sm.templates.install()
 
 __sm.templates.seed()
 {
-  typeset _template="${1:-}"
+  typeset _template _hash _strings temporary
+  _template="${1:-}"
   shift || __sm.log.fail "No template name was given."
-  typeset _hash=("$@") _strings=() temporary=${_template}.${timestamp}.$$
+  _hash=("$@")
+  _strings=()
+  temporary=${_template}.${timestamp}.$$
 
   if ! files exist "${_template}"
   then
@@ -102,16 +106,19 @@ __sm.templates.seed()
 
 __sm.templates.update()
 {
-
-  typeset _template="${1:-}" _target="${2:-}"
+  typeset _template _target _incoming _hash _strings _variables
+  _template="${1:-}"
+  _target="${2:-}"
   shift || __sm.log.fail "Cannot update seed template;"\
     " Template name was not given as the first parameter."
   shift || __sm.log.fail "Cannot update seed template;"\
     " Template target was not given as the second parameter."
 
-  typeset  _incoming="${1:-${_target}.incoming}"
+  _incoming="${1:-${_target}.incoming}"
   shift || true
-  typeset _hash=("$@") _strings=() _variables="${_target}.var.$$"
+  _hash=("$@")
+  _strings=()
+  _variables="${_target}.var.$$"
 
   __sm.templates.exist "${_template}" || __sm.log.fail "Cannot update seed template;"\
     " No template was found matching '${_name}'."
@@ -134,4 +141,3 @@ __sm.templates.update()
 
   rm "${_variables}"
 }
-

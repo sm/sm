@@ -65,12 +65,7 @@ __sm.cache.map.modules.initialize()
     return 0
   fi
 
-  _modules=(
-  "${_modules_root}"/includes
-  "${_modules_root}"/*/includes
-  "${_modules_root}"/*/*/includes
-  "${_modules_root}"/*/*/*/includes
-  )
+  _modules=( "${_modules_root}"/**/includes )
 
   for _module_path in "${_modules[@]}"
   do
@@ -99,8 +94,10 @@ __sm.cache.map.modules.initialize()
 
 __sm.cache.map.find.matching()
 {
-  typeset _method="$1" _name="$2"
+  typeset _method _name _item
+  _method="$1"
   shift || __sm.log.fail "No method and action name was given for search"
+  _name="$1"
   shift || __sm.log.fail "No action name was given for search"
   for _item in "${_actions_cache[@]}"
   do

@@ -12,7 +12,8 @@ start_step()
 
 step()
 {
-  typeset name="$1"
+  typeset name
+  name="$1"
 
   shift || __sm.log.fail "Cannot take step as no step name given;"\
     "step [name] <- missing name."
@@ -51,6 +52,7 @@ retreat()
 
   while [[ -n "${steps_started}" ]]
   do
+    #TODO: use internal version
     array pop steps_started step
     if __sm.command.exists "fail_${step}"
     then

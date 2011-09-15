@@ -9,13 +9,16 @@ find_starting_action()
   shift || __sm.log.fail "Cannot detect extension existence;"\
     " No extension name was given."
 
-  typeset _action_params=("$@") _action_path _new_action_path
-  typeset _rest_params=() _param_temp _action_params_length
-
-  typeset _actions_root="${extensions_path}/${extension}/bin"
-  typeset _map="${extensions_path}/${extension}/map"
-  typeset _modules_root="${extensions_path}/${extension}/shell"
-  typeset _actions_cache=() _found_actions=()
+  typeset _action_params _action_path _new_action_path _rest_params \
+    _param_temp _action_params_length _actions_root _map _modules_root \
+    _actions_cache _found_actions _candidate
+  _action_params=("$@")
+  _actions_root="${extensions_path}/${extension}/bin"
+  _map="${extensions_path}/${extension}/map"
+  _modules_root="${extensions_path}/${extension}/shell"
+  _rest_params=()
+  _actions_cache=()
+  _found_actions=()
 
   __sm.cache.map.filesystem.initialize
   __sm.cache.map.actions.initialize
@@ -27,7 +30,6 @@ find_starting_action()
     _action_path="${_action_path// //}"
     if __sm.cache.map.find.matching starting "${_action_path}"
     then
-      typeset _candidate
       for _candidate in "${_found_actions[@]}"
       do
         _candidate="${_candidate%%=*}"
@@ -45,7 +47,8 @@ show_extension_names()
   shift || __sm.log.fail "no path given"
 
   #$1 is ignored == "unused"
-  typeset _patern=$2
+  typeset _patern extension
+  _patern=$2
   for extension in "${extensions_path}"/*
   do
     extension="${extension##*/}"
@@ -61,10 +64,11 @@ show_extension_names()
 extension_action_completion()
 {
   trace_filter action_completion
-  typeset _action_found=0 _extension_found=0 _extension_found_path cut_count last_char
-
+  typeset _action_found _extension_found _extension_found_path cut_count last_char _args
+  _action_found=0
+  _extension_found=0
   last_char="${extension_args:${#extension_args}-1:1}"
-  typeset _args=( ${extension_args} )
+  _args=( ${extension_args} )
 
   if [[ -n "${ZSH_VERSION}" ]];then unsetopt nullglob;else shopt -u nullglob;fi
   unset _args[${__sm_array_start}]

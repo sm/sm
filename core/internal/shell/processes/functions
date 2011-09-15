@@ -2,7 +2,8 @@
 
 __sm.process.lockfile.lock()
 {
-  typeset _lockfile="${1:-}"
+  typeset _lockfile
+  _lockfile="${1:-}"
   shift ||
     __sm.log.fail "No lockfile was specified as the first parameter."
 

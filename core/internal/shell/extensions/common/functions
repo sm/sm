@@ -2,7 +2,8 @@
 
 __sm.extension.path()
 {
-  typeset _path extension="${1:-}"
+  typeset _path extension
+  extension=$1
   shift || __sm.log.fail "Cannot process extension path;"\
     " No extension name was given."
 
@@ -19,7 +20,8 @@ __sm.extension.path()
 
 __sm.extension.is.valid()
 {
-  typeset _path="${1:-}"
+  typeset _path
+  _path="${1:-}"
   shift || __sm.log.fail "No extension path was given to check validity."
   [[ -n "${_path}" ]] || __sm.log.fail "Path to the extension was not given."
   [[ -d "${_path}/bin" || -d "${_path}/shell" ]]
@@ -37,7 +39,9 @@ __sm.extension.find()
 
 __sm.extension.sets.iterator()
 {
-  typeset _path="$1" _command="$2"
+  typeset _path _command
+  _path="$1"
+  _command="$2"
   shift 2
   "${_command}" "${_path}" "$@"
   return 1
@@ -45,7 +49,9 @@ __sm.extension.sets.iterator()
 
 __sm.extension.iterator()
 {
-  typeset _path="$1" _command="$2" _ext_path
+  typeset _path _command _ext_path
+  _path="$1"
+  _command="$2"
   shift 2
   for  _ext_path in "${_path}"/*
   do
@@ -61,7 +67,8 @@ __sm.extension.get.uri()
 
 __sm.extension.in()
 {
-  typeset _path="$1" _extension
+  typeset _path _extension
+  _path="$1"
 
   found_extensions=()
 

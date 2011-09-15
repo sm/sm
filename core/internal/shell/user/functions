@@ -9,7 +9,8 @@ user_initialize()
 
 __sm.user.home()
 {
-  typeset _user="$1" _line
+  typeset _user _line
+  _user="$1"
   NIY "Printing out User home, based on OS."
   if __sm.os.type.is darwin
   then
@@ -35,7 +36,8 @@ __sm.user.home()
 
 __sm.user.shell()
 {
-  typeset _user="$1" _line
+  typeset _user _line
+  _user="$1"
   NIY "Printing out User shell, based on OS."
   if __sm.os.type.is darwin
   then
@@ -62,20 +64,25 @@ __sm.user.shell()
 
 __sm.user.set.shell()
 {
-  typeset _user="$1" _value="$2"
+  typeset _user _value
+  _user="$1"
+  _value="$2"
   # validate via /etc/shells, lines starting with '^/'
   NIY "Setting user's shell."
 }
 
 __sm.user.set.home()
 {
-  typeset _user="$1" _value="$2"
+  typeset _user _value
+  _user="$1"
+  _value="$2"
   NIY "Setting user's home."
 }
 
 __sm.user.exists()
 {
-  typeset _name _rest IFS=:
+  typeset _name _rest IFS
+  IFS=:
   while read _name _rest
   do
     if [[ "${_name}" == "$1" ]]
@@ -96,7 +103,10 @@ __sm.user.create.unless.exists()
 
 __sm.user.add()
 {
-  typeset _user="$1" _group="$2" _flags=($3)
+  typeset _user _group _flags
+  _user="$1"
+  _group="$2"
+  _flags=( ${=3} )
 
   [[ -n "${_group}" ]] || _group="${_user}"
 
@@ -160,8 +170,10 @@ __sm.user.add()
 
 __sm.user.remove()
 {
-  typeset _user="$1" _flags=($2)
-  typeset ....
+  typeset _user _flags
+  _user="$1"
+  _flags=( ${=2} )
+
   (( UID == 0 )) || # root user has id 0
     __sm.log.fail "Users and groups may be manipulated only by the super-user (root), via su or sudo."
   (

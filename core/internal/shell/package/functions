@@ -2,8 +2,10 @@
 
 __sm.package.cli()
 {
-  typeset _ignored_args=() _package_args=( $@ ) _token
-  typeset number_of_args=${#_package_args[@]} index
+  typeset _ignored_args _package_args _token number_of_args index
+  _ignored_args=()
+  _package_args=( $@ )
+  number_of_args=${#_package_args[@]}
 
   for (( index=0 ; index < $number_of_args ; index++ ))
   do
@@ -88,7 +90,10 @@ __sm.package.cli()
 
 __sm.package.error()
 {
-  typeset _message="$1" _log="$2" _lines="${3:-50}"
+  typeset _message _log _lines
+  _message="$1"
+  _log="$2"
+  _lines="${3:-50}"
 
   if [[ -n ${_log} && -s "${_log}" ]]
   then # Append tail of __sm.log.error log to the __sm.log.error message.
@@ -170,7 +175,6 @@ __sm.package.define()
 __sm.package.configure.flags()
 {
   typeset _flag
-
   for _flag in "$@"
   do
     if ! __sm.string.contains "${_flag}" "${configure_flags[*]}"
@@ -182,7 +186,9 @@ __sm.package.configure.flags()
 
 __sm.package.configure.flag()
 {
-  typeset _key="$1" _value="$2"
+  typeset _key _value
+  _key="$1"
+  _value="$2"
 
   if ! __sm.string.contains.key "${_key}" "${configure_flags[*]}"
   then
@@ -193,7 +199,6 @@ __sm.package.configure.flag()
 __sm.package.make.flags()
 {
   typeset _flag
-
   for _flag in "$@"
   do
     if ! __sm.string.contains "${_flag}" "${make_flags[*]}"
@@ -206,7 +211,6 @@ __sm.package.make.flags()
 __sm.package.package_dependencies()
 {
   typeset _flag
-
   for _flag in "$@"
   do
     if ! __sm.string.contains "${_flag}" "${package_dependencies[*]}"
@@ -557,7 +561,8 @@ __sm.package.fetch()
 {
   (( $# == 0 )) || __sm.package.cli $@
 
-  typeset _args=()
+  typeset _args _entries
+  _args=()
 
   true \
     "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
@@ -576,7 +581,7 @@ __sm.package.fetch()
 
   [[ -d "${source_path}/${package_dir}/${package_dir}" ]] || return 0
 
-  typeset _entries=( "${source_path}/${package_dir}/${package_dir}"/*  )
+  _entries=( "${source_path}/${package_dir}/${package_dir}"/*  )
   mv "${_entries[@]}" "${source_path}/${package_dir}/"
 
   rm -rf "${source_path}/${package_dir}/${package_dir}/"
@@ -687,7 +692,8 @@ __sm.package.activate()
 
 __sm.package.setup()
 {
-  typeset _package="${1:-${package_name}}"
+  typeset _package
+  _package="${1:-${package_name}}"
 
   __sm.package.profile.d "${_package}"
 
@@ -721,7 +727,9 @@ __sm.package.deactivate()
 
 __sm.package.activate.first()
 {
-  typeset _package="${1:-}" _version="${2:-}"
+  typeset _package _version
+  _package="${1:-}"
+  _version="${2:-}"
   shift || __sm.log.fail "Package name must be given as first parameter."
   shift || __sm.log.fail "Package version must be given as second parameter."
 
@@ -735,7 +743,9 @@ __sm.package.activate.first()
 
 __sm.package.ldconfig()
 {
-  typeset _package="${1:-${package_name}}" _path _files _ldconfig="/sbin/ldconfig"
+  typeset _package _path _files _ldconfig
+  _package="${1:-${package_name}}"
+  _ldconfig="/sbin/ldconfig"
   [[ -n "${_package}" ]] || __sm.log.fail "Package name must be given."
 
   #  paths exist "${packages_path}/versions/${_package}/active/lib" ||
@@ -776,7 +786,8 @@ __sm.package.ldconfig()
 
 __sm.package.profile.d()
 {
-  typeset _package="${1:-${package_name}}"
+  typeset _package
+  _package="${1:-${package_name}}"
   [[ -n "${_package}" ]] || __sm.log.fail "Package name must be given."
 
   templates exist "profile.d.template" || return 0
@@ -814,9 +825,9 @@ __sm.package.patch()
   typeset _patches _patch _path _paths
 
   _paths=(
-  "${extension_patches_path}"
-  "${extension_patches_path}/$(os type)"
-  "${extension_patches_path}/$(os type)/${package_version}"
+    "${extension_patches_path}"
+    "${extension_patches_path}/$(os type)"
+    "${extension_patches_path}/$(os type)/${package_version}"
   )
 
   for _path in "${_paths[@]}"
@@ -833,7 +844,8 @@ __sm.package.patch()
 
 __sm.package.patches.apply()
 {
-  typeset _patch _patches=("$@")
+  typeset _patch _patches
+  _patches=("$@")
   shift || __sm.log.fail "No patches were given."
 
   for _patch in "${_patches[@]}"
@@ -845,10 +857,12 @@ __sm.package.patches.apply()
 
 __sm.package.is.active()
 {
-  typeset _name="${1:-}" _version="${2:-}"
+  typeset _name _version _path
+  _name="${1:-}"
+  _version="${2:-}"
   shift || __sm.log.fail "No package name was given, or name is empty."
 
-  typeset _path="${packages_path}/versions/${_name}"
+  _path="${packages_path}/versions/${_name}"
 
   if shift
   then # version was passed
@@ -870,7 +884,9 @@ __sm.package.website()
 
 __sm.package.dependencies()
 {
-  typeset dependency _dependencies=(${package_dependencies[@]}) _missing_dependencies=()
+  typeset dependency _dependencies _missing_dependencies IFS
+  _dependencies=(${package_dependencies[@]})
+  _missing_dependencies=()
 
   unset package_dependencies
 
@@ -885,7 +901,7 @@ __sm.package.dependencies()
 
   if [[ -n "${_missing_dependencies}" ]]
   then
-    typeset IFS=','
+    IFS=','
     __sm.log.error "${extension} requires ${_missing_dependencies[*]}.\n
 Please install via sm package module, and retry. Typically, this can be done as follows:\n
 \tsm ${_missing_dependencies[*]} package install\n"
@@ -896,7 +912,8 @@ __sm.package.info()
 {
   (( $# == 0 )) || __sm.package.cli $@
 
-  typeset _installed _path="${packages_path}/versions/${package_name}" package_md5
+  typeset _installed _path package_md5 _installed
+  _path="${packages_path}/versions/${package_name}"
 
   true "${package_dir:="${package_name}-${package_version}"}" \
     "${package_url:="${package_base_url}/${package_file}"}"
@@ -906,7 +923,7 @@ __sm.package.info()
   log "package_name: ${package_name}"
   if paths exist "${_path}"
   then
-    typeset _installed=($( __sm.package.versions.installed ${package_name} ${package_version} ))
+    _installed=($( __sm.package.versions.installed ${package_name} ${package_version} ))
     log "  versions_installed: ${_installed[*]}"
   else
     log "  versions_installed: none"
@@ -957,10 +974,9 @@ __sm.packages.installed()
 
 __sm.packages.active()
 {
-  typeset _name="${1:-}"
-  if [[ -n "${_name}" ]]
+  if [[ -n "$1" ]]
   then
-    versionedfs active path "${packages_path}" name "${_name}"
+    versionedfs active path "${packages_path}" name "$1"
   else
     versionedfs active path "${packages_path}"
   fi
@@ -973,7 +989,8 @@ __sm.packages.available()
 
 __sm.packages.list()
 {
-  typeset _action="${1:-}" _args
+  typeset _action _args
+  _action="${1:-}"
   shift || true
   __sm.packages.${_action:-installed} "$@"
 }

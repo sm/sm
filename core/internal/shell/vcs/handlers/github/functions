@@ -12,12 +12,15 @@ internal_vcs_handlers_github_initialize()
 # Code Walkthrough
 github_get()
 {
-  typeset _uri="${1:-}" _target="${2:-}" branch=${3:-${branch:-master}}
+  typeset _uri _target branch save_fetch_error_handler
+  _uri="${1:-}"
+  _target="${2:-}"
+  branch=${3:-${branch:-master}}
 
   shift || __sm.log.fail "uri must be specified as the first parameter."
   shift || __sm.log.fail "target path must be specified as the second parameter."
 
-  typeset save_fetch_error_handler="${fetch_error_handler}"
+  save_fetch_error_handler="${fetch_error_handler}"
   fetch_error_handler=true
 
   for _method in ${github_resolution_order[@]}

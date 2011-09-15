@@ -9,8 +9,8 @@ services_avilable()
 __sm.services.list()
 services_list()
 {
-  typeset _action="${1:-}" _args
-
+  typeset _action _args
+  _action="${1:-}"
   shift || true
 
   case "${_action}" in

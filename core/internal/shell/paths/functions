@@ -29,31 +29,30 @@ __sm.paths.move()
 
 __sm.paths.enter()
 {
-  typeset _path="$1"
-  [[ -d "${_path}" ]] || __sm.log.fail "Path '${_path}' does not exist."
-  builtin cd "${_path}" ||
-    __sm.log.fail "Could not cd into the given path '${_path}'; "\
+  [[ -d "$1" ]] || __sm.log.fail "Path '$1' does not exist."
+  builtin cd "$1" ||
+    __sm.log.fail "Could not cd into the given path '$1'; "\
       "'cd' command failed with __sm.log.error code '$?'."
 }
 
 __sm.paths.exists()
 {
-  typeset _path="${1}"
-  [[ -d "$_path" ]]
+  [[ -d "$1" ]]
 }
 
 #
 __sm.paths.join()
 {
-  typeset IFS='/'
+  typeset IFS
+  IFS='/'
   printf "$*"
 }
 
 __sm.paths.expand()
 {
-  typeset _path="$1"
-  [[ -d "${_path}" ]] || __sm.log.fail "Path '${_path}' does not exist."
-  ( builtin cd "${_path}" ; echo $PWD )
+  #TODO: replace with ${1:A}
+  [[ -d "$1" ]] || __sm.log.fail "Path '$1' does not exist."
+  ( builtin cd "$1" ; echo $PWD )
 }
 
 __sm.paths.create()
@@ -78,12 +77,11 @@ __sm.paths.create()
 
 __sm.paths.remove()
 {
-  typeset _path _paths=("$@")
-
   removed_paths=()
   nonexistant_paths=()
 
-  for _path in "${_paths[@]}"
+  typeset _path
+  for _path in "$@"
   do
     if [[ -L "${_path}" ]]
     then
@@ -128,8 +126,11 @@ __sm.paths.copy()
 __sm.paths.chown()
 {
   trace_filter filesystem
-  typeset _identity="$1" _flags="$2" _path _command
+  typeset _identity _flags _path _command
+  _identity="$1"
+  _flags="$2"
   shift 2
+
   for _path in "$@"
   do
     [[ -n "${_path}" ]] || continue
@@ -148,8 +149,11 @@ __sm.paths.chown()
 __sm.paths.chmod()
 {
   trace_filter filesystem
-  typeset _mode="$1" _flags="$2"
+  typeset _mode _flags
+  _mode="$1"
+  _flags="$2"
   shift 2
+
   for _path in "$@"
   do
     if [[ ! -d "${_path}" ]]
@@ -168,7 +172,8 @@ __sm.paths.chmod()
 
 __sm.paths.in()
 {
-  typeset _path="${1:-}"
+  typeset _path
+  _path="${1:-}"
   shift  || __sm.log.fail "Path was not given!"
   [[ -d "${_path}" ]] || __sm.log.fail "'${_path}' is not a path!"
 
@@ -182,20 +187,21 @@ __sm.paths.in()
 
 __sm.paths.within()
 {
-  typeset _path _paths=("$@")
+  typeset _path
 
   while read -r _path
   do
     [[ -d "${_path}" ]] || continue
     __sm.paths.within "${_path}"
-  done < <(__sm.paths.in "${_paths[@]}")
+  done < <(__sm.paths.in "$@")
 }
 
 __sm.paths.search()
 {
-  typeset _glob="$1"
+  typeset _glob
+  _glob="$1"
   shift
-  _paths=("$@")
+  _path=("$@")
 
   [[ -n "${_glob}" ]] || __sm.log.fail "'${_path}' is not a path!"
   [[ -d "${_path}" ]] || __sm.log.fail "'${_path}' is not a directory!"
@@ -205,11 +211,14 @@ __sm.paths.search()
     [[ "${_line}" == ${_glob} ]] || continue
     echo "${_line}"
   done < <(paths in "${_path}")
+  #TODO: WTF ^ why using api in internal
 }
 
 __sm.paths.absolute()
 {
-  typeset _path _paths=("$@") _recorded_path=$PWD
+  #TODO: replace with ${1:A} ?
+  typeset _path _recorded_path
+  _recorded_path=$PWD
 
   for _path in "$@"
   do
