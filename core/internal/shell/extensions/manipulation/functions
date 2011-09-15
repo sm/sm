@@ -2,7 +2,7 @@
 
 extension_version()
 {
-  local _extension="${1:-}"
+  typeset _extension="${1:-}"
   shift || __sm.log.fail "Cannot retrieve extension version;"\
     " No extension was given."
   true ${extension_path:="${extensions_path}/${_extension}"}
@@ -40,7 +40,7 @@ extension_version()
 #     limitations under the License.
 extension_license()
 {
-  local _extension="${1:-${extension}}"
+  typeset _extension="${1:-${extension}}"
 
   variable_is_nonempty _extension ||
     __sm.log.fail "Cannot display extension license;"\
@@ -64,7 +64,7 @@ extension_license()
 __sm.extension.actions()
 {
   NIY
-  local _extension="${1:-}" _files _file _actions=()
+  typeset _extension="${1:-}" _files _file _actions=()
   shift || __sm.log.fail "No extension was given."
   [[ -d "${extension_bin_path}" ]] || return 0
   #TODO: build actions cache and use it to display actions
@@ -77,23 +77,23 @@ __sm.extension.actions()
 #
 __sm.extension.install()
 {
-  local _name="${1:-}"
+  typeset _name="${1:-}"
   shift || __sm.log.fail "No extension name was given."
 
-  local _uri="${1:-}"
+  typeset _uri="${1:-}"
   shift || true
   [[ -n "${_uri}" ]] || _uri=$( __sm.extension.get.uri "${_name}" )
 
   [[ -n "${_uri}" ]] ||
     __sm.log.error "uri not given and cannot find ${_name} in known extensions."
 
-  local _version="head"
+  typeset _version="head"
   if [[ "${_name}" == *:* ]]
   then
     _version="${_name/*:}"
   fi
 
-  local _identifier="$(scm_identifier "${_uri}")"
+  typeset _identifier="$(scm_identifier "${_uri}")"
 
   if fetch_uri "${_uri}" "${src_path}/${_identifier}" "$@"
   then
@@ -118,7 +118,7 @@ __sm.extension.install()
 
 __sm.extension.installed()
 {
-  local _token _type _modules _paths=() _excludes=() _exclude
+  typeset _token _type _modules _paths=() _excludes=() _exclude
 
   args="$*"
 

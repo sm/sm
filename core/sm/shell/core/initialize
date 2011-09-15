@@ -111,6 +111,8 @@ fi
 
 export sm_path __sm_modules_path initial_pwd extension_action_calls=0
 
+zmodload zsh/parameter
+
 # Load module() function, then load core modules.
 source "${sm_path}/core/sm/shell/core/functions"
 source "${sm_path}/core/sm/shell/string/functions"

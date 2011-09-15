@@ -4,7 +4,7 @@
 # ## modules\_installed()
 modules_installed()
 {
-  local _module
+  typeset _module
   for _module in "${__sm_modules_path}"/*
   do
     [[ -d "${_module}" ]] || continue
@@ -14,12 +14,12 @@ modules_installed()
 
 module_functions()
 {
-  local _function _functions _modules="${@:-}"
+  typeset _function _functions _modules="${@:-}"
 
   [[ -n "${_modules}" ]] ||
     __sm.log.fail "Cannot print the functions for module(s); No module names given."
 
-  local _path="${__sm_modules_path}/${_module}"
+  typeset _path="${__sm_modules_path}/${_module}"
 
   _functions=($(
   find "${_path}" -mindepth 1 -maxdepth 1 -name functions -type f -print0 |
@@ -35,7 +35,7 @@ module_functions()
 
 modules_list()
 {
-  local _module _modules _function _functions
+  typeset _module _modules _function _functions
 
   for language in shell ruby
   do
@@ -54,7 +54,7 @@ modules_list()
 
 module_docs()
 {
-  local _function _functions _module content_flag table_flag
+  typeset _function _functions _module content_flag table_flag
 
   while (( $# > 0 ))
   do
@@ -83,7 +83,7 @@ module_docs()
     __sm.log.fail "Cannot generate documentation for '${_module}';"\
       " 'pygmentize' was not found in the PATH, install pygmentize and try again."
 
-  local _path="${core_development_path}/shell/${_module}"
+  typeset _path="${core_development_path}/shell/${_module}"
   if (( content_flag == 1 ))
   then
     shocco "${_path}/functions" |
@@ -102,9 +102,9 @@ modules_docgen()
   # TODO: Replace with,
   # for file in modules/*/functions ; do (name=${file%%\/functions}; shocco $file > html/${name//*\/}.html)& done ; wait
 
-  local _module _function _functions _name
-  local _prefix="${core_development_path}/html/shell"
-  local _path="${site_development_path}"
+  typeset _module _function _functions _name
+  typeset _prefix="${core_development_path}/html/shell"
+  typeset _path="${site_development_path}"
 
   if [[ -n "${core_development_path}" ]]
   then
@@ -170,9 +170,9 @@ modules_site_docgen()
   # TODO: Replace with,
   # for file in modules/*/functions ; do (name=${file%%\/functions}; shocco $file > html/${name//*\/}.html)& done ; wait
 
-  local _module _function _functions _name _file
-  local _prefix="${core_development_path}/html/shell"
-  local _path="${site_development_path}"
+  typeset _module _function _functions _name _file
+  typeset _prefix="${core_development_path}/html/shell"
+  typeset _path="${site_development_path}"
 
   paths exists "${core_development_path}" ||
     __sm.log.fail "Set core_development_path in ~/.smrc, to run docgen."

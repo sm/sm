@@ -9,8 +9,8 @@ extension()
 {
   trace_filter extensions
 
-  local _command _params=() _name _uri
-  local __extension_commands=(
+  typeset _command _params=() _name _uri
+  typeset __extension_commands=(
     "in extension sets do=extension sets iterator"
     "in extensions do=extension iterator"
     "read known uri=get uri"

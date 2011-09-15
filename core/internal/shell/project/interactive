@@ -31,7 +31,7 @@ export projects_path
 #
 p()
 {
-  local _path regex1 regex2
+  typeset _path regex1 regex2
 
   if [[ -n "${BASH_VERSION}" && "$PS4" = "+ " ]]
   then

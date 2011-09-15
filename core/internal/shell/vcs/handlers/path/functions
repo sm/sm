@@ -10,7 +10,7 @@
 # Code Walkthrough
 path_get()
 {
-  local initial_pwd="$PWD" _source="${1:-}" _target="${2:-}"
+  typeset initial_pwd="$PWD" _source="${1:-}" _target="${2:-}"
 
   shift || __sm.log.fail "source path must be the first parameter to path_get()."
   shift || __sm.log.fail "target path must be the second parameter to path_get()."

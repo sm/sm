@@ -2,7 +2,11 @@
 
 __sm.paths.move()
 {
-  local _source="$1" _target="$2" _mode="$3" _owner="$4"
+  typeset _source _target _mode _owner
+  _source="$1"
+  _target="$2"
+  _mode="$3"
+  _owner="$4"
 
   mv "${_source}" "${_target}" ||
     __sm.log.fail "Could not move '${_source}' to '${_target}',"\
@@ -23,32 +27,9 @@ __sm.paths.move()
   fi
 }
 
-__sm.paths.copy()
-{
-  local _source="$1" _target="$2" _mode="$3" _owner="$4"
-
-  cp -Rf "${_source}" "${_target}" ||
-    __sm.log.fail "Could not copy '${_source}' to '${_target}',"\
-      "as the 'cp' command failed with __sm.log.error code '$?'."
-
-  if [[ -n "${_mode}" ]]
-  then
-    chmod -R "${_mode}" "${_target}" ||
-    __sm.log.fail "Could not recursively change mode of '${_target}' to"\
-    "${_mode}, as the 'chmod -R' command failed with __sm.log.error code '$?'."
-  fi
-
-  if [[ -n "${_owner}" ]]
-  then
-    chown -R "${_owner}" "${_target}" ||
-    __sm.log.fail "Could not recursively change ownership of '${_target}' to"\
-    "${_owner}, as the 'chown -R' command failed with __sm.log.error code '$?'."
-  fi
-}
-
 __sm.paths.enter()
 {
-  local _path="$1"
+  typeset _path="$1"
   [[ -d "${_path}" ]] || __sm.log.fail "Path '${_path}' does not exist."
   builtin cd "${_path}" ||
     __sm.log.fail "Could not cd into the given path '${_path}'; "\
@@ -57,29 +38,28 @@ __sm.paths.enter()
 
 __sm.paths.exists()
 {
-  local _path="${1}"
+  typeset _path="${1}"
   [[ -d "$_path" ]]
 }
 
 #
 __sm.paths.join()
 {
-  local IFS='/'
+  typeset IFS='/'
   printf "$*"
 }
 
 __sm.paths.expand()
 {
-  local _path="$1"
+  typeset _path="$1"
   [[ -d "${_path}" ]] || __sm.log.fail "Path '${_path}' does not exist."
   ( builtin cd "${_path}" ; echo $PWD )
 }
 
 __sm.paths.create()
 {
-  local _path _paths=("$@")
-
-  for _path in "${_paths[@]}"
+  typeset _path
+  for _path in "$@"
   do
     if [[ -d "${_path}" ]] || [[ -L "${_path}" && -d "$(readlink "${_path}")" ]]
     then
@@ -98,7 +78,7 @@ __sm.paths.create()
 
 __sm.paths.remove()
 {
-  local _path _paths=("$@")
+  typeset _path _paths=("$@")
 
   removed_paths=()
   nonexistant_paths=()
@@ -124,13 +104,14 @@ __sm.paths.remove()
 
 __sm.paths.copy()
 {
-  local _target="$1" _flags="$2" _path
+  typeset _target _flags _path
+  _target="$1"
+  _flags="$2"
   shift 2
-  local _paths=("$@")
 
   __sm.paths.create "${_target}"
 
-  for _path in "${_paths[@]}"
+  for _path in "$@"
   do
     if [[ ! -d "${_path}" ]]
     then
@@ -147,7 +128,7 @@ __sm.paths.copy()
 __sm.paths.chown()
 {
   trace_filter filesystem
-  local _identity="$1" _flags="$2" _path _command
+  typeset _identity="$1" _flags="$2" _path _command
   shift 2
   for _path in "$@"
   do
@@ -167,7 +148,7 @@ __sm.paths.chown()
 __sm.paths.chmod()
 {
   trace_filter filesystem
-  local _mode="$1" _flags="$2"
+  typeset _mode="$1" _flags="$2"
   shift 2
   for _path in "$@"
   do
@@ -187,7 +168,7 @@ __sm.paths.chmod()
 
 __sm.paths.in()
 {
-  local _path="${1:-}"
+  typeset _path="${1:-}"
   shift  || __sm.log.fail "Path was not given!"
   [[ -d "${_path}" ]] || __sm.log.fail "'${_path}' is not a path!"
 
@@ -201,7 +182,7 @@ __sm.paths.in()
 
 __sm.paths.within()
 {
-  local _path _paths=("$@")
+  typeset _path _paths=("$@")
 
   while read -r _path
   do
@@ -212,7 +193,7 @@ __sm.paths.within()
 
 __sm.paths.search()
 {
-  local _glob="$1"
+  typeset _glob="$1"
   shift
   _paths=("$@")
 
@@ -228,7 +209,7 @@ __sm.paths.search()
 
 __sm.paths.absolute()
 {
-  local _path _paths=("$@") _recorded_path=$PWD
+  typeset _path _paths=("$@") _recorded_path=$PWD
 
   for _path in "$@"
   do

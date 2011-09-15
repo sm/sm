@@ -39,7 +39,7 @@
 #
 log()
 {
-  local _token _command _message=()
+  typeset _token _command _message=()
 
   while (( $# ))
   do
@@ -49,7 +49,7 @@ log()
         _command="${_token}"
         ;;
       (*)
-        _message+=("$@{_token}")
+        _message+=("${_token}")
         ;;
     esac
   done
@@ -117,14 +117,14 @@ trace_filter()
   then
     if [[ -n "${BASH_VERSION}" ]]
     then
-      __sm.log.trace.filter start $state "${FUNCNAME[1]}=$1"
+      __sm.log.trace.filter start "$state" "${FUNCNAME[1]}=$1"
     elif [[ -n "${ZSH_VERSION}" ]]
     then
-      true # no-op for now
-      #__sm.log.trace.filter start $state "${funcstack[2]}=$1"
+      #true # no-op for now
+      __sm.log.trace.filter start "$state" "${funcstack[2]}=$1"
     fi
   else
-    __sm.log.trace.filter stop $state "${__sm_trace_filter_stack[@]}"
+    __sm.log.trace.filter stop "$state" "${__sm_trace_filter_stack[@]}"
   fi
 }
 
@@ -179,10 +179,13 @@ backtrace()
 {
   trace_filter backtrace # backtrace is disabled by default.
 
-  local _separator _columns _stack _trace _message _flag _source _function _line \
+  typeset _separator _columns _stack _trace _message _flag _source _function _line \
     _index _largest _format _digits _longest _string \
-    _source_length=20 _function_length=20 _digits=1
+    _source_length _function_length _digits
 
+  _source_length=20
+  _function_length=20
+  _digits=1
 
   _columns=$(tput cols 2>/dev/null || echo 80)
   printf -v _separator '%*s' "${_columns:-${COLUMNS:-80}}"
@@ -286,7 +289,7 @@ backtrace()
     setopt extendedglob
     _stack=(${funcstack[@]})
     _trace=(${functrace[@]})
-    for (( _index=0 ; _index < ${#_stack[@]} ; _index++ ))
+    for (( _index=1 ; _index < ${#_stack} ; _index++ ))
     do
       _string=${functrace[${_index}]}
       _string="${_string%:*}"
@@ -361,14 +364,18 @@ backtrace()
     done
   fi
 
-  [[ "${_flag}" != "no_exit" ]] || return 0
-
-  __sm.seppuku
+  if [[ "${_flag}" == "no_exit" ]]
+  then
+    trace_filter
+  else
+    __sm.seppuku
+  fi
 }
 
 __sm.log.step()
 {
-  local _message="${1:-}" _output _log_file _status
+  typeset _message _output _log_file _status
+  _message="${1:-}"
 
   if (( $# > 1 ))
   then
@@ -405,7 +412,7 @@ __sm.log.todo()
 {
   if (( debug_flag )) && __sm.log.options.check "$debug_flags" "todo"
   then
-    local file="${BASH_SOURCE[2]}" line="${BASH_LINENO[1]}"
+    typeset file="${BASH_SOURCE[2]}" line="${BASH_LINENO[1]}"
     printf "DEBUG todo: ${file##${sm_path}\/}:${line}:\n"
     printf "$*" | xargs -s 72 | xargs -I {} printf "DEBUG todo: # {}\n"
   else
@@ -470,7 +477,8 @@ __sm.set.ps4()
 
 __sm.log.trace.filter()
 {
-  local _action="$1" old _name
+  typeset old _name _action
+  _action="$1"
   shift || __sm.log.fail "Filter action {start,stop} must be specified."
 
   case "${_action}" in
@@ -478,7 +486,7 @@ __sm.log.trace.filter()
       __sm_trace_filter_stack=( "$1" "${__sm_trace_filter_stack[@]}" )
       ;;
     stop)
-      old="${__sm_trace_filter_stack[${__sm_array_start}]}"
+      old="${__sm_trace_filter_stack[__sm_array_start]}"
       old="${old%%=*}"
 
       if [[ -n "${BASH_VERSION}" ]]
@@ -538,7 +546,7 @@ __sm.log.warn()
 
 __sm.log.debug()
 {
-  local type="$1"
+  typeset type="$1"
   shift || __sm.log.fail "Debug type must be given as the first parameter."
 
   if (( debug_flag )) && __sm.log.options.check "$debug_flags" "$type"
@@ -558,7 +566,7 @@ __sm.log.debug()
 
 __sm.log.search()
 {
-  local name="${1:-}" value="${2:-}"
+  typeset name="${1:-}" value="${2:-}"
   shift || __sm.log.fail "name must be given as the first parameter."
   shift || __sm.log.fail "value must be given as the second parameter."
 
@@ -578,7 +586,7 @@ __sm.actions.call()
 
 __sm.actions.source()
 {
-  local script="$1"
+  typeset script="$1"
   shift || __sm.log.fail "No script was given as the first parameter."
   [[ -r "$script" ]] || __sm.log.fail "Could not find script to run: $script."
   trace_filter action
@@ -587,7 +595,7 @@ __sm.actions.source()
 
 __sm.debug.variables.callback()
 {
-  local _variable ction_stack
+  typeset _variable ction_stack
 
   if [[ -n "${BASH_VERSION}" ]]
   then
@@ -624,7 +632,7 @@ __sm.debug.variables.callback()
 
 __sm.debug.variables.callback.initialize()
 {
-  local _variable
+  typeset _variable
   for _variable in "${var_debug_flags[@]}"
   do
     eval "
@@ -648,7 +656,9 @@ __sm.seppuku()
 
 __sm.log.piece()
 {
-  local _message="${1:-}" _unicode=0
+  typeset _message _unicode
+  _message="${1:-}"
+  _unicode=0
   true ${LINES:=$(tput cols)}
 
   if [[ -z "${LANG:-}" || "${LANG}" = *UTF* || "${LANG}" = *utf8* ]]
@@ -703,7 +713,7 @@ __sm.log.piece()
 
 __sm.tmp.logs.clean()
 {
-  local _log
+  typeset _log
   [[ -d "${TMP_PATH:-/tmp}"/$$/logs ]] || return 0
   for _log in "${TMP_PATH:-/tmp}"/$$/logs/*.err.log
   do
@@ -724,7 +734,7 @@ __sm.log.options.check()
 
 __sm.log.rotate()
 {
-  local _file="${1:-}"
+  typeset _file="${1:-}"
   shift || __sm.log.fail "Cannot rotate a log file, as no log file was given."
 
   timestamp="$( date +"%Y-%m-%dT%H:%M:%S" )"
@@ -732,7 +742,7 @@ __sm.log.rotate()
   verbose "Tailing the file in a background process into a tail logfile."
   ( tail -n 0 -f "${_file}" > ${file}.$$.log )&
 
-  local _tail_pid=$!
+  typeset _tail_pid=$!
 
   verbose "Copying the file's contents into a new timestamped file."
   cp "${_file}" "${_file}.${timestamp}"
@@ -755,7 +765,7 @@ __sm.log.rotate()
 
 __sm.log.streams()
 {
-  local _command="${1:-}" _prefix _err _out _mix
+  typeset _command="${1:-}" _prefix _err _out _mix
 
   # TODO: allow specification of path, name prefix
   while (( $# > 0 ))

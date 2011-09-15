@@ -44,19 +44,20 @@ __sm.string.ends()
 
 __sm.string.number.of.words()
 {
-  local __words=( $1 )
-  printf "${#__words[@]}\n"
+  printf "${=#__words}\n"
 }
 
 __sm.string.to.function.name()
 {
-  local __string=( $@ ) IFS="."
+  typeset __string IFS
+  __string=( $@ )
+  IFS="."
   printf "${__string[*]}\n"
 }
 
 __sm.string.ematch()
 {
-  local _value="$1" _regex="$2" _result
+  typeset _value="$1" _regex="$2" _result
 
   # Use grep for extended regexp.
   echo "${_value}" | grep -qE "${_regex}"

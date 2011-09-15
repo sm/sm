@@ -2,7 +2,7 @@
 
 __sm.files.source()
 {
-  local _file _files=("$@")
+  typeset _file _files=("$@")
   shift || __sm.log.fail "Cannot source files; No files were given."
 
   for _file in "${_files[@]}"
@@ -22,7 +22,7 @@ __sm.files.source()
 
 __sm.files.nonempty()
 {
-  local _file _files=("$@")
+  typeset _file _files=("$@")
 
   for _file in "${_files[@]}"
   do
@@ -36,7 +36,7 @@ __sm.files.nonempty()
 
 __sm.files.empty()
 {
-  local _file _files=("$@")
+  typeset _file _files=("$@")
 
   for _file in "${_files[@]}"
   do
@@ -51,7 +51,7 @@ __sm.files.empty()
 __sm.files.remove()
 {
   # TODO: add 'from' parameter
-  local _file _files=("$@")
+  typeset _file _files=("$@")
   shift || __sm.log.fail "Cannot remove files, as no files were given to remove."
 
   for _file in "${_files[@]}"
@@ -78,7 +78,7 @@ __sm.files.remove()
 __sm.files.create()
 {
   trace_filter filesystem
-  local _file _path _files=("$@")
+  typeset _file _path _files=("$@")
   shift || __sm.log.fail "Cannot ensure files exist; No files were given."
 
   for _file in "${_files[@]}"
@@ -96,7 +96,7 @@ __sm.files.create()
 
 __sm.files.link()
 {
-  local _source="$1" _target="$2" _flags=(${3:-}) _path
+  typeset _source="$1" _target="$2" _flags=(${3:-}) _path
 
   _path="${_target%\/*}"
   if [[ -n "${_path}" ]]
@@ -111,9 +111,9 @@ __sm.files.link()
 
 __sm.files.move()
 {
-  local _source="$1" _target="$2" _flags=($3) #_mode="$4" _owner="$5"
+  typeset _source="$1" _target="$2" _flags=($3) #_mode="$4" _owner="$5"
   shift 3
-  local _file _files=("$@")
+  typeset _file _files=("$@")
 
   if [[ -n "${_files}" ]]
   then
@@ -209,9 +209,9 @@ __sm.files.move()
 
 __sm.files.copy()
 {
-  local _source="$1" _target="$2" _flags=($3)
+  typeset _source="$1" _target="$2" _flags=($3)
   shift 3
-  local _file _files=("$@")
+  typeset _file _files=("$@")
 
   if [[ -n "${_files[*]}" ]]
   then
@@ -230,9 +230,9 @@ __sm.files.copy()
 
 __sm.files.chown()
 {
-  local _owner="$1" _flags=($2)
+  typeset _owner="$1" _flags=($2)
   shift 2
-  local _file _files=("$@")
+  typeset _file _files=("$@")
   chown ${_flags[@]} "${_owner}" "${_files[@]}" ||
     __sm.log.fail "There was an error ($?) chowning"\
     " files '${_files[@]}' owner to '${_owner}'."
@@ -240,9 +240,9 @@ __sm.files.chown()
 
 __sm.files.chmod()
 {
-  local _mode="$1" _flags=($2)
+  typeset _mode="$1" _flags=($2)
   shift 2
-  local _file _files=("$@")
+  typeset _file _files=("$@")
 
   if ! chmod ${_flags[@]} ${_mode} "${_files[@]}"
   then
@@ -253,13 +253,13 @@ __sm.files.chmod()
 
 __sm.files.exist()
 {
-  local _file="$1"
+  typeset _file="$1"
   [[ -f "${_file}" ]]
 }
 
 __sm.files.exists()
 {
-  local _file
+  typeset _file
   for _file in "$@"
   do
     [[ -f "${_file}" ]] || return 1
@@ -269,9 +269,9 @@ __sm.files.exists()
 
 __sm.files.contain()
 {
-  local _string="$1" _regex="$2"
+  typeset _string="$1" _regex="$2"
   shift 2
-  local _file _files=("$@")
+  typeset _file _files=("$@")
 
   for _file in ${_files[@]}
   do
@@ -294,7 +294,7 @@ __sm.files.contain()
 
 __sm.files.containing()
 {
-  local _string="$1" _regex="$2"
+  typeset _string="$1" _regex="$2"
   shift 2
   _files=("$@") _file
 
@@ -322,7 +322,7 @@ __sm.files.containing()
 
 __sm.files.are.empty()
 {
-  local _file _files=("$@")
+  typeset _file _files=("$@")
 
   for _file in "${_files[@]}"
   do
@@ -337,7 +337,7 @@ __sm.files.are.empty()
 
 __sm.files.are.nonempty()
 {
-  local _file _files=("$@")
+  typeset _file _files=("$@")
 
   for _file in "${_files[@]}"
   do
@@ -352,7 +352,7 @@ __sm.files.are.nonempty()
 
 __sm.files.are.executable()
 {
-  local _file _files=( "$@" )
+  typeset _file _files=( "$@" )
   for _file in "${_files[@]}"
   do
     [[ -r "${_file}" && -x "${_file}" ]] || return 1
@@ -361,7 +361,7 @@ __sm.files.are.executable()
 
 __sm.files.are.missing()
 {
-  local _file
+  typeset _file
   for _file in "$@"
   do
     if [[ -f "${_file}" ]]
@@ -374,7 +374,7 @@ __sm.files.are.missing()
 
 __sm.files.are.symlinks()
 {
-  local _file _files=("$@")
+  typeset _file _files=("$@")
   for _file in "${_files[@]}"
   do
     [[ -L "${_file}" ]] || return 1
@@ -383,8 +383,8 @@ __sm.files.are.symlinks()
 
 __sm.files.sha.256()
 {
-  local _sum _files=("$@")
-  local _sums=($(shasum -a 256 "${_files[@]}"))
+  typeset _sum _files=("$@")
+  typeset _sums=($(shasum -a 256 "${_files[@]}"))
   for _sum in "${_sums[@]}"
   do
     echo "${_sum// *}"
@@ -393,8 +393,8 @@ __sm.files.sha.256()
 
 __sm.files.sha.512()
 {
-  local _sum _files=("$@")
-  local _sums=($(shasum -a 512 "${_files[@]}"))
+  typeset _sum _files=("$@")
+  typeset _sums=($(shasum -a 512 "${_files[@]}"))
   for _sum in "${_sums[@]}"
   do
     echo "${_sum// *}"
@@ -403,13 +403,13 @@ __sm.files.sha.512()
 
 __sm.files.write()
 {
-  local _string="$1" _target="$2" _flags=($3)
+  typeset _string="$1" _target="$2" _flags=($3)
   printf "${_string}\n" | tee ${_flags[@]} "${_target}" >/dev/null
 }
 
 __sm.files.in()
 {
-  local _file _paths=() _file_paths=($@)
+  typeset _file _paths=() _file_paths=($@)
   #TODO: WTF ? this one can not work as main for gets empty array
   for _path in "${_paths[@]}"
   do
@@ -425,7 +425,7 @@ __sm.files.in()
 
 __sm.files.within()
 {
-  local _paths=("$@")
+  typeset _paths=("$@")
   for _path in "${_paths[@]}"
   do
     [[ -d "${_path}" ]] || __sm.log.fail "'${_path}' is not a directory!"
@@ -446,7 +446,7 @@ __sm.files.within()
 
 __sm.files.within.matching()
 {
-  local _string="$1" _regex="$2" _file
+  typeset _string="$1" _regex="$2" _file
   shift 2
   _paths=("${@}")
   for _path in "${_paths}"
@@ -476,7 +476,7 @@ __sm.files.within.matching()
 
 __sm.files.md5()
 {
-  local _files=("$@") _file _command _md5
+  typeset _files=("$@") _file _command _md5
 
   if __sm.command.exists "md5sum"
   then
@@ -506,9 +506,9 @@ __sm.files.md5()
 
 __sm.files.replace()
 {
-  local _string="$1" _regex="$2"
+  typeset _string="$1" _regex="$2"
   shift 2
-  local _file _files=("$@")
+  typeset _file _files=("$@")
 
   for _file in "${_files[@]}"
   do
@@ -519,13 +519,13 @@ __sm.files.replace()
 
 __sm.files.open()
 {
-  local _files=("$@")
+  typeset _files=("$@")
   os open "${_files[@]}"
 }
 
 __sm.files.absolute.path()
 {
-  local _path _paths=("$@") _recorded_path=$PWD \
+  typeset _path _paths=("$@") _recorded_path=$PWD \
     _amount=$# _index _file_name
 
   for (( _index=0 ; _index < _amount ; _index++ ))

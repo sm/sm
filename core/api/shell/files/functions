@@ -15,9 +15,9 @@ files()
 {
   trace_filter filesystem
 
-  local _token _command _subcommand _path _file _files=() _source _target _mode \
+  typeset _token _command _subcommand _path _file _files=() _source _target _mode \
     _owner _flags _string _regex
-  local __files_commands=(
+  typeset __files_commands=(
     "is empty=are empty"
     "is nonempty=are nonempty"
     "is executable=are executable"

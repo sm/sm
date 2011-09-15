@@ -13,7 +13,7 @@ os()
 {
   trace_filter os
 
-  local _command _subcommand
+  typeset _command _subcommand
 
   while (( $# > 0 ))
   do

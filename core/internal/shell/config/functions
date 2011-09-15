@@ -2,7 +2,7 @@
 
 __sm.config.read()
 {
-  local _extension="$1" _file="$2" _key="$3" _variable="$4" _prefix="$5" _temp _value
+  typeset _extension="$1" _file="$2" _key="$3" _variable="$4" _prefix="$5" _temp _value
 
   if [[ -z "${_variable}" ]]
   then
@@ -28,7 +28,7 @@ __sm.config.read()
 
 __sm.config.write()
 {
-  local _extension="$1" _file="$2" _key="$3" _value="$4"
+  typeset _extension="$1" _file="$2" _key="$3" _value="$4"
   # unset, delete / write, set
   case "${value}" in
     (unset|delete)
@@ -49,7 +49,7 @@ __sm.config.settings.search()
 {
   trace_filter config_search
 
-  local extension=$1 setting=$2 _path paths
+  typeset extension=$1 setting=$2 _path paths
 
   paths=( "/etc/sm/${extension}" "$HOME/.sm/${extension}" ) # Standard paths
 
@@ -76,7 +76,7 @@ __sm.config.settings.search()
 
 __sm.config.settings.search.path.update()
 {
-  local path=$1 _uri
+  typeset path=$1 _uri
 
   if __sm.string.contains "${path}" "${__sm_settings_search_cache[*]}"
   then

@@ -11,7 +11,7 @@
 # Code Walkthrough
 detect_uri()
 {
-  local extensions_path="${1:-}" _uri_path
+  typeset extensions_path="${1:-}" _uri_path
 
   shift || fail "extensions_path must be given as first parameter."
 
@@ -30,7 +30,7 @@ detect_uri()
 
 __sm.vcs.read_uri()
 {
-  local _uri=$(cat $1)
+  typeset _uri=$(cat $1)
   if [[ -n "${_uri}" && -d "${_uri}" && -f "${_uri}/.uri" && -s "${_uri}/.uri" ]]
   then
     __sm.vcs.read_uri "${_uri}/.uri"
@@ -46,7 +46,7 @@ __sm.vcs.read_uri()
 # Code Walkthrough
 scm_identifier()
 {
-  local _uri="${1:-}"
+  typeset _uri="${1:-}"
 
   shift || fail "url must be given as first parameter."
 
@@ -65,7 +65,7 @@ scm_identifier()
 # Code Walkthrough
 is_github_uri()
 {
-  local _uri="${1:-}"
+  typeset _uri="${1:-}"
   shift || fail "uri must be given as first parameter."
 
   if __sm.string.ematch "${_uri}" "^[[:alnum:]_-]+\/[[:alnum:]_-]+$"
@@ -89,7 +89,7 @@ is_github_uri()
 
 is_archive_uri()
 {
-  local _uri="${1:-}"
+  typeset _uri="${1:-}"
   shift || fail "uri must be given as first parameter."
   case "${_uri}" in
     *.tar|*.tgz|*.txz|*.tbz2|*.xz|*.bz2|*.gz|*.zip|*.lzma|*github.com/*/*ball/*)
@@ -103,7 +103,7 @@ is_archive_uri()
 
 fetch_uri_detect_scm_type()
 {
-  local _uri="${1:-}"
+  typeset _uri="${1:-}"
 
   shift || fail "uri must be given as first parameter."
 

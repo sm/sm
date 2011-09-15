@@ -4,7 +4,7 @@ __sm.cache.map.check()
 {
   trace_filter action_detection
 
-  local _found_actions=() _method="$1" _name="$2" _item
+  typeset _found_actions=() _method="$1" _name="$2" _item
   shift || __sm.log.fail "No method and action name was given for search"
   shift || __sm.log.fail "No action name was given for search"
 
@@ -31,13 +31,13 @@ __sm.cache.map.check()
 
   elif (( ${#_found_actions[@]} ))
   then
-    local _candidate _candidates=()
+    typeset _candidate _candidates=()
     for _candidate in "${_found_actions[@]}"
     do
       _candidate="${_candidate%%=*}"
       _candidates+=( "sm ${extension} ${_candidate//\// } ${_rest_params[@]}\n" )
     done
-    local screen_height=${LINES:-20}
+    typeset screen_height=${LINES:-20}
     if (( ${#_found_actions[@]} + 4  > screen_height ))
     then
       __sm.log.error "More than one matching action found;\n\nDid you mean:\n ${_candidates[*]}\n" 2>&1 | less
@@ -59,12 +59,12 @@ __sm.extension.actions.find()
   shift || __sm.log.fail "Extension path must be given as the first parameter."
   shift || __sm.log.fail "Extension name must be given as the second parameter."
 
-  local _action_params=("$@") _action_path _new_action_path
-  local _rest_params=() _param_temp _action_params_length
-  local _actions_root="${extensions_path}/${extension}/bin"
-  local _map="${extensions_path}/${extension}/map"
-  local _modules_root="${extensions_path}/${extension}/shell"
-  local _actions_cache=()
+  typeset _action_params=("$@") _action_path _new_action_path
+  typeset _rest_params=() _param_temp _action_params_length
+  typeset _actions_root="${extensions_path}/${extension}/bin"
+  typeset _map="${extensions_path}/${extension}/map"
+  typeset _modules_root="${extensions_path}/${extension}/shell"
+  typeset _actions_cache=()
 
   __sm.cache.map.filesystem.initialize
   __sm.cache.map.actions.initialize
@@ -137,7 +137,7 @@ __sm.extension.action()
       ;;
   esac
 
-  local _extension_found=0 _action_found=0
+  typeset _extension_found=0 _action_found=0
   if __sm.extension.in.paths __sm.extension.find "${extension_args[@]}"
   then
     _extension_found=1

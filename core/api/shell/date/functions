@@ -4,7 +4,7 @@ date()
 {
   true ${date_format:="%Y-%m-%dT%H:%M:%S"}
 
-  local _start _end _date _step="day" \
+  typeset _start _end _date _step="day" \
     _format_in="%Y-%m-%d" _format_out="%Y-%m-%d"
 
   while (( $# > 0 ))

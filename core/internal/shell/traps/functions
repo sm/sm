@@ -2,7 +2,7 @@
 
 __sm.traps.on.exit()
 {
-  local _result="$?" _command
+  typeset _result="$?" _command
   for _command in "${on_exit_commands[@]}"
   do
     if ! eval "${_command}"

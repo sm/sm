@@ -46,8 +46,8 @@ versionedfs()
 {
   trace_filter versionedfs
 
-  local _token _path _paths _source _name _version _strategy _method _activate
-  local _action="${1:-}"
+  typeset _token _path _paths _source _name _version _strategy _method _activate
+  typeset _action="${1:-}"
   shift || __sm.log.fail "Usage: versionedfs path \"{versionedfs root path}\" "\
     "strategy \"{fhs,name}\" method \"{link,copy}\" activate \"{newest,first}\""
 
@@ -145,7 +145,7 @@ versionedfs()
 
 __sm.versionedfs.create()
 {
-  local _path="$1"
+  typeset _path="$1"
   mkdir -p "${_path}/"{.versionedfs,versions,active} ||
     __sm.log.fail "Could not create paths ${_path}/{.versionedfs,versions,active}"
 
@@ -157,9 +157,9 @@ __sm.versionedfs.create()
 
 __sm.versionedfs.add()
 {
-  local _path="$1" _name="$2" _version="${3}" _source="$4"
+  typeset _path="$1" _name="$2" _version="${3}" _source="$4"
 
-  local _version_path="${_path}/versions/${_name}/${_version}"
+  typeset _version_path="${_path}/versions/${_name}/${_version}"
 
   if [[ -d "${_version_path}" ]]
   then
@@ -177,8 +177,8 @@ __sm.versionedfs.add()
 
 __sm.versionedfs.remove()
 {
-  local _path="$1" _name="${2}" _version="${3}"
-  local _version_path="${_path}/versions/${_name}/${_version}"
+  typeset _path="$1" _name="${2}" _version="${3}"
+  typeset _version_path="${_path}/versions/${_name}/${_version}"
 
   __sm.versionedfs.deactivate "${_path}" "${_name}" "${_version}"
 
@@ -190,9 +190,9 @@ __sm.versionedfs.remove()
 
 __sm.versionedfs.activate()
 {
-  local _path="$1" _name="${2}" _version="${3}" _target
-  local _version_path="${_path}/versions/${_name}/${_version}"
-  local _active_path="${_path}/active"
+  typeset _path="$1" _name="${2}" _version="${3}" _target
+  typeset _version_path="${_path}/versions/${_name}/${_version}"
+  typeset _active_path="${_path}/active"
 
   if [[ -L "${_path}/versions/${_name}/active" ]]
   then # Deactivate if active version.
@@ -204,7 +204,7 @@ __sm.versionedfs.activate()
 #    fi
   fi
 
-  local _activate _active_version_path _index=0 _count _active_path
+  typeset _activate _active_version_path _index=0 _count _active_path
 
   read -r _activate < "${_path}/.versionedfs/activate"
 
@@ -276,14 +276,14 @@ __sm.versionedfs.activate()
 
 __sm.versionedfs.deactivate()
 {
-  local _path="$1" _name="${2}" _version="${3:-}"
-  local _name_path="${_path}/versions/${_name}"
-  local _active_path="${_path}/active"
+  typeset _path="$1" _name="${2}" _version="${3:-}"
+  typeset _name_path="${_path}/versions/${_name}"
+  typeset _active_path="${_path}/active"
 
   [[ -L "${_path}/versions/${_name}/active" ]] || return 0 # No active version
 
-  local _index=0 _count
-  local _version_path="$(readlink "${_path}/versions/${_name}/active")"
+  typeset _index=0 _count
+  typeset _version_path="$(readlink "${_path}/versions/${_name}/active")"
 
   if [[ -n "${_version}" && "${_version_path}" == "${_name_path}/${_version}" ]]
   then
@@ -309,7 +309,7 @@ __sm.versionedfs.deactivate()
           rm -f "${_target}"
         elif [[ -d "${_target}" ]]
         then
-          local _targets=( "${_target}"/* )
+          typeset _targets=( "${_target}"/* )
           if (( ! ${#_targets[@]} ))
           then
             rm -rf "${_target}"
@@ -331,7 +331,7 @@ __sm.versionedfs.deactivate()
 
 __sm.versionedfs.list()
 {
-  local _method=$1 _path="$2" _name="${3:-}" __path __name __version
+  typeset _method=$1 _path="$2" _name="${3:-}" __path __name __version
 
   if [[ -n "${_name}" ]]
   then

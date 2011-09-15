@@ -2,32 +2,32 @@
 
 __sm.array.is.nonempty()
 {
-  local _name="${1}"
+  typeset _name="${1}"
   eval "(( \${#${_name}[@]} > 0 ))"
 }
 
 __sm.array.is.empty()
 {
-  local _name="${1}"
+  typeset _name="${1}"
   eval "(( \${#${_name}[@]} == 0 ))"
 }
 
 __sm.array.is.even()
 {
-  local _name="${1}"
+  typeset _name="${1}"
   eval "(( ( \${#${_name}[@]} % 2 ) == 0 ))"
 }
 
 __sm.array.length()
 {
-  local _name="${1}" _length
+  typeset _name="${1}" _length
   eval "_length=\${#${_name}[@]}"
   printf ${_length}
 }
 
 __sm.array.last()
 {
-  local _name="${1}" _length _element
+  typeset _name="${1}" _length _element
   eval "_length=\${#${_name}[@]}"
   eval "_element=\"\${${_name}[${_length}]}\""
   printf "%{_element}"
@@ -35,7 +35,7 @@ __sm.array.last()
 
 __sm.array.first()
 {
-  local _name="${1}" _element _length
+  typeset _name="${1}" _element _length
   eval "_length=\"\${#${_name}[@]}\""
   (( _length )) || return 1
   eval "_element=\"\${${_name}[${__sm_array_start}]}\""
@@ -44,11 +44,11 @@ __sm.array.first()
 
 __sm.array.push()
 {
-  local _name="${1}"
+  typeset _name="${1}"
   shift
   if eval "(( \${#${_name}[@]} > 0 ))"
   then
-    local _element _elements=("$@")
+    typeset _element _elements=("$@")
 
     (( ${#_elements[@]} )) || __sm.log.fail "No elements were given."
 
@@ -61,9 +61,9 @@ __sm.array.push()
 
 __sm.array.append()
 {
-  local _name="${1}"
+  typeset _name="${1}"
   shift
-  local _element _elements=("$@")
+  typeset _element _elements=("$@")
 
   (( ${#_elements[@]} )) || __sm.log.fail "No elements were given."
 
@@ -75,7 +75,7 @@ __sm.array.append()
 
 __sm.array.pop()
 {
-  local _name="${1}" _variable="${2:-}" index
+  typeset _name="${1}" _variable="${2:-}" index
   shift || __sm.log.fail "Array name was not given."
 
   eval "(( \${#${_name}[@]} ))" || __sm.log.fail "Array '${_name}' was empty."
@@ -96,7 +96,7 @@ __sm.array.pop()
 
 __sm.array.shift()
 {
-  local _name="${1:-}" index _variable="${2:-}"
+  typeset _name="${1:-}" index _variable="${2:-}"
   shift || __sm.log.fail "Array name was not given."
 
   [[ -z "${_variable}" ]] || eval "${_variable}=\${${_name}[${__sm_array_start}]}"
@@ -109,10 +109,10 @@ __sm.array.shift()
 
 __sm.array.unshift()
 {
-  local _name="${1:-}"
+  typeset _name="${1:-}"
   shift || __sm.log.fail "Array name was given."
 
-  local _elements=("$@")
+  typeset _elements=("$@")
 
   (( ${#_elements[@]} )) || __sm.log.fail "No elements were given."
 
@@ -121,15 +121,15 @@ __sm.array.unshift()
 
 __sm.array.join()
 {
-  local _name="${1:-}"
+  typeset _name="${1:-}"
   shift || __sm.log.fail "Array name was not given."
-  local IFS=${1:-' '}
+  typeset IFS=${1:-' '}
   eval "printf \"\${${_name}[*]}\""
 }
 
 __sm.array.largest()
 {
-  local _name="${1:-}" _index _largest=""
+  typeset _name="${1:-}" _index _largest=""
   shift || __sm.log.fail "No array variable name was given."
 
   eval "
@@ -146,7 +146,7 @@ __sm.array.largest()
 
 __sm.array.sort()
 {
-  local _name="$1" _direction="${2:-"asc"}" _index _largest=""
+  typeset _name="$1" _direction="${2:-"asc"}" _index _largest=""
   if [[ "${_direction}" == "desc" ]]
   then
     eval "${_name}=(\$(
@@ -161,7 +161,7 @@ __sm.array.sort()
 
 __sm.array.unique()
 {
-  local _name="${1:-}" _index _largest=""
+  typeset _name="${1:-}" _index _largest=""
   shift || __sm.log.fail "Array variable name was not given."
 
   eval "${_name}=(\$(

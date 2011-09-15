@@ -30,7 +30,8 @@ __sm.command.run()
 
 __sm.command.detect()
 {
-  local __string="$1" __key __value
+  typeset __string __key __value
+  __string="$1"
   shift
 
   # Error if no command was given
@@ -45,12 +46,12 @@ __sm.command.detect()
     __key="$1"
 
     case "${__key}" in
-      (*=*)
+      *=*)
         # If command is mapping, then unwrap its key/value
-        __value="${__key#*=}"
-        __key="${__key%%=*}"
+        __value="${__key#*\=}"
+        __key="${__key%%\=*}"
         ;;
-      (*)
+      *)
         # When no mapping then key is value
         __value="${__key}"
         ;;
@@ -78,9 +79,9 @@ __sm.command.detect()
   done
 
   # In case no long command matched grab first param as command. Todo ? allow disabling
-  __string=( ${__string} )
-  __sm_command_detected="${__string}"
-  __sm_command_dotted="${__string}"
+  __string=( ${=__string} )
+  __sm_command_detected="${__string[1]}"
+  __sm_command_dotted="${__string[1]}"
   __sm_command_words=1
   return 0
 }

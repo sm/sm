@@ -3,7 +3,7 @@
 # TODO: Rework this into a 1.0.0 module API
 database_extension_setup()
 {
-  local extension="${1}" module="${2}" path="${3}"
+  typeset extension="${1}" module="${2}" path="${3}"
   shift || __sm.log.fail "Extension must be given as the first parameter."
   shift || __sm.log.fail "Module must be given as the second parameter."
   shift || __sm.log.fail "Path must be given as the third parameter."

@@ -6,7 +6,7 @@
 
 string()
 {
-  local _token _command _string _search _regex
+  typeset _token _command _string _search _regex
 
   while (( $# ))
   do
