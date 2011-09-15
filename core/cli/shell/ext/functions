@@ -28,7 +28,8 @@ ext_help()
 
 ext_list()
 {
-  typeset extensions COLUMNS=80
+  typeset extensions
+  true ${COLUMNS:=80}
 
   if __sm.extension.in "${exts_system_path}/active"
   then
@@ -52,7 +53,7 @@ ext_list()
 
 ext_list_known()
 {
-  typeset COLUMNS=80
+  true ${COLUMNS:=80}
 
   printf "# %18s | %s\n" "Extension name" "Repository"
 
@@ -64,7 +65,9 @@ ext_list_known()
 
 ext_install()
 {
-  typeset _name _names="$1" _uri="$2"
+  typeset _name _names _uri
+  _names="$1"
+  _uri="$2"
   shift || __sm.log.fail "No extension name was given."
 
   _names=(${_names//,/ })
@@ -82,7 +85,8 @@ ext_install()
 
 ext_install_all()
 {
-  typeset _ext _name _uri COLUMNS=80
+  typeset _ext _name _uri
+  true ${COLUMNS:=80}
   while read _ext
   do
     [[ "${line}" != \#* ]] || continue
@@ -129,7 +133,8 @@ ext_update()
 
 ext_update_all()
 {
-  typeset _name _entries=( "${exts_user_path}"/* )
+  typeset _name _entries
+  _entries=( "${exts_user_path}"/* )
 
   if (( ! "${#_entries[@]}" ))
   then
@@ -145,7 +150,8 @@ ext_update_all()
 
 ext_uninstall()
 {
-  typeset _name="$1"
+  typeset _name
+  _name="$1"
   case "${_name}" in
     */*|.|..)
       __sm.log.error "Please specify a valid extension name."
@@ -168,7 +174,8 @@ ext_uninstall()
 
 ext_check_availability()
 {
-  typeset _ext _line _args=($@)
+  typeset _ext _line _args
+  _args=($@)
 
   # TODO: refactor this to take argument of uri to check instead.
   #       provide check_known_exts_availability or some such to wrap this.
@@ -189,4 +196,3 @@ ext_check_availability()
     esac
   done < "${sm_path}/core/cli/config/known_ext"
 }
-

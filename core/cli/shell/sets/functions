@@ -27,7 +27,8 @@ sets_help()
 
 sets_list()
 {
-  typeset _path extensions COLUMNS=80
+  typeset _path extensions
+  true ${COLUMNS:=80}
 
   for _path in "${extensions_search_paths[@]}"
   do
@@ -59,7 +60,8 @@ sets_list()
 
 sets_list_known()
 {
-  typeset COLUMNS=80
+  typeset line
+  true ${COLUMNS:=80}
   printf "# %18s | %s\n" "Set Name" "Repository"
 
   while read line
@@ -70,10 +72,11 @@ sets_list_known()
 
 sets_install()
 {
-  typeset _name _names="${1:-}" _extension_namespace
+  typeset _name _names _extension_namespace
+  _names="${1:-}"
   shift || __sm.log.fail "No set name was given."
 
-  _names=(${_names//,/ })
+  _names=( ${=_names//,/ } )
   _extension_namespace="${sets_user_path#${sm_path}\/}"
   _extension_namespace="${_extension_namespace#${sm_user_path}\/}"
 
@@ -85,18 +88,19 @@ sets_install()
 
 set_install()
 {
-  typeset _name="${1:-}"
+  typeset _name _uri _identifier _version
+  _name="${1:-}"
   shift || __sm.log.fail "No set name was given."
 
-  typeset _uri="${1:-}"
+  _uri="${1:-}"
   shift || _uri=$( awk -F= "/^${_name}=/ {print \$2 }" < "${sm_path}/core/cli/config/known_sets" | tail -n 1 )
 
   [[ -n "${_uri}" ]] ||
     __sm.log.error "uri not given and cannot find ${_name} in known extension sets."
 
-  typeset _identifier="$(scm_identifier "${_uri}")"
+  _identifier="$(scm_identifier "${_uri}")"
 
-  typeset _version="head"
+  _version="head"
   if [[ "${_name}" == *:* ]]
   then
     _version="${_name/*:}"
@@ -117,7 +121,9 @@ set_install()
 
 sets_install_all()
 {
-  typeset _set _name _uri COLUMNS=80
+  typeset _set _name _uri
+  true ${COLUMNS:=80}
+
   while read _set
   do
     [[ "${line}" != \#* ]] || continue
@@ -164,7 +170,8 @@ sets_update()
 
 sets_update_all()
 {
-  typeset _name _sets=( "${sets_user_path}"/active/* )
+  typeset _name _sets
+  _sets=( "${sets_user_path}"/active/* )
 
   if (( ! ${#_sets[@]} ))
   then
@@ -180,7 +187,8 @@ sets_update_all()
 
 sets_uninstall()
 {
-  typeset _name="$1"
+  typeset _name
+  _name="$1"
   case "${_name}" in
     */*|.|..)
       __sm.log.error "Please specify a valid extension name."
@@ -203,7 +211,8 @@ sets_uninstall()
 
 sets_check_availability()
 {
-  typeset _set _line _args=($@)
+  typeset _set _line _args
+  _args=( $@ )
 
   # TODO: refactor this to take argument of uri to check instead.
   #       provide check_known_sets_availability or some such to wrap this.

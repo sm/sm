@@ -2,10 +2,12 @@
 
 detect_man()
 {
-  typeset _extensions_path=$1 _extension=$2
+  typeset _extensions_path _extension _man_path _man_name _man_paths
+  _extensions_path=$1
+  _extension=$2
   shift
 
-  typeset _man_path _man_name="$*" #include extension in name
+  _man_name="$*" #include extension in name
   shift
 
   _man_name="${_man_name:-cli}"
@@ -26,7 +28,7 @@ detect_man()
     return 1
   fi
 
-  typeset _man_paths=( ${_extensions_path}/${_extension}/man/man*/${_man_name}* )
+  _man_paths=( ${_extensions_path}/${_extension}/man/man*/${_man_name}* )
   if (( ${#_man_paths[@]} ))
   then
     man_file="${_man_paths[__sm_array_start]}"
@@ -37,7 +39,7 @@ detect_man()
 
 man_display()
 {
-  typeset man_path man_params man_number
+  typeset man_path man_params man_number status _man_name
 
   if echo $1 | grep -E '^[0-9]+$' >/dev/null
   then
@@ -50,7 +52,7 @@ man_display()
   then
     if ! man $man_file
     then
-      typeset status=$?
+      status=$?
       case $status in
         (16)
           #Not found page - ignore
@@ -60,7 +62,7 @@ man_display()
       esac
     fi
   else
-    typeset _man_name="$*"
+    _man_name="$*"
     _man_name="${_man_name:-cli}"
     _man_name="${_man_name// /_}"
     log "Could not find man page for ${_man_name}${man_number:+.${man_number}}"

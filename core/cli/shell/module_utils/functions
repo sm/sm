@@ -14,16 +14,17 @@ modules_installed()
 
 module_functions()
 {
-  typeset _function _functions _modules="${@:-}"
+  typeset _function _functions _modules _path
+  _modules="${@:-}"
 
   [[ -n "${_modules}" ]] ||
     __sm.log.fail "Cannot print the functions for module(s); No module names given."
 
-  typeset _path="${__sm_modules_path}/${_module}"
+  _path="${__sm_modules_path}/${_module}"
 
   _functions=($(
-  find "${_path}" -mindepth 1 -maxdepth 1 -name functions -type f -print0 |
-  xargs -0 grep '^[a-z_]*()$' 2>/dev/null || true
+    find "${_path}" -mindepth 1 -maxdepth 1 -name functions -type f -print0 |
+    xargs -0 grep '^[a-z_]*()$' 2>/dev/null || true
   ))
 
   for _function in "${_functions[@]}"
@@ -83,7 +84,8 @@ module_docs()
     __sm.log.fail "Cannot generate documentation for '${_module}';"\
       " 'pygmentize' was not found in the PATH, install pygmentize and try again."
 
-  typeset _path="${core_development_path}/shell/${_module}"
+  typeset _path
+  _path="${core_development_path}/shell/${_module}"
   if (( content_flag == 1 ))
   then
     shocco "${_path}/functions" |
@@ -102,9 +104,9 @@ modules_docgen()
   # TODO: Replace with,
   # for file in modules/*/functions ; do (name=${file%%\/functions}; shocco $file > html/${name//*\/}.html)& done ; wait
 
-  typeset _module _function _functions _name
-  typeset _prefix="${core_development_path}/html/shell"
-  typeset _path="${site_development_path}"
+  typeset _module _function _functions _name _prefix _path
+  _prefix="${core_development_path}/html/shell"
+  _path="${site_development_path}"
 
   if [[ -n "${core_development_path}" ]]
   then
@@ -170,9 +172,9 @@ modules_site_docgen()
   # TODO: Replace with,
   # for file in modules/*/functions ; do (name=${file%%\/functions}; shocco $file > html/${name//*\/}.html)& done ; wait
 
-  typeset _module _function _functions _name _file
-  typeset _prefix="${core_development_path}/html/shell"
-  typeset _path="${site_development_path}"
+  typeset _module _function _functions _name _file _prefix _path
+  _prefix="${core_development_path}/html/shell"
+  _path="${site_development_path}"
 
   paths exists "${core_development_path}" ||
     __sm.log.fail "Set core_development_path in ~/.smrc, to run docgen."

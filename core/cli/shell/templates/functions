@@ -57,8 +57,9 @@ templates_targets()
 }
 
 templates_list() {
-  typeset template="$1"
-  typeset settings="$template.settings"
+  typeset template settings
+  template="$1"
+  settings="$template.settings"
 
   log "Template: $template"
   if [[ -f $settings ]]
@@ -102,9 +103,12 @@ templates_list_all() {
 
 templates_apply_one()
 {
-  typeset target="$1" target_new="$1.$$"
-  typeset key="$1" template="${1/_*./_.}"
-  typeset settings="${template}.settings" # replacements
+  typeset target target_new key template settings
+  target="$1"
+  target_new="$1.$$"
+  key="$1"
+  template="${1/_*./_.}"
+  settings="${template}.settings" # replacements
 
   cp -f $template $target_new
   hash read key $key from "$settings" # replacements
@@ -123,7 +127,8 @@ templates_apply_one()
 
 templates_apply_all()
 {
-  typeset list template first="$1"
+  typeset list template first
+  first="$1"
 
   (( $# )) || __sm.log.error "Please provide a template or target name!"
 
@@ -147,9 +152,12 @@ templates_apply_all()
 
 templates_apply_diff()
 {
-  typeset target="$1" target_new="$1.new"
-  typeset key="$1" template="${target/_*./_.}"
-  typeset settings="${template}.settings" replacements
+  typeset target target_new key template settings replacements
+  target="$1"
+  target_new="$1.new"
+  key="$1"
+  template="${target/_*./_.}"
+  settings="${template}.settings"
 
   cp -f $template $target_new
   hash read key "$key" from "$settings" replacements

@@ -32,8 +32,11 @@ smrc_update()
 {
   templates exist "cli/smrc" || __sm.log.fail "The template core sm/smrc is missing."
 
-  typeset template="cli/smrc" target="$HOME/.smrc" \
-    backup="$HOME/.smrc.$timestamp" incoming="$HOME/.smrc.incoming.$$"
+  typeset template target backup incoming
+  template="cli/smrc"
+  target="$HOME/.smrc"
+  backup="$HOME/.smrc.$timestamp"
+  incoming="$HOME/.smrc.incoming.$$"
 
   if ! files exist "${target}"
   then

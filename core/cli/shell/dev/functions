@@ -83,7 +83,8 @@ sm_development_update()
 
 extension_package()
 {
-  typeset _name="${1:-}" _path _version file _archiver
+  typeset _name _path _version file _archiver
+  _name="${1:-}"
   shift || __sm.log.fail "Cannot package an extension; no extension name was given."
 
   _path="${extensions_development_path:-"$extensions_src_path"}"
@@ -123,7 +124,8 @@ extension_package()
 
 extension_publish()
 {
-  typeset _name="${1:-}" _path _version _file
+  typeset _name _path _version _file
+  _name="${1:-}"
   shift || __sm.log.fail "Cannot publish an extension; no extension name was given."
 
   NIY "Extension publishing locally and to extensions.beginrescueend.com has not yet been implemented."
@@ -156,7 +158,9 @@ extension_publish()
 
 extension_module_add()
 {
-  typeset _extension="${1}" _module="${2}" _path
+  typeset _extension _module _path
+  _extension="${1}"
+  _module="${2}"
   _path="${3:-"${extensions_development_path}/${_extension}"}"
 
   if ! files contain string "${_module}" "${_path}/shell/includes"

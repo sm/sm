@@ -8,7 +8,8 @@ fetch_version()
 
 md5_match()
 { # TODO: switch this to using system module's os_* DSL
-  typeset _archive="$1" _path
+  typeset _archive _path
+  _archive="$1"
 
   if command exists md5
   then
@@ -81,14 +82,17 @@ Halting installation.
 
 install_remote()
 {
-  typeset remote="${1:-sm}"
-
+  typeset remote
+  remote="${1:-sm}"
   install_sm_scm "$(scm_identifier "$remote")" "$remote"
 }
 
 install_sm_scm()
 {
-  typeset remote="origin" dir="${1}" repo="${2:-sm}"
+  typeset remote dir repo
+  remote="origin"
+  dir="${1}"
+  repo="${2:-sm}"
 
   __sm.includes api/vcs
 
@@ -103,4 +107,3 @@ install_sm_scm()
 
   exec bash ${PWD}/install --trace="$trace_flags" --debug="$debug_flags"
 }
-
