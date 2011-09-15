@@ -39,7 +39,8 @@
 #
 log()
 {
-  typeset _token _command _message=()
+  typeset _token _command _message
+  _message=()
 
   while (( $# ))
   do
@@ -410,9 +411,11 @@ __sm.log.log()
 
 __sm.log.todo()
 {
+  typeset file line
   if (( debug_flag )) && __sm.log.options.check "$debug_flags" "todo"
   then
-    typeset file="${BASH_SOURCE[2]}" line="${BASH_LINENO[1]}"
+    file="${BASH_SOURCE[2]}"
+    line="${BASH_LINENO[1]}"
     printf "DEBUG todo: ${file##${sm_path}\/}:${line}:\n"
     printf "$*" | xargs -s 72 | xargs -I {} printf "DEBUG todo: # {}\n"
   else
@@ -546,7 +549,8 @@ __sm.log.warn()
 
 __sm.log.debug()
 {
-  typeset type="$1"
+  typeset type
+  type="$1"
   shift || __sm.log.fail "Debug type must be given as the first parameter."
 
   if (( debug_flag )) && __sm.log.options.check "$debug_flags" "$type"
@@ -566,7 +570,9 @@ __sm.log.debug()
 
 __sm.log.search()
 {
-  typeset name="${1:-}" value="${2:-}"
+  typeset name value
+  name="${1:-}"
+  value="${2:-}"
   shift || __sm.log.fail "name must be given as the first parameter."
   shift || __sm.log.fail "value must be given as the second parameter."
 
@@ -586,7 +592,8 @@ __sm.actions.call()
 
 __sm.actions.source()
 {
-  typeset script="$1"
+  typeset script
+  script="$1"
   shift || __sm.log.fail "No script was given as the first parameter."
   [[ -r "$script" ]] || __sm.log.fail "Could not find script to run: $script."
   trace_filter action
@@ -734,7 +741,8 @@ __sm.log.options.check()
 
 __sm.log.rotate()
 {
-  typeset _file="${1:-}"
+  typeset _file _tail_pid
+  _file="${1:-}"
   shift || __sm.log.fail "Cannot rotate a log file, as no log file was given."
 
   timestamp="$( date +"%Y-%m-%dT%H:%M:%S" )"
@@ -742,7 +750,7 @@ __sm.log.rotate()
   verbose "Tailing the file in a background process into a tail logfile."
   ( tail -n 0 -f "${_file}" > ${file}.$$.log )&
 
-  typeset _tail_pid=$!
+  _tail_pid=$!
 
   verbose "Copying the file's contents into a new timestamped file."
   cp "${_file}" "${_file}.${timestamp}"
@@ -765,7 +773,8 @@ __sm.log.rotate()
 
 __sm.log.streams()
 {
-  typeset _command="${1:-}" _prefix _err _out _mix
+  typeset _command _prefix _err _out _mix _token
+  _command="${1:-}"
 
   # TODO: allow specification of path, name prefix
   while (( $# > 0 ))

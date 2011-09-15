@@ -57,7 +57,9 @@ __sm.string.to.function.name()
 
 __sm.string.ematch()
 {
-  typeset _value="$1" _regex="$2" _result
+  typeset _value _regex _result
+  _value="$1"
+  _regex="$2"
 
   # Use grep for extended regexp.
   echo "${_value}" | grep -qE "${_regex}"

@@ -80,7 +80,8 @@ __sm.modules.include()
 
 __sm.module.include()
 {
-  typeset _module="$1" _file _module_dependency _module_path _hook _function
+  typeset _module _file _module_dependency _module_path _hook _function
+  _module="$1"
 
   if __sm.module.is.loaded "${_module}"
   then
@@ -147,10 +148,11 @@ __sm.module.include()
 #TODO: remove - deprecated
 __sm.modules.reinitialize()
 {
-  typeset _module _modules=("$@") _loaded_modules _module_path _initialize_path
+  typeset _module _loaded_modules _module_path _initialize_path
 
   _loaded_modules=" ${__sm_modules_loaded[*]} "
-  for _module in "${_modules[@]}"
+
+  for _module in "$@"
   do
     _module_path="${_loaded_modules##* ${_module}=}"
     _module_path="${_module_path%% *}"
@@ -164,7 +166,8 @@ __sm.modules.reinitialize()
 
 __sm.module.is.loaded()
 {
-  typeset _name="${1}"
+  typeset _name
+  _name="${1}"
   case " ${__sm_modules_loaded[*]} " in
     (*[[:space:]]${_name}=*)
       return 0
@@ -177,7 +180,8 @@ __sm.module.is.loaded()
 
 __sm.extension.in.paths()
 {
-  typeset callback="${1:-}" _path
+  typeset callback _path
+  callback="${1:-}"
   shift || __sm.log.fail "Callback name must be given ast the first parameter."
 
   if [[ -n "$1" ]] # do search if params given
@@ -193,7 +197,8 @@ __sm.extension.in.paths()
 
 __sm.cli.in.path()
 {
-  typeset callback="${1:-}"
+  typeset callback
+  callback="${1:-}"
   shift || __sm.log.fail "Callback name must be given ast the first parameter."
 
   "${callback}" "${sm_path}/core" "cli" "$@"
@@ -255,25 +260,31 @@ __sm.extension.paths.initialize()
 
 __sm.extension.path.reorder()
 {
-  typeset part="${1:-}" extensions_path="${2:-}" extension="${3:-}"
+  typeset part extensions_path extension output
+  part="${1:-}"
+  extensions_path="${2:-}"
+  extension="${3:-}"
   shift 3 || __sm.log.fail "Path part extensions_path extnesion must be given first ."
 
-  typeset output="$extensions_path/$extension/$part/$*"
+  output="$extensions_path/$extension/$part/$*"
   rebuilded_path="${output// //}"
 }
 
 __sm.extension.path.rebuild()
 {
-  typeset part="$1" extensions_path="$2"
+  typeset part extensions_path params
+  part="$1"
+  extensions_path="$2"
   shift 2 || __sm.log.fail "Path extensions_path part must be given first."
 
-  typeset params="$*"
+  params="$*"
   __sm.extension.path.reorder "${part}" "${extensions_path}" ${=params//\// }
 }
 
 __sm.module.detect()
 {
-  typeset extensions_path=$1 _module_path
+  typeset extensions_path _module_path
+  extensions_path=$1
   shift || __sm.log.fail "Extensions path must be given as the first parameter."
 
   __sm.extension.path.rebuild "shell" $extensions_path $@
@@ -294,4 +305,3 @@ __sm.module.detect()
     return 1
   fi
 }
-
