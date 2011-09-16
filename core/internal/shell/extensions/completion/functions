@@ -32,7 +32,7 @@ find_starting_action()
     then
       for _candidate in "${_found_actions[@]}"
       do
-        _candidate="${_candidate%%=*}"
+        _candidate="${_candidate%%\=*}"
         printf "${_candidate//\// }\n"
       done
       return 0

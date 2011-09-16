@@ -66,7 +66,7 @@ sets_list_known()
 
   while read line
   do
-    printf "%20s   %s\n" "${line/=*}" "${line/*=}"
+    printf "%20s   %s\n" "${line/\=*}" "${line/*\=}"
   done < "${sm_path}/core/cli/config/known_sets"
 }
 
@@ -127,8 +127,8 @@ sets_install_all()
   while read _set
   do
     [[ "${line}" != \#* ]] || continue
-    _name="${_set/=*}"
-    _uri="${_set/*=}"
+    _name="${_set/\=*}"
+    _uri="${_set/*\=}"
     sets_install "${_name}" "${_uri}" --on-fail true
   done < "${sm_path}/core/cli/config/known_sets"
 }
@@ -226,9 +226,9 @@ sets_check_availability()
         while read _line
         do
           [[ "${_line}" == Status* ]] || continue
-          echo "${_set/=*}" "${_line/*:}"
+          echo "${_set/\=*}" "${_line/*:}"
           break
-        done < <(curl -s --head https://github.com/sm/sm-"${_set/=*}")
+        done < <(curl -s --head https://github.com/sm/sm-"${_set/\=*}")
         ;;
     esac
   done < "${sm_path}/core/cli/config/known_sets"

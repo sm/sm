@@ -45,7 +45,7 @@ __sm.string.ends()
 __sm.string.number.of.words()
 {
   local _words
-  _words=( ${=*} )
+  _words=( ${\=*} )
   printf "${#_words}\n"
 }
 

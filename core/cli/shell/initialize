@@ -15,8 +15,7 @@ true \
   ${remote:="origin"} \
   ${branch:="master"}
 
-# Load the BDSM framework version.
-sm_version
+__sm.version # Load the BDSM framework version.
 
 user="$USER"
 

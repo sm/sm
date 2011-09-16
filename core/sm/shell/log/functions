@@ -393,7 +393,7 @@ __sm.log.trace.filter()
       ;;
     stop)
       old="${__sm_trace_filter_stack[__sm_array_start]}"
-      old="${old%%=*}"
+      old="${old%%\=*}"
 
       if [[ -n "${BASH_VERSION}" ]]
       then
@@ -418,7 +418,7 @@ __sm.log.trace.filter()
 
   if [[ -n "$filter" ]]
   then
-    if __sm.log.options.check "$trace_flags" "${filter##*=}"
+    if __sm.log.options.check "$trace_flags" "${filter##*\=}"
     then
       return 1
     fi
@@ -475,8 +475,10 @@ __sm.log.search()
 
 __sm.actions.call()
 {
+  local _action
+  _action="$1" && shift
   trace_filter action || set -o xtrace
-  "$@"
+  $_action $@
 }
 
 __sm.actions.source()

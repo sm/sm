@@ -85,4 +85,5 @@ vcs/help=vcs/scm_help()
 vcs/scm_get=vcs/cli_fetch()
 vcs=vcs/scm_help()
 version=version
+--version=version
 website=website

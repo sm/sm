@@ -47,12 +47,12 @@ __sm.command.detect()
     __key="$1"
 
     case "${__key}" in
-      *=*)
+      (*=*)
         # If command is mapping, then unwrap its key/value
         __value="${__key#*\=}"
         __key="${__key%%\=*}"
         ;;
-      *)
+      (*)
         # When no mapping then key is value
         __value="${__key}"
         ;;

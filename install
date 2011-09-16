@@ -11,7 +11,7 @@ do
       extension_args+=("--trace=all")
       ;;
     (--prefix=*)
-      prefix_path="${token/*=}"
+      prefix_path="${token/*\=}"
       ;;
     (shell)
       case "$1" in
@@ -33,7 +33,7 @@ do
       fi
       ;;
     (DESTROOT=)
-      DESTROOT="${token/*=}"
+      DESTROOT="${token/*\=}"
       ;;
     (DESTROOT)
       DESTROOT="$1"

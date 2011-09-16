@@ -84,7 +84,7 @@ __sm.cache.map.modules.initialize()
         do
           if [[ "${_action_pair}" == [[:alpha:]]* ]]
           then
-            __sm.cache.map.add "${_module_name:+${_module_name}/}${_action_pair/=*}=${_module_name:+${_module_name}/}${_action_pair/*=}"
+            __sm.cache.map.add "${_module_name:+${_module_name}/}${_action_pair/\=*}=${_module_name:+${_module_name}/}${_action_pair/*\=}"
           fi
         done < "${module_path}/actions"
       fi

@@ -59,7 +59,7 @@ ext_list_known()
 
   while read line
   do
-    printf "%20s   %s\n" "${line/=*}" "${line/*=}"
+    printf "%20s   %s\n" "${line/\=*}" "${line/*\=}"
   done < "${sm_path}/core/cli/config/known_ext"
 }
 
@@ -90,8 +90,8 @@ ext_install_all()
   while read _ext
   do
     [[ "${line}" != \#* ]] || continue
-    _name="${_ext/=*}"
-    _uri="${_ext/*=}"
+    _name="${_ext/\=*}"
+    _uri="${_ext/*\=}"
     ext_install "${_name}" "${_uri}" --on-fail true
   done < "${sm_path}/core/cli/config/known_exts"
 }
@@ -189,9 +189,9 @@ ext_check_availability()
         while read _line
         do
           [[ "${_line}" == Status* ]] || continue
-          echo "${_ext/=*}" "${_line/*:}"
+          echo "${_ext/\=*}" "${_line/*:}"
           break
-        done < <(curl -s --head https://github.com/sm/sm_"${_ext/=*}")
+        done < <(curl -s --head https://github.com/sm/sm_"${_ext/\=*}")
         ;;
     esac
   done < "${sm_path}/core/cli/config/known_ext"

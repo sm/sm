@@ -143,13 +143,17 @@ __sm.extension.run()
     (function)
       _namespaces=${_path##${extension_bin_path}}
       __sm.extension.modules.include ${_namespaces//\// }
-      action=${action%%(*}
+      setopt nullglob
+      action=${action%%\(*}
+      unsetopt nullglob
       __sm.extension.action.prerequisites
       __sm.actions.call ${action} "${extension_args[@]}"
       ;;
 
     (shell)
+      setopt nullglob
       [[ "${action##*/}" != help ]] || __sm.includes api/help
+      unsetopt nullglob
       _namespaces=${_path##${extension_bin_path}}
       __sm.extension.modules.include ${_namespaces//\// }
       __sm.extension.action.prerequisites

@@ -425,16 +425,16 @@ __sm.package.init()
   [[ -n "${package_name}" ]] || __sm.log.fail "Package name must be given.\n"
 
   case "${package_name}" in
-    *=*) # exact version specifier
-      package_version="${package_name#*=}"
-      package_name="${package_name%%=*}"
+    (*=*) # exact version specifier
+      package_version="${package_name#*\=}"
+      package_name="${package_name%%\=*}"
       ;;
-    *:*) # minimum version specifier
+    (*:*) # minimum version specifier
       # TODO: concept of 'minimum' ;)
       package_version="${package_name#*:}"
       package_name="${package_name%%:*}"
       ;;
-    *)
+    (*)
       true "${package_version:="${2:-}"}" "${archive_format:="${3:-}"}"
       ;;
   esac
@@ -989,10 +989,8 @@ __sm.packages.available()
 
 __sm.packages.list()
 {
-  local _action _args
-  _action="${1:-}"
-  shift || true
-  __sm.packages.${_action:-installed} "$@"
+  local _args
+  __sm.packages.${1:-installed} "$@"
 }
 
 __sm.package.usage() {

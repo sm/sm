@@ -11,17 +11,17 @@ __sm.exports()
 
 # Examples
 #
-#     user$ sm_version
-#     user$ echo $sm_version
+#     user$ __sm.version
+#     user$ echo $__sm_version
 #     69.69.69
 #
-sm_version()
+__sm.version()
 {
   if [[ -s "$sm_path/VERSION" ]]
   then
-    read -r sm_version < "$sm_path/VERSION"
+    read -r __sm_version < "$sm_path/VERSION"
   else
-    sm_version="?.?.?"
+    __sm_version="?.?.?"
   fi
 }
 

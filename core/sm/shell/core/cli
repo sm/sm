@@ -28,7 +28,7 @@ do
       ;;
 
     --trace=*)
-      trace_flags+=" ${token##--trace=}"
+      trace_flags+=" ${token##--trace\=}"
       ;;
 
     --debug)
@@ -37,12 +37,12 @@ do
       ;;
 
     --debug=*)
-      debug_flags+=" ${token##--debug=}"
+      debug_flags+=" ${token##--debug\=}"
       debug_flag=1
       ;;
 
     --var-debug=*)
-      var_debug_flags+=( "${token##--var-debug=}" )
+      var_debug_flags+=( "${token##--var-debug\=}" )
       ;;
 
     --var-debug-*)
@@ -50,11 +50,11 @@ do
       ;;
 
     --module=*)
-      preload_modules+=( ${token##--module=} )
+      preload_modules+=( ${token##--module\=} )
       ;;
 
     --call=*)
-      call_action="${token##--call=}"
+      call_action="${token##--call\=}"
       [[ "$call_action" =~ \/ ]] && preload_modules+=( ${call_action%/*} ) || true
       call_action="${call_action##*/}"
       ;;

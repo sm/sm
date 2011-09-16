@@ -6,8 +6,10 @@ variables()
 {
   trace_filter variables || set -o xtrace
 
-  local _command _variables=() _type __variables_commands
+  local _command _variables _type __variables_commands
+
   _variables=()
+
   __variables_commands=(
     "is empty=are empty"
     "is nonempty=are nonempty"

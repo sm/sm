@@ -155,7 +155,7 @@ then
       ${sm_path}/bin/smp ${extension_args[@]}
       ;;
     (*)
-      __sm.includes modules api/extensions/detection api/extensions/execution
+      __sm.includes sm/modules api/extensions/detection api/extensions/execution
       __sm.extension.action
       __sm.extension.actions.type
       __sm.extension.run
