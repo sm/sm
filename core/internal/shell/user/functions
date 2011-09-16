@@ -9,7 +9,7 @@ user_initialize()
 
 __sm.user.home()
 {
-  typeset _user _line
+  local _user _line
   _user="$1"
   NIY "Printing out User home, based on OS."
   if __sm.os.type.is darwin
@@ -36,7 +36,7 @@ __sm.user.home()
 
 __sm.user.shell()
 {
-  typeset _user _line
+  local _user _line
   _user="$1"
   NIY "Printing out User shell, based on OS."
   if __sm.os.type.is darwin
@@ -64,7 +64,7 @@ __sm.user.shell()
 
 __sm.user.set.shell()
 {
-  typeset _user _value
+  local _user _value
   _user="$1"
   _value="$2"
   # validate via /etc/shells, lines starting with '^/'
@@ -73,7 +73,7 @@ __sm.user.set.shell()
 
 __sm.user.set.home()
 {
-  typeset _user _value
+  local _user _value
   _user="$1"
   _value="$2"
   NIY "Setting user's home."
@@ -81,7 +81,7 @@ __sm.user.set.home()
 
 __sm.user.exists()
 {
-  typeset _name _rest IFS
+  local _name _rest IFS
   IFS=:
   while read _name _rest
   do
@@ -103,7 +103,7 @@ __sm.user.create.unless.exists()
 
 __sm.user.add()
 {
-  typeset _user _group _flags
+  local _user _group _flags
   _user="$1"
   _group="$2"
   _flags=( ${=3} )
@@ -170,7 +170,7 @@ __sm.user.add()
 
 __sm.user.remove()
 {
-  typeset _user _flags
+  local _user _flags
   _user="$1"
   _flags=( ${=2} )
 

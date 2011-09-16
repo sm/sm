@@ -2,7 +2,7 @@
 
 extension_version()
 {
-  typeset _extension
+  local _extension
   _extension=$1
   shift || __sm.log.fail "Cannot retrieve extension version;"\
     " No extension was given."
@@ -41,7 +41,7 @@ extension_version()
 #     limitations under the License.
 extension_license()
 {
-  typeset _extension
+  local _extension
   _extension="${1:-${extension}}"
 
   variable_is_nonempty _extension ||
@@ -66,7 +66,7 @@ extension_license()
 __sm.extension.actions()
 {
   NIY
-  typeset _extension _files _file _actions
+  local _extension _files _file _actions
   _extension="${1:-}"
   _actions=()
   shift || __sm.log.fail "No extension was given."
@@ -81,7 +81,7 @@ __sm.extension.actions()
 #
 __sm.extension.install()
 {
-  typeset _name _uri _version _identifier
+  local _name _uri _version _identifier
   _name="${1:-}"
   shift || __sm.log.fail "No extension name was given."
 
@@ -123,7 +123,7 @@ __sm.extension.install()
 
 __sm.extension.installed()
 {
-  typeset _token _type _modules _paths _excludes _exclude
+  local _token _type _modules _paths _excludes _exclude
   _paths=()
   _excludes=()
   args="$*"

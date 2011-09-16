@@ -18,7 +18,7 @@ api_database_initialize()
 
 __sm.database.cli()
 {
-  typeset _ignored_args args_count index token
+  local _ignored_args args_count index token
   _ignored_args=()
   args_count=${#extension_args[@]}
 

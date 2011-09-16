@@ -6,7 +6,7 @@ variables()
 {
   trace_filter variables
 
-  typeset _command _variables=() _type __variables_commands
+  local _command _variables=() _type __variables_commands
   _variables=()
   __variables_commands=(
     "is empty=are empty"

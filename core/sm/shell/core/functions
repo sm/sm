@@ -63,8 +63,8 @@ then # Allow for command_missing when a command is not found during lookup.
 
     if [[ $MACHTYPE = *linux* ]]
     then # do not run when within a subshell, Linux version.
-      typeset cmd state remainder
-      typeset -i pid ppid pgrp session tty_nr tpgid
+      local cmd state remainder
+      local -i pid ppid pgrp session tty_nr tpgid
       read pid cmd state ppid pgrp session tty_nr tpgid remainder \
         < /proc/self/stat
 

@@ -38,7 +38,7 @@ The settings file content consists of file names, and replacements for them:
 
 templates_targets()
 {
-  typeset target
+  local target
 
   (( $# )) || __sm.log.error "Please provide a template name!"
 
@@ -57,7 +57,7 @@ templates_targets()
 }
 
 templates_list() {
-  typeset template settings
+  local template settings
   template="$1"
   settings="$template.settings"
 
@@ -76,7 +76,7 @@ templates_list() {
 }
 
 templates_list_all() {
-  typeset template templates all
+  local template templates all
   case "x$1" in
     xall)
       templates=( $( ls -1d *_.* 2>/dev/null || true ) )
@@ -103,7 +103,7 @@ templates_list_all() {
 
 templates_apply_one()
 {
-  typeset target target_new key template settings
+  local target target_new key template settings
   target="$1"
   target_new="$1.$$"
   key="$1"
@@ -127,7 +127,7 @@ templates_apply_one()
 
 templates_apply_all()
 {
-  typeset list template first
+  local list template first
   first="$1"
 
   (( $# )) || __sm.log.error "Please provide a template or target name!"
@@ -152,7 +152,7 @@ templates_apply_all()
 
 templates_apply_diff()
 {
-  typeset target target_new key template settings replacements
+  local target target_new key template settings replacements
   target="$1"
   target_new="$1.new"
   key="$1"
@@ -170,7 +170,7 @@ templates_apply_diff()
 
 templates_apply_diffs()
 {
-  typeset list template
+  local list template
 
   (( $# )) || __sm.log.error "Please provide a template or target name!"
 

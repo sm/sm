@@ -4,7 +4,7 @@
 
 step()
 {
-  typeset name
+  local name
   name="$1"
 
   shift || __sm.log.fail "Cannot take step as no step name given;"\
@@ -45,7 +45,7 @@ start_step()
 
 retreat()
 {
-  typeset step
+  local step
 
   if [[ -z "${steps_started}" ]]
   then

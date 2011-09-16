@@ -2,7 +2,7 @@
 
 traps()
 {
-  typeset _token _signal _code __traps_code
+  local _token _signal _code __traps_code
 
   if [[ -z "${__sm_traps_exit_commands:-}" ]]
   then

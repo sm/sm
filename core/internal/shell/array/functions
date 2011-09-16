@@ -17,35 +17,35 @@ __sm.array.is.even()
 
 __sm.array.length()
 {
-  typeset _length
+  local _length
   eval "_length=\${#$1}"
   printf ${_length}
 }
 
 __sm.array.last()
 {
-  typeset _element
+  local _element
   eval "_element=\"\${$1[-1]}\""
   printf "${_element}"
 }
 
 __sm.array.first()
 {
-  typeset _element
+  local _element
   eval "_element=\"\${$1[1]}\""
   printf "${_element}"
 }
 
 __sm.array.push()
 {
-  typeset _name
+  local _name
   _name="${1}"
   shift
   if eval "(( \${#${_name}} > 0 ))"
   then
     (( $# )) || __sm.log.fail "No elements were given."
 
-    typeset _element
+    local _element
     for _element in "$@"
     do
       eval "${_name}+=(\"\${_element}\")"
@@ -55,12 +55,12 @@ __sm.array.push()
 
 __sm.array.append()
 {
-  typeset _name
+  local _name
   _name="${1}"
   shift
   (( $# )) || __sm.log.fail "No elements were given."
 
-  typeset _element
+  local _element
   for _element in "$@"
   do
     eval "${_name}+=(\"\${_element}\")}"
@@ -69,7 +69,7 @@ __sm.array.append()
 
 __sm.array.pop()
 {
-  typeset _name _variable index
+  local _name _variable index
   _name="${1}"
   _variable="${2:-}"
   shift || __sm.log.fail "Array name was not given."
@@ -92,7 +92,7 @@ __sm.array.pop()
 
 __sm.array.shift()
 {
-  typeset _name index _variable
+  local _name index _variable
   _name="${1:-}"
   _variable="${2:-}"
   shift || __sm.log.fail "Array name was not given."
@@ -107,11 +107,11 @@ __sm.array.shift()
 
 __sm.array.unshift()
 {
-  typeset _name
+  local _name
   _name="${1:-}"
   shift || __sm.log.fail "Array name was given."
 
-  typeset _elements=("$@")
+  local _elements=("$@")
 
   (( $# )) || __sm.log.fail "No elements were given."
 
@@ -120,7 +120,7 @@ __sm.array.unshift()
 
 __sm.array.join()
 {
-  typeset _name IFS
+  local _name IFS
   _name="${1:-}"
   shift || __sm.log.fail "Array name was not given."
   IFS=${1:-' '}
@@ -129,7 +129,7 @@ __sm.array.join()
 
 __sm.array.largest()
 {
-  typeset _name _index _largest
+  local _name _index _largest
   _name="${1:-}"
   _largest=""
   shift || __sm.log.fail "No array variable name was given."
@@ -148,7 +148,7 @@ __sm.array.largest()
 
 __sm.array.sort()
 {
-  typeset _name _direction _index _largest
+  local _name _direction _index _largest
   _name="$1"
   _direction="${2:-"asc"}"
   _largest=""
@@ -166,7 +166,7 @@ __sm.array.sort()
 
 __sm.array.unique()
 {
-  typeset _name
+  local _name
   _name="${1:-}"
   shift || __sm.log.fail "Array variable name was not given."
 

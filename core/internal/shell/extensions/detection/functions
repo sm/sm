@@ -4,7 +4,7 @@ __sm.cache.map.check()
 {
   trace_filter action_detection
 
-  typeset _found_actions _method _name _item _candidate _candidates screen_height
+  local _found_actions _method _name _item _candidate _candidates screen_height
   _found_actions=()
   _method="$1"
   _name="$2"
@@ -62,7 +62,7 @@ __sm.extension.actions.find()
   shift || __sm.log.fail "Extension path must be given as the first parameter."
   shift || __sm.log.fail "Extension name must be given as the second parameter."
 
-  typeset _action_params _action_path _new_action_path _rest_params _param_temp \
+  local _action_params _action_path _new_action_path _rest_params _param_temp \
     _action_params_length _actions_root _map _modules_root _actions_cache
   _action_params=("$@")
   _rest_params=()
@@ -142,7 +142,7 @@ __sm.extension.action()
       ;;
   esac
 
-  typeset _extension_found _action_found
+  local _extension_found _action_found
   _extension_found=0
   _action_found=0
   if __sm.extension.in.paths __sm.extension.find "${extension_args[@]}"

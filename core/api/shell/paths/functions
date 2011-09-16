@@ -49,7 +49,7 @@ path() { paths "$@" ; }
 paths()
 {
   trace_filter filesystem
-  typeset _token _command _path _paths _source _target _mode _owner _flags _glob __paths_commands
+  local _token _command _path _paths _source _target _mode _owner _flags _glob __paths_commands
   _paths=()
   __paths_commands=(
     "change owner to=chown"

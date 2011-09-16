@@ -11,7 +11,7 @@
 # Code Walkthrough
 detect_uri()
 {
-  typeset extensions_path _uri_path
+  local extensions_path _uri_path
   extensions_path="${1:-}"
   shift || fail "extensions_path must be given as first parameter."
 
@@ -30,7 +30,7 @@ detect_uri()
 
 __sm.vcs.read_uri()
 {
-  typeset _uri
+  local _uri
   _uri=$(cat $1)
   if [[ -n "${_uri}" && -d "${_uri}" && -f "${_uri}/.uri" && -s "${_uri}/.uri" ]]
   then
@@ -47,7 +47,7 @@ __sm.vcs.read_uri()
 # Code Walkthrough
 scm_identifier()
 {
-  typeset _uri
+  local _uri
   _uri="${1:-}"
   shift || fail "url must be given as first parameter."
 
@@ -66,7 +66,7 @@ scm_identifier()
 # Code Walkthrough
 is_github_uri()
 {
-  typeset _uri
+  local _uri
   _uri="${1:-}"
   shift || fail "uri must be given as first parameter."
 
@@ -91,7 +91,7 @@ is_github_uri()
 
 is_archive_uri()
 {
-  typeset _uri
+  local _uri
   _uri="${1:-}"
   shift || fail "uri must be given as first parameter."
   case "${_uri}" in
@@ -106,7 +106,7 @@ is_archive_uri()
 
 fetch_uri_detect_scm_type()
 {
-  typeset _uri
+  local _uri
   _uri="${1:-}"
   shift || fail "uri must be given as first parameter."
 

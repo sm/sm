@@ -66,7 +66,7 @@ __sm.service.initialize()
     true "${service_user:="$USER"}"
   fi
 
-  typeset _path
+  local _path
   for _path in  "${install_path}/bin" "${install_path}/sbin"
   do
     if paths exist "$_path"
@@ -108,7 +108,7 @@ __sm.service.setup()
 {
   (( $# == 0 )) || __sm.service.cli "$@"
 
-  typeset _path _file
+  local _path _file
 
   #TODO: do not use apis in internal
   files source "${extension_path}"/shell/{functions,initialize,cli}
@@ -294,7 +294,7 @@ Options:
 
 __sm.service.cli()
 {
-  typeset _ignored_args _service_args _token index
+  local _ignored_args _service_args _token index
   _ignored_args=()
   _service_args=( $@ )
   number_of_args=${#extension_args[@]}
@@ -365,7 +365,7 @@ __sm.service.cli()
 
 __sm.service.pid()
 {
-  typeset _pid _path
+  local _pid _path
   _path="${run_path:="/var/run"}/${service}"
   _pid=0
 
@@ -396,7 +396,7 @@ __sm.service.load.confd()
 
 __sm.service.initd.install()
 {
-  typeset _service _version
+  local _service _version
   _service="${1:-}"
   shift ||fail "Service name was not passed in as the first parameter"
   _version="${2:-${package_version}}"
@@ -447,7 +447,7 @@ __sm.service.init.start()
 {
   __sm.log.step "Starting ${service}..."
 
-  typeset _result _command _prefix
+  local _result _command _prefix
   _result=0
   _command=( "${service_binary}" )
 
@@ -506,7 +506,7 @@ __sm.service.init.status()
 {
   log "statusing ${service}..."
 
-  typeset _command _prefix
+  local _command _prefix
   _command=( "${service_binary}" )
 
   if [[ -n "${service_status_flags}" ]]
@@ -544,7 +544,7 @@ __sm.service.init.reload()
 {
   log "reloading ${service}..."
 
-  typeset _command
+  local _command
   _command=( "${service_binary}" )
 
   if [[ -n "${service_reload_flags}" ]]
@@ -573,7 +573,7 @@ __sm.service.init.usage()
 
 __sm.service.init.logtail()
 {
-  typeset _lines
+  local _lines
   _lines="${1:-10}"
   tail -n ${_lines} "${service_log_file}"
 }
@@ -605,7 +605,7 @@ __sm.service.confd()
 
 __sm.service.init.action()
 {
-  typeset _action
+  local _action
   _action="${1:-}"
 
   __sm.service.load.confd
@@ -636,7 +636,7 @@ __sm.service.initd()
 
 __sm.service.deactivate()
 {
-  typeset _service
+  local _service
   _service="${1:-"${service}"}"
 
   [[ -n "${_service}" ]] || __sm.log.fail "Service name must be set or given to deactivate."
@@ -680,7 +680,7 @@ __sm.service.deactivate()
 
 __sm.service.activate()
 {
-  typeset _service _version
+  local _service _version
   _service="${1:-"${service}"}"
   shift || __sm.log.fail "The service name must be set or given to activate a service."
 
@@ -752,7 +752,7 @@ __sm.service.status()
 
   if [[ -s "${service_pid_file}" ]] && (( $(head -1 ${service_pid_file}) > 0 ))
   then
-    typeset ps pid
+    local ps pid
     pid=$(head -1 ${service_pid_file})
     ps=$(ps -p ${pid} -ostate,sgi_rss,vsize | tail -1)
 
@@ -770,7 +770,7 @@ __sm.service.status()
 
     if __sm.command.exists lsof
     then
-      typeset cwd binary libraries tcp_ports udp_ports sockets logs string
+      local cwd binary libraries tcp_ports udp_ports sockets logs string
       cwd=""
       binary=""
       libraries=()
@@ -866,7 +866,7 @@ __sm.service.status()
 
 __sm.service.signal()
 {
-  typeset _signal _pid
+  local _signal _pid
   _signal="${1}"
   _pid="${2:-0}"
   shift || __sm.log.fail "Cannot signal service;"\

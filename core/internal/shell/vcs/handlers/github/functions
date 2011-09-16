@@ -12,7 +12,7 @@ internal_vcs_handlers_github_initialize()
 # Code Walkthrough
 github_get()
 {
-  typeset _uri _target branch save_fetch_error_handler
+  local _uri _target branch save_fetch_error_handler
   _uri="${1:-}"
   _target="${2:-}"
   branch=${3:-${branch:-master}}

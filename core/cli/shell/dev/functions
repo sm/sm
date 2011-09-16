@@ -2,7 +2,7 @@
 
 sm_development_setup()
 {
-  typeset _component _separator _string
+  local _component _separator _string
 
   printf -v _separator '%*s' "${_columns:-${COLUMNS:-80}}"
 
@@ -83,7 +83,7 @@ sm_development_update()
 
 extension_package()
 {
-  typeset _name _path _version file _archiver
+  local _name _path _version file _archiver
   _name="${1:-}"
   shift || __sm.log.fail "Cannot package an extension; no extension name was given."
 
@@ -124,7 +124,7 @@ extension_package()
 
 extension_publish()
 {
-  typeset _name _path _version _file
+  local _name _path _version _file
   _name="${1:-}"
   shift || __sm.log.fail "Cannot publish an extension; no extension name was given."
 
@@ -158,7 +158,7 @@ extension_publish()
 
 extension_module_add()
 {
-  typeset _extension _module _path
+  local _extension _module _path
   _extension="${1}"
   _module="${2}"
   _path="${3:-"${extensions_development_path}/${_extension}"}"

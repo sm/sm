@@ -2,7 +2,7 @@
 
 __sm.config.read()
 {
-  typeset _extension _file _key _variable _prefix _temp _value
+  local _extension _file _key _variable _prefix _temp _value
   _extension="$1"
   _file="$2"
   _key="$3"
@@ -33,7 +33,7 @@ __sm.config.read()
 
 __sm.config.write()
 {
-  typeset _extension _file _key _value
+  local _extension _file _key _value
   _extension="$1"
   _file="$2"
   _key="$3"
@@ -58,7 +58,7 @@ __sm.config.settings.search()
 {
   trace_filter config_search
 
-  typeset extension setting _path paths
+  local extension setting _path paths
   extension=$1
   setting=$2
 
@@ -87,7 +87,7 @@ __sm.config.settings.search()
 
 __sm.config.settings.search.path.update()
 {
-  typeset path _uri
+  local path _uri
   path=$1
 
   if __sm.string.contains "${path}" "${__sm_settings_search_cache[*]}"

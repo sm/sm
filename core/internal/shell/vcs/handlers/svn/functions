@@ -8,7 +8,7 @@
 svn_get()
 {
   NIY "Subversion scm_update"
-  typeset initial_pwd _uri _target
+  local initial_pwd _uri _target
   initial_pwd="$PWD"
   _uri="${1:-}"
   _target="${2:-}"

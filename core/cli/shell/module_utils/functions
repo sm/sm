@@ -4,7 +4,7 @@
 # ## modules\_installed()
 modules_installed()
 {
-  typeset _module
+  local _module
   for _module in "${__sm_modules_path}"/*
   do
     [[ -d "${_module}" ]] || continue
@@ -14,7 +14,7 @@ modules_installed()
 
 module_functions()
 {
-  typeset _function _functions _modules _path
+  local _function _functions _modules _path
   _modules="${@:-}"
 
   [[ -n "${_modules}" ]] ||
@@ -36,7 +36,7 @@ module_functions()
 
 modules_list()
 {
-  typeset _module _modules _function _functions
+  local _module _modules _function _functions
 
   for language in shell ruby
   do
@@ -55,7 +55,7 @@ modules_list()
 
 module_docs()
 {
-  typeset _function _functions _module content_flag table_flag
+  local _function _functions _module content_flag table_flag
 
   while (( $# > 0 ))
   do
@@ -84,7 +84,7 @@ module_docs()
     __sm.log.fail "Cannot generate documentation for '${_module}';"\
       " 'pygmentize' was not found in the PATH, install pygmentize and try again."
 
-  typeset _path
+  local _path
   _path="${core_development_path}/shell/${_module}"
   if (( content_flag == 1 ))
   then
@@ -104,7 +104,7 @@ modules_docgen()
   # TODO: Replace with,
   # for file in modules/*/functions ; do (name=${file%%\/functions}; shocco $file > html/${name//*\/}.html)& done ; wait
 
-  typeset _module _function _functions _name _prefix _path
+  local _module _function _functions _name _prefix _path
   _prefix="${core_development_path}/html/shell"
   _path="${site_development_path}"
 
@@ -172,7 +172,7 @@ modules_site_docgen()
   # TODO: Replace with,
   # for file in modules/*/functions ; do (name=${file%%\/functions}; shocco $file > html/${name//*\/}.html)& done ; wait
 
-  typeset _module _function _functions _name _file _prefix _path
+  local _module _function _functions _name _file _prefix _path
   _prefix="${core_development_path}/html/shell"
   _path="${site_development_path}"
 

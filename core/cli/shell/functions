@@ -3,7 +3,7 @@
 #TODO: this code should be distributed to proper places
 extension_cli()
 {
-  typeset _ignored_args _string _token
+  local _ignored_args _string _token
   _ignored_args=()
 
   number_of_args=${#extension_args[@]}
@@ -45,7 +45,7 @@ extension_cli()
 #
 actions()
 {
-  typeset _action _token
+  local _action _token
   _action="$1"
   shift || __sm.log.fail "Actions command not given."
 
@@ -75,7 +75,7 @@ actions()
 __sm.actions.maps.build()
 {
   NIY
-  typeset _path _extensions
+  local _path _extensions
   for _path in "$@"
   do
     _extensions=()

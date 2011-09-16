@@ -4,7 +4,7 @@
 config()
 {
   trace_filter config
-  typeset _token _command _file _key _value _variable _prefix
+  local _token _command _file _key _value _variable _prefix
 
   while (( $# ))
   do

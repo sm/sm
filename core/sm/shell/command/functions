@@ -17,7 +17,7 @@ __sm.command.is.function()
 
 __sm.command.run.as()
 {
-  typeset _user _flags
+  local _user _flags
   _user="$1" _flags=( ${=2} )
   shift 2
   #TODO: find a way for proper passing of params with spaces
@@ -31,7 +31,7 @@ __sm.command.run()
 
 __sm.command.detect()
 {
-  typeset __string __key __value
+  local __string __key __value
   __string="$1"
   shift
 

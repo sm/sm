@@ -12,7 +12,7 @@ __sm.cache.map.add()
 __sm.cache.map.filesystem.initialize()
 {
   trace_filter action_detection
-  typeset _action_path _file_name
+  local _action_path _file_name
 
   if [[ -d "${_actions_root}" ]]
   then
@@ -36,7 +36,7 @@ __sm.cache.map.filesystem.initialize()
 __sm.cache.map.actions.initialize()
 {
   trace_filter action_detection
-  typeset _mapping
+  local _mapping
   if [[ -f "${_map}" ]]
   then
     for _mapping in $( grep -v "^#" < "${_map}" || true )
@@ -57,7 +57,7 @@ __sm.module.detect.actions()
 __sm.cache.map.modules.initialize()
 {
   trace_filter action_detection
-  typeset _modules _module_path _module_name _action_pair
+  local _modules _module_path _module_name _action_pair
 
   if [[ ! -d "${_modules_root}" ]]
   then
@@ -94,7 +94,7 @@ __sm.cache.map.modules.initialize()
 
 __sm.cache.map.find.matching()
 {
-  typeset _method _name _item
+  local _method _name _item
   _method="$1"
   shift || __sm.log.fail "No method and action name was given for search"
   _name="$1"

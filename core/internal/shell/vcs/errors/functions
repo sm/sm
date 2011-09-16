@@ -8,7 +8,7 @@ fetch_error_initialize()
 
 fetch_error()
 {
-  typeset _message _pair
+  local _message _pair
   _message="${1:-}"
   shift || __sm.log.fail "Message must be given as first parameter."
 
@@ -30,7 +30,7 @@ fetch_error()
 
 fetch_error_default_handler()
 {
-  typeset _message
+  local _message
   _message="${1:-}"
   shift || __sm.log.fail "Message must be given as first parameter."
 

@@ -2,7 +2,7 @@
 
 __sm.package.cli()
 {
-  typeset _ignored_args _package_args _token number_of_args index
+  local _ignored_args _package_args _token number_of_args index
   _ignored_args=()
   _package_args=( $@ )
   number_of_args=${#_package_args[@]}
@@ -90,7 +90,7 @@ __sm.package.cli()
 
 __sm.package.error()
 {
-  typeset _message _log _lines
+  local _message _log _lines
   _message="$1"
   _log="$2"
   _lines="${3:-50}"
@@ -174,7 +174,7 @@ __sm.package.define()
 
 __sm.package.configure.flags()
 {
-  typeset _flag
+  local _flag
   for _flag in "$@"
   do
     if ! __sm.string.contains "${_flag}" "${configure_flags[*]}"
@@ -186,7 +186,7 @@ __sm.package.configure.flags()
 
 __sm.package.configure.flag()
 {
-  typeset _key _value
+  local _key _value
   _key="$1"
   _value="$2"
 
@@ -198,7 +198,7 @@ __sm.package.configure.flag()
 
 __sm.package.make.flags()
 {
-  typeset _flag
+  local _flag
   for _flag in "$@"
   do
     if ! __sm.string.contains "${_flag}" "${make_flags[*]}"
@@ -210,7 +210,7 @@ __sm.package.make.flags()
 
 __sm.package.package_dependencies()
 {
-  typeset _flag
+  local _flag
   for _flag in "$@"
   do
     if ! __sm.string.contains "${_flag}" "${package_dependencies[*]}"
@@ -418,7 +418,7 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
 
 __sm.package.init()
 {
-  typeset default_configure_flags _flag
+  local default_configure_flags _flag
 
   true ${package_name:=${extension}}
 
@@ -536,7 +536,7 @@ __sm.package.fetch.md5()
 {
   (( $# == 0 )) || __sm.package.cli $@
 
-  typeset download_url
+  local download_url
 
   : \
     "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
@@ -561,7 +561,7 @@ __sm.package.fetch()
 {
   (( $# == 0 )) || __sm.package.cli $@
 
-  typeset _args _entries
+  local _args _entries
   _args=()
 
   true \
@@ -605,7 +605,7 @@ __sm.package.update()
 
 __sm.package.configure()
 {
-  typeset _command
+  local _command
 
   command exists gcc || command exists cc || __sm.log.fail "No C compiler found."
 
@@ -633,7 +633,7 @@ __sm.package.configure()
 
 __sm.package.gnu.make()
 {
-  typeset _command
+  local _command
 
   if [[ -n ${build_command:-} ]]
   then
@@ -656,7 +656,7 @@ __sm.package.preinstall()
 
 __sm.package.make.install()
 {
-  typeset _command
+  local _command
 
   if [[ -n ${install_command:-} ]]
   then
@@ -692,7 +692,7 @@ __sm.package.activate()
 
 __sm.package.setup()
 {
-  typeset _package
+  local _package
   _package="${1:-${package_name}}"
 
   __sm.package.profile.d "${_package}"
@@ -727,7 +727,7 @@ __sm.package.deactivate()
 
 __sm.package.activate.first()
 {
-  typeset _package _version
+  local _package _version
   _package="${1:-}"
   _version="${2:-}"
   shift || __sm.log.fail "Package name must be given as first parameter."
@@ -743,7 +743,7 @@ __sm.package.activate.first()
 
 __sm.package.ldconfig()
 {
-  typeset _package _path _files _ldconfig
+  local _package _path _files _ldconfig
   _package="${1:-${package_name}}"
   _ldconfig="/sbin/ldconfig"
   [[ -n "${_package}" ]] || __sm.log.fail "Package name must be given."
@@ -786,7 +786,7 @@ __sm.package.ldconfig()
 
 __sm.package.profile.d()
 {
-  typeset _package
+  local _package
   _package="${1:-${package_name}}"
   [[ -n "${_package}" ]] || __sm.log.fail "Package name must be given."
 
@@ -822,7 +822,7 @@ __sm.package.uninstall()
 
 __sm.package.patch()
 {
-  typeset _patches _patch _path _paths
+  local _patches _patch _path _paths
 
   _paths=(
     "${extension_patches_path}"
@@ -844,7 +844,7 @@ __sm.package.patch()
 
 __sm.package.patches.apply()
 {
-  typeset _patch _patches
+  local _patch _patches
   _patches=("$@")
   shift || __sm.log.fail "No patches were given."
 
@@ -857,7 +857,7 @@ __sm.package.patches.apply()
 
 __sm.package.is.active()
 {
-  typeset _name _version _path
+  local _name _version _path
   _name="${1:-}"
   _version="${2:-}"
   shift || __sm.log.fail "No package name was given, or name is empty."
@@ -884,7 +884,7 @@ __sm.package.website()
 
 __sm.package.dependencies()
 {
-  typeset dependency _dependencies _missing_dependencies IFS
+  local dependency _dependencies _missing_dependencies IFS
   _dependencies=(${package_dependencies[@]})
   _missing_dependencies=()
 
@@ -912,7 +912,7 @@ __sm.package.info()
 {
   (( $# == 0 )) || __sm.package.cli $@
 
-  typeset _installed _path package_md5 _installed
+  local _installed _path package_md5 _installed
   _path="${packages_path}/versions/${package_name}"
 
   true "${package_dir:="${package_name}-${package_version}"}" \
@@ -989,7 +989,7 @@ __sm.packages.available()
 
 __sm.packages.list()
 {
-  typeset _action _args
+  local _action _args
   _action="${1:-}"
   shift || true
   __sm.packages.${_action:-installed} "$@"

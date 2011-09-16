@@ -4,7 +4,7 @@ timestamp()
 {
   trace_filter timestamp
 
-  typeset _command _params=() _name _uri __extension_commands
+  local _command _params=() _name _uri __extension_commands
   _params=()
   __extension_commands=(
     "show new"

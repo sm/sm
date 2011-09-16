@@ -8,7 +8,7 @@
 
 hash()
 {
-  typeset _token _file _keys _valid_keys
+  local _token _file _keys _valid_keys
   _valid_keys='^[^ ^=]+'
 
   while (( $# ))

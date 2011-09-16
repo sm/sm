@@ -2,7 +2,7 @@
 
 database_extension_setup()
 {
-  typeset extension module path
+  local extension module path
   extension="${1}"
   shift || __sm.log.fail "Extension must be given as the first parameter."
   module="${1}"

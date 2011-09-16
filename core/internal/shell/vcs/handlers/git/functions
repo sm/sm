@@ -7,7 +7,7 @@
 # Code Walkthrough
 git_get()
 {
-  typeset initial_pwd _uri _final_target branch remote revision _target _uri_https
+  local initial_pwd _uri _final_target branch remote revision _target _uri_https
   initial_pwd="$PWD"
   _uri="${1:-}"
   _final_target="${2:-}"

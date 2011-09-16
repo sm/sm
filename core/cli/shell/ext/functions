@@ -28,7 +28,7 @@ ext_help()
 
 ext_list()
 {
-  typeset extensions
+  local extensions
   true ${COLUMNS:=80}
 
   if __sm.extension.in "${exts_system_path}/active"
@@ -65,7 +65,7 @@ ext_list_known()
 
 ext_install()
 {
-  typeset _name _names _uri
+  local _name _names _uri
   _names="$1"
   _uri="$2"
   shift || __sm.log.fail "No extension name was given."
@@ -85,7 +85,7 @@ ext_install()
 
 ext_install_all()
 {
-  typeset _ext _name _uri
+  local _ext _name _uri
   true ${COLUMNS:=80}
   while read _ext
   do
@@ -98,7 +98,7 @@ ext_install_all()
 
 ext_update()
 {
-  typeset _name _uri
+  local _name _uri
   (( $# > 0 )) ||
     __sm.log.error "Cannot update extension ext without name."
 
@@ -133,7 +133,7 @@ ext_update()
 
 ext_update_all()
 {
-  typeset _name _entries
+  local _name _entries
   _entries=( "${exts_user_path}"/* )
 
   if (( ! "${#_entries[@]}" ))
@@ -150,7 +150,7 @@ ext_update_all()
 
 ext_uninstall()
 {
-  typeset _name
+  local _name
   _name="$1"
   case "${_name}" in
     */*|.|..)
@@ -174,7 +174,7 @@ ext_uninstall()
 
 ext_check_availability()
 {
-  typeset _ext _line _args
+  local _ext _line _args
   _args=($@)
 
   # TODO: refactor this to take argument of uri to check instead.

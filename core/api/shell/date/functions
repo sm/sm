@@ -4,7 +4,7 @@ date()
 {
   true ${date_format:="%Y-%m-%dT%H:%M:%S"}
 
-  typeset _start _end _date _step _format_in _format_out
+  local _start _end _date _step _format_in _format_out
   _step="day"
   _format_in="%Y-%m-%d"
   _format_out="%Y-%m-%d"

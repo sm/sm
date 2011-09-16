@@ -40,7 +40,7 @@
 package()
 {
   trace_filter package
-  typeset _token _subcommand _command _logfile _lines _params
+  local _token _subcommand _command _logfile _lines _params
   _lines=50
   _params=()
 

@@ -2,7 +2,7 @@
 
 process()
 {
-  typeset _command _token
+  local _command _token
 
   while (( $# ))
   do

@@ -39,7 +39,7 @@
 #
 log()
 {
-  typeset _token _command _message
+  local _token _command _message
   _message=()
 
   while (( $# ))
@@ -180,7 +180,7 @@ backtrace()
 {
   trace_filter backtrace # backtrace is disabled by default.
 
-  typeset _separator _columns _stack _trace _message _flag _source _function _line \
+  local _separator _columns _stack _trace _message _flag _source _function _line \
     _index _largest _format _digits _longest _string \
     _source_length _function_length _digits
 
@@ -375,7 +375,7 @@ backtrace()
 
 __sm.log.step()
 {
-  typeset _message _output _log_file _status
+  local _message _output _log_file _status
   _message="${1:-}"
 
   if (( $# > 1 ))
@@ -411,7 +411,7 @@ __sm.log.log()
 
 __sm.log.todo()
 {
-  typeset file line
+  local file line
   if (( debug_flag )) && __sm.log.options.check "$debug_flags" "todo"
   then
     file="${BASH_SOURCE[2]}"
@@ -480,7 +480,7 @@ __sm.set.ps4()
 
 __sm.log.trace.filter()
 {
-  typeset old _name _action
+  local old _name _action
   _action="$1"
   shift || __sm.log.fail "Filter action {start,stop} must be specified."
 
@@ -549,7 +549,7 @@ __sm.log.warn()
 
 __sm.log.debug()
 {
-  typeset type
+  local type
   type="$1"
   shift || __sm.log.fail "Debug type must be given as the first parameter."
 
@@ -570,7 +570,7 @@ __sm.log.debug()
 
 __sm.log.search()
 {
-  typeset name value
+  local name value
   name="${1:-}"
   value="${2:-}"
   shift || __sm.log.fail "name must be given as the first parameter."
@@ -592,7 +592,7 @@ __sm.actions.call()
 
 __sm.actions.source()
 {
-  typeset script
+  local script
   script="$1"
   shift || __sm.log.fail "No script was given as the first parameter."
   [[ -r "$script" ]] || __sm.log.fail "Could not find script to run: $script."
@@ -602,7 +602,7 @@ __sm.actions.source()
 
 __sm.debug.variables.callback()
 {
-  typeset _variable ction_stack
+  local _variable ction_stack
 
   if [[ -n "${BASH_VERSION}" ]]
   then
@@ -639,7 +639,7 @@ __sm.debug.variables.callback()
 
 __sm.debug.variables.callback.initialize()
 {
-  typeset _variable
+  local _variable
   for _variable in "${var_debug_flags[@]}"
   do
     eval "
@@ -663,7 +663,7 @@ __sm.seppuku()
 
 __sm.log.piece()
 {
-  typeset _message _unicode
+  local _message _unicode
   _message="${1:-}"
   _unicode=0
   true ${LINES:=$(tput cols)}
@@ -720,7 +720,7 @@ __sm.log.piece()
 
 __sm.tmp.logs.clean()
 {
-  typeset _log
+  local _log
   [[ -d "${TMP_PATH:-/tmp}"/$$/logs ]] || return 0
   for _log in "${TMP_PATH:-/tmp}"/$$/logs/*.err.log
   do
@@ -741,7 +741,7 @@ __sm.log.options.check()
 
 __sm.log.rotate()
 {
-  typeset _file _tail_pid
+  local _file _tail_pid
   _file="${1:-}"
   shift || __sm.log.fail "Cannot rotate a log file, as no log file was given."
 
@@ -773,7 +773,7 @@ __sm.log.rotate()
 
 __sm.log.streams()
 {
-  typeset _command _prefix _err _out _mix _token
+  local _command _prefix _err _out _mix _token
   _command="${1:-}"
 
   # TODO: allow specification of path, name prefix

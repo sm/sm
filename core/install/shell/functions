@@ -18,7 +18,7 @@ perform()
 
 prepare_for_installation()
 {
-  typeset directory _path
+  local directory _path
 
   __sm.log.step "Ensuring that installation target path exists (${install_path})"
   paths create "${install_path}"
@@ -41,7 +41,7 @@ prepare_for_installation()
 
 cleanse_targets()
 {
-  typeset _path _entity
+  local _path _entity
   _path="$1"
   shift || __sm.log.fail "Usage:\n\n  cleanse_targets {target} {paths/files under target}"
   for _entity in "$@"
@@ -52,7 +52,7 @@ cleanse_targets()
 
 install_core()
 {
-  typeset _dir
+  local _dir
 
   __sm.log.step "Installing core directories (${directories[*]})"
   cleanse_targets "${install_path}" "${directories[@]}"
@@ -82,7 +82,7 @@ install_configuration_files()
 
 setup_shell_completion()
 {
-  typeset _prefix _mode _name
+  local _prefix _mode _name
   _prefix="/etc"
 
   paths exists "${_prefix}/bash_completion.d" || return 0
@@ -102,7 +102,7 @@ setup_shell_completion()
 
 setup_profile_d()
 {
-  typeset _PATH
+  local _PATH
   _PATH="PATH=\"\${PATH}:${install_path}/bin:${install_path}/pkg/active/bin:${install_path}/pkg/active/sbin\""
 
   if user is root
@@ -179,7 +179,7 @@ set_sm_path()
 
 make_binaries_executable()
 {
-  typeset _binary
+  local _binary
   for _binary in "${binaries[@]}"
   do
     file chmod 0755 "${install_path}/bin/${_binary}"
@@ -188,7 +188,7 @@ make_binaries_executable()
 
 set_binaries_shell()
 {
-  typeset _binary
+  local _binary
   for _binary in sm smp
   do
     file replace \

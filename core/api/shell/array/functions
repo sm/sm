@@ -29,7 +29,7 @@
 array()
 {
   trace_filter array
-  typeset _command _subcommand _name _variable
+  local _command _subcommand _name _variable
   _command="$1"
   shift || __sm.log.fail "Array command must be given as the first parameter."
 
