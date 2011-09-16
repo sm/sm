@@ -51,10 +51,9 @@ __sm.string.number.of.words()
 
 __sm.string.to.function.name()
 {
-  typeset __string IFS
-  __string=( $@ )
-  IFS="."
-  printf "${__string[*]}\n"
+  typeset __string
+  __string=$*
+  printf "${__string// /.}\n"
 }
 
 __sm.string.ematch()
