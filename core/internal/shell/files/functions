@@ -165,9 +165,11 @@ __sm.files.copy()
 
 __sm.files.chown()
 {
-  typeset _owner="$1" _flags=($2)
+  typeset _owner _flags _file _files
+  _owner="$1"
+  _flags=($2)
   shift 2
-  typeset _file _files=("$@")
+  _files=("$@")
   chown ${_flags[@]} "${_owner}" "${_files[@]}" ||
     __sm.log.fail "There was an error ($?) chowning"\
     " files '${_files[@]}' owner to '${_owner}'."
