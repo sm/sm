@@ -476,9 +476,9 @@ __sm.log.search()
 __sm.actions.call()
 {
   local _action
-  _action="$1" && shift
+  _action=(${=1}) && shift
   trace_filter action || set -o xtrace
-  $_action $@
+  ${_action[@]} $@
 }
 
 __sm.actions.source()
