@@ -36,13 +36,11 @@ __sm.cache.map.check()
   then
     _candidates=()
 
-    setopt nullglob
     for _candidate in "${_found_actions[@]}"
     do
       _candidate="${_candidate%%\=*}"
       _candidates+=( "sm ${extension} ${_candidate//\// } ${_rest_params[@]}\n" )
     done
-    unsetopt nullglob
 
     screen_height=${LINES:-20}
     if (( ${#_found_actions[@]} + 4  > screen_height ))
@@ -69,7 +67,7 @@ __sm.extension.actions.find()
 
   local _action_params _action_path _new_action_path _rest_params _param_temp \
     _action_params_length _actions_root _map _modules_root _actions_cache
-  _action_params=("$@")
+  _action_params=( "$@" )
   _rest_params=()
   _actions_root="${extensions_path}/${extension}/bin"
   _map="${extensions_path}/${extension}/map"
@@ -100,17 +98,12 @@ __sm.extension.actions.find()
         return 0
       fi
 
-      # Not found, go down one level
-      _action_params_length=${#_action_params[@]}
-      (( _action_params_length )) || break # finish if no more params
+      # no more params
+      (( ${#_action_params} )) || break # finish if no more params
 
-      #TODO: account for zsh indexes ( -1 -> -0 )
-      _param_temp="${_action_params[$(( _action_params_length - 1 ))]}"
-      _rest_params=( "${_param_temp}" "${_rest_params[@]}" )
-      if [[ -n "${ZSH_VERSION}" ]];then unsetopt nullglob;else shopt -u nullglob;fi
+      # Not found, go down one level
+      _rest_params=( "${_action_params[-1]}" "${_rest_params[@]}" )
       _action_params=( ${_action_params[1,-2]} )
-      if [[ -n "${ZSH_VERSION}" ]];then setopt nullglob;else shopt -s nullglob;fi
-      _action_params=( "${=action_params}" ) # Just in case ... works without it
     done
   else
     __sm.log.error "${extensions_path}/${extension} does not have map or module dependencies with actions"
@@ -130,20 +123,20 @@ __sm.extension.action()
   unset extension action
 
   #TODO: Should be moved to core/cli?
-  case "${extension_args[${__sm_array_start}]}" in
+  case "${extension_args[1]}" in
     (*\=*) # exact version specifier
-      package_name="${extension_args[${__sm_array_start}]}"
+      package_name="${extension_args[1]}"
       export package_version="${package_name##*\=}"
       export package_name="${package_name%%\=*}"
       export extension="${package_name}"
-      extension_args[${__sm_array_start}]="${extension}"
+      extension_args[1]="${extension}"
       ;;
     (*:*)
-      package_name="${extension_args[${__sm_array_start}]}"
+      package_name="${extension_args[1]}"
       export package_version="${package_name##*:}"
       export package_name="${package_name%%:*}"
       export extension="${package_name}"
-      extension_args[${__sm_array_start}]="${extension}"
+      extension_args[1]="${extension}"
       ;;
   esac
 
@@ -174,7 +167,7 @@ __sm.extension.action()
     then
       __sm.log.error "Unknown action path: "${extension_args[@]}"\n\nUsage: \n  sm extension [namespace] [action].\n"
     else
-      __sm.log.error "Could not find extension: "${extension_args}"\n"
+      __sm.log.error "Could not find extension: "${extension_args[1]}"\n"
     fi
   fi
 

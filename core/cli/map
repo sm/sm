@@ -62,6 +62,7 @@ sets/update=sets/update/sets_update()
 sets/package=sets/sets_package()
 sets/info=sets/sets_info()
 sets/release=sets/sets_release()
+sets/list=sets/sets_list()
 sets=sets/sets_list()
 shell=console
 smrc/install=smrc/smrc_install()

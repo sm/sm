@@ -74,7 +74,7 @@ __sm.extension.in()
 
   if [[ -d "${_path}" ]]
   then
-    for _extension in "${_path}"/*
+    for _extension in ${_path}/*
     do
       if [[ -d "${_extension}/bin" || -d "${_extension}/shell" ]]
       then

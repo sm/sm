@@ -68,12 +68,8 @@ extension_action_completion()
   _action_found=0
   _extension_found=0
   last_char="${extension_args:${#extension_args}-1:1}"
-  _args=( ${extension_args} )
-
-  if [[ -n "${ZSH_VERSION}" ]];then unsetopt nullglob;else shopt -u nullglob;fi
-  unset _args[${__sm_array_start}]
-  if [[ -n "${ZSH_VERSION}" ]];then setopt nullglob;else shopt -s nullglob;fi
-  _args=( ${_args[@]} )
+  _args=( ${=extension_args} )
+  _args=( ${_args[1,-2]} )
   show_word=${#_args[@]}
 
   if __sm.extension.in.paths __sm.extension.find "${_args[@]}"

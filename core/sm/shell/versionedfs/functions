@@ -353,11 +353,8 @@ __sm.versionedfs.list()
   then
     _name="${_name//,/ }"
   fi
-  setopt nullglob
-  _packages=($( "${_path}"/versions/*/* ))
-  unsetopt nullglob
 
-  for __path in "${_packages[@]}"
+  for __path in ${_path}/versions/*/*
   do
     __version="${__path##*/}"
     case "${_method}" in

@@ -1,8 +1,7 @@
 #!/bin/sh
 
 # The following shell options must be enabled for the SM Framework.
-if [[ -n "${ZSH_VERSION}" ]];
-then setopt extendedglob nullglob ; else shopt -s extglob nullglob ; fi
+setopt EXTENDED_GLOB NULL_GLOB
 
 saved_sm_path="${sm_path:-"/sm"}"
 

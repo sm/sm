@@ -78,16 +78,10 @@ __sm.array.pop()
 
   if [[ -n "${_variable}" ]]
   then
-    # TODO: Account for zsh vs bash (-1)
-    eval "${_variable}=\${${_name}[\${#${_name}[@]}-1]}"
+    eval "${_variable}=\${${_name}[-1]}"
   fi
 
-  if [[ -n "${ZSH_VERSION}" ]];then unsetopt nullglob;else shopt -u nullglob;fi
-  eval "unset ${_name}[\${#${_name}[@]}-1]"
-  if [[ -n "${ZSH_VERSION}" ]];then setopt nullglob;else shopt -s nullglob;fi
-
-  #TODO: check if this one is required:
-  eval "${_name}=( \"\${${_name}[@]}\" ) "
+  eval "${_name}=( \"\${${_name}[1,-2]}\" ) "
 }
 
 __sm.array.shift()
@@ -99,10 +93,7 @@ __sm.array.shift()
 
   [[ -z "${_variable}" ]] || eval "${_variable}=\${${_name}[${__sm_array_start}]}"
 
-  if [[ -n "${ZSH_VERSION}" ]];then unsetopt nullglob;else shopt -u nullglob;fi
-  unset "${_name}[${__sm_array_start}]"
-  if [[ -n "${ZSH_VERSION}" ]];then setopt nullglob;else shopt -s nullglob;fi
-  eval "${_name}=( \"\${${_name}[@]}\" ) "
+  eval "${_name}=( \"\${${_name}[2,-1]}\" ) "
 }
 
 __sm.array.unshift()
@@ -152,16 +143,13 @@ __sm.array.sort()
   _name="$1"
   _direction="${2:-"asc"}"
   _largest=""
-  if [[ "${_direction}" == "desc" ]]
+  if [[ "${_direction}" == "asc" ]]
   then
-    eval "${_name}=(\$(
-  echo \"\${${_name}[@]}\" | sed -e 's/\s/\n/g' | sort -r
-  ))"
+    _direction=o
   else
-    eval "${_name}=(\$(
-    echo \"\${${_name}[@]}\" | tr ' ' \"\n\" | sort
-    ))"
+    _direction=O
   fi
+  eval "${_name}=( \"\${(${_direction})${_name}}\" )"
 }
 
 __sm.array.unique()
@@ -170,8 +158,5 @@ __sm.array.unique()
   _name="${1:-}"
   shift || __sm.log.fail "Array variable name was not given."
 
-  eval "${_name}=(\$(
-  echo \" \${${_name}[@]} \" |
-  awk -v RS=' ' -v ORS=' ' '!(\$0 in a){a[\$0];print}'
-  ))"
+  eval "${_name}=( \${(u)${_name}[@]} )"
 }

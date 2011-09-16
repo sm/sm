@@ -4,31 +4,6 @@
 # SM Framework Core Module ~ Modules (modules)
 #
 
-modules()
-{
-  __sm.log.warn "modules() is depreciated, instead use includes()"
-  __sm.includes "$@"
-}
-
-# modules()
-includes()
-{
-  __sm.includes "$@"
-}
-
-__sm.includes()
-{
-  case "$1" in
-    (include|load)
-      shift #compatibility mode
-      ;;
-  esac
-
-  [[ -n "$*" ]] || __sm.log.fail "No modules given to include."
-
-  __sm.modules.include "$@"
-}
-
 __sm.modules.core.initialize()
 {
   (( ! ${__sm_modules_initialized:=0} )) || return 0
@@ -63,6 +38,85 @@ __sm.modules.core.initialize()
       __sm.log.error "Cannot preload module: ${_module}."
     fi
   done
+}
+
+__sm.extension.paths.initialize()
+{
+  local _extension_set_path
+
+  if [[ -z "${extensions_search_paths[*]}" ]]
+  then
+    extensions_search_paths=()
+
+    # Single user extensions
+    if [[ "${exts_system_path}" != "${exts_user_path}" ]]
+    then
+      extensions_search_paths+=( "${exts_user_path}/active" )
+    fi
+
+    # Single system extensions
+    extensions_search_paths+=( "${exts_system_path}/active" )
+
+    # User extension sets
+    if [[ "${sets_system_path}" != "${sets_user_path}" ]]
+    then
+      for _extension_set_path in "${sets_user_path}"/active/*
+      do
+        if [[ -d "${_extension_set_path}" ]]
+        then
+          extensions_search_paths+=( "${_extension_set_path}" )
+        fi
+      done
+    fi
+
+    # System extension sets
+    for _extension_set_path in "${sets_system_path}"/active/*
+    do
+      if [[ -d "${_extension_set_path}" ]]
+      then
+        extensions_search_paths+=( "${_extension_set_path}" )
+      fi
+    done
+  fi
+
+  case " ${extensions_search_paths[*]} " in
+    (*[[:space:]]${sm_path}/core[[:space:]]*)
+      true
+      ;;
+    (*) # Core is required to run, add it if not found
+      extensions_search_paths+=( "${sm_path}/core" )
+    ;;
+  esac
+
+  __sm.log.debug search "sets_user_path:${sets_user_path}:"
+  __sm.log.debug search "exts_user_path:${exts_user_path}:"
+  __sm.log.debug search "extensions_search_paths:${extensions_search_paths[*]}:"
+  export extensions_search_paths
+}
+
+modules()
+{
+  __sm.log.warn "modules() is depreciated, instead use includes()"
+  __sm.includes "$@"
+}
+
+# modules()
+includes()
+{
+  __sm.includes "$@"
+}
+
+__sm.includes()
+{
+  case "$1" in
+    (include|load)
+      shift #compatibility mode
+      ;;
+  esac
+
+  [[ -n "$*" ]] || __sm.log.fail "No modules given to include."
+
+  __sm.modules.include "$@"
 }
 
 __sm.modules.include()
@@ -202,60 +256,6 @@ __sm.cli.in.path()
   shift || __sm.log.fail "Callback name must be given ast the first parameter."
 
   "${callback}" "${sm_path}/core" "cli" "$@"
-}
-
-__sm.extension.paths.initialize()
-{
-  local _extension_set_path
-
-  if [[ -z "${extensions_search_paths[*]}" ]]
-  then
-    extensions_search_paths=()
-
-    # Single user extensions
-    if [[ "${exts_system_path}" != "${exts_user_path}" ]]
-    then
-      extensions_search_paths+=( "${exts_user_path}/active" )
-    fi
-
-    # Single system extensions
-    extensions_search_paths+=( "${exts_system_path}/active" )
-
-    # User extension sets
-    if [[ "${sets_system_path}" != "${sets_user_path}" ]]
-    then
-      for _extension_set_path in "${sets_user_path}"/active/*
-      do
-        if [[ -d "${_extension_set_path}" ]]
-        then
-          extensions_search_paths+=( "${_extension_set_path}" )
-        fi
-      done
-    fi
-
-    # System extension sets
-    for _extension_set_path in "${sets_system_path}"/active/*
-    do
-      if [[ -d "${_extension_set_path}" ]]
-      then
-        extensions_search_paths+=( "${_extension_set_path}" )
-      fi
-    done
-  fi
-
-  case " ${extensions_search_paths[*]} " in
-    (*[[:space:]]${sm_path}/core[[:space:]]*)
-      true
-      ;;
-    (*) # Core is required to run, add it if not found
-      extensions_search_paths+=( "${sm_path}/core" )
-    ;;
-  esac
-
-  __sm.log.debug search "sets_user_path:${sets_user_path}:"
-  __sm.log.debug search "exts_user_path:${exts_user_path}:"
-  __sm.log.debug search "extensions_search_paths:${extensions_search_paths[*]}:"
-  export extensions_search_paths
 }
 
 __sm.extension.path.reorder()
