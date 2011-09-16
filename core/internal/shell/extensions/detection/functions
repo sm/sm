@@ -44,7 +44,7 @@ __sm.cache.map.check()
     done
     unsetopt nullglob
 
-    screen_height=${LINES:-$(tput lines 2>/dev/null || echo 20)}
+    screen_height=${LINES:-20}
     if (( ${#_found_actions[@]} + 4  > screen_height ))
     then
       __sm.log.error "More than one matching action found;\n\nDid you mean:\n ${_candidates[*]}\n" 2>&1 | less

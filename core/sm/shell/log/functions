@@ -185,9 +185,7 @@ backtrace()
   _source_length=20
   _function_length=20
   _digits=1
-
-  _columns=$( tput cols 2>/dev/null || true )
-  : "${_columns:=${COLUMNS:-80}}"
+  _columns=${COLUMNS:-80}
   _separator=$(printf '%*s' "${_columns}")
   _message="${1:-}" _flag="$2"
   [[ -z ${_message} ]] || printf "\n${_message}\n\n" >&2
@@ -557,7 +555,7 @@ __sm.log.piece()
   local _message _unicode
   _message="${1:-}"
   _unicode=0
-  true ${LINES:=$(tput cols)}
+  true ${LINES:=20}
 
   if [[ -z "${LANG:-}" || "${LANG}" = *UTF* || "${LANG}" = *utf8* ]]
   then
