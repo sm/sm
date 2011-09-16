@@ -48,7 +48,7 @@ path() { paths "$@" ; }
 
 paths()
 {
-  trace_filter filesystem
+  trace_filter filesystem || set -o xtrace
   local _token _command _path _paths _source _target _mode _owner _flags _glob __paths_commands
   _paths=()
   __paths_commands=(

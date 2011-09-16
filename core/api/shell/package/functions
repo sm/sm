@@ -39,7 +39,7 @@
 #
 package()
 {
-  trace_filter package
+  trace_filter package || set -o xtrace
   local _token _subcommand _command _logfile _lines _params
   _lines=50
   _params=()

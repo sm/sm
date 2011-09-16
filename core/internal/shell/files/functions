@@ -79,7 +79,7 @@ __sm.files.remove()
 
 __sm.files.create()
 {
-  trace_filter filesystem
+  trace_filter filesystem || set -o xtrace
   local _file _path _files
   _files=("$@")
   shift || __sm.log.fail "Cannot ensure files exist; No files were given."

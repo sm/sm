@@ -7,7 +7,7 @@ api_extensions_initialize()
 
 extension()
 {
-  trace_filter extensions
+  trace_filter extensions || set -o xtrace
 
   local _command _params _name _uri __extension_commands
   _params=()

@@ -9,7 +9,7 @@
 # This is what is used by service extensions.
 service()
 {
-  trace_filter service
+  trace_filter service || set -o xtrace
 
   local _token _command _parameters
   _parameters=()

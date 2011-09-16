@@ -2,7 +2,7 @@
 
 command()
 {
-  trace_filter command
+  trace_filter command || set -o xtrace
   local _command _subcommand _token _user _code _flags
   _flags=()
 

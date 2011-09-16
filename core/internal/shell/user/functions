@@ -223,6 +223,11 @@ __sm.user.is.root()
   (( UID == __sm_user_id_root ))
 }
 
+__sm.user.is.not.root()
+{
+  (( UID != __sm_user_id_root ))
+}
+
 __sm.user.is.privileged()
 {
   (( UID < __sm_user_id_users ))

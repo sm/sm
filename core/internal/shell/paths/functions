@@ -125,7 +125,7 @@ __sm.paths.copy()
 
 __sm.paths.chown()
 {
-  trace_filter filesystem
+  trace_filter filesystem || set -o xtrace
   local _identity _flags _path _command
   _identity="$1"
   _flags="$2"
@@ -148,7 +148,7 @@ __sm.paths.chown()
 
 __sm.paths.chmod()
 {
-  trace_filter filesystem
+  trace_filter filesystem || set -o xtrace
   local _mode _flags
   _mode="$1"
   _flags="$2"

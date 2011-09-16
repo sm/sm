@@ -44,7 +44,7 @@
 #
 versionedfs()
 {
-  trace_filter versionedfs
+  trace_filter versionedfs || set -o xtrace
 
   local _token _path _paths _source _name _version _strategy _method _activate _action
   _action="${1:-}"

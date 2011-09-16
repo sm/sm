@@ -11,7 +11,7 @@
 #
 os()
 {
-  trace_filter os
+  trace_filter os || set -o xtrace
 
   local _command _subcommand
 

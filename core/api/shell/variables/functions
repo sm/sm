@@ -4,7 +4,7 @@ variable() { variables "$@"; }
 
 variables()
 {
-  trace_filter variables
+  trace_filter variables || set -o xtrace
 
   local _command _variables=() _type __variables_commands
   _variables=()

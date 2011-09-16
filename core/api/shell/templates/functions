@@ -21,7 +21,7 @@
 template() { templates "$@" ; }
 templates()
 {
-  trace_filter templates
+  trace_filter templates || set -o xtrace
 
   local _command _name _target _source _mode _owner _template _params __templates_commands
   _source="${extension_templates_path}" \

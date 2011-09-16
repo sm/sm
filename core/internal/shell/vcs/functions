@@ -18,7 +18,7 @@ internal_vcs_initialize()
 
 fetch_uri()
 {
-  trace_filter vcs
+  trace_filter vcs || set -o xtrace
   fetch_error_initialize "$@"
 
   local vcs_initial_pwd _uri _target _args

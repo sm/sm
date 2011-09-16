@@ -56,7 +56,7 @@ __sm.config.write()
 
 __sm.config.settings.search()
 {
-  trace_filter config_search
+  trace_filter config_search || set -o xtrace
 
   local extension setting _path paths
   extension=$1

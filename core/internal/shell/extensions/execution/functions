@@ -89,7 +89,7 @@ __sm.extension.modules.include()
 
 __sm.extension.action.prerequisites()
 {
-  trace_filter action_pre
+  trace_filter action_pre || set -o xtrace
   local _pre _name _action _extension
   _action="${action// *}"
   _extension="${extension// *}"
@@ -130,7 +130,7 @@ __sm.extension.action.prerequisites()
 
 __sm.extension.run()
 {
-  trace_filter extension_run
+  trace_filter extension_run || set -o xtrace
 
   local _type _path _namespaces
   _type="${action_type:-}"

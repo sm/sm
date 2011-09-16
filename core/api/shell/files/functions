@@ -13,7 +13,7 @@ file() { files "$@" ; }
 
 files()
 {
-  trace_filter filesystem
+  trace_filter filesystem || set -o xtrace
 
   local _token _command _subcommand _path _file _files _source _target _mode \
     _owner _flags _string _regex __files_commands

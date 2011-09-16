@@ -11,7 +11,7 @@ __sm.cache.map.add()
 # Step 1 collect direct filesystem mapping
 __sm.cache.map.filesystem.initialize()
 {
-  trace_filter action_detection
+  trace_filter action_detection || set -o xtrace
   local _action_path _file_name
 
   if [[ -d "${_actions_root}" ]]
@@ -35,7 +35,7 @@ __sm.cache.map.filesystem.initialize()
 # Step 2 read map
 __sm.cache.map.actions.initialize()
 {
-  trace_filter action_detection
+  trace_filter action_detection || set -o xtrace
   local _mapping
   if [[ -f "${_map}" ]]
   then
@@ -56,7 +56,7 @@ __sm.module.detect.actions()
 # Step 3 collect dependent modules mapping
 __sm.cache.map.modules.initialize()
 {
-  trace_filter action_detection
+  trace_filter action_detection || set -o xtrace
   local _modules _module_path _module_name _action_pair
 
   if [[ ! -d "${_modules_root}" ]]

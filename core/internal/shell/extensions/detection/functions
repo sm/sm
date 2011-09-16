@@ -2,7 +2,7 @@
 
 __sm.cache.map.check()
 {
-  trace_filter action_detection
+  trace_filter action_detection || set -o xtrace
 
   local _found_actions _method _name _item _candidate _candidates screen_height
   _found_actions=()
@@ -56,7 +56,7 @@ __sm.cache.map.check()
 
 __sm.extension.actions.find()
 {
-  trace_filter action_detection
+  trace_filter action_detection || set -o xtrace
   extensions_path="$1" extension="$2"
 
   shift || __sm.log.fail "Extension path must be given as the first parameter."
@@ -115,7 +115,7 @@ __sm.extension.actions.find()
 
 __sm.extension.action()
 {
-  trace_filter action_detection
+  trace_filter action_detection || set -o xtrace
 
   (( extension_action_calls == 0 )) ||
     __sm.log.fail "Cannot call a 2nd time, args: ${extension_args[*]}"

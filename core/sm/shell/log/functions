@@ -111,23 +111,23 @@ log_step()
   __sm.log.step "$@"
 }
 
-trace_filter()
+__sm.trace_filter()
 {
-  set +o xtrace
   if [[ -n "$1" ]]
   then
     if [[ -n "${BASH_VERSION}" ]]
     then
-      __sm.log.trace.filter start "$state" "${FUNCNAME[1]}=$1"
+      __sm.log.trace.filter start "${FUNCNAME[1]}=$1"
     elif [[ -n "${ZSH_VERSION}" ]]
     then
       #true # no-op for now
-      __sm.log.trace.filter start "$state" "${funcstack[2]}=$1"
+      __sm.log.trace.filter start "${funcstack[1]}=$1"
     fi
   else
-    __sm.log.trace.filter stop "$state" "${__sm_trace_filter_stack[@]}"
+    __sm.log.trace.filter stop "${__sm_trace_filter_stack[@]}"
   fi
 }
+alias trace_filter='set +o xtrace ; __sm.trace_filter'
 
 # Examples
 #
@@ -178,7 +178,7 @@ trace_filter()
 # ### Code Walkthrough
 backtrace()
 {
-  trace_filter backtrace # backtrace is disabled by default.
+  trace_filter backtrace || set -o xtrace # backtrace is disabled by default.
 
   local _separator _columns _stack _trace _message _flag _source _function _line \
     _index _largest _format _digits _longest _string \
@@ -497,7 +497,7 @@ __sm.log.trace.filter()
         _name="${FUNCNAME[2]}"
       elif [[ -n "${ZSH_VERSION}" ]]
       then
-        _name="${funcstack[3]}"
+        _name="${funcstack[2]}"
       fi
 
       if [[ "${_name}" == "${old}" ]]
@@ -515,29 +515,15 @@ __sm.log.trace.filter()
 
   if [[ -n "$filter" ]]
   then
-    if [[ -n "${BASH_VERSION}" ]]
+    if __sm.log.options.check "$trace_flags" "${filter##*=}"
     then
-      if __sm.log.options.check "$trace_flags" "${filter##*=}"
-      then
-        trap 'set +o xtrace "\$?=$?" ; trace_filter' RETURN
-      elif [[ -n "${ZSH_VERSION}" ]]
-      then
-        true # what to do...
-      fi
-      set -o xtrace
+      return 1
     fi
   else
     # No param, restore default state
     if (( trace_flag != 0 ))
     then
-      if [[ -n "${BASH_VERSION}" ]]
-      then
-        trap 'set +o xtrace "\$?=$?" ; trace_filter' RETURN
-      elif [[ -n "${ZSH_VERSION}" ]]
-      then
-        true # what to do...
-      fi
-      set -o xtrace
+      return 1
     fi
   fi
 }
@@ -586,7 +572,7 @@ __sm.log.search()
 
 __sm.actions.call()
 {
-  trace_filter action
+  trace_filter action || set -o xtrace
   "$@"
 }
 
@@ -596,7 +582,7 @@ __sm.actions.source()
   script="$1"
   shift || __sm.log.fail "No script was given as the first parameter."
   [[ -r "$script" ]] || __sm.log.fail "Could not find script to run: $script."
-  trace_filter action
+  trace_filter action || set -o xtrace
   source "$script"
 }
 

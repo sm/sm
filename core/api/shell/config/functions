@@ -3,7 +3,7 @@
 
 config()
 {
-  trace_filter config
+  trace_filter config || set -o xtrace
   local _token _command _file _key _value _variable _prefix
 
   while (( $# ))

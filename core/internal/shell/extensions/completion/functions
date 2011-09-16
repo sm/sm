@@ -2,7 +2,7 @@
 
 find_starting_action()
 {
-  trace_filter action_completion
+  trace_filter action_completion || set -o xtrace
   extensions_path="$1" extension="$2"
   shift || __sm.log.fail "Cannot detect extension existence;"\
     " No extension path was given."
@@ -63,7 +63,7 @@ show_extension_names()
 
 extension_action_completion()
 {
-  trace_filter action_completion
+  trace_filter action_completion || set -o xtrace
   local _action_found _extension_found _extension_found_path cut_count last_char _args
   _action_found=0
   _extension_found=0
