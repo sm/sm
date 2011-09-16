@@ -7,7 +7,7 @@ __sm.package.cli()
   _package_args=( $@ )
   number_of_args=${#_package_args[@]}
 
-  for (( index=0 ; index < $number_of_args ; index++ ))
+  for (( index=1 ; index <= $number_of_args ; index++ ))
   do
     _token="${_package_args[$index]}"
     case "${_token}" in

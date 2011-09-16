@@ -195,7 +195,7 @@ backtrace()
   setopt extendedglob
   _stack=(${funcstack[@]})
   _trace=(${functrace[@]})
-  for (( _index=1 ; _index < ${#_stack} ; _index++ ))
+  for (( _index=1 ; _index <= ${#_stack} ; _index++ ))
   do
     _string=${functrace[${_index}]}
     _string="${_string%:*}"
@@ -238,7 +238,7 @@ backtrace()
   printf "${_separator// /=}\n" 1>&2
 
   # Iterate over the functions array stack, skipping this backtrace function [0].
-  for (( _index=1 ; _index < ${#_stack[@]} ; ++_index ))
+  for (( _index=1 ; _index <= ${#_stack[@]} ; ++_index ))
   do
     _string="${funcfiletrace[${_index}]}"
     _source="${_string%:*}"

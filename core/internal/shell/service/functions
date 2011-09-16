@@ -300,7 +300,7 @@ __sm.service.cli()
   number_of_args=${#extension_args[@]}
   #TODO WTF: which ^ params should be checked here ?
 
-  for (( index=0 ; index < $number_of_args ; index++ ))
+  for (( index=1 ; index <= $number_of_args ; index++ ))
   do
     token="${extension_args[$index]}"
 

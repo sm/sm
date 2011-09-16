@@ -86,7 +86,7 @@ __sm.templates.seed()
   array is even _hash || __sm.log.fail "Cannot seed template;"\
     " Every replacement key must have a replacement value."
 
-  for (( index=0 ; index < ${#_hash[@]} ; index++ ))
+  for (( index=1 ; index <= ${#_hash[@]} ; index++ ))
   do
     _strings+=(-e "s#{{${_hash[${index}]}}}#${_hash[$((++index))]}#g")
   done
@@ -125,7 +125,7 @@ __sm.templates.update()
 
   _template="${template_path}"
 
-  for (( index=0 ; index < ${#_hash[@]} ; index++ ))
+  for (( index=1 ; index <= ${#_hash[@]} ; index++ ))
   do
     _strings+=(-e "s#{{${_hash[${index}]}}}#${_hash[$((++index))]}#g")
   done

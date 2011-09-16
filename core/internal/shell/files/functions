@@ -474,7 +474,7 @@ __sm.files.absolute.path()
   _amount=$#
   _recorded_path=$PWD
 
-  for (( _index=0 ; _index < _amount ; _index++ ))
+  for (( _index=1 ; _index <= _amount ; _index++ ))
   do
     _path=${_paths[_index]}
 

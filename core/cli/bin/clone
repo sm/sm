@@ -6,7 +6,7 @@ NYI
 [[ -n "${extension_args}" ]] ||
   __sm.log.error "clone: An extension name must be specified."
 
-for (( index = 0 ; index < ${#extension_args[@]} ; index++ ))
+for (( index = 1 ; index <= ${#extension_args[@]} ; index++ ))
 do
   token="${extension_args[${index}]}"
   case "${token}" in

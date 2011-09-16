@@ -135,7 +135,7 @@ __sm.array.largest()
   shift || __sm.log.fail "No array variable name was given."
 
   eval "
-  for (( _index=0 ; _index < \${#${_name}[@]} ; _index++ ))
+  for (( _index=1 ; _index <= \${#${_name}[@]} ; _index++ ))
   do
     if (( \${#${_name}[\${_index}]} > \${#_largest} ))
     then

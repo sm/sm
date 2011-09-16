@@ -6,7 +6,7 @@ version_pattern="+([[:digit:]]).+([[:digit:]]).+([[:digit:]])"
 
 _ignored_args=()
 
-for (( index=0 ; index < ${#extension_args[@]} ; index++ ))
+for (( index=1 ; index <= ${#extension_args[@]} ; index++ ))
 do
   _token="${extension_args[$index]}"
   if [[ -n "${ZSH_VERSION}" ]]

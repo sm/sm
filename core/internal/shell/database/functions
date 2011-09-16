@@ -22,7 +22,7 @@ __sm.database.cli()
   _ignored_args=()
   args_count=${#extension_args[@]}
 
-  for (( index=0 ; index < $args_count ; index++ ))
+  for (( index=1 ; index <= $args_count ; index++ ))
   do
     token="${extension_args[$index]}"
 
