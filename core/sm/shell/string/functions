@@ -44,7 +44,9 @@ __sm.string.ends()
 
 __sm.string.number.of.words()
 {
-  printf "${=#__words}\n"
+  typeset _words
+  _words=( ${=*} )
+  printf "${#_words}\n"
 }
 
 __sm.string.to.function.name()
