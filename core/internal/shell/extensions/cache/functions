@@ -104,21 +104,21 @@ __sm.cache.map.find.matching()
     case "${_method}" in
       (only_one)
         case "${_item}" in
-          (${_name}=*)
+          (${_name}\=*)
             _found_actions+=("${_item}")
             ;;
         esac
         ;;
       (allow_many)
         case "${_item}" in
-          (*${_name}*=*)
+          (*${_name}*\=*)
             _found_actions+=("${_item}")
             ;;
         esac
         ;;
       (starting)
         case "${_item}" in
-          (${_name}*=*)
+          (${_name}*\=*)
             _found_actions+=("${_item}")
             ;;
         esac

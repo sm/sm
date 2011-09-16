@@ -2,12 +2,11 @@
 
 __sm.package.cli()
 {
-  local _ignored_args _package_args _token number_of_args index
+  local _ignored_args _package_args _token index
   _ignored_args=()
   _package_args=( $@ )
-  number_of_args=${#_package_args[@]}
 
-  for (( index=1 ; index <= $number_of_args ; index++ ))
+  for (( index=1 ; index <= ${#_package_args} ; index++ ))
   do
     _token="${_package_args[$index]}"
     case "${_token}" in
@@ -425,7 +424,7 @@ __sm.package.init()
   [[ -n "${package_name}" ]] || __sm.log.fail "Package name must be given.\n"
 
   case "${package_name}" in
-    (*=*) # exact version specifier
+    (*\=*) # exact version specifier
       package_version="${package_name#*\=}"
       package_name="${package_name%%\=*}"
       ;;

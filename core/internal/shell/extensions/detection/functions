@@ -61,7 +61,8 @@ __sm.cache.map.check()
 __sm.extension.actions.find()
 {
   trace_filter action_detection || set -o xtrace
-  extensions_path="$1" extension="$2"
+  extensions_path="$1"
+  extension="$2"
 
   shift || __sm.log.fail "Extension path must be given as the first parameter."
   shift || __sm.log.fail "Extension name must be given as the second parameter."
@@ -107,9 +108,9 @@ __sm.extension.actions.find()
       _param_temp="${_action_params[$(( _action_params_length - 1 ))]}"
       _rest_params=( "${_param_temp}" "${_rest_params[@]}" )
       if [[ -n "${ZSH_VERSION}" ]];then unsetopt nullglob;else shopt -u nullglob;fi
-      unset _action_params[$(( _action_params_length - 1 ))]
+      _action_params=( ${_action_params[1,-2]} )
       if [[ -n "${ZSH_VERSION}" ]];then setopt nullglob;else shopt -s nullglob;fi
-      _action_params=( "${_action_params[@]}" ) # Just in case ... works without it
+      _action_params=( "${=action_params}" ) # Just in case ... works without it
     done
   else
     __sm.log.error "${extensions_path}/${extension} does not have map or module dependencies with actions"
@@ -130,7 +131,7 @@ __sm.extension.action()
 
   #TODO: Should be moved to core/cli?
   case "${extension_args[${__sm_array_start}]}" in
-    (*=*) # exact version specifier
+    (*\=*) # exact version specifier
       package_name="${extension_args[${__sm_array_start}]}"
       export package_version="${package_name##*\=}"
       export package_name="${package_name%%\=*}"
