@@ -121,7 +121,7 @@ __sm.trace_filter()
     elif [[ -n "${ZSH_VERSION}" ]]
     then
       #true # no-op for now
-      __sm.log.trace.filter start "${funcstack[1]}=$1"
+      __sm.log.trace.filter start "${funcstack[2]}=$1"
     fi
   else
     __sm.log.trace.filter stop "${__sm_trace_filter_stack[@]}"
@@ -400,7 +400,7 @@ __sm.log.trace.filter()
         _name="${FUNCNAME[2]}"
       elif [[ -n "${ZSH_VERSION}" ]]
       then
-        _name="${funcstack[2]}"
+        _name="${funcstack[3]}"
       fi
 
       if [[ "${_name}" == "${old}" ]]
@@ -478,7 +478,7 @@ __sm.actions.call()
   local _action
   _action=(${=1}) && shift
   trace_filter action || set -o xtrace
-  ${_action[@]} $@
+  $_action $@
 }
 
 __sm.actions.source()
