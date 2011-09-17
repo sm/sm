@@ -50,7 +50,7 @@ alias trace_filter='set +o xtrace ; __sm.log.trace.filter'
 log()
 {
   trace_filter log || set -o xtrace
-  local _token _command _message
+  typeset _token _command _message
   _message=()
 
   while (( $# ))
@@ -181,7 +181,7 @@ backtrace()
 {
   trace_filter backtrace || set -o xtrace # backtrace is disabled by default.
 
-  local _separator _columns _stack _trace _message _flag _source _function _line \
+  typeset _separator _columns _stack _trace _message _flag _source _function _line \
     _index _largest _format _digits _longest _string _source_length _function_length \
     _source_line _function_line
   _source_length=20
@@ -282,7 +282,7 @@ backtrace()
 __sm.log.step()
 {
   trace_filter log || set -o xtrace
-  local _message _output _log_file _status
+  typeset _message _output _log_file _status
   _message="${1:-}"
 
   if (( $# > 1 ))
@@ -320,7 +320,7 @@ __sm.log.log()
 __sm.log.todo()
 {
   trace_filter log || set -o xtrace
-  local file line
+  typeset file line
   if (( debug_flag )) && __sm.log.options.check "$debug_flags" "todo"
   then
     file="${BASH_SOURCE[2]}"
@@ -404,7 +404,7 @@ __sm.log.debug()
 }
 __sm.log.debug.not.traced()
 {
-  local type
+  typeset type
   type="$1"
   (( $# )) && shift || __sm.log.fail "Debug type must be given as the first parameter."
 
@@ -426,7 +426,7 @@ __sm.log.debug.not.traced()
 __sm.log.search()
 {
   trace_filter log || set -o xtrace
-  local name value
+  typeset name value
   name="${1:-}"
   value="${2:-}"
   (( $# )) && shift || __sm.log.fail "name must be given as the first parameter."
@@ -443,7 +443,7 @@ __sm.log.search()
 __sm.actions.call()
 {
   trace_filter log || set -o xtrace
-  local _action
+  typeset _action
   _action=(${=1}) && shift
   trace_filter action || set -o xtrace
   $_action $@
@@ -452,7 +452,7 @@ __sm.actions.call()
 __sm.actions.source()
 {
   trace_filter log || set -o xtrace
-  local script
+  typeset script
   script="$1"
   (( $# )) && shift || __sm.log.fail "No script was given as the first parameter."
   [[ -r "$script" ]] || __sm.log.fail "Could not find script to run: $script."
@@ -463,7 +463,7 @@ __sm.actions.source()
 __sm.debug.variables.callback()
 {
   trace_filter log || set -o xtrace
-  local _variable ction_stack
+  typeset _variable ction_stack
 
   if [[ -n "${BASH_VERSION}" ]]
   then
@@ -501,7 +501,7 @@ __sm.debug.variables.callback()
 __sm.debug.variables.callback.initialize()
 {
   trace_filter log || set -o xtrace
-  local _variable
+  typeset _variable
   for _variable in "${var_debug_flags[@]}"
   do
     eval "
@@ -528,7 +528,7 @@ __sm.log.piece()
 {
   trace_filter log || set -o xtrace
   typeset -g log_step_message
-  local _message _unicode
+  typeset _message _unicode
   _message="${1:-}"
   _unicode=0
   true ${LINES:=20}
@@ -586,7 +586,7 @@ __sm.log.piece()
 __sm.tmp.logs.clean()
 {
   trace_filter log || set -o xtrace
-  local _log
+  typeset _log
   [[ -d "${TMP_PATH:-/tmp}"/$$/logs ]] || return 0
   for _log in "${TMP_PATH:-/tmp}"/$$/logs/*.err.log
   do
@@ -609,7 +609,7 @@ __sm.log.options.check()
 __sm.log.rotate()
 {
   trace_filter log || set -o xtrace
-  local _file _tail_pid
+  typeset _file _tail_pid
   _file="${1:-}"
   (( $# )) && shift || __sm.log.fail "Cannot rotate a log file, as no log file was given."
 
@@ -642,7 +642,7 @@ __sm.log.rotate()
 __sm.log.streams()
 {
   trace_filter log || set -o xtrace
-  local _command _prefix _err _out _mix _token
+  typeset _command _prefix _err _out _mix _token
   _command="${1:-}"
 
   # TODO: allow specification of path, name prefix

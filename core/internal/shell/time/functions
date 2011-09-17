@@ -16,7 +16,7 @@ __sm.timestamp.show.new()
   # Set the format to either the first parameter, if nonempty or to the
   # iso-something format ;) otherwise. Use the date command with the format
   # string and print the result to the STDOUT of the calling environment.
-  local _format
+  typeset _format
   _format="${1:-"%Y-%m-%dT%H:%M:%S"}"
   date +"${_format}"
 }

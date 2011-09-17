@@ -1,6 +1,6 @@
 #!/bin/sh
 
-local version_pattern _ignored_args _token index
+typeset version_pattern _ignored_args _token index
 
 version_pattern="+([[:digit:]]).+([[:digit:]]).+([[:digit:]])"
 

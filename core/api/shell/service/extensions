@@ -2,7 +2,7 @@
 
 service_extension_setup()
 {
-  local extension module path
+  typeset extension module path
   extension="${1:-}"
   module="${2:-}"
   path="${3:-}"

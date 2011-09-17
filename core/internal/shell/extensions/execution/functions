@@ -3,7 +3,7 @@
 __sm.extension.actions.type()
 {
   typeset -g action_type 
-  local _path _path_type extension
+  typeset _path _path_type extension
   _path="${action_path:-}"
 
   case "${action}" in
@@ -72,7 +72,7 @@ __sm.extension.actions.type()
 
 __sm.extension.modules.include()
 {
-  local _token _namespace module_name
+  typeset _token _namespace module_name
   _namespace=""
 
   module_name="${extension}"
@@ -91,7 +91,7 @@ __sm.extension.modules.include()
 __sm.extension.action.prerequisites()
 {
   trace_filter action_pre || set -o xtrace
-  local _pre _name _action _extension
+  typeset _pre _name _action _extension
   _action="${action// *}"
   _extension="${extension// *}"
 
@@ -134,7 +134,7 @@ __sm.extension.run()
   trace_filter extension_run || set -o xtrace
 
   typeset -g action
-  local _type _path _namespaces requires
+  typeset _type _path _namespaces requires
   _type="${action_type:-}"
   _path="${action_path:-}"
 

@@ -6,7 +6,7 @@ __sm.cache.map.check()
 
   typeset -g action  action_path
   typeset -ga extension_args
-  local _found_actions _method _name _item _candidate _candidates screen_height
+  typeset _found_actions _method _name _item _candidate _candidates screen_height
   _found_actions=()
   _method="$1"
   _name="$2"
@@ -62,7 +62,7 @@ __sm.extension.actions.find()
 {
   trace_filter action_detection || set -o xtrace
   typeset -g extensions_path extension
-  local _action_params _action_path _new_action_path _rest_params _param_temp \
+  typeset _action_params _action_path _new_action_path _rest_params _param_temp \
     _action_params_length _actions_root _map _modules_root _actions_cache
 
   extensions_path="$1"
@@ -145,7 +145,7 @@ __sm.extension.action()
       ;;
   esac
 
-  local _extension_found _action_found
+  typeset _extension_found _action_found
   _extension_found=0
   _action_found=0
   if __sm.extension.in.paths __sm.extension.find "${extension_args[@]}"

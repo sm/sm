@@ -43,8 +43,8 @@ package()
   typeset -g package_name package_version package_base_url package_file \
     package_user archive_format package_md5 package_sha256 package_sha512
 
-  local _token _subcommand _command _logfile _lines _key _log _message
-  local -a _params
+  typeset _token _subcommand _command _logfile _lines _key _log _message
+  typeset -a _params
   _lines=50
 
   while (( $# ))

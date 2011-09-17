@@ -9,7 +9,7 @@ services_avilable()
 __sm.services.list()
 services_list()
 {
-  local _action _args
+  typeset _action _args
   _action="${1:-}"
   (( $# )) && shift || true
 

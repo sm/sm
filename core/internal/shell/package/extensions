@@ -2,7 +2,7 @@
 
 package_extension_setup()
 {
-  local extension module path action
+  typeset extension module path action
   extension="${1:-}"
   module="${2:-}"
   path="${3:-}"

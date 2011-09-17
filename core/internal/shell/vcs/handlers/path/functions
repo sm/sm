@@ -10,7 +10,7 @@
 # Code Walkthrough
 path_get()
 {
-  local initial_pwd _source _target
+  typeset initial_pwd _source _target
   initial_pwd="$PWD"
   _source="${1:-}"
   _target="${2:-}"

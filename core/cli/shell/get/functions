@@ -8,7 +8,7 @@ fetch_version()
 
 md5_match()
 { # TODO: switch this to using system module's os_* DSL
-  local _archive _path
+  typeset _archive _path
   _archive="$1"
 
   if command exists md5
@@ -82,14 +82,14 @@ Halting installation.
 
 install_remote()
 {
-  local remote
+  typeset remote
   remote="${1:-sm}"
   install_sm_scm "$(scm_identifier "$remote")" "$remote"
 }
 
 install_sm_scm()
 {
-  local remote dir repo
+  typeset remote dir repo
   remote="origin"
   dir="${1}"
   repo="${2:-sm}"

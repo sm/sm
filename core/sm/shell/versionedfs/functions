@@ -46,7 +46,7 @@ versionedfs()
 {
   trace_filter versionedfs || set -o xtrace
 
-  local _token _path _paths _source _name _version _strategy _method _activate _action
+  typeset _token _path _paths _source _name _version _strategy _method _activate _action
   _action="${1:-}"
   (( $# )) && shift || __sm.log.fail "Usage: versionedfs path \"{versionedfs root path}\" "\
     "strategy \"{fhs,name}\" method \"{link,copy}\" activate \"{newest,first}\""
@@ -145,7 +145,7 @@ versionedfs()
 
 __sm.versionedfs.create()
 {
-  local _path
+  typeset _path
   _path="$1"
   mkdir -p "${_path}/"{.versionedfs,versions,active} ||
     __sm.log.fail "Could not create paths ${_path}/{.versionedfs,versions,active}"
@@ -158,7 +158,7 @@ __sm.versionedfs.create()
 
 __sm.versionedfs.add()
 {
-  local _path _name _version _source _version_path
+  typeset _path _name _version _source _version_path
   _path="$1"
   _name="$2"
   _version="${3}"
@@ -181,7 +181,7 @@ __sm.versionedfs.add()
 
 __sm.versionedfs.remove()
 {
-  local _path _name _version _version_path
+  typeset _path _name _version _version_path
   _path="$1"
   _name="${2}"
   _version="${3}"
@@ -197,7 +197,7 @@ __sm.versionedfs.remove()
 
 __sm.versionedfs.activate()
 {
-  local _path _name _version _target _version_path _active_path _activate \
+  typeset _path _name _version _target _version_path _active_path _activate \
     _active_version_path _index _count
   _path="$1"
   _name="${2}"
@@ -286,7 +286,7 @@ __sm.versionedfs.activate()
 
 __sm.versionedfs.deactivate()
 {
-  local _path _name _version _name_path _active_path _index _count _version_path _targets
+  typeset _path _name _version _name_path _active_path _index _count _version_path _targets
   _path="$1"
   _name="${2}"
   _version="${3:-}"
@@ -344,7 +344,7 @@ __sm.versionedfs.deactivate()
 
 __sm.versionedfs.list()
 {
-  local _method _path _name __path __name __version
+  typeset _method _path _name __path __name __version
   _method=$1
   _path="$2"
   _name="${3:-}"

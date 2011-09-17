@@ -2,7 +2,7 @@
 
 __sm.files.source()
 {
-  local _file _files
+  typeset _file _files
   _files=("$@")
   (( $# )) && shift || __sm.log.fail "Cannot source files; No files were given."
 
@@ -23,7 +23,7 @@ __sm.files.source()
 
 __sm.files.nonempty()
 {
-  local _file
+  typeset _file
 
   for _file in "$@"
   do
@@ -37,7 +37,7 @@ __sm.files.nonempty()
 
 __sm.files.empty()
 {
-  local _file
+  typeset _file
 
   for _file in "$@"
   do
@@ -52,7 +52,7 @@ __sm.files.empty()
 __sm.files.remove()
 {
   # TODO: add 'from' parameter
-  local _file _files
+  typeset _file _files
   _files=("$@")
   (( $# )) && shift || __sm.log.fail "Cannot remove files, as no files were given to remove."
 
@@ -80,7 +80,7 @@ __sm.files.remove()
 __sm.files.create()
 {
   trace_filter filesystem || set -o xtrace
-  local _file _path _files
+  typeset _file _path _files
   _files=("$@")
   (( $# )) && shift || __sm.log.fail "Cannot ensure files exist; No files were given."
 
@@ -99,7 +99,7 @@ __sm.files.create()
 
 __sm.files.link()
 {
-  local _source _target _flags _path
+  typeset _source _target _flags _path
   _source="$1"
   _target="$2"
   _flags=(${=3})
@@ -117,7 +117,7 @@ __sm.files.link()
 
 __sm.files.move()
 {
-  local _source _target _flags _file _files
+  typeset _source _target _flags _file _files
   _source="$1"
   _target="$2"
   _flags=( ${=3} )
@@ -141,7 +141,7 @@ __sm.files.move()
 
 __sm.files.copy()
 {
-  local _source _target _flags _file _files
+  typeset _source _target _flags _file _files
   _source="$1"
   _target="$2"
   _flags=( ${=3} )
@@ -165,7 +165,7 @@ __sm.files.copy()
 
 __sm.files.chown()
 {
-  local _owner _flags _file _files
+  typeset _owner _flags _file _files
   _owner="$1"
   _flags=(${=2})
   shift 2
@@ -177,7 +177,7 @@ __sm.files.chown()
 
 __sm.files.chmod()
 {
-  local _mode _flags _file _files
+  typeset _mode _flags _file _files
   _mode="$1"
   _flags=( ${=2} )
   shift 2
@@ -197,7 +197,7 @@ __sm.files.exist()
 
 __sm.files.exists()
 {
-  local _file
+  typeset _file
   for _file in "$@"
   do
     [[ -f "${_file}" ]] || return 1
@@ -207,7 +207,7 @@ __sm.files.exists()
 
 __sm.files.contain()
 {
-  local _string _regex _file
+  typeset _string _regex _file
   _string="$1"
   _regex="$2"
   shift 2
@@ -233,7 +233,7 @@ __sm.files.contain()
 
 __sm.files.containing()
 {
-  local _string _regex _file _files
+  typeset _string _regex _file _files
   _string="$1"
   _regex="$2"
   shift 2
@@ -263,7 +263,7 @@ __sm.files.containing()
 
 __sm.files.are.empty()
 {
-  local _file
+  typeset _file
   for _file in "$@"
   do
     _file=${_file/\~\//$HOME\/} # Expand ~/ to full value of $HOME
@@ -277,7 +277,7 @@ __sm.files.are.empty()
 
 __sm.files.are.nonempty()
 {
-  local _file
+  typeset _file
   for _file in "$@"
   do
     _file=${_file/\~\//$HOME\/} # Expand ~/ to full value of $HOME
@@ -291,7 +291,7 @@ __sm.files.are.nonempty()
 
 __sm.files.are.executable()
 {
-  local _file
+  typeset _file
   for _file in "$@"
   do
     [[ -r "${_file}" && -x "${_file}" ]] || return 1
@@ -300,7 +300,7 @@ __sm.files.are.executable()
 
 __sm.files.are.missing()
 {
-  local _file
+  typeset _file
   for _file in "$@"
   do
     if [[ -f "${_file}" ]]
@@ -313,7 +313,7 @@ __sm.files.are.missing()
 
 __sm.files.are.symlinks()
 {
-  local _file
+  typeset _file
   for _file in "$@"
   do
     [[ -L "${_file}" ]] || return 1
@@ -322,7 +322,7 @@ __sm.files.are.symlinks()
 
 __sm.files.sha()
 {
-  local _sum _sums _files _number
+  typeset _sum _sums _files _number
   _number=$1
   shift
   _files=("$@")
@@ -344,7 +344,7 @@ __sm.files.sha.512()
 
 __sm.files.write()
 {
-  local _string _target _flags
+  typeset _string _target _flags
   _string="$1"
   _target="$2"
   _flags=(${=3})
@@ -353,7 +353,7 @@ __sm.files.write()
 
 __sm.files.in()
 {
-  local _path _file
+  typeset _path _file
   for _path in "$@"
   do
     [[ -d "${_path}" ]] || __sm.log.fail "'${_path}' is not a valid path! "
@@ -367,7 +367,7 @@ __sm.files.in()
 
 __sm.files.within()
 {
-  local _path _entry
+  typeset _path _entry
   for _path in "$@"
   do
     [[ -d "${_path}" ]] || __sm.log.fail "'${_path}' is not a directory!"
@@ -388,7 +388,7 @@ __sm.files.within()
 
 __sm.files.within.matching()
 {
-  local _string _regex _file _path
+  typeset _string _regex _file _path
   _string="$1"
   _regex="$2"
   shift 2
@@ -419,7 +419,7 @@ __sm.files.within.matching()
 
 __sm.files.md5()
 {
-  local _file _command _md5
+  typeset _file _command _md5
 
   if __sm.command.exists "md5sum"
   then
@@ -449,7 +449,7 @@ __sm.files.md5()
 
 __sm.files.replace()
 {
-  local _string _regex _file
+  typeset _string _regex _file
   _string="$1"
   _regex="$2"
   shift 2
@@ -469,7 +469,7 @@ __sm.files.open()
 __sm.files.absolute.path()
 {
   #TODO is it possible to replace it with ${1:A} ???
-  local _path _paths _recorded_path _amount _index _file_name
+  typeset _path _paths _recorded_path _amount _index _file_name
   _paths=( "$@" )
   _amount=$#
   _recorded_path=$PWD

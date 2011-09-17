@@ -3,7 +3,7 @@
 __sm.extension.path()
 {
   typeset -g extension_path
-  local _path extension
+  typeset _path extension
   extension=$1
   (( $# )) && shift || __sm.log.fail "Cannot process extension path;"\
     " No extension name was given."
@@ -21,7 +21,7 @@ __sm.extension.path()
 
 __sm.extension.is.valid()
 {
-  local _path
+  typeset _path
   _path="${1:-}"
   (( $# )) && shift || __sm.log.fail "No extension path was given to check validity."
   [[ -n "${_path}" ]] || __sm.log.fail "Path to the extension was not given."
@@ -45,7 +45,7 @@ __sm.extension.find()
 
 __sm.extension.sets.iterator()
 {
-  local _path _command
+  typeset _path _command
   _path="$1"
   _command="$2"
   shift 2
@@ -55,7 +55,7 @@ __sm.extension.sets.iterator()
 
 __sm.extension.iterator()
 {
-  local _path _command _ext_path
+  typeset _path _command _ext_path
   _path="$1"
   _command="$2"
   shift 2
@@ -74,7 +74,7 @@ __sm.extension.get.uri()
 __sm.extension.in()
 {
   typeset -ga found_extensions
-  local _path _extension
+  typeset _path _extension
   _path="$1"
 
   found_extensions=()

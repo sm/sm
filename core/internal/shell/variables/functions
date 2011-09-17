@@ -3,7 +3,7 @@
 __sm.variables.are.nonempty()
 {
   trace_filter variables || set -o xtrace
-  local _variable _variables
+  typeset _variable _variables
   _variables=("$@")
   (( $# )) && shift || __sm.log.fail "Cannot check if variables are nonempty; No variables were given."
 
@@ -17,7 +17,7 @@ __sm.variables.are.nonempty()
 __sm.variables.are.empty()
 {
   trace_filter variables || set -o xtrace
-  local _variable
+  typeset _variable
   _variable="${1:-}"
   (( $# )) && shift || __sm.log.fail "Cannot check if variable is empty, as no variable was given."
   eval "[[ -z \"\${${_variable}:-}\" ]]"
@@ -29,7 +29,7 @@ __sm.variables.filter()
   __sm_variables_empty=()
   __sm_variables_nonempty=()
 
-  local _variable
+  typeset _variable
   for _variable in "$@"
   do
     if eval "[[ -z \"\${${_variable}:-}\" ]]"
@@ -44,7 +44,7 @@ __sm.variables.filter()
 __sm.variables.must.be.nonempty()
 {
   trace_filter variables || set -o xtrace
-  local _error IFS
+  typeset _error IFS
   _error="$1"
   IFS=','
   shift
@@ -60,7 +60,7 @@ __sm.variables.must.be.nonempty()
 __sm.variables.must.be.empty()
 {
   trace_filter variables || set -o xtrace
-  local _error IFS
+  typeset _error IFS
   _error="$1"
   IFS=','
   shift

@@ -31,7 +31,7 @@ export projects_path
 #
 p()
 {
-  local _path _regex1 _regex2
+  typeset _path _regex1 _regex2
   _regex1="${1:-}"
   _regex2="${2:-}"
   true "${projects_path:="$HOME/projects"}"

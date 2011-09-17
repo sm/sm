@@ -11,7 +11,7 @@ service()
 {
   trace_filter service || set -o xtrace
 
-  local _token _command _parameters
+  typeset _token _command _parameters
   _parameters=()
 
   while (( $# ))

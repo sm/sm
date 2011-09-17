@@ -2,7 +2,7 @@
 
 __sm.os.open()
 {
-  local _uri
+  typeset _uri
   _uri="${1:-}"
   (( $# )) && shift || __sm.log.fail "Cannot open URI; No uri was given."
 
@@ -30,7 +30,7 @@ __sm.os.open()
 
 __sm.os.type()
 {
-  local _type
+  typeset _type
   case "$OSTYPE" in
     (*linux*)
       _type="linux"
@@ -68,7 +68,7 @@ __sm.os.type.is()
 
 __sm.os.cpu.count()
 {
-  local _cpu_count
+  typeset _cpu_count
   _cpu_count=1
 
   if __sm.os.type.is darwin
@@ -155,7 +155,7 @@ __sm.os.arch.capable()
 {
   if __sm.os.type.is darwin
   then
-    local _string
+    typeset _string
     read -r _string < <(sysctl hw.cpu64bit_capable)
     if (( ${_string//* } == 1 ))
     then

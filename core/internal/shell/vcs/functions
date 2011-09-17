@@ -21,7 +21,7 @@ fetch_uri()
   trace_filter vcs || set -o xtrace
   fetch_error_initialize "$@"
 
-  local vcs_initial_pwd _uri _target _args
+  typeset vcs_initial_pwd _uri _target _args
   vcs_initial_pwd="$PWD"
   _uri="${1:-}"
   _target="${2:-}"
@@ -74,7 +74,7 @@ fetch_uri()
 #
 fetch_uris()
 {
-  local _uris _target _args _uri
+  typeset _uris _target _args _uri
   _uris=( "${1}" )
   _target="${2:-}"
   _args=()
@@ -110,7 +110,7 @@ fetch_uris()
 
 fetch_uri_parse_args()
 {
-  local _token _allowed_arg
+  typeset _token _allowed_arg
 
   while (( $# > 0 ))
   do
@@ -144,7 +144,7 @@ fetch_uri_parse_args()
 
 fetch_update()
 {
-  local _uri _target
+  typeset _uri _target
   _target="${1:-}"
   (( $# )) && shift || __sm.log.fail "target path must be specified as the second parameter."
 
@@ -162,7 +162,7 @@ fetch_update()
 
 cli_fetch()
 {
-  local _uri _target _args
+  typeset _uri _target _args
   _uri="${1:-}"
   _target="${2:-}"
   _args=()
@@ -173,7 +173,7 @@ cli_fetch()
 
 cli_fetch_update()
 {
-  local _target
+  typeset _target
   _target="${1:-}"
   (( $# )) && shift || __sm.log.error "target path must be specified as the second parameter."
   fetch_update "${_target}" --on-fail __sm.log.error "$@"

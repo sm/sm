@@ -44,21 +44,21 @@ __sm.string.ends()
 
 __sm.string.number.of.words()
 {
-  local _words
+  typeset _words
   _words=( ${\=*} )
   printf "${#_words}\n"
 }
 
 __sm.string.to.function.name()
 {
-  local __string
+  typeset __string
   __string=$*
   printf "${__string// /.}\n"
 }
 
 __sm.string.ematch()
 {
-  local _value _regex _result
+  typeset _value _regex _result
   _value="$1"
   _regex="$2"
 

@@ -32,7 +32,7 @@ smrc_update()
 {
   templates exist "cli/smrc" || __sm.log.fail "The template core sm/smrc is missing."
 
-  local template target backup incoming
+  typeset template target backup incoming
   template="cli/smrc"
   target="$HOME/.smrc"
   backup="$HOME/.smrc.$timestamp"

@@ -2,7 +2,7 @@
 
 shell()
 {
-  local _token
+  typeset _token
   while (( $# ))
   do
     _token="$1" && shift

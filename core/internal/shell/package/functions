@@ -3,8 +3,8 @@
 __sm.package.cli()
 {
   trace_filter package || set -o xtrace
-  local _token index
-  local -a _ignored_args _package_args
+  typeset _token index
+  typeset -a _ignored_args _package_args
   _package_args=( $@ )
 
   for (( index=1 ; index <= ${#_package_args} ; index++ ))
@@ -91,7 +91,7 @@ __sm.package.cli()
 __sm.package.error()
 {
   trace_filter package || set -o xtrace
-  local _message _log _lines
+  typeset _message _log _lines
   _message="$1"
   _log="$2"
   _lines="${3:-50}"
@@ -178,7 +178,7 @@ __sm.package.configure.flags()
 {
   trace_filter package || set -o xtrace
   typeset -ga configure_flags
-  local _flag
+  typeset _flag
   for _flag in "$@"
   do
     if ! __sm.string.contains "${_flag}" "${configure_flags[*]}"
@@ -192,7 +192,7 @@ __sm.package.configure.flag()
 {
   trace_filter package || set -o xtrace
   typeset -ga configure_flags
-  local _key _value
+  typeset _key _value
   _key="$1"
   _value="$2"
 
@@ -206,7 +206,7 @@ __sm.package.make.flags()
 {
   trace_filter package || set -o xtrace
   typeset -ga make_flags
-  local _flag
+  typeset _flag
   for _flag in "$@"
   do
     if ! __sm.string.contains "${_flag}" "${make_flags[*]}"
@@ -220,7 +220,7 @@ __sm.package.package_dependencies()
 {
   trace_filter package || set -o xtrace
   typeset -ga package_dependencies
-  local _flag
+  typeset _flag
   for _flag in "$@"
   do
     if ! __sm.string.contains "${_flag}" "${package_dependencies[*]}"
@@ -437,7 +437,7 @@ __sm.package.init()
   trace_filter package || set -o xtrace
   typeset -g extension_patches_path
   typeset -ga fhs_dirs
-  local default_configure_flags _flag
+  typeset default_configure_flags _flag
 
   true ${package_name:=${extension}}
 
@@ -558,7 +558,7 @@ __sm.package.fetch.md5()
   trace_filter package || set -o xtrace
   (( $# == 0 )) || __sm.package.cli $@
 
-  local download_url
+  typeset download_url
 
   : \
     "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
@@ -584,7 +584,7 @@ __sm.package.fetch()
   trace_filter package || set -o xtrace
   (( $# == 0 )) || __sm.package.cli $@
 
-  local _args _entries
+  typeset _args _entries
   _args=()
 
   true \
@@ -629,7 +629,7 @@ __sm.package.update()
 __sm.package.configure()
 {
   trace_filter package || set -o xtrace
-  local _command
+  typeset _command
 
   command exists gcc || command exists cc || __sm.log.fail "No C compiler found."
 
@@ -658,7 +658,7 @@ __sm.package.configure()
 __sm.package.gnu.make()
 {
   trace_filter package || set -o xtrace
-  local _command
+  typeset _command
 
   if [[ -n ${build_command:-} ]]
   then
@@ -683,7 +683,7 @@ __sm.package.preinstall()
 __sm.package.make.install()
 {
   trace_filter package || set -o xtrace
-  local _command
+  typeset _command
 
   if [[ -n ${install_command:-} ]]
   then
@@ -722,7 +722,7 @@ __sm.package.activate()
 __sm.package.setup()
 {
   trace_filter package || set -o xtrace
-  local _package
+  typeset _package
   _package="${1:-${package_name}}"
 
   __sm.package.profile.d "${_package}"
@@ -759,7 +759,7 @@ __sm.package.deactivate()
 __sm.package.activate.first()
 {
   trace_filter package || set -o xtrace
-  local _package _version
+  typeset _package _version
   _package="${1:-}"
   _version="${2:-}"
   (( $# )) && shift || __sm.log.fail "Package name must be given as first parameter."
@@ -776,7 +776,7 @@ __sm.package.activate.first()
 __sm.package.ldconfig()
 {
   trace_filter package || set -o xtrace
-  local _package _path _files _ldconfig
+  typeset _package _path _files _ldconfig
   _package="${1:-${package_name}}"
   _ldconfig="/sbin/ldconfig"
   [[ -n "${_package}" ]] || __sm.log.fail "Package name must be given."
@@ -820,7 +820,7 @@ __sm.package.ldconfig()
 __sm.package.profile.d()
 {
   trace_filter package || set -o xtrace
-  local _package
+  typeset _package
   _package="${1:-${package_name}}"
   [[ -n "${_package}" ]] || __sm.log.fail "Package name must be given."
 
@@ -858,7 +858,7 @@ __sm.package.uninstall()
 __sm.package.patch()
 {
   trace_filter package || set -o xtrace
-  local _patches _patch _path _paths
+  typeset _patches _patch _path _paths
 
   _paths=(
     "${extension_patches_path}"
@@ -881,7 +881,7 @@ __sm.package.patch()
 __sm.package.patches.apply()
 {
   trace_filter package || set -o xtrace
-  local _patch _patches
+  typeset _patch _patches
   _patches=("$@")
   (( $# )) && shift || __sm.log.fail "No patches were given."
 
@@ -895,7 +895,7 @@ __sm.package.patches.apply()
 __sm.package.is.active()
 {
   trace_filter package || set -o xtrace
-  local _name _version _path
+  typeset _name _version _path
   _name="${1:-}"
   _version="${2:-}"
   (( $# )) && shift || __sm.log.fail "No package name was given, or name is empty."
@@ -925,7 +925,7 @@ __sm.package.website()
 __sm.package.dependencies()
 {
   trace_filter package || set -o xtrace
-  local dependency _dependencies _missing_dependencies IFS
+  typeset dependency _dependencies _missing_dependencies IFS
   _dependencies=(${package_dependencies[@]})
   _missing_dependencies=()
 
@@ -954,7 +954,7 @@ __sm.package.info()
   trace_filter package || set -o xtrace
   (( $# == 0 )) || __sm.package.cli $@
 
-  local _installed _path package_md5 _installed
+  typeset _installed _path package_md5 _installed
   _path="${packages_path}/versions/${package_name}"
 
   true "${package_dir:="${package_name}-${package_version}"}" \
@@ -1037,7 +1037,7 @@ __sm.packages.available()
 __sm.packages.list()
 {
   trace_filter package || set -o xtrace
-  local _args
+  typeset _args
   __sm.packages.${1:-installed} "$@"
 }
 

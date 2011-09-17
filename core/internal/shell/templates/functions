@@ -3,7 +3,7 @@
 __sm.templates.find()
 {
   typeset -g template_path template_name
-  local _extensions_path _extension _template_path _params_path
+  typeset _extensions_path _extension _template_path _params_path
   _extensions_path="$1"
 
   (( $# )) && shift || __sm.log.fail "No extensions path and extension name given."
@@ -69,7 +69,7 @@ __sm.templates.install()
 
 __sm.templates.seed()
 {
-  local _template _hash _strings temporary
+  typeset _template _hash _strings temporary
   _template="${1:-}"
   (( $# )) && shift || __sm.log.fail "No template name was given."
   _hash=("$@")
@@ -107,7 +107,7 @@ __sm.templates.seed()
 
 __sm.templates.update()
 {
-  local _template _target _incoming _hash _strings _variables
+  typeset _template _target _incoming _hash _strings _variables
   _template="${1:-}"
   _target="${2:-}"
   (( $# )) && shift || __sm.log.fail "Cannot update seed template;"\

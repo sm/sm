@@ -27,7 +27,7 @@ sets_help()
 
 sets_list()
 {
-  local _path extensions
+  typeset _path extensions
   true ${COLUMNS:=80}
 
   for _path in "${extensions_search_paths[@]}"
@@ -60,7 +60,7 @@ sets_list()
 
 sets_list_known()
 {
-  local line
+  typeset line
   true ${COLUMNS:=80}
   printf "# %18s | %s\n" "Set Name" "Repository"
 
@@ -72,7 +72,7 @@ sets_list_known()
 
 sets_install()
 {
-  local _name _names _extension_namespace
+  typeset _name _names _extension_namespace
   _names="${1:-}"
   (( $# )) && shift || __sm.log.fail "No set name was given."
 
@@ -88,7 +88,7 @@ sets_install()
 
 set_install()
 {
-  local _name _uri _identifier _version
+  typeset _name _uri _identifier _version
   _name="${1:-}"
   (( $# )) && shift || __sm.log.fail "No set name was given."
 
@@ -122,7 +122,7 @@ set_install()
 
 sets_install_all()
 {
-  local _set _name _uri
+  typeset _set _name _uri
   true ${COLUMNS:=80}
 
   while read _set
@@ -136,7 +136,7 @@ sets_install_all()
 
 sets_update()
 {
-  local _name _uri
+  typeset _name _uri
   (( $# > 0 )) ||
     __sm.log.error "Cannot update extension sets without giving their names! "
 
@@ -171,7 +171,7 @@ sets_update()
 
 sets_update_all()
 {
-  local _name _sets
+  typeset _name _sets
   _sets=( "${sets_user_path}"/active/* )
 
   if (( ! ${#_sets[@]} ))
@@ -188,7 +188,7 @@ sets_update_all()
 
 sets_uninstall()
 {
-  local _name
+  typeset _name
   _name="$1"
   case "${_name}" in
     */*|.|..)
@@ -212,7 +212,7 @@ sets_uninstall()
 
 sets_check_availability()
 {
-  local _set _line _args
+  typeset _set _line _args
   _args=( $@ )
 
   # TODO: refactor this to take argument of uri to check instead.

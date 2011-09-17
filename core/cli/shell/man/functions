@@ -2,7 +2,7 @@
 
 detect_man()
 {
-  local _extensions_path _extension _man_path _man_name _man_paths
+  typeset _extensions_path _extension _man_path _man_name _man_paths
   _extensions_path=$1
   _extension=$2
   shift
@@ -39,7 +39,7 @@ detect_man()
 
 man_display()
 {
-  local man_path man_params man_number status _man_name
+  typeset man_path man_params man_number status _man_name
 
   if echo $1 | grep -E '^[0-9]+$' >/dev/null
   then

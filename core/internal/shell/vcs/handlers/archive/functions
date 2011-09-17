@@ -7,7 +7,7 @@
 # Code Walkthrough
 archive_get()
 {
-  local _uri _final_target _package_md5 _archive
+  typeset _uri _final_target _package_md5 _archive
   _uri="${1:-}"
   _final_target="${2:-}"
   _package_md5="${3:-${md5:-#}}"
@@ -81,7 +81,7 @@ Please read 'sm man curl' for instructions how to solve this problem.\n"
       ;;
     (*github.com/*/tarball/*)
       tar zxf "${_archive}" || fetch_error extracting_archive_failed
-      local name_pattern="${_uri#https://github.com/}"
+      typeset name_pattern="${_uri#https://github.com/}"
       name_pattern="${name_pattern%tarball/*}"
       name_pattern="${name_pattern//\//-}"
       mv ${name_pattern}*/* .
@@ -99,7 +99,7 @@ Please read 'sm man curl' for instructions how to solve this problem.\n"
       ;;
     (*github.com/*/zipball/*)
       unzip -q "${_archive}" || fetch_error extracting_archive_failed
-      local name_pattern="${_uri#https://github.com/}"
+      typeset name_pattern="${_uri#https://github.com/}"
       name_pattern="${name_pattern%zipball/*}"
       name_pattern="${name_pattern//\//-}"
       mv ${name_pattern}*/* .
