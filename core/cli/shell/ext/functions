@@ -65,7 +65,7 @@ ext_list_known()
 
 ext_install()
 {
-  local _name _names _uri
+  local _name _names _uri _extension_namespace
   _names="$1"
   _uri="$2"
   (( $# )) && shift || __sm.log.fail "No extension name was given."
@@ -78,8 +78,7 @@ ext_install()
 
   for _name in ${_names[@]}
   do
-    __sm.log.step "Installing ${_name} in ${_extension_namespace//\// }" \
-      extension install as "${_name}" ${_uri:+from} ${_uri}
+    extension install as "${_name}" ${_uri:+from} ${_uri}
   done
 }
 

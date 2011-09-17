@@ -101,6 +101,7 @@ __sm.extension.install()
 
   _identifier="$(scm_identifier "${_uri}")"
 
+  __sm.log.step "${_name} ${_version}"
   if fetch_uri "${_uri}" "${src_path}/${_identifier}" "$@"
   then
     __sm.extension.is.valid "${src_path}/${_identifier}" ||
