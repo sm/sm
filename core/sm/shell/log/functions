@@ -250,11 +250,12 @@ backtrace()
     _function_line=${_string#*:}
     #_line=${funcfiletrace[$(( _index - 1 ))]}
 
-    case "${_function}" in
-      (__sm*)
-        continue # Skip internal functions.
-        ;;
-    esac
+#TODO: make it a switch if required, there is a need to trace internal functions
+#    case "${_function}" in
+#      (__sm*)
+#        continue # Skip internal functions.
+#        ;;
+#    esac
 
     case "${EDITOR:-}" in
       # Print a file with the format and content for GUI editing tools, to open a
