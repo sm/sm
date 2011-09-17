@@ -4,7 +4,7 @@ sm_development_setup()
 {
   local _component _separator _string
 
-  printf -v _separator '%*s' "${_columns:-${COLUMNS:-80}}"
+  _separator=$( printf '%*s' "${COLUMNS:-80}" )
 
   true "${projects_path:="$HOME/projects"}"
 
