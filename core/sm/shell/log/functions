@@ -202,6 +202,7 @@ backtrace()
 
     _string=${funcfiletrace[${_index}]}
     _string="${_string%:*}"
+    _string="${_string#$initial_pwd\/}"
     if (( ${#_string} > ${_source_length} ))
     then _source_length=${#_string} ; fi
 
@@ -240,6 +241,7 @@ backtrace()
   do
     _string="${funcfiletrace[${_index}]}"
     _source="${_string%:*}"
+    _source="${_source#$initial_pwd\/}"
     _source_line=${_string#*:}
     _string="${functrace[${_index}]:+${functrace[${_index}]}}"
     _function="${_string%:*}"
