@@ -142,7 +142,7 @@ __sm.extension.run()
   case "${_type}" in
     (function)
       _namespaces=${_path##${extension_bin_path}}
-      __sm.extension.modules.include ${_namespaces//\// }
+      __sm.extension.modules.include ${=_namespaces//\// }
       action=${action%%\(*}
       __sm.extension.action.prerequisites
       __sm.actions.call ${action} "${extension_args[@]}"
@@ -151,14 +151,14 @@ __sm.extension.run()
     (shell)
       [[ "${action##*/}" != help ]] || __sm.includes api/help
       _namespaces=${_path##${extension_bin_path}}
-      __sm.extension.modules.include ${_namespaces//\// }
+      __sm.extension.modules.include ${=_namespaces//\// }
       __sm.extension.action.prerequisites
       __sm.actions.source "${_path}/${action}" "${extension_args[@]}"
       ;;
 
     (ruby)
       # Allow env settings via _initialize
-      __sm.extension.modules.include ${_namespaces//\// }
+      __sm.extension.modules.include ${=_namespaces//\// }
       requires=()
       for script in functions initialize
       do
