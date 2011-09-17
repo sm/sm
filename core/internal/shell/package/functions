@@ -649,7 +649,7 @@ __sm.package.configure()
 
   __sm.log.debug package "__sm.package.configure: ${_command}"
 
-  ${_command} > configure.log 2>&1 ||
+  ${=_command} > configure.log 2>&1 ||
     __sm.package.error \
     "Configuration of ${package_name} ${package_version} failed." \
     "configure.log"
@@ -669,7 +669,7 @@ __sm.package.gnu.make()
 
   __sm.log.debug package "__sm.package.gnu.make: ${_command}"
 
-  ${_command} > build.log 2>&1 ||
+  ${=_command} > build.log 2>&1 ||
     __sm.package.error \
     "Compilation of ${package_name} ${package_version} failed! " "$PWD/build.log"
 }
@@ -693,7 +693,7 @@ __sm.package.make.install()
   fi
 
   __sm.log.step "${package_name} ${package_version} ~ install"
-  ${_command} > make.install.log 2>&1 ||
+  ${=_command} > make.install.log 2>&1 ||
     __sm.package.error \
       "Installation of ${package_name} ${package_version} failed! " \
       "$PWD/make.install.log"

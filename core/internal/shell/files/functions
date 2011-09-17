@@ -102,7 +102,7 @@ __sm.files.link()
   local _source _target _flags _path
   _source="$1"
   _target="$2"
-  _flags=(${3:-})
+  _flags=(${=3})
 
   _path="${_target%\/*}"
   if [[ -n "${_path}" ]]
@@ -167,7 +167,7 @@ __sm.files.chown()
 {
   local _owner _flags _file _files
   _owner="$1"
-  _flags=($2)
+  _flags=(${=2})
   shift 2
   _files=("$@")
   chown ${_flags[@]} "${_owner}" "${_files[@]}" ||
