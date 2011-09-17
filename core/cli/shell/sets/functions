@@ -106,6 +106,7 @@ set_install()
     _version="${_name/*:}"
   fi
 
+  log step "${_name} ${_version}"
   if fetch_uri "${_uri}" "${src_path}/${_identifier}" "$@"
   then
     versionedfs add \
