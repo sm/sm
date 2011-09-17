@@ -4,6 +4,16 @@
 # SM Framework Core Module ~ Logging (logging)
 #
 
+#has to be first definition ??? maybe because of alias ?
+__sm.log.trace.filter()
+{
+  if __sm.log.options.check "$trace_flags" "$1"
+  then
+    return 1
+  fi
+}
+alias trace_filter='set +o xtrace ; __sm.log.trace.filter'
+
 # ## log rotate()
 #
 # Strategically rotate a logfile, minimizing data loss.
@@ -39,6 +49,7 @@
 #
 log()
 {
+  trace_filter log || set -o xtrace
   local _token _command _message
   _message=()
 
@@ -65,69 +76,59 @@ log()
 
 log_search()
 {
+  trace_filter log || set -o xtrace
   __sm.log.warn "log_search is depreciated, use 'log search instead'\n"
   __sm.log.search "$@"
 }
 
 todo()
 {
+  trace_filter log || set -o xtrace
   __sm.log.warn "todo is depreciated, use 'log todo instead'\n"
   __sm.log.todo "$@"
 }
 
 warn()
 {
+  trace_filter log || set -o xtrace
   __sm.log.warn "warn is depreciated, use 'log warn instead'\n"
   __sm.log.warn "$@"
 }
 
 debug()
 {
+  trace_filter log || set -o xtrace
   __sm.log.warn "debug is depreciated, use 'log debug instead'\n"
   __sm.log.debug "$@"
 }
 
 error()
 {
+  trace_filter log || set -o xtrace
   __sm.log.warn "error is depreciated, use 'log __sm.log.error instead'\n"
   __sm.log.error "$@"
 }
 
 succeed()
 {
+  trace_filter log || set -o xtrace
   __sm.log.warn "succeed is depreciated, use 'log succeed instead'\n"
   __sm.log.succeed "$@"
 }
 
 fail()
 {
+  trace_filter log || set -o xtrace
   __sm.log.warn "fail is depreciated, use 'log __sm.log.fail instead'\n"
   __sm.log.fail "$@"
 }
 
 log_step()
 {
+  trace_filter log || set -o xtrace
   __sm.log.warn "log_step is depreciated, use 'log step instead'"
   __sm.log.step "$@"
 }
-
-__sm.trace_filter()
-{
-  if [[ -n "$1" ]]
-  then
-    if [[ -n "${BASH_VERSION}" ]]
-    then
-      __sm.log.trace.filter start "${FUNCNAME[1]}=$1"
-    elif [[ -n "${ZSH_VERSION}" ]]
-    then
-      #true # no-op for now
-      __sm.log.trace.filter start "${funcstack[2]}=$1"
-    fi
-  else
-    __sm.log.trace.filter stop "${__sm_trace_filter_stack[@]}"
-  fi
-}
-alias trace_filter='set +o xtrace ; __sm.trace_filter'
 
 # Examples
 #
@@ -279,6 +280,7 @@ backtrace()
 
 __sm.log.step()
 {
+  trace_filter log || set -o xtrace
   local _message _output _log_file _status
   _message="${1:-}"
 
@@ -310,11 +312,13 @@ __sm.log.step()
 
 __sm.log.log()
 {
+  trace_filter log || set -o xtrace
   printf "$*\n"
 }
 
 __sm.log.todo()
 {
+  trace_filter log || set -o xtrace
   local file line
   if (( debug_flag )) && __sm.log.options.check "$debug_flags" "todo"
   then
@@ -354,6 +358,7 @@ __sm.log.succeed()
 
 __sm.log.fail()
 {
+  trace_filter log || set -o xtrace
   trace_flag=0
   if [[ -n "${BASH_VERSION}" ]]
   then
@@ -367,6 +372,7 @@ __sm.log.fail()
 
 __sm.set.ps4()
 {
+  trace_filter log || set -o xtrace
   # Set and export the PS4 variable, so that this script -- and called bash scripts --
   # will display more detailed and formatted trace output.
   # Finally, return true, 0, for success.
@@ -382,62 +388,20 @@ __sm.set.ps4()
   return 0
 }
 
-__sm.log.trace.filter()
-{
-  local old _name _action filter
-  _action="$1"
-  (( $# )) && shift || __sm.log.fail "Filter action {start,stop} must be specified."
-
-  case "${_action}" in
-    start)
-      __sm_trace_filter_stack=( "$1" "${__sm_trace_filter_stack[@]}" )
-      ;;
-    stop)
-      old="${__sm_trace_filter_stack[__sm_array_start]}"
-      old="${old%%\=*}"
-
-      if [[ -n "${BASH_VERSION}" ]]
-      then
-        _name="${FUNCNAME[2]}"
-      elif [[ -n "${ZSH_VERSION}" ]]
-      then
-        _name="${funcstack[3]}"
-      fi
-
-      if [[ "${_name}" == "${old}" ]]
-      then
-        (( $# )) && shift || true
-        __sm_trace_filter_stack=( "$@" )
-      fi
-      ;;
-    *)
-      __sm.log.fail "Unknown trace action ${_action}, use {start,stop}."
-      ;;
-  esac
-
-  filter="${__sm_trace_filter_stack[${__sm_array_start}]}"
-
-  if [[ -n "$filter" ]]
-  then
-    if __sm.log.options.check "$trace_flags" "${filter##*\=}"
-    then
-      return 1
-    fi
-  else
-    # No param, restore default state
-    if (( trace_flag != 0 ))
-    then
-      return 1
-    fi
-  fi
-}
+#__sm.log.trace.filter()
 
 __sm.log.warn()
 {
+  trace_filter log || set -o xtrace
   printf "WARNING: $*\n" >&2
 }
 
 __sm.log.debug()
+{
+  trace_filter log || set -o xtrace
+  __sm.log.debug.not.traced "$@"
+}
+__sm.log.debug.not.traced()
 {
   local type
   type="$1"
@@ -460,6 +424,7 @@ __sm.log.debug()
 
 __sm.log.search()
 {
+  trace_filter log || set -o xtrace
   local name value
   name="${1:-}"
   value="${2:-}"
@@ -476,6 +441,7 @@ __sm.log.search()
 
 __sm.actions.call()
 {
+  trace_filter log || set -o xtrace
   local _action
   _action=(${=1}) && shift
   trace_filter action || set -o xtrace
@@ -484,6 +450,7 @@ __sm.actions.call()
 
 __sm.actions.source()
 {
+  trace_filter log || set -o xtrace
   local script
   script="$1"
   (( $# )) && shift || __sm.log.fail "No script was given as the first parameter."
@@ -494,6 +461,7 @@ __sm.actions.source()
 
 __sm.debug.variables.callback()
 {
+  trace_filter log || set -o xtrace
   local _variable ction_stack
 
   if [[ -n "${BASH_VERSION}" ]]
@@ -531,6 +499,7 @@ __sm.debug.variables.callback()
 
 __sm.debug.variables.callback.initialize()
 {
+  trace_filter log || set -o xtrace
   local _variable
   for _variable in "${var_debug_flags[@]}"
   do
@@ -550,11 +519,13 @@ __sm.debug.variables.callback.initialize()
 
 __sm.seppuku()
 {
+  trace_filter log || set -o xtrace
   kill -s USR2 $__sm_pid # to exit application, not current subshell.
 }
 
 __sm.log.piece()
 {
+  trace_filter log || set -o xtrace
   typeset -g log_step_message
   local _message _unicode
   _message="${1:-}"
@@ -613,6 +584,7 @@ __sm.log.piece()
 
 __sm.tmp.logs.clean()
 {
+  trace_filter log || set -o xtrace
   local _log
   [[ -d "${TMP_PATH:-/tmp}"/$$/logs ]] || return 0
   for _log in "${TMP_PATH:-/tmp}"/$$/logs/*.err.log
@@ -623,6 +595,7 @@ __sm.tmp.logs.clean()
 
 __sm.log.options.check()
 {
+  # Do not trace this function, it is dependency to trace_filter
   # Do not use brackets; they slow things down a lot.
   if __sm.string.contains "$2" "$1"
   then
@@ -634,6 +607,7 @@ __sm.log.options.check()
 
 __sm.log.rotate()
 {
+  trace_filter log || set -o xtrace
   local _file _tail_pid
   _file="${1:-}"
   (( $# )) && shift || __sm.log.fail "Cannot rotate a log file, as no log file was given."
@@ -666,6 +640,7 @@ __sm.log.rotate()
 
 __sm.log.streams()
 {
+  trace_filter log || set -o xtrace
   local _command _prefix _err _out _mix _token
   _command="${1:-}"
 
@@ -709,5 +684,3 @@ __sm.log.streams()
     } 3>&1 1>&2 | tee "${_stdout}"
   } > "${_stdmix}" 2>&1
 }
-
-

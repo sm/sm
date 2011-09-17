@@ -2,8 +2,9 @@
 
 __sm.package.cli()
 {
-  local _ignored_args _package_args _token index
-  _ignored_args=()
+  trace_filter package || set -o xtrace
+  local _token index
+  local -a _ignored_args _package_args
   _package_args=( $@ )
 
   for (( index=1 ; index <= ${#_package_args} ; index++ ))
@@ -89,6 +90,7 @@ __sm.package.cli()
 
 __sm.package.error()
 {
+  trace_filter package || set -o xtrace
   local _message _log _lines
   _message="$1"
   _log="$2"
@@ -103,6 +105,7 @@ __sm.package.error()
 
 __sm.package.define()
 {
+  trace_filter package || set -o xtrace
   while (( $# > 0 ))
   do
     key="$1" && shift
@@ -173,6 +176,8 @@ __sm.package.define()
 
 __sm.package.configure.flags()
 {
+  trace_filter package || set -o xtrace
+  typeset -ga configure_flags
   local _flag
   for _flag in "$@"
   do
@@ -185,6 +190,8 @@ __sm.package.configure.flags()
 
 __sm.package.configure.flag()
 {
+  trace_filter package || set -o xtrace
+  typeset -ga configure_flags
   local _key _value
   _key="$1"
   _value="$2"
@@ -197,6 +204,8 @@ __sm.package.configure.flag()
 
 __sm.package.make.flags()
 {
+  trace_filter package || set -o xtrace
+  typeset -ga make_flags
   local _flag
   for _flag in "$@"
   do
@@ -209,6 +218,8 @@ __sm.package.make.flags()
 
 __sm.package.package_dependencies()
 {
+  trace_filter package || set -o xtrace
+  typeset -ga package_dependencies
   local _flag
   for _flag in "$@"
   do
@@ -221,6 +232,7 @@ __sm.package.package_dependencies()
 
 __sm.package.set.cflags()
 {
+  trace_filter package || set -o xtrace
   if ! __sm.string.contains "-I${active_path}/include" "${CFLAGS}"
   then
     export CFLAGS="-I${active_path}/include ${CFLAGS:-} "
@@ -229,6 +241,7 @@ __sm.package.set.cflags()
 
 __sm.package.set.ldflags()
 {
+  trace_filter package || set -o xtrace
   if ! __sm.string.contains "-L${active_path}/lib" "${LDFLAGS}"
   then
     export LDFLAGS="-L${active_path}/lib ${LDFLAGS:-}"
@@ -237,6 +250,7 @@ __sm.package.set.ldflags()
 
 __sm.package.set.cc()
 {
+  trace_filter package || set -o xtrace
   if os is darwin && [[ -x /usr/bin/gcc-4.2 ]]
   then
     export CC=/usr/bin/gcc-4.2
@@ -252,6 +266,7 @@ __sm.package.exports()
 
 __sm.package.install()
 {
+  trace_filter package || set -o xtrace
   case "${package_strategy:=gnu}" in
     (gnu|binary|java)
       __sm.package.${package_strategy}.install "$@"
@@ -264,6 +279,7 @@ __sm.package.install()
 
 __sm.package.uninstall()
 {
+  trace_filter package || set -o xtrace
   case "${package_strategy:=gnu}" in
     (gnu|binary|java)
       __sm.package.${package_strategy}.uninstall "$@"
@@ -276,6 +292,7 @@ __sm.package.uninstall()
 
 __sm.package.gnu.install()
 {
+  trace_filter package || set -o xtrace
   (( $# == 0 )) || __sm.package.cli $@
 
   __sm.package.set.cflags
@@ -417,6 +434,9 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
 
 __sm.package.init()
 {
+  trace_filter package || set -o xtrace
+  typeset -g extension_patches_path
+  typeset -ga fhs_dirs
   local default_configure_flags _flag
 
   true ${package_name:=${extension}}
@@ -521,18 +541,21 @@ __sm.package.init()
 
 __sm.package.binary.install()
 {
+  trace_filter package || set -o xtrace
   NIY "Binary package strategy"
   # TODO: fetch, extract, copy to install path.
 }
 
 __sm.package.java.install()
 {
+  trace_filter package || set -o xtrace
   NIY "Java package strategy"
   # TODO: fetch, extract, copy to install path, setup java launcher.
 }
 
 __sm.package.fetch.md5()
 {
+  trace_filter package || set -o xtrace
   (( $# == 0 )) || __sm.package.cli $@
 
   local download_url
@@ -558,6 +581,7 @@ __sm.package.fetch.md5()
 
 __sm.package.fetch()
 {
+  trace_filter package || set -o xtrace
   (( $# == 0 )) || __sm.package.cli $@
 
   local _args _entries
@@ -580,14 +604,14 @@ __sm.package.fetch()
 
   [[ -d "${source_path}/${package_dir}/${package_dir}" ]] || return 0
 
-  _entries=( "${source_path}/${package_dir}/${package_dir}"/*  )
-  mv "${_entries[@]}" "${source_path}/${package_dir}/"
+  mv "${source_path}/${package_dir}/${package_dir}"/* "${source_path}/${package_dir}/"
 
   rm -rf "${source_path}/${package_dir}/${package_dir}/"
 }
 
 __sm.package.update()
 {
+  trace_filter package || set -o xtrace
   (( $# == 0 )) || __sm.package.cli $@
 
   # TODO: check if newer version exists, if so then...
@@ -604,6 +628,7 @@ __sm.package.update()
 
 __sm.package.configure()
 {
+  trace_filter package || set -o xtrace
   local _command
 
   command exists gcc || command exists cc || __sm.log.fail "No C compiler found."
@@ -632,6 +657,7 @@ __sm.package.configure()
 
 __sm.package.gnu.make()
 {
+  trace_filter package || set -o xtrace
   local _command
 
   if [[ -n ${build_command:-} ]]
@@ -650,11 +676,13 @@ __sm.package.gnu.make()
 
 __sm.package.preinstall()
 {
+  trace_filter package || set -o xtrace
   true # nothing to be done for now.
 }
 
 __sm.package.make.install()
 {
+  trace_filter package || set -o xtrace
   local _command
 
   if [[ -n ${install_command:-} ]]
@@ -675,11 +703,13 @@ __sm.package.make.install()
 
 __sm.package.postinstall()
 {
+  trace_filter package || set -o xtrace
   true
 }
 
 __sm.package.activate()
 {
+  trace_filter package || set -o xtrace
   (( $# == 0 )) || __sm.package.cli $@
 
   versionedfs activate \
@@ -691,6 +721,7 @@ __sm.package.activate()
 
 __sm.package.setup()
 {
+  trace_filter package || set -o xtrace
   local _package
   _package="${1:-${package_name}}"
 
@@ -709,6 +740,7 @@ __sm.package.setup()
 
 __sm.package.deactivate()
 {
+  trace_filter package || set -o xtrace
   (( $# == 0 )) || __sm.package.cli $@
 
   __sm.log.step "${package_name} ${_version} ~ deactivate"
@@ -726,6 +758,7 @@ __sm.package.deactivate()
 
 __sm.package.activate.first()
 {
+  trace_filter package || set -o xtrace
   local _package _version
   _package="${1:-}"
   _version="${2:-}"
@@ -742,6 +775,7 @@ __sm.package.activate.first()
 
 __sm.package.ldconfig()
 {
+  trace_filter package || set -o xtrace
   local _package _path _files _ldconfig
   _package="${1:-${package_name}}"
   _ldconfig="/sbin/ldconfig"
@@ -785,6 +819,7 @@ __sm.package.ldconfig()
 
 __sm.package.profile.d()
 {
+  trace_filter package || set -o xtrace
   local _package
   _package="${1:-${package_name}}"
   [[ -n "${_package}" ]] || __sm.log.fail "Package name must be given."
@@ -803,6 +838,7 @@ __sm.package.profile.d()
 
 __sm.package.uninstall()
 {
+  trace_filter package || set -o xtrace
   (( $# == 0 )) || __sm.package.cli $@
 
   if __sm.package.is.active "${package_name}" "${package_version}"
@@ -821,6 +857,7 @@ __sm.package.uninstall()
 
 __sm.package.patch()
 {
+  trace_filter package || set -o xtrace
   local _patches _patch _path _paths
 
   _paths=(
@@ -843,6 +880,7 @@ __sm.package.patch()
 
 __sm.package.patches.apply()
 {
+  trace_filter package || set -o xtrace
   local _patch _patches
   _patches=("$@")
   (( $# )) && shift || __sm.log.fail "No patches were given."
@@ -856,6 +894,7 @@ __sm.package.patches.apply()
 
 __sm.package.is.active()
 {
+  trace_filter package || set -o xtrace
   local _name _version _path
   _name="${1:-}"
   _version="${2:-}"
@@ -873,16 +912,19 @@ __sm.package.is.active()
 
 __sm.package.docs()
 {
+  trace_filter package || set -o xtrace
   os open "${package_docs_url}"
 }
 
 __sm.package.website()
 {
+  trace_filter package || set -o xtrace
   os open "${package_website_url}"
 }
 
 __sm.package.dependencies()
 {
+  trace_filter package || set -o xtrace
   local dependency _dependencies _missing_dependencies IFS
   _dependencies=(${package_dependencies[@]})
   _missing_dependencies=()
@@ -909,6 +951,7 @@ Please install via sm package module, and retry. Typically, this can be done as 
 
 __sm.package.info()
 {
+  trace_filter package || set -o xtrace
   (( $# == 0 )) || __sm.package.cli $@
 
   local _installed _path package_md5 _installed
@@ -949,6 +992,7 @@ __sm.package.info()
 
 __sm.package.man()
 {
+  trace_filter package || set -o xtrace
   (( $# == 0 )) || __sm.package.cli $@
 
   true "${package_path:="${packages_path}/versions/${package_name}/${package_version}"}"
@@ -963,16 +1007,19 @@ __sm.package.man()
 
 __sm.package.versions.installed()
 {
+  trace_filter package || set -o xtrace
   versionedfs versions path "${packages_path}" name "${package_name}"
 }
 
 __sm.packages.installed()
 {
+  trace_filter package || set -o xtrace
   versionedfs versions path "${packages_path}"
 }
 
 __sm.packages.active()
 {
+  trace_filter package || set -o xtrace
   if [[ -n "$1" ]]
   then
     versionedfs active path "${packages_path}" name "$1"
@@ -983,16 +1030,20 @@ __sm.packages.active()
 
 __sm.packages.available()
 {
+  trace_filter package || set -o xtrace
   __sm.extension.installed module "api/package" "$@"
 }
 
 __sm.packages.list()
 {
+  trace_filter package || set -o xtrace
   local _args
   __sm.packages.${1:-installed} "$@"
 }
 
-__sm.package.usage() {
+__sm.package.usage()
+{
+  trace_filter package || set -o xtrace
   log "
   Usage:
 
@@ -1010,4 +1061,3 @@ __sm.package.usage() {
 
   "
 }
-
