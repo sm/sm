@@ -7,9 +7,9 @@ service_extension_setup()
   module="${2:-}"
   path="${3:-}"
   true ${language:=shell}
-  shift || __sm.log.fail "Extension name not given as first parameter."
-  shift || __sm.log.fail "Module name not given as second parameter."
-  shift || __sm.log.fail "Path not given as third parameter."
+  (( $# )) && shift || __sm.log.fail "Extension name not given as first parameter."
+  (( $# )) && shift || __sm.log.fail "Module name not given as second parameter."
+  (( $# )) && shift || __sm.log.fail "Path not given as third parameter."
 
   for action in start stop restart status list
   do

@@ -22,13 +22,13 @@ os()
       (is)
         _command="$token"
         _os="${1}"
-        shift || __sm.log.fail "lowercase operating system name must follow keyword 'os';"\
+        (( $# )) && shift || __sm.log.fail "lowercase operating system name must follow keyword 'os';"\
           "os is <linux|darwin|bsd|solaris|aix>"
         ;;
       (cpu)
         _command=cpu
         _subcommand="$1"
-        shift || __sm.log.fail "A command must follow keyword 'cpu'; one of {count}"
+        (( $# )) && shift || __sm.log.fail "A command must follow keyword 'cpu'; one of {count}"
         case "${_subcommand}" in
           (count)
             true # all good.

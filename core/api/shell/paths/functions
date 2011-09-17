@@ -68,11 +68,11 @@ paths()
   case "${_command}" in
     (chmod)
       _mode="${1}"
-      shift || __sm.log.fail "Mode must follow keywords 'chmod'"
+      (( $# )) && shift || __sm.log.fail "Mode must follow keywords 'chmod'"
       ;;
     (chown)
       _owner="${1}"
-      shift || __sm.log.fail "Owner must be provided after keyword 'owner'"
+      (( $# )) && shift || __sm.log.fail "Owner must be provided after keyword 'owner'"
       ;;
   esac
 
@@ -82,31 +82,31 @@ paths()
     case "${_token}" in
       (to)
         _target="${1}"
-        shift || __sm.log.fail "Target path must be given after keyword 'to'"
+        (( $# )) && shift || __sm.log.fail "Target path must be given after keyword 'to'"
         ;;
       (from)
         _source="${1}"
-        shift || __sm.log.fail "Source path must be given after keyword 'from'"
+        (( $# )) && shift || __sm.log.fail "Source path must be given after keyword 'from'"
         ;;
       (mode|permissions)
         _mode="${1}"
-        shift || __sm.log.fail "Mode must follow keyword '${_token}'"
+        (( $# )) && shift || __sm.log.fail "Mode must follow keyword '${_token}'"
         ;;
       (owner)
         _owner="${1}"
-        shift || __sm.log.fail "Owner must be given after keyword 'owner'"
+        (( $# )) && shift || __sm.log.fail "Owner must be given after keyword 'owner'"
         ;;
       (recursive|recursively)
         _flags+=(-R)
         ;;
       (matching|regex|glob)
         _regex="$1"
-        shift ||
+        (( $# )) && shift ||
           __sm.log.fail "Shell glob pattern string must b given after keyword '${_token}'"
         ;;
       (in)
         _paths+=("$1")
-        shift || __sm.log.fail "A path is expected following keyword 'in'"
+        (( $# )) && shift || __sm.log.fail "A path is expected following keyword 'in'"
         ;;
       (*)
         _paths+=("${_token}")

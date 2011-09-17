@@ -96,9 +96,9 @@ __sm.cache.map.find.matching()
 {
   local _method _name _item
   _method="$1"
-  shift || __sm.log.fail "No method and action name was given for search"
+  (( $# )) && shift || __sm.log.fail "No method and action name was given for search"
   _name="$1"
-  shift || __sm.log.fail "No action name was given for search"
+  (( $# )) && shift || __sm.log.fail "No action name was given for search"
   for _item in "${_actions_cache[@]}"
   do
     case "${_method}" in

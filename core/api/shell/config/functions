@@ -15,23 +15,23 @@ config()
         ;;
       (key)
         _key="$1"
-        shift || __sm.log.fail "a key must be given after keywords 'key'"
+        (( $# )) && shift || __sm.log.fail "a key must be given after keywords 'key'"
         ;;
       (value)
         _value="$1"
-        shift || __sm.log.fail "a value must be given after keywords 'value'"
+        (( $# )) && shift || __sm.log.fail "a value must be given after keywords 'value'"
         ;;
       (into|as)
         _variable="$1"
-        shift || __sm.log.fail "a variable name must be given after keywords 'into|as'"
+        (( $# )) && shift || __sm.log.fail "a variable name must be given after keywords 'into|as'"
         ;;
       (prefix) # TODO: Nix prefix?
         _prefix="$1"
-        shift || __sm.log.fail "a prefix name must be given after keyword 'prefix'"
+        (( $# )) && shift || __sm.log.fail "a prefix name must be given after keyword 'prefix'"
         ;;
       (file)
         _file="$1"
-        shift || __sm.log.fail "a file name must be given after keyword 'file'"
+        (( $# )) && shift || __sm.log.fail "a file name must be given after keyword 'file'"
         ;;
       (from)
         _extension="$1" || __sm.log.fail "An extension name must follow keyword 'for'"

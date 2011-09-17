@@ -14,7 +14,7 @@ string()
     case "${_token}" in
       (from)
         _search="$1"
-        shift || __sm.log.fail "From source string must follow keyword 'from'"
+        (( $# )) && shift || __sm.log.fail "From source string must follow keyword 'from'"
         ;;
       (to)
         _string="$1"
@@ -22,7 +22,7 @@ string()
       (contains)
         _command=contains
         _search="$1"
-        shift || __sm.log.fail "Search (glob) string must follow keyword 'contains'"
+        (( $# )) && shift || __sm.log.fail "Search (glob) string must follow keyword 'contains'"
         ;;
       (*)
         if [[ -z "${_string}" ]]

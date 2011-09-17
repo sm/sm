@@ -15,8 +15,8 @@ git_get()
   remote=${4:-origin}
   revision=${5:-HEAD}
 
-  shift || __sm.log.fail "url must be the first parameter to git_get()."
-  shift || __sm.log.fail "target path must be the second parameter to git_get()."
+  (( $# )) && shift || __sm.log.fail "url must be the first parameter to git_get()."
+  (( $# )) && shift || __sm.log.fail "target path must be the second parameter to git_get()."
 
   __sm.command.exists git ||
     __sm.log.error "'git' was not found, please install git and try again.\n"\

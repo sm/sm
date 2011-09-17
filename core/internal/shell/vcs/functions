@@ -26,8 +26,8 @@ fetch_uri()
   _uri="${1:-}"
   _target="${2:-}"
   _args=()
-  shift || __sm.log.fail "uri must be specified as the first parameter."
-  shift || __sm.log.fail "target path must be specified as the second parameter."
+  (( $# )) && shift || __sm.log.fail "uri must be specified as the first parameter."
+  (( $# )) && shift || __sm.log.fail "target path must be specified as the second parameter."
 
   builtin cd "$initial_pwd"
 
@@ -78,8 +78,8 @@ fetch_uris()
   _uris=( "${1}" )
   _target="${2:-}"
   _args=()
-  shift || __sm.log.fail "uri must be specified as the first parameter."
-  shift || __sm.log.fail "target path must be specified as the second parameter."
+  (( $# )) && shift || __sm.log.fail "uri must be specified as the first parameter."
+  (( $# )) && shift || __sm.log.fail "target path must be specified as the second parameter."
 
   fetch_uri_parse_args "$@"
 
@@ -120,7 +120,7 @@ fetch_uri_parse_args()
       case "${_token}" in
         (*${_allowed_arg})
           eval "${_allowed_arg}=\"${1}\""
-          shift || __sm.log.fail "${_allowed_arg} must be specified after '${_token}'."
+          (( $# )) && shift || __sm.log.fail "${_allowed_arg} must be specified after '${_token}'."
           continue 2
           ;;
       esac
@@ -129,12 +129,12 @@ fetch_uri_parse_args()
     case "${_token}" in
       (--on-fail)
         fetch_error_handler=$1
-        shift || __sm.log.fail "fetch __sm.log.error handler function must be specified after '--on-fail'."
+        (( $# )) && shift || __sm.log.fail "fetch __sm.log.error handler function must be specified after '--on-fail'."
         continue
         ;;
       (--fallback-uri)
         _uris+=( ${1//,/ } )
-        shift || __sm.log.fail "comma separated lit of uris must be specified after '--fallback-uri'."
+        (( $# )) && shift || __sm.log.fail "comma separated lit of uris must be specified after '--fallback-uri'."
         continue
         ;;
     esac
@@ -146,7 +146,7 @@ fetch_update()
 {
   local _uri _target
   _target="${1:-}"
-  shift || __sm.log.fail "target path must be specified as the second parameter."
+  (( $# )) && shift || __sm.log.fail "target path must be specified as the second parameter."
 
   if [[ -d "${_target}" ]] && [[ -s "${_target}/.uri" ]]
   then
@@ -166,8 +166,8 @@ cli_fetch()
   _uri="${1:-}"
   _target="${2:-}"
   _args=()
-  shift || __sm.log.error "uri must be specified as the first parameter."
-  shift || __sm.log.error "target path must be specified as the second parameter."
+  (( $# )) && shift || __sm.log.error "uri must be specified as the first parameter."
+  (( $# )) && shift || __sm.log.error "target path must be specified as the second parameter."
   fetch_uri "${_uri}" "${_target}" --on-fail __sm.log.error "$@"
 }
 
@@ -175,6 +175,6 @@ cli_fetch_update()
 {
   local _target
   _target="${1:-}"
-  shift || __sm.log.error "target path must be specified as the second parameter."
+  (( $# )) && shift || __sm.log.error "target path must be specified as the second parameter."
   fetch_update "${_target}" --on-fail __sm.log.error "$@"
 }

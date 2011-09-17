@@ -385,7 +385,7 @@ __sm.log.trace.filter()
 {
   local old _name _action
   _action="$1"
-  shift || __sm.log.fail "Filter action {start,stop} must be specified."
+  (( $# )) && shift || __sm.log.fail "Filter action {start,stop} must be specified."
 
   case "${_action}" in
     start)
@@ -405,7 +405,7 @@ __sm.log.trace.filter()
 
       if [[ "${_name}" == "${old}" ]]
       then
-        shift || true
+        (( $# )) && shift || true
         __sm_trace_filter_stack=( "$@" )
       fi
       ;;
@@ -440,7 +440,7 @@ __sm.log.debug()
 {
   local type
   type="$1"
-  shift || __sm.log.fail "Debug type must be given as the first parameter."
+  (( $# )) && shift || __sm.log.fail "Debug type must be given as the first parameter."
 
   if (( debug_flag )) && __sm.log.options.check "$debug_flags" "$type"
   then
@@ -462,8 +462,8 @@ __sm.log.search()
   local name value
   name="${1:-}"
   value="${2:-}"
-  shift || __sm.log.fail "name must be given as the first parameter."
-  shift || __sm.log.fail "value must be given as the second parameter."
+  (( $# )) && shift || __sm.log.fail "name must be given as the first parameter."
+  (( $# )) && shift || __sm.log.fail "value must be given as the second parameter."
 
   if (( debug_flag )) && __sm.log.options.check "$debug_flags" "search"
   then
@@ -485,7 +485,7 @@ __sm.actions.source()
 {
   local script
   script="$1"
-  shift || __sm.log.fail "No script was given as the first parameter."
+  (( $# )) && shift || __sm.log.fail "No script was given as the first parameter."
   [[ -r "$script" ]] || __sm.log.fail "Could not find script to run: $script."
   trace_filter action || set -o xtrace
   source "$script"
@@ -634,7 +634,7 @@ __sm.log.rotate()
 {
   local _file _tail_pid
   _file="${1:-}"
-  shift || __sm.log.fail "Cannot rotate a log file, as no log file was given."
+  (( $# )) && shift || __sm.log.fail "Cannot rotate a log file, as no log file was given."
 
   timestamp="$( date +"%Y-%m-%dT%H:%M:%S" )"
 
@@ -678,19 +678,19 @@ __sm.log.streams()
         ;;
       err)
         _stderr="${1}"
-        shift || __sm.log.fail "stderr name must follow keyword 'err'"
+        (( $# )) && shift || __sm.log.fail "stderr name must follow keyword 'err'"
         ;;
       out)
         _stdout="${1}"
-        shift || __sm.log.fail "stdout name must follow keyword 'out'"
+        (( $# )) && shift || __sm.log.fail "stdout name must follow keyword 'out'"
         ;;
       mix)
         _stdmix="${1}"
-        shift || __sm.log.fail "stdmix name must follow keyword 'mix'"
+        (( $# )) && shift || __sm.log.fail "stdmix name must follow keyword 'mix'"
         ;;
       *)
         _command="${1}"
-        shift || __sm.log.fail "A command must be given in order to log it's streams."
+        (( $# )) && shift || __sm.log.fail "A command must be given in order to log it's streams."
         ;;
     esac
   done

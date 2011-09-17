@@ -48,7 +48,7 @@ versionedfs()
 
   local _token _path _paths _source _name _version _strategy _method _activate _action
   _action="${1:-}"
-  shift || __sm.log.fail "Usage: versionedfs path \"{versionedfs root path}\" "\
+  (( $# )) && shift || __sm.log.fail "Usage: versionedfs path \"{versionedfs root path}\" "\
     "strategy \"{fhs,name}\" method \"{link,copy}\" activate \"{newest,first}\""
 
   while (( $# ))
@@ -57,23 +57,23 @@ versionedfs()
     case "${_token}" in
       (path)
         _path="${1}"
-        shift || __sm.log.fail "versionedfs path must follow keyword 'path'"
+        (( $# )) && shift || __sm.log.fail "versionedfs path must follow keyword 'path'"
         ;;
       (source)
         _source="${1}"
-        shift || __sm.log.fail "Source path must follow keyword 'source'"
+        (( $# )) && shift || __sm.log.fail "Source path must follow keyword 'source'"
         ;;
       (name)
         _name="${1}"
-        shift || __sm.log.fail "Name must follow keyword 'name'"
+        (( $# )) && shift || __sm.log.fail "Name must follow keyword 'name'"
         ;;
       (version)
         _version="${1}"
-        shift || __sm.log.fail "Version string must follow keyword 'version'"
+        (( $# )) && shift || __sm.log.fail "Version string must follow keyword 'version'"
         ;;
       (strategy)
         _strategy="${1}"
-        shift || __sm.log.fail "Strategy string must follow keyword 'strategy'"
+        (( $# )) && shift || __sm.log.fail "Strategy string must follow keyword 'strategy'"
         case "${_strategy}" in
           (fhs|name) true ;;
           (*) __sm.log.fail "Strategy must be one of {fhs,name}" ;;
@@ -81,7 +81,7 @@ versionedfs()
         ;;
       (method)
         _method="${1}"
-        shift || __sm.log.fail "method string must follow keyword 'method'"
+        (( $# )) && shift || __sm.log.fail "method string must follow keyword 'method'"
         case "${_method}" in
           (link|copy) true ;;
           (*) __sm.log.fail "Method must be one of {link,copy}" ;;
@@ -89,7 +89,7 @@ versionedfs()
         ;;
       (activate)
         _activate="${1}"
-        shift || __sm.log.fail "activate string must follow keyword 'activate'"
+        (( $# )) && shift || __sm.log.fail "activate string must follow keyword 'activate'"
         case "${_activate}" in
           (first|newest) true ;;
           (*) __sm.log.fail "Activate must be one of {first,newest}" ;;
@@ -97,7 +97,7 @@ versionedfs()
         ;;
       (keep)
         _keep="${1}"
-        shift || __sm.log.fail "keep number must follow keyword 'activate'"
+        (( $# )) && shift || __sm.log.fail "keep number must follow keyword 'activate'"
         case "${_keep}" in
           (+([[:digit:]]))
             (( _keep > 0)) || __sm.log.fail "Keep must be a positive integer." ;;

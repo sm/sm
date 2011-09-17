@@ -729,8 +729,8 @@ __sm.package.activate.first()
   local _package _version
   _package="${1:-}"
   _version="${2:-}"
-  shift || __sm.log.fail "Package name must be given as first parameter."
-  shift || __sm.log.fail "Package version must be given as second parameter."
+  (( $# )) && shift || __sm.log.fail "Package name must be given as first parameter."
+  (( $# )) && shift || __sm.log.fail "Package version must be given as second parameter."
 
   if paths exist "${install_path}"
   then
@@ -845,7 +845,7 @@ __sm.package.patches.apply()
 {
   local _patch _patches
   _patches=("$@")
-  shift || __sm.log.fail "No patches were given."
+  (( $# )) && shift || __sm.log.fail "No patches were given."
 
   for _patch in "${_patches[@]}"
   do
@@ -859,7 +859,7 @@ __sm.package.is.active()
   local _name _version _path
   _name="${1:-}"
   _version="${2:-}"
-  shift || __sm.log.fail "No package name was given, or name is empty."
+  (( $# )) && shift || __sm.log.fail "No package name was given, or name is empty."
 
   _path="${packages_path}/versions/${_name}"
 

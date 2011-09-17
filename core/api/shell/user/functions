@@ -29,17 +29,17 @@ user()
   case "${_command}" in
     (set.home)
       _value="$1"
-      shift || __sm.log.fail "A home path must follow keyword 'home';"\
+      (( $# )) && shift || __sm.log.fail "A home path must follow keyword 'home';"\
         "user set home /home/{username} for {username}"
       ;;
     (set.shell)
       _value="$1"
-      shift || __sm.log.fail "A shell must follow keyword 'shell'"\
+      (( $# )) && shift || __sm.log.fail "A shell must follow keyword 'shell'"\
         "user set shell /bin/zsh for {username}"
       ;;
     (exists)
       _user="$1"
-      shift || __sm.log.fail "A user name must follow keyword 'exists'"\
+      (( $# )) && shift || __sm.log.fail "A user name must follow keyword 'exists'"\
         "user exists {username}"
       ;;
   esac
@@ -53,19 +53,19 @@ user()
         ;;
       (name|user|for)
         _user="$1"
-        shift || __sm.log.fail "User name must follow keyword 'user'"
+        (( $# )) && shift || __sm.log.fail "User name must follow keyword 'user'"
         ;;
       (group)
         _group="${1:-}"
-        shift || __sm.log.fail "Group name must follow keyword 'group'"
+        (( $# )) && shift || __sm.log.fail "Group name must follow keyword 'group'"
         ;;
       (from)
         _source="${1:-}"
-        shift || __sm.log.fail "from source name must follow keyword 'from'"
+        (( $# )) && shift || __sm.log.fail "from source name must follow keyword 'from'"
         ;;
       (shell)
         _shell="${1:-}"
-        shift || __sm.log.fail "A user shell (/bin/{zsh,bash}) must follow keyword 'shell'"
+        (( $# )) && shift || __sm.log.fail "A user shell (/bin/{zsh,bash}) must follow keyword 'shell'"
         ;;
       (force)
         _flags+=(-f)

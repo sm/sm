@@ -174,7 +174,7 @@ __sm.paths.in()
 {
   local _path
   _path="${1:-}"
-  shift  || __sm.log.fail "Path was not given!"
+  (( $# )) && shift || __sm.log.fail "Path was not given!"
   [[ -d "${_path}" ]] || __sm.log.fail "'${_path}' is not a path!"
 
   for dir in "${_path}"/*

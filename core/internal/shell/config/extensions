@@ -8,7 +8,7 @@ config_extension_setup()
   path="${3:-}"
   true ${language:=shell}
 
-  shift 3 || __sm.log.fail "Extension name, module name and path must be given."
+  (( $# >=3 )) && shift 3 || __sm.log.fail "Extension name, module name and path must be given."
 
   path create "${extension_path}/config"
   file create "${extension_path}/defaults"

@@ -5,7 +5,7 @@ __sm.templates.find()
   local _extensions_path _extension _template_path _params_path
   _extensions_path="$1"
 
-  shift || __sm.log.fail "No extensions path and extension name given."
+  (( $# )) && shift || __sm.log.fail "No extensions path and extension name given."
 
   _params_path="$*"
   _params_path="${_params_path// //}"
@@ -70,7 +70,7 @@ __sm.templates.seed()
 {
   local _template _hash _strings temporary
   _template="${1:-}"
-  shift || __sm.log.fail "No template name was given."
+  (( $# )) && shift || __sm.log.fail "No template name was given."
   _hash=("$@")
   _strings=()
   temporary=${_template}.${timestamp}.$$
@@ -109,13 +109,13 @@ __sm.templates.update()
   local _template _target _incoming _hash _strings _variables
   _template="${1:-}"
   _target="${2:-}"
-  shift || __sm.log.fail "Cannot update seed template;"\
+  (( $# )) && shift || __sm.log.fail "Cannot update seed template;"\
     " Template name was not given as the first parameter."
-  shift || __sm.log.fail "Cannot update seed template;"\
+  (( $# )) && shift || __sm.log.fail "Cannot update seed template;"\
     " Template target was not given as the second parameter."
 
   _incoming="${1:-${_target}.incoming}"
-  shift || true
+  (( $# )) && shift || true
   _hash=("$@")
   _strings=()
   _variables="${_target}.var.$$"

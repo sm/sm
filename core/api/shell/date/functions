@@ -15,23 +15,23 @@ date()
     case "${_token}" in
       (step)
         _step="${1:-}"
-        shift || __sm.log.fail "step must follow keyword 'step'"
+        (( $# )) && shift || __sm.log.fail "step must follow keyword 'step'"
         ;;
       (format_in)
         _format_in="${1}"
-        shift || __sm.log.fail "input format must follow keyword 'format_in'"
+        (( $# )) && shift || __sm.log.fail "input format must follow keyword 'format_in'"
         ;;
       (format|format_out)
         _format_out="${1}"
-        shift || __sm.log.fail "output format must follow keyword 'format[_out]'"
+        (( $# )) && shift || __sm.log.fail "output format must follow keyword 'format[_out]'"
         ;;
       (start)
         _start="${1}"
-        shift || __sm.log.fail "start must follow keyword 'start'"
+        (( $# )) && shift || __sm.log.fail "start must follow keyword 'start'"
         ;;
       (end)
         _end="${1}"
-        shift || __sm.log.fail "end must follow keyword 'end'"
+        (( $# )) && shift || __sm.log.fail "end must follow keyword 'end'"
         ;;
       (*)
         if [[ -z "${_start}" ]]

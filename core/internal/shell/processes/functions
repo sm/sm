@@ -4,7 +4,7 @@ __sm.process.lockfile.lock()
 {
   local _lockfile
   _lockfile="${1:-}"
-  shift ||
+  (( $# )) && shift ||
     __sm.log.fail "No lockfile was specified as the first parameter."
 
   printf "$$" >> "${_lockfile}" # *Append* current process's pid to the lockfile

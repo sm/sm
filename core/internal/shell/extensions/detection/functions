@@ -8,8 +8,8 @@ __sm.cache.map.check()
   _found_actions=()
   _method="$1"
   _name="$2"
-  shift || __sm.log.fail "No method and action name was given for search"
-  shift || __sm.log.fail "No action name was given for search"
+  (( $# )) && shift || __sm.log.fail "No method and action name was given for search"
+  (( $# )) && shift || __sm.log.fail "No action name was given for search"
 
   __sm.cache.map.find.matching "${_method}" "${_name}"
 
@@ -62,8 +62,8 @@ __sm.extension.actions.find()
   extensions_path="$1"
   extension="$2"
 
-  shift || __sm.log.fail "Extension path must be given as the first parameter."
-  shift || __sm.log.fail "Extension name must be given as the second parameter."
+  (( $# )) && shift || __sm.log.fail "Extension path must be given as the first parameter."
+  (( $# )) && shift || __sm.log.fail "Extension name must be given as the second parameter."
 
   local _action_params _action_path _new_action_path _rest_params _param_temp \
     _action_params_length _actions_root _map _modules_root _actions_cache

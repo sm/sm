@@ -15,11 +15,11 @@ traps()
     case "${_token}" in
       (on)
         _signal="$1"
-        shift || __sm.log.fail "A signal must follow keyword 'on'"
+        (( $# )) && shift || __sm.log.fail "A signal must follow keyword 'on'"
         case "${_signal}" in
           (exit|EXIT)
             _code="$*"
-            shift || __sm.log.fail "The code to be run on EXIT must be given after keyword 'EXIT'."
+            (( $# )) && shift || __sm.log.fail "The code to be run on EXIT must be given after keyword 'EXIT'."
             __traps_code="$(trap)"
             __traps_code="$( echo "${__traps_code}" | awk '/ EXIT$/' |
                              sed -e "s#' EXIT##" -e "s#.*'##")"

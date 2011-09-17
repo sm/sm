@@ -72,7 +72,7 @@ __sm.array.pop()
   local _name _variable index
   _name="${1}"
   _variable="${2:-}"
-  shift || __sm.log.fail "Array name was not given."
+  (( $# )) && shift || __sm.log.fail "Array name was not given."
 
   eval "(( \${#${_name}[@]} ))" || __sm.log.fail "Array '${_name}' was empty."
 
@@ -89,7 +89,7 @@ __sm.array.shift()
   local _name index _variable
   _name="${1:-}"
   _variable="${2:-}"
-  shift || __sm.log.fail "Array name was not given."
+  (( $# )) && shift || __sm.log.fail "Array name was not given."
 
   [[ -z "${_variable}" ]] || eval "${_variable}=\${${_name}[${__sm_array_start}]}"
 
@@ -100,7 +100,7 @@ __sm.array.unshift()
 {
   local _name
   _name="${1:-}"
-  shift || __sm.log.fail "Array name was given."
+  (( $# )) && shift || __sm.log.fail "Array name was given."
 
   local _elements=("$@")
 
@@ -113,7 +113,7 @@ __sm.array.join()
 {
   local _name IFS
   _name="${1:-}"
-  shift || __sm.log.fail "Array name was not given."
+  (( $# )) && shift || __sm.log.fail "Array name was not given."
   IFS=${1:-' '}
   eval "printf \"\${${_name}[*]}\""
 }
@@ -123,7 +123,7 @@ __sm.array.largest()
   local _name _index _largest
   _name="${1:-}"
   _largest=""
-  shift || __sm.log.fail "No array variable name was given."
+  (( $# )) && shift || __sm.log.fail "No array variable name was given."
 
   eval "
   for (( _index=1 ; _index <= \${#${_name}[@]} ; _index++ ))
@@ -156,7 +156,7 @@ __sm.array.unique()
 {
   local _name
   _name="${1:-}"
-  shift || __sm.log.fail "Array variable name was not given."
+  (( $# )) && shift || __sm.log.fail "Array variable name was not given."
 
   eval "${_name}=( \${(u)${_name}[@]} )"
 }

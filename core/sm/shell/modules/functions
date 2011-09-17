@@ -236,7 +236,7 @@ __sm.extension.in.paths()
 {
   local callback _path
   callback="${1:-}"
-  shift || __sm.log.fail "Callback name must be given ast the first parameter."
+  (( $# )) && shift || __sm.log.fail "Callback name must be given ast the first parameter."
 
   if [[ -n "$1" ]] # do search if params given
   then
@@ -253,7 +253,7 @@ __sm.cli.in.path()
 {
   local callback
   callback="${1:-}"
-  shift || __sm.log.fail "Callback name must be given ast the first parameter."
+  (( $# )) && shift || __sm.log.fail "Callback name must be given ast the first parameter."
 
   "${callback}" "${sm_path}/core" "cli" "$@"
 }
@@ -264,7 +264,7 @@ __sm.extension.path.reorder()
   part="${1:-}"
   extensions_path="${2:-}"
   extension="${3:-}"
-  shift 3 || __sm.log.fail "Path part extensions_path extnesion must be given first ."
+  (( $# >= 3 )) && shift 3 || __sm.log.fail "Path part extensions_path extnesion must be given first ."
 
   output="$extensions_path/$extension/$part/$*"
   rebuilded_path="${output// //}"
@@ -275,7 +275,7 @@ __sm.extension.path.rebuild()
   local part extensions_path params
   part="$1"
   extensions_path="$2"
-  shift 2 || __sm.log.fail "Path extensions_path part must be given first."
+  (( $# >= 2 )) && shift 2 || __sm.log.fail "Path extensions_path part must be given first."
 
   params="$*"
   __sm.extension.path.reorder "${part}" "${extensions_path}" ${=params//\// }
@@ -285,7 +285,7 @@ __sm.module.detect()
 {
   local extensions_path _module_path
   extensions_path=$1
-  shift || __sm.log.fail "Extensions path must be given as the first parameter."
+  (( $# )) && shift || __sm.log.fail "Extensions path must be given as the first parameter."
 
   __sm.extension.path.rebuild "shell" $extensions_path $@
   _module_path=${rebuilded_path}

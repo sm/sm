@@ -43,7 +43,7 @@ cleanse_targets()
 {
   local _path _entity
   _path="$1"
-  shift || __sm.log.fail "Usage:\n\n  cleanse_targets {target} {paths/files under target}"
+  (( $# )) && shift || __sm.log.fail "Usage:\n\n  cleanse_targets {target} {paths/files under target}"
   for _entity in "$@"
   do
     rm -rf "${_path}/${_entity}"

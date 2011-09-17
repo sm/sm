@@ -19,11 +19,11 @@ hash()
         ;;
       (key)
         _key="$1"
-        shift || __sm.log.fail "Key name must follow keyword 'key'"
+        (( $# )) && shift || __sm.log.fail "Key name must follow keyword 'key'"
         ;;
       (variable)
         _variable="$1"
-        shift || __sm.log.fail "Variable name must follow keyword 'variable'"
+        (( $# )) && shift || __sm.log.fail "Variable name must follow keyword 'variable'"
         ;;
       (*)
         if [[ -z "${_command}" ]]

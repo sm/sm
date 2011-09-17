@@ -4,7 +4,7 @@ __sm.files.source()
 {
   local _file _files
   _files=("$@")
-  shift || __sm.log.fail "Cannot source files; No files were given."
+  (( $# )) && shift || __sm.log.fail "Cannot source files; No files were given."
 
   for _file in "${_files[@]}"
   do
@@ -54,7 +54,7 @@ __sm.files.remove()
   # TODO: add 'from' parameter
   local _file _files
   _files=("$@")
-  shift || __sm.log.fail "Cannot remove files, as no files were given to remove."
+  (( $# )) && shift || __sm.log.fail "Cannot remove files, as no files were given to remove."
 
   for _file in "${_files[@]}"
   do
@@ -82,7 +82,7 @@ __sm.files.create()
   trace_filter filesystem || set -o xtrace
   local _file _path _files
   _files=("$@")
-  shift || __sm.log.fail "Cannot ensure files exist; No files were given."
+  (( $# )) && shift || __sm.log.fail "Cannot ensure files exist; No files were given."
 
   for _file in "${_files[@]}"
   do

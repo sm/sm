@@ -10,7 +10,7 @@ shell()
       (is)
         _command=is
         _subcommand="${1}"
-        shift || __sm.log.fail "A command must follow keyword 'is'"
+        (( $# )) && shift || __sm.log.fail "A command must follow keyword 'is'"
         case "${_subcommand}" in
           (interactive)
             [[ -t 0 ]]

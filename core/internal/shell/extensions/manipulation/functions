@@ -4,7 +4,7 @@ extension_version()
 {
   local _extension
   _extension=$1
-  shift || __sm.log.fail "Cannot retrieve extension version;"\
+  (( $# )) && shift || __sm.log.fail "Cannot retrieve extension version;"\
     " No extension was given."
   true ${extension_path:="${extensions_path}/${_extension}"}
 
@@ -69,7 +69,7 @@ __sm.extension.actions()
   local _extension _files _file _actions
   _extension="${1:-}"
   _actions=()
-  shift || __sm.log.fail "No extension was given."
+  (( $# )) && shift || __sm.log.fail "No extension was given."
   [[ -d "${extension_bin_path}" ]] || return 0
   #TODO: build actions cache and use it to display actions
   echo "${_actions[@]}"
@@ -83,10 +83,10 @@ __sm.extension.install()
 {
   local _name _uri _version _identifier
   _name="${1:-}"
-  shift || __sm.log.fail "No extension name was given."
+  (( $# )) && shift || __sm.log.fail "No extension name was given."
 
   _uri="${1:-}"
-  shift || true
+  (( $# )) && shift || true
   [[ -n "${_uri}" ]] || _uri=$( __sm.extension.get.uri "${_name}" )
 
   [[ -n "${_uri}" ]] ||
@@ -137,15 +137,15 @@ __sm.extension.installed()
         ;;
       (module|type)
         _type="$1"
-        shift || __sm.log.fail "An module type must follow the '${_token}' keyword"
+        (( $# )) && shift || __sm.log.fail "An module type must follow the '${_token}' keyword"
         ;;
       (in)
         _paths="${1}"
-        shift || __sm.log.fail "A path must follow keyword 'in'"
+        (( $# )) && shift || __sm.log.fail "A path must follow keyword 'in'"
         ;;
       (exclude)
         _exclude="${1}"
-        shift || __sm.log.fail "A string must follow keyword 'exclude'"
+        (( $# )) && shift || __sm.log.fail "A string must follow keyword 'exclude'"
         _excludes+=("${_exclude//,/ }")
         ;;
       (*)

@@ -398,7 +398,7 @@ __sm.service.initd.install()
 {
   local _service _version
   _service="${1:-}"
-  shift ||fail "Service name was not passed in as the first parameter"
+  (( $# )) && shift ||fail "Service name was not passed in as the first parameter"
   _version="${2:-${package_version}}"
   #TODO: WTF ^ why is this $2 after a shift ?
 
@@ -682,7 +682,7 @@ __sm.service.activate()
 {
   local _service _version
   _service="${1:-"${service}"}"
-  shift || __sm.log.fail "The service name must be set or given to activate a service."
+  (( $# )) && shift || __sm.log.fail "The service name must be set or given to activate a service."
 
   _version="${2:-${package_version}}"
   #TODO: WTF ^ why use $2 after shift ?
@@ -869,7 +869,7 @@ __sm.service.signal()
   local _signal _pid
   _signal="${1}"
   _pid="${2:-0}"
-  shift || __sm.log.fail "Cannot signal service;"\
+  (( $# )) && shift || __sm.log.fail "Cannot signal service;"\
     " Signal must be given as the first parameter and be one of:"\
     " {KILL,QUIT,TERM,USR1,USR2,TTIN,TTOU,a digit})."
 

@@ -45,11 +45,11 @@ files()
       ;;
     (chmod)
       _mode="${1}"
-      shift || __sm.log.fail "Mode must follow keywords 'chmod'"
+      (( $# )) && shift || __sm.log.fail "Mode must follow keywords 'chmod'"
       ;;
     (chown)
       _owner="${1}"
-      shift || __sm.log.fail "Owner must be provided after keyword 'owner'"
+      (( $# )) && shift || __sm.log.fail "Owner must be provided after keyword 'owner'"
       ;;
   esac
 
@@ -62,19 +62,19 @@ files()
         ;;
       (to)
         _target="${1}"
-        shift || __sm.log.fail "Target path must be provided after keyword '${_token}'"
+        (( $# )) && shift || __sm.log.fail "Target path must be provided after keyword '${_token}'"
         ;;
       (from)
         _source="${1}"
-        shift || __sm.log.fail "Source path must be provided after keyword 'from'"
+        (( $# )) && shift || __sm.log.fail "Source path must be provided after keyword 'from'"
         ;;
       (mode|permissions)
         _mode="${1}"
-        shift || __sm.log.fail "Mode must follow keywords 'mode|permissions'"
+        (( $# )) && shift || __sm.log.fail "Mode must follow keywords 'mode|permissions'"
         ;;
       (owner)
         _owner="${1}"
-        shift || __sm.log.fail "Owner must be provided after keyword 'owner'"
+        (( $# )) && shift || __sm.log.fail "Owner must be provided after keyword 'owner'"
         ;;
       (recursive|recursively)
         _flags+=(-R)
@@ -88,27 +88,27 @@ files()
         ;;
       (string|content)
         _string="$1"
-        shift || __sm.log.fail "A string must be followed by keyword 'string'"
+        (( $# )) && shift || __sm.log.fail "A string must be followed by keyword 'string'"
         ;;
       (regex)
         _regex="$1"
-        shift || __sm.log.fail "A regex must be followed by keyword 'regex'"
+        (( $# )) && shift || __sm.log.fail "A regex must be followed by keyword 'regex'"
         ;;
       (in)
         _files+=("$1")
-        shift || __sm.log.fail "A file name must follow keyword 'in'"
+        (( $# )) && shift || __sm.log.fail "A file name must follow keyword 'in'"
         ;;
       (key)
         _key="$1"
-        shift || __sm.log.fail "A key name must follow keyword 'key'"
+        (( $# )) && shift || __sm.log.fail "A key name must follow keyword 'key'"
         ;;
       (value)
         _value="$1"
-        shift || __sm.log.fail "A value must follow keyword 'value'"
+        (( $# )) && shift || __sm.log.fail "A value must follow keyword 'value'"
         ;;
       (with)
         _string="$1"
-        shift || __sm.log.fail "A content string must follow keyword 'with'"
+        (( $# )) && shift || __sm.log.fail "A content string must follow keyword 'with'"
         ;;
       (*)
         _files+=("${_token}")

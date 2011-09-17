@@ -68,7 +68,7 @@ ext_install()
   local _name _names _uri
   _names="$1"
   _uri="$2"
-  shift || __sm.log.fail "No extension name was given."
+  (( $# )) && shift || __sm.log.fail "No extension name was given."
 
   _names=(${_names//,/ })
 

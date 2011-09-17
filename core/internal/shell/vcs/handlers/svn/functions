@@ -13,8 +13,8 @@ svn_get()
   _uri="${1:-}"
   _target="${2:-}"
 
-  shift || __sm.log.fail "url must be specified as the first parameter."
-  shift || __sm.log.fail "target path must be specified as the second parameter."
+  (( $# )) && shift || __sm.log.fail "url must be specified as the first parameter."
+  (( $# )) && shift || __sm.log.fail "target path must be specified as the second parameter."
 
   if [[ -d "${_target}" ]]
   then # TODO: ensure this works...

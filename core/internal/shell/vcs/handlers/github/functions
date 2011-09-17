@@ -17,8 +17,8 @@ github_get()
   _target="${2:-}"
   branch=${3:-${branch:-master}}
 
-  shift || __sm.log.fail "uri must be specified as the first parameter."
-  shift || __sm.log.fail "target path must be specified as the second parameter."
+  (( $# )) && shift || __sm.log.fail "uri must be specified as the first parameter."
+  (( $# )) && shift || __sm.log.fail "target path must be specified as the second parameter."
 
   save_fetch_error_handler="${fetch_error_handler}"
   fetch_error_handler=true

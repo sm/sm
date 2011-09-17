@@ -4,9 +4,9 @@ find_starting_action()
 {
   trace_filter action_completion || set -o xtrace
   extensions_path="$1" extension="$2"
-  shift || __sm.log.fail "Cannot detect extension existence;"\
+  (( $# )) && shift || __sm.log.fail "Cannot detect extension existence;"\
     " No extension path was given."
-  shift || __sm.log.fail "Cannot detect extension existence;"\
+  (( $# )) && shift || __sm.log.fail "Cannot detect extension existence;"\
     " No extension name was given."
 
   local _action_params _action_path _new_action_path _rest_params \
@@ -44,7 +44,7 @@ find_starting_action()
 show_extension_names()
 {
   extensions_path="$1"
-  shift || __sm.log.fail "no path given"
+  (( $# )) && shift || __sm.log.fail "no path given"
 
   #$1 is ignored == "unused"
   local _patern extension

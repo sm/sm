@@ -41,7 +41,7 @@ templates()
   fi
 
   _name="$1"
-  shift || __sm.log.fail "Template name was not given"
+  (( $# )) && shift || __sm.log.fail "Template name was not given"
 
   while (( $# > 0 ))
   do
@@ -49,15 +49,15 @@ templates()
     case "${_token}" in
       (to)
         _target="$1"
-        shift || __sm.log.fail "target path must follow keyword 'to'"
+        (( $# )) && shift || __sm.log.fail "target path must follow keyword 'to'"
         ;;
       (mode)
         _mode="$1"
-        shift || __sm.log.fail "mode must follow keyword 'mode'"
+        (( $# )) && shift || __sm.log.fail "mode must follow keyword 'mode'"
         ;;
       (owner)
         _owner="$1"
-        shift || __sm.log.fail "owner must follow keyword 'owner'"
+        (( $# )) && shift || __sm.log.fail "owner must follow keyword 'owner'"
         ;;
       (from)
         __sm.log.fail "'from' keyword is no longer supported"

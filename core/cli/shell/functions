@@ -47,7 +47,7 @@ actions()
 {
   local _action _token
   _action="$1"
-  shift || __sm.log.fail "Actions command not given."
+  (( $# )) && shift || __sm.log.fail "Actions command not given."
 
   while (( $# ))
   do

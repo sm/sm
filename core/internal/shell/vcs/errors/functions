@@ -10,7 +10,7 @@ fetch_error()
 {
   local _message _pair
   _message="${1:-}"
-  shift || __sm.log.fail "Message must be given as first parameter."
+  (( $# )) && shift || __sm.log.fail "Message must be given as first parameter."
 
   for _pair in "$@"
   do
@@ -32,7 +32,7 @@ fetch_error_default_handler()
 {
   local _message
   _message="${1:-}"
-  shift || __sm.log.fail "Message must be given as first parameter."
+  (( $# )) && shift || __sm.log.fail "Message must be given as first parameter."
 
    __vcs_failed="${_message}"
   case "${_message}" in

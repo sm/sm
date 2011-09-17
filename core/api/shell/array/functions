@@ -31,12 +31,12 @@ array()
   trace_filter array || set -o xtrace
   local _command _subcommand _name _variable
   _command="$1"
-  shift || __sm.log.fail "Array command must be given as the first parameter."
+  (( $# )) && shift || __sm.log.fail "Array command must be given as the first parameter."
 
   case "${_command}" in
     (is)
       _subcommand="$1" _name="$2"
-      shift 2 || __sm.log.fail "subcommand and array name missing;"\
+      (( $# >= 2 )) && shift 2 || __sm.log.fail "subcommand and array name missing;"\
         " array is <empty,nonempty,even> {name}"
       case "${_subcommand}" in
         (empty)
@@ -55,65 +55,65 @@ array()
       ;;
     (length)
       _name="$1"
-      shift || __sm.log.fail "Array name missing:  array length {name}"
+      (( $# )) && shift || __sm.log.fail "Array name missing:  array length {name}"
       __sm.array.length "${_name}"
       ;;
     (last)
       _name="$1"
-      shift || __sm.log.fail "Array name missing:  array last {name}"
+      (( $# )) && shift || __sm.log.fail "Array name missing:  array last {name}"
       __sm.array.last "${_name}"
       ;;
     (first)
       _name="$1"
-      shift || __sm.log.fail "Array name missing:  array first {name}"
+      (( $# )) && shift || __sm.log.fail "Array name missing:  array first {name}"
       __sm.array.first "${_name}"
       ;;
     (push)
       _name="$1" _element="$2"
-      shift 2 || __sm.log.fail "Array name or element missing:"\
+      (( $# >= 2 )) && shift 2 || __sm.log.fail "Array name or element missing:"\
         " array push {name} {element}"
       __sm.array.push "${_name}" "${_element}"
       ;;
     (pop)
       _name="$1" _variable="${2:-}"
-      shift || __sm.log.fail "Array name missing:  array pop {name} [{variable}]"
+      (( $# )) && shift || __sm.log.fail "Array name missing:  array pop {name} [{variable}]"
       __sm.array.pop "${_name}" "${_variable}"
       ;;
     (append)
       _name="$1" _element="$2"
-      shift 2 || __sm.log.fail "Array name or element missing:"\
+      (( $# >= 2 )) && shift 2 || __sm.log.fail "Array name or element missing:"\
         " array append {name} {element}"
       __sm.array.append "${_name}" "${_element}"
       ;;
     (shift)
       _name="$1" _variable="${2:-}"
-      shift || __sm.log.fail "Array name missing:  array shift {name} [{variable}]"
+      (( $# )) && shift || __sm.log.fail "Array name missing:  array shift {name} [{variable}]"
       __sm.array.shift "${_name}" "${_variable}"
       ;;
     (unshift)
       _name="$1"
-      shift || __sm.log.fail "Array name missing:  array unshift {name} [{variable}]"
+      (( $# )) && shift || __sm.log.fail "Array name missing:  array unshift {name} [{variable}]"
       __sm.array.unshift "${_name}" "${_variable}"
       ;;
     (join)
       _name="$1" _separator="${2:-' '}"
-      shift || __sm.log.fail "Array name missing:  array join {name} [separator]"
+      (( $# )) && shift || __sm.log.fail "Array name missing:  array join {name} [separator]"
       __sm.array.join "${_name}" "${_separator}"
       ;;
     (largest)
       _name="$1"
-      shift || __sm.log.fail "Array name missing:  array largest {name}"
+      (( $# )) && shift || __sm.log.fail "Array name missing:  array largest {name}"
       __sm.array.largest "${_name}"
       ;;
     (sort)
       _subcommand="$1" _name="$2"
-      shift 2 || __sm.log.fail "sort direction and array name missing;"\
+      (( $# >= 2 )) && shift 2 || __sm.log.fail "sort direction and array name missing;"\
         " array sort <desc,asc> {name}."
       __sm.array.sort "${_name}" "${_subcommand}"
       ;;
     (unique)
       _name="$1"
-      shift || __sm.log.fail "Array name missing:  array unique {name}."
+      (( $# )) && shift || __sm.log.fail "Array name missing:  array unique {name}."
       __sm.array.unique "${_name}"
       ;;
     (start)

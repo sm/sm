@@ -11,7 +11,7 @@ services_list()
 {
   local _action _args
   _action="${1:-}"
-  shift || true
+  (( $# )) && shift || true
 
   case "${_action}" in
     (active)

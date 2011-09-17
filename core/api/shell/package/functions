@@ -65,15 +65,15 @@ package()
         ;;
       (log)
         _log="$1"
-        shift || __sm.log.fail "Log file path/name must be given following keyword 'log'"
+        (( $# )) && shift || __sm.log.fail "Log file path/name must be given following keyword 'log'"
         ;;
       (lines)
         _lines="$1"
-        shift || __sm.log.fail "Number of lines to show must be given following keyword 'lines'"
+        (( $# )) && shift || __sm.log.fail "Number of lines to show must be given following keyword 'lines'"
         ;;
       (message)
         _message="$1"
-        shift || __sm.log.fail "Message must be given following keyword 'message'"
+        (( $# )) && shift || __sm.log.fail "Message must be given following keyword 'message'"
       ;;
       (configure)
         _command=configure
@@ -114,43 +114,43 @@ package()
         ;;
       (key)
         _key="$1"
-        shift || __sm.log.fail "Key name must follow keyword 'key'"
+        (( $# )) && shift || __sm.log.fail "Key name must follow keyword 'key'"
         ;;
       (name)
         package_name="$1"
-        shift || __sm.log.fail "a package name must follow keyword 'name'"
+        (( $# )) && shift || __sm.log.fail "a package name must follow keyword 'name'"
         ;;
       (version)
         package_version="$1"
-        shift || __sm.log.fail "a package version must follow keyword 'version'"
+        (( $# )) && shift || __sm.log.fail "a package version must follow keyword 'version'"
         ;;
       (base_url)
         package_base_url="$1"
-        shift || __sm.log.fail "a package base_url must follow keyword 'base_url'"
+        (( $# )) && shift || __sm.log.fail "a package base_url must follow keyword 'base_url'"
         ;;
       (file)
         package_file="$1"
-        shift || __sm.log.fail "a package file name must follow keyword 'file'"
+        (( $# )) && shift || __sm.log.fail "a package file name must follow keyword 'file'"
         ;;
       (user)
         package_user="$1"
-        shift || __sm.log.fail "a package user name must follow keyword 'user'"
+        (( $# )) && shift || __sm.log.fail "a package user name must follow keyword 'user'"
         ;;
       (archive_format)
         archive_format="$1"
-        shift || __sm.log.fail "a package archive_format must follow keyword 'archive_format'"
+        (( $# )) && shift || __sm.log.fail "a package archive_format must follow keyword 'archive_format'"
         ;;
       (md5)
         package_md5="$1"
-        shift || __sm.log.fail "a package md5 sum must follow keyword 'md5'"
+        (( $# )) && shift || __sm.log.fail "a package md5 sum must follow keyword 'md5'"
         ;;
       (sha256)
         package_sha256="$1"
-        shift || __sm.log.fail "a package sha256 key must follow keyword 'sha256'"
+        (( $# )) && shift || __sm.log.fail "a package sha256 key must follow keyword 'sha256'"
         ;;
       (sha512)
         package_sha512="$1"
-        shift || __sm.log.fail "a package sha512 key must follow keyword 'sha512'"
+        (( $# )) && shift || __sm.log.fail "a package sha512 key must follow keyword 'sha512'"
         ;;
       (*)
         _params+=("${_token}")

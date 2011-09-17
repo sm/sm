@@ -15,8 +15,8 @@ path_get()
   _source="${1:-}"
   _target="${2:-}"
 
-  shift || __sm.log.fail "source path must be the first parameter to path_get()."
-  shift || __sm.log.fail "target path must be the second parameter to path_get()."
+  (( $# )) && shift || __sm.log.fail "source path must be the first parameter to path_get()."
+  (( $# )) && shift || __sm.log.fail "target path must be the second parameter to path_get()."
 
   if rm -rf "${_target}" > /dev/null 2>&1
   then

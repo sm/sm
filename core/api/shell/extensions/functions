@@ -30,11 +30,11 @@ extension()
     case "$1" in
       (name|for|as)
         _name=$2
-        shift 2 || __sm.log.fail "Extension name was not given after <$1> param."
+        (( $# >= 2 )) && shift 2 || __sm.log.fail "Extension name was not given after <$1> param."
         ;;
       (uri|from)
         _uri=$2
-        shift 2 || __sm.log.fail "Extension uri was not given after <$1> param."
+        (( $# >= 2 )) && shift 2 || __sm.log.fail "Extension uri was not given after <$1> param."
         ;;
       (*)
         _params+=( "$1" )

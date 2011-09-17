@@ -4,7 +4,7 @@ __sm.os.open()
 {
   local _uri
   _uri="${1:-}"
-  shift || __sm.log.fail "Cannot open URI; No uri was given."
+  (( $# )) && shift || __sm.log.fail "Cannot open URI; No uri was given."
 
   if __sm.command.exists open
   then

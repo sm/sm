@@ -7,9 +7,9 @@ package_extension_setup()
   module="${2:-}"
   path="${3:-}"
   true ${language:=shell}
-  shift || __sm.log.fail "Cannot setup package extension; no extension name given."
-  shift || __sm.log.fail "Cannot setup package extension; no module name given."
-  shift || __sm.log.fail "Cannot setup package extension; no path given."
+  (( $# )) && shift || __sm.log.fail "Cannot setup package extension; no extension name given."
+  (( $# )) && shift || __sm.log.fail "Cannot setup package extension; no module name given."
+  (( $# )) && shift || __sm.log.fail "Cannot setup package extension; no path given."
 
   for action in install uninstall update activate deactivate
   do
