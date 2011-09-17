@@ -93,7 +93,7 @@ set_install()
   shift || __sm.log.fail "No set name was given."
 
   _uri="${1:-}"
-  shift || _uri=$( awk -F= "/^${_name}=/ {print \$2 }" < "${sm_path}/core/cli/config/known_sets" | tail -n 1 )
+  (( $# )) && shift || _uri=$( awk -F= "/^${_name}=/ {print \$2 }" < "${sm_path}/core/cli/config/known_sets" | tail -n 1 )
 
   [[ -n "${_uri}" ]] ||
     __sm.log.error "uri not given and cannot find ${_name} in known extension sets."
