@@ -28,6 +28,7 @@ __sm.config.read()
     [[ -z "${_value}" ]] || break
   done
 
+  typeset -g ${_variable}
   eval "${_variable}=\"${_value}\""
 }
 

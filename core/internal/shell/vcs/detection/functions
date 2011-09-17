@@ -17,7 +17,7 @@ detect_uri()
 
   __sm.extension.path.rebuild ".uri" $extensions_path $@
 
-  _uri_path="${rebuilded_path}"
+  _uri_path="${__sm_rebuilded_path}"
 
   if [[ -s "${_uri_path}" ]]
   then
@@ -106,6 +106,7 @@ is_archive_uri()
 
 fetch_uri_detect_scm_type()
 {
+  typeset -g scm_type
   local _uri
   _uri="${1:-}"
   (( $# )) && shift || fail "uri must be given as first parameter."

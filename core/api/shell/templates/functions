@@ -23,7 +23,7 @@ templates()
 {
   trace_filter templates || set -o xtrace
 
-  local _command _name _target _source _mode _owner _template _params __templates_commands
+  local _command _name _target _source _mode _owner _template _params __templates_commands _token
   _source="${extension_templates_path}" \
   _mode=0644
   _owner=$USER

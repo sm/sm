@@ -2,6 +2,7 @@
 
 fetch_error_initialize()
 {
+  typeset -ga fetch_params
   fetch_params=( "$@" )
   unset fetch_error_handler __vcs_failed
 }

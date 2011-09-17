@@ -2,6 +2,7 @@
 
 install_initialize()
 {
+  typeset -ga cleanse_paths directories binaries files aux_paths configs
   cleanse_paths=( external completion modules extensions )
   directories=( bin )
   binaries=( sm sm-ll smp )
@@ -82,7 +83,7 @@ install_configuration_files()
 
 setup_shell_completion()
 {
-  local _prefix _mode _name
+  local _prefix _mode _name completion_prefix
   _prefix="/etc"
 
   paths exists "${_prefix}/bash_completion.d" || return 0

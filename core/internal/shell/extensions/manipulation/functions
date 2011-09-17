@@ -2,7 +2,8 @@
 
 extension_version()
 {
-  local _extension
+  typeset -g extension_path
+  local _extension extension_version
   _extension=$1
   (( $# )) && shift || __sm.log.fail "Cannot retrieve extension version;"\
     " No extension was given."

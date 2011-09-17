@@ -1,5 +1,7 @@
 #!/bin/sh
 
+local version_pattern _ignored_args _token index
+
 version_pattern="+([[:digit:]]).+([[:digit:]]).+([[:digit:]])"
 
 #TODO: merge this code to extension_cli

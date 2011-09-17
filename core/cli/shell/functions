@@ -3,7 +3,7 @@
 #TODO: this code should be distributed to proper places
 extension_cli()
 {
-  local _ignored_args _string _token
+  local _ignored_args _string _token number_of_args
   _ignored_args=()
 
   number_of_args=${#extension_args[@]}

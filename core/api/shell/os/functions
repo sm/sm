@@ -13,7 +13,7 @@ os()
 {
   trace_filter os || set -o xtrace
 
-  local _command _subcommand
+  local _command _subcommand _os
 
   while (( $# > 0 ))
   do

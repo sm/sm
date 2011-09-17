@@ -31,6 +31,7 @@ __sm.command.run()
 
 __sm.command.detect()
 {
+  typeset -g __sm_command_detected __sm_command_dotted __sm_command_words
   local __string __key __value
   __string="$1"
   shift

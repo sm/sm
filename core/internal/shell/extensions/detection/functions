@@ -4,6 +4,8 @@ __sm.cache.map.check()
 {
   trace_filter action_detection || set -o xtrace
 
+  typeset -g action  action_path
+  typeset -ga extension_args
   local _found_actions _method _name _item _candidate _candidates screen_height
   _found_actions=()
   _method="$1"
@@ -59,14 +61,16 @@ __sm.cache.map.check()
 __sm.extension.actions.find()
 {
   trace_filter action_detection || set -o xtrace
+  typeset -g extensions_path extension
+  local _action_params _action_path _new_action_path _rest_params _param_temp \
+    _action_params_length _actions_root _map _modules_root _actions_cache
+
   extensions_path="$1"
   extension="$2"
 
   (( $# )) && shift || __sm.log.fail "Extension path must be given as the first parameter."
   (( $# )) && shift || __sm.log.fail "Extension name must be given as the second parameter."
 
-  local _action_params _action_path _new_action_path _rest_params _param_temp \
-    _action_params_length _actions_root _map _modules_root _actions_cache
   _action_params=( "$@" )
   _rest_params=()
   _actions_root="${extensions_path}/${extension}/bin"
@@ -118,6 +122,7 @@ __sm.extension.action()
   (( extension_action_calls == 0 )) ||
     __sm.log.fail "Cannot call a 2nd time, args: ${extension_args[*]}"
 
+  typeset -gi extension_action_calls
   extension_action_calls+=1
 
   unset extension action

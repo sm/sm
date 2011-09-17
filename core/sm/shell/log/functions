@@ -383,7 +383,7 @@ __sm.set.ps4()
 
 __sm.log.trace.filter()
 {
-  local old _name _action
+  local old _name _action filter
   _action="$1"
   (( $# )) && shift || __sm.log.fail "Filter action {start,stop} must be specified."
 
@@ -554,6 +554,7 @@ __sm.seppuku()
 
 __sm.log.piece()
 {
+  typeset -g log_step_message
   local _message _unicode
   _message="${1:-}"
   _unicode=0

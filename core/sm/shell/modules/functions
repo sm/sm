@@ -7,9 +7,9 @@
 __sm.modules.core.initialize()
 {
   (( ! ${__sm_modules_initialized:=0} )) || return 0
-
   true $((__sm_modules_initialized++))
 
+  typeset -ga __sm_modules_loaded
   local _module _name _path
 
   __sm.extension.paths.initialize
@@ -42,6 +42,7 @@ __sm.modules.core.initialize()
 
 __sm.extension.paths.initialize()
 {
+  typeset -ga extensions_search_paths
   local _extension_set_path
 
   if [[ -z "${extensions_search_paths[*]}" ]]
@@ -260,6 +261,7 @@ __sm.cli.in.path()
 
 __sm.extension.path.reorder()
 {
+  typeset -g __sm_rebuilded_path
   local part extensions_path extension output
   part="${1:-}"
   extensions_path="${2:-}"
@@ -267,7 +269,7 @@ __sm.extension.path.reorder()
   (( $# >= 3 )) && shift 3 || __sm.log.fail "Path part extensions_path extnesion must be given first ."
 
   output="$extensions_path/$extension/$part/$*"
-  rebuilded_path="${output// //}"
+  __sm_rebuilded_path="${output// //}"
 }
 
 __sm.extension.path.rebuild()
@@ -283,12 +285,13 @@ __sm.extension.path.rebuild()
 
 __sm.module.detect()
 {
+  typeset -g module_path module_name
   local extensions_path _module_path
   extensions_path=$1
   (( $# )) && shift || __sm.log.fail "Extensions path must be given as the first parameter."
 
   __sm.extension.path.rebuild "shell" $extensions_path $@
-  _module_path=${rebuilded_path}
+  _module_path=${__sm_rebuilded_path}
 
   if [[ -d "${_module_path}/functions" ]]
   then
