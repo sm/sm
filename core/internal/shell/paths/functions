@@ -77,10 +77,9 @@ __sm.paths.create()
 
 __sm.paths.remove()
 {
-  removed_paths=()
-  nonexistant_paths=()
-
+  typeset -ga removed_paths nonexistant_paths
   local _path
+
   for _path in "$@"
   do
     if [[ -L "${_path}" ]]

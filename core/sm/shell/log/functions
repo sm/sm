@@ -181,7 +181,8 @@ backtrace()
   trace_filter backtrace || set -o xtrace # backtrace is disabled by default.
 
   local _separator _columns _stack _trace _message _flag _source _function _line \
-    _index _largest _format _digits _longest _string _source_length _function_length
+    _index _largest _format _digits _longest _string _source_length _function_length \
+    _source_line _function_line
   _source_length=20
   _function_length=20
   _digits=1
