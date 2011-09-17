@@ -8,6 +8,7 @@ user()
   _flags=()
   __user_commands=(
     "is root"
+    "is not root"
     "is privileged"
     "is unprivileged"
     "set home"
