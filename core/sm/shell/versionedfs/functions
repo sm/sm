@@ -198,7 +198,7 @@ __sm.versionedfs.remove()
 __sm.versionedfs.activate()
 {
   typeset _path _name _version _target _version_path _active_path _activate \
-    _active_version_path _index _count
+    _active_version_path _index _count _files
   _path="$1"
   _name="${2}"
   _version="${3}"

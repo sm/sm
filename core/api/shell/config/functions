@@ -4,7 +4,7 @@
 config()
 {
   trace_filter config || set -o xtrace
-  typeset _token _command _file _key _value _variable _prefix
+  typeset _token _command _file _key _value _variable _prefix _extension
 
   while (( $# ))
   do
