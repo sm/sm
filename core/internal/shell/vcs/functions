@@ -75,7 +75,7 @@ fetch_uri()
 fetch_uris()
 {
   typeset _uris _target _args _uri
-  _uris=( "${1}" )
+  _uris=( ${=1} )
   _target="${2:-}"
   _args=()
   (( $# )) && shift || __sm.log.fail "uri must be specified as the first parameter."
@@ -110,6 +110,8 @@ fetch_uris()
 
 fetch_uri_parse_args()
 {
+  typeset -g fetch_error_handler branch remote revision scm_type md5
+  typeset -ga _uris
   typeset _token _allowed_arg
 
   while (( $# > 0 ))

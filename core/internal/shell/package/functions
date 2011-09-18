@@ -562,49 +562,68 @@ __sm.package.java.install()
 __sm.package.fetch.md5()
 {
   trace_filter package || set -o xtrace
-  (( $# == 0 )) || __sm.package.cli $@
-
+  typeset -g packge_md5_url
   typeset download_url
+  (( $# == 0 )) || __sm.package.cli $@
+  : "${package_file:="${package_name}-${package_version}.${archive_format}"}"
 
-  : \
-    "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
-    "${packge_md5_url:="${package_base_url}/${package_file}.md5"}"
+  if [[ -z "${packge_md5_url:-}" ]]
+  then
+    for download_url in ${=package_base_url}
+    do
+      packge_md5_url="${packge_md5_url:-} ${download_url}/${package_file}.md5"
+    done
+  fi
 
   [[ -n "${package_md5}" ]] || __sm.config.read "${package_name}" md5 "${package_file}" package_md5
   [[ -n "${package_md5}" ]] ||
-    if [[ -n "${package_md5_url}" ]]
-    then # TODO: Can this be added into fetch_uri ?
-      curl -L "${packge_md5_url}" -o "${archives_path}/${package_file}.md5" 2>/dev/null ||
-        __sm.log.error "Fetching MD5 checksum from '${package_md5_url}' failed."
+    for download_url in ${=packge_md5_url}
+    do
+      curl -L "${download_url}" -o "${archives_path}/${package_file}.md5" 2>/dev/null ||
+        __sm.log.error "Fetching MD5 checksum from '${download_url}' failed."
 
       package_md5=$(cat "${archives_path}/${package_file}.md5")
 
       rm "${archives_path}/${package_file}.md5"
-    else
-      package_md5="" # not known.
-    fi
+
+      if (( ${#package_md5} == 32 ))
+      then
+        return 0
+      else
+        package_md5=""
+      fi
+    done
 }
 
 __sm.package.fetch()
 {
   trace_filter package || set -o xtrace
+  typeset -g package_file package_url
+  typeset _entries _url
+  typeset -a _args
   (( $# == 0 )) || __sm.package.cli $@
+  true "${package_file:="${package_name}-${package_version}.${archive_format}"}"
 
-  typeset _args _entries
-  _args=()
+  if [[ -z "${package_url:-}" ]]
+  then
+    for _url in ${=package_base_url}
+    do
+      package_url="${package_url:-} ${_url}/${package_file}"
+    done
+  fi
 
-  true \
-    "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
-    "${package_url:="${package_base_url}/${package_file}"}"
-
-  __sm.package.fetch.md5
   if [[ -n "${scm_type:-}" ]]
   then
     _args+=( "scm_type" "${scm_type}" )
   fi
 
-  fetch_uri "${package_url}" "${source_path}/${package_dir}" \
-    "${package_md5:-#}" ${_args[@]} || return 1
+  __sm.package.fetch.md5
+  if [[ -n "${package_md5:-}" ]]
+  then
+    _args+=( "md5" "${package_md5}" )
+  fi
+
+  fetch_uris "${package_url}" "${source_path}/${package_dir}" ${_args[@]} || return 1
 
   [[ -z "${__vcs_failed}" ]] || return 1
 

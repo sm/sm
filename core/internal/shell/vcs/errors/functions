@@ -9,10 +9,12 @@ fetch_error_initialize()
 
 fetch_error()
 {
+  typeset -g __vcs_failed
   typeset _message _pair
   _message="${1:-}"
   (( $# )) && shift || __sm.log.fail "Message must be given as first parameter."
 
+  __vcs_failed="${_message}"
   for _pair in "$@"
   do
     eval "local ${_pair#--}"
@@ -35,7 +37,6 @@ fetch_error_default_handler()
   _message="${1:-}"
   (( $# )) && shift || __sm.log.fail "Message must be given as first parameter."
 
-   __vcs_failed="${_message}"
   case "${_message}" in
     (unknown_scm)
       _message="Unknown SCM type (${scm_type:-"not found"}) for url '${uri}'." ;;

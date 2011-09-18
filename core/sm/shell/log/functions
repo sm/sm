@@ -415,9 +415,9 @@ __sm.log.debug.not.traced()
   then
     if [[ "$1" == "-" ]]
     then
-      printf "DEBUG $type: "
+      printf "DEBUG $type --> \n"
       cat -
-      printf "\n"
+      printf "DEBUG $type <-- \n"
     else
       printf "DEBUG $type: $*\n"
     fi
