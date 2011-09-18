@@ -299,7 +299,7 @@ Options:
 
 __sm.service.cli()
 {
-  typeset _ignored_args _service_args _token index
+  typeset _ignored_args _service_args _token index number_of_args
   _ignored_args=()
   _service_args=( $@ )
   number_of_args=${#extension_args[@]}
