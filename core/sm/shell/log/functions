@@ -10,6 +10,9 @@ __sm.log.trace.filter()
   if __sm.log.options.check "$trace_flags" "$1"
   then
     return 1
+  elif __sm.string.contains "${funcstack[2]}" "${trace_functions[*]}"
+  then
+    return 1
   fi
 }
 alias trace_filter='set +o xtrace ; __sm.log.trace.filter'
