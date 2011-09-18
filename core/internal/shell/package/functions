@@ -109,6 +109,10 @@ __sm.package.error()
 __sm.package.define()
 {
   trace_filter package || set -o xtrace
+  typeset -g package_name package_version package_file package_dir package_url package_base_url \
+    package_docs_url package_patches_url package_md5_url bin_path packages_path source_path \
+    target_path archive_format
+  typeset key value
   while (( $# > 0 ))
   do
     key="$1" && shift
