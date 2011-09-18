@@ -908,7 +908,7 @@ __sm.package.is.active()
 
   _path="${packages_path}/versions/${_name}"
 
-  if shift
+  if (( $# )) && shift
   then # version was passed
     [[ -d "${_path}/${_version}" ]]
   else # version was not passed
