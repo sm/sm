@@ -176,7 +176,13 @@ __sm.module.include()
   fi
 
   # Load module
-  for _file in functions cli initialize
+  if [[ -s "${_module_path}/functions" ]]
+  then
+    #TODO: should we check for errors here ?!?!?!
+    source "${_module_path}/functions"
+    __sm.trace.functions
+  fi
+  for _file in cli initialize
   do
     if [[ -s "${_module_path}/${_file}" ]]
     then
@@ -198,6 +204,28 @@ __sm.module.include()
   done
 
   return 0
+}
+
+__sm.trace.functions()
+{
+  typeset -ga trace_functions
+
+  typeset     _function_name
+  typeset -a  _not_available
+
+  if (( ${#trace_functions} ))
+  then
+    for _function_name in $trace_functions
+    do
+      if declare -f "${_function_name}" > /dev/null 2>&1
+      then
+        typeset -ft "${_function_name}"
+      else
+        _not_available+=( ${_function_name} )
+      fi
+    done
+    trace_functions=( ${_not_available} )
+  fi
 }
 
 #TODO: remove - deprecated
