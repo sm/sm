@@ -310,8 +310,6 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
     exit 0
   fi
 
-  true "${package_dir:="${package_name}-${package_version}"}"
-
   paths create "${source_path}"
 
   paths enter "${source_path}"
@@ -506,6 +504,7 @@ __sm.package.init()
 
   true \
     "${package_version:="${package_default_version}"}" \
+    "${package_dir:="${package_name}-${package_version}"}" \
     "${init_scripts_path:="$(init_scripts_path)"}" \
     "${archive_format:=tar.gz}" \
     "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
@@ -730,12 +729,12 @@ __sm.package.setup()
 
   __sm.package.profile.d "${_package}"
 
-  if  __sm.module.is.loaded "service"
+  if  __sm.module.is.loaded "api/service"
   then
     __sm.service.setup "${_package}"
   fi
 
-  if __sm.module.is.loaded "database"
+  if __sm.module.is.loaded "api/database"
   then
     __sm.database.setup "${_package}"
   fi

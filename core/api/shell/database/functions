@@ -63,7 +63,7 @@ database_usage() {
   return 0
 }
 
-database_setup()
+__sm.database.setup()
 {
   paths create "${data_base_path}"
 
