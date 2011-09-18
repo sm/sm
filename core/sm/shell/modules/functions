@@ -209,9 +209,7 @@ __sm.module.include()
 __sm.trace.functions()
 {
   typeset -ga trace_functions
-
   typeset     _function_name
-  typeset -a  _not_available
 
   if (( ${#trace_functions} ))
   then
@@ -220,11 +218,8 @@ __sm.trace.functions()
       if declare -f "${_function_name}" > /dev/null 2>&1
       then
         typeset -ft "${_function_name}"
-      else
-        _not_available+=( ${_function_name} )
       fi
     done
-    trace_functions=( ${_not_available} )
   fi
 }
 
