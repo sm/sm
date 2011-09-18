@@ -117,7 +117,15 @@ files()
   done
 
   case "${_command}" in
-    (contain|containing|replace)
+    (contain|containing)
+      [[ -n "${_string}" ]] || [[ -n "${_regex}" ]] ||
+        __sm.log.fail "regexp or string must be given for 'files ${_command}'."
+      if __sm.files.${_command} "${_string}" "${_regex}" "${_files[@]}"
+      then return 0 ; else return 1 ; fi
+      ;;
+    (replace)
+      [[ -n "${_string}" ]] || __sm.log.fail "string must be given for 'files ${_command}'."
+      [[ -n "${_regex}" ]] || __sm.log.fail "regexp must be given for 'files ${_command}'."
       if __sm.files.${_command} "${_string}" "${_regex}" "${_files[@]}"
       then return 0 ; else return 1 ; fi
       ;;
