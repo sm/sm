@@ -525,7 +525,7 @@ __sm.package.init()
 
   for dir in ${fhs_dirs}
   do
-    paths create "${active_path}/${fhs_dirs}"
+    paths create "${active_path}/${dir}"
   done
 
   if user is root
