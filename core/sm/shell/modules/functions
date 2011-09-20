@@ -246,6 +246,7 @@ __sm.module.is.loaded()
 {
   typeset _name
   _name="${1}"
+  setopt nullglob
   case " ${__sm_modules_loaded[*]} " in
     (*[[:space:]]${_name}=*)
       return 0
@@ -254,6 +255,7 @@ __sm.module.is.loaded()
       return 1
       ;;
   esac
+  unsetopt nullglob
 }
 
 __sm.extension.in.paths()

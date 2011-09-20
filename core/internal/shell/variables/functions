@@ -26,6 +26,8 @@ __sm.variables.are.empty()
 __sm.variables.filter()
 {
   trace_filter variables || set -o xtrace
+  typeset -a __sm_variables_empty __sm_variables_nonempty
+
   __sm_variables_empty=()
   __sm_variables_nonempty=()
 

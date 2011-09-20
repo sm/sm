@@ -303,7 +303,7 @@ __sm.service.cli()
   _ignored_args=()
   _service_args=( $@ )
   number_of_args=${#extension_args[@]}
-  #TODO WTF: which ^ params should be checked here ?
+  #TODO Question: which ^ params should be checked here ?
 
   for (( index=1 ; index <= $number_of_args ; index++ ))
   do
@@ -404,8 +404,7 @@ __sm.service.initd.install()
   typeset _service _version
   _service="${1:-}"
   (( $# )) && shift ||fail "Service name was not passed in as the first parameter"
-  _version="${2:-${package_version}}"
-  #TODO: WTF ^ why is this $2 after a shift ?
+  _version="${1:-${package_version}}"
 
   if ! paths exist "${init_scripts_path}"
   then
@@ -466,18 +465,18 @@ __sm.service.init.start()
     _command+=("${service_flags[@]}")
   fi
 
-  if (( service_run_as_root_flag == 1 ))
+  if (( service_run_as_root_flag ))
   then
     user is root || _prefix="sudo"
-
-    if ${_prefix} ${_command[*]}
+    if ! ${_prefix} ${_command[*]}
     then
-      true
-    else
       __sm.log.error "${service} failed to start."
     fi
   else
-    if __sm.command.run.as "${service_user}" "" "${_command[*]}"
+    if (( ${service_run_as_user_flag:-0} )) && __sm.command.run.as "${service_user}" "" "${_command[*]}"
+    then
+      __sm.log.succeed "${service} successfully started."
+    elif ${_command}
     then
       __sm.log.succeed "${service} successfully started."
     else
@@ -535,7 +534,11 @@ __sm.service.init.status()
       __sm.log.error "failed check status of ${service}."
     fi
   else
-    if __sm.command.run.as "${service_user}" "" "${_command[*]}"
+    if (( ${service_run_as_user_flag:-0} )) && __sm.command.run.as "${service_user}" "" "${_command[*]}"
+    then
+      touch "$service_pid_file"
+      succeed
+    elif ${_command}
     then
       touch "$service_pid_file"
       succeed
@@ -562,7 +565,10 @@ __sm.service.init.reload()
     _command+=("${service_flags[@]}")
   fi
 
-  if __sm.command.run.as "${service_user}" "" "${_command[*]}"
+  if (( ${service_run_as_user_flag:-0} )) && __sm.command.run.as "${service_user}" "" "${_command[*]}"
+  then
+    touch "$service_pid_file"
+  elif ${_command}
   then
     touch "$service_pid_file"
   else
@@ -689,8 +695,8 @@ __sm.service.activate()
   _service="${1:-"${service}"}"
   (( $# )) && shift || __sm.log.fail "The service name must be set or given to activate a service."
 
-  _version="${2:-${package_version}}"
-  #TODO: WTF ^ why use $2 after shift ?
+  _version="${1:-${package_version}}"
+
   [[ -n "${_version}" ]] || __sm.log.fail "Version must be set or given to activate a service."
 
   if files are symlinks "${service_db_path}/active"

@@ -5,6 +5,8 @@
 #
 internal_project_initialize()
 {
+  typeset -g project_log_path extension_log_path
+
   # TODO: Read project and project_path from defaults file first.
   if user is root
   then

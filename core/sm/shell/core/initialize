@@ -58,7 +58,8 @@ true \
   "${config_path:="${sm_path}/core/sm/config"}" \
   "${packages_path:="${sm_path}/pkg"}" \
   "${active_path:="${packages_path}/active"}" \
-  "${extension_args:=""}"
+  "${extension_args:=""}" \
+  "${extension_version:="0.0.1"}"
 
 if [[ -n "${ZSH_VERSION:-}" ]]
 then

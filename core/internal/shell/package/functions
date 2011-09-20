@@ -1036,13 +1036,13 @@ __sm.package.versions.installed()
   versionedfs versions path "${packages_path}" name "${package_name}"
 }
 
-__sm.packages.installed()
+__sm.packages.list.installed()
 {
   trace_filter package || set -o xtrace
   versionedfs versions path "${packages_path}"
 }
 
-__sm.packages.active()
+__sm.packages.list.active()
 {
   trace_filter package || set -o xtrace
   if [[ -n "$1" ]]
@@ -1063,7 +1063,12 @@ __sm.packages.list()
 {
   trace_filter package || set -o xtrace
   typeset _args
-  __sm.packages.${1:-installed} "$@"
+  __sm.packages.list.${1:-installed} "$@"
+}
+
+__sm.packages.list.known()
+{
+  NIY "pkg list known"
 }
 
 __sm.package.usage()

@@ -209,8 +209,7 @@ __sm.paths.search()
   do
     [[ "${_line}" == ${_glob} ]] || continue
     echo "${_line}"
-  done < <(paths in "${_path}")
-  #TODO: WTF ^ why using api in internal
+  done < <(__sm.paths.in "${_path}")
 }
 
 __sm.paths.absolute()

@@ -108,7 +108,7 @@ debug()
 error()
 {
   trace_filter log || set -o xtrace
-  __sm.log.warn "error is depreciated, use 'log __sm.log.error instead'\n"
+  __sm.log.warn "error is depreciated, use 'log error instead'\n"
   __sm.log.error "$@"
 }
 

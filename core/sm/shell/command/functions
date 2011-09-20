@@ -2,12 +2,14 @@
 
 __sm.command.exists()
 {
+  builtin hash -r
   builtin command -v "${1}" > /dev/null 2>&1
 }
 
 __sm.command.full.name()
 {
-  builtin command -v
+  builtin hash -r
+  builtin command -v "${1}"
 }
 
 __sm.command.is.function()
