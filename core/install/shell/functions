@@ -2,7 +2,7 @@
 
 install_initialize()
 {
-  typeset -ga cleanse_paths directories binaries files aux_paths configs
+  typeset -fa cleanse_paths directories binaries files aux_paths configs
   cleanse_paths=( external completion modules extensions )
   directories=( bin )
   binaries=( sm sm-ll smp )

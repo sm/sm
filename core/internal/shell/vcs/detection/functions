@@ -106,7 +106,7 @@ is_archive_uri()
 
 fetch_uri_detect_scm_type()
 {
-  typeset -g scm_type
+  typeset -f scm_type
   typeset _uri
   _uri="${1:-}"
   (( $# )) && shift || fail "uri must be given as first parameter."

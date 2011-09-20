@@ -2,7 +2,7 @@
 
 extension_version()
 {
-  typeset -g extension_path
+  typeset -f extension_path
   typeset _extension extension_version
   _extension=$1
   (( $# )) && shift || __sm.log.fail "Cannot retrieve extension version;"\

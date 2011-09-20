@@ -9,7 +9,7 @@ __sm.modules.core.initialize()
   (( ! ${__sm_modules_initialized:=0} )) || return 0
   true $((__sm_modules_initialized++))
 
-  typeset -ga __sm_modules_loaded
+  typeset -fa __sm_modules_loaded
   typeset _module _name _path
 
   __sm.extension.paths.initialize
@@ -42,7 +42,7 @@ __sm.modules.core.initialize()
 
 __sm.extension.paths.initialize()
 {
-  typeset -ga extensions_search_paths
+  typeset -fa extensions_search_paths
   typeset _extension_set_path
 
   if [[ -z "${extensions_search_paths[*]}" ]]
@@ -208,7 +208,7 @@ __sm.module.include()
 
 __sm.trace.functions()
 {
-  typeset -ga trace_functions
+  typeset -fa trace_functions
   typeset     _function_name
 
   if (( ${#trace_functions} ))
@@ -286,7 +286,7 @@ __sm.cli.in.path()
 
 __sm.extension.path.reorder()
 {
-  typeset -g __sm_rebuilded_path
+  typeset -f __sm_rebuilded_path
   typeset part extensions_path extension output
   part="${1:-}"
   extensions_path="${2:-}"
@@ -310,7 +310,7 @@ __sm.extension.path.rebuild()
 
 __sm.module.detect()
 {
-  typeset -g module_path module_name
+  typeset -f module_path module_name
   typeset extensions_path _module_path
   extensions_path=$1
   (( $# )) && shift || __sm.log.fail "Extensions path must be given as the first parameter."

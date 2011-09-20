@@ -2,7 +2,7 @@
 
 __sm.templates.find()
 {
-  typeset -g template_path template_name
+  typeset -f template_path template_name
   typeset _extensions_path _extension _template_path _params_path
   _extensions_path="$1"
 

@@ -2,14 +2,14 @@
 
 fetch_error_initialize()
 {
-  typeset -ga fetch_params
+  typeset -fa fetch_params
   fetch_params=( "$@" )
   unset fetch_error_handler __vcs_failed
 }
 
 fetch_error()
 {
-  typeset -g __vcs_failed
+  typeset -f __vcs_failed
   typeset _message _pair
   _message="${1:-}"
   (( $# )) && shift || __sm.log.fail "Message must be given as first parameter."

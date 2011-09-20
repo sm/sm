@@ -110,8 +110,8 @@ fetch_uris()
 
 fetch_uri_parse_args()
 {
-  typeset -g fetch_error_handler branch remote revision scm_type md5
-  typeset -ga _uris
+  typeset -f fetch_error_handler branch remote revision scm_type md5
+  typeset -fa _uris
   typeset _token _allowed_arg
 
   while (( $# > 0 ))
