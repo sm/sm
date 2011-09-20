@@ -86,7 +86,10 @@ package()
             shift
             ;;
           (*)
-            __sm.log.fail "Unknown configure param '$1'."
+            if [[ -n "$1" ]]
+            then
+              __sm.log.fail "Unknown configure param '$1'."
+          fi
             continue
             ;;
         esac

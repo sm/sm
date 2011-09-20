@@ -22,10 +22,6 @@ then set -e; else set -o errtrace ; fi
 # Call backtrace on error
 trap "backtrace \"A command has returned error code '(\$?)' without being handled.\"" ERR
 
-if [[ -n "${BASH_VERSION}" ]] # Persist function RETURN & DEBUG handler
-then set -o functrace ; fi
-# Do not set trap ... RETURN here, set it on first -x
-
 if [[ -n "${var_debug_flags[*]}" ]]
 then
   __sm.debug.variables.callback.initialize

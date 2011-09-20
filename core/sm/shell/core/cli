@@ -94,13 +94,7 @@ then
   extension_args=()
 fi
 
-if [[ -n "${BASH_VERSION}" ]]
-then
-  PS4="# \${BASH_SOURCE##\${sm_path}\/} \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO} $ "
-elif [[ -n "${ZSH_VERSION}" ]]
-then
-  PS4="+%x:%I %N():%i > "
-fi
+PS4="+%x:%I %N():%i > "
 export PS4
 
 if [[ " ${trace_flags} " =~ " all " ]]

@@ -337,15 +337,7 @@ __sm.log.todo()
 
 __sm.log.error()
 {
-  set +o xtrace
-  if [[ -n "${BASH_VERSION}" ]]
-  then
-    printf "ERROR(${FUNCNAME[2]}): $*\n" >&2
-    set +o errtrace
-  elif [[ -n "${ZSH_VERSION}" ]]
-  then
-    printf "ERROR(${funcstack[3]}): $*\n" >&2
-  fi
+  printf "ERROR(${funcstack[3]}): $*\n" >&2
   trap - ERR
   exit 1
 }
@@ -364,13 +356,7 @@ __sm.log.fail()
 {
   trace_filter log || set -o xtrace
   trace_flag=0
-  if [[ -n "${BASH_VERSION}" ]]
-  then
-    backtrace "FAIL(${funcname[2]}): $*"
-  elif [[ -n "${ZSH_VERSION}" ]]
-  then
-    backtrace "FAIL(${funcstack[3]}): $*"
-  fi
+  backtrace "FAIL(${funcstack[3]}): $*"
   exit 1
 }
 
@@ -380,13 +366,7 @@ __sm.set.ps4()
   # Set and export the PS4 variable, so that this script -- and called bash scripts --
   # will display more detailed and formatted trace output.
   # Finally, return true, 0, for success.
-  if [[ -n "${BASH_VERSION}" ]]
-  then
-    PS4="# \${BASH_SOURCE##\${sm_path}\/} \${FUNCNAME[0]:+\${FUNCNAME[0]}()} \${LINENO} $ "
-  elif [[ -n "${ZSH_VERSION}" ]]
-  then
-    PS4="+%x:%I %N():%i > "
-  fi
+  PS4="+%x:%I %N():%i > "
   export PS4
 
   return 0
@@ -468,13 +448,7 @@ __sm.debug.variables.callback()
   trace_filter log || set -o xtrace
   typeset _variable ction_stack
 
-  if [[ -n "${BASH_VERSION}" ]]
-  then
-    _stack="${FUNCNAME[*]}"
-  elif [[ -n "${ZSH_VERSION}" ]]
-  then
-    _stack="${funcstack[*]}"
-  fi
+  _stack="${funcstack[*]}"
 
   for _variable in ${var_debug_flags[@]}
   do
