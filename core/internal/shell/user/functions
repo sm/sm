@@ -140,6 +140,8 @@ __sm.user.add()
     ;;
 
     "Darwin")
+      typeset current_max_gid next_gid current_max_uid next_uid
+
       current_max_gid=$(dscl . -list /Groups gid | awk '{print $2}' | sort -g -r | head -1)
       next_gid=$((current_max_gid+1))
 
