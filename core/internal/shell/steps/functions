@@ -1,47 +1,12 @@
 #!/bin/sh
 
-ext_steps_initialize()
+__sm.step.start()
 {
-  steps_started=()
-}
-
-start_step()
-{
+  typeset -A steps_started
   steps_started+=( "$1" )
 }
 
-step()
-{
-  typeset name
-  name="$1"
-
-  (( $# )) && shift || __sm.log.fail "Cannot take step as no step name given;"\
-    "step [name] <- missing name."
-
-  start_step "$name"
-
-  if __sm.command.exists before_step
-  then
-    before_step "$name" "$@"
-  fi
-
-  "$name" "$@"
-
-  if __sm.command.exists after_step
-  then
-    after_step "$name" "$@"
-  fi
-}
-
-steps()
-{
-  for step in $@
-  do
-    step "${step}"
-  done
-}
-
-retreat()
+__sm.steps.retreat()
 {
   typeset step
 
@@ -52,16 +17,16 @@ retreat()
 
   while [[ -n "${steps_started}" ]]
   do
-    #TODO: use internal version
     array pop steps_started step
-    if __sm.command.exists "fail_${step}"
+    if command exists "fail_${step}"
     then
       "fail_${step}"
     fi
 
-    if __sm.command.exists after_step
+    if command exists after_step
     then
       after_step "fail_${step}"
     fi
   done
 }
+

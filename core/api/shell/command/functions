@@ -1,6 +1,8 @@
 #!/bin/sh
 
-command()
+command() { commands "$@" ; }
+
+commands()
 {
   trace_filter command || set -o xtrace
   typeset _command _subcommand _token _user _code _flags
@@ -61,7 +63,7 @@ command()
         esac
         ;;
       (*)
-        __sm.log.fail "Unknown command '${_token}'."
+        builtin command $1 $@
         ;;
     esac
   done

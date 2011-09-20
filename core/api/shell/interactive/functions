@@ -19,6 +19,7 @@ shell()
             __sm.log.fail "Unknown command following keyword 'is'; shell is <interactive>"
             ;;
         esac
+        ;;
       (*)
         [[ -z "${_command}" ]]
         ;;

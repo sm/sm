@@ -11,7 +11,11 @@ process()
       (on)
         _subcommand="$1"
         case "${_subcommand}"
-        (exit)
+          (exit)
+            true # TODO: implement this.
+            ;;
+        esac
+        ;;
       (*)
         ;;
     esac

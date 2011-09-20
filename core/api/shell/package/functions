@@ -77,7 +77,7 @@ package()
       (message)
         _message="$1"
         (( $# )) && shift || __sm.log.fail "Message must be given following keyword 'message'"
-      ;;
+        ;;
       (configure)
         _command=configure
         case "$1" in

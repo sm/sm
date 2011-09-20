@@ -10,16 +10,16 @@ step()
   (( $# )) && shift || __sm.log.fail "Cannot take step as no step name given;"\
     "step [name] <- missing name."
 
-  start_step "$name"
+  __sm.step.start "$name"
 
-  if command exists before_step
+  if __sm.command.exists before_step
   then
     before_step "$name" "$@"
   fi
 
   "$name" "$@"
 
-  if command exists after_step
+  if __sm.command.exists after_step
   then
     after_step "$name" "$@"
   fi
@@ -30,40 +30,6 @@ steps()
   for step in $@
   do
     step "${step}"
-  done
-}
-
-api_steps_initialize()
-{
-  steps_started=()
-}
-
-start_step()
-{
-  steps_started+=( "$1" )
-}
-
-retreat()
-{
-  typeset step
-
-  if [[ -z "${steps_started}" ]]
-  then
-    steps_started=( "$@" )
-  fi
-
-  while [[ -n "${steps_started}" ]]
-  do
-    array pop steps_started step
-    if command exists "fail_${step}"
-    then
-      "fail_${step}"
-    fi
-
-    if command exists after_step
-    then
-      after_step "fail_${step}"
-    fi
   done
 }
 

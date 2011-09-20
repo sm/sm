@@ -6,6 +6,7 @@
 # Allows manipulation of multiline values and keyss containing - and \.
 #
 
+# TODO: Replace hash() with zsh mapfiles / internal constructs merge into config.
 hash()
 {
   typeset _token _file _keys _valid_keys
