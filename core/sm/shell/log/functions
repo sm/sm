@@ -504,7 +504,7 @@ __sm.seppuku()
 __sm.log.piece()
 {
   trace_filter log || set -o xtrace
-  typeset -g log_step_message
+  typeset -f log_step_message
   typeset _message _unicode
   _message="${1:-}"
   _unicode=0

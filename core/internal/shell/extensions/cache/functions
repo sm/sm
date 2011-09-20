@@ -2,7 +2,7 @@
 
 __sm.cache.map.add()
 {
-  typeset -ga _actions_cache
+  typeset -fa _actions_cache
   if ! __sm.string.contains "$1" "${_actions_cache[*]}"
   then
     _actions_cache+=( "$1" )
@@ -95,7 +95,7 @@ __sm.cache.map.modules.initialize()
 
 __sm.cache.map.find.matching()
 {
-  typeset -ga _found_actions
+  typeset -fa _found_actions
   typeset _method _name _item
   _method="$1"
   (( $# )) && shift || __sm.log.fail "No method and action name was given for search"

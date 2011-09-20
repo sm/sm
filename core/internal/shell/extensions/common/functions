@@ -2,7 +2,7 @@
 
 __sm.extension.path()
 {
-  typeset -g extension_path
+  typeset -f extension_path
   typeset _path extension
   extension=$1
   (( $# )) && shift || __sm.log.fail "Cannot process extension path;"\
@@ -30,7 +30,7 @@ __sm.extension.is.valid()
 
 __sm.extension.find()
 {
-  typeset -g extensions_path extension
+  typeset -f extensions_path extension
   extensions_path="${1:-}"
   extension="${2:-}"
 
@@ -73,7 +73,7 @@ __sm.extension.get.uri()
 
 __sm.extension.in()
 {
-  typeset -ga found_extensions
+  typeset -fa found_extensions
   typeset _path _extension
   _path="$1"
 

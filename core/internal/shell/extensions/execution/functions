@@ -2,7 +2,7 @@
 
 __sm.extension.actions.type()
 {
-  typeset -g action_type 
+  typeset -f action_type 
   typeset _path _path_type extension
   _path="${action_path:-}"
 
@@ -133,7 +133,7 @@ __sm.extension.run()
 {
   trace_filter extension_run || set -o xtrace
 
-  typeset -g action
+  typeset -f action
   typeset _type _path _namespaces requires
   _type="${action_type:-}"
   _path="${action_path:-}"

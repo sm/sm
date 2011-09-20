@@ -77,7 +77,7 @@ __sm.paths.create()
 
 __sm.paths.remove()
 {
-  typeset -ga removed_paths nonexistant_paths
+  typeset -fa removed_paths nonexistant_paths
   typeset _path
 
   for _path in "$@"

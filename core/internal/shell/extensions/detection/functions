@@ -4,8 +4,8 @@ __sm.cache.map.check()
 {
   trace_filter action_detection || set -o xtrace
 
-  typeset -g action  action_path
-  typeset -ga extension_args
+  typeset -f action  action_path
+  typeset -fa extension_args
   typeset _found_actions _method _name _item _candidate _candidates screen_height
   _found_actions=()
   _method="$1"
@@ -61,7 +61,7 @@ __sm.cache.map.check()
 __sm.extension.actions.find()
 {
   trace_filter action_detection || set -o xtrace
-  typeset -g extensions_path extension
+  typeset -f extensions_path extension
   typeset _action_params _action_path _new_action_path _rest_params _param_temp \
     _action_params_length _actions_root _map _modules_root _actions_cache
 
@@ -122,7 +122,7 @@ __sm.extension.action()
   (( extension_action_calls == 0 )) ||
     __sm.log.fail "Cannot call a 2nd time, args: ${extension_args[*]}"
 
-  typeset -gi extension_action_calls
+  typeset -fi extension_action_calls
   extension_action_calls+=1
 
   unset extension action
