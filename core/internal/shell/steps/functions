@@ -2,12 +2,13 @@
 
 __sm.step.start()
 {
-  typeset -A steps_started
+  typeset -ga steps_started
   steps_started+=( "$1" )
 }
 
 __sm.steps.retreat()
 {
+  typeset -ga steps_started
   typeset step
 
   if [[ -z "${steps_started}" ]]
@@ -15,7 +16,7 @@ __sm.steps.retreat()
     steps_started=( "$@" )
   fi
 
-  while [[ -n "${steps_started}" ]]
+  while (( ${#steps_started} ))
   do
     array pop steps_started step
     if command exists "fail_${step}"
