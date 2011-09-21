@@ -515,7 +515,7 @@ __sm.package.init()
     "${install_base_path:="${packages_path}/versions/${package_name}"}" \
     "${install_path:="${install_base_path}/${package_version}"}"
 
-  package configure flag key --prefix "${install_path}"
+  __sm.package.configure.flag --prefix "${install_path}"
 
   # This check should only happen in places that require a version...
   #[[ -n "${package_version}" ]] ||
@@ -724,7 +724,6 @@ __sm.package.make.install()
       "$PWD/make.install.log"
   __sm.log.step success
 }
-
 
 __sm.package.postinstall()
 {
