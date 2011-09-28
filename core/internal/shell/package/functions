@@ -284,19 +284,6 @@ __sm.package.install()
   esac
 }
 
-__sm.package.uninstall()
-{
-  trace_filter package || set -o xtrace
-  case "${package_strategy:=gnu}" in
-    (gnu|binary|java)
-      __sm.package.${package_strategy}.uninstall "$@"
-      ;;
-    *)
-      __sm.log.fail "Unknown package strategy ${package_strategy}"
-      ;;
-  esac
-}
-
 __sm.package.gnu.install()
 {
   trace_filter package || set -o xtrace
@@ -751,12 +738,12 @@ __sm.package.setup()
 
   __sm.package.profile.d "${_package}"
 
-  if  __sm.module.is.loaded "api/service"
+  if  __sm.module.is.loaded "internal/service"
   then
     __sm.service.setup "${_package}"
   fi
 
-  if __sm.module.is.loaded "api/database"
+  if __sm.module.is.loaded "internal/database"
   then
     __sm.database.setup "${_package}"
   fi
@@ -863,6 +850,19 @@ __sm.package.profile.d()
 __sm.package.uninstall()
 {
   trace_filter package || set -o xtrace
+  case "${package_strategy:=gnu}" in
+    (gnu|binary|java)
+      __sm.package.${package_strategy}.uninstall "$@"
+      ;;
+    *)
+      __sm.log.fail "Unknown package strategy ${package_strategy}"
+      ;;
+  esac
+}
+
+__sm.package.gnu.uninstall()
+{
+  trace_filter package || set -o xtrace
   (( $# == 0 )) || __sm.package.cli $@
 
   if __sm.package.is.active "${package_name}" "${package_version}"
@@ -874,7 +874,10 @@ __sm.package.uninstall()
 
   paths remove "${install_path}"
 
-  ! module_is_loaded service || service_uninstall # Remove any service reminants
+  if  __sm.module.is.loaded "internal/service"
+  then
+    __sm.service.uninstall "${_package}" # Remove any service reminants
+  fi
 
   __sm.log.step success
 }
@@ -1055,7 +1058,7 @@ __sm.packages.list.active()
 __sm.packages.available()
 {
   trace_filter package || set -o xtrace
-  __sm.extension.installed module "api/package" "$@"
+  __sm.extension.installed module "internal/package" "$@"
 }
 
 __sm.packages.list()
