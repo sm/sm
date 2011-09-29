@@ -51,7 +51,7 @@ package()
   do
     _token="$1" && shift
     case "${_token}" in
-      (cli|install|uninstall)
+      (cli|install|uninstall|info)
         _command="${_token}"
         ;;
       (is)
@@ -186,7 +186,7 @@ package()
           ;;
       esac
       ;;
-    (install|uninstall)
+    (install|uninstall|info)
       __sm.package.${_command} "${_params[@]}"
       ;;
     (configure)
