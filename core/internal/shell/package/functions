@@ -240,27 +240,40 @@ __sm.package.package_dependencies()
 __sm.package.set.cflags()
 {
   trace_filter package || set -o xtrace
+  export CFLAGS
   if ! __sm.string.contains "-I${active_path}/include" "${CFLAGS}"
   then
-    export CFLAGS="-I${active_path}/include ${CFLAGS:-} "
+    CFLAGS="-I${active_path}/include${CFLAGS:+ }${CFLAGS:-}"
+  fi
+}
+
+__sm.package.set.cpath()
+{
+  trace_filter package || set -o xtrace
+  export CPATH
+  if ! __sm.string.contains "${active_path}/include" "${CPATH:-}"
+  then
+    CPATH="${CPATH:-}${CPATH:+ }${active_path}/include"
   fi
 }
 
 __sm.package.set.ldflags()
 {
   trace_filter package || set -o xtrace
+  export LDFLAGS
   if ! __sm.string.contains "-L${active_path}/lib" "${LDFLAGS}"
   then
-    export LDFLAGS="-L${active_path}/lib ${LDFLAGS:-}"
+    LDFLAGS="-L${active_path}/lib${LDFLAGS:+ }${LDFLAGS:-}"
   fi
 }
 
 __sm.package.set.cc()
 {
   trace_filter package || set -o xtrace
+  export CC
   if os is darwin && [[ -x /usr/bin/gcc-4.2 ]]
   then
-    export CC=/usr/bin/gcc-4.2
+    CC=/usr/bin/gcc-4.2
   fi
 }
 
@@ -290,6 +303,7 @@ __sm.package.gnu.install()
   (( $# == 0 )) || __sm.package.cli $@
 
   __sm.package.set.cflags
+  __sm.package.set.cpath
   __sm.package.set.cc
   __sm.package.set.ldflags
 
@@ -680,6 +694,7 @@ __sm.package.gnu.make()
   fi
 
   __sm.log.debug package "__sm.package.gnu.make: ${_command}"
+  env | grep -E '^C.*=|PATH.*=|FLAGS.*=' | __sm.log.debug package -
 
   ${=_command} > build.log 2>&1 ||
     __sm.package.error \
