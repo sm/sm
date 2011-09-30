@@ -431,7 +431,7 @@ __sm.files.md5()
     __sm.log.error "Could not find a suitable MD5 command (md5/md5sum) in PATH."
   fi
 
-  for file in "$@"
+  for _file in "$@"
   do
     [[ -r "${_file}" ]] || continue
 
