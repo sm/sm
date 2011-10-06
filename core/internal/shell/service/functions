@@ -781,14 +781,9 @@ __sm.service.status()
 
     if __sm.command.exists lsof
     then
-      typeset cwd binary libraries tcp_ports udp_ports sockets logs string
-      cwd=""
-      binary=""
-      libraries=()
-      tcp_ports=()
-      udp_ports=()
-      sockets=()
-      logs=()
+      typeset cwd binary
+      typeset -a libraries tcp_ports udp_ports sockets logs string
+
       while read -r line
       do
         case "$line" in
@@ -799,7 +794,7 @@ __sm.service.status()
             binary="${line##* }"
             ;;
           (*/lib/*)
-            string="${line%% (*}"
+            string="${line%% \(*}"
             libraries+=("${string##* }")
             ;;
           (*.log*)
@@ -809,12 +804,12 @@ __sm.service.status()
             sockets+=("${line##* }")
             ;;
           (*TCP*)
-            string="${line%% (*}"
+            string="${line%% \(*}"
             tcp_ports+=("${string##* }")
             ;;
           (*)
             true # ignore
-          ;;
+            ;;
         esac
       done < <(lsof -U -p ${pid})
 
