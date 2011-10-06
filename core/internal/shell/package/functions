@@ -5,7 +5,7 @@ __sm.package.cli()
   trace_filter package || set -o xtrace
   typeset -g src_path data_path package_user package_version package_base_url \
     package_file package_directory archive_format package_md5 force_flag \
-    static_flag shared_flag
+    static_flag shared_flag package_user configure_flags
   typeset _token index
   typeset -a _ignored_args _package_args
   _package_args=( $@ )
