@@ -18,7 +18,6 @@ files()
   typeset -a _files >/dev/null 2>&1
   typeset _token _command _subcommand _path _file _files _source _target _mode \
     _owner _flags _string _regex __files_commands >/dev/null 2>&1
-  _files=()
   __files_commands=(
     "is empty=are empty"
     "is nonempty=are nonempty"
