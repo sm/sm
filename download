@@ -1,0 +1,17 @@
+#!/bin/zsh
+
+version=$(curl https://bdsm.beginrescueend.com/releases/latest.txt)
+echo "Downloading version $version"
+curl -O https://bdsm.beginrescueend.com/releases/sm-$version.tar.bz2
+
+echo "Extracting"
+tar jxf sm-$version.tar.bz2
+
+echo "Installing"
+cd sm-$version
+./install
+
+echo "Cleaning up"
+cd ../
+rm -rf sm-$version
+rm -rf sm-$version.tar.bz2
