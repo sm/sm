@@ -21,8 +21,10 @@ echo "Extracting archive"
 
 echo "Entering setup path: $sm_path"
 [[ -d $sm_path ]] && cd $sm_path &&
-  echo "Running installer"
-  [[ -f $install_bin ]] && bash < $install_bin
+  echo "Running installer" &&
+  [[ -f $install_bin ]] && bash < $install_bin &&
+  echo "Leaving setup path" &&
+  cd ../
 
 echo "Cleaning up"
 [[ -d $HOME/.sm ]] && 
