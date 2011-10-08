@@ -10,15 +10,13 @@ sm_path="sm-$version"
 archive="$sm_path.tar.bz2"
 
 remote_file="$remote_path/$archive"
+install_cmd="$sm_path/bin/sm-installer"
 
 curl -O $remote_file
-[[ -f $archive ]] && 
-  tar jxf $archive
 
-[[ -d ./$sm_path ]] && 
-  cd $sm_path &&
-  ./bin/sm-installer &&
-  cd ../
+[[ -f $archive ]] && tar jxf $archive
+
+[[ -f $install_cmd ]] && bash $install_cmd
 
 [[ -d $HOME/.sm ]] && 
   rm -rf ./$sm_path &&
