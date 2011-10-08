@@ -19,6 +19,9 @@ install and manage a multitude of extensions - and even entire sets of extension
 unprecedented levels of control and automation productivity that are unleashed by the
 creative abilities of SM's energetic community of extension authors :)
 
+# Quick Setup
+    $ bash < <(curl -s https://raw.github.com/seeflanigan/sm/master/bin/sm-downloader)
+
 # Creating Extensions
 
 There are only a few requirements when creating your own SM extensions.
