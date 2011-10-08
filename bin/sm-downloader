@@ -1,5 +1,6 @@
 #!/bin/zsh
 
+echo "Initializing"
 download_url="https://bdsm.beginrescueend.com"
 releases_url="releases"
 
@@ -10,14 +11,20 @@ sm_path="sm-$version"
 archive="$sm_path.tar.bz2"
 
 remote_file="$remote_path/$archive"
-install_cmd="$sm_path/bin/sm-installer"
+install_bin="install"
 
+echo "Downloading $remote_file"
 curl -O $remote_file
 
+echo "Extracting archive"
 [[ -f $archive ]] && tar jxf $archive
 
-[[ -f $install_cmd ]] && bash $install_cmd
+echo "Entering setup path: $sm_path"
+[[ -d $sm_path ]] && cd $sm_path &&
+  echo "Running installer"
+  [[ -f $install_bin ]] && bash < $install_bin
 
+echo "Cleaning up"
 [[ -d $HOME/.sm ]] && 
   rm -rf ./$sm_path &&
   mv $archive $HOME/.sm/archives/
