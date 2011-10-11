@@ -17,7 +17,7 @@ files()
 
   typeset -a _files >/dev/null 2>&1
   typeset _token _command _subcommand _path _file _files _source _target _mode \
-    _owner _flags _string _regex __files_commands >/dev/null 2>&1
+    _owner _flags _string _regex __files_commands _as_user >/dev/null 2>&1
   __files_commands=(
     "is empty=are empty"
     "is nonempty=are nonempty"
@@ -110,6 +110,10 @@ files()
         _string="$1"
         (( $# )) && shift || __sm.log.fail "A content string must follow keyword 'with'"
         ;;
+      (as)
+        _as_user="$1"
+        (( $# )) && shift || __sm.log.fail "A content string must follow keyword 'as'"
+        ;;
       (*)
         _files+=("${_token}")
         ;;
@@ -164,7 +168,7 @@ files()
     (write)
       [[ -n "${_string}" ]] || __sm.log.fail "String must be given; string 'string'."
       [[ -n "${_target}" ]] || __sm.log.fail "Target must be given;  to {file name}."
-      __sm.files.write "${_string}" "${_target}" "${_flags[*]}"
+      __sm.files.write "${_string}" "${_target}" "${_flags[*]}" ${_as_user}
       ;;
     (*)
       if [[ -z "${_owner}" && -z "${_mode}" ]]
