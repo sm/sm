@@ -27,16 +27,16 @@ __sm.database.cli()
     token="${extension_args[$index]}"
 
     case "$token" in
-      --data)
+      (--data)
         data_path="${extension_args[$((++index))]}"
         ;;
-      --trace)
+      (--trace)
         set -o xtrace
         ;;
-      --help)
+      (--help)
         database_usage
         ;;
-      *)
+      (*)
         _ignored_args+=("${token}")
         ;;
     esac

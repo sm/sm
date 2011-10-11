@@ -121,10 +121,10 @@ init_scripts_path()
   if (( UID == 0 ))
   then
     case "$OSTYPE" in
-      *darwin*)
+      (*darwin*)
         printf "/etc/init.d"
         ;;
-      *linux*|*)
+      (*linux*|*)
         if [[ -d "/etc/init.d" ]]
         then
           printf "/etc/init.d"
