@@ -17,7 +17,7 @@ __sm.cache.map.filesystem.initialize()
 
   if [[ -d "${_actions_root}" ]]
   then
-    for _action_path in "${_actions_root}"/*
+    for _action_path in ${_actions_root}/**/*
     do
       [[ -f "${_action_path}" && -x "${_action_path}" ]] || continue
       _action_path="${_action_path#${_actions_root}\/}"
