@@ -11,72 +11,73 @@ do
   token="$1"
   case "$token" in
 
-    --help)
+    (--help)
       shift #end of processing
       extension_args=("cli" "help" "$@")
       break
       ;;
 
-    -v|--version|-V)
+    (-v|--version|-V)
       shift #end of processing
       extension_args=("cli" "version" "${token}" "$@")
       break
       ;;
 
-    --trace)
+    (--trace)
       trace_flags+=" action"
       ;;
 
-    --trace=*)
+    (--trace=*)
       trace_flags+=" ${token##--trace\=}"
       ;;
 
-    --fun-trace=*)
+    (--fun-trace=*)
       trace_functions+=( ${=token##--fun-trace\=} )
       ;;
 
-    --debug)
+    (--debug)
       debug_flags+=" all"
       debug_flag=1
       ;;
 
-    --debug=*)
+    (--debug=*)
       debug_flags+=" ${token##--debug\=}"
       debug_flag=1
       ;;
 
-    --var-debug=*)
+    (--var-debug=*)
       var_debug_flags+=( "${token##--var-debug\=}" )
       ;;
 
-    --var-debug-*)
+    (--var-debug-*)
       var_debug_type_flag="${token##--var-debug-}"
       ;;
 
-    --module=*)
+    (--module=*)
       preload_modules+=( ${token##--module\=} )
       ;;
 
-    --call=*)
+    (--call=*)
       call_action="${token##--call\=}"
       [[ "$call_action" =~ \/ ]] && preload_modules+=( ${call_action%/*} ) || true
       call_action="${call_action##*/}"
       ;;
 
-    --force)
+    (--force)
       export force_flag=1
       ;;
 
-    --)
+    (--)
       shift # end of processing.
       extension_args=("$@")
       break
       ;;
 
-    -*)
+    (-*)
       printf "ERROR: unknown flag: '${token}'.\n"
       ;;
-    *)
+
+    (*)
       if [[ -f "$token" && -z "$sm_script" ]]
       then
         sm_script=$1

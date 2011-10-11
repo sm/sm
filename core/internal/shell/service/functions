@@ -31,15 +31,20 @@ __sm.service.initialize()
     "${service_spool_path:="${var_path}/spool/${service}"}" \
     "${service_config_path:="${etc_path}/${service}"}" \
     "${service_db_path:="${var_path}/db/${service}"}" \
-    "${service_data_path:="${var_path}/db/${service}/${package_version}"}" \
+    "${service_data_path:="${var_path}/db/${service}/${service_version}"}" \
     "${service_log_path:="${var_path}/log/${service}"}" \
     "${service_lock_path:="${var_path}/lock/${service}"}" \
-    "${service_src_path:="${source_path}/${service}-${package_version}"}" \
+    "${service_src_path:="${source_path}/${service}-${service_version}"}" \
     "${service_config_file:="${service_config_path}/${service}.conf"}" \
     "${service_log_file:="${service_log_path}/${service}.log"}" \
     "${service_pid_file:="${service_pid_path}/${service}.pid"}" \
     "${service_lock_file:="${service_lock_path}/${service}.lock"}" \
     "${service_run_as_root_flag:=0}"
+
+  if variable is empty service_version
+  then
+    config read file defaults from ${service} key version into service_version
+  fi
 
   service_paths=(
     "${service_bin_path}"
@@ -404,7 +409,7 @@ __sm.service.initd.install()
   typeset _service _version
   _service="${1:-}"
   (( $# )) && shift ||fail "Service name was not passed in as the first parameter"
-  _version="${1:-${package_version}}"
+  _version="${1:-${service_version}}"
 
   if ! paths exist "${init_scripts_path}"
   then
@@ -432,7 +437,7 @@ __sm.service.initd.install()
         service_config_path "${service_config_path}"
     fi
 
-    __sm.service.activate "${service}" "${package_version}"
+    __sm.service.activate "${service}" "${service_version}"
 
     # TODO: Replace this with install_template + seed_template
     files write \
@@ -695,7 +700,7 @@ __sm.service.activate()
   _service="${1:-"${service}"}"
   (( $# )) && shift || __sm.log.fail "The service name must be set or given to activate a service."
 
-  _version="${1:-${package_version}}"
+  _version="${1:-${service_version}}"
 
   [[ -n "${_version}" ]] || __sm.log.fail "Version must be set or given to activate a service."
 
