@@ -1,15 +1,15 @@
 #!/bin/sh
 
+typeset -g service_pid service_initialized service_binary service_cli_binary
+typeset -ga service_paths service_root_paths service_actions \
+  service_flags service_start_flags service_stop_flags \
+  service_restart_flags service_status_flags service_reload_flags
+
 __sm.service.initialize()
 {
   # TODO: Account for user service installs...
   # TODO: Merge service_paths and service_root_paths...
   # TODO: determine root_install vs user_install...
-  typeset -g service_pid service_initialized service_binary
-  typeset -ga service_paths service_root_paths service_actions \
-    service_flags service_start_flags service_stop_flags \
-    service_restart_flags service_status_flags service_reload_flags
-
   if user is root
   then
     etc_path="/etc"
@@ -781,14 +781,9 @@ __sm.service.status()
 
     if __sm.command.exists lsof
     then
-      typeset cwd binary libraries tcp_ports udp_ports sockets logs string
-      cwd=""
-      binary=""
-      libraries=()
-      tcp_ports=()
-      udp_ports=()
-      sockets=()
-      logs=()
+      typeset cwd binary
+      typeset -a libraries tcp_ports udp_ports sockets logs string
+
       while read -r line
       do
         case "$line" in
@@ -799,7 +794,7 @@ __sm.service.status()
             binary="${line##* }"
             ;;
           (*/lib/*)
-            string="${line%% (*}"
+            string="${line%% \(*}"
             libraries+=("${string##* }")
             ;;
           (*.log*)
@@ -809,12 +804,12 @@ __sm.service.status()
             sockets+=("${line##* }")
             ;;
           (*TCP*)
-            string="${line%% (*}"
+            string="${line%% \(*}"
             tcp_ports+=("${string##* }")
             ;;
           (*)
             true # ignore
-          ;;
+            ;;
         esac
       done < <(lsof -U -p ${pid})
 

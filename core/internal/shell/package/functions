@@ -1,11 +1,12 @@
 #!/bin/sh
 
+typeset -g src_path data_path package_user package_version package_base_url \
+  package_file package_directory archive_format package_md5 force_flag \
+  static_flag shared_flag package_user configure_flags
+
 __sm.package.cli()
 {
   trace_filter package || set -o xtrace
-  typeset -g src_path data_path package_user package_version package_base_url \
-    package_file package_directory archive_format package_md5 force_flag \
-    static_flag shared_flag
   typeset _token index
   typeset -a _ignored_args _package_args
   _package_args=( $@ )
@@ -128,53 +129,53 @@ __sm.package.define()
     fi
 
     case "$key" in
-      name)
+      (name)
         package_name="${value}"
         ;;
-      version)
+      (version)
         package_version="${value}"
         ;;
-      file)
+      (file)
         package_file="${value}"
         ;;
-      dir)
+      (dir)
         package_dir="${value}"
         ;;
-      url)
+      (url)
         package_url="${value}"
         ;;
-      base_url)
+      (base_url)
         package_base_url="${value}"
         ;;
-      docs_url)
+      (docs_url)
         package_docs_url="${value}"
         ;;
-      patches_url)
+      (patches_url)
         package_patches_url="${value}"
         ;;
-      md5_url)
+      (md5_url)
         package_md5_url="${value}"
         ;;
-      bin_path)
+      (bin_path)
         bin_path="${value}"
         ;;
-      packages_path)
+      (packages_path)
         packages_path="${value}"
         ;;
-      source_path)
+      (source_path)
         source_path="${value}"
         ;;
-      target_path)
+      (target_path)
         target_path="${value}"
         ;;
-      archive_format)
+      (archive_format)
         archive_format="${value}"
         ;;
       # TODO: Simplify into
       #(+([[[:alnum:]]|])_path|name|version|url|md5_url)
       #  eval "${key}=${value}"
       #  ;;
-      *)
+      (*)
         __sm.log.fail "Unknown key '${key}' (value: ${value})."
       ;;
     esac
@@ -307,8 +308,7 @@ __sm.package.gnu.install()
   __sm.package.set.cc
   __sm.package.set.ldflags
 
-  if __sm.package.versions.installed | grep -q "${package_version}" &&
-    [[ "${force_flag}" != "1" ]]
+  if __sm.package.versions.installed | grep -q "${package_version}" && (( force_flag != 1 ))
   then
     log "The ${package_name} ${package_version} package is already installed.
 To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
