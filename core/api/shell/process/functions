@@ -114,7 +114,7 @@ process()
       esac
       ;;
     (status)
-      if [[ -n "${_file}" || -n "${_pid}"]]
+      if [[ -n "${_file}" || -n "${_pid}" ]]
       then
         __sm.process.status "${_name}" "${_file}" "${_pid}"
       else
