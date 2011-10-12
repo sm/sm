@@ -461,20 +461,17 @@ __sm.service.init.start()
   _command=( "${service_binary}" )
 
   if [[ -n "${service_start_flags}" ]]
-  then
-    _command+=("${service_start_flags[@]}")
-  fi
+  then _command+=("${service_start_flags[@]}") ; fi
 
   if [[ -n "${service_flags}" ]]
-  then
-    _command+=("${service_flags[@]}")
-  fi
+  then _command+=("${service_flags[@]}") ; fi
 
   if (( service_run_as_root_flag ))
   then
     user is root || _prefix="sudo"
     if ! ${_prefix} ${_command[*]}
     then
+      __sm.log.step fail
       __sm.log.error "${service} failed to start."
     fi
   else
@@ -485,6 +482,7 @@ __sm.service.init.start()
     then
       __sm.log.succeed "${service} successfully started."
     else
+      __sm.log.step fail
       log "${service} failed to start; check ${service_log_file} for details:"
       exec tail -n 50 "${service_log_file}"
       error
@@ -505,6 +503,7 @@ __sm.service.init.stop()
     then
       rm -f "$service_pid_file"
     else
+      __sm.log.step fail
       return $?
     fi
   fi
@@ -764,110 +763,7 @@ __sm.service.activate()
 
 __sm.service.status()
 {
-  log "${service}:"
-
-  if [[ -s "${service_pid_file}" ]] && (( $(head -1 ${service_pid_file}) > 0 ))
-  then
-    typeset ps pid
-    pid=$(head -1 ${service_pid_file})
-    ps=$(ps -p ${pid} -ostate,sgi_rss,vsize | tail -1)
-
-    log "  status: running"
-    log "  version: ${service_version}"
-    log "  process: "
-    log "    pid: ${pid}"
-    if os is linux
-    then
-      log "    parent_pid: $(awk  '/^PPid:/{print $2}' /proc/${pid}/status)"
-      log "    state: $(printf "$ps" | awk '{print $1}')"
-      log "    rss: $(printf "$ps" | awk '{print $2}')"
-      log "    vsz: $(printf "$ps" | awk '{print $3}')"
-    fi
-
-    if __sm.command.exists lsof
-    then
-      typeset cwd binary
-      typeset -a libraries tcp_ports udp_ports sockets logs string
-
-      while read -r line
-      do
-        case "$line" in
-          (*[[:space:]]cwd[[:space:]]*)
-            cwd="${line##* }"
-            ;;
-          (*[[:space:]]txt[[:space:]]*)
-            binary="${line##* }"
-            ;;
-          (*/lib/*)
-            string="${line%% \(*}"
-            libraries+=("${string##* }")
-            ;;
-          (*.log*)
-            logs+=("${line##* }")
-            ;;
-          (*.sock*)
-            sockets+=("${line##* }")
-            ;;
-          (*TCP*)
-            string="${line%% \(*}"
-            tcp_ports+=("${string##* }")
-            ;;
-          (*)
-            true # ignore
-            ;;
-        esac
-      done < <(lsof -U -p ${pid})
-
-      log "    cwd: ${cwd}"
-      log "    binary: ${binary}"
-
-      if (( ${#logs[@]} > 0 ))
-      then
-        log "    logs:"
-        array sort asc logs
-        array unique logs
-        for log in "${logs[@]}"
-        do
-          printf "      - %s\n" "${log}"
-        done
-      fi
-
-      if (( ${#libraries[@]} > 0 ))
-      then
-        log "    libraries:"
-        array sort asc libraries
-        array unique libraries
-        for library in "${libraries[@]}"
-        do
-          printf "      - %s\n" "${library}"
-        done
-      fi
-
-      if (( ${#tcp_ports[@]} > 0 ))
-      then
-        log "    tcp_ports:"
-        array sort asc tcp_ports
-        array unique tcp_ports
-        for tcp_port in "${tcp_ports[@]}"
-        do
-          printf "      - %s\n" "${tcp_port}"
-        done
-      fi
-
-      if (( ${#sockets[@]} > 0 ))
-      then
-        log "    sockets:"
-        array sort asc sockets
-        array unique sockets
-        for socket in "${sockets[@]}"
-        do
-          printf "      - %s\n" "${socket}"
-        done
-      fi
-    fi
-  else
-    log "  status: not running."
-  fi
+  __sm.process.status "${service}" "${service_pid_file}" # ${service_pid}
 
   if __sm.command.exists "${service}_status"
   then # Run the service specific status function, if it exists
@@ -877,30 +773,7 @@ __sm.service.status()
 
 __sm.service.signal()
 {
-  typeset _signal _pid
-  _signal="${1}"
-  _pid="${2:-0}"
-  (( $# )) && shift || __sm.log.fail "Cannot signal service;"\
-    " Signal must be given as the first parameter and be one of:"\
-    " {KILL,QUIT,TERM,USR1,USR2,TTIN,TTOU,a digit})."
-
-  (( _pid )) ||
-    __sm.log.fail "pid to signal must be passed in as the second parameter;"\
-    " please check your code (see trace below.)"
-
-  case "${_signal}" in
-    (KILL|QUIT|TERM|USR1|USR2|TTIN|TTOU|WINCH|+([[:digit:]]))
-      if (( _pid > 0 ))
-      then
-        kill -${_signal} ${_pid}
-      else
-        log "Not sending signal ${_signal} to process, as pid is 0 (process not found/running)."
-      fi
-      ;;
-    (*)
-      __sm.log.fail "Signal must be one of:"\
-        " {KILL,QUIT,TERM,USR1,USR2,TTIN,TTOU,a digit})."
-      ;;
-  esac
+  log warn "__sm.service.signal is depreciated, instead use __sm.process.signal from api/process"
+  __sm.process.signal $@
 }
 

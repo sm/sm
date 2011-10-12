@@ -1,0 +1,101 @@
+#!/bin/sh
+
+process()
+{
+  trace_filter process || set -o xtrace
+  typeset _token _command _process _command _user _flags __process_commands _signal _pid _name
+  _pid=0
+
+  __process_commands=(
+  "on exit=exit"
+  "is running=running"
+  )
+
+  if __sm.command.detect "$*" "${__process_commands[@]}"
+  then
+    _command="${__sm_command_dotted}"
+    shift "${__sm_command_words}"
+  else
+    __sm.log.fail "No command given.\nUsage:  \npaths <command> ..."
+  fi
+
+  while (( $# ))
+  do
+    _token="$1" && shift
+    case "${_token}" in
+      (name)
+        _name="$1"
+        shift || fail "Process name must be given after keyword 'name'"
+        ;;
+      (pid)
+        _pid=$1
+        shift || fail "Process id (pid) must be given after keyword 'pid'"
+        ;;
+      (status|signal)
+        _command="${_token}"
+        ;;
+      (+([[:digit:]]))
+        _pid=${_token}
+        ;;
+      (kill|KILL|quit|QUIT|term|TERM|usr1|USR1|usr2|USR2|ttin|TTIN|ttou|TTOU|winch|WINCH|-+([[:digit:]]))
+        _command=signal
+        _signal=${_token}:u
+        ;;
+      (pidfile)
+        _pid_file="$1"
+        shift || fail "Pid file name must be given after keyword 'pidfile'."
+        ;;
+      (*.pid)
+        _pid_file="${_token}"
+        ;;
+      (*)
+        __sm.log.fail "Unknown token '${_token}'"
+        ;;
+    esac
+  done
+
+  case "${_command}" in
+    (signal)
+      if ! (( _pid ))
+      then
+        __sm.log.fail "pid to signal must be given;"\
+          " please check your code (see trace below.)"
+      fi
+
+      case "${_signal}" in
+        (KILL|QUIT|TERM|USR1|USR2|TTIN|TTOU|WINCH|+([[:digit:]]))
+          __sm.process.signal ${_signal} ${_pid}
+          ;;
+        (*)
+          __sm.log.fail "Cannot signal service;"\
+            " Signal must be given as the first parameter and be one of:"\
+            " {KILL,QUIT,TERM,USR1,USR2,TTIN,TTOU,a digit})."
+          ;;
+      esac
+      ;;
+    (status)
+      if [[ -n "${_pid_file}" || -n "${_pid}"]]
+      then
+        __sm.process.status "${_name}" "${_pid_file}" "${_pid}"
+      else
+        __sm.log.fail "Either a pidfile or a process id (pid) must be given in order to show process status."
+      fi
+      ;;
+    (running)
+      __sm.process.is.running "${_pid}" "${_pid_file}"
+      ;;
+    (exit)
+      NIY "Process on exit"
+      __sm.process.on.exit ...
+      ;;
+    (*)
+      if [[ -n "${_command}" ]]
+      then
+        __sm.log.fail "Process API command '${_command}' s not handled."
+      else
+        __sm.log.fail "Process API command must be given."
+      fi
+      ;;
+  esac
+}
+

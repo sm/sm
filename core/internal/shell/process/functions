@@ -1,0 +1,173 @@
+#!/bin/sh
+
+__sm.process.is.running() {
+  typeset _pid _pid_file
+  _pid=${1:-0} ; _pid_file="$2"
+
+  if (( _pid < 1 )) && [[ -s "${_pid_file}" ]]
+  then read -r _pid < ${_pid_file} ; fi
+
+  kill -0 $_pid
+}
+
+__sm.process.run() {
+  typeset _command ; _command="$1"
+  typeset -g process_pid >/dev/null 2>&1
+  ${_command} &
+  process_pid=$!
+  return 0
+}
+
+__sm.process.status() {
+  typeset _name _pid_file _pid _ps
+  _name="$1"; _pid_file="$2"; _pid="${3:-0}"
+
+  log "${name:-"process"}:"
+
+  if [[ -s "${_pid_file}" ]]
+  then read -r _pid < ${_pid_file} ; fi
+
+  if (( ${_pid} > 0 ))
+  then
+    _ps=$(ps -p ${pid} -ostate,sgi_rss,vsize | tail -1)
+
+    log "  status: running"
+    log "  version: ${service_version}"
+    log "  process: "
+    log "    pid: ${pid}"
+
+    if os is linux
+    then
+      log "    parent_pid: $(awk  '/^PPid:/{print $2}' /proc/${pid}/status)"
+      log "    state: $(printf "$_ps" | awk '{print $1}')"
+      log "    rss: $(printf "$_ps" | awk '{print $2}')"
+      log "    vsz: $(printf "$_ps" | awk '{print $3}')"
+    fi
+
+    # TODO: Use /proc for linux and lsof otherwise
+    if __sm.command.exists lsof
+    then
+      typeset cwd binary
+      typeset -a libraries tcp_ports udp_ports sockets logs string
+
+      while read -r line
+      do
+        case "$line" in
+          (*[[:space:]]cwd[[:space:]]*)
+            cwd="${line##* }"
+            ;;
+          (*[[:space:]]txt[[:space:]]*)
+            binary="${line##* }"
+            ;;
+          (*/lib/*)
+            string="${line%% \(*}"
+            libraries+=("${string##* }")
+            ;;
+          (*.log*)
+            logs+=("${line##* }")
+            ;;
+          (*.sock*)
+            sockets+=("${line##* }")
+            ;;
+          (*TCP*)
+            string="${line%% \(*}"
+            tcp_ports+=("${string##* }")
+            ;;
+          (*)
+            true # ignore other lines
+            ;;
+        esac
+      done < <(lsof -U -p ${pid})
+
+      log "    cwd: ${cwd}"
+      log "    binary: ${binary}"
+
+      if (( ${#logs[@]} > 0 ))
+      then
+        log "    logs:"
+        array sort asc logs
+        array unique logs
+        for log in "${logs[@]}"
+        do
+          printf "      - %s\n" "${log}"
+        done
+      fi
+
+      if (( ${#libraries[@]} > 0 ))
+      then
+        log "    libraries:"
+        array sort asc libraries
+        array unique libraries
+        for library in "${libraries[@]}"
+        do
+          printf "      - %s\n" "${library}"
+        done
+      fi
+
+      if (( ${#tcp_ports[@]} > 0 ))
+      then
+        log "    tcp_ports:"
+        array sort asc tcp_ports
+        array unique tcp_ports
+        for tcp_port in "${tcp_ports[@]}"
+        do
+          printf "      - %s\n" "${tcp_port}"
+        done
+      fi
+
+      if (( ${#sockets[@]} > 0 ))
+      then
+        log "    sockets:"
+        array sort asc sockets
+        array unique sockets
+        for socket in "${sockets[@]}"
+        do
+          printf "      - %s\n" "${socket}"
+        done
+      fi
+    fi
+  else
+    log "  status: not running."
+  fi
+}
+
+__sm.process.signal() {
+  typeset _signal _pid
+  _signal="${1}"
+  _pid="${2:-0}"
+
+  if (( _pid > 0 ))
+  then
+    kill -${_signal} ${_pid}
+  else
+    log "Not sending signal ${_signal} to process, as pid is 0 (process not found/running)."
+  fi
+}
+
+__sm.process.lockfile.lock()
+{
+  typeset _lockfile
+  _lockfile="${1:-}"
+  (( $# )) && shift ||
+    __sm.log.fail "No lockfile was specified as the first parameter."
+
+  printf "$$" >> "${_lockfile}" # *Append* current process's pid to the lockfile
+
+  # Now read in the first pidfile from the lockfile.  This means that the first
+  # instance that successfully writes its pid to the lockfile obtains the lock.
+  read -r _pid < "${_lockfile}"
+
+  # If the pidfile read in matches the pid of the current process, then
+  if [[ "${_pid}" != "$$" ]]
+  then
+    __sm.log.error "Another process already owns the lockfile; exiting."
+  fi
+
+  # The currently running process has the lock; immediately add an on-exit
+  # hook that removes the lockfile when the process exits, thus relinquishing
+  # the filesystem-level lock. This also preserves existing EXIT code.
+  traps on exit "cd '$PWD';rm -f ${_lockfile}"
+
+  return 0 # The lock has been obtained! Proceed with nefarious things!
+}
+
