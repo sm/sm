@@ -344,11 +344,15 @@ __sm.files.sha.512()
 
 __sm.files.write()
 {
-  typeset _string _target _flags
+  typeset _string _target _flags _user
   _string="$1"
   _target="$2"
-  _flags=(${=3})
-  printf "${_string}\n" | tee ${_flags[@]} "${_target}" >/dev/null
+  _flags=( ${=3} )
+  if [[ -n "$4" ]]
+  then
+    _user="sudo -u $4"
+  fi
+  printf "${_string}\n" | ${=_user} tee ${_flags[@]} "${_target}" >/dev/null
 }
 
 __sm.files.in()
