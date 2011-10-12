@@ -94,6 +94,7 @@ limitations under the License.
 
 # License Exceptions:
 
-bin/bdsm-ll is GNU Parallel and is licensed under the GNU GPL v3 which can be
-read here: http://www.gnu.org/licenses/gpl.html
+bin/sm-ll, bin/sm-sql, bin/sm-sem are all part of the GNU Parallel project
+and are licensed under the GNU GPL v3 which can be read at either LICENSE.gpl3
+or on the web at http://www.gnu.org/licenses/gpl.html
 
