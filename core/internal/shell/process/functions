@@ -1,6 +1,7 @@
 #!/bin/sh
 
-__sm.process.is.running() {
+__sm.process.is.running()
+{
   typeset _pid _pid_file
   _pid=${1:-0} ; _pid_file="$2"
 
@@ -10,7 +11,8 @@ __sm.process.is.running() {
   kill -0 $_pid
 }
 
-__sm.process.run() {
+__sm.process.run()
+{
   typeset _command ; _command="$1"
   typeset -g process_pid >/dev/null 2>&1
   ${_command} &
@@ -18,7 +20,8 @@ __sm.process.run() {
   return 0
 }
 
-__sm.process.status() {
+__sm.process.status()
+{
   typeset _name _pid_file _pid _ps
   _name="$1"; _pid_file="$2"; _pid="${3:-0}"
 
@@ -131,10 +134,13 @@ __sm.process.status() {
   fi
 }
 
-__sm.process.signal() {
-  typeset _signal _pid
-  _signal="${1}"
-  _pid="${2:-0}"
+__sm.process.signal()
+{
+  typeset _signal _pid _pid_file
+  _signal="${1}" ; _pid="${2:-0}" ; _pid_file="${3:-}"
+
+  if (( _pid < 1 )) && [[ -s "${_pid_file}" ]]
+  then read -r _pid < ${_pid_file} ; fi
 
   if (( _pid > 0 ))
   then
@@ -148,9 +154,6 @@ __sm.process.lockfile.lock()
 {
   typeset _lockfile
   _lockfile="${1:-}"
-  (( $# )) && shift ||
-    __sm.log.fail "No lockfile was specified as the first parameter."
-
   printf "$$" >> "${_lockfile}" # *Append* current process's pid to the lockfile
 
   # Now read in the first pidfile from the lockfile.  This means that the first
@@ -160,7 +163,8 @@ __sm.process.lockfile.lock()
   # If the pidfile read in matches the pid of the current process, then
   if [[ "${_pid}" != "$$" ]]
   then
-    __sm.log.error "Another process already owns the lockfile; exiting."
+    __sm.log.debug "Another process already owns the lockfile;"
+    return 1
   fi
 
   # The currently running process has the lock; immediately add an on-exit
