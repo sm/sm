@@ -1,0 +1,31 @@
+#!/bin/zsh
+
+echo "Initializing"
+download_url="https://bdsm.beginrescueend.com"
+releases_url="releases"
+
+remote_path="$download_url/$releases_url"
+
+version=$(curl "$remote_path/latest.txt")
+sm_path="sm-$version"
+archive="$sm_path.tar.bz2"
+
+remote_file="$remote_path/$archive"
+install_bin="install"
+
+echo "Downloading $remote_file"
+curl -O $remote_file
+
+[[ -f $archive ]] && 
+  echo "Extracting $archive" &&
+  tar jxf $archive
+
+[[ -d $sm_path ]] && cd $sm_path &&
+  echo "Installing" &&
+  [[ -f $install_bin ]] && bash < $install_bin &&
+  cd ../
+
+[[ -d $HOME/.sm ]] && 
+  echo "Cleaning up" &&
+  rm -rf ./$sm_path &&
+  mv $archive $HOME/.sm/archives/
