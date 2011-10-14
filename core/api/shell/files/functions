@@ -138,7 +138,7 @@ files()
       if __sm.files.${_command} "${_files[@]}"
       then return 0 ; else return 1 ; fi
       ;;
-    (open|md5|enter|join|expand|search|within|in|source|empty|nonempty|exist|exists|remove|create)
+    (open|md5|enter|join|expand|search|within|in|source|empty|nonempty|exist|exists|remove|create|touch)
       [[ -n "${_files}" ]] || __sm.log.fail "files must be given for 'files ${_command}'."
       if __sm.files.${_command} "${_files[@]}"
       then return 0 ; else return 1 ; fi

@@ -500,3 +500,16 @@ __sm.files.absolute.path()
 
   builtin cd "${_recorded_path}"
 }
+
+__sm.files.touch()
+{
+  typeset _file
+
+  for _file in "$@"
+  do
+    _file=${_file/\~\//$HOME\/} # Expand ~/ to full value of $HOME
+    touch "${_file}"
+  done
+  return 0
+}
+
