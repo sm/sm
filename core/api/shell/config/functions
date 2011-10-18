@@ -1,6 +1,11 @@
 #!/bin/sh
 
-
+#
+# SM config API
+#
+# config read key {key} file {file} [<into|as> {variable}] [prefix {prefix}]
+# config write key {key} value {value} file {file}
+#
 config()
 {
   trace_filter config || set -o xtrace

@@ -1,5 +1,10 @@
 #!/bin/sh
 
+database()
+{
+  :
+}
+
 api_database_initialize()
 {
   if user is root

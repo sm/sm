@@ -1,6 +1,13 @@
 #!/bin/sh
 
-date()
+#
+# SM date module API
+#
+# dates start {date} end {date} [step {step}] [format "%Y-%m-%dT%H:%I:%S]
+#
+# where {step} is one of {minute,hour,day,week,month,year}
+#
+dates()
 {
   true ${date_format:="%Y-%m-%dT%H:%M:%S"}
 
@@ -51,25 +58,25 @@ date()
   [[ -n "${_end}" ]]   || __sm.log.fail "end date must be specified."
 
   case "${_step}" in
-    minute)
+    (minute)
       _minute=60
       ;;
-    hour)
+    (hour)
       _step=3600
       ;;
-    day)
+    (day)
       _step=86400
       ;;
-    week)
+    (week)
       _step=604800
       ;;
-    month)
+    (month)
       _step=2629743
       ;;
-    year)
+    (year)
       _step=31556926
       ;;
-    *)
+    (*)
       __sm.log.fail "Unknown step token ${1:-};"\
         " valid steps are {minute,hour,day,week,month,year}."
       ;;

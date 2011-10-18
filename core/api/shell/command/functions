@@ -1,5 +1,17 @@
 #!/bin/sh
 
+#
+# SM command API
+#
+# command exists {name}
+# command is function {name}
+# command is script {name} # NIY
+# command is binary {name} # NIY
+# command full name {name}
+# command run "command to run"
+# command run as {username} "command to run"
+# command "command" # calls shell builtin 'command'.
+#
 command() { commands "$@" ; }
 
 commands()

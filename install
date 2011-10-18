@@ -4,8 +4,7 @@ extension_args=()
 
 while (( $# ))
 do
-  token="$1"
-  shift
+  token="$1" && shift
   case "$token" in
     (--trace|trace)
       extension_args+=("--trace=all")

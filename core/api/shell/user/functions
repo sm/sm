@@ -1,5 +1,16 @@
 #!/bin/sh
 
+#
+# user is root user {username}
+# user is not root user {username}
+# user is privileged user {username}
+# user is unprivileged user {username}
+# user set home {home} for {username}
+# user set shell {shell} for {username}
+# user create unless exists name {username}
+# user exists name {username}
+#
+
 user()
 {
   trace_filter users || set -o xtrace

@@ -1,5 +1,13 @@
 #!/bin/sh
 
+#
+# variable is empty {variable}
+# variable is nonempty {variable}
+# variables are empty {variables}
+# variables are nonempty {variables}
+# variables must be empty {variables}
+# variables must be nonempty {variables}
+#
 variable() { variables "$@"; }
 
 variables()

@@ -1,12 +1,12 @@
 #!/bin/sh
 
 #
-# # Hash in file Module
+# NOTE: hash() is merged into the config module API, do not use hash api as it
+# will be removed.
 #
 # Allows manipulation of multiline values and keyss containing - and \.
 #
-
-# TODO: Replace hash() with zsh mapfiles / internal constructs merge into config.
+# TODO: Remove hash() with zsh mapfiles / internal constructs merge into config.
 hash()
 {
   typeset _token _file _keys _valid_keys

@@ -3,16 +3,16 @@
 # TODO: Rework this into a 1.0.0 module API
 
 #
-#     user$ templates install "nginx.conf" \
-#           to "${nginx_path}/nginx.conf" \
-#           mode 0644 owner "${nginx_user}"
+#    user$ templates install "nginx.conf" \
+#            to "${nginx_path}/nginx.conf" \
+#            mode 0644 owner "${nginx_user}"
 #
 #    user$ templates seed "/etc/conf.d/${extension}.conf" \
-#      prefix_path "${prefix_path}" \
-#      init_scripts_path "${init_scripts_path}" \
-#      data_path "${data_path}" \
-#      confd_path "${confd_path}" \
-#      extension "${extension}"
+#            prefix_path "${prefix_path}" \
+#            init_scripts_path "${init_scripts_path}" \
+#            data_path "${data_path}" \
+#            confd_path "${confd_path}" \
+#            extension "${extension}"
 #
 # Note that if you wish to eliminate all unset strings, pass the pair
 #     ".*" ""

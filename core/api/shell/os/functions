@@ -9,6 +9,17 @@
 #
 # TODO: Finish this API documentation below
 #
+# os is <linux|darwin|bsd|solaris|aix>
+# os cpu count
+# os open {uri}
+# os type
+# os version
+# os version major
+# os version minor
+# os version patch
+# os arch
+# os arch capable
+#
 os()
 {
   trace_filter os || set -o xtrace

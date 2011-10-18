@@ -6,24 +6,26 @@
 # API Version: 1.0.0
 #
 # array {command} {params...}
+#
 # where command is one of:
-# is
-#   empty
-#   nonempty
-#   even
-# last
-# first
-# push
-# pop
-# append
-# shift
-# unshift
-# join
-# largest
-# sort
-#   desc
-#   asc
-# unique
+#
+#   is empty
+#   is nonempty
+#   is even
+#   length
+#   last
+#   first
+#   push
+#   pop
+#   append
+#   shift
+#   unshift
+#   join
+#   largest
+#   sort desc
+#   sort asc
+#   unique
+#   start     # index of first element
 #
 
 array()

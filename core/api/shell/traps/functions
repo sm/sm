@@ -1,5 +1,8 @@
 #!/bin/sh
 
+#
+# traps on exit "command"
+#
 traps()
 {
   typeset _token _signal _code __traps_code

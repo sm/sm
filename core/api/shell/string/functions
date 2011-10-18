@@ -4,6 +4,11 @@
 # SM Framework Core Module ~ String (string)
 #
 
+#
+# string contains {string} {content}
+# string append ...
+# string prepend ...
+#
 string()
 {
   typeset _token _command _string _search _regex

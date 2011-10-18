@@ -9,6 +9,41 @@
 #
 # TODO: Finish this API documentation below
 #
+# file exists {file}
+# files exist {file}
+# file is empty {file}
+# files are nonempty {file}
+# file is executable {file}
+# files are executable {file}
+# file is symlink {file}
+# files are symlinks {file}
+# file absolute path {file}
+# file sha 256 {file}
+# file sha 512 {file}
+# file change owner {owner} {file}
+# file chown {mode} {file}
+# files chown {mode} {files}
+# file change permissions {mode} {file}
+# files change permissions {mode} {files}
+# file chmod {mode} {file}
+# files chmod {mode} {files}
+# files change permissions
+# file append to {file} content {content}
+# file copy from {source} to {target}
+# file move from {source} to {target}
+# file link symbolic force from {source} to {target}
+# file replace regex {regex} with {content} in {file}
+# file open {file}
+# file md5 {file}
+# file(s) expand {file}
+# file search {file} # NIY
+# file(s) source {file}
+# file remove {file}
+# file create {file}
+# file touch {file}
+# files touch {files}
+# files within {path}
+# files in {path}
 file() { files "$@" ; }
 
 files()
@@ -29,6 +64,7 @@ files()
     "sha 256"
     "sha 512"
     "change owner to=chown"
+    "change permissions to=chmod"
     "change rights to=chmod"
   )
 

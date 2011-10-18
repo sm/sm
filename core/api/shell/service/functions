@@ -7,6 +7,31 @@
 # TODO: Rework this into a 1.0.0 module API
 # Public API for managing and working with a single service.
 # This is what is used by service extensions.
+#
+# service start
+# service stop
+# service restart
+# service reload
+# service restart
+# service setup
+# service status
+# service info
+# service logtail
+# service list
+# service configcheck
+# service usage
+# service cli
+# service setup
+# service uninstall
+# service pid
+# service confd
+# service initd
+# service activate
+# service deactivate
+# service status
+# service signal
+# service initialize
+#
 service()
 {
   trace_filter service || set -o xtrace
