@@ -25,6 +25,7 @@ os()
   trace_filter os || set -o xtrace
 
   typeset _command _subcommand _os
+  typeset -a _files
 
   while (( $# > 0 ))
   do

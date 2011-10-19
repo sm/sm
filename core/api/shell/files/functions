@@ -158,7 +158,7 @@ files()
   done
 
   case "${_command}" in
-    (contain|containing)
+    (contain|containing|contains)
       [[ -n "${_string}" ]] || [[ -n "${_regex}" ]] ||
         __sm.log.fail "regexp or string must be given for 'files ${_command}'."
       if __sm.files.${_command} "${_string}" "${_regex}" "${_files[@]}"
