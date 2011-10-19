@@ -24,15 +24,15 @@ os()
 {
   trace_filter os || set -o xtrace
 
-  typeset _command _subcommand _os
+  typeset _command _subcommand _os _token
   typeset -a _files
 
   while (( $# > 0 ))
   do
-    token="$1" && shift
-    case "${token}" in
+    _token="$1" && shift
+    case "${_token}" in
       (is)
-        _command="$token"
+        _command="$_token"
         _os="${1}"
         (( $# )) && shift || __sm.log.fail "lowercase operating system name must follow keyword 'os';"\
           "os is <linux|darwin|bsd|solaris|aix>"
@@ -53,9 +53,9 @@ os()
       (*)
         if [[ -z "${_command}" ]]
         then
-          _command="$token"
+          _command="$_token"
         else
-          _files+=("$token")
+          _files+=("$_token")
         fi
         ;;
     esac

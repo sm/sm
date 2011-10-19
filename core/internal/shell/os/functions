@@ -132,7 +132,7 @@ __sm.os.arch.type()
   case "${MACHTYPE//-*}" in
     # The machine type is 32 bit.
     # Note that this accounts for Solaris 32 bit as well (i86pc).
-    (i386|i686|i86pc)
+    (*i386*|*i686*|*i86pc*)
       printf "%s" "i386"
       ;;
     # The machine type is 64 bit.
@@ -161,10 +161,10 @@ __sm.os.arch.capable()
     then
       printf "%s" "x86_64"
     else
-      os_arch_type
+      __sm.os.arch.type
     fi
   else
-    os_arch_type
+    __sm.os.arch.type
   fi
 }
 
