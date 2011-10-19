@@ -117,6 +117,8 @@ __sm.extension.actions.find()
 
 __sm.extension.action()
 {
+  typeset -g package_version package_name extension >/dev/null 2>&1
+
   trace_filter action_detection || set -o xtrace
 
   (( extension_action_calls == 0 )) ||
