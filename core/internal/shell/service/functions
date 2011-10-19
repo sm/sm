@@ -39,6 +39,7 @@ __sm.service.initialize()
     "${service_log_file:="${service_log_path}/${service}.log"}" \
     "${service_pid_file:="${service_pid_path}/${service}.pid"}" \
     "${service_lock_file:="${service_lock_path}/${service}.lock"}" \
+    "${service_ip:="0.0.0.0"}" \
     "${service_run_as_root_flag:=0}"
 
   if variable is empty service_version
