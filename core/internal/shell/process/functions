@@ -32,16 +32,16 @@ __sm.process.status()
 
   if (( ${_pid} > 0 ))
   then
-    _ps=$(ps -p ${pid} -ostate,sgi_rss,vsize | tail -1)
+    _ps=$(ps -p ${_pid} -ostate,sgi_rss,vsize | tail -1)
 
     log "  status: running"
     log "  version: ${service_version}"
     log "  process: "
-    log "    pid: ${pid}"
+    log "    pid: ${_pid}"
 
     if os is linux
     then
-      log "    parent_pid: $(awk  '/^PPid:/{print $2}' /proc/${pid}/status)"
+      log "    parent_pid: $(awk  '/^PPid:/{print $2}' /proc/${_pid}/status)"
       log "    state: $(printf "$_ps" | awk '{print $1}')"
       log "    rss: $(printf "$_ps" | awk '{print $2}')"
       log "    vsz: $(printf "$_ps" | awk '{print $3}')"
@@ -80,7 +80,7 @@ __sm.process.status()
             true # ignore other lines
             ;;
         esac
-      done < <(lsof -U -p ${pid})
+      done < <(lsof -U -p ${_pid})
 
       log "    cwd: ${cwd}"
       log "    binary: ${binary}"
