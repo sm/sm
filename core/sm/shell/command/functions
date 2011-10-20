@@ -17,6 +17,15 @@ __sm.command.is.function()
   declare -f "${1}" > /dev/null 2>&1
 }
 
+__sm.command.exec.as()
+{
+  typeset _user _flags
+  _user="$1" _flags=( ${=2} )
+  shift 2
+  #TODO: find a way for proper passing of params with spaces
+  exec nohup su ${_flags[@]} "${_user}" -c "$*"
+}
+
 __sm.command.run.as()
 {
   typeset _user _flags
