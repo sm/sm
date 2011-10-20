@@ -45,7 +45,7 @@ git_get()
     git checkout master -f -q >/dev/null 2>&1
     git reset --hard HEAD >/dev/null 2>&1
     git fetch ${remote} >/dev/null 2>&1
-    if [[ -z "$(git branch | awk "/${branch}$/" 2>/dev/null)" ]]
+    if [[ -z "$(git branch --no-color | awk "/${branch}\$/" 2>/dev/null)" ]]
     then
       if ! (
         builtin cd "${repo_path}"
@@ -54,7 +54,7 @@ git_get()
       then
         fetch_error remote_branch_not_found
       fi
-    elif [[ -z "$(git branch | awk "/\* $branch$/{print \$2}" 2>/dev/null)" ]]
+    elif [[ -z "$(git branch --no-color | awk "/\* $branch\$/{print \$2}" 2>/dev/null)" ]]
     then
       if ! (
         builtin cd "${repo_path}"
