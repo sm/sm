@@ -221,14 +221,14 @@ backtrace()
   # set editor. If you haven't set an editor, SM defaults the editor variable to
   # the pager, or to empty string.
   case "${EDITOR:="vi"}" in
-    (mvim*|mate*)
+    (*mvim*|*mate*)
       # Set the format based on GUI editing tools format for opening
       # a file to a given line using a file URI.
       _format="%-60s # %-$((${#_source_length} + 2))s \n"
       # Print the backtrace header to the calling environment's STDERR
       printf "${_format}" "Source" "function()"  1>&2
       ;;
-    (vi*|gvim*|emacs*|*)
+    (*gvim*|*vi*|*emacs*|*)
       # Set the format based on the console editing tools format for opening
       # a file to a given line.
       # _format="%-$((${#_largest} + 2))s $ %${#EDITOR}s +%-$((${#_digits}))s %-$((${#_longest} + 2))s %s\n"
@@ -263,12 +263,15 @@ backtrace()
     case "${EDITOR:-}" in
       # Print a file with the format and content for GUI editing tools, to open a
       # given line using a URI. Print a backtrace to calling environment's STDERR.
-      (mvim*|mate*)
+      (*mvim*)
         printf "${_format}" "open ${EDITOR// *}://open?url=file://${_source}&line=${_source_line}" "${_function}" 1>&2
+        ;;
+      (*mate*)
+        printf "${_format}" "open txmt://open?url=file://${_source}&line=${_source_line}" "${_function}" 1>&2
         ;;
       # Print a file with the format and content for console editing tools, to open a
       # file to a given line. Print backtrace to calling environment's STDERR.
-      (vi*|gvim*|emacs*|*)
+      (*gvim*|*vi*|*emacs*|*)
         printf "${_format}" "${EDITOR}" "${_source_line}" "${_source} " "${_function}" 1>&2
         ;;
     esac
