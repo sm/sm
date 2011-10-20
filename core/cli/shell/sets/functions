@@ -2,27 +2,22 @@
 
 sets_help()
 {
-  __sm.includes api/help
+  # TODO: Move this to a sets man page.
+  log "BDSM extension sets management
 
-  description "BDSM extension sets management"
+sets List                 # installed sets.
+sets known                # List extension sets that can be installed.
+sets install all          # Install all extension sets found on the known list.
+sets install {name}       # Install extension set {name} found on the known list.
+sets install {name} [uri] # Install extension set {name}, from [uri] if given.
+sets add {name} [uri]     # Shortcut for install.
+sets update all           # Update all extension sets using remembered uris.
+sets update {name}        # Update extension set {name} using remembered uri.
+sets uninstall {name}     # Remove extension set {name}.
+sets rm {name}            # Shortcut for uninstall.
+sets help                 # Show this help.
+"
 
-  action "sets" "List installed sets."
-  action "sets known" "List extension sets that can be installed."
-  action_separator
-  action "sets install all" "Install all extension sets found on the known list."
-  action "sets install {name}" "Install extension set {name} found on the known list."
-  action "sets install {name} [uri]" "Install extension set {name}, from [uri] if given."
-  action "sets add {name} [uri]" "Shortcut for install."
-  action_separator
-  action "sets update all" "Update all extension sets using remembered uris."
-  action "sets update {name}" "Update extension set {name} using remembered uri."
-  action_separator
-  action "sets uninstall {name}" "Remove extension set {name}."
-  action "sets rm {name}" "Shortcut for uninstall."
-  action_separator
-  action "sets help" "Show this help."
-
-  show_help usage
 }
 
 sets_list()
