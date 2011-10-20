@@ -182,7 +182,7 @@ __sm.module.include()
     source "${_module_path}/functions"
     __sm.trace.functions
   fi
-  for _file in cli initialize
+  for _file in hooks cli initialize
   do
     if [[ -s "${_module_path}/${_file}" ]]
     then
