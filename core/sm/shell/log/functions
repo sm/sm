@@ -267,7 +267,6 @@ backtrace()
         printf "${_format}" "open ${EDITOR// *}://open?url=file://${_source}&line=${_source_line}" "${_function}" 1>&2
         ;;
       (*mate*)
-txmt://open/?url=file://~/.bash_profile&line=11&column=2
         printf "${_format}" "open \"txmt://open?url=file://${_source}&line=${_source_line}\"" "${_function}" 1>&2
         ;;
       # Print a file with the format and content for console editing tools, to open a
