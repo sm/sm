@@ -1,4 +1,11 @@
 #!/bin/sh
 
+typeset -g service_pid service_port service_initialized service_binary service_cli_binary \
+  service_ip service_bind_interface service_db_file
+
+typeset -ga service_paths service_root_paths service_actions \
+  service_flags service_start_flags service_stop_flags \
+  service_restart_flags service_status_flags service_reload_flags
+
 __sm.service.initialize
 
