@@ -19,6 +19,11 @@ __sm.templates.find()
     template_path="${_template_path}.template"
     template_name="${_extension}/${_params_path}"
     return 0
+  elif [[ -f "${_template_path}.mustache" ]]
+  then
+    template_path="${_template_path}.mustache"
+    template_name="${_extension}/${_params_path}"
+    return 0
   elif [[ -f "${_template_path}" ]]
   then
     template_path="${_template_path}"
