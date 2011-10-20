@@ -3,6 +3,7 @@
 detect_man()
 {
   typeset _extensions_path _extension _man_path _man_name _man_paths
+  typeset -g man_file
   _extensions_path=$1
   _extension=$2
   shift
