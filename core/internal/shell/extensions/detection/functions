@@ -45,11 +45,14 @@ __sm.cache.map.check()
     done
 
     screen_height=${LINES:-20}
-    if (( ${#_found_actions[@]} + 4  > screen_height ))
+    if shell is interactive
     then
-      __sm.log.error "More than one matching action found;\n\nDid you mean:\n ${_candidates[*]}\n" 2>&1 | less
-    else
-      __sm.log.error "More than one matching action found;\n\nDid you mean:\n ${_candidates[*]}\n"
+      if (( ${#_found_actions[@]} + 4  > screen_height ))
+      then
+        __sm.log.error "More than one matching action found;\n\nDid you mean:\n ${_candidates[*]}\n" 2>&1 | less
+      else
+        __sm.log.error "More than one matching action found;\n\nDid you mean:\n ${_candidates[*]}\n"
+      fi
     fi
     exit 1
   else
