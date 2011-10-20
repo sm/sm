@@ -162,7 +162,7 @@ __sm.service.setup()
 
 __sm.service.uninstall()
 {
-  NIY "service uninstall has not yet been implemented."
+  __sm.log.warn "service uninstall has not yet been implemented."
   # 1. Remove init scripts.
   # 2. Unload OS service hooks.
   # 3. Deactivate database path.
