@@ -25,7 +25,7 @@ git_get()
 
   _target="${scm_path}/$( scm_identifier "${_uri}" )"
 
-  # v v v this looks slightly freakish... ~ Wayne
+  # FIXME v v v this looks slightly freakish... ~ Wayne
   _final_target=$(
     builtin cd "${initial_pwd}"
     mkdir -p "${_final_target}"
