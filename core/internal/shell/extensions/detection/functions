@@ -36,7 +36,7 @@ __sm.cache.map.check()
 
   elif (( ${#_found_actions[@]} ))
   then
-    if shell is interactive
+    if [[ -t 0 ]]
     then
       typeset -a _candidates
 
