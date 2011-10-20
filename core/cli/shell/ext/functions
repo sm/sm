@@ -2,28 +2,21 @@
 
 ext_help()
 {
-  __sm.includes api/help
+  log "BDSM extension ext management
 
-  description "BDSM extension ext management"
-
-  action "ext" "List installed ext."
-  action "ext known" "List extension ext that can be installed."
-  action_separator
-  action "ext install all" "Install all extension ext found on the known list."
-  action "ext install {name}" "Install extension {name} found on the known list."
-  action "ext install {name} {uri}" "Install extension {name} from the given {uri}."
-  action "ext add" "Shortcut for install."
-  action_separator
-  action "ext update all" "Update all extension ext using remembered uris."
-  action "ext update {name}" "Update extension {name} using remembered uri."
-  action "ext up" "Shortcut for update."
-  action_separator
-  action "ext uninstall {name}" "Remove extension {name}."
-  action "ext del" "Shortcut for uninstall."
-  action_separator
-  action "ext help" "Show this help."
-
-  show_help usage
+ext List installed ext.
+ext known List extension ext that can be installed.
+ext install all Install all extension ext found on the known list.
+ext install {name} Install extension {name} found on the known list.
+ext install {name} {uri} Install extension {name} from the given {uri}.
+ext add Shortcut for install.
+ext update all Update all extension ext using remembered uris.
+ext update {name} Update extension {name} using remembered uri.
+ext up Shortcut for update.
+ext uninstall {name} Remove extension {name}.
+ext del Shortcut for uninstall.
+ext help Show this help.
+"
 }
 
 ext_list()

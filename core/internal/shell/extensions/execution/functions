@@ -2,7 +2,7 @@
 
 __sm.extension.actions.type()
 {
-  typeset -g action_type 
+  typeset -g action_type
   typeset _path _path_type extension
   _path="${action_path:-}"
 
@@ -151,7 +151,6 @@ __sm.extension.run()
       ;;
 
     (shell)
-      [[ "${action##*/}" != help ]] || __sm.includes api/help
       _namespaces=${_path##${extension_bin_path}}
       __sm.extension.modules.include ${=_namespaces//\// }
       __sm.extension.action.prerequisites
