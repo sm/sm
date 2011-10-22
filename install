@@ -2,6 +2,12 @@
 
 extension_args=()
 
+if [[ ! -e "/bin/zsh" ]]
+then
+  echo "ERROR: /bin/zsh required for SM."
+  exit 1
+fi
+
 while (( $# ))
 do
   token="$1" && shift
