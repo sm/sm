@@ -503,9 +503,9 @@ __sm.package.init()
   config read file defaults from ${package_name} \
     key make_flags prefix default
 
-  __sm.package.package_dependencies "${default_package_dependencies[@]}"
-  __sm.package.configure.flags "${default_configure_flags[@]}"
-  __sm.package.make.flags "${default_make_flags[@]}"
+  __sm.package.package_dependencies ${=default_package_dependencies[*]}
+  __sm.package.configure.flags ${=default_configure_flags[*]}
+  __sm.package.make.flags ${=default_make_flags[*]}
 
   true \
     "${package_version:="${package_default_version}"}" \
