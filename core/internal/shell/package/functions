@@ -445,7 +445,7 @@ __sm.package.init()
   typeset -ga fhs_dirs
   typeset default_configure_flags _flag
 
-  true ${package_name:=${extension}}
+  true ${package_name:=${1:-${extension}}}
 
   [[ -n "${package_name}" ]] || __sm.log.fail "Package name must be given.\n"
 

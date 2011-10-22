@@ -13,5 +13,8 @@ info=package info()
 package/activate=package activate()
 activate=package activate()
 
+package/deactivate=package deactivate()
+deactivate=package deactivate()
+
 package/man=package man()
 man=package man()
