@@ -2,9 +2,9 @@
 
 extension_args=()
 
-if [[ ! -e "/bin/zsh" ]]
+if ! command -v zsh >/dev/null
 then
-  echo "ERROR: /bin/zsh required for SM."
+  echo "ERROR: ZSH is required for SM."
   exit 1
 fi
 
