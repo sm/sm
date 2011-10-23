@@ -272,7 +272,7 @@ __sm.package.set.cc()
 {
   trace_filter package || set -o xtrace
   export CC
-  if os is darwin && [[ -x /usr/bin/gcc-4.2 ]]
+  if __sm.os.type.is darwin && [[ -x /usr/bin/gcc-4.2 ]]
   then
     CC=/usr/bin/gcc-4.2
   fi
@@ -690,7 +690,11 @@ __sm.package.gnu.make()
   then
     _command="${build_command}"
   else
-    _command="make ${make_flags[@]:-"-j$(os cpu count)"}"
+    if ! __sm.string.contains.key "-j" "${make_flags[*]}"
+    then
+      make_flags+=( "-j" "$(__sm.os.cpu.count)" )
+    fi
+    _command="make ${make_flags[@]}"
   fi
 
   __sm.log.debug package "__sm.package.gnu.make: ${_command}"
@@ -813,7 +817,7 @@ __sm.package.ldconfig()
   user is root || return 0
 
   # TODO: Figure out if solaris and freebsd have an analog to this?
-  if os is linux
+  if __sm.os.type.is linux
   then
     if paths exist "/etc/ld.so.conf.d"
     then
@@ -834,7 +838,7 @@ __sm.package.ldconfig()
     __sm.log.step "${package_name} ${package_version} ~ ldconfig" \
       "${_ldconfig}" "${active_path}/lib"
 
-  elif os is darwin
+  elif __sm.os.type.is darwin
   then # Cluster Fuck!
     true
     # This should be handled by the profile.d?
@@ -904,8 +908,8 @@ __sm.package.patch()
 
   _paths=(
     "${extension_patches_path}"
-    "${extension_patches_path}/$(os type)"
-    "${extension_patches_path}/$(os type)/${package_version}"
+    "${extension_patches_path}/$(__sm.os.type)"
+    "${extension_patches_path}/$(__sm.os.type)/${package_version}"
   )
 
   for _path in "${_paths[@]}"
@@ -955,13 +959,13 @@ __sm.package.is.active()
 __sm.package.docs()
 {
   trace_filter package || set -o xtrace
-  os open "${package_docs_url}"
+  __sm.os.open "${package_docs_url}"
 }
 
 __sm.package.website()
 {
   trace_filter package || set -o xtrace
-  os open "${package_website_url}"
+  __sm.os.open "${package_website_url}"
 }
 
 __sm.package.dependencies()
