@@ -62,7 +62,7 @@ process()
   while (( $# ))
   do
     _token="$1" && shift
-    case "${_token}" in
+    case ${_token} in
       (name)
         _name="$1"
         shift || fail "Process name must be given after keyword 'name'"
@@ -78,10 +78,10 @@ process()
       (status|signal|lock)
         _command="${_token}"
         ;;
-      (+([[:digit:]]))
+      ([[:digit:]]##)
         _pid=${_token}
         ;;
-      (kill|KILL|quit|QUIT|term|TERM|usr1|USR1|usr2|USR2|ttin|TTIN|ttou|TTOU|winch|WINCH|hup|HUP|-+([[:digit:]]))
+      (kill|KILL|quit|QUIT|term|TERM|usr1|USR1|usr2|USR2|ttin|TTIN|ttou|TTOU|winch|WINCH|hup|HUP|-[[:digit:]]##)
         _command=signal
         _signal=${_token}:u
         ;;
@@ -103,7 +103,7 @@ process()
       fi
 
       case "${_signal}" in
-        (KILL|QUIT|TERM|USR1|USR2|TTIN|TTOU|WINCH|HUP|+([[:digit:]]))
+        (KILL|QUIT|TERM|USR1|USR2|TTIN|TTOU|WINCH|HUP|[[:digit:]]##)
           __sm.process.signal ${_signal} ${_pid}
           ;;
         (*)

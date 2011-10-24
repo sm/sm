@@ -99,7 +99,7 @@ versionedfs()
         _keep="${1}"
         (( $# )) && shift || __sm.log.fail "keep number must follow keyword 'activate'"
         case "${_keep}" in
-          (+([[:digit:]]))
+          ([[:digit:]]##)
             (( _keep > 0)) || __sm.log.fail "Keep must be a positive integer." ;;
           (*) __sm.log.fail "Keep must be an integer." ;;
         esac
