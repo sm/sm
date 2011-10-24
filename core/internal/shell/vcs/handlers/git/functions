@@ -10,6 +10,7 @@ git_get()
   typeset initial_pwd _uri _final_target branch remote revision _target _uri_https
   initial_pwd="$PWD"
   _uri="${1:-}"
+  # place/dir where user wishes to see output
   _final_target="${2:-}"
   branch=${3:-master}
   remote=${4:-origin}
@@ -23,13 +24,17 @@ git_get()
     "Note that git can be installed from the tools extension set:\n"\
     "sm sets install vcs ; sm git install"
 
+  # internal directory to check out sources
   _target="${scm_path}/$( scm_identifier "${_uri}" )"
 
-  # v v v this looks slightly freakish... ~ Wayne
   _final_target=$(
+    # Starting point in case of relative _final_target
     builtin cd "${initial_pwd}"
+    # Ensure _final_target exists in filesystem
     mkdir -p "${_final_target}"
+    # go to _final_target
     builtin cd "${_final_target}"
+    # so we can print the full path for _final_target
     pwd
   )
 
@@ -40,7 +45,7 @@ git_get()
     git checkout master -f -q >/dev/null 2>&1
     git reset --hard HEAD >/dev/null 2>&1
     git fetch ${remote} >/dev/null 2>&1
-    if [[ -z "$(git branch | awk "/${branch}$/" 2>/dev/null)" ]]
+    if [[ -z "$(git branch --no-color | awk "/${branch}\$/" 2>/dev/null)" ]]
     then
       if ! (
         builtin cd "${repo_path}"
@@ -49,7 +54,7 @@ git_get()
       then
         fetch_error remote_branch_not_found
       fi
-    elif [[ -z "$(git branch | awk "/\* $branch$/{print \$2}" 2>/dev/null)" ]]
+    elif [[ -z "$(git branch --no-color | awk "/\* $branch\$/{print \$2}" 2>/dev/null)" ]]
     then
       if ! (
         builtin cd "${repo_path}"

@@ -43,29 +43,39 @@ package()
   typeset -g package_name package_version package_base_url package_file \
     package_user archive_format package_md5 package_sha256 package_sha512
 
-  typeset _token _subcommand _command _logfile _lines _key _log _message
-  typeset -a _params
+  typeset _token _command _logfile _lines _key _log _message
+  typeset -a _params __package_commands
   _lines=50
+
+  __package_commands=(
+    "is active"
+    "is installed"
+    "configure flag"
+    "configure flags"
+    "make install"
+    "acvtivate first"
+  )
+
+  if __sm.command.detect "$*" "${__package_commands[@]}"
+  then
+    _command="${__sm_command_dotted}"
+    shift "${__sm_command_words}"
+  else
+    __sm.log.fail "No command given.\nUsage:  \nfiles <command> ..."
+  fi
+
+  case "${_command}" in
+    (define)
+      _params+=( "$@" )
+      shift $#
+      ;;
+  esac
+
 
   while (( $# ))
   do
     _token="$1" && shift
     case "${_token}" in
-      (cli|install|uninstall|info)
-        _command="${_token}"
-        ;;
-      (is)
-        _command=is
-        case "$1" in
-          (active|installed)
-            _subcommand="$1"
-            shift
-            ;;
-          (*)
-            __sm.log.fail "A valid command must follow keyword is; {active|installed}"
-            ;;
-        esac
-        ;;
       (log)
         _log="$1"
         (( $# )) && shift || __sm.log.fail "Log file path/name must be given following keyword 'log'"
@@ -77,46 +87,6 @@ package()
       (message)
         _message="$1"
         (( $# )) && shift || __sm.log.fail "Message must be given following keyword 'message'"
-        ;;
-      (configure)
-        _command=configure
-        case "$1" in
-          (flag|flags)
-            _subcommand="$1"
-            shift
-            ;;
-          (*)
-            if [[ -n "$1" ]]
-            then
-              __sm.log.fail "Unknown configure param '$1'."
-          fi
-            continue
-            ;;
-        esac
-        ;;
-      (make)
-        _command=make
-        if [[ "$1" == install ]]
-        then
-          _subcommand="install"
-          shift
-        fi
-        ;;
-      (activate)
-        _command=activate
-        if [[ "$1" == first ]]
-        then
-          _subcommand=first
-          shift
-        fi
-        ;;
-      (initialize)
-        _command=initialize
-        ;;
-      (define)
-        _command=define
-        _params+=("$@")
-        break
         ;;
       (key)
         _key="$1"
@@ -169,38 +139,11 @@ package()
   [[ -n "${package_name}" ]]    || __sm.log.fail "Package name must be set/given"
 
   case "${_command}" in
-    (make)
-      case "$_subcommand" in
-        (install)
-          __sm.package.make.install
-          ;;
-        (*)
-          __sm.package.make "${_params[@]}"
-          ;;
-      esac
-      ;;
-    (is)
-      case "$_subcommand" in
-        (active|installed)
-          __sm.package.is.${_subcommand} "${_params[@]}"
-          ;;
-      esac
-      ;;
-    (install|uninstall|info)
+    (cli|make|make.install|is.active|is.installed|install|uninstall|info|configure|configure.flags)
       __sm.package.${_command} "${_params[@]}"
       ;;
-    (configure)
-      case "${_subcommand}" in
-        (flag)
-          __sm.package.configure.flag "${_key}" "${_params[@]}"
-          ;;
-        (flags)
-          __sm.package.configure.flags "${_params[@]}"
-          ;;
-        (*)
-          __sm.package.configure
-          ;;
-      esac
+    (configure.flag)
+      __sm.package.configure.flag "${_key}" "${_params[@]}"
       ;;
     (define)
       [[ -n "${_params}" ]] || __sm.log.fail "No '{key} {value}' pairs given."
@@ -211,13 +154,8 @@ package()
         __sm.log.fail "Every key must have an associated value."
       fi
       ;;
-    (activate)
-      if [[ "${_subcommand}" == "first" ]]
-      then
-        __sm.package.activate.first "${package_name}" "${package_version}"
-      else
-        __sm.package.activate "${package_name}" "${package_version}"
-      fi
+    (activate|activate.first|deactivate)
+      __sm.package.${_command} "${package_name}" "${package_version}"
       ;;
     (initialize)
       declare -a package_dependencies
@@ -228,11 +166,7 @@ package()
       [[ -n "${_message}" ]] || __sm.log.fail "Message must be given for package error."
       __sm.package.error "${_params[@]}" "${_log}" "${_lines}"
       ;;
-    (cli)
-      __sm.package.cli "${_params[@]}"
-      ;;
     (*)
       __sm.log.fail "Unknown package command '${_token}'"
   esac
 }
-

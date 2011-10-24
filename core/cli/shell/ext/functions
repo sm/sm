@@ -4,7 +4,7 @@ ext_help()
 {
   log "BDSM extension ext management
 
-ext List installed ext.
+ext list installed ext.
 ext known List extension ext that can be installed.
 ext install all Install all extension ext found on the known list.
 ext install {name} Install extension {name} found on the known list.

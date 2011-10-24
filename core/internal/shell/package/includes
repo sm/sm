@@ -1,7 +1,7 @@
 api/environment
 api/extensions/manipulation
 api/filesystem
-api/os
+internal/os
 api/config
 api/templates
 api/user
