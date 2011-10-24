@@ -690,7 +690,7 @@ __sm.package.gnu.make()
   then
     _command="${build_command}"
   else
-    if ! __sm.string.contains.key "-j" "${make_flags[*]}"
+    if ! __sm.string.contains "-j" "${make_flags[*]}"
     then
       make_flags+=( "-j" "$(__sm.os.cpu.count)" )
     fi
