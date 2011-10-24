@@ -83,7 +83,7 @@ process()
         ;;
       (kill|KILL|quit|QUIT|term|TERM|usr1|USR1|usr2|USR2|ttin|TTIN|ttou|TTOU|winch|WINCH|hup|HUP|-[[:digit:]]##)
         _command=signal
-        _signal=${_token}:u
+        _signal=${_token}
         ;;
       (*.pid)
         _file="${_token}"
