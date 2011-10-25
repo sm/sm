@@ -76,7 +76,7 @@ __sm.extension.modules.include()
   _namespace=""
 
   module_name="${extension}"
-  __sm.module.include "$module_name"
+  __sm.module.include "$module_name" || __sm.log.debug search "extension main module not found: $module_name"
 
   while (( $# > 0 ))
   do
