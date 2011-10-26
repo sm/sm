@@ -23,6 +23,7 @@ __sm.service.initialize()
     "${service_bin_path:="${active_path}/bin"}" \
     "${service_sbin_path:="${active_path}/sbin"}" \
     "${service_pid_path:="${var_path}/run/${service}"}" \
+    "${service_pid_file:="${service_pid_path}/${service}.pid"}" \
     "${service_spool_path:="${var_path}/spool/${service}"}" \
     "${service_config_path:="${etc_path}/${service}"}" \
     "${service_db_path:="${var_path}/db/${service}"}" \
@@ -32,7 +33,6 @@ __sm.service.initialize()
     "${service_src_path:="${source_path}/${service}-${service_version}"}" \
     "${service_config_file:="${service_config_path}/${service}.conf"}" \
     "${service_log_file:="${service_log_path}/${service}.log"}" \
-    "${service_pid_file:="${service_pid_path}/${service}.pid"}" \
     "${service_lock_file:="${service_lock_path}/${service}.lock"}" \
     "${service_ip:="0.0.0.0"}" \
     "${service_run_as_root_flag:=0}"
