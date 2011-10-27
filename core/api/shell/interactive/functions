@@ -8,7 +8,8 @@
 #
 shell()
 {
-  typeset _token
+  typeset _token _command _subcommand
+
   while (( $# ))
   do
     _token="$1" && shift
