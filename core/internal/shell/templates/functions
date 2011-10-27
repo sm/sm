@@ -33,7 +33,7 @@ __sm.templates.find()
   return 1
 }
 
-__sm.templates.exist()
+__sm.templates.exists()
 {
   if __sm.extension.in.paths __sm.templates.find "$@" ||
      __sm.cli.in.path __sm.templates.find "$@"
@@ -47,7 +47,7 @@ __sm.templates.exist()
 
 __sm.templates.install()
 {
-  __sm.templates.exist "${_name}" || __sm.log.fail "No template found matching '${_name}'."
+  __sm.templates.exists "${_name}" || __sm.log.fail "No template found matching '${_name}'."
 
   _template="${template_path}"
   _name="$(basename "${_name}")"
@@ -136,7 +136,7 @@ __sm.templates.update()
   _strings=()
   _variables="${_target}.var.$$"
 
-  if ! __sm.templates.exist "${_template}"
+  if ! __sm.templates.exists "${_template}"
   then
     __sm.log.fail "Cannot update seed template;"\
       " No template was found matching '${_template}'."

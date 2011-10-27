@@ -81,7 +81,10 @@ templates()
       __sm.templates.seed "${_name}" "${_params[@]}"
       fi
       ;;
-    (exist|seed)
+    (exist|exists)
+      __sm.templates.exists "${_name}" "${_params[@]}"
+      ;;
+    (seed)
       __sm.templates.${_command} "${_name}" "${_params[@]}"
       ;;
     (*)
