@@ -65,6 +65,7 @@ templates()
         __sm.log.fail "'from' keyword is no longer supported"
         ;;
       (with)
+        _params+=("$@")
         break
         ;;
       (*)
