@@ -1,14 +1,12 @@
 #!/bin/sh
 
-typeset -g src_path data_path package_user package_version package_base_url \
-  package_file package_directory archive_format package_md5 force_flag \
-  static_flag shared_flag package_user configure_flags
-
 __sm.package.cli()
 {
   trace_filter package || set -o xtrace
+
   typeset _token index
   typeset -a _ignored_args _package_args
+
   _package_args=( $@ )
 
   for (( index=1 ; index <= ${#_package_args} ; index++ ))
@@ -110,9 +108,6 @@ __sm.package.error()
 __sm.package.define()
 {
   trace_filter package || set -o xtrace
-  typeset -g package_name package_version package_file package_dir package_url package_base_url \
-    package_docs_url package_patches_url package_md5_url bin_path packages_path source_path \
-    target_path archive_format
   typeset key value
   while (( $# > 0 ))
   do
@@ -185,7 +180,6 @@ __sm.package.define()
 __sm.package.configure.flags()
 {
   trace_filter package || set -o xtrace
-  typeset -ga configure_flags
   typeset _flag
   for _flag in "$@"
   do
@@ -199,7 +193,6 @@ __sm.package.configure.flags()
 __sm.package.configure.flag()
 {
   trace_filter package || set -o xtrace
-  typeset -ga configure_flags
   typeset _key _value
   _key="$1"
   _value="$2"
@@ -213,7 +206,6 @@ __sm.package.configure.flag()
 __sm.package.make.flags()
 {
   trace_filter package || set -o xtrace
-  typeset -ga make_flags
   typeset _flag
   for _flag in "$@"
   do
@@ -227,7 +219,6 @@ __sm.package.make.flags()
 __sm.package.package_dependencies()
 {
   trace_filter package || set -o xtrace
-  typeset -ga package_dependencies
   typeset _flag
   for _flag in "$@"
   do
@@ -273,9 +264,7 @@ __sm.package.set.cc()
   trace_filter package || set -o xtrace
   export CC
   if __sm.os.type.is darwin && [[ -x /usr/bin/gcc-4.2 ]]
-  then
-    CC=/usr/bin/gcc-4.2
-  fi
+  then CC=/usr/bin/gcc-4.2 ; fi
 }
 
 __sm.package.exports()
@@ -441,8 +430,7 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
 __sm.package.init()
 {
   trace_filter package || set -o xtrace
-  typeset -g extension_patches_path
-  typeset -ga fhs_dirs
+
   typeset default_configure_flags _flag
 
   true ${package_name:=${1:-${extension}}}
@@ -563,7 +551,6 @@ __sm.package.java.install()
 __sm.package.fetch.md5()
 {
   trace_filter package || set -o xtrace
-  typeset -g packge_md5_url
   typeset download_url
   (( $# == 0 )) || __sm.package.cli $@
   : "${package_file:="${package_name}-${package_version}.${archive_format}"}"
@@ -599,9 +586,10 @@ __sm.package.fetch.md5()
 __sm.package.fetch()
 {
   trace_filter package || set -o xtrace
-  typeset -g package_file package_url
+
   typeset _entries _url
   typeset -a _args
+
   (( $# == 0 )) || __sm.package.cli $@
   true "${package_file:="${package_name}-${package_version}.${archive_format}"}"
 
@@ -684,6 +672,7 @@ __sm.package.configure()
 __sm.package.gnu.make()
 {
   trace_filter package || set -o xtrace
+
   typeset _command
 
   if [[ -n ${build_command:-} ]]
@@ -771,6 +760,7 @@ __sm.package.setup()
 __sm.package.deactivate()
 {
   trace_filter package || set -o xtrace
+
   (( $# == 0 )) || __sm.package.cli $@
 
   __sm.log.step "${package_name} ${_version} ~ deactivate"
@@ -789,9 +779,12 @@ __sm.package.deactivate()
 __sm.package.activate.first()
 {
   trace_filter package || set -o xtrace
+
   typeset _package _version
+
   _package="${1:-}"
   _version="${2:-}"
+
   (( $# )) && shift || __sm.log.fail "Package name must be given as first parameter."
   (( $# )) && shift || __sm.log.fail "Package version must be given as second parameter."
 
@@ -806,10 +799,16 @@ __sm.package.activate.first()
 __sm.package.ldconfig()
 {
   trace_filter package || set -o xtrace
+
   typeset _package _path _files _ldconfig
+
   _package="${1:-${package_name}}"
   _ldconfig="/sbin/ldconfig"
-  [[ -n "${_package}" ]] || __sm.log.fail "Package name must be given."
+
+  if [[ -z "${_package}" ]]
+  then
+    __sm.log.fail "Package name must be given."
+  fi
 
   #  paths exist "${packages_path}/versions/${_package}/active/lib" ||
   #    return 0 # no lib/ directory for activated package, no need to update ldconfig
@@ -850,9 +849,15 @@ __sm.package.ldconfig()
 __sm.package.profile.d()
 {
   trace_filter package || set -o xtrace
+
   typeset _package
+
   _package="${1:-${package_name}}"
-  [[ -n "${_package}" ]] || __sm.log.fail "Package name must be given."
+
+  if [[ -z "${_package}" ]]
+  then
+    __sm.log.fail "Package name must be given."
+  fi
 
   templates exist "profile.d.template" || return 0
 
@@ -869,6 +874,7 @@ __sm.package.profile.d()
 __sm.package.uninstall()
 {
   trace_filter package || set -o xtrace
+
   case "${package_strategy:=gnu}" in
     (gnu|binary|java)
       __sm.package.${package_strategy}.uninstall "$@"
@@ -882,6 +888,7 @@ __sm.package.uninstall()
 __sm.package.gnu.uninstall()
 {
   trace_filter package || set -o xtrace
+
   (( $# == 0 )) || __sm.package.cli $@
 
   if __sm.package.is.active "${package_name}" "${package_version}"
@@ -904,6 +911,7 @@ __sm.package.gnu.uninstall()
 __sm.package.patch()
 {
   trace_filter package || set -o xtrace
+
   typeset _patches _patch _path _paths
 
   _paths=(
@@ -927,8 +935,11 @@ __sm.package.patch()
 __sm.package.patches.apply()
 {
   trace_filter package || set -o xtrace
+
   typeset _patch _patches
+
   _patches=("$@")
+
   (( $# )) && shift || __sm.log.fail "No patches were given."
 
   for _patch in "${_patches[@]}"
@@ -941,9 +952,12 @@ __sm.package.patches.apply()
 __sm.package.is.active()
 {
   trace_filter package || set -o xtrace
+
   typeset _name _version _path
+
   _name="${1:-}"
   _version="${2:-}"
+
   (( $# )) && shift || __sm.log.fail "No package name was given, or name is empty."
 
   _path="${packages_path}/versions/${_name}"

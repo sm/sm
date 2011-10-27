@@ -18,7 +18,7 @@ __sm.extension.actions.type()
 
   case "${_path_type}" in
 
-    (*sh[[:space:]]script*|*POSIX[[:space:]]shell*|*Bourne-Again*)
+    (*sh[[:space:]]script*|*POSIX[[:space:]]shell*|*Bourne*)
       action_type="shell"
       ;;
 
