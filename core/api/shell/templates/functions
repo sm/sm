@@ -76,9 +76,9 @@ templates()
     (install|update)
       __sm.templates.${_command} "${_name}" "${_params[@]}"
 
-      if (( ${#_seed_hash[@]} && ${#_params[@]} ))
+      if (( ${#_params[@]} ))
       then
-      __sm.templates.seed "${_name}" "${_params[@]}"
+        __sm.templates.seed "${_name}" "${_params[@]}"
       fi
       ;;
     (exist|exists)
