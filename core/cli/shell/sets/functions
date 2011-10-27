@@ -104,6 +104,17 @@ set_install()
   log step "${_name} ${_version}"
   if fetch_uri "${_uri}" "${src_path}/${_identifier}" "$@"
   then
+
+    if [[ "${sets_system_path}" != "${sets_user_path}" ]]
+    then
+      __sm.log.warn "Installing extensions set to user directory '${sets_user_path}'."
+    fi
+
+    versionedfs create \
+      path "${sets_user_path}" \
+      strategy name method copy activate first
+
+
     versionedfs add \
       path "${sets_user_path}" name "${_name}" version "${_version}" \
       source "${src_path}/${_identifier}"
