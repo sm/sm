@@ -23,8 +23,10 @@ templates()
 {
   trace_filter templates || set -o xtrace
 
-  typeset _command _name _target _source _mode _owner _template _params __templates_commands _token
-  _source="${extension_templates_path}" \
+  typeset _command _name _target _source _mode _owner _template _params \
+    __templates_commands _token
+
+  _source="${extension_templates_path}"
   _mode=0644
   _owner=$USER
   _params=()
@@ -62,13 +64,24 @@ templates()
       (from)
         __sm.log.fail "'from' keyword is no longer supported"
         ;;
+      (with)
+        break
+        ;;
       (*)
         _params+=("${_token}")
     esac
   done
 
   case "${_command}" in
-    (exist|install|seed|update)
+    (install|update)
+      __sm.templates.${_command} "${_name}" "${_params[@]}"
+
+      if (( ${#_seed_hash[@]} && ${#_params[@]} ))
+      then
+      __sm.templates.seed "${_name}" "${_params[@]}"
+      fi
+      ;;
+    (exist|seed)
       __sm.templates.${_command} "${_name}" "${_params[@]}"
       ;;
     (*)
