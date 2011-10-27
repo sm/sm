@@ -2,7 +2,8 @@
 
 typeset -g \
   service_pid service_port service_initialized service_binary service_cli_binary \
-  service_ip service_bind_interface service_db_file service_port service_socket
+  service_ip service_bind_interface service_db_file service_port service_socket \
+  service_pid_file service_log_file
 
 typeset -ga \
   service_paths service_root_paths service_actions service_flags \
