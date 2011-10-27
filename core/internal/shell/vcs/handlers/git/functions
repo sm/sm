@@ -74,14 +74,22 @@ git_get()
       fetch_error pull_failed
     fi
   else
-    mkdir -p "${_target}"
+    mkdir -p "${_target%/*}"
     if git clone --depth 1 ${_uri} "${_target}" >/dev/null 2>&1
     then
       echo "${_uri}" > "${_target}/.uri"
     else
       _uri_https="${_uri/git:\/\//https://}"
-      [[ "${_uri_https}" != "${_uri}" ]] || fetch_error cannot_clone uri="${_uri}"
-      [[ -z "${__vcs_failed}" ]] || return 0
+
+      if [[ "${_uri_https}" == "${_uri}" ]]
+      then
+        fetch_error cannot_clone uri="${_uri}"
+      fi
+
+      if [[ -n "${__vcs_failed}" ]]
+      then
+        return 0
+      fi
 
       __sm.log.debug vcs "git uri: ${_uri} failed, trying: ${_uri_https}"
       if git clone --depth 1 ${_uri_https} "${_target}" >/dev/null 2>&1
