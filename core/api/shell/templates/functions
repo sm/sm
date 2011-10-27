@@ -79,7 +79,7 @@ templates()
 
       if (( ${#_params[@]} ))
       then
-        __sm.templates.seed "${_name}" "${_params[@]}"
+        __sm.templates.seed "${_target}" "${_params[@]}"
       fi
       ;;
     (exist|exists)
