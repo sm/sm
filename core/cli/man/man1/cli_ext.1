@@ -1,0 +1,56 @@
+.\"   $Id$
+.\"
+.\"   Man page for the bdsm project.
+.\"
+.\"   $Log$
+.\"
+
+.TH SM 1 "2011 August 19" "SM Framework"
+
+.SH DESCRIPTION
+SM Extensions may be installed within a ext of extenisons.
+
+.TP 13
+.B ext [help]
+Show this ext help manual
+
+.TP 13
+.B ext list
+List installed extensions.
+
+.TP 13
+.B ext known
+List known open source single extensions that can be installed.
+
+.TP 13
+.B ext install all
+Install all extension extensions found on the known list.
+
+.TP 13
+.B ext install {name}
+Install extension ext {name} found on the known list.
+
+.TP 13
+.B ext install {name} [uri]
+Install extension ext {name}, from [uri] if given.
+
+.TP 13
+.B ext add {name} [uri]
+Shortcut for install.
+
+.TP 13
+.B ext update all
+Update all extension extensions using remembered uris.
+
+.TP 13
+.B ext update {name}
+Update extension ext {name} using remembered uri.
+
+.TP 13
+.B ext uninstall {name}
+Remove extension ext {name}.
+
+.TP 13
+.B ext rm {name}
+Shortcut for uninstall.
+

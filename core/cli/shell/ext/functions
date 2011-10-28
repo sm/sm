@@ -1,24 +1,5 @@
 #!/bin/sh
 
-ext_help()
-{
-  log "BDSM extension ext management
-
-ext list installed ext.
-ext known List extension ext that can be installed.
-ext install all Install all extension ext found on the known list.
-ext install {name} Install extension {name} found on the known list.
-ext install {name} {uri} Install extension {name} from the given {uri}.
-ext add Shortcut for install.
-ext update all Update all extension ext using remembered uris.
-ext update {name} Update extension {name} using remembered uri.
-ext up Shortcut for update.
-ext uninstall {name} Remove extension {name}.
-ext del Shortcut for uninstall.
-ext help Show this help.
-"
-}
-
 ext_list()
 {
   typeset extensions

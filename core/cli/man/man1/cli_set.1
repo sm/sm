@@ -1,0 +1,56 @@
+.\"   $Id$
+.\"
+.\"   Man page for the bdsm project.
+.\"
+.\"   $Log$
+.\"
+
+.TH SM 1 "2011 August 19" "SM Framework"
+
+.SH DESCRIPTION
+SM Extensions may be installed within a set of extenisons.
+
+.TP 13
+.B set [help]
+Show this set help manual
+
+.TP 13
+.B set list
+List installed sets.
+
+.TP 13
+.B set known
+List known open source extension sets that can be installed.
+
+.TP 13
+.B set install all
+Install all extension sets found on the known list.
+
+.TP 13
+.B set install {name}
+Install extension set {name} found on the known list.
+
+.TP 13
+.B set install {name} [uri]
+Install extension set {name}, from [uri] if given.
+
+.TP 13
+.B set add {name} [uri]
+Shortcut for install.
+
+.TP 13
+.B set update all
+Update all extension sets using remembered uris.
+
+.TP 13
+.B set update {name}
+Update extension set {name} using remembered uri.
+
+.TP 13
+.B set uninstall {name}
+Remove extension set {name}.
+
+.TP 13
+.B set rm {name}
+Shortcut for uninstall.
+
