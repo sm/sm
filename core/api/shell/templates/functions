@@ -74,9 +74,8 @@ templates()
   done
 
   case "${_command}" in
-    (install|update)
+    (install)
       __sm.templates.${_command} "${_name}" "${_params[@]}"
-
       if (( ${#_params[@]} ))
       then
         __sm.templates.seed "${_target}" "${_params[@]}"
@@ -85,7 +84,7 @@ templates()
     (exist|exists)
       __sm.templates.exists "${_name}" "${_params[@]}"
       ;;
-    (seed)
+    (seed|update)
       __sm.templates.${_command} "${_name}" "${_params[@]}"
       ;;
     (*)
