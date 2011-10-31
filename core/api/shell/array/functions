@@ -31,7 +31,7 @@
 array()
 {
   trace_filter array || set -o xtrace
-  typeset _command _subcommand _name _variable
+  typeset _command _subcommand _name _variable element
   _command="$1"
   (( $# )) && shift || __sm.log.fail "Array command must be given as the first parameter."
 
@@ -120,6 +120,12 @@ array()
       ;;
     (start)
       echo ${__sm_array_start}
+      ;;
+    (print)
+      __sm.array.join "${_name}" " "
+      ;;
+    (each)
+      __sm.array.each "${_name}" "$@"
       ;;
     (*)
       __sm.log.fail "Unknown array command '${_command}'"

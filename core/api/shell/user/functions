@@ -8,6 +8,7 @@
 # user set home {home} for {username}
 # user set shell {shell} for {username}
 # user create unless exists name {username}
+# user create name {username}
 # user exists name {username}
 #
 
