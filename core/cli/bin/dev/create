@@ -21,10 +21,10 @@ do
 
   _path="${target_path}/${extension}"
 
-  paths copy bin shell templates config \
+  paths copy bin config shell templates \
     to "${_path}"
 
-  copy_files README.md VERSION CHANGELOG.md TODO.md \
+  file copy README.md VERSION CHANGELOG.md TODO.md \
     to "${_path}"
 
   for _module in "${extension_modules[@]}"
