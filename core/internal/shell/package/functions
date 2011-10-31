@@ -555,17 +555,17 @@ __sm.package.fetch.md5()
   (( $# == 0 )) || __sm.package.cli $@
   : "${package_file:="${package_name}-${package_version}.${archive_format}"}"
 
-  if [[ -z "${packge_md5_url:-}" ]]
+  if [[ -z "${package_md5_url:-}" ]]
   then
     for download_url in ${=package_base_url}
     do
-      packge_md5_url="${packge_md5_url:-} ${download_url}/${package_file}.md5"
+      packge_md5_url="${package_md5_url:-} ${download_url}/${package_file}.md5"
     done
   fi
 
   [[ -n "${package_md5}" ]] || __sm.config.read "${package_name}" md5 "${package_file}" package_md5
   [[ -n "${package_md5}" ]] ||
-    for download_url in ${=packge_md5_url}
+    for download_url in ${=package_md5_url}
     do
       curl -L "${download_url}" -o "${archives_path}/${package_file}.md5" 2>/dev/null ||
         __sm.log.error "Fetching MD5 checksum from '${download_url}' failed."
