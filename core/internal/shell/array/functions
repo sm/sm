@@ -165,11 +165,7 @@ __sm.array.each()
 {
   typeset _name _command element
 
-  _name="${1:-}"
-  (( $# )) && shift || __sm.log.fail "Array name was not given to each."
-
-  _command=${1:-' '}
-  (( $# )) && shift || __sm.log.fail "Command to run was not given to each."
+  _name="$1" ; _command="$2"
 
   eval "for element in \"\${${_name}[@]}\" ; do ${_command} ; done"
 }

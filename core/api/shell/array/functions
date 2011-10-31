@@ -125,6 +125,10 @@ array()
       __sm.array.join "${_name}" " "
       ;;
     (each)
+      _name="$1"
+      (( $# )) && shift || __sm.log.fail "Array name missing:  array unique {name}."
+      (( $# )) || __sm.log.fail "Command to run was not given to each."
+
       __sm.array.each "${_name}" "$@"
       ;;
     (*)
