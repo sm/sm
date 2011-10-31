@@ -26,6 +26,8 @@
 #   sort asc
 #   unique
 #   start     # index of first element
+#   each {array name} {command(s) to run for each '$element'}
+#     $ includes api/array; a=(1 2 3 4); array each a 'echo $element'
 #
 
 array()
