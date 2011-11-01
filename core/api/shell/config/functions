@@ -9,7 +9,10 @@
 config()
 {
   trace_filter config || set -o xtrace
-  typeset _token _command _file _key _value _variable _prefix _extension
+  typeset _token _command _file _key _value _variable _prefix _extension \
+    _delimiter
+
+  _delimiter='='
 
   while (( $# ))
   do
@@ -41,6 +44,10 @@ config()
       (from)
         _extension="$1" || __sm.log.fail "An extension name must follow keyword 'for'"
         ;;
+      (delimiter)
+        _delimiter="$1"
+        (( $# )) && shift || __sm.log.fail "a delimiter string must be given after keyword 'delimiter'"
+        ;;
     esac
   done
 
@@ -48,13 +55,15 @@ config()
     (read)
       [[ -n "${_file}" ]] || __sm.log.fail "File name must be given (file {filename})."
       [[ -n "${_key}" ]]  || __sm.log.fail "key name must be given (key {keyname})."
-      __sm.config.read "${_extension}" "${_file}" "${_key}" "${_variable}" "${_prefix}"
+      __sm.config.read "${_extension}" "${_file}" "${_key}" "${_variable}" \
+        "${_prefix}" "${_delimiter}"
       ;;
     (write)
       [[ -n "${_file}" ]]  || __sm.log.fail "File name must be given (file {filename})."
       [[ -n "${_key}" ]]   || __sm.log.fail "key name must be given (key {keyname})."
       [[ -n "${_value}" ]] || __sm.log.fail "value must be given (value {valuename})."
-      __sm.config.write "${_extension}" "${_file}" "${_key}" "${_value}"
+      __sm.config.write "${_extension}" "${_file}" "${_key}" "${_value}" \
+        "${_delimiter}"
       ;;
     (*)
       __sm.log.fail "Unknown command '${_command}'"
