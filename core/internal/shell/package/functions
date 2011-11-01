@@ -559,7 +559,7 @@ __sm.package.fetch.md5()
   then
     for download_url in ${=package_base_url}
     do
-      packge_md5_url="${package_md5_url:-} ${download_url}/${package_file}.md5"
+      package_md5_url="${package_md5_url:-} ${download_url}/${package_file}.md5"
     done
   fi
 
