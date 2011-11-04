@@ -108,7 +108,7 @@ user()
       __sm.user.${_command} ${_user} ${_value}
       ;;
     (add|create.unless.exists)
-      __sm.user.${_command} "${_user}" "${_group}" "${_flags[*]}"
+      __sm.user.${_command} "${_user}" "${_group}" "${_home}" "${_flags[*]}"
       ;;
     (remove)
       __sm.user.${_command} "${_user}" "${_flags[*]}"

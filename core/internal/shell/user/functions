@@ -73,10 +73,16 @@ __sm.user.set.shell()
 
 __sm.user.set.home()
 {
-  typeset _user _value
+  typeset _user _home
   _user="$1"
-  _value="$2"
-  NIY "Setting user's home."
+  _home="$2"
+
+  if os is linux
+  then
+    usermod -d ${_home} ${_user}
+  else
+    NIY "non-linux user home setting."
+  fi
 }
 
 __sm.user.exists()
@@ -103,12 +109,18 @@ __sm.user.create.unless.exists()
 
 __sm.user.add()
 {
-  typeset _user _group _flags
+  typeset _user _group _home
+  typeset -a _flags
+
   _user="$1"
   _group="$2"
-  _flags=( ${=3} )
+  _home="$3"
+  _flags=( ${=4} )
 
-  [[ -n "${_group}" ]] || _group="${_user}"
+  if [[ -z "${_group}" ]]
+  then
+    _group="${_user}"
+  fi
 
   (( UID == 0 )) || # root user has id 0
     __sm.log.fail "Users and groups may be manipulated only by the super-user (root), via su or sudo."
@@ -119,10 +131,12 @@ __sm.user.add()
       groupadd "$_group"
       useradd -g "$_user" "$_user" -s /bin/bash
       usermod -s /bin/bash "$_user"
+      # how to set home?
       ;;
 
     "FreeBSD")
       pw groupadd -q "$_user"
+      # how to set home?
       ;;
 
     "Linux")
@@ -134,9 +148,7 @@ __sm.user.add()
         groupadd -f "$_group"
       fi
 
-      useradd -g "${_user}" "${_user}" #TODO: add system users only !
-      usermod -d "${data_path%\/*}" "${_user}"
-      usermod -s /bin/bash "${_user}"
+      useradd -s /bin/bash -d "${_home:-"/home/${_user}"}" -g "${_user}" "${_user}" #TODO: add system users only !
     ;;
 
     "Darwin")
