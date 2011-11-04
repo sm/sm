@@ -163,10 +163,10 @@ __sm.array.unique()
 
 __sm.array.each()
 {
-  typeset _name _command element
+  typeset _name _command _variable
 
-  _name="$1" ; _command="$2"
+  _name="$1" ; _command="$2" ; _variable="${3:-"element"}"
 
-  eval "for element in \"\${${_name}[@]}\" ; do ${_command} ; done"
+  eval "for ${_variable} in \"\${${_name}[@]}\" ; do ${_command} ; done"
 }
 

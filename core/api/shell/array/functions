@@ -25,15 +25,22 @@
 #   sort desc
 #   sort asc
 #   unique
+#
 #   start     # index of first element
-#   each {array name} {command(s) to run for each '$element'}
+#
+#   each '{array name}' '{command(s) to run for each element}',
+#   default variable name is '$element'
 #     $ includes api/array; a=(1 2 3 4); array each a 'echo $element'
 #
-
+#   each '{array name}' [as {variable name}] '{command(s) to run for each element}'
+#     $ includes api/array; a=(1 2 3 4); array each a as number 'echo $number'
+#
 array()
 {
   trace_filter array || set -o xtrace
+
   typeset _command _subcommand _name _variable element
+
   _command="$1"
   (( $# )) && shift || __sm.log.fail "Array command must be given as the first parameter."
 
@@ -129,9 +136,16 @@ array()
     (each)
       _name="$1"
       (( $# )) && shift || __sm.log.fail "Array name missing:  array unique {name}."
-      (( $# )) || __sm.log.fail "Command to run was not given to each."
 
-      __sm.array.each "${_name}" "$@"
+      if [[ "$1" == "as" ]]
+      then
+        _variable="$2"
+        shift 2 || __sm.log.fail "A variable name must follow keyword 'as'"
+      fi
+
+      _subcommand="$1" && shift || __sm.log.fail "Command to run was not given to each."
+
+      __sm.array.each "${_name}" "${_subcommand}" "${_variable:-}"
       ;;
     (*)
       __sm.log.fail "Unknown array command '${_command}'"
