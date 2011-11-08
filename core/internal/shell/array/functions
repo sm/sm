@@ -63,7 +63,7 @@ __sm.array.append()
   typeset _element
   for _element in "$@"
   do
-    eval "${_name}+=(\"\${_element}\")}"
+    eval "${_name}+=(\"\${_element}\")"
   done
 }
 
