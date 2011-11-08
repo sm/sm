@@ -39,7 +39,7 @@ array()
 {
   trace_filter array || set -o xtrace
 
-  typeset _command _subcommand _name _variable element
+  typeset _command _subcommand _name _variable _element
 
   _command="$1"
   (( $# )) && shift || __sm.log.fail "Array command must be given as the first parameter."
