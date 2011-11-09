@@ -17,7 +17,6 @@
 # files are executable {file}
 # file is symlink {file}
 # files are symlinks {file}
-# file absolute path {file}
 # file sha 256 {file}
 # file sha 512 {file}
 # file change owner {owner} {file}
@@ -35,7 +34,7 @@
 # file replace regex {regex} with {content} in {file}
 # file open {file}
 # file md5 {file}
-# file(s) expand {file}
+# file(s) expand {file} # eg. expand to include 'full/absolute' path
 # file search {file} # NIY
 # file(s) source {file}
 # file remove {file}
@@ -51,6 +50,7 @@ files()
   trace_filter filesystem || set -o xtrace
 
   typeset -a _files >/dev/null 2>&1
+
   typeset _token _command _subcommand _path _file _files _source _target _mode \
     _owner _flags _string _regex __files_commands _as_user >/dev/null 2>&1
 
@@ -60,7 +60,7 @@ files()
     "is executable=are executable"
     "is missing=are missing"
     "is symlink=are symlinks"
-    "absolute path"
+    "absolute path=expand"
     "sha 256"
     "sha 512"
     "change owner to=chown"
@@ -170,11 +170,7 @@ files()
       if __sm.files.${_command} "${_string}" "${_regex}" "${_files[@]}"
       then return 0 ; else return 1 ; fi
       ;;
-    (are.*|sha.*|absolute.*)
-      if __sm.files.${_command} "${_files[@]}"
-      then return 0 ; else return 1 ; fi
-      ;;
-    (open|md5|enter|join|expand|search|within|in|source|empty|nonempty|exist|exists|remove|create|touch)
+    (open|md5|enter|join|expand|search|within|in|source|empty|nonempty|exist|exists|remove|create|touch|are.*|sha.*)
       [[ -n "${_files}" ]] || __sm.log.fail "files must be given for 'files ${_command}'."
       if __sm.files.${_command} "${_files[@]}"
       then return 0 ; else return 1 ; fi

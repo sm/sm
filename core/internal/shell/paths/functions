@@ -212,7 +212,7 @@ __sm.paths.search()
   done < <(__sm.paths.in "${_path}")
 }
 
-__sm.paths.absolute()
+__sm.paths.full()
 {
   #TODO: replace with ${1:A} ?
   typeset _path _recorded_path

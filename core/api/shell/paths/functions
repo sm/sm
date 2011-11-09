@@ -54,6 +54,7 @@ paths()
   __paths_commands=(
     "change owner to=chown"
     "change rights to=chmod"
+    "absolute path=full path"
     "exist=exists"
   )
 
@@ -134,9 +135,9 @@ paths()
       [[ -n "${_paths}" ]] || __sm.log.fail "Path to list paths in must be given."
       __sm.paths.in "${_paths[@]}"
       ;;
-    (absolute)
+    (full)
       [[ -n "${_paths}" ]] || __sm.log.fail "Path to expand must be given."
-      __sm.paths.absolute "${_paths[@]}"
+      __sm.paths.full "${_paths[@]}"
       ;;
     (create|remove|enter|exists|join|expand)
       [[ -n "${_paths}" ]] || __sm.log.fail "Path to ${_command} must be given."

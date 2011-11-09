@@ -470,7 +470,7 @@ __sm.files.open()
   os open "$@"
 }
 
-__sm.files.absolute.path()
+__sm.files.expand()
 {
   #TODO is it possible to replace it with ${1:A} ???
   typeset _path _paths _recorded_path _amount _index _file_name
@@ -496,7 +496,7 @@ __sm.files.absolute.path()
     fi
   done
 
-  printf "$( pwd )/${_file_name}\n"
+  printf "$(pwd)/${_file_name}\n" # TODO: Question: Can we use $PWD here instead?
 
   builtin cd "${_recorded_path}"
 }
