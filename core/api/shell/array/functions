@@ -81,23 +81,15 @@ array()
         ;;
       (variable|as)
         _variable="$1"
-        (( $# )) && shift || __sm.log.fail "A variable name must follow keyword 'variable'"
+        (( $# )) && shift || __sm.log.fail "A variable name must follow keyword '${_token}'"
         ;;
       (suffix)
         _suffix="$1"
         (( $# )) && shift || __sm.log.fail "A string suffix must follow keyword 'suffix'"
         ;;
-      (run)
+      (run|do|exec)
         _subcommand="$1"
-        (( $# )) && shift || __sm.log.fail "A subcommand to run must follow keyword 'run'"
-        ;;
-      (each)
-        if [[ "$1" == "as" ]]
-        then
-          _variable="$2"
-          shift 2 || __sm.log.fail "A variable name must follow keyword 'as'"
-        fi
-        _subcommand="$1" && shift || __sm.log.fail "Command to run was not given to each."
+        (( $# )) && shift || __sm.log.fail "A subcommand to run must follow keyword '${_token}'"
         ;;
       (*)
         if [[ -z "${_name}" ]]
