@@ -1,0 +1,10 @@
+#!/bin/sh
+
+uri() { uris "$@" ; }
+
+uris() {
+  # TODO: get
+  # TODO: migrate 'fetch_uri' into this API
+  NIY
+}
+
