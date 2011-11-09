@@ -39,117 +39,103 @@ array()
 {
   trace_filter array || set -o xtrace
 
-  typeset _command _subcommand _name _variable _element _separator
+  typeset _token _command _subcommand _name _variable _elements _separator \
+    _prefix _suffix
 
-  _command="$1"
-  (( $# )) && shift || __sm.log.fail "Array command must be given as the first parameter."
+  typeset -a __commands
+
+  __commands=(
+    "is empty"
+    "is nonempty"
+    "is even"
+    "sort asc"
+    "sort desc"
+    "sort=sort asc"
+  )
+
+  if __sm.command.detect "$*" "${__commands[@]}"
+  then
+    _command="${__sm_command_dotted}"
+    shift "${__sm_command_words}"
+  else
+    __sm.log.fail "Array command not given: array <command> [options]..."
+  fi
+
+  _elements=()
+
+  while (( $# ))
+  do
+    _token="$1" && shift
+    case "${_token}" in
+      (name)
+        _name="$1"
+        (( $# )) && shift || __sm.log.fail "Array name missing:  array unshift {name} [{variable}]"
+        ;;
+      (separator)
+        _separator="$1"
+        (( $# )) && shift || __sm.log.fail "A string separator must follow keyword 'separator'"
+        ;;
+      (prefix)
+        _prefix="$1"
+        (( $# )) && shift || __sm.log.fail "A string prefix must follow keyword 'prefix'"
+        ;;
+      (variable)
+        _variable="$1"
+        (( $# )) && shift || __sm.log.fail "A variable name must follow keyword 'variable'"
+        ;;
+      (suffix)
+        _suffix="$1"
+        (( $# )) && shift || __sm.log.fail "A string suffix must follow keyword 'suffix'"
+        ;;
+      (run)
+        _subcommand="$1"
+        (( $# )) && shift || __sm.log.fail "A subcommand to run must follow keyword 'run'"
+        ;;
+      (each)
+        if [[ "$1" == "as" ]]
+        then
+          _variable="$2"
+          shift 2 || __sm.log.fail "A variable name must follow keyword 'as'"
+        fi
+        _subcommand="$1" && shift || __sm.log.fail "Command to run was not given to each."
+        ;;
+      (*)
+        if [[ -z "${_name}" ]]
+        then
+          _name="${_token}"
+        else
+          _elements+=("${_token}")
+        fi
+        ;;
+    esac
+  done
+
+  if [[ -z "${_name}"  && "${_command}" != "start" ]]
+  then
+   __sm.log.fail "Array name missing:  array ${_command} {name}"
+  fi
 
   case "${_command}" in
-    (is)
-      _subcommand="$1" _name="$2"
-      (( $# >= 2 )) && shift 2 || __sm.log.fail "subcommand and array name missing;"\
-        " array is <empty,nonempty,even> {name}"
-      case "${_subcommand}" in
-        (empty)
-          __sm.array.is.empty "${_name}"
-          ;;
-        (nonempty)
-          __sm.array.is.nonempty "${_name}"
-          ;;
-        (even)
-          __sm.array.is.even "${_name}"
-          ;;
-        (*)
-          __sm.log.fail "Unknown '${_subcommand}'; array is <empty,nonempty,even> {name}"
-          ;;
-      esac
+    (is*|sort*|length|last|first|largest|unique|pop|shift)
+      __sm.array.${_command} "${_name}" "${_variable}"
       ;;
-    (length)
-      _name="$1"
-      (( $# )) && shift || __sm.log.fail "Array name missing:  array length {name}"
-      __sm.array.length "${_name}"
+    (push|append|unshift)
+      __sm.array.${_command} "${_name}" "${_elements[@]}"
       ;;
-    (last)
-      _name="$1"
-      (( $# )) && shift || __sm.log.fail "Array name missing:  array last {name}"
-      __sm.array.last "${_name}"
+    (join|print)
+      __sm.array.join "${_name}" "${_separator}" "${_prefix}" "${_suffix}"
       ;;
-    (first)
-      _name="$1"
-      (( $# )) && shift || __sm.log.fail "Array name missing:  array first {name}"
-      __sm.array.first "${_name}"
-      ;;
-    (push)
-      _name="$1" _element="$2"
-      (( $# >= 2 )) && shift 2 || __sm.log.fail "Array name or element missing:"\
-        " array push {name} {element}"
-      __sm.array.push "${_name}" "${_element}"
-      ;;
-    (pop)
-      _name="$1" _variable="${2:-}"
-      (( $# )) && shift || __sm.log.fail "Array name missing:  array pop {name} [{variable}]"
-      __sm.array.pop "${_name}" "${_variable}"
-      ;;
-    (append)
-      _name="$1" _element="$2"
-      (( $# >= 2 )) && shift 2 || __sm.log.fail "Array name or element missing:"\
-        " array append {name} {element}"
-      __sm.array.append "${_name}" "${_element}"
-      ;;
-    (shift)
-      _name="$1" _variable="${2:-}"
-      (( $# )) && shift || __sm.log.fail "Array name missing:  array shift {name} [{variable}]"
-      __sm.array.shift "${_name}" "${_variable}"
-      ;;
-    (unshift)
-      _name="$1"
-      (( $# )) && shift || __sm.log.fail "Array name missing:  array unshift {name} [{variable}]"
-      __sm.array.unshift "${_name}" "${_variable}"
-      ;;
-    (join)
-      _name="$1" _separator="${2:-' '}"
-      (( $# )) && shift || __sm.log.fail "Array name missing:  array join {name} [separator]"
-      __sm.array.join "${_name}" "${_separator}"
-      ;;
-    (largest)
-      _name="$1"
-      (( $# )) && shift || __sm.log.fail "Array name missing:  array largest {name}"
-      __sm.array.largest "${_name}"
-      ;;
-    (sort)
-      _subcommand="$1" _name="$2"
-      (( $# >= 2 )) && shift 2 || __sm.log.fail "sort direction and array name missing;"\
-        " array sort <desc,asc> {name}."
-      __sm.array.sort "${_name}" "${_subcommand}"
-      ;;
-    (unique)
-      _name="$1"
-      (( $# )) && shift || __sm.log.fail "Array name missing:  array unique {name}."
-      __sm.array.unique "${_name}"
+    (each)
+      __sm.array.${_command} "${_name}" "${_subcommand}" "${_variable:-}"
       ;;
     (start)
       echo ${__sm_array_start}
-      ;;
-    (print)
-      __sm.array.join "${_name}" " "
-      ;;
-    (each)
-      _name="$1"
-      (( $# )) && shift || __sm.log.fail "Array name missing:  array unique {name}."
-
-      if [[ "$1" == "as" ]]
-      then
-        _variable="$2"
-        shift 2 || __sm.log.fail "A variable name must follow keyword 'as'"
-      fi
-
-      _subcommand="$1" && shift || __sm.log.fail "Command to run was not given to each."
-
-      __sm.array.each "${_name}" "${_subcommand}" "${_variable:-}"
       ;;
     (*)
       __sm.log.fail "Unknown array command '${_command}'"
       ;;
   esac
+
+
 }
 

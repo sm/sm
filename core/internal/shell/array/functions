@@ -38,29 +38,22 @@ __sm.array.first()
 
 __sm.array.push()
 {
-  typeset _name
-  _name="${1}"
-  shift
-  if eval "(( \${#${_name}} > 0 ))"
-  then
-    (( $# )) || __sm.log.fail "No elements were given."
+  typeset _name _element
+  _name="${1}" && shift
+  (( $# )) || __sm.log.fail "No elements were given."
 
-    typeset _element
-    for _element in "$@"
-    do
-      eval "${_name}+=(\"\${_element}\")"
-    done
-  fi
+  for _element in "$@"
+  do
+    eval "${_name}+=(\"\${_element}\")"
+  done
 }
 
 __sm.array.append()
 {
-  typeset _name
-  _name="${1}"
-  shift
+  typeset _name _element
+  _name="${1}" && shift
   (( $# )) || __sm.log.fail "No elements were given."
 
-  typeset _element
   for _element in "$@"
   do
     eval "${_name}+=(\"\${_element}\")"
@@ -70,15 +63,17 @@ __sm.array.append()
 __sm.array.pop()
 {
   typeset _name _variable index
+
   _name="${1}"
   _variable="${2:-}"
-  (( $# )) && shift || __sm.log.fail "Array name was not given."
 
   eval "(( \${#${_name}[@]} ))" || __sm.log.fail "Array '${_name}' was empty."
 
   if [[ -n "${_variable}" ]]
   then
     eval "${_variable}=\${${_name}[-1]}"
+  else
+    eval "echo \${${_name}[-1]}"
   fi
 
   eval "${_name}=( \"\${${_name}[1,-2]}\" ) "
@@ -89,33 +84,47 @@ __sm.array.shift()
   typeset _name index _variable
   _name="${1:-}"
   _variable="${2:-}"
-  (( $# )) && shift || __sm.log.fail "Array name was not given."
 
-  [[ -z "${_variable}" ]] || eval "${_variable}=\${${_name}[${__sm_array_start}]}"
+  if [[ -n "${_variable}" ]]
+  then
+    eval "${_variable}=\${${_name}[${__sm_array_start}]}"
+  else
+    eval "echo \${${_name}[${__sm_array_start}]}"
+  fi
 
-  eval "${_name}=( \"\${${_name}[2,-1]}\" ) "
+  eval "${_name}=( \${${_name}[2,-1]} )"
 }
 
 __sm.array.unshift()
 {
-  typeset _name
-  _name="${1:-}"
-  (( $# )) && shift || __sm.log.fail "Array name was given."
-
-  typeset _elements=("$@")
-
+  typeset _name _elements
+  _name="${1}" && shift
   (( $# )) || __sm.log.fail "No elements were given."
+  _elements=("$@")
 
   eval "${_name}=(\"$@\" \"\${${_name}[@]}\")"
 }
 
 __sm.array.join()
 {
-  typeset _name IFS
+  typeset _name _separator _element _size _prefix _suffix
+
   _name="${1:-}"
-  (( $# )) && shift || __sm.log.fail "Array name was not given."
-  IFS=${1:-' '}
-  eval "printf \"\${${_name}[*]}\""
+  _separator="${2:- }"
+  _prefix="${3:-}"
+  _suffix="${4:-}"
+
+  eval "
+  _size=\${#${_name}[@]}
+  if [[ -n "\${_prefix}" ]] ; then printf \"\${_prefix}\" ; fi
+  for (( _index=1 ; _index <= _size ; ))
+  do
+    printf \"\${${_name}[\${_index}]}\"
+    if (( _index++ < _size )) ; then printf \"\${_separator}\" ; fi
+  done
+
+  if [[ -n "\${_suffix}" ]] ; then printf \"\${_suffix}\" ; fi
+  "
 }
 
 __sm.array.largest()
@@ -137,12 +146,24 @@ __sm.array.largest()
   printf "%s" "${_largest}"
 }
 
+__sm.array.sort.desc()
+{
+  __sm.array.sort "desc" "$@"
+}
+
+__sm.array.sort.asc()
+{
+  __sm.array.sort "asc" "$@"
+}
+
 __sm.array.sort()
 {
-  typeset _name _direction _index _largest
-  _name="$1"
-  _direction="${2:-"asc"}"
+  typeset _direction _name _index _largest
+
+  _direction="$1" # Either 'asc' or 'desc'
+  _name="$2"
   _largest=""
+
   if [[ "${_direction}" == "asc" ]]
   then
     _direction=o
