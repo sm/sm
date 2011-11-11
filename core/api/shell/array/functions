@@ -40,7 +40,7 @@ array()
   trace_filter array || set -o xtrace
 
   typeset _token _command _subcommand _name _variable _elements _separator \
-    _prefix _suffix
+    _prefix _suffix _index
 
   typeset -a __commands
 
@@ -62,11 +62,18 @@ array()
   fi
 
   _elements=()
+  _index=0
 
   while (( $# ))
   do
     _token="$1" && shift
     case "${_token}" in
+      (index)
+        _index=1
+        ;;
+      (element)
+        _index=0
+        ;;
       (name)
         _name="$1"
         (( $# )) && shift || __sm.log.fail "Array name missing:  array unshift {name} [{variable}]"
@@ -108,7 +115,10 @@ array()
   fi
 
   case "${_command}" in
-    (is*|sort*|length|last|first|largest|unique|pop|shift)
+    (first|last)
+      __sm.array.${_command} "${_name}" "${_variable}" "${_index}"
+      ;;
+    (is*|sort*|length|largest|unique|pop|shift)
       __sm.array.${_command} "${_name}" "${_variable}"
       ;;
     (push|append|unshift)

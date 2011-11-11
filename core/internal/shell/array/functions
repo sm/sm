@@ -24,16 +24,52 @@ __sm.array.length()
 
 __sm.array.last()
 {
-  typeset _element
-  eval "_element=\"\${$1[-1]}\""
-  printf "${_element}"
+  typeset _element _name _variable _index
+  _name="$1"
+  _variable="$2"
+  _index="$3"
+
+  if (( _index ))
+  then
+    if [[ -n "${_variable}" ]]
+    then
+      eval "${_variable}=\${#${_name}}"
+    else
+      eval "echo \"\${#${_name}}\""
+    fi
+  else
+    if [[ -n "${_variable}" ]]
+    then
+      eval "${_variable}=\${${_name}[-1]}"
+    else
+      eval "echo \"\${${_name}[-1]}\""
+    fi
+  fi
 }
 
 __sm.array.first()
 {
-  typeset _element
-  eval "_element=\"\${$1[1]}\""
-  printf "${_element}"
+  typeset _element _name _variable _index
+  _name="$1"
+  _variable="$2"
+  _index="$3"
+
+  if (( _index ))
+  then
+    if [[ -n "${_variable}" ]]
+    then
+      eval "${_variable}=${__sm_array_start}"
+    else
+      echo ${__sm_array_start}
+    fi
+  else
+    if [[ -n "${_variable}" ]]
+    then
+      eval "${_variable}=\${${_name}[${__sm_array_start}]}"
+    else
+      eval "echo \"\${${_name}[${__sm_array_start}]}\""
+    fi
+  fi
 }
 
 __sm.array.push()
