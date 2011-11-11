@@ -148,7 +148,8 @@ __sm.user.add()
         groupadd -f "$_group"
       fi
 
-      useradd -s /bin/bash -d "${_home:-"/home/${_user}"}" -g "${_group}" "${_user}" #TODO: add system users only !
+      useradd -s /bin/bash -d "${_home:-"/home/${_user}"}" -g "${_group}" \
+        "${_user}"
     ;;
 
     "Darwin")

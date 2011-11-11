@@ -87,7 +87,7 @@ array()
         _suffix="$1"
         (( $# )) && shift || __sm.log.fail "A string suffix must follow keyword 'suffix'"
         ;;
-      (run|do|exec)
+      (run|do)
         _subcommand="$1"
         (( $# )) && shift || __sm.log.fail "A subcommand to run must follow keyword '${_token}'"
         ;;

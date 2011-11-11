@@ -160,3 +160,34 @@ __sm.templates.update()
 
   rm "${_variables}"
 }
+
+
+# template diff {name}
+# Identical to install except that instead of doing the install it will check the files for differences.
+# 0 - identical
+# 1 - difference ; show diff changes as well
+#
+# template diff \
+#   "${extension}/before_release" \
+#   to "${shared_path}/deploy/before_release" \
+#   mode 0755
+#
+__sm.templates.diff()
+{
+  __sm.templates.exists "${_name}" ||
+    __sm.log.fail "No template found matching '${_name}'."
+
+  _template="${template_path}"
+  _name="$(basename "${_name}")"
+
+  # Step 1. change the target,
+  # Step 2. do the actual install
+  # Step 3. then do diff of changed target vs actual
+  # Step 4. check mode,owner
+
+  # 1. file missing
+  # 2. Actual diff differences
+  # 3. different owner than specified (if specified)
+  # 4. different mode than specified (if specified)
+}
+

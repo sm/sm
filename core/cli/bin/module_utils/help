@@ -22,7 +22,7 @@ action "open" \
 action "functions" \
   "Prints out a summary listing of DSL functions, by module."
 
-resource "http://bdsm.beginrescueend.com/shell/"
+resource "http://sm.beginrescueend.com/shell/"
 
 show_help usage
 

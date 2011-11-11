@@ -1,12 +1,12 @@
 #!/bin/sh
-#TODO: update repository_url to "sm/bdsm"
+
 true \
   "${src_path:="${sm_path}/src"}" \
   "${md5_path:="${sm_path}/md5"}" \
   "${archives_path:="${sm_path}/archives"}" \
   "${archive_format:=tar.gz}" \
   "${package_name:=${extension}}" \
-  "${repository_url:="git://github.com/sm/bdsm"}"
+  "${repository_url:="git://github.com/sm/sm"}"
 
 [[ -n "$extensions_url" ]] || __sm.config.read sm defaults extensions_url
 [[ -n "$releases_url"   ]] || __sm.config.read sm defaults releases_url

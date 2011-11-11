@@ -66,7 +66,7 @@ variables()
       __sm.variables.${_command} "${_variables[@]}"
       ;;
     (must.be.empty|must.be.nonempty)
-      [[ -n "${_variables[*]}" ]] || __sm.log.error "No variable names given for validation"
+      (( ${#_variables[@]} )) || __sm.log.error "No variable names given for validation"
       [[ -n "${_type}" ]] || __sm.log.error "No message type given for validation"
       __sm.variables.${_command} "${_type}" "${_variables[@]}"
       ;;

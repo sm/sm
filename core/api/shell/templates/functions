@@ -81,6 +81,14 @@ templates()
         __sm.templates.seed "${_target}" "${_params[@]}"
       fi
       ;;
+    (diff)
+      # change the target, do the actual install then do diff.
+      __sm.templates.diff "${_name}" "${_owner}" "${_mode}" "" "" "" "${_params[@]}"
+      if (( ${#_params[@]} ))
+      then
+        __sm.templates.seed "${_target}" "${_params[@]}"
+      fi
+      ;;
     (exist|exists)
       __sm.templates.exists "${_name}" "${_params[@]}"
       ;;
