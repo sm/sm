@@ -163,7 +163,13 @@ __sm.service.start()
 
   if __sm.command.exists "${service}_start"
   then
-    __sm.log.step "Starting ${service}..." "${service}_start"
+    __sm.log.step "Starting ${service}..."
+    if "${service}_start"
+    then
+      __sm.log.step success
+    else
+      __sm.log.step failure
+    fi
   else
     __sm.service.init.start
   fi
@@ -178,7 +184,13 @@ __sm.service.stop()
 
   if __sm.command.exists "${service}_stop"
   then
-    __sm.log.step "Stopping ${service}..." "${service}_stop"
+    __sm.log.step "Stopping ${service}..."
+    if "${service}_stop"
+    then
+      __sm.log.step success
+    else
+      __sm.log.step failure
+    fi
   else
     __sm.service.init.stop
   fi
@@ -208,7 +220,13 @@ __sm.service.restart()
 
   if __sm.command.exists "${service}_restart"
   then
-    __sm.log.step "Restarting ${service}..." "${service}_restart"
+    __sm.log.step "Restarting ${service}..."
+    if "${service}_restart"
+    then
+      __sm.log.step success
+    else
+      __sm.log.step failure
+    fi
   else
     __sm.service.init.restart
   fi
@@ -218,7 +236,13 @@ __sm.service.init.restart()
 {
   if __sm.command.exists "${service}_restart"
   then
-    __sm.log.step "Restarting ${service}..." "${service}_restart"
+    __sm.log.step "Restarting ${service}..."
+    if "${service}_restart"
+    then
+      __sm.log.step success
+    else
+      __sm.log.step failure
+    fi
   else
     log "Restarting ${service}..."
     __sm.service.init.stop $@
@@ -461,7 +485,7 @@ __sm.service.init.start()
     user is root || _prefix="sudo"
     if ! ${_prefix} ${_command[*]}
     then
-      __sm.log.step fail
+      __sm.log.step failure
       __sm.log.error "${service} failed to start."
     fi
   else
@@ -472,10 +496,10 @@ __sm.service.init.start()
     then
       __sm.log.succeed "${service} successfully started."
     else
-      __sm.log.step fail
+      __sm.log.step failure
       log "${service} failed to start; check ${service_log_file} for details:"
       exec tail -n 50 "${service_log_file}"
-      error
+      __sm.log.error
     fi
   fi
   __sm.log.step success
@@ -493,7 +517,7 @@ __sm.service.init.stop()
     then
       rm -f "$service_pid_file"
     else
-      __sm.log.step fail
+      __sm.log.step failure
       return $?
     fi
   fi
