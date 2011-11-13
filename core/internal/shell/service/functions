@@ -686,11 +686,13 @@ __sm.service.deactivate()
 
       elif __sm.command.exists chkconfig
       then
-        chkconfig ${service} on
-
-      #elif __sm.command.exists svc
-      #then
-      #  svc ${service} on # TODO: daemontools start on boot
+        if file contains regex 'chkconfig' "/etc/init.d/${service}" &&  ! chkconfig ${service} on
+        then
+          log warn "'chkconfig ${service} on' did not work as expected, check the first six lines of /etc/init.d/${service}."
+        fi
+        # elif __sm.command.exists svc
+        # then
+        #   svc ${service} on # TODO: daemontools start on boot
 
       else # Fall back on rc.local to start redis at system startup.
         if files exist "/etc/rc.local"
@@ -744,7 +746,10 @@ __sm.service.activate()
 
           elif __sm.command.exists chkconfig
           then
-            chkconfig ${service} off
+            if file contains regex 'chkconfig' "/etc/init.d/${service}" &&  ! chkconfig ${service} off
+            then
+              log warn "'chkconfig ${service} off' did not work as expected, check the first six lines of /etc/init.d/${service}."
+            fi
 
             #elif __sm.command.exists svc
             #then
