@@ -166,10 +166,10 @@ __sm.extension.run()
         requires+=( "-r${__sm_modules_path}/ruby/core/${script}.rb" )
       done
 
-      "${binary:-ruby}" -I"${__sm_modules_path}/ruby" -I"${extension_modules_path}/ruby" \
+      exec "${binary:-ruby}" -I"${__sm_modules_path}/ruby" -I"${extension_modules_path}/ruby" \
         ${requires[@]} "${_path}/${action}"
       ;;
-    # python|lua|javascript)
+    # (python|lua|javascript)
       #   ADD "${__sm_modules_path}/${_type}/" to the lib path so the script can require "sm"
       #  "${_path}"
       #  ;;
@@ -179,7 +179,7 @@ __sm.extension.run()
       ;;
 
     (binary|*)
-      "${_path}/${action}" ${extension_action} "${extension_args[@]}"
+      exec "${_path}/${action}" ${extension_action} "${extension_args[@]}"
       ;;
   esac
 }
