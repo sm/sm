@@ -682,8 +682,10 @@ __sm.service.deactivate()
 
       elif __sm.command.exists rc-update
       then
-        rc-update add ${service} default
-
+        if ! rc-update add ${service} default
+        then
+          log warn "'rc-update ${service} add default' did not work as expected, check the first six lines of /etc/init.d/${service}."
+        fi
       elif __sm.command.exists chkconfig
       then
         if file contains regex 'chkconfig' "/etc/init.d/${service}" &&  ! chkconfig ${service} on
@@ -742,8 +744,10 @@ __sm.service.activate()
         then # Add service to system startup
           if __sm.command.exists rc-update
           then
-            rc-update remove ${service} default
-
+            if ! rc-update add ${service} default
+            then
+              log warn "'rc-update ${service} add default' did not work as expected, check the first six lines of /etc/init.d/${service}."
+            fi
           elif __sm.command.exists chkconfig
           then
             if file contains regex 'chkconfig' "/etc/init.d/${service}" &&  ! chkconfig ${service} off
