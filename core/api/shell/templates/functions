@@ -78,7 +78,7 @@ templates()
       __sm.templates.${_command} "${_name}" "${_params[@]}"
       if (( ${#_params[@]} ))
       then
-        __sm.templates.seed "${_target}" "${_params[@]}"
+        __sm.templates.seed "${_target}" "${_owner}" "${_mode}" "${_params[@]}"
       fi
       ;;
     (diff)
@@ -86,7 +86,7 @@ templates()
       __sm.templates.diff "${_name}" "${_owner}" "${_mode}" "" "" "" "${_params[@]}"
       if (( ${#_params[@]} ))
       then
-        __sm.templates.seed "${_target}" "${_params[@]}"
+        __sm.templates.seed "${_target}" "${_owner}" "${_mode}" "${_params[@]}"
       fi
       ;;
     (exist|exists)

@@ -76,9 +76,11 @@ __sm.templates.install()
 
 __sm.templates.seed()
 {
-  typeset _template _hash _strings temporary
-  _template="${1:-}"
-  (( $# )) && shift || __sm.log.fail "No template name was given."
+  typeset _template _owner _mode _hash _strings temporary
+  _template="${1}"
+  _owner="${2}"
+  _mode="${3}"
+  shift 3
   _hash=("$@")
   _strings=()
   temporary=${_template}.${timestamp}.$$
@@ -117,7 +119,10 @@ __sm.templates.seed()
 
   file move \
     from "${temporary}" \
-    to "${_template}"
+    to "${_template}" \
+    mode "${_mode}" \
+    owner "${_owner}"
+
 }
 
 __sm.templates.update()
