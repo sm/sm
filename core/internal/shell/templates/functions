@@ -122,7 +122,6 @@ __sm.templates.seed()
     to "${_template}" \
     mode "${_mode}" \
     owner "${_owner}"
-
 }
 
 __sm.templates.update()

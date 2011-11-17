@@ -92,7 +92,10 @@ templates()
     (exist|exists)
       __sm.templates.exists "${_name}" "${_params[@]}"
       ;;
-    (seed|update)
+    (seed)
+      __sm.templates.seed "${_target}" "${_owner}" "${_mode}" "${_params[@]}"
+      ;;
+    (update)
       __sm.templates.${_command} "${_name}" "${_params[@]}"
       ;;
     (*)
