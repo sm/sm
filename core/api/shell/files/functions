@@ -157,21 +157,20 @@ files()
     esac
   done
 
-  if [[ -z "${_files[*]}" && -z "${_path}" ]]
-  then
-    __sm.log.fail "No files and/or paths were given to use."
-  fi
-
   case "${_command}" in
     (contain|containing|contains)
       [[ -n "${_string}" ]] || [[ -n "${_regex}" ]] ||
         __sm.log.fail "regexp or string must be given for 'files ${_command}'."
+      [[ -n "${_files}" ]] || __sm.log.fail "files must be given for 'files ${_command}'."
+
       if __sm.files.${_command%s} "${_string}" "${_regex}" "${_files[@]}"
       then return 0 ; else return 1 ; fi
       ;;
     (replace)
       [[ -n "${_string}" ]] || __sm.log.fail "string must be given for 'files ${_command}'."
       [[ -n "${_regex}" ]] || __sm.log.fail "regexp must be given for 'files ${_command}'."
+      [[ -n "${_files}" ]] || __sm.log.fail "files must be given for 'files ${_command}'."
+
       if __sm.files.${_command} "${_string}" "${_regex}" "${_files[@]}"
       then return 0 ; else return 1 ; fi
       ;;
