@@ -105,5 +105,6 @@ install_sm_scm()
 
   chmod 0755 ${PWD}/install ${PWD}/bin/*
 
-  exec bash ${PWD}/install --trace="$trace_flags" --debug="$debug_flags"
+  exec bash ${PWD}/install \
+    --trace="${trace_flags}" --debug="${debug_flags}" --verbose="${verbose_flag}"
 }

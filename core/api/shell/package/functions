@@ -158,8 +158,7 @@ package()
       __sm.package.${_command} "${package_name}" "${package_version}"
       ;;
     (initialize)
-      declare -a package_dependencies
-      declare -a configure_flags
+      typeset -a package_dependencies configure_flags
       __sm.package.init
       ;;
     (error)

@@ -3,14 +3,18 @@
 set +o nounset
 set +o noclobber
 
-: ${debug_flags:="-search"} ${debug_flag:=0} ${trace_flags:="-search -backtrace"} ${trace_flag:=0} ${var_debug_type_flag:="long"}
-declare -a var_debug_flags trace_functions
+: \
+  ${debug_flags:="-search"} ${debug_flag:=0} \
+  ${trace_flags:="-search -backtrace"} ${trace_flag:=0} \
+  ${verbose_flag:=0} \
+  ${var_debug_type_flag:="long"}
+
+typeset -a var_debug_flags trace_functions trace_flags
 
 while (( $# > 0 ))
 do
   token="$1"
   case "$token" in
-
     (--help)
       shift #end of processing
       extension_args=("cli" "help" "$@")
@@ -33,6 +37,10 @@ do
 
     (--fun-trace=*)
       trace_functions+=( ${=token##--fun-trace\=} )
+      ;;
+
+    (--verbose)
+      verbose_flag=1
       ;;
 
     (--debug)
@@ -96,6 +104,7 @@ then
 fi
 
 PS4="+%x:%I %N():%i > "
+
 export PS4
 
 if [[ " ${trace_flags} " =~ " all " ]]
@@ -107,4 +116,6 @@ fi
 debug_flags="${debug_flags## }"
 trace_flags="${trace_flags## }"
 
-export debug_flag debug_flags trace_flag trace_flags extension_args sm_script var_debug_flags var_debug_type_flag
+export debug_flag debug_flags trace_flag trace_flags verbose_flag extension_args \
+  sm_script var_debug_flags var_debug_type_flag
+

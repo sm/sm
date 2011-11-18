@@ -442,7 +442,10 @@ __sm.actions.source()
   script="$1"
   (( $# )) && shift || __sm.log.fail "No script was given as the first parameter."
   [[ -r "$script" ]] || __sm.log.fail "Could not find script to run: $script."
+  if (( verbose_flag )) ; then PS4="> "; fi # Yes this is done before the xtrace
   trace_filter action || set -o xtrace
+  if (( verbose_flag )) ; then set -v ; fi
+
   source "$script"
 }
 
