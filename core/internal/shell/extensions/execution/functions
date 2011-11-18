@@ -3,7 +3,7 @@
 __sm.extension.actions.type()
 {
   typeset -g action_type
-  typeset _path _path_type extension
+  typeset _path _path_type extension shebang
   _path="${action_path:-}"
 
   case "${action}" in
@@ -32,7 +32,7 @@ __sm.extension.actions.type()
           #rb) action_type="ruby"   ;;
           ;;
         (*)
-          read -r shebang < "${_path}"
+          read -r shebang < "${_path}/${action}"
 
           case "${shebang}" in
             *ruby|*rbx|*jruby|*macruby)
@@ -40,12 +40,31 @@ __sm.extension.actions.type()
               binary="${binary##* }"
               action_type="ruby"
               ;;
-            (*)
-              if [[ -x "${_path}" ]] ; then
+            (\#!/*/env *)
+              shebang="${shebang#\#!}"
+              shebang="${shebang#* }" #search for the binary to env to
+              if [[ -x "${_path}/${action}" && -x "$( which ${shebang} 2>/dev/null || true )" ]]
+              then
                 action_type="binary"
               else
-                action_type="not executable"
+                debug search "can not find shebang '${shebang}'"
+                action_type="noexec"
               fi
+              ;;
+            (\#!/*)
+              shebang="${shebang#\#!}"
+              shebang="${shebang% *}"
+              if [[ -x "${_path}/${action}" && -x "${shebang}" ]]
+              then
+                action_type="binary"
+              else
+                debug search "can not find shebang '${shebang}'"
+                action_type="noexec"
+              fi
+              ;;
+            (*)
+              debug search "can not find shebang '${shebang}'"
+              action_type="dne"
               ;;
           esac
           ;;
@@ -54,14 +73,16 @@ __sm.extension.actions.type()
       ;;
 
     (cannot[[:space:]]open)
+      debug search "'${_path_type}' file '${_path}/${action}'"
       action_type="dne"
       ;;
 
     (*)
-      if [[ -x "${_path}" ]]
+      if [[ -x "${_path}/${action}" ]]
       then
         action_type="binary"
       else
+        debug search "not executable file '${_path}/${action}'"
         action_type="noexec"
       fi
       ;;
