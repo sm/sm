@@ -157,6 +157,11 @@ files()
     esac
   done
 
+  if [[ -z "${_files[*]}" && -z "${_path}" ]]
+  then
+    __sm.log.fail "No files and/or paths were given to use."
+  fi
+
   case "${_command}" in
     (contain|containing|contains)
       [[ -n "${_string}" ]] || [[ -n "${_regex}" ]] ||
