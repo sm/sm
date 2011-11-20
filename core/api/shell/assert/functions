@@ -1,0 +1,84 @@
+#!/bin/sh
+
+assert()
+{
+  trace_filter array || set -o xtrace
+
+  typeset _token _type _matcher _code _string _match _name
+
+  typeset -a __commands _params
+
+  _type="$1" && shift || __sm.log.fail "An assertion type must follow keyword 'assert'"
+
+  __commands=(
+    "is equal to=equals"
+    "is not equal to=not equal"
+    "is empty"
+    "is nonempty"
+  )
+
+  if __sm.command.detect "$*" "${__commands[@]}"
+  then
+    _matcher="${__sm_command_dotted}"
+    shift "${__sm_command_words}"
+  else
+    __sm.log.fail "Array command not given: array <command> [options]..."
+  fi
+
+  _params=()
+  _index=0
+
+  while (( $# ))
+  do
+    _token="$1" && shift
+    case "${_token}" in
+      (code)
+        _code="${1}" && shift ||
+          __sm.log.fail "A string containing code to run must follow keyword 'code'."
+      (*)
+        _params+=("${_token}")
+        ;;
+    esac
+  done
+
+  if [[ -z "${_type}" ]]
+  then
+    __sm.log.fail "keyword 'assert' must be followed by an assertion type {variable,array,string,function,file,stdout,stderr}"
+  elif [[ -z "${_matcher}" ]]
+  then
+    __sm.log.fail "'assert ${_type}' must be followed by a matcher." ]]
+  fi
+
+  case "${_type}" in
+    (variable|array|file)
+      _name="$1" && shift ||
+        __sm.log.fail "A ${_type} name must follow keyword '${_type}'"
+      eval "_string=\"\${${_name}}\""
+      ;;
+    (string)
+      _string="$1" && shift ||
+        __sm.log.fail "A string must follow keyword 'string'"
+      ;;
+    (file)
+      _name="$1" && shift ||
+        __sm.log.fail "An array name must follow keyword 'array'"
+      [[ -n "${_code}" ]] ||
+        __sm.log.fail "Code to run must be given for 'assert ${_type}', use: code '{{code}}'"
+      ;;
+    (stdout|stderr)
+      [[ -n "${_code}" ]] ||
+        __sm.log.fail "Code to run must be given for 'assert ${_type}', use: code '{{code}}'"
+      ;;
+    (function)
+      _name="$1" && shift ||
+        __sm.log.fail "A function name must follow keyword 'function'"
+      ;;
+    (*)
+      __sm.log.fail "Unknown assertion type '${_type}'"
+      ;;
+  esac
+
+  # type(s): matchers
+  # variable|array|string: equals, length, contains, matches, is.empty, is.nonempty
+}
+

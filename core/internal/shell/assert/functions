@@ -1,0 +1,41 @@
+#!/bin/sh
+
+__sm.assert.string.matcher() {
+  case "${_matcher}" in
+    (equals|length|contains|matches|is.empty|is.nonempty)
+      __sm.array.${_command} "${_string}" "${_match}"
+      ;;
+    (*)
+      __sm.log.fail "Unknown assert matcher '${_command}' for assertion type '${_type}'"
+      ;;
+  esac
+}
+
+__sm.assert.equals() {
+  [[ "${1}" == "${2}" ]] # _string == _match
+}
+
+__sm.assert.not.equal() {
+  [[ "${1}" != "${2}" ]] # _string != _match
+}
+
+__sm.assert.is.empty() {
+  [[ -z "${1}" ]]
+}
+
+__sm.assert.length.equals() {
+  (( "${1}" == ${#2} )) # _length == length of given _string
+}
+
+__sm.assert.is.nonempty() {
+  [[ -n "${1}" ]]
+}
+
+__sm.assert.contains() {
+  [[ " $1 " =~ " $2 " ]] # _string =~ _match
+}
+
+__sm.assert.matches() {
+  [[ " $1 " =~ " $2 " ]] # _string =~ _match
+}
+
