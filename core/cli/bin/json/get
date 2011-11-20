@@ -1,0 +1,63 @@
+#!/usr/bin/env perl
+
+BEGIN{ push @INC, $ENV{'sm_path'}."/core/internal/perl"; }
+
+use JSON -support_by_pp; # http://search.cpan.org/~makamaka/JSON-2.53/lib/JSON.pm
+
+sub fail { print STDERR join(" ", @_)."\n"; exit 1; }
+
+my $path = shift @ARGV;
+if (! $path) {
+  fail "ERROR: A json path to extract must be given as the first argument\nexample: 'system/hostname'."
+}
+
+my $json_file = shift @ARGV;
+if ( ! $json_file ) {
+  fail "ERROR: A json file must be given as the second argument."
+} elsif( ! -e $json_file ) {
+  fail "ERROR: The json file $json_file does not exist!"
+}
+
+open(my $json_file_handle, '<', $json_file);
+$json_string = join("", <$json_file_handle>);
+close($json_file_handle);
+
+my $json_object = new JSON;
+my $json = $json_object->allow_nonref->utf8->relaxed->escape_slash->loose->allow_singlequote->allow_barekey->decode($json_string);
+
+@_ = split("/", $path);
+my $key       = pop(@_);
+my $namespace = join("/", @_);
+my $hash      = $json;
+my $subhash   = {};
+
+if($namespace) {
+  foreach(split("/", $namespace)) {
+    if(! $hash->{$_}) {
+      exit 0 # No value.
+    } elsif(exists $hash->{$_}) {
+      # TODO: Question: Proper way to reassign the hash to it's subhash, this
+      # works however I am not sure if there is an easier one liner that does
+      # not involve a 2nd variable (subhash).
+      $subhash = $hash->{$_};
+      $hash = $subhash; # reassign the hash to the value of the current key (namespace).
+    } else {
+      fail "ERROR: Namespace ${namespace} missing under path '".join("/", $path)."'";
+    }
+  }
+}
+
+my $reference = \$hash->{$key};
+
+if (ref($reference) eq "SCALAR") {
+  printf "%s\n", $hash->{$key};
+} elsif (ref($reference) eq "ARRAY") {
+  print STDOUT join("", $hash->{$key}); # TODO: Think this out a bit more.
+} elsif (ref($hash->{$key}) eq "HASH") {
+  # This allows for namespace querying to reflect on available keys.
+  printf "%s\n", join(" ",keys(%{$hash->{$key}}));
+} else {
+  fail "ERROR: Key '$key' missing under namespace '$namespace' missing for path '".join("/",@path)."'.";
+}
+
+exit 0; # Success!!!

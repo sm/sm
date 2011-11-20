@@ -1,0 +1,23 @@
+#!/bin/sh
+
+json()
+{
+  trace_filter "json" || set -o xtrace
+
+  typeset _token
+
+  _token="$1" && shift || log fail "Usage: json get '{path}'"
+  case "${_token}" in
+    (get)
+      __sm.json.get "$@"
+      ;;
+    (set)
+      __sm.json.set "$@"
+      ;;
+    (*)
+      log error "Unrecognized command: json ${_token}"
+      ;;
+  esac
+}
+
+
