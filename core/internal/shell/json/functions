@@ -2,21 +2,11 @@
 
 __sm.json.get()
 {
-  typeset _type _path _default _variable
+  typeset _type _path _default _variable _file
   typeset -a _params
-
   _params=("$@")
 
-  if array is empty _params
-  then
-    log fail "json: No parameters given to json api."
-  elif ! array is even _params
-  then
-    log fail "json: An even number of parameters must be passed in, do you have a value for every key?"
-  fi
-
   # TODO: support 'as {variable name}'
-
   while array is nonempty _params
   do
     array shift _params variable _type

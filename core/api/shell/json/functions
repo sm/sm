@@ -4,20 +4,43 @@ json()
 {
   trace_filter "json" || set -o xtrace
 
-  typeset _token
+  typeset _token _command
+  typeset -a _params
+  _params=()
 
   _token="$1" && shift || log fail "Usage: json get '{path}'"
   case "${_token}" in
-    (get)
-      __sm.json.get "$@"
+    (get|set)
+      _command="${_token}"
       ;;
-    (set)
-      __sm.json.set "$@"
+    (from)
+      __sm_json_file="${1}" && shift ||
+        __sm.log.fail "a json file path/name must follow keyword 'from'"
       ;;
     (*)
-      log error "Unrecognized command: json ${_token}"
+      if [[ -z "${_command}" ]]
+      then
+        __sm.log.fail "Unrecognized command: json ${_token}"
+      else
+        _params+=("$1")
+      fi
       ;;
   esac
-}
 
+  if [[ -z "${_file}" ]]
+  then
+    __sm.log.fail "A file name must be given to ${_command} json: 'json ${_command} from {file name}'."
+  elif [[ "${_command}" == "get" && ! -s "${_file}" ]]
+  then
+    __sm.log.fail "The json file given '${_file}' to get values from must be nonempty."
+  elif array is empty _params
+  then
+    __sm.log.fail "json: No parameters given to json api."
+  elif ! array is even _params
+  then
+    __sm.log.fail "json: An even number of parameters must be passed in, do you have a value for every key?"
+  fi
+
+  __sm.json.${_command} "${_file}" "${_params[@]}"
+}
 
