@@ -4,35 +4,45 @@ json()
 {
   trace_filter "json" || set -o xtrace
 
-  typeset _token _command
+  typeset _token _command _json_file
   typeset -a _params
+
+  _command="$1" && shift ||
+    __sm.log.fail "Usage: json {get|set} from file '{file}' ..."
+
   _params=()
 
-  _token="$1" && shift || log fail "Usage: json get '{path}'"
-  case "${_token}" in
-    (get|set)
-      _command="${_token}"
-      ;;
-    (from)
-      __sm_json_file="${1}" && shift ||
-        __sm.log.fail "a json file path/name must follow keyword 'from'"
-      ;;
-    (*)
-      if [[ -z "${_command}" ]]
-      then
-        __sm.log.fail "Unrecognized command: json ${_token}"
-      else
-        _params+=("$1")
-      fi
-      ;;
-  esac
+  while (( $# ))
+  do
+    _token="$1" && shift
+    case "${_token}" in
+      (get|read)
+        _command="get"
+        ;;
+      (set|write)
+        _command="set"
+        ;;
+      (from|to)
+        _json_file="${1}" && shift ||
+          __sm.log.fail "a json file path/name must follow keyword '${_token}'"
+        ;;
+      (*)
+        if [[ -z "${_command}" ]]
+        then
+          __sm.log.fail "Unrecognized command: json ${_token}"
+        else
+          _params+=("$1")
+        fi
+        ;;
+    esac
+  done
 
-  if [[ -z "${_file}" ]]
+  if [[ -z "${_json_file}" ]]
   then
     __sm.log.fail "A file name must be given to ${_command} json: 'json ${_command} from {file name}'."
-  elif [[ "${_command}" == "get" && ! -s "${_file}" ]]
+  elif [[ "${_command}" == "get" && ! -s "${_json_file}" ]]
   then
-    __sm.log.fail "The json file given '${_file}' to get values from must be nonempty."
+    __sm.log.fail "The json file given '${_json_file}' to get values from must be nonempty."
   elif array is empty _params
   then
     __sm.log.fail "json: No parameters given to json api."
@@ -41,6 +51,6 @@ json()
     __sm.log.fail "json: An even number of parameters must be passed in, do you have a value for every key?"
   fi
 
-  __sm.json.${_command} "${_file}" "${_params[@]}"
+  __sm.json.${_command} "${_json_file}" "${_params[@]}"
 }
 

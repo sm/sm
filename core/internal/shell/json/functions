@@ -2,8 +2,9 @@
 
 __sm.json.get()
 {
-  typeset _type _path _default _variable _file
+  typeset _type _path _default _variable _json_file
   typeset -a _params
+  _json_file="$1" && shift
   _params=("$@")
 
   # TODO: support 'as {variable name}'
@@ -24,7 +25,7 @@ __sm.json.get()
 
         typeset -g ${_variable} >/dev/null
 
-        if ! eval "${_variable}=$("${sm_path}/core/cli/bin/json/get" "${_path}" "${json_file}")"
+        if ! eval "${_variable}=$("${sm_path}/core/cli/bin/json/get" "${_path}" "${_json_file}")"
         then
           eval "${_variable}="
         fi
@@ -43,7 +44,7 @@ __sm.json.get()
 
         typeset -ga ${_variable} >/dev/null
 
-        if ! eval "${_variable}=($("${sm_path}/core/cli/bin/json/get" "${_path}" "${json_file}"))"
+        if ! eval "${_variable}=($("${sm_path}/core/cli/bin/json/get" "${_path}" "${_json_file}"))"
         then
           eval "${_variable}=()"
         fi
