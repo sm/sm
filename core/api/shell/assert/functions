@@ -14,7 +14,6 @@ assert()
     (variable|array|file)
       _name="$1" && shift ||
         __sm.log.fail "A ${_type} name must follow keyword '${_type}'"
-      eval "_string=\"\${${_name}}\""
       ;;
     (string)
       _string="$1" && shift ||
@@ -95,7 +94,11 @@ assert()
   fi
 
   case "${_type}" in
-    (variable|array|file|string)
+    (variable|array)
+      eval "_string=\"\${${_name}}\""
+      __sm.assert.string.matcher ${_matcher} "${_string}" "${_match}"
+      ;;
+    (string)
       __sm.assert.string.matcher ${_matcher} "${_string}" "${_match}"
       ;;
     (file)

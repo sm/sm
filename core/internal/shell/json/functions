@@ -8,11 +8,9 @@ __sm.json.get()
   # TODO: support 'as {variable name}'
   while (( $# ))
   do
-    shift
+    _type="$1" && shift
     _path="$1" && shift
-
     _variable="${_path//\//_}"
-
     case "${_type}" in
       (string)
         if [[ "$1" == "default" ]]
@@ -28,9 +26,9 @@ __sm.json.get()
           eval "${_variable}="
         fi
 
-        if variable is empty ${_variable} && variable is nonempty _default
+        if eval "[[ -z \"\${${_variable}}\" && -n \"${_default}\" ]]"
         then
-          eval "${_variable}=${_default}"
+          eval "${_variable}=\"${_default}\""
         fi
         ;;
       (array)
@@ -47,7 +45,7 @@ __sm.json.get()
           eval "${_variable}=()"
         fi
 
-        if variable is empty ${_variable} && variable is nonempty _default
+        if eval "[[ -z \"\${${_variable}}\" && -n \"${_default}\" ]]"
         then
           eval "${_variable}=(${_default})"
         fi
