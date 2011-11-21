@@ -1,0 +1,65 @@
+#!/bin/sh
+
+__sm.json.get()
+{
+  typeset _type _path _default _variable _json_file
+  typeset -a _params
+  _json_file="$1" && shift
+  _params=("$@")
+
+  # TODO: support 'as {variable name}'
+  while array is nonempty _params
+  do
+    array shift _params variable _type
+    array shift _params variable _path
+
+    _variable="${_path//\//_}"
+
+    case "${_type}" in
+      (string)
+        if [[ "$(array first _params)" == "default" ]]
+        then
+          array shift _params >/dev/null
+          array shift _params variable _default
+        fi
+
+        typeset -g ${_variable} >/dev/null
+
+        if ! eval "${_variable}=$("${sm_path}/core/cli/bin/json/get" "${_path}" "${_json_file}")"
+        then
+          eval "${_variable}="
+        fi
+
+        if variable is empty ${_variable} && variable is nonempty _default
+        then
+          eval "${_variable}=${_default}"
+        fi
+        ;;
+      (array)
+        if [[ "$(array first _params)" == "default" ]]
+        then
+          array shift _params >/dev/null
+          array shift _params variable _default
+        fi
+
+        typeset -ga ${_variable} >/dev/null
+
+        if ! eval "${_variable}=($("${sm_path}/core/cli/bin/json/get" "${_path}" "${_json_file}"))"
+        then
+          eval "${_variable}=()"
+        fi
+
+        if variable is empty ${_variable} && variable is nonempty _default
+        then
+          eval "${_variable}=(${_default})"
+        fi
+        ;;
+    esac
+  done
+}
+
+__sm.json.set()
+{
+  NIY
+}
+

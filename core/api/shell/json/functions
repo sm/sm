@@ -1,0 +1,56 @@
+#!/bin/sh
+
+json()
+{
+  trace_filter "json" || set -o xtrace
+
+  typeset _token _command _json_file
+  typeset -a _params
+
+  _command="$1" && shift ||
+    __sm.log.fail "Usage: json {get|set} from file '{file}' ..."
+
+  _params=()
+
+  while (( $# ))
+  do
+    _token="$1" && shift
+    case "${_token}" in
+      (get|read)
+        _command="get"
+        ;;
+      (set|write)
+        _command="set"
+        ;;
+      (from|to)
+        _json_file="${1}" && shift ||
+          __sm.log.fail "a json file path/name must follow keyword '${_token}'"
+        ;;
+      (*)
+        if [[ -z "${_command}" ]]
+        then
+          __sm.log.fail "Unrecognized command: json ${_token}"
+        else
+          _params+=("${_token}")
+        fi
+        ;;
+    esac
+  done
+
+  if [[ -z "${_json_file}" ]]
+  then
+    __sm.log.fail "A file name must be given to ${_command} json: 'json ${_command} from {file name}'."
+  elif [[ "${_command}" == "get" && ! -s "${_json_file}" ]]
+  then
+    __sm.log.fail "The json file given '${_json_file}' to get values from must be nonempty."
+  elif array is empty _params
+  then
+    __sm.log.fail "json: No parameters given to json api."
+  elif ! array is even _params
+  then
+    __sm.log.fail "json: An even number of parameters must be passed in, do you have a value for every key?"
+  fi
+
+  __sm.json.${_command} "${_json_file}" "${_params[@]}"
+}
+

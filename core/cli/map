@@ -89,3 +89,4 @@ dev/create=dev/create
 package=dev/package
 publish=dev/publish
 create=dev/create
+json/get=json/get
