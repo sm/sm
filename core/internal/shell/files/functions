@@ -91,7 +91,7 @@ __sm.files.create()
       continue # Already exists, move along.
     fi
     _path="${_file%\/*}"
-    paths create "${_path}"
+    __sm.paths.create "${_path}"
     touch "${_file}" || __sm.log.fail "Error creating the file '${_file}'; "\
       " touch command returned error code '$?'."
   done

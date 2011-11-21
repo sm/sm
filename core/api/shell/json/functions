@@ -2,7 +2,7 @@
 
 json()
 {
-  trace_filter "json" || set -o xtrace
+  trace_filter json || set -o xtrace
 
   typeset _token _command _json_file
   typeset -a _params
@@ -43,10 +43,10 @@ json()
   elif [[ "${_command}" == "get" && ! -s "${_json_file}" ]]
   then
     __sm.log.fail "The json file given '${_json_file}' to get values from must be nonempty."
-  elif array is empty _params
+  elif (( ${#_params} == 0 ))
   then
     __sm.log.fail "json: No parameters given to json api."
-  elif ! array is even _params
+  elif (( ( ${#_params} % 2 ) != 0 ))
   then
     __sm.log.fail "json: An even number of parameters must be passed in, do you have a value for every key?"
   fi

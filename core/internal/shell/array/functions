@@ -118,6 +118,7 @@ __sm.array.pop()
 __sm.array.shift()
 {
   typeset _name index _variable
+
   _name="${1:-}"
   _variable="${2:-}"
 
@@ -134,6 +135,7 @@ __sm.array.shift()
 __sm.array.unshift()
 {
   typeset _name _elements
+
   _name="${1}" && shift
   (( $# )) || __sm.log.fail "No elements were given."
   _elements=("$@")

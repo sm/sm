@@ -3,24 +3,22 @@
 __sm.json.get()
 {
   typeset _type _path _default _variable _json_file
-  typeset -a _params
   _json_file="$1" && shift
-  _params=("$@")
 
   # TODO: support 'as {variable name}'
-  while array is nonempty _params
+  while (( $# ))
   do
-    array shift _params variable _type
-    array shift _params variable _path
+    shift
+    _path="$1" && shift
 
     _variable="${_path//\//_}"
 
     case "${_type}" in
       (string)
-        if [[ "$(array first _params)" == "default" ]]
+        if [[ "$1" == "default" ]]
         then
-          array shift _params >/dev/null
-          array shift _params variable _default
+          shift
+          _default="$1" && shift
         fi
 
         typeset -g ${_variable} >/dev/null
@@ -36,10 +34,10 @@ __sm.json.get()
         fi
         ;;
       (array)
-        if [[ "$(array first _params)" == "default" ]]
+        if [[ "$1" == "default" ]]
         then
-          array shift _params >/dev/null
-          array shift _params variable _default
+          shift
+          _default="$1" && shift
         fi
 
         typeset -ga ${_variable} >/dev/null
