@@ -2,13 +2,42 @@
 
 assert()
 {
-  trace_filter array || set -o xtrace
+  trace_filter assert || set -o xtrace
 
-  typeset _token _type _matcher _code _string _match _name
+  typeset _token _type _matcher _code _string _match _name _index
 
   typeset -a __commands _params
 
   _type="$1" && shift || __sm.log.fail "An assertion type must follow keyword 'assert'"
+
+  case "${_type}" in
+    (variable|array|file)
+      _name="$1" && shift ||
+        __sm.log.fail "A ${_type} name must follow keyword '${_type}'"
+      eval "_string=\"\${${_name}}\""
+      ;;
+    (string)
+      _string="$1" && shift ||
+        __sm.log.fail "A string must follow keyword 'string'"
+      ;;
+    (file)
+      _name="$1" && shift ||
+        __sm.log.fail "An array name must follow keyword 'array'"
+      [[ -n "${_code}" ]] ||
+        __sm.log.fail "Code to run must be given for 'assert ${_type}', use: code '{{code}}'"
+      ;;
+    (function)
+      _name="$1" && shift ||
+        __sm.log.fail "A function name must follow keyword 'function'"
+      ;;
+    (stdout|stderr)
+      [[ -n "${_code}" ]] ||
+        __sm.log.fail "Code to run must be given for 'assert ${_type}', use: code '{{code}}'"
+      ;;
+    (*)
+      __sm.log.fail "Unknown assertion type '${_type}'"
+      ;;
+  esac
 
   __commands=(
     "is equal to=equals"
@@ -35,6 +64,7 @@ assert()
       (code)
         _code="${1}" && shift ||
           __sm.log.fail "A string containing code to run must follow keyword 'code'."
+        ;;
       (*)
         _params+=("${_token}")
         ;;
@@ -50,35 +80,18 @@ assert()
   fi
 
   case "${_type}" in
-    (variable|array|file)
-      _name="$1" && shift ||
-        __sm.log.fail "A ${_type} name must follow keyword '${_type}'"
-      eval "_string=\"\${${_name}}\""
-      ;;
-    (string)
-      _string="$1" && shift ||
-        __sm.log.fail "A string must follow keyword 'string'"
+    (variable|array|file|string)
+      __sm.assert.${_matcher} "${_string}"
       ;;
     (file)
-      _name="$1" && shift ||
-        __sm.log.fail "An array name must follow keyword 'array'"
-      [[ -n "${_code}" ]] ||
-        __sm.log.fail "Code to run must be given for 'assert ${_type}', use: code '{{code}}'"
-      ;;
-    (stdout|stderr)
-      [[ -n "${_code}" ]] ||
-        __sm.log.fail "Code to run must be given for 'assert ${_type}', use: code '{{code}}'"
+      NIY
       ;;
     (function)
-      _name="$1" && shift ||
-        __sm.log.fail "A function name must follow keyword 'function'"
+      NIY
       ;;
-    (*)
-      __sm.log.fail "Unknown assertion type '${_type}'"
+    (stdout|stderr)
+      NIY
       ;;
   esac
-
-  # type(s): matchers
-  # variable|array|string: equals, length, contains, matches, is.empty, is.nonempty
 }
 
