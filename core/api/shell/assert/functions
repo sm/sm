@@ -90,10 +90,8 @@ assert()
     __sm.files.create "/tmp/sm/assert/$$/stdout.log" "/tmp/sm/assert/$$/stderr.log"
     if ! $(echo ${_code}) > "/tmp/sm/assert/$$/stdout.log" 2> "/tmp/sm/assert/$$/stderr.log"
     then
-    set +x
       return 1
     fi
-    set +x
   fi
 
   case "${_type}" in
