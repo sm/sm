@@ -31,7 +31,7 @@ json()
         then
           __sm.log.fail "Unrecognized command: json ${_token}"
         else
-          _params+=("$1")
+          _params+=("${_token}")
         fi
         ;;
     esac
