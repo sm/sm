@@ -10,14 +10,26 @@ __sm.json.get()
   do
     _type="$1" && shift
     _path="$1" && shift
-    _variable="${_path//\//_}"
     case "${_type}" in
       (string)
-        if [[ "$1" == "default" ]]
-        then
-          shift
-          _default="$1" && shift
-        fi
+        while :
+        do
+          case "${1}" in
+            (as|variable)
+              _variable="${2}" && shift 2 ||
+                __sm.log.fail "A variable name must follow keyword '${_token}'"
+              ;;
+            (default)
+              _default="$2" && shift 2
+              ;;
+            (*)
+              break
+              ;;
+          esac
+        done
+
+        if [[ -z "${_variable}" ]]
+        then _variable="${_path//\//_}" ; fi
 
         typeset -g ${_variable} >/dev/null
 
@@ -32,11 +44,24 @@ __sm.json.get()
         fi
         ;;
       (array)
-        if [[ "$1" == "default" ]]
-        then
-          shift
-          _default="$1" && shift
-        fi
+        while :
+        do
+          case "${1}" in
+            (as|variable)
+              _variable="${2}" && shift 2 ||
+                __sm.log.fail "A variable name must follow keyword '${_token}'"
+              ;;
+            (default)
+              _default="$2" && shift 2
+              ;;
+            (*)
+              break
+              ;;
+          esac
+        done
+
+        if [[ -z "${_variable}" ]]
+        then _variable="${_path//\//_}" ; fi
 
         typeset -ga ${_variable} >/dev/null
 
