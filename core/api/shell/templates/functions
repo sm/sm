@@ -23,7 +23,7 @@ templates()
 {
   trace_filter templates || set -o xtrace
 
-  typeset _command _name _target _source _mode _owner _template _params \
+  typeset _command _name _target _source _mode _owner _group _template _params \
     __templates_commands _token
 
   _source="${extension_templates_path}"
@@ -51,20 +51,28 @@ templates()
     case "${_token}" in
       (to)
         _target="$1"
-        (( $# )) && shift || __sm.log.fail "target path must follow keyword 'to'"
+        (( $# )) && shift ||
+          __sm.log.fail "A target path must follow keyword 'to'"
         ;;
       (mode)
         _mode="$1"
-        (( $# )) && shift || __sm.log.fail "mode must follow keyword 'mode'"
+        (( $# )) && shift ||
+          __sm.log.fail "A file mode must follow keyword 'mode'"
         ;;
       (owner)
         _owner="$1"
-        (( $# )) && shift || __sm.log.fail "owner must follow keyword 'owner'"
+        (( $# )) && shift ||
+          __sm.log.fail "An owner name must follow keyword 'owner'"
+        ;;
+      (group)
+        _group="$1"
+        (( $# )) && shift ||
+          __sm.log.fail "A group name must follow keyword 'group'"
         ;;
       (from)
         __sm.log.fail "'from' keyword is no longer supported"
         ;;
-      (with)
+      (with|variables)
         _params+=("$@")
         break
         ;;
@@ -72,6 +80,9 @@ templates()
         _params+=("${_token}")
     esac
   done
+
+  if [[ -n "${_group}" ]] && ! __sm.string.contains ":" "${_owner}"
+  then _owner="${_owner}:${_group}" ; fi
 
   case "${_command}" in
     (install)
