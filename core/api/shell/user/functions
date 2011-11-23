@@ -17,7 +17,7 @@ user()
   trace_filter users || set -o xtrace
 
   typeset _token _command _subcommand _user _group _source _flags _value \
-  _shell _home __user_commands
+  _shell _home __user_commands _password
 
   _flags=()
   __user_commands=(
@@ -67,23 +67,33 @@ user()
         ;;
       (name|user|for)
         _user="$1"
-        (( $# )) && shift || __sm.log.fail "User name must follow keyword 'user'"
+        (( $# )) && shift ||
+          __sm.log.fail "User name must follow keyword 'user'"
         ;;
       (group)
         _group="${1:-}"
-        (( $# )) && shift || __sm.log.fail "Group name must follow keyword 'group'"
+        (( $# )) && shift ||
+          __sm.log.fail "Group name must follow keyword 'group'"
         ;;
       (from)
         _source="${1:-}"
-        (( $# )) && shift || __sm.log.fail "from source name must follow keyword 'from'"
+        (( $# )) && shift ||
+          __sm.log.fail "from source name must follow keyword 'from'"
         ;;
       (shell)
         _shell="${1:-}"
-        (( $# )) && shift || __sm.log.fail "A user shell (/bin/{zsh,bash}) must follow keyword 'shell'"
+        (( $# )) && shift ||
+          __sm.log.fail "A user shell (/bin/{zsh,bash}) must follow keyword 'shell'"
         ;;
       (home)
         _home="${1:-}"
-        (( $# )) && shift || __sm.log.fail "A user home (/home/{username}) must follow keyword 'home'"
+        (( $# )) && shift ||
+          __sm.log.fail "A user home (/home/{username}) must follow keyword 'home'"
+        ;;
+      (password)
+        _password="${1:-}"
+        (( $# )) && shift ||
+          __sm.log.fail "A user password must follow keyword 'password'"
         ;;
       (force)
         _flags+=(-f)
