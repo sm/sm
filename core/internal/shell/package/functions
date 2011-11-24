@@ -945,7 +945,7 @@ __sm.package.patch()
   do
     paths exists "${_path}" || continue # No patch path
 
-    _patches=( "${_path}"/*.patch )
+    _patches=( ${_path}/*.patch ${_path}/*.diff )
     if (( ${#_patches[@]} ))
     then
       __sm.package.patches.apply "${_patches[@]}"
@@ -966,7 +966,10 @@ __sm.package.patches.apply()
   for _patch in "${_patches[@]}"
   do
     [[ -f "${_patch}" && -s "${_patch}" ]] || continue
-    __sm.log.error "TODO: patch application is NIY (see __sm.package.patch())"
+    patch -F 3 -p 1 -N -f < ${_patch} > patch.install.log 2>&1 ||
+      __sm.package.error \
+        "Patching of ${package_name} ${package_version} with ${_patch} failed! " \
+        "$PWD/patch.install.log"
   done
 }
 
