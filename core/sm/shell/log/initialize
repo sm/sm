@@ -4,7 +4,7 @@ true \
   ${debug_flags:="-search"} ${debug_flag:=0} ${trace_flags:="-search -backtrace"} \
   ${trace_flag:=0} ${var_debug_type_flag:="long"} "${log_path:="${sm_path}/log"}"
 
-declare -a var_debug_flags
+typeset -a var_debug_flags
 
 __sm_trace_filter_stack=()
 

@@ -15,6 +15,9 @@ do
     (--trace|trace)
       extension_args+=("--trace=all")
       ;;
+    (--verbose=*)
+      extension_args+=("--verbose")
+      ;;
     (--prefix=*)
       prefix_path="${token/*\=}"
       ;;

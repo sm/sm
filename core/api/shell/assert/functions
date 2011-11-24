@@ -1,0 +1,115 @@
+#!/bin/sh
+
+assert()
+{
+  trace_filter assert || set -o xtrace
+
+  typeset _token _type _matcher _code _string _match _name _index
+
+  typeset -a __commands _params
+
+  _type="$1" && shift || __sm.log.fail "An assertion type must follow keyword 'assert'"
+
+  case "${_type}" in
+    (variable|array|file)
+      _name="$1" && shift ||
+        __sm.log.fail "A ${_type} name must follow keyword '${_type}'"
+      ;;
+    (string)
+      _string="$1" && shift ||
+        __sm.log.fail "A string must follow keyword 'string'"
+      ;;
+    (file)
+      _name="$1" && shift ||
+        __sm.log.fail "An array name must follow keyword 'array'"
+      [[ -n "${_code}" ]] ||
+        __sm.log.fail "Code to run must be given for 'assert ${_type}', use: code '{{code}}'"
+      ;;
+    (function)
+      _name="$1" && shift ||
+        __sm.log.fail "A function name must follow keyword 'function'"
+      ;;
+    (stdout|stderr)
+      [[ -n "${_code}" ]] ||
+        __sm.log.fail "Code to run must be given for 'assert ${_type}', use: code '{{code}}'"
+      ;;
+    (*)
+      __sm.log.fail "Unknown assertion type '${_type}'"
+      ;;
+  esac
+
+  __commands=(
+    "is equal to=equals"
+    "is not equal to=not equal"
+    "is empty"
+    "is nonempty"
+  )
+
+  if __sm.command.detect "$*" "${__commands[@]}"
+  then
+    _matcher="${__sm_command_dotted}"
+    shift "${__sm_command_words}"
+  else
+    __sm.log.fail "Array command not given: array <command> [options]..."
+  fi
+
+  _params=()
+  _index=0
+
+  while (( $# ))
+  do
+    _token="$1" && shift
+    case "${_token}" in
+      (code)
+        _code="${1}" && shift ||
+          __sm.log.fail "A string containing code to run must follow keyword 'code'."
+        ;;
+      (*)
+        if [[ -z "${_match}" ]]
+        then
+          _match="${_token}"
+        else
+          _params+=("${_token}")
+        fi
+        ;;
+    esac
+  done
+
+  if [[ -z "${_type}" ]]
+  then
+    __sm.log.fail "keyword 'assert' must be followed by an assertion type {variable,array,string,function,file,stdout,stderr}"
+  elif [[ -z "${_matcher}" ]]
+  then
+    __sm.log.fail "'assert ${_type}' must be followed by a matcher." ]]
+  fi
+
+  if [[ -n "${_code}" ]]
+  then
+    __sm.paths.create "/tmp/sm/assert/$$"
+    __sm.files.create "/tmp/sm/assert/$$/stdout.log" "/tmp/sm/assert/$$/stderr.log"
+    if ! $(echo ${_code}) > "/tmp/sm/assert/$$/stdout.log" 2> "/tmp/sm/assert/$$/stderr.log"
+    then
+      return 1
+    fi
+  fi
+
+  case "${_type}" in
+    (variable|array)
+      eval "_string=\"\${${_name}}\""
+      __sm.assert.string.matcher ${_matcher} "${_string}" "${_match}"
+      ;;
+    (string)
+      __sm.assert.string.matcher ${_matcher} "${_string}" "${_match}"
+      ;;
+    (file)
+      NIY
+      ;;
+    (function)
+      NIY
+      ;;
+    (stdout|stderr)
+      NIY
+      ;;
+  esac
+}
+

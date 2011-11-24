@@ -30,7 +30,8 @@ commands()
         ;;
       (is)
         _subcommand="$1"
-        (( $# )) && shift || __sm.log.fail "A command must follow keyword 'is'; <function>"
+        (( $# )) && shift ||
+          __sm.log.fail "A command must follow keyword 'is'; <function>"
         case "${_subcommand}" in
           (function)
             if __sm.command.is.function "$1" >/dev/null 2>&1
@@ -45,14 +46,16 @@ commands()
         ;;
       (full)
         _subcommand="$1"
-        (( $# )) && shift || __sm.log.fail "A 'command full' must follow keyword 'name'."
+        (( $# )) && shift ||
+          __sm.log.fail "A 'command full' must follow keyword 'name'."
         case "${_subcommand}" in
           (name)
             if __sm.command.full.name "$1" >/dev/null 2>&1
             then return 0 ; else return 1 ; fi
             ;;
           (*)
-            (( $# )) && shift || __sm.log.fail "A 'command full' must follow keyword 'name'."
+            (( $# )) && shift ||
+              __sm.log.fail "A 'command full' must follow keyword 'name'."
             ;;
         esac
         ;;
@@ -60,8 +63,10 @@ commands()
         case "$1" in
           (as)
             shift
-            _user="$1"
-            (( $# )) && shift || __sm.log.fail "A user name or id must be specified after keyword 'as'"
+            if [[ "$1" == "user" ]]
+            then shift ; fi
+            _user="$1" && shift ||
+              __sm.log.fail "A user name or id must be specified after keyword 'as'"
             # TODO: Check to ensure user name/id exists on the system
             if __sm.command.run.as "${_user}" "${_flags[*]}" "$@"
             then return 0 ; else return 1 ; fi

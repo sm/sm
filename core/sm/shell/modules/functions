@@ -167,6 +167,9 @@ __sm.module.include()
   then
     while read -r _module_dependency
     do
+      _module_dependency="${_module_dependency%%\#*}" # Ignore commented lines
+      [[ -n ${_module_dependency} ]] || continue # Ignore empty lines
+
       if ! __sm.module.include "${_module_dependency}"
       then
         __sm.log.error "Could not find module dependency '${_module_dependency}' "\
