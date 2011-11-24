@@ -732,12 +732,10 @@ __sm.package.make.install()
     _command="make ${make_install_flags[@]:-install}"
   fi
 
-  __sm.log.step "${package_name} ${package_version} ~ install"
   ${=_command} > make.install.log 2>&1 ||
     __sm.package.error \
       "Installation of ${package_name} ${package_version} failed! " \
       "$PWD/make.install.log"
-  __sm.log.step success
 }
 
 __sm.package.postinstall()
