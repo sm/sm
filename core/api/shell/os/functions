@@ -28,6 +28,7 @@ os()
   typeset -a _params __os_commands
 
   __os_commands=(
+    "is=type is"
     "arch capable"
     "arch is=arch type is"
     "arch type"
@@ -46,7 +47,7 @@ os()
   fi
 
   case "${_command}" in
-    (is)
+    (type.is)
       _os="$1"
       (( $# )) && shift || __sm.log.fail "System name must follow keywords 'is';"\
         "os is <linux|darwin|bsd|solaris|aix>"
@@ -65,10 +66,10 @@ os()
   shift $#
 
   case "${_command}" in
-    (is)
+    (type.is)
       case "${_os}" in
         (linux|bsd|darwin|solaris|aix)
-          __sm.os.is ${_os}
+          __sm.os.type.is ${_os}
           ;;
         (*)
           __sm.log.fail "Unhandled os '${_os}'"
