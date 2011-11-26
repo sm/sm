@@ -24,105 +24,64 @@ os()
 {
   trace_filter os || set -o xtrace
 
-  typeset _command _subcommand _os _token
-  typeset -a _files
+  typeset _command _os
+  typeset -a _params __os_commands
 
-  while (( $# > 0 ))
-  do
-    _token="$1" && shift
-    case "${_token}" in
-      (is)
-        _command="$_token"
-        _os="${1}"
-        (( $# )) && shift || __sm.log.fail "lowercase operating system name must follow keyword 'os';"\
-          "os is <linux|darwin|bsd|solaris|aix>"
-        ;;
-      (cpu)
-        _command=cpu
-        _subcommand="$1"
-        (( $# )) && shift || __sm.log.fail "A command must follow keyword 'cpu'; one of {count}"
-        case "${_subcommand}" in
-          (count)
-            true # all good.
-            ;;
-          (*)
-            __sm.log.fail "A valid command must follow keyword 'cpu'; one of {count}"
-            ;;
-        esac
-        ;;
-      (*)
-        if [[ -z "${_command}" ]]
-        then
-          _command="$_token"
-        else
-          _files+=("$_token")
-        fi
-        ;;
-    esac
-  done
+  __os_commands=(
+    "arch capable"
+    "arch is=arch type is"
+    "arch type"
+    "cpu count"
+    "version major"
+    "version minor"
+    "version patch"
+  )
+
+  if __sm.command.detect "$*" "${__os_commands[@]}"
+  then
+    _command="${__sm_command_dotted}"
+    shift "${__sm_command_words}"
+  else
+    __sm.log.fail "No command given.\nUsage:  \nos <command> ..."
+  fi
+
+  case "${_command}" in
+    (is)
+      _os="$1"
+      (( $# )) && shift || __sm.log.fail "System name must follow keywords 'is';"\
+        "os is <linux|darwin|bsd|solaris|aix>"
+      ;;
+    (arch.type.is)
+      _params=( "$1" )
+      (( $# )) && shift || __sm.log.fail "Architecture must follow keywords 'is'"
+      ;;
+    (open)
+      _params=( "$@" )
+      (( $# )) && shift || __sm.log.fail "Files must follow keywords 'open'"
+      ;;
+  esac
+
+  _params+=( "$@" )
+  shift $#
 
   case "${_command}" in
     (is)
       case "${_os}" in
         (linux|bsd|darwin|solaris|aix)
-          if [[ "$OSTYPE" == *${_os}* ]]
-          then
-            return 0
-          else
-            return 1
-          fi
+          __sm.os.is ${_os}
           ;;
         (*)
           __sm.log.fail "Unhandled os '${_os}'"
           ;;
       esac
       ;;
-    (open)
-      __sm.os.open "${_files[@]}"
-      ;;
-    (type)
-      __sm.os.type
-      ;;
-    (version)
-      case "${_subcommand}" in
-        (major)
-          __sm.os.version.major
-          ;;
-        (minor)
-          __sm.os.version.minor
-          ;;
-        (patch)
-          __sm.os.version.patch
-          ;;
-        (*)
-          __sm.os.version
-          ;;
-      esac
-      ;;
-    (arch)
-      case "${_subcommand}" in
-        (capable)
-          __sm.os.arch.capable
-          ;;
-        (*)
-          __sm.os.arch
-          ;;
-      esac
-      ;;
-    (cpu)
-      case "${_subcommand}" in
-        (count)
-          __sm.os.cpu.count
-          ;;
-        (*)
-      __sm.log.fail "Unknown command for os cpu: '${_subcommand}'; valid commands include {count} "
-          ;;
-      esac
+    (arch*|cpu.count|open|type|version*)
+      __sm.os.${_command} "${_params[@]}"
       ;;
     (*)
       __sm.log.fail "Unknown command for os: '${_command}' "\
         "A os command must be specified as the first parameter: "\
-        "{is,}"
+        "{is,arch,cpu,open,type}"
       ;;
   esac
 }
@@ -163,4 +122,3 @@ __sm.os.confd.path()
     echo "$HOME/.conf.d"
   fi
 }
-
