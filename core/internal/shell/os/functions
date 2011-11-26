@@ -154,11 +154,6 @@ __sm.os.arch.type()
   fi
 }
 
-__sm.os.arch.type.is()
-{
-  __sm.os.arch.type "$1"
-}
-
 __sm.os.arch()
 {
   printf "%s\n" "${MACHTYPE//-*}"
@@ -172,11 +167,21 @@ __sm.os.arch.capable()
     read -r _string < <(sysctl hw.cpu64bit_capable)
     if (( ${_string//* } == 1 ))
     then
-      printf "%s" "x86_64"
+      if [[ -n "${1}" ]]
+      then
+        [[ "x86_64" == "${1}" ]]
+      else
+        printf "%s\n" "x86_64"
+      fi
     else
-      __sm.os.arch.type
+      __sm.os.arch.type $1
     fi
   else
-    __sm.os.arch.type
+    __sm.os.arch.type $1
   fi
+}
+
+__sm.os.arch.type.is()
+{
+  __sm.os.arch.capable $1
 }
