@@ -664,6 +664,7 @@ __sm.package.configure()
 {
   trace_filter package || set -o xtrace
   typeset _command
+  typeset -x PKG_CONFIG_PATH PREFIX
 
   command exists gcc || command exists cc || __sm.log.fail "No C compiler found."
 
@@ -671,7 +672,6 @@ __sm.package.configure()
   then
     _command="${configure_command}"
   else
-    export PREFIX="${install_base_path}/${package_version}"
 
     # package configure flag key --prefix "${install_path}"
     __sm.package.configure.flag "--prefix" "${install_path}"
@@ -681,6 +681,8 @@ __sm.package.configure()
     [[ -x "${_command%% *}" ]] || return 0
   fi
 
+  PREFIX="${install_base_path}/${package_version}"
+  PKG_CONFIG_PATH=${active_path}/lib/pkgconfig
   __sm.log.debug package "__sm.package.configure: ${_command}"
 
   ${=_command} > configure.log 2>&1 ||
