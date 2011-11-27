@@ -220,7 +220,7 @@ __sm.package.package_dependencies()
 {
   trace_filter package || set -o xtrace
   typeset _flag
-  typeset -xg package_dependencies
+  typeset -axg package_dependencies
   for _flag in "$@"
   do
     if ! __sm.string.contains "${_flag}" "${package_dependencies[*]}"
