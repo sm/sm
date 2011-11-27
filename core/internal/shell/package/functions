@@ -670,10 +670,8 @@ __sm.package.configure()
 
   _command="${configure_command:-./configure}"
 
-  if [[ -x "${_command%% *}" ]]
+  if [[ ! -x "${_command%% *}" ]]
   then
-    __sm.log.debug package "__sm.package.configure: ${_command}"
-  else
     __sm.log.debug package "Configure command '${_command%% *}' not available."
     return 0
   fi
@@ -685,6 +683,8 @@ __sm.package.configure()
   fi
 
   _command="${_command} ${configure_flags[*]}"
+  __sm.log.debug package "__sm.package.configure: ${_command}"
+
   PREFIX="${install_base_path}/${package_version}"
   PKG_CONFIG_PATH=${active_path}/lib/pkgconfig
 
