@@ -668,11 +668,7 @@ __sm.package.configure()
 
   command exists gcc || command exists cc || __sm.log.fail "No C compiler found."
 
-  __sm.package.configure.flag "--prefix" "${install_path}"
-  __sm.package.configure.flag "--sysconfdir" "/etc"
-
   _command="${configure_command:-./configure}"
-  _command="${_command} ${configure_flags[*]}"
 
   if [[ -x "${_command%% *}" ]]
   then
@@ -682,6 +678,13 @@ __sm.package.configure()
     return 0
   fi
 
+  __sm.package.configure.flag "--prefix" "${install_path}"
+  if "${_command%% *}" --help 2>/dev/null | \grep -- --sysconfdir >/dev/null
+  then
+    __sm.package.configure.flag "--sysconfdir" "/etc"
+  fi
+
+  _command="${_command} ${configure_flags[*]}"
   PREFIX="${install_base_path}/${package_version}"
   PKG_CONFIG_PATH=${active_path}/lib/pkgconfig
 
