@@ -8,7 +8,7 @@ json()
   typeset -a _params
 
   _command="$1" && shift ||
-    __sm.log.fail "Usage: json {get|set} from file '{file}' ..."
+    __sm.log.fail "Usage: json get from file '{file}' ..."
 
   _params=()
 
@@ -19,10 +19,7 @@ json()
       (get|read)
         _command="get"
         ;;
-      (set|write)
-        _command="set"
-        ;;
-      (from|to)
+      (from)
         _json_file="${1}" && shift ||
           __sm.log.fail "a json file path/name must follow keyword '${_token}'"
         ;;
