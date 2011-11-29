@@ -1,6 +1,7 @@
 #!/bin/sh
 
 # Usage:
+# {example} # => {result when applied to json below}
 # json get from ${json_file} string path/to/item # => 'found item'
 # json get from ${json_file} array path/to/list  # => 'list of items'
 #
