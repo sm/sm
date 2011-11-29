@@ -1,5 +1,11 @@
 #!/bin/sh
 
+# Usage:
+# json get from ${json_file} string path/to/item # => 'found item'
+# json get from ${json_file} array path/to/list  # => 'list of items'
+#
+# run against json in file ${json_file}:
+# { path: { to: { item: 'found item', list: ['list', 'of', 'items']}}}
 json()
 {
   trace_filter json || set -o xtrace
