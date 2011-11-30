@@ -473,12 +473,6 @@ __sm.package.init()
       ;;
   esac
 
-  if command exists "${package_name}_initialize"
-  then
-    __sm.string.contains "${package_name}_initialize" "${FUNCNAME[*]}" ||
-      "${package_name}_initialize"
-  fi
-
   true \
     "${source_path:="${sm_path}/src"}" \
     "${archives_path:="${sm_path}/archives"}" \
@@ -511,6 +505,12 @@ __sm.package.init()
     key configure_flags prefix default
   config read file defaults from ${package_name} \
     key make_flags prefix default
+
+  if command exists "${package_name}_initialize"
+  then
+    __sm.string.contains "${package_name}_initialize" "${FUNCNAME[*]}" ||
+      "${package_name}_initialize"
+  fi
 
   __sm.package.package_dependencies ${=default_package_dependencies[*]}
   __sm.package.configure.flags ${=default_configure_flags[*]}
