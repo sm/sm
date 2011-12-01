@@ -47,7 +47,7 @@ __sm.extension.actions.type()
               then
                 action_type="binary"
               else
-                debug search "can not find shebang '${shebang}'"
+                log debug search "can not find shebang '${shebang}'"
                 action_type="noexec"
               fi
               ;;
@@ -58,12 +58,12 @@ __sm.extension.actions.type()
               then
                 action_type="binary"
               else
-                debug search "can not find shebang '${shebang}'"
+                log debug search "can not find shebang '${shebang}'"
                 action_type="noexec"
               fi
               ;;
             (*)
-              debug search "can not find shebang '${shebang}'"
+              log debug search "can not find shebang '${shebang}'"
               action_type="dne"
               ;;
           esac
@@ -73,7 +73,7 @@ __sm.extension.actions.type()
       ;;
 
     (cannot[[:space:]]open)
-      debug search "'${_path_type}' file '${_path}/${action}'"
+      log debug search "'${_path_type}' file '${_path}/${action}'"
       action_type="dne"
       ;;
 
@@ -82,7 +82,7 @@ __sm.extension.actions.type()
       then
         action_type="binary"
       else
-        debug search "not executable file '${_path}/${action}'"
+        log debug search "not executable file '${_path}/${action}'"
         action_type="noexec"
       fi
       ;;

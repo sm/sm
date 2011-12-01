@@ -220,6 +220,7 @@ __sm.package.package_dependencies()
 {
   trace_filter package || set -o xtrace
   typeset _flag
+  typeset -axg package_dependencies
   for _flag in "$@"
   do
     if ! __sm.string.contains "${_flag}" "${package_dependencies[*]}"
@@ -472,12 +473,6 @@ __sm.package.init()
       ;;
   esac
 
-  if command exists "${package_name}_initialize"
-  then
-    __sm.string.contains "${package_name}_initialize" "${FUNCNAME[*]}" ||
-      "${package_name}_initialize"
-  fi
-
   true \
     "${source_path:="${sm_path}/src"}" \
     "${archives_path:="${sm_path}/archives"}" \
@@ -510,6 +505,12 @@ __sm.package.init()
     key configure_flags prefix default
   config read file defaults from ${package_name} \
     key make_flags prefix default
+
+  if command exists "${package_name}_initialize"
+  then
+    __sm.string.contains "${package_name}_initialize" "${FUNCNAME[*]}" ||
+      "${package_name}_initialize"
+  fi
 
   __sm.package.package_dependencies ${=default_package_dependencies[*]}
   __sm.package.configure.flags ${=default_configure_flags[*]}
@@ -664,24 +665,29 @@ __sm.package.configure()
 {
   trace_filter package || set -o xtrace
   typeset _command
+  typeset -x PKG_CONFIG_PATH PREFIX
 
   command exists gcc || command exists cc || __sm.log.fail "No C compiler found."
 
-  if [[ -n "${configure_command}" ]]
+  _command="${configure_command:-./configure}"
+
+  if [[ ! -x "${_command%% *}" ]]
   then
-    _command="${configure_command}"
-  else
-    export PREFIX="${install_base_path}/${package_version}"
-
-    # package configure flag key --prefix "${install_path}"
-    __sm.package.configure.flag "--prefix" "${install_path}"
-
-    _command="./configure ${configure_flags[*]}"
-
-    [[ -x "${_command%% *}" ]] || return 0
+    __sm.log.debug package "Configure command '${_command%% *}' not available."
+    return 0
   fi
 
+  __sm.package.configure.flag "--prefix" "${install_path}"
+  if "${_command%% *}" --help 2>/dev/null | \grep -- --sysconfdir >/dev/null
+  then
+    __sm.package.configure.flag "--sysconfdir" "/etc"
+  fi
+
+  _command="${_command} ${configure_flags[*]}"
   __sm.log.debug package "__sm.package.configure: ${_command}"
+
+  PREFIX="${install_base_path}/${package_version}"
+  PKG_CONFIG_PATH=${active_path}/lib/pkgconfig
 
   ${=_command} > configure.log 2>&1 ||
     __sm.package.error \
@@ -732,12 +738,10 @@ __sm.package.make.install()
     _command="make ${make_install_flags[@]:-install}"
   fi
 
-  __sm.log.step "${package_name} ${package_version} ~ install"
   ${=_command} > make.install.log 2>&1 ||
     __sm.package.error \
       "Installation of ${package_name} ${package_version} failed! " \
       "$PWD/make.install.log"
-  __sm.log.step success
 }
 
 __sm.package.postinstall()
@@ -945,7 +949,7 @@ __sm.package.patch()
   do
     paths exists "${_path}" || continue # No patch path
 
-    _patches=( "${_path}"/*.patch )
+    _patches=( ${_path}/*.patch ${_path}/*.diff )
     if (( ${#_patches[@]} ))
     then
       __sm.package.patches.apply "${_patches[@]}"
@@ -966,7 +970,10 @@ __sm.package.patches.apply()
   for _patch in "${_patches[@]}"
   do
     [[ -f "${_patch}" && -s "${_patch}" ]] || continue
-    __sm.log.error "TODO: patch application is NIY (see __sm.package.patch())"
+    patch -F 3 -p 1 -N -f < ${_patch} > patch.install.log 2>&1 ||
+      __sm.package.error \
+        "Patching of ${package_name} ${package_version} with ${_patch} failed! " \
+        "$PWD/patch.install.log"
   done
 }
 

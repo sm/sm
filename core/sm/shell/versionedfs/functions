@@ -240,8 +240,7 @@ __sm.versionedfs.activate()
     (fhs)
       case "${_method}" in
         (link)
-          # TODO: Switch this to using shell globbing builtin?
-          _files=($( find "${_version_path}" -mindepth 1 ))
+          _files=( ${_version_path}/**/* )
           _count="${#_files[@]}"
           for _file in "${_files[@]}"
           do
@@ -392,4 +391,3 @@ __sm.versionedfs.list()
     fi
   done
 }
-

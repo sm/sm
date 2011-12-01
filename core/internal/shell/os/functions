@@ -129,21 +129,29 @@ __sm.os.version.patch()
 
 __sm.os.arch.type()
 {
+  typeset _arch
   case "${MACHTYPE//-*}" in
     # The machine type is 32 bit.
     # Note that this accounts for Solaris 32 bit as well (i86pc).
     (*i386*|*i686*|*i86pc*)
-      printf "%s" "i386"
+      _arch="i386"
       ;;
     # The machine type is 64 bit.
     (*x86_64*)
-      printf "%s" "x86_64"
+      _arch="x86_64"
       ;;
     # The machine type is PowerPC.
     (*ppc*)
-      printf "%s" "ppc"
+      _arch="ppc"
       ;;
   esac
+
+  if [[ -n "${1}" ]]
+  then
+    [[ "${_arch}" == "${1}" ]]
+  else
+    printf "%s\n" "${_arch}"
+  fi
 }
 
 __sm.os.arch()
@@ -159,12 +167,21 @@ __sm.os.arch.capable()
     read -r _string < <(sysctl hw.cpu64bit_capable)
     if (( ${_string//* } == 1 ))
     then
-      printf "%s" "x86_64"
+      if [[ -n "${1}" ]]
+      then
+        [[ "x86_64" == "${1}" ]]
+      else
+        printf "%s\n" "x86_64"
+      fi
     else
-      __sm.os.arch.type
+      __sm.os.arch.type $1
     fi
   else
-    __sm.os.arch.type
+    __sm.os.arch.type $1
   fi
 }
 
+__sm.os.arch.type.is()
+{
+  __sm.os.arch.capable $1
+}

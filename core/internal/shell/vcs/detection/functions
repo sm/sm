@@ -1,4 +1,4 @@
-  #!/bin/sh
+#!/bin/sh
 
 #
 # # VCS (SCM) Module
@@ -84,7 +84,7 @@ is_github_uri()
         fi
       fi
     fi
-    debug vcs "Uri '${_uri}' looks like github one, but github claims it is not."
+    log debug vcs "Uri '${_uri}' looks like github one, but github claims it is not."
   fi
   return 1
 }
