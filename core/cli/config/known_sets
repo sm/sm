@@ -1,5 +1,6 @@
 backups=sm/sm-backups
 databases=sm/sm-databases
+postgresql=sm/sm-postgresql
 gnu=sm/sm-gnu
 irc=sm/sm-irc
 java=sm/sm-java
