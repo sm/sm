@@ -1,11 +1,13 @@
 backups=sm/sm-backups
 databases=sm/sm-databases
+postgresql=sm/sm-postgresql
 gnu=sm/sm-gnu
 irc=sm/sm-irc
 java=sm/sm-java
 javascript=sm/sm-javascript
 languages=sm/sm-languages
 libraries=sm/sm-libraries
+media=sm/sm-media
 monitoring=sm/sm-monitoring
 networking=sm/sm-networking
 ruby=sm/sm-ruby
