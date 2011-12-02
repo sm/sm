@@ -254,7 +254,7 @@ __sm.package.set.ldflags()
 {
   trace_filter package || set -o xtrace
   export LDFLAGS
-  if ! __sm.string.contains "-L${active_path}/lib" "${LDFLAGS}"
+  if ! __sm.string.contains "-L${active_path}/lib" "${LDFLAGS:-}"
   then
     LDFLAGS="-L${active_path}/lib${LDFLAGS:+ }${LDFLAGS:-}"
   fi
@@ -291,6 +291,7 @@ __sm.package.install()
 __sm.package.gnu.install()
 {
   trace_filter package || set -o xtrace
+
   (( $# == 0 )) || __sm.package.cli $@
 
   __sm.package.set.cflags
