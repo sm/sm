@@ -87,15 +87,12 @@ __sm.user.set.home()
 
 __sm.user.exists()
 {
-  typeset _name _rest IFS
-  IFS=:
-  while read _name _rest
-  do
-    if [[ "${_name}" == "$1" ]]
-    then
-      return 0
-    fi
-  done < /etc/passwd
+  if os is  darwin
+  then
+    dscl . -list /Users | \grep "^$1$" >/dev/null
+  else
+    \grep "^$1:" /etc/passwd >/dev/null
+  fi
   return 1
 }
 
