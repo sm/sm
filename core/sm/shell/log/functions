@@ -252,6 +252,8 @@ backtrace()
     _string="${functrace[${_index}]:+${functrace[${_index}]}}"
     _function="${_string%:*}"
     _function_line=${_string#*:}
+    if [[ "$_source" == "zsh" && "$_function" == "zsh" ]]
+    then _source="(console)"; fi
     #_line=${funcfiletrace[$(( _index - 1 ))]}
 
 #TODO: make it a switch if required, there is a need to trace internal functions
@@ -339,9 +341,14 @@ __sm.log.todo()
   fi
 }
 
-__sm.log.error()
+__sm.log.error.no_exit()
 {
   printf "ERROR(${funcstack[3]}): $*\n" >&2
+}
+
+__sm.log.error()
+{
+  __sm.log.error.no_exit "$@"
   trap - ERR
   exit 1
 }
@@ -354,6 +361,13 @@ __sm.log.succeed()
     printf "$*\n"
   fi
   #exit 0
+}
+
+__sm.log.fail.no_exit()
+{
+  trace_filter log || set -o xtrace
+  trace_flag=0
+  backtrace "FAIL(${funcstack[3]}): $*" no_exit
 }
 
 __sm.log.fail()
