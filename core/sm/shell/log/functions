@@ -453,7 +453,7 @@ __sm.actions.source()
 __sm.debug.variables.callback()
 {
   trace_filter log || set -o xtrace
-  typeset _variable ction_stack
+  typeset _variable _stack
 
   _stack="${funcstack[*]}"
 
