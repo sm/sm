@@ -98,6 +98,9 @@ user()
       (force)
         _flags+=(-f)
         ;;
+      (system)
+        _flags+=("${_token}")
+        ;;
       (*)
         __sm.log.fail "Unhandled token '${_token}'"
         ;;
@@ -106,7 +109,10 @@ user()
 
   case "${_command}" in
     (is.*)
-      if __sm.user.${_command} ; then return 0 ; else return 1 ; fi
+      __sm.user.${_command} || return $?
+      ;;
+    (exists)
+      __sm.user.${_command} ${_user} "${_flags[*]}" || return $?
       ;;
     (home)
       __sm.user.${_command} ${_user} ${_home}
@@ -128,4 +134,3 @@ user()
       ;;
   esac
 }
-

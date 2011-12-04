@@ -192,7 +192,8 @@ backtrace()
   _digits=1
   _columns=${COLUMNS:-80}
   _separator=$(printf '%*s' "${_columns}")
-  _message="${1:-}" _flag="$2"
+  _message="${1:-}"
+  _flag="$2"
   [[ -z ${_message} ]] || printf "\n${_message}\n\n" >&2
 
   setopt extendedglob
@@ -432,7 +433,7 @@ __sm.actions.call()
   typeset _action
   _action=(${=1}) && shift
   trace_filter action || set -o xtrace
-  $_action $@
+  $_action $@ || return $?
 }
 
 __sm.actions.source()

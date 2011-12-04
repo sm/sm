@@ -1,12 +1,5 @@
 #!/bin/sh
 
-user_initialize()
-{
-  __sm_user_id_root=0
-  #TODO: on linux often user ids start with 1000
-  __sm_user_id_users=500
-}
-
 __sm.user.home()
 {
   typeset _user _line
@@ -87,18 +80,37 @@ __sm.user.set.home()
 
 __sm.user.exists()
 {
-  if os is  darwin
-  then
-    dscl . -list /Users | \grep "^$1$" >/dev/null
-  else
-    \grep "^$1:" /etc/passwd >/dev/null
+  typeset _filter _user _flags
+  _user="$1"
+  _flags="$2"
+
+  if __sm.os.type.is darwin && __sm.string.contains "system" "${_flags}"
+  then _user="_${_user}"
   fi
-  return 1
+
+  if __sm.string.contains "system" "${_flags}"
+  then _filter="< ${__sm_user_id_users}"
+  else _filter=">= ${__sm_user_id_users}"
+  fi
+
+  if __sm.os.type.is darwin
+  then
+    dscl . -list /Users UniqueID | \awk '{if ($2 '${_filter}') print $1;}'
+  else
+    cat /etc/passwd | \awk -F: '{if ($3 '${_filter}') print $1;}'
+  fi | \
+    \grep "^${_user}$" >/dev/null || return $?
 }
 
 __sm.user.create.unless.exists()
 {
-  if ! __sm.user.exists "$1"
+  typeset _system
+  if __sm.string.contains system "$4"
+  then _system="system"
+  else _system=""
+  fi
+
+  if ! __sm.user.exists "$1" ${_system}
   then
     __sm.user.add "$@"
   fi
@@ -145,8 +157,7 @@ __sm.user.add()
         groupadd -f "$_group"
       fi
 
-      useradd -s /bin/bash -d "${_home:-"/home/${_user}"}" -g "${_group}" \
-        "${_user}"
+      useradd -s /bin/bash -d "${_home:-"/home/${_user}"}" -g "${_group}" "${_user}"
     ;;
 
     "Darwin")

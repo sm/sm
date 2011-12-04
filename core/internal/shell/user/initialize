@@ -1,0 +1,10 @@
+#!/bin/sh
+
+typeset -gx __sm_user_id_root __sm_user_id_users
+
+__sm_user_id_root=0
+
+if __sm.os.type.is darwin
+then __sm_user_id_users=500
+else __sm_user_id_users=1000
+fi
