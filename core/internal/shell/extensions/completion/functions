@@ -43,6 +43,7 @@ find_starting_action()
 
 show_extension_names()
 {
+  typeset -g extensions_path
   extensions_path="$1"
   (( $# )) && shift || __sm.log.fail "no path given"
 
@@ -64,7 +65,7 @@ show_extension_names()
 extension_action_completion()
 {
   trace_filter action_completion || set -o xtrace
-  typeset _action_found _extension_found _extension_found_path cut_count last_char _args
+  typeset _action_found _extension_found _extension_found_path cut_count last_char _args show_word
   _action_found=0
   _extension_found=0
   last_char="${extension_args:${#extension_args}-1:1}"
