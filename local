@@ -22,7 +22,8 @@ set -o nounset # do not allow unset variables processing
 initial_pwd="$PWD"
 sm_path="$PWD"
 __sm_modules_path="${sm_path}/core/sm/shell"
-true ${sm_shell:="zsh"}
-export initial_pwd sm_path __sm_modules_path initial_pwd sm_shell
+
+export initial_pwd sm_path __sm_modules_path initial_pwd
+
 . "${__sm_modules_path}/core/cli"
 . "${__sm_modules_path}/core/initialize"
