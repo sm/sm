@@ -8,6 +8,8 @@ __sm.json.get()
   # TODO: support 'as {variable name}'
   while (( $# ))
   do
+    _variable= # Ensure _variable is empty for each next round.
+    _default= # Ensure _default is empty for each next round.
     _type="$1" && shift
     _path="$1" && shift
     case "${_type}" in
