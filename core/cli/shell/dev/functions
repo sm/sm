@@ -195,9 +195,8 @@ extension_create()
 
   for _module in ${extension_modules[@]}
   do
-    __sm.log.step "dependency: ${_module}"
-    extension_module_add "${_extension}" "${_module}" "${_target_path}"
-    __sm.log.step succ
+    __sm.log.step "dependency: ${_module}" \
+      extension_module_add "${_extension}" "${_module}" "${_target_path}"
   done
 
   log  "Extension created at '${_target_path}/'."
@@ -210,18 +209,27 @@ extension_module_add()
   _module="${2}"
   _path="${3:-"${extensions_development_path}/${_extension}"}"
 
-  if ! files contain string "${_module}" "${_path}/shell/includes"
-  then
-    files write append string "\n${_module}" to "${_path}/shell/includes"
-  fi
-
   # Run the module's extension setup function, if it exists.
-  if files exist "${sm_path}/core/cli/shell/${_module}/extensions"
+  if __sm.extension.in.paths __sm.module.detect "${_module}"
   then
-    files source "${sm_path}/core/cli/shell/${_module}/extensions"
-    if command exists "${_module}_extension_setup"
+    if ! files contain string "${_module}" "${_path}/shell/includes"
     then
-      "${_module}_extension_setup" "${extension}" "${_module}" "${_path}"
+      files write append string "\n${_module}" to "${_path}/shell/includes"
     fi
+
+    if [[ -f "${module_path}/extensions" && -s "${module_path}/extensions" ]]
+    then
+      files source "${module_path}/extensions"
+      if command exists "${_module//\//_}_extension_setup"
+      then
+        "${_module//\//_}_extension_setup" "${extension}" "${_module}" "${_path}"
+      else
+        log warn "no code for ${_module//\//_}_extension_setup"
+      fi
+    else
+      log warn "no extensions code for ${_module} in ${module_path}/extensions"
+    fi
+  else
+    log warn "${_module} not found !"
   fi
 }

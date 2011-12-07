@@ -1,0 +1,13 @@
+#!/bin/sh
+
+api_templates_extension_setup()
+{
+  typeset _extension _module _path
+  _extension="${1}"
+  _module="${2}"
+  _path="${3:-"${extensions_development_path}/${_extension}"}"
+
+  template install ${_module}/ext/templates/example \
+    to "${_path}/templates/example.mustache" \
+    extension "${_extension}"
+}
