@@ -61,8 +61,8 @@ do
       var_debug_type_flag="${token##--var-debug-}"
       ;;
 
-    (--module=*)
-      preload_modules+=( ${token##--module\=} )
+    (--include=*)
+      preload_modules+=( ${token##--include\=} )
       ;;
 
     (--includes=*)
