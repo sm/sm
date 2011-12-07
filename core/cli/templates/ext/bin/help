@@ -1,7 +1,0 @@
-#!/bin/sh
-
-description "${extension} BDSM extension."
-
-action "help" "Display help for ${extension}."
-
-show_help usage

@@ -4,18 +4,15 @@
 # between all of your actions. You may also make map file in the root
 # extension path defining a mapping of cli items to function names, example:
 #
-#install=myextension_install()
-#
+#install={{extension}}_install()
 
-# myextension_cli()
+# {{extension}}_cli()
 # {
 #   true # In here you implement any CLI processing
 #        # arguements are passed to you in either $@ or extension_args.
 # }
 
-#
-# myextension_initialize()
+# {{extension}}_initialize()
 # {
 #   true # In here you do any initialization for your extension.
 # }
-#

@@ -65,12 +65,15 @@ Show trace output for all functions that are not excluded, by default excluded i
 .B -search
 ).
 .TP 13
-.B --debug={filter}
-Show debug messages for given filter.
+.B --trace-fun={function_name}
+Display tracing for the given {function_name}, tracing is filtered down by any trace_filters.
 .TP 13
-.B --var-debug={variable_name}
+.B --trace-var={variable_name}
 Display changes and stacktrace when the given {variable_name} changes.
 .TP 13
-.B --var-debug-short
+.B --trace-var-short
 Show only list of functions instead of full stack trace when using
-.B --var-debug={variable_name}
+.B --trace-var={variable_name}
+.TP 13
+.B --debug={filter}
+Show debug messages for given filter.

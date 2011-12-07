@@ -35,8 +35,16 @@ do
       trace_flags+=" ${token##--trace\=}"
       ;;
 
-    (--fun-trace=*)
+    (--trace-fun=*)
       trace_functions+=( ${=token##--fun-trace\=} )
+      ;;
+
+    (--trace-var=*)
+      var_debug_flags+=( "${token##--var-debug\=}" )
+      ;;
+
+    (--trace-var-*)
+      var_debug_type_flag="${token##--trace-var-}"
       ;;
 
     (--verbose)
@@ -53,16 +61,16 @@ do
       debug_flag=1
       ;;
 
-    (--var-debug=*)
-      var_debug_flags+=( "${token##--var-debug\=}" )
+    (--here)
+      extensions_search_paths_here="$initial_pwd"
       ;;
 
-    (--var-debug-*)
-      var_debug_type_flag="${token##--var-debug-}"
+    (--include=*)
+      preload_modules+=( ${token##--include\=} )
       ;;
 
-    (--module=*)
-      preload_modules+=( ${token##--module\=} )
+    (--includes=*)
+      preload_modules+=( ${token##--includes\=} )
       ;;
 
     (--call=*)
@@ -118,4 +126,3 @@ trace_flags="${trace_flags## }"
 
 export debug_flag debug_flags trace_flag trace_flags verbose_flag extension_args \
   sm_script var_debug_flags var_debug_type_flag
-
