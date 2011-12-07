@@ -76,11 +76,6 @@ sm_development_setup()
   log "BDSM development environment setup is complete."
 }
 
-sm_development_update()
-{
-  NIY
-}
-
 extension_package()
 {
   typeset _name _path _version file _archiver
@@ -156,6 +151,58 @@ extension_publish()
   log "Packaging complete. (Packages are located in '${_path}/pkg' )"
 }
 
+extension_create()
+{
+  typeset _target_path _extension _template _module
+  typeset -a _templates
+  typeset -ga extension_modules
+  _templates=(
+    bin/help
+    shell/functions
+    shell/includes
+    README.md
+    VERSION
+    CHANGELOG.md
+    TODO.md
+  )
+
+  [[ -n "${extension_args}" ]] || __sm.log.fail "Extension create: You must specify extension name and includes for it."
+
+  __sm.array.shift extension_args _extension
+  _target_path="${extensions_development_path:-${initial_pwd}}/${_extension}"
+
+  if paths exists "${_target_path}"
+  then
+    __sm.log.error "create: Extension '${_extension}' already exists at ${_target_path}."
+    return 1
+  else
+    __sm.log.log "Creating extension '${_extension}':"
+    paths create "${_target_path}"
+  fi
+
+  for _template in "${_templates[@]}"
+  do
+    __sm.log.step "template: ${_template}" \
+      template install cli/ext/${_template} \
+        to ${_target_path}/${_template} \
+        extension "${_extension}"
+  done
+
+  if [[ -z "${extension_modules}" && -n "${extension_args}" ]]
+  then
+    extension_modules=( "${extension_args[@]}" )
+  fi
+
+  for _module in ${extension_modules[@]}
+  do
+    __sm.log.step "dependency: ${_module}"
+    extension_module_add "${_extension}" "${_module}" "${_target_path}"
+    __sm.log.step succ
+  done
+
+  log  "Extension created at '${_target_path}/'."
+}
+
 extension_module_add()
 {
   typeset _extension _module _path
@@ -166,5 +213,15 @@ extension_module_add()
   if ! files contain string "${_module}" "${_path}/shell/includes"
   then
     files write append string "\n${_module}" to "${_path}/shell/includes"
+  fi
+
+  # Run the module's extension setup function, if it exists.
+  if files exist "${sm_path}/core/cli/shell/${_module}/extensions"
+  then
+    files source "${sm_path}/core/cli/shell/${_module}/extensions"
+    if command exists "${_module}_extension_setup"
+    then
+      "${_module}_extension_setup" "${extension}" "${_module}" "${_path}"
+    fi
   fi
 }
