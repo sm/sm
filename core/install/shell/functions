@@ -194,7 +194,7 @@ set_binaries_shell()
   do
     file replace \
       regex "^#!.*$" \
-      with "#!/bin/${sm_shell}" \
+      with "#!/usr/bin/env zsh" \
       in "${install_path}/bin/${_binary}"
   done
 }
@@ -240,4 +240,3 @@ install_sm()
 
   __sm.log.succeed "S{cripting,ystem,tack} Management (SM) Framework (Core) installed."
 }
-
