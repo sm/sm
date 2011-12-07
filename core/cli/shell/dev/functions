@@ -157,7 +157,6 @@ extension_create()
   typeset -a _templates
   typeset -ga extension_modules
   _templates=(
-    bin/help
     shell/functions
     shell/includes
     README.md
