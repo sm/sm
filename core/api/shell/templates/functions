@@ -25,7 +25,9 @@ templates()
 
   typeset _command _name _target _source _mode _owner _group _template _params \
     __templates_commands _token
+  typeset -g _templates_append_flag
 
+  _templates_append_flag=0
   _source="${extension_templates_path}"
   _mode=0644
   _owner=$USER
@@ -76,6 +78,9 @@ templates()
         _params+=("$@")
         break
         ;;
+      (append)
+        _templates_append_flag=1
+        ;;
       (*)
         _params+=("${_token}")
     esac
@@ -114,4 +119,3 @@ templates()
       ;;
   esac
 }
-

@@ -222,7 +222,7 @@ extension_module_add()
       files source "${module_path}/extensions"
       if command exists "${_module//\//_}_extension_setup"
       then
-        "${_module//\//_}_extension_setup" "${extension}" "${_module}" "${_path}"
+        "${_module//\//_}_extension_setup" "${_extension}" "${_module}" "${_path}"
       else
         log warn "no code for ${_module//\//_}_extension_setup"
       fi

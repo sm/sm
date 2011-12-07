@@ -1,19 +1,21 @@
 #!/bin/sh
 
-package_extension_setup()
+api_package_extension_setup()
 {
-  typeset extension module path
-  extension="${1:-}"
-  module="${2:-}"
-  path="${3:-}"
-  true ${language:=shell}
-  (( $# )) && shift || __sm.log.fail "No extension name given."
-  (( $# )) && shift || __sm.log.fail "No module name given."
-  (( $# )) && shift || __sm.log.fail "No path given."
+  typeset _extension _module _path _template
+  _extension="${1}"
+  _module="${2}"
+  _path="${3:-"${extensions_development_path}/${_extension}"}"
 
-  for action in install uninstall update activate deactivate
+  if [[ ! -s "${_path}/shell/functions" ]]
+  then
+    echo "#!/bin/sh" > "${_path}/shell/functions"
+  fi
+
+  for _template in config/defaults config/md5 shell/functions
   do
-    files write append string "${action}=${module}_${action}()" to "${path}/map"
+    template install ${_module}/ext/${_template} \
+      append to "${_path}/${_template}" \
+      extension "${_extension}"
   done
 }
-

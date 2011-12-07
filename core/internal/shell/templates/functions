@@ -66,11 +66,18 @@ __sm.templates.install()
       mode "${_mode}" \
       owner "${_owner}"
   else
-    file copy force \
-      from "${_template}" \
-      to "${_target}" \
-      mode "${_mode}" \
-      owner "${_owner}"
+    if (( ${_templates_append_flag:-0} == 0 ))
+    then
+      file copy force \
+        from "${_template}" \
+        to "${_target}" \
+        mode "${_mode}" \
+        owner "${_owner}"
+    else
+      cat "${_template}" >> "${_target}"
+      file change mode "${_mode}" "${_target}"
+      file change owner "${_owner}" "${_target}"
+    fi
   fi
 }
 
@@ -194,4 +201,3 @@ __sm.templates.diff()
   # 3. different owner than specified (if specified)
   # 4. different mode than specified (if specified)
 }
-
