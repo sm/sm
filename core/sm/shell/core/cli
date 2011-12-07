@@ -35,8 +35,16 @@ do
       trace_flags+=" ${token##--trace\=}"
       ;;
 
-    (--fun-trace=*)
+    (--trace-fun=*)
       trace_functions+=( ${=token##--fun-trace\=} )
+      ;;
+
+    (--trace-var=*)
+      var_debug_flags+=( "${token##--var-debug\=}" )
+      ;;
+
+    (--trace-var-*)
+      var_debug_type_flag="${token##--trace-var-}"
       ;;
 
     (--verbose)
@@ -51,14 +59,6 @@ do
     (--debug=*)
       debug_flags+=" ${token##--debug\=}"
       debug_flag=1
-      ;;
-
-    (--var-debug=*)
-      var_debug_flags+=( "${token##--var-debug\=}" )
-      ;;
-
-    (--var-debug-*)
-      var_debug_type_flag="${token##--var-debug-}"
       ;;
 
     (--here)
