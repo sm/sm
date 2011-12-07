@@ -65,6 +65,10 @@ do
       preload_modules+=( ${token##--module\=} )
       ;;
 
+    (--includes=*)
+      preload_modules+=( ${token##--includes\=} )
+      ;;
+
     (--call=*)
       call_action="${token##--call\=}"
       [[ "$call_action" =~ \/ ]] && preload_modules+=( ${call_action%/*} ) || true
@@ -118,4 +122,3 @@ trace_flags="${trace_flags## }"
 
 export debug_flag debug_flags trace_flag trace_flags verbose_flag extension_args \
   sm_script var_debug_flags var_debug_type_flag
-
