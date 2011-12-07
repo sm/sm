@@ -4,6 +4,7 @@
 extension_cli()
 {
   typeset _ignored_args _string _token number_of_args
+  typeset -gax extension_modules extension_actions
   _ignored_args=()
 
   number_of_args=${#extension_args[@]}
@@ -26,9 +27,13 @@ extension_cli()
         extension_license
         exit 0
         ;;
-      (--modules)
+      (--modules|includes)
         _string="${extension_args[$((++index))]}"
-        extension_modules=(${_string//,/ })
+        extension_modules=(${=_string//,/ })
+        ;;
+      (--bin|actions)
+        _string="${extension_args[$((++index))]}"
+        extension_actions=(${=_string//,/ })
         ;;
       (*)
         _ignored_args+=("${_token}")
@@ -81,5 +86,3 @@ __sm.actions.maps.build()
     _extensions=()
   done
 }
-
-

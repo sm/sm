@@ -153,7 +153,7 @@ extension_publish()
 
 extension_create()
 {
-  typeset _target_path _extension _template _module
+  typeset _target_path _extension _template _module _action
   typeset -a _templates
   typeset -ga extension_modules
   _templates=(
@@ -164,6 +164,7 @@ extension_create()
     VERSION
     CHANGELOG.md
     TODO.md
+    map
   )
 
   [[ -n "${extension_args}" ]] || __sm.log.fail "Extension create: You must specify extension name and includes for it."
@@ -180,13 +181,18 @@ extension_create()
     paths create "${_target_path}"
   fi
 
+  __sm.log.step "extension template"
   for _template in "${_templates[@]}"
   do
-    __sm.log.step "template: ${_template}" \
-      template install cli/ext/${_template} \
-        to ${_target_path}/${_template} \
-        extension "${_extension}"
+    template install cli/ext/${_template} \
+      to ${_target_path}/${_template} \
+      extension "${_extension}"
+    if __sm.string.starts "bin/" "${_template}"
+    then
+      files chmod +x ${_target_path}/${_template}
+    fi
   done
+  __sm.log.step succ
 
   if [[ -z "${extension_modules}" && -n "${extension_args}" ]]
   then
@@ -195,8 +201,14 @@ extension_create()
 
   for _module in ${extension_modules[@]}
   do
-    __sm.log.step "dependency: ${_module}" \
+    __sm.log.step "includes: ${_module}" \
       extension_module_add "${_extension}" "${_module}" "${_target_path}"
+  done
+
+  for _action in ${extension_actions[@]}
+  do
+    __sm.log.step "action: ${_action}" \
+      extension_action_add "${_extension}" "${_action}" "${_target_path}"
   done
 
   log  "Extension created at '${_target_path}/'."
@@ -209,14 +221,14 @@ extension_module_add()
   _module="${2}"
   _path="${3:-"${extensions_development_path}/${_extension}"}"
 
+  if ! files contain string "${_module}" "${_path}/shell/includes"
+  then
+    files write append string "\n${_module}" to "${_path}/shell/includes"
+  fi
+
   # Run the module's extension setup function, if it exists.
   if __sm.extension.in.paths __sm.module.detect "${_module}"
   then
-    if ! files contain string "${_module}" "${_path}/shell/includes"
-    then
-      files write append string "\n${_module}" to "${_path}/shell/includes"
-    fi
-
     if [[ -f "${module_path}/extensions" && -s "${module_path}/extensions" ]]
     then
       files source "${module_path}/extensions"
@@ -232,4 +244,31 @@ extension_module_add()
   else
     log warn "${_module} not found !"
   fi
+}
+
+extension_action_add()
+{
+  typeset _extension _action _path _module
+  typeset -a _replacements _modules
+  _extension="${1}"
+  _action="${2}"
+  _path="${3:-"${extensions_development_path}/${_extension}"}"
+  _module="/${_action}"
+  while [[ -n "${_module}" ]]
+  do
+    _module="${_module%/*}"
+    _modules=( "${_extension}/shell${_module}" "${_modules[@]}" )
+  done
+
+  _replacements=(
+    extension "${_extension}"
+    action "${_action}"
+    action_cli "sm ${_extension} ${_action//\// }"
+    action_modules "${_modules}"
+  )
+
+  template install cli/ext/bin/action \
+    to ${_target_path}/bin/${_action} \
+    mode +x \
+    "${_replacements[@]}"
 }
