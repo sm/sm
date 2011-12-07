@@ -157,13 +157,13 @@ extension_create()
   typeset -a _templates
   typeset -ga extension_modules
   _templates=(
-    bin/help
     shell/functions
     shell/includes
     README.md
     VERSION
     CHANGELOG.md
     TODO.md
+    map
   )
 
   [[ -n "${extension_args}" ]] || __sm.log.fail "Extension create: You must specify extension name and includes for it."
