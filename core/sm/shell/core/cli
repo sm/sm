@@ -61,6 +61,10 @@ do
       var_debug_type_flag="${token##--var-debug-}"
       ;;
 
+    (--here)
+      extensions_search_paths_here="$initial_pwd"
+      ;;
+
     (--include=*)
       preload_modules+=( ${token##--include\=} )
       ;;

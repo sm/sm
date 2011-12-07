@@ -89,6 +89,34 @@ __sm.extension.paths.initialize()
     ;;
   esac
 
+  if [[ -n "${extensions_search_paths_here}" ]]
+  then
+    # use here as path for --here in set dir
+    extensions_search_paths=(
+      "${extensions_search_paths_here}"
+      "${extensions_search_paths[@]}"
+    )
+
+    while [[ -n "${extensions_search_paths_here}" ]] &&
+      [[ "${extensions_search_paths_here}" =~ \/ ]] &&
+      [[ -d "${extensions_search_paths_here}" ]] &&
+      [[ ! -d "${extensions_search_paths_here}/bin" ]] &&
+      [[ ! -d "${extensions_search_paths_here}/shell" ]]
+    do
+      extensions_search_paths_here="${extensions_search_paths_here%/*}"
+    done
+
+    if [[ -d "${extensions_search_paths_here}/bin" ]] ||
+      [[ -d "${extensions_search_paths_here}/shell" ]]
+    then
+      # removing extension name so "set" gets added to path
+      extensions_search_paths=(
+        "${extensions_search_paths_here%/*}"
+        "${extensions_search_paths[@]}"
+      )
+    fi
+  fi
+
   __sm.log.debug search "sets_user_path:${sets_user_path}:"
   __sm.log.debug search "exts_user_path:${exts_user_path}:"
   __sm.log.debug search "extensions_search_paths:${extensions_search_paths[*]}:"
