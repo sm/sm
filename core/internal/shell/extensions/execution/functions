@@ -12,7 +12,14 @@ __sm.extension.actions.type()
       return 0
       ;;
     (*)
-      _path_type="$(file "${_path}/${action}")"
+      if [[ -f "${_path}/${action}" ]]
+      then
+        _path_type="$(file "${_path}/${action}")"
+      else
+        log debug search "can not find file '${_path}/${action}'"
+        action_type="dne"
+        return 0
+      fi
       ;;
   esac
 
