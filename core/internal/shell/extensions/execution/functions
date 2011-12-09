@@ -71,7 +71,7 @@ __sm.extension.actions.type()
               ;;
             (*)
               log debug search "can not find shebang '${shebang}'"
-              action_type="dne"
+              action_type="noexec"
               ;;
           esac
           ;;
@@ -202,8 +202,12 @@ __sm.extension.run()
       #  "${_path}"
       #  ;;
 
-    (dne|noexec)
-      __sm.log.fail "Processing ${action} failed; file type is unknown, file does not exist, or file is not executable."
+    (noexec)
+      __sm.log.fail "Processing action ${_path#${extension_path}/}${_path:+/}${action} failed; file type is unknown or file is not executable."
+      ;;
+
+    (dne)
+      __sm.log.fail "Processing action ${_path#${extension_path}/}${_path:+/}${action} failed; file does not exist or file is not readable."
       ;;
 
     (binary|*)
