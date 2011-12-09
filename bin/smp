@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env zsh
 
 sm_path="/opt/sm" # BDSM framework path
 export PATH="${PATH}:${sm_path}"
@@ -79,4 +79,3 @@ case "$*" in
   *)
     "${sm_path}/bin/sm" "$@"
 esac
-
