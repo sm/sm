@@ -208,7 +208,7 @@ __sm.array.sort()
   else
     _direction=O
   fi
-  eval "${_name}=( \"\${(${_direction})${_name}}\" )"
+  eval "${_name}=( \${(${_direction})${_name}} )"
 }
 
 __sm.array.unique()
@@ -228,4 +228,3 @@ __sm.array.each()
 
   eval "for ${_variable} in \"\${${_name}[@]}\" ; do ${_command} ; done"
 }
-
