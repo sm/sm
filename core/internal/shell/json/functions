@@ -2,7 +2,7 @@
 
 __sm.json.get()
 {
-  typeset _type _path _default _variable _json_file
+  typeset _type _path _default _variable _json_file _array_name
   _json_file="$1" && shift
 
   # TODO: support 'as {variable name}'
@@ -13,6 +13,11 @@ __sm.json.get()
     _type="$1" && shift
     _path="$1" && shift
     case "${_type}" in
+      (into)
+        _array_name="${_path}"
+        typeset -ga ${_array_name}
+
+        ;;
       (string)
         while :
         do
@@ -43,6 +48,11 @@ __sm.json.get()
         if eval "[[ -z \"\${${_variable}}\" && -n \"${_default}\" ]]"
         then
           eval "${_variable}=\"${_default}\""
+        fi
+
+        if [[ -n "${_array_name}" ]]
+        then
+          eval "${_array_name}+=(${_variable} \${${_variable}})"
         fi
         ;;
       (array)
@@ -75,6 +85,11 @@ __sm.json.get()
         if eval "[[ -z \"\${${_variable}}\" && -n \"${_default}\" ]]"
         then
           eval "${_variable}=(${_default})"
+        fi
+
+        if [[ -n "${_array_name}" ]]
+        then
+          eval "${_array_name}+=(${_variable} \${${_variable}})"
         fi
         ;;
     esac

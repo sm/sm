@@ -95,10 +95,10 @@ is_archive_uri()
   _uri="${1:-}"
   (( $# )) && shift || fail "uri must be given as first parameter."
   case "${_uri}" in
-    *.tar*|*.tgz*|*.txz*|*.tbz2*|*.xz*|*.bz2*|*.gz*|*.zip*|*.lzma*|*github.com/*/*ball/*)
+    (*.tar*|*.tgz*|*.txz*|*.tbz2*|*.xz*|*.bz2*|*.gz*|*.zip*|*.lzma*|*github.com/*/*ball/*)
       return 0
       ;;
-    *)
+    (*)
       return 1
       ;;
   esac
