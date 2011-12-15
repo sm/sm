@@ -94,7 +94,6 @@ set_install()
       path "${sets_user_path}" \
       strategy name method copy activate first
 
-
     versionedfs add \
       path "${sets_user_path}" name "${_name}" version "${_version}" \
       source "${src_path}/${_identifier}"

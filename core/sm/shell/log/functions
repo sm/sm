@@ -4,7 +4,7 @@
 # SM Framework Core Module ~ Logging (logging)
 #
 
-#has to be first definition ??? maybe because of alias ?
+# Must be the first definition?! Perhaps this is because of the alias?
 __sm.log.trace.filter()
 {
   if __sm.log.options.check "$trace_flags" "$1"
@@ -13,6 +13,8 @@ __sm.log.trace.filter()
   elif __sm.string.contains "${funcstack[2]}" "${trace_functions[*]}"
   then
     return 1
+  else
+    return 0
   fi
 }
 alias trace_filter='set +o xtrace ; __sm.log.trace.filter'
