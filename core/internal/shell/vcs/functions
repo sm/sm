@@ -37,8 +37,7 @@ fetch_uri()
 
   if [[ -z "${scm_type}" ]]
   then
-    if ! fetch_uri_detect_scm_type "${_uri}" \
-    || [[ -n "${__vcs_failed}" ]]
+    if ! fetch_uri_detect_scm_type "${_uri}" || [[ -n "${__vcs_failed}" ]]
     then
       fetch_error unknown_scm "uri=${_uri}"
       return $?
