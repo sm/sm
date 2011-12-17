@@ -81,25 +81,34 @@ __sm.user.set.home()
 __sm.user.exists()
 {
   typeset _filter _user _flags
+
   _user="$1"
   _flags="$2"
 
   if __sm.os.type.is darwin && __sm.string.contains "system" "${_flags}"
-  then _user="_${_user}"
-  fi
+  then _user="_${_user}" ; fi
 
   if __sm.string.contains "system" "${_flags}"
   then _filter="< ${__sm_user_id_users}"
   else _filter=">= ${__sm_user_id_users}"
   fi
 
-  if __sm.os.type.is darwin
-  then
-    dscl . -list /Users UniqueID | \awk '{if ($2 '${_filter}') print $1;}'
-  else
-    cat /etc/passwd | \awk -F: '{if ($3 '${_filter}') print $1;}'
-  fi | \
-    \grep "^${_user}$" >/dev/null || return $?
+  if [[ "${_user}" == "0" ]] ||  (( _user ))
+  then # UID
+    if __sm.os.type.is darwin
+    then
+      dscl . -list /Users UniqueID | \awk '{if ($2 == '${_filter}') print $1;}'
+    else
+      \awk -F: '{if ($3 == '${_filter}') print $1;}' /etc/passwd
+    fi | \grep "^${_user}$" >/dev/null || return $?
+  else # Name
+    if __sm.os.type.is darwin
+    then
+      dscl . -list /Users UniqueID | awk '{print $1}'
+    else
+      awk "/^${_filter}:/" /etc/passwd
+    fi | \grep "^${_user}$" >/dev/null || return $?
+  fi
 }
 
 __sm.user.create.unless.exists()
@@ -111,9 +120,7 @@ __sm.user.create.unless.exists()
   fi
 
   if ! __sm.user.exists "$1" ${_system}
-  then
-    __sm.user.add "$@"
-  fi
+  then __sm.user.add "$@" ; fi
 }
 
 __sm.user.add()
