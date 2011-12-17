@@ -93,20 +93,24 @@ __sm.user.exists()
   else _filter=">= ${__sm_user_id_users}"
   fi
 
+  # TODO: Figure out the filtering of system users... although I am not
+  # convinced that filter is necessary at all.
+
+  # At this point _user is expected to be UID numeric or USER string.
   if [[ "${_user}" == "0" ]] ||  (( _user ))
   then # UID
     if __sm.os.type.is darwin
     then
-      dscl . -list /Users UniqueID | \awk '{if ($2 == '${_filter}') print $1;}'
+      dscl . -list /Users UniqueID | \awk '{if ($2 == '${_user}') print $1;}'
     else
-      \awk -F: '{if ($3 == '${_filter}') print $1;}' /etc/passwd
+      \awk -F: '{if ($3 == '${_user}') print $1;}' /etc/passwd
     fi | \grep "^${_user}$" >/dev/null || return $?
   else # Name
     if __sm.os.type.is darwin
     then
       dscl . -list /Users UniqueID | awk '{print $1}'
     else
-      awk -F: "/^${_filter}:/{print $1}" /etc/passwd
+      awk -F: "/^${_user}:/{print $1}" /etc/passwd
     fi | \grep "^${_user}$" >/dev/null || return $?
   fi
 }
