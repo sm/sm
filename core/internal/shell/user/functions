@@ -106,7 +106,7 @@ __sm.user.exists()
     then
       dscl . -list /Users UniqueID | awk '{print $1}'
     else
-      awk "/^${_filter}:/" /etc/passwd
+      awk -F: "/^${_filter}:/{print $1}" /etc/passwd
     fi | \grep "^${_user}$" >/dev/null || return $?
   fi
 }
