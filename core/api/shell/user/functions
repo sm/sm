@@ -99,7 +99,7 @@ user()
         _flags+=(-f)
         ;;
       (system)
-        _flags+=("${_token}")
+        _flags+=(--system)
         ;;
       (*)
         __sm.log.fail "Unhandled token '${_token}'"

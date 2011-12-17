@@ -16,7 +16,6 @@ __sm.json.get()
       (into)
         _array_name="${_path}"
         typeset -ga ${_array_name}
-
         ;;
       (string)
         while :
