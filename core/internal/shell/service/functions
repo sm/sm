@@ -115,9 +115,8 @@ __sm.service.setup()
 
   if user is root
   then
-    # TODO: create an 'user_exists' function and use it here.
-    user create unless exists system \
-      user "${service_user}" group "${service_user}" #>/dev/null 2>&1
+    if ! user exists ${service_user}
+    then user create system user "${service_user}" group "${service_user}" ; fi
 
     paths create "${service_root_paths[@]}"
 

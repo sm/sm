@@ -118,6 +118,7 @@ __sm.user.exists()
 __sm.user.create.unless.exists()
 {
   typeset _system
+
   if __sm.string.contains system "$4"
   then _system="system"
   else _system=""
