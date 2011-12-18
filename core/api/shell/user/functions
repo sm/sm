@@ -14,7 +14,7 @@
 
 user()
 {
-  trace_filter users || set -o xtrace
+  trace_filter user || set -o xtrace
 
   typeset _token _command _subcommand _user _group _source _flags _value \
   _shell _home __user_commands _password
