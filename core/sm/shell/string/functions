@@ -56,6 +56,11 @@ __sm.string.to.function.name()
   printf "${__string// /.}\n"
 }
 
+__sm.string.from.function.name()
+{
+  printf "${1//./ }\n"
+}
+
 __sm.string.ematch()
 {
   typeset _value _regex _result
