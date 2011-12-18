@@ -80,38 +80,39 @@ __sm.user.set.home()
 
 __sm.user.exists()
 {
-  typeset _filter _user _flags
+  typeset _user _flags
 
   _user="$1"
   _flags="$2"
 
-  if __sm.os.type.is darwin && __sm.string.contains "system" "${_flags}"
-  then _user="_${_user}" ; fi
+  if __sm.string.is.empty "${_user}"
+  then
 
-  if __sm.string.contains "system" "${_flags}"
-  then _filter="< ${__sm_user_id_users}"
-  else _filter=">= ${__sm_user_id_users}"
-  fi
+    return 1
 
-  # TODO: Figure out the filtering of system users... although I am not
-  # convinced that filter is necessary at all.
-
-  # At this point _user is expected to be UID numeric or USER string.
-  if [[ "${_user}" == "0" ]] ||  (( _user ))
+  # At this point _user is expected to be UID numeric or USER login string.
+  elif __sm.string.is.number "${_user}"
   then # UID
+
     if __sm.os.type.is darwin
     then
-      dscl . -list /Users UniqueID | \awk '{if ($2 == '${_user}') print $1;}'
+      dscl . -list /Users UniqueID | \awk '{print $2;}'
     else
-      \awk -F: '{if ($3 == '${_user}') print $1;}' /etc/passwd
+      \awk -F: '{print $3;}' /etc/passwd
     fi | \grep "^${_user}$" >/dev/null || return $?
+
   else # Name
+
+    if __sm.os.type.is darwin && __sm.string.contains "system" "${_flags}"
+    then _user="_${_user#_}" ; fi
+
     if __sm.os.type.is darwin
     then
-      dscl . -list /Users UniqueID | awk '{print $1}'
+      dscl . -list /Users UniqueID | \awk '{print $1;}'
     else
-      awk -F: '/^'${_user}':/{print $1}' /etc/passwd
+      \awk -F: '{print $1;}' /etc/passwd
     fi | \grep "^${_user}$" >/dev/null || return $?
+
   fi
 }
 
@@ -287,4 +288,3 @@ __sm.user.is()
     [[ "$USER" == "${_identifier}" ]]
   fi
 }
-

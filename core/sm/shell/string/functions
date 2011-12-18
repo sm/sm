@@ -75,3 +75,18 @@ __sm.string.ematch()
       ;;
   esac
 }
+
+__sm.string.is.number()
+{
+  if [[ -n "$1" ]]
+  then
+    [[ "$1" == "0" ]] ||  (( $1 ))
+  else
+    return 1
+  fi
+}
+
+__sm.string.is.empty()
+{
+  [[ -z "$1" ]]
+}
