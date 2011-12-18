@@ -108,7 +108,7 @@ user()
   done
 
   case "${_command}" in
-    (is.*)
+    (is*)
       __sm.user.${_command} || return $?
       ;;
     (exists)
