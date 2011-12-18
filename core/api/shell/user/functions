@@ -56,6 +56,11 @@ user()
       (( $# )) && shift || __sm.log.fail "A user name must follow keyword 'exists'"\
         "user exists {username}"
       ;;
+    (is)
+      _user="$1"
+      (( $# )) && shift || __sm.log.fail "A user name or id must follow keyword 'is'"\
+        "user is {username or id}"
+      ;;
   esac
 
   while (( $# > 0 ))
