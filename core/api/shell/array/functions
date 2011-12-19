@@ -86,7 +86,7 @@ array()
         _prefix="$1"
         (( $# )) && shift || __sm.log.fail "A string prefix must follow keyword 'prefix'"
         ;;
-      (variable|as)
+      (variable|as|into)
         _variable="$1"
         (( $# )) && shift || __sm.log.fail "A variable name must follow keyword '${_token}'"
         ;;
