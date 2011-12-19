@@ -33,14 +33,14 @@ __sm.array.last()
   then
     if [[ -n "${_variable}" ]]
     then
-      eval "${_variable}=\${#${_name}}"
+      eval "typeset -g ${_variable}; ${_variable}=\${#${_name}}"
     else
       eval "echo \"\${#${_name}}\""
     fi
   else
     if [[ -n "${_variable}" ]]
     then
-      eval "${_variable}=\${${_name}[-1]}"
+      eval "typeset -g ${_variable}; ${_variable}=\${${_name}[-1]}"
     else
       eval "echo \"\${${_name}[-1]}\""
     fi
@@ -58,14 +58,14 @@ __sm.array.first()
   then
     if [[ -n "${_variable}" ]]
     then
-      eval "${_variable}=${__sm_array_start}"
+      eval "typeset -g ${_variable}; ${_variable}=${__sm_array_start}"
     else
       echo ${__sm_array_start}
     fi
   else
     if [[ -n "${_variable}" ]]
     then
-      eval "${_variable}=\${${_name}[${__sm_array_start}]}"
+      eval "typeset -g ${_variable}; ${_variable}=\${${_name}[${__sm_array_start}]}"
     else
       eval "echo \"\${${_name}[${__sm_array_start}]}\""
     fi
@@ -107,7 +107,7 @@ __sm.array.pop()
 
   if [[ -n "${_variable}" ]]
   then
-    eval "${_variable}=\${${_name}[-1]}"
+    eval "typeset -g ${_variable}; ${_variable}=\${${_name}[-1]}"
   else
     eval "echo \${${_name}[-1]}"
   fi
@@ -124,7 +124,7 @@ __sm.array.shift()
 
   if [[ -n "${_variable}" ]]
   then
-    eval "${_variable}=\${${_name}[${__sm_array_start}]}"
+    eval "typeset -g ${_variable}; ${_variable}=\${${_name}[${__sm_array_start}]}"
   else
     eval "echo \${${_name}[${__sm_array_start}]}"
   fi
