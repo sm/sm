@@ -4,68 +4,100 @@
 # SM Framework Core Module ~ String (string)
 #
 
-#
+## Space separated strings
 # string contains {string} {content}
-# string append ...
-# string prepend ...
+# string contains key {key_name} {content}
+#
+## Normal strings detection
+# string ematch {string} {content}
+# string ends [with] {string} {content}
+# string starts [with] {string} {content}
+# string is empty {string}
+# string is number {string}
+# string starts with one of {string} {search} {search} ...
+#
+## Normal strings transform
+# string number of words {string} {string} ...
+# string from function name {function_name}
+# string to function name {string}
 #
 string()
 {
-  typeset _token _command _string _search _regex
+  typeset _token _command _string _search
+  typeset -a __commands _searches
 
-  while (( $# ))
-  do
-    _token="$1" && shift
-    case "${_token}" in
-      (from)
-        _search="$1"
-        (( $# )) && shift || __sm.log.fail "From source string must follow keyword 'from'"
-        ;;
-      (to)
-        _string="$1"
-        ;;
-      (contains)
-        _command=contains
-        _search="$1"
-        (( $# )) && shift || __sm.log.fail "Search (glob) string must follow keyword 'contains'"
-        ;;
-      (*)
-        if [[ -z "${_string}" ]]
-        then
-          _string="${_token}"
-        elif [[ -z "${_search}" ]]
-        then
-          _search="${_token}"
-        fi
-        ;;
-    esac
-  done
+  __commands=(
+    "contains.key"
+    "ends with=ends"
+    "from function name"
+    "is number"
+    "is empty"
+    "match=contains"
+    "to function name"
+    "starts with=starts"
+    "starts with one of"
+    "count words=number of words"
+  )
+
+  if __sm.command.detect "$*" "${__commands[@]}"
+  then
+    _command="${__sm_command_dotted}"
+    shift "${__sm_command_words}"
+  else
+    __sm.log.fail "Array command not given: array <command> [options]..."
+  fi
 
   case "${_command}" in
-    (contains)
-      __sm.string.contains "${_search}" "${_string}"
+    (ematch|contains|ends|starts)
+      _search="$1"
+      (( $# )) && shift || __sm.log.fail "Search term must follow '${__sm_command_detected}'."
+      _string="$1"
+      (( $# )) && shift || __sm.log.fail "Content must follow '${__sm_command_detected} \"${_search}\"'."
       ;;
-    (append)
-      printf "${_string}"
-      if ! [[ "${_string}" =~ "${_search}" ]] ; then printf " ${_search}" ; fi
+    (contains.key)
+      _search="$1"
+      (( $# )) && shift || __sm.log.fail "Key name must follow '${__sm_command_detected}'."
+      _string="$1"
+      (( $# )) && shift || __sm.log.fail "Content must follow '${__sm_command_detected} \"${_search}\"'."
       ;;
-    (prepend)
-      if ! [[ "${_string}" =~ "${_search}" ]] ; then printf "${_search} " ; fi
-      printf "${_string}"
+    (starts.with.one.of)
+      _string="$1"
+      (( $# )) && shift || __sm.log.fail "Content must follow '${__sm_command_detected}'."
+      _searches=( "$@" )
+      (( $# )) && shift $# || __sm.log.fail "Search terms must follow '${__sm_command_detected} \"${_string}\"'."
       ;;
-    (remove)
-      _string=" ${_string} "               # wrap with spaces.
-      _string="${_string// ${_search} / }" # remove second string.
-      _string="${_string## }"              # remove spaces from beginning.
-      _string="${_string%% }"              # remove spaces from end.
-      printf "${_string}"
+    (number.of.words)
+      _string="$*"
+      (( $# )) && shift $# || __sm.log.fail "Strings must follow '${__sm_command_detected}'."
       ;;
-    (truncate)
-      printf ""
+    (from.function.name)
+      _string="$1"
+      (( $# )) && shift || __sm.log.fail "Function name must follow '${__sm_command_detected}'."
+      ;;
+    (to.function.name|is.*)
+      _string="$1"
+      (( $# )) && shift || __sm.log.fail "String must follow '${__sm_command_detected}'."
+      ;;
+  esac
+
+  case "${_command}" in
+    (contains*|ends|starts)
+      __sm.string.${_command} "${_search}" "${_string}" || return $?
+      ;;
+    (ematch)
+      __sm.string.${_command} "${_string}" "${_search}" || return $?
+      ;;
+    (is.*)
+      __sm.string.${_command} "${_string}" || return $?
+      ;;
+    (starts.with.one.of)
+      __sm.string.${_command} "${_string}" "${_searches[@]}" || return $?
+      ;;
+    (number.of.words|*.function.name)
+      __sm.string.${_command} "${_string}"
       ;;
     (*)
       __sm.log.fail "Unknown string command '${_command}'"
       ;;
   esac
 }
-

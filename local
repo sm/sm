@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/usr/bin/env zsh
 #
 # S{cripting,ystem,tack} Management (SM) Framework (Core)
 #

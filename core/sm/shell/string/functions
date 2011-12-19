@@ -56,6 +56,11 @@ __sm.string.to.function.name()
   printf "${__string// /.}\n"
 }
 
+__sm.string.from.function.name()
+{
+  printf "${1//./ }\n"
+}
+
 __sm.string.ematch()
 {
   typeset _value _regex _result
@@ -74,4 +79,19 @@ __sm.string.ematch()
       __sm.log.fail "grep returned unknown error code: ${_result}"
       ;;
   esac
+}
+
+__sm.string.is.number()
+{
+  if [[ -n "$1" ]]
+  then
+    [[ "$1" == "0" ]] ||  (( $1 ))
+  else
+    return 1
+  fi
+}
+
+__sm.string.is.empty()
+{
+  [[ -z "$1" ]]
 }
