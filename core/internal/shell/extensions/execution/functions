@@ -175,14 +175,14 @@ __sm.extension.run()
       __sm.extension.modules.include ${=_namespaces//\// }
       action=${action%%\(*}
       __sm.extension.action.prerequisites
-      __sm.actions.call ${action} "${extension_args[@]}"
+      __sm.actions.call ${action} "${extension_args[@]}" || return $?
       ;;
 
     (shell)
       _namespaces=${_path##${extension_bin_path}}
       __sm.extension.modules.include ${=_namespaces//\// }
       __sm.extension.action.prerequisites
-      __sm.actions.source "${_path}/${action}" "${extension_args[@]}"
+      __sm.actions.source "${_path}/${action}" "${extension_args[@]}" || return $?
       ;;
 
     (ruby)

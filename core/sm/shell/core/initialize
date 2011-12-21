@@ -127,7 +127,7 @@ then
   then # Sourcing needed for loading from bash 3, for now, set sm_script='/'
     true # Skip any actions, stop with the framework simply loaded.
   else
-    __sm.actions.source $sm_script "${extension_args[@]}" # load script
+    __sm.actions.source $sm_script "${extension_args[@]}" || exit $?
   fi
 elif [[ -n "${call_action}" ]]
 then
@@ -141,12 +141,12 @@ elif set | grep '^extension_args=(' >/dev/null
 then
   case "${extension_args[1]}" in
     (*,*)
-      ${sm_path}/bin/smp ${extension_args[@]}
+      ${sm_path}/bin/smp ${extension_args[@]} || exit $?
       ;;
     (*)
       __sm.includes sm/modules api/extensions/detection api/extensions/execution
       __sm.extension.action
       __sm.extension.actions.type
-      __sm.extension.run
+      __sm.extension.run || exit $?
   esac
 fi
