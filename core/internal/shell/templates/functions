@@ -83,36 +83,39 @@ __sm.templates.install()
 
 __sm.templates.seed()
 {
-  typeset _template _owner _mode _hash _strings temporary
+  typeset _template _owner _mode _hash _strings temporary _key _value _variable_name
+
   _template="${1}"
   _owner="${2}"
   _mode="${3}"
-  shift 3
+  _variable_name="${4}"
+  shift 4
   _hash=("$@")
   _strings=()
   temporary=${_template}.${timestamp}.$$
 
   if ! file exists "${_template}"
-  then
-    __sm.log.fail "template file '${_template}' does not exist."
-  fi
+  then __sm.log.fail "template file '${_template}' does not exist." ; fi
 
-  if array is empty _hash
+  if array is empty ${_variable_name:-"_hash"}
   then
     __sm.log.fail "Cannot seed template '${_template}';"\
       " No replacement keys were specified."
   fi
 
-  if ! array is even _hash
+  if ! array is even ${_variable_name:-"_hash"}
   then
     __sm.log.fail "Cannot seed template;"\
       " Every replacement key must have a replacement value."
   fi
 
-  for (( index=1 ; index <= ${#_hash[@]} ; index++ ))
+  eval "
+  for (( index=1 ; index <= \${#${_variable_name:-"_hash"}[@]} ; index++ ))
   do
-    _strings+=(-e "s#{{${_hash[${index}]}}}#${_hash[$((++index))]}#g")
-  done
+    _key=\"\${${_variable_name:-"_hash"}[\${index}]}\"
+    _value=\"\${${_variable_name:-"_hash"}[\$((++index))]}\"
+    _strings+=(-e \"s#{{\${_key}}}#\${_value}#g\")
+  done"
 
   sed "${_strings[@]}" ${_template} > ${temporary} ||
     __sm.log.error "There was an error (?) seeding the template '${_template}';" \

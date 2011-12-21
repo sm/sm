@@ -2,7 +2,9 @@
 
 __sm.json.get()
 {
+  trace_filter json || set -o xtrace
   typeset _type _path _default _variable _json_file _array_name
+
   _json_file="$1" && shift
 
   # TODO: support 'as {variable name}'
@@ -12,6 +14,7 @@ __sm.json.get()
     _default= # Ensure _default is empty for each next round.
     _type="$1" && shift
     _path="$1" && shift
+    _default=""
     case "${_type}" in
       (into)
         _array_name="${_path}"
@@ -41,17 +44,17 @@ __sm.json.get()
 
         if ! eval "${_variable}=$("${sm_path}/core/cli/bin/json/get" "${_path}" "${_json_file}")"
         then
-          eval "${_variable}="
+          eval "${_variable}=\"\""
         fi
 
-        if eval "[[ -z \"\${${_variable}}\" && -n \"${_default}\" ]]"
+        if eval "[[ -z \"\${${_variable}}\" ]]"
         then
           eval "${_variable}=\"${_default}\""
         fi
 
         if [[ -n "${_array_name}" ]]
         then
-          eval "${_array_name}+=(${_variable} \${${_variable}})"
+          eval "${_array_name}+=(${_variable} \"\${${_variable}}\")"
         fi
         ;;
       (array)
@@ -81,9 +84,9 @@ __sm.json.get()
           eval "${_variable}=()"
         fi
 
-        if eval "[[ -z \"\${${_variable}}\" && -n \"${_default}\" ]]"
+        if eval "[[ -z \"\${${_variable}}\" ]]"
         then
-          eval "${_variable}=(${_default})"
+          eval "${_variable}=(\"${_default}\")"
         fi
 
         if [[ -n "${_array_name}" ]]
@@ -97,6 +100,7 @@ __sm.json.get()
 
 __sm.json.set()
 {
+  trace_filter json || set -o xtrace
   NIY
 }
 

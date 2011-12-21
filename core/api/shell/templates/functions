@@ -24,7 +24,7 @@ templates()
   trace_filter templates || set -o xtrace
 
   typeset _command _name _target _source _mode _owner _group _template _params \
-    __templates_commands _token
+    __templates_commands _token _variable_name
   typeset -g _templates_append_flag
 
   _templates_append_flag=0
@@ -75,8 +75,14 @@ templates()
         __sm.log.fail "'from' keyword is no longer supported"
         ;;
       (with|variables)
-        _params+=("$@")
-        break
+        if [[ "${1}" == "from" ]]
+        then
+          shift
+          _variable_name="${1}"
+        else
+          _params+=("$@")
+          break
+        fi
         ;;
       (append)
         _templates_append_flag=1
@@ -91,17 +97,17 @@ templates()
 
   case "${_command}" in
     (install)
-      __sm.templates.${_command} "${_name}" "${_params[@]}"
+      __sm.templates.${_command} "${_name}" "${_variable_name}" "${_params[@]}"
       if (( ${#_params[@]} ))
       then
-        __sm.templates.seed "${_target}" "${_owner}" "${_mode}" "${_params[@]}"
+        __sm.templates.seed "${_target}" "${_owner}" "${_mode}" "${_variable_name}" "${_params[@]}"
       fi
       ;;
     (exist|exists)
       __sm.templates.exists "${_name}" "${_params[@]}"
       ;;
     (seed)
-      __sm.templates.seed "${_name}" "${_owner}" "${_mode}" "${_params[@]}"
+      __sm.templates.seed "${_name}" "${_owner}" "${_mode}" "${_variable_name}" "${_params[@]}"
       ;;
     (update)
       __sm.templates.${_command} "${_name}" "${_params[@]}"
