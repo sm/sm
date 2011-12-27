@@ -9,7 +9,7 @@ __sm.config.read()
   _key="$3"
   _variable="$4"
   _prefix="$5"
-  _delimiter="$6"
+  _delimiter="${6:-"="}"
 
   if [[ -z "${_variable}" ]]
   then _variable="${_key}" ; fi
