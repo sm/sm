@@ -19,6 +19,17 @@ install and manage a multitude of extensions - and even entire sets of extension
 unprecedented levels of control and automation productivity that are unleashed by the
 creative abilities of SM's energetic community of extension authors :)
 
+# Manual
+
+The manual may be downloaded as a PDF. Keep in mind that it is a work in
+progress. Suggestions on improving the manual are most welcome.
+
+The latest version of the manual is kept at the following url:
+
+    https://sm.beginrescueend.com/sm-manual.pdf
+
+Anytime updates are made to the manual a new version is pushed to that url.
+
 # Creating Extensions
 
 There are only a few requirements when creating your own SM extensions.
