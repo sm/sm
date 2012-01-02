@@ -59,7 +59,7 @@ dates()
 
   case "${_step}" in
     (minute)
-      _minute=60
+      _step=60
       ;;
     (hour)
       _step=3600
