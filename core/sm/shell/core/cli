@@ -40,7 +40,7 @@ do
       ;;
 
     (--trace-var=*)
-      var_debug_flags+=( "${token##--var-debug\=}" )
+      var_debug_flags+=( "${token##--trace-var\=}" )
       ;;
 
     (--trace-var-*)
