@@ -44,6 +44,7 @@ archive_get()
   then
     if [[ -f "${_uri}" ]]
     then
+      # TODO: switch to internal, do not call api/ in internal
       if ! files copy force from "${_uri}" to "${_archive}"
       then
         fetch_error copy_failed from=${_uri} to=${_archive}

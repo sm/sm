@@ -1,2 +1,2 @@
-api/vcs/handlers/archive
-api/vcs/handlers/git
+internal/vcs/handlers/archive
+internal/vcs/handlers/git
