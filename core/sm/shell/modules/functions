@@ -18,7 +18,8 @@ __sm.modules.core.initialize()
   __sm_modules_loaded=(
     "sm/core=core/sm/shell/core"
     "sm/string=core/internal/shell/string"
-    "sm/logging=core/sm/shell/logging"
+    "sm/temp=core/sm/shell/temp"
+    "sm/log=core/sm/shell/log"
     "sm/command=core/sm/shell/command"
     "sm/modules=core/sm/shell/modules"
     "sm/versionedfs=core/sm/shell/versionedfs"

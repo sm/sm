@@ -85,9 +85,9 @@ assert()
 
   if [[ -n "${_code}" ]]
   then
-    __sm.paths.create "/tmp/sm/assert/$$"
-    __sm.files.create "/tmp/sm/assert/$$/stdout.log" "/tmp/sm/assert/$$/stderr.log"
-    if ! $(echo ${_code}) > "/tmp/sm/assert/$$/stdout.log" 2> "/tmp/sm/assert/$$/stderr.log"
+    __sm.paths.create "${sm_temp_path}/assert/$$"
+    __sm.files.create "${sm_temp_path}/assert/$$/stdout.log" "${sm_temp_path}/assert/$$/stderr.log"
+    if ! $(echo ${_code}) > "${sm_temp_path}/assert/$$/stdout.log" 2> "${sm_temp_path}/assert/$$/stderr.log"
     then
       return 1
     fi
@@ -112,4 +112,3 @@ assert()
       ;;
   esac
 }
-

@@ -105,6 +105,7 @@ zmodload zsh/parameter
 # Load module() function, then load core modules.
 source "${sm_path}/core/sm/shell/core/functions"
 source "${sm_path}/core/sm/shell/string/functions"
+source "${sm_path}/core/sm/shell/temp/initialize"
 source "${sm_path}/core/sm/shell/log/functions"
 source "${sm_path}/core/sm/shell/log/initialize"
 source "${sm_path}/core/sm/shell/command/functions"

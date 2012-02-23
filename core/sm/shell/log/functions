@@ -305,20 +305,19 @@ __sm.log.step()
     shift
     __sm.log.piece "${_message}"
 
-    _log_file="${TMP_PATH:-/tmp}/$$.stderr.log"
+    [[ -d "${sm_temp_path}/steps" ]] || mkdir "${sm_temp_path}/steps"
+    _log_file="${sm_temp_path}/steps/$$.stderr.log"
 
     touch "${_log_file}"
     if "$@" > "${_log_file}"
     then
       __sm.log.piece "succ"
       cat "${_log_file}"
-      rm -rf "${_log_file}"
       return 0
     else
       _status="$?"
       __sm.log.piece "fail"
       cat "${_log_file}" >&2
-      rm -rf "${_log_file}"
       return ${_status} # pass __sm.log.error return status code up !
     fi
   else
@@ -585,17 +584,6 @@ __sm.log.piece()
       ;;
   esac
   unset log_step_message
-}
-
-__sm.tmp.logs.clean()
-{
-  trace_filter log || set -o xtrace
-  typeset _log
-  [[ -d "${TMP_PATH:-/tmp}"/$$/logs ]] || return 0
-  for _log in "${TMP_PATH:-/tmp}"/$$/logs/*.err.log
-  do
-    rm -f "${_log}"
-  done
 }
 
 __sm.log.options.check()

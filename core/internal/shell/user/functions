@@ -175,14 +175,14 @@ __sm.user.add()
 
     "Darwin")
       typeset current_max_gid next_gid current_max_uid next_uid
-      mkdir -p /tmp/$$
+      mkdir -p "${sm_temp_path}/darwin"
 
-      dscl . -list /Groups gid | awk '{print $2}' | sort -g -r | head -1 > /tmp/$$/gid
-      read -r current_max_gid < /tmp/$$/gid
+      dscl . -list /Groups gid | awk '{print $2}' | sort -g -r | head -1 > "${sm_temp_path}/darwin/gid"
+      read -r current_max_gid < "${sm_temp_path}/darwin/gid"
       next_gid=$((current_max_gid+1))
 
-      dscl . -list /Users UniqueID | awk '{print $2}' | sort -g -r | head -1 > /tmp/$$/uid
-      read -r current_max_uid < /tmp/$$/gid
+      dscl . -list /Users UniqueID | awk '{print $2}' | sort -g -r | head -1 > "${sm_temp_path}/darwin/uid"
+      read -r current_max_uid < "${sm_temp_path}/darwin/uid"
       next_uid=$((current_max_uid+1))
 
       if ! dscl . -list /Users | grep -q "^${_user}$" ; then

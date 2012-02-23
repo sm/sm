@@ -14,8 +14,6 @@ set +o errexit     # Do not exit on error
 trap 'exit 1' USR2 # Exit on USR2 (send by backtrace to $__sm_pid)
 export __sm_pid=$$  # Store process pid for closing from backtrace
 
-trap __sm.tmp.logs.clean EXIT
-
 if [[ -n "${ZSH_VERSION}" ]] # Persist ERR handler
 then set -e; else set -o errtrace ; fi
 
