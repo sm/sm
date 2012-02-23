@@ -36,7 +36,7 @@ do
       ;;
 
     (--trace-fun=*)
-      trace_functions+=( ${=token##--fun-trace\=} )
+      trace_functions+=( ${token##--trace-fun\=} )
       ;;
 
     (--trace-var=*)
