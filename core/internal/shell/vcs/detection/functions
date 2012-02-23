@@ -125,7 +125,7 @@ fetch_uri_detect_scm_type()
     scm_type="file"
   else
     case "${_uri}" in
-      (*git*)    scm_type="git" ;;
+      (git://*|git@*|*.git) scm_type="git" ;;
       (*svn*)    scm_type="svn" ;;
       (*hg*)     scm_type="hg"     ;;
       (*fossil*) scm_type="fossil" ;;
