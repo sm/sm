@@ -1,0 +1,40 @@
+#!/bin/sh
+
+# ## archive\_get()
+#
+#
+#
+# Code Walkthrough
+file_get()
+{
+  typeset _source _target
+  _source="${1:-}"
+  _target="${2:-}"
+  (( $# )) && shift || __sm.log.fail "source must be specified as the first parameter."
+  (( $# )) && shift || __sm.log.fail "target path must be specified as the second parameter."
+
+  if [[ -f "${_source}" ]]
+  then
+    if cp -f "${_source}" "${_target}"
+    then
+      echo "${_source}" > "${_target}.uri"
+    else
+      fetch_error copy_failed from=${_source} to=${_target}
+    fi
+  else
+    if curl -s -L "${_source}" -o "${_target}"
+    then
+      echo "${_source}" > "${_target}.uri"
+    else
+      case $? in
+        (60)
+          __sm.log.error "Peer certificate cannot be authenticated with known CA certificates.\n\n\
+Please read 'sm man curl' for instructions how to solve this problem.\n"
+          ;;
+        (*)
+          fetch_error download_failed from=${_source} to=${_target}
+          ;;
+      esac
+    fi
+  fi
+}
