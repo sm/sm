@@ -3,9 +3,11 @@
 __sm.json.get()
 {
   trace_filter json || set -o xtrace
-  typeset _type _path _default _variable _json_file _array_name
+  typeset _type _path _default _variable _json_file _json_file_src _array_name
 
-  _json_file="$1" && shift
+  _json_file_src="$1" && shift
+  _json_file="${sm_temp_path}/${_json_file_src##*/}"
+  fetch_uri "${_json_file_src}" "${_json_file}"
 
   # TODO: support 'as {variable name}'
   while (( $# ))
@@ -103,4 +105,3 @@ __sm.json.set()
   trace_filter json || set -o xtrace
   NIY
 }
-
