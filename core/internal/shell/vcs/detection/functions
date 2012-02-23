@@ -117,12 +117,12 @@ fetch_uri_detect_scm_type()
   elif is_archive_uri "${_uri}" # check for packages
   then
     scm_type="archive"
+  elif [[ -f "${_uri}" ]] && ! [[ "${_uri}" =~ ".git" ]] # check for file && ! local.git
+  then
+    scm_type="file"
   elif is_github_uri "${_uri}" # check for pattern user/repository from github
   then
     scm_type="github"
-  elif [[ -f "${_uri}" ]] # check for file
-  then
-    scm_type="file"
   else
     case "${_uri}" in
       (git://*|git@*|*.git) scm_type="git" ;;
