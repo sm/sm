@@ -40,9 +40,6 @@ json()
   if [[ -z "${_json_uri}" ]]
   then
     __sm.log.fail "A file name must be given to ${_command} json: 'json ${_command} from {file name}'."
-  elif [[ "${_command}" == "get" && ! -s "${_json_uri}" ]]
-  then
-    __sm.log.fail "The json file given '${_json_uri}' to get values from must be nonempty."
   elif (( ${#_params} == 0 ))
   then
     __sm.log.fail "json: No parameters given to json api."
