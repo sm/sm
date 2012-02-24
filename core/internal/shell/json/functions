@@ -4,8 +4,6 @@ __sm.json.cli()
 {
   trace_filter json || set -o xtrace
 
-  set +o xtrace
-
   typeset _token index
   typeset -a _ignored_args _ext_args
 
@@ -20,76 +18,13 @@ __sm.json.cli()
         [[ -n "${json_uri}" ]] ||
           __sm.log.error "a json uri/path must follow keyword '${_token}'"
         ;;
-      (data)
-        data_path="${_ext_args[$((++index))]}"
-        [[ -n "${data_path}" ]] ||
-          __sm.log.error "a path must follow keyword 'data'"
-        ;;
-      (user)
-        package_user="${_ext_args[$((++index))]}"
-        [[ -n "${package_user}" ]] ||
-          __sm.log.error "a user name must follow keyword 'user'"
-        ;;
-      (version)
-        package_version="${_ext_args[$((++index))]}"
-        [[ -n "${package_version}" ]] ||
-          __sm.log.error "a version number string must follow keyword 'version'"
-        ;;
-      (base_url)
-        package_base_url="${_ext_args[$((++index))]}"
-        [[ -n "${package_base_url}" ]] ||
-          __sm.log.error "a base path url must follow keyword 'base_url'"
-        ;;
-      (file)
-        package_file="${_ext_args[$((++index))]}"
-        [[ -n "${package_file}" ]] ||
-          __sm.log.error "a path must follow keyword 'file'"
-        ;;
-      (dir)
-        package_directory="${_ext_args[$((++index))]}"
-        [[ -n "${package_directory}" ]] ||
-          __sm.log.error "a single extracted directory name must follow keyword 'dir'"
-        ;;
-      (archive_format)
-        archive_format="${_ext_args[$((++index))]}"
-        [[ -n "${archive_format}" ]] ||
-          __sm.log.error "an archive format (tar.gz,tar.bz2,tar.xz,zip,...) must follow keyword 'archive_format'"
-        ;;
-      (md5)
-        package_md5="${_ext_args[$((++index))]}"
-        [[ -n "${package_md5}" ]] ||
-          __sm.log.error "an md5 sum string must follow keyword 'md5'"
-        ;;
-      (force)
-        force_flag=1
-        ;;
-      (static)
-        static_flag=1
-        __sm.package.configure.flags --static
-        ;;
-      (shared)
-        shared_flag=1
-        __sm.package.configure.flags --enable-shared
-        ;;
-      (licence)
-        extension_license
-        succeed
-        ;;
-      (help)
-        __sm.package.usage
-        succeed
-        ;;
-      (--with*|--enable*|--disable*)
-        __sm.package.configure.flags "${_token}"
-        ;;
       (*)
         _ignored_args+=("${_token}")
         ;;
     esac
-
   done
 
-  __sm.package.init "${_ignored_args[@]}"
+  extension_args=${_ignored_args}
 }
 
 __sm.json.get()

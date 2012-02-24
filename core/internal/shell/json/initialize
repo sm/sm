@@ -2,5 +2,7 @@
 
 typeset -gx json_uri
 
-if (( $# )) ; then __sm.json.cli $@ ; fi
+if (( $# )) ; then
+  __sm.json.cli ${extension_args[@]}
+fi
 
