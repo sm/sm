@@ -20,7 +20,8 @@ set -o errexit # exit on errors in early stage before logging is initialized
 set -o nounset # do not allow unset variables processing
 
 initial_pwd="$PWD" # record where the script was run from right away.
-sm_path="/opt/sm"  # BDSM framework path
+# SM Framework path, may be overridden on command line or as exported environment variable.
+sm_path="${sm_path:=/opt/sm}"
 __sm_modules_path="${sm_path}/core/sm/shell"
 
 export initial_pwd sm_path __sm_modules_path initial_pwd
