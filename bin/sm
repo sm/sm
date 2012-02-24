@@ -20,8 +20,11 @@ set -o errexit # exit on errors in early stage before logging is initialized
 set -o nounset # do not allow unset variables processing
 
 initial_pwd="$PWD" # record where the script was run from right away.
+
 # SM Framework path, may be overridden on command line or as exported environment variable.
-sm_path="${sm_path:=/opt/sm}"
+if [[ -z "${sm_path}" || ! -d "${sm_path}" ]]
+then sm_path="$(dirname $(command cd $(dirname $0); pwd ))" ; fi
+
 __sm_modules_path="${sm_path}/core/sm/shell"
 
 export initial_pwd sm_path __sm_modules_path initial_pwd
