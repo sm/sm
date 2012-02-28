@@ -16,11 +16,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Declare the variables we use here.
+typeset self initial_pwd sm_path __sm_modules_path initial_pwd >/dev/null 2>&1
+
 set -o errexit # exit on errors in early stage before logging is initialized
 set -o nounset # do not allow unset variables processing
 
 initial_pwd="$PWD" # record where the script was run from right away.
-sm_path="/opt/sm"  # BDSM framework path
+
+# Account for symlinks
+if [[ -L $0 ]] ; then self=$(readlink $0) ; else self=$0 ; fi
+
+# SM Framework path, may be overridden on command line or as exported environment variable.
+[[ -n "${sm_path:-}" && -d "${sm_path:-}" ]] || sm_path="$(dirname $(builtin cd $(dirname $self); pwd ))"
+
 __sm_modules_path="${sm_path}/core/sm/shell"
 
 export initial_pwd sm_path __sm_modules_path initial_pwd

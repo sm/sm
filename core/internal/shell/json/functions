@@ -1,13 +1,46 @@
 #!/bin/sh
 
+__sm.json.cli()
+{
+  trace_filter json || set -o xtrace
+
+  typeset _token index
+  typeset -a _ignored_args _ext_args
+
+  _ext_args=( $@ )
+
+  for (( index=1 ; index <= ${#_ext_args} ; index++ ))
+  do
+    _token="${_ext_args[$index]}"
+    case "${_token}" in
+      (json_uri|json_file)
+        json_uri="${_ext_args[$((++index))]}"
+        [[ -n "${json_uri}" ]] ||
+          __sm.log.error "a json uri/path must follow keyword '${_token}'"
+        ;;
+      (*)
+        _ignored_args+=("${_token}")
+        ;;
+    esac
+  done
+
+  extension_args=(${_ignored_args})
+}
+
 __sm.json.get()
 {
   trace_filter json || set -o xtrace
-  typeset _type _path _default _variable _json_file _json_file_src _array_name
+  typeset _type _path _default _variable _json_uri _json_uri_src _array_name
 
-  _json_file_src="$1" && shift
-  _json_file="${sm_temp_path}/${_json_file_src##*/}"
-  fetch_uri "${_json_file_src}" "${_json_file}"
+  _json_uri_src="$1" && shift
+  _json_uri="${sm_temp_path}/${_json_uri_src##*/}"
+
+  fetch_uri "${_json_uri_src}" "${_json_uri}" # ensure uri maps to a file.
+
+  if [[ ! -s "${_json_uri}" ]]
+  then # Question: Should we default to an empty json object file?
+    __sm.log.fail "The json file located at '${json_uri}' is empty!"
+  fi
 
   # TODO: support 'as {variable name}'
   while (( $# ))
@@ -44,7 +77,7 @@ __sm.json.get()
 
         typeset -g ${_variable} >/dev/null
 
-        if ! eval "${_variable}=$("${sm_path}/core/cli/bin/json/get" "${_path}" "${_json_file}")"
+        if ! eval "${_variable}=$("${sm_path}/core/cli/bin/json/get" "${_path}" "${_json_uri}")"
         then
           eval "${_variable}=\"\""
         fi
@@ -81,7 +114,7 @@ __sm.json.get()
 
         typeset -ga ${_variable} >/dev/null
 
-        if ! eval "${_variable}=($("${sm_path}/core/cli/bin/json/get" "${_path}" "${_json_file}"))"
+        if ! eval "${_variable}=($("${sm_path}/core/cli/bin/json/get" "${_path}" "${_json_uri}"))"
         then
           eval "${_variable}=()"
         fi

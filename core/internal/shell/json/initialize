@@ -1,6 +1,9 @@
 #!/bin/sh
 
-typeset -g json_file
+typeset -gx json_uri
+typeset -gax extension_args
 
-json_file="/etc/system.json"
+if (( $# )) ; then
+  __sm.json.cli ${extension_args[@]}
+fi
 

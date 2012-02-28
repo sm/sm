@@ -61,8 +61,20 @@ do
       debug_flag=1
       ;;
 
-    (--here)
+    (--ext-path) # No argument defaults to cwd
       extensions_search_paths_here="$initial_pwd"
+      ;;
+
+    (--ext-path=*)
+      extensions_search_paths_here="${token##--ext-path\=}"
+      ;;
+
+    (--exts-path=*)
+      exts_user_path="${token##--exts-path\=}"
+      ;;
+
+    (--sets-path=*)
+      sets_user_path="${token##--sets-path\=}"
       ;;
 
     (--include=*)
