@@ -165,7 +165,7 @@ setup_profile_d()
 
 set_sm_path()
 {
-  files replace regex "^sm_path=.*" \
+  files replace regex "^.*sm_path=.*" \
     with "sm_path=\"${install_path}\"" \
     "${install_path}/bin/sm"
 
