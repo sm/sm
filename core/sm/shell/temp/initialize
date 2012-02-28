@@ -3,7 +3,7 @@
 typeset -gx sm_temp_path
 sm_temp_path="${TMP_PATH:-/tmp}/sm-tmp-$$"
 
-mkdir "${sm_temp_path}"
+mkdir -p "${sm_temp_path}"
 
 #TODO: allow multiple EXIT traps ?
 trap "rm -rf \"${sm_temp_path}\"" EXIT
