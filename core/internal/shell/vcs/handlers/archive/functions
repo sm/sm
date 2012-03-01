@@ -50,7 +50,7 @@ archive_get()
         fetch_error copy_failed from=${_uri} to=${_archive}
       fi
     else
-      if curl -s -L "${_uri}" -o "${_archive}"
+      if ${curl} -s -L "${_uri}" -o "${_archive}"
       then
         : #Download worked
       else

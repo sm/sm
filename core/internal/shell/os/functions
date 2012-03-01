@@ -20,7 +20,7 @@ __sm.os.open()
       then
         ${EDITOR:-less} "${_uri}"
       else
-        curl -s "${_uri}"
+        ${curl} -s "${_uri}"
       fi
     else
       echo "$_uri"

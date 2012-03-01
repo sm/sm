@@ -214,7 +214,7 @@ sets_check_availability()
           [[ "${_line}" == Status* ]] || continue
           echo "${_set/\=*}" "${_line/*:}"
           break
-        done < <(curl -s --head https://github.com/sm/sm-"${_set/\=*}")
+        done < <(${curl} -s --head https://github.com/sm/sm-"${_set/\=*}")
         ;;
     esac
   done < "${sm_path}/core/cli/config/known_sets"

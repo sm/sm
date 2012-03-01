@@ -22,7 +22,7 @@ file_get()
       fetch_error copy_failed from=${_source} to=${_target}
     fi
   else
-    if curl -s -L "${_source}" -o "${_target}"
+    if ${curl} -s -L "${_source}" -o "${_target}"
     then
       echo "${_source}" > "${_target}.uri"
     else
