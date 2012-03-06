@@ -9,3 +9,4 @@ website_url=https://sm.beginrescueend.com/
 version=
 base_url=
 archive_format=tar.gz
+curl=curl

@@ -164,7 +164,7 @@ ext_check_availability()
           [[ "${_line}" == Status* ]] || continue
           echo "${_ext/\=*}" "${_line/*:}"
           break
-        done < <(curl -s --head https://github.com/sm/sm_"${_ext/\=*}")
+        done < <(${curl} -s --head https://github.com/sm/sm_"${_ext/\=*}")
         ;;
     esac
   done < "${sm_path}/core/cli/config/known_ext"
