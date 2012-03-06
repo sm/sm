@@ -593,7 +593,7 @@ __sm.package.fetch.md5()
       then
         __sm.file.copy "${download_url}" "${archives_path}/${package_file}" -f
       else
-        curl -L "${download_url}" -o "${archives_path}/${package_file}.md5" 2>/dev/null ||
+        ${curl} -L "${download_url}" -o "${archives_path}/${package_file}.md5" 2>/dev/null ||
           __sm.log.error "Fetching MD5 checksum from '${download_url}' failed."
       fi
 

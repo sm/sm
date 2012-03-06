@@ -72,13 +72,13 @@ is_github_uri()
 
   if __sm.string.ematch "${_uri}" "^[[:alnum:]_-]+\/[[:alnum:]_-]+$"
   then
-    if curl -s -f -I -L "https://github.com/${_uri}" >/dev/null 2>&1
+    if ${curl} -s -f -I -L "https://github.com/${_uri}" >/dev/null 2>&1
     then
       return 0
     else
       if (( $? == 60 ))
       then
-        if curl -s -k -f -I -L "https://github.com/${_uri}" >/dev/null 2>&1
+        if ${curl} -s -k -f -I -L "https://github.com/${_uri}" >/dev/null 2>&1
         then
           return 0
         fi

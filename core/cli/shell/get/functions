@@ -2,7 +2,7 @@
 
 fetch_version()
 {
-  version=$(curl -s "${releases_url}/latest-version.txt" 2>/dev/null) ||
+  version=$(${curl} -s "${releases_url}/latest-version.txt" 2>/dev/null) ||
     __sm.log.fail "Unable to fetch version from ${releases_url}/latest-version.txt"
 }
 
@@ -45,7 +45,7 @@ install_release()
 {
   archive="$archives_path/sm-${version}.tar.gz"
 
-  md5=$(curl -s "${releases_url}/sm-${version}.tar.gz.md5" 2>/dev/null)
+  md5=$(${curl} -s "${releases_url}/sm-${version}.tar.gz.md5" 2>/dev/null)
 
   if files exist "${archive}" && ! md5_match
   then
@@ -57,7 +57,7 @@ install_release()
   paths create "${archives_path}"
 
   #TODO make use of fetch_uri
-  curl -s -L "${releases_url}/sm-${version}.tar.gz" -o "$archive"
+  ${curl} -s -L "${releases_url}/sm-${version}.tar.gz" -o "$archive"
 
   # TODO: shasum default instead
   [[ "$(files md5 "${archive}")" == "${md5}" ]] ||
