@@ -82,13 +82,24 @@ HTML output. Turn on HTML tabular output.
 Show the list of running queries.
 
 
+=item B<--show-databases>
+
+=item B<--showdbs>
+
+=item B<--list-databases>
+
+=item B<--listdbs>
+
+List the databases (table spaces) in the database.
+
+
 =item B<--show-tables>
 
 =item B<--list-tables>
 
 =item B<--table-list>
 
-List the tables in the database
+List the tables in the database.
 
 
 =item B<--noheaders>
@@ -316,6 +327,11 @@ GNU B<sql> is part of GNU B<parallel>. Report bugs to <bug-parallel@gnu.org>.
 
 =head1 AUTHOR
 
+When using GNU B<sql> for a publication please cite:
+
+O. Tange (2011): GNU SQL - A Command Line Tool for Accessing Different
+Databases Using DBURLs, ;login: The USENIX Magazine, April 2011:29-32.
+
 Copyright (C) 2008,2009,2010 Ole Tange http://ole.tange.dk
 
 Copyright (C) 2010,2011 Ole Tange, http://ole.tange.dk and Free
@@ -493,6 +509,10 @@ if(defined $::opt_tablelist) {
     unshift @ARGV, tablelist($database_driver,%dburl);
 }
 
+if(defined $::opt_dblist) {
+    unshift @ARGV, dblist($database_driver,%dburl);
+}
+
 if(defined $::opt_dbsize) {
     unshift @ARGV, dbsize($database_driver,%dburl);
 }
@@ -536,7 +556,7 @@ $Global::Initfile && unlink $Global::Initfile;
 exit ($err);
 
 sub parse_options {
-    $Global::version = 20110822;
+    $Global::version = 20120222;
     $Global::progname = 'sql';
 
     # This must be done first as this may exec myself
@@ -556,6 +576,11 @@ sub parse_options {
 	       "show-processlist|proclist|listproc" => \$::opt_processlist,
 	       "show-tables|showtables|listtables|list-tables|tablelist|table-list"
 	       => \$::opt_tablelist,
+	       "dblist|".
+	       "listdb|listdbs|list-db|list-dbs|list-database|".
+	       "list-databases|listdatabases|listdatabase|showdb|".
+	       "showdbs|show-db|show-dbs|show-database|show-databases|".
+	       "showdatabases|showdatabase" => \$::opt_dblist,
 	       "db-size|dbsize" => \$::opt_dbsize,
 	       "table-size|tablesize" => \$::opt_tablesize,
 	       "noheaders|no-headers|n" => \$::opt_n,
@@ -763,6 +788,25 @@ sub tablelist {
 	return $statement{$dbdriver};
     } else {
 	print STDERR "tablelist is not implemented for $dbdriver\n";
+	exit 1;
+    }
+}
+
+# Return the code for 'show databases' in the chosen database dialect
+sub dblist {
+    my $dbdriver = shift;
+    my %dburl = @_;
+    my %statement =
+	("mysql" => "show databases;",
+	 "postgresql" => ("SELECT datname FROM pg_database ".
+			  "WHERE datname NOT IN ('template0','template1','postgres') ".
+			  "ORDER BY datname ASC;"),
+	 "oracle" => ("select * from user_tablespaces;"),
+	);
+    if($statement{$dbdriver}) {
+	return $statement{$dbdriver};
+    } else {
+	print STDERR "dblist is not implemented for $dbdriver\n";
 	exit 1;
     }
 }
