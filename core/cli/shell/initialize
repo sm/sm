@@ -10,7 +10,7 @@ true \
 
 [[ -n "$extensions_url" ]] || __sm.config.read sm defaults extensions_url
 [[ -n "$releases_url"   ]] || __sm.config.read sm defaults releases_url
-[[ -n "$curl"]]            || __sm.config.read sm defaults curl
+[[ -n "$curl" ]]            || __sm.config.read sm defaults curl
 
 true \
   ${remote:="origin"} \
