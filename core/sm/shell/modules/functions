@@ -316,15 +316,15 @@ __sm.cli.in.path()
 
 __sm.extension.path.reorder()
 {
-  typeset -g __sm_rebuilded_path
+  typeset -g __sm_rebuilt_path
   typeset part extensions_path extension output
   part="${1:-}"
   extensions_path="${2:-}"
   extension="${3:-}"
-  (( $# >= 3 )) && shift 3 || __sm.log.fail "Path part extensions_path extnesion must be given first ."
+  (( $# >= 3 )) && shift 3 || __sm.log.fail "Path part extensions_path extension must be given first ."
 
   output="$extensions_path/$extension/$part/$*"
-  __sm_rebuilded_path="${output// //}"
+  __sm_rebuilt_path="${output// //}"
 }
 
 __sm.extension.path.rebuild()
@@ -346,7 +346,7 @@ __sm.module.detect()
   (( $# )) && shift || __sm.log.fail "Extensions path must be given as the first parameter."
 
   __sm.extension.path.rebuild "shell" $extensions_path $@
-  _module_path=${__sm_rebuilded_path}
+  _module_path=${__sm_rebuilt_path}
 
   if [[ -d "${_module_path}/functions" ]]
   then

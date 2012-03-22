@@ -17,7 +17,7 @@ detect_uri()
 
   __sm.extension.path.rebuild ".uri" $extensions_path $@
 
-  _uri_path="${__sm_rebuilded_path}"
+  _uri_path="${__sm_rebuilt_path}"
 
   if [[ -s "${_uri_path}" ]]
   then
