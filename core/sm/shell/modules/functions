@@ -107,8 +107,8 @@ __sm.extension.paths.initialize()
       extensions_search_paths_here="${extensions_search_paths_here%/*}"
     done
 
-    if [[ -d "${extensions_search_paths_here}/bin" ]] ||
-      [[ -d "${extensions_search_paths_here}/shell" ]]
+    if [[ -n "${extensions_search_paths_here%/*}" && -d "${extensions_search_paths_here%/*}" ]] &&
+      [[ -d "${extensions_search_paths_here}/bin" || -d "${extensions_search_paths_here}/shell" ]]
     then
       # removing extension name so "set" gets added to path
       extensions_search_paths=(
