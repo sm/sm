@@ -1,0 +1,3 @@
+#!/bin/sh
+
+[[ -n "$curl" ]] || __sm.config.read sm defaults curl

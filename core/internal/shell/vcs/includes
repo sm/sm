@@ -1,2 +1,3 @@
+internal/config
 internal/vcs/detection
 internal/vcs/errors

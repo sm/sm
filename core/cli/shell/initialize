@@ -10,7 +10,6 @@ true \
 
 [[ -n "$extensions_url" ]] || __sm.config.read sm defaults extensions_url
 [[ -n "$releases_url"   ]] || __sm.config.read sm defaults releases_url
-[[ -n "$curl" ]]            || __sm.config.read sm defaults curl
 
 true \
   ${remote:="origin"} \
@@ -23,4 +22,3 @@ user="$USER"
 extensions_src_path="${src_path}/extensions"
 
 export source_path
-
