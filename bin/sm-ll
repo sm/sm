@@ -116,6 +116,7 @@ if($::opt_nonall or $::opt_onall) {
 	join(" ",
 	     ((defined $::opt_u) ? "-u" : ""),
 	     ((defined $::opt_group) ? "-g" : ""),
+	     ((defined $::opt_colsep) ? "--colsep ".shell_quote($::opt_colsep) : ""),
 	     ((defined @::opt_v) ? "-vv" : ""),
 	     ((defined $::opt_D) ? "-D" : ""),
 	     ((defined $::opt_timeout) ? "--timeout ".$::opt_timeout : ""),
@@ -156,7 +157,7 @@ if($Global::semaphore) {
 $SIG{TERM} = \&start_no_new_jobs;
 start_more_jobs();
 if($::opt_pipe) {
-    spreadstdin();
+    spreadstdin(@fhlist);
 }
 reap_if_needed();
 ::debug("Start draining\n");
@@ -177,6 +178,7 @@ sub __PIPE_MODE__ {}
 sub spreadstdin {
     # read a record
     # Spawn a job and print the record to it.
+    my @fhlist = @_; # Filehandles to read from (Defaults to STDIN)
     my $record;
     my $buf = "";
     my $header = "";
@@ -220,7 +222,8 @@ sub spreadstdin {
     my $recendrecstart = $recend.$recstart;
     # Force the while-loop once if everything was read by header reading
     my $force_one_time_through = 0;
-    while(!$force_one_time_through++ or read(STDIN,substr($buf,length $buf,0),$::opt_blocksize)) {
+    for my $in (@fhlist) {
+    while(!$force_one_time_through++ or read($in,substr($buf,length $buf,0),$::opt_blocksize)) {
 	# substr above = append to $buf
 	reap_if_needed(); # Re-enable reaping after read() (Bug#33352)
 	if($::opt_r) {
@@ -269,13 +272,15 @@ sub spreadstdin {
 		}
 	    }
 	}
-	do_not_reap(); # Disable reaping before read(STDIN) (Bug#33352)
+	do_not_reap(); # Disable reaping before read($in) (Bug#33352)
     }
+}
+
     # If there is anything left in the buffer write it
     substr($buf,0,0) = $header;
     write_record_to_pipe(\$buf,$recstart,$recend);
 
-    ::debug("Done reading STDIN\n");
+    ::debug("Done reading input\n");
     flush_and_close_pipes();
     ::debug("Done flushing to children\n");
     $Global::start_no_new_jobs = 1;
@@ -543,7 +548,7 @@ sub get_options_from_array {
 sub parse_options {
     # Returns: N/A
     # Defaults:
-    $Global::version = 20120222;
+    $Global::version = 20120322;
     $Global::progname = 'parallel';
     $Global::infinity = 2**31;
     $Global::debug = 0;
@@ -1017,8 +1022,9 @@ sub enough_file_handles {
         my %fh;
         my $enough_filehandles = 1;
         # We need a filehandle for STDOUT and STDERR
+	# perl uses 7 filehandles for something?
         # open3 uses 2 extra filehandles temporarily
-        for my $i (1..6) {
+        for my $i (1..8) {
             $enough_filehandles &&= open($fh{$i},"</dev/null");
         }
         for (values %fh) { close $_; }
@@ -2182,7 +2188,9 @@ sub swap_activity {
         -e $ENV{'HOME'}."/.parallel" or mkdir $ENV{'HOME'}."/.parallel";
         -e $ENV{'HOME'}."/.parallel/tmp" or mkdir $ENV{'HOME'}."/.parallel/tmp";
         my $swap_activity;
-	$swap_activity = "vmstat 1 2 | tail -n1 | awk '{print \$7*\$8}'";
+	$swap_activity = ("vmstat 1 2 2>/dev/null | tail -n1 | awk '{print \$7*\$8}' || ".
+			  # If the (remote) machine is Mac and the above fails, try this:
+			  "vm_stat 1 | head -n 3 | tail -n1 | awk '{print \$9*\$10}'");
         if($self->{'string'} ne ":") {
             $swap_activity = $self->sshcommand() . " " . $self->serverlogin() . " " .
 		::shell_quote_scalar($swap_activity);
@@ -2618,13 +2626,27 @@ sub no_of_cpus {
     # Returns:
     #   Number of physical CPUs
     local $/="\n"; # If delimiter is set, then $/ will be wrong
-    my $no_of_cpus = (no_of_cpus_freebsd()
-                      || no_of_cpus_darwin()
-                      || no_of_cpus_solaris()
-                      || no_of_cpus_aix()
-                      || no_of_cpus_gnu_linux()
-        );
+    my $no_of_cpus;
+    if ($^O eq 'linux') {
+        $no_of_cpus = no_of_cpus_gnu_linux();
+    } elsif ($^O eq 'freebsd') {
+        $no_of_cpus = no_of_cpus_freebsd();
+    } elsif ($^O eq 'solaris') {
+        $no_of_cpus = no_of_cpus_solaris();
+    } elsif ($^O eq 'aix') {
+        $no_of_cpus = no_of_cpus_aix();
+    } elsif ($^O eq 'darwin') {
+	$no_of_cpus = no_of_cpus_darwin();
+    } else {
+	$no_of_cpus = (no_of_cpus_freebsd()
+		       || no_of_cpus_darwin()
+		       || no_of_cpus_solaris()
+		       || no_of_cpus_aix()
+		       || no_of_cpus_gnu_linux()
+	    );
+    }
     if($no_of_cpus) {
+	chomp $no_of_cpus;
         return $no_of_cpus;
     } else {
         warn("parallel: Cannot figure out number of cpus. Using 1");
@@ -2636,13 +2658,27 @@ sub no_of_cores {
     # Returns:
     #   Number of CPU cores
     local $/="\n"; # If delimiter is set, then $/ will be wrong
-    my $no_of_cores = (no_of_cores_freebsd()
-                       || no_of_cores_darwin()
-                       || no_of_cores_solaris()
-                       || no_of_cores_aix()
-                       || no_of_cores_gnu_linux()
-        );
+    my $no_of_cores;
+    if ($^O eq 'linux') {
+	$no_of_cores = no_of_cores_gnu_linux();
+    } elsif ($^O eq 'freebsd') {
+        $no_of_cores = no_of_cores_freebsd();
+    } elsif ($^O eq 'solaris') {
+	$no_of_cores = no_of_cores_solaris();
+    } elsif ($^O eq 'aix') {
+        $no_of_cores = no_of_cores_aix();
+    } elsif ($^O eq 'darwin') {
+	$no_of_cores = no_of_cores_darwin();
+    } else {
+	$no_of_cores = (no_of_cores_freebsd()
+			|| no_of_cores_darwin()
+			|| no_of_cores_solaris()
+			|| no_of_cores_aix()
+			|| no_of_cores_gnu_linux()
+	    );
+    }
     if($no_of_cores) {
+	chomp $no_of_cores;
         return $no_of_cores;
     } else {
         warn("parallel: Cannot figure out number of CPU cores. Using 1");

@@ -556,7 +556,7 @@ $Global::Initfile && unlink $Global::Initfile;
 exit ($err);
 
 sub parse_options {
-    $Global::version = 20120222;
+    $Global::version = 20120322;
     $Global::progname = 'sql';
 
     # This must be done first as this may exec myself
