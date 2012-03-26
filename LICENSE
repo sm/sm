@@ -16,10 +16,19 @@ limitations under the License.
 
 = License Exceptions
 
-bin/sm-{ll,sql,sem,nl} are all part of the GNU Parallel project and are licensed
-under the GNU GPL v3 which can be read at either LICENSE.gpl3 or on the web at
-http://www.gnu.org/licenses/gpl.html
+bin/sm-{ll,sql,sem,nl} are all part of the GNU Parallel [1,2] project and are
+licensed under the GNU GPL v3 which can be read at either LICENSE.gpl3 or on the
+web at http://www.gnu.org/licenses/gpl.html
 
 JSON.pm and associated files are from CPAN written by Makamaka Hannyaharamitu
 and carries the same license as Perl itself.
+
+
+= References
+
+[1] O. Tange (2011): GNU Parallel - The Command-Line Power Tool, ;login:
+The USENIX Magazine, February 2011:42-47.
+
+[2] O. Tange (2011): GNU SQL - A Command Line Tool for Accessing Different
+Databases Using DBURLs, ;login: The USENIX Magazine, April 2011:29-32.
 
