@@ -41,7 +41,7 @@ package()
 {
   trace_filter package || set -o xtrace
   typeset -g package_name package_version package_base_url package_file \
-    package_user archive_format package_md5 package_sha256 package_sha512
+    package_user archive_format package_checksum
 
   typeset _token _command _logfile _lines _key _log _message
   typeset -a _params __package_commands
@@ -116,9 +116,9 @@ package()
         archive_format="$1"
         (( $# )) && shift || __sm.log.fail "a package archive_format must follow keyword 'archive_format'"
         ;;
-      (md5)
-        package_md5="$1"
-        (( $# )) && shift || __sm.log.fail "a package md5 sum must follow keyword 'md5'"
+      (checksum)
+        package_checksum="$1"
+        (( $# )) && shift || __sm.log.fail "a package checksum sum must follow keyword 'checksum'. Format: '{type},{checksum}'"
         ;;
       (sha256)
         package_sha256="$1"

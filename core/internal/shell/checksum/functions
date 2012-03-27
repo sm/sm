@@ -15,11 +15,11 @@ __sm.checksum()
       elif __sm.command.exists md5sum
       then
         read _sum < <( md5sum "${_file}" )
-        _sum="${_sum/* = }"
 
       else
         __sm.log.fail "Neither md5sum nor md5 were found in PATH."
       fi
+      _sum="${_sum%% *}"
       ;;
     (sha*)
       _number="${_type#sha}"
@@ -43,7 +43,7 @@ __sm.checksum()
 
   if [[ -n "${_checksum}" ]]
   then
-    if "${_checksum}" == "${_sum}" ]]
+    if [[ "${_checksum}" == "${_sum}" ]]
     then return 0
     else return 1 ; fi
   else

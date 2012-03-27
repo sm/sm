@@ -53,10 +53,10 @@ __sm.package.cli()
         [[ -n "${archive_format}" ]] ||
           __sm.log.error "an archive format (tar.gz,tar.bz2,tar.xz,zip,...) must follow keyword 'archive_format'"
         ;;
-      (md5)
-        package_md5="${_package_args[$((++index))]}"
-        [[ -n "${package_md5}" ]] ||
-          __sm.log.error "an md5 sum string must follow keyword 'md5'"
+      (checksum)
+        package_checksum="${_package_args[$((++index))]}"
+        [[ -n "${package_checksum}" ]] ||
+          __sm.log.error "an checksum sum string must follow keyword 'checksum'. Format: '{type},{sum}'. eg. 'sha256,abcde...'"
         ;;
       (force)
         force_flag=1
@@ -148,8 +148,8 @@ __sm.package.define()
       (patches_url)
         package_patches_url="${value}"
         ;;
-      (md5_url)
-        package_md5_url="${value}"
+      (checksum_url)
+        package_checksum_url="${value}"
         ;;
       (bin_path)
         bin_path="${value}"
@@ -167,7 +167,7 @@ __sm.package.define()
         archive_format="${value}"
         ;;
       # TODO: Simplify into
-      #(+([[[:alnum:]]|])_path|name|version|url|md5_url)
+      #(+([[[:alnum:]]|])_path|name|version|url|checksum_url)
       #  eval "${key}=${value}"
       #  ;;
       (*)
@@ -271,7 +271,7 @@ __sm.package.set.cc()
 __sm.package.exports()
 {
   export package_name packages_path package_name package_version archive_format \
-    package_file package_url package_md5_url packages_path bin_path source_path \
+    package_file package_url package_checksum_url packages_path bin_path source_path \
     LDFLAGS CFLAGS package_default_version
 }
 
@@ -482,7 +482,7 @@ __sm.package.init()
   __sm.package.exports
   # Ensure that package_version is set at this point
 
-  for variable in version base_url md5_url user
+  for variable in version base_url checksum_url user
   do
     if variable is empty "package_${variable}"
     then
@@ -570,42 +570,42 @@ __sm.package.java.install()
   # TODO: fetch, extract, copy to install path, setup java launcher.
 }
 
-__sm.package.fetch.md5()
+__sm.package.fetch.checksum()
 {
   trace_filter package || set -o xtrace
   typeset download_url
   (( $# == 0 )) || __sm.package.cli $@
-  : "${package_file:="${package_name}-${package_version}.${archive_format}"}"
+  true "${package_file:="${package_name}-${package_version}.${archive_format}"}"
 
-  if [[ -z "${package_md5_url:-}" ]]
+  if [[ -z "${package_checksum_url:-}" ]]
   then
     for download_url in ${=package_base_url}
     do
-      package_md5_url="${package_md5_url:-} ${download_url}/${package_file}.md5"
+      package_checksum_url="${package_checksum_url:-} ${download_url}/${package_file}.checksum"
     done
   fi
 
-  [[ -n "${package_md5}" ]] || __sm.config.read "${package_name}" md5 "${package_file}" package_md5
-  [[ -n "${package_md5}" ]] ||
-    for download_url in ${=package_md5_url}
+  [[ -n "${package_checksum}" ]] || __sm.config.read "${package_name}" checksum "${package_file}" package_checksum
+  [[ -n "${package_checksum}" ]] ||
+    for download_url in ${=package_checksum_url}
     do
       if [[ -f "${download_url}" ]]
       then
         __sm.file.copy "${download_url}" "${archives_path}/${package_file}" -f
       else
-        ${curl} -L "${download_url}" -o "${archives_path}/${package_file}.md5" 2>/dev/null ||
-          __sm.log.error "Fetching MD5 checksum from '${download_url}' failed."
+        ${curl} -L "${download_url}" -o "${archives_path}/${package_file}.checksum" 2>/dev/null ||
+          __sm.log.error "Fetching checksum from '${download_url}' failed."
       fi
 
-      package_md5=$(cat "${archives_path}/${package_file}.md5")
+      package_checksum=$(cat "${archives_path}/${package_file}.checksum")
 
-      rm "${archives_path}/${package_file}.md5"
+      rm "${archives_path}/${package_file}.checksum"
 
-      if (( ${#package_md5} == 32 ))
+      if (( ${#package_checksum} == 32 ))
       then
         return 0
       else
-        package_md5=""
+        package_checksum=""
       fi
     done
 }
@@ -633,11 +633,10 @@ __sm.package.fetch()
     _args+=( "scm_type" "${scm_type}" )
   fi
 
-  __sm.package.fetch.md5
-  if [[ -n "${package_md5:-}" ]]
-  then
-    _args+=( "md5" "${package_md5}" )
-  fi
+  __sm.package.fetch.checksum
+
+  if [[ -n "${package_checksum:-}" ]]
+  then _args+=( "checksum" "${package_checksum}" ) ; fi
 
   fetch_uris "${package_url}" "${source_path}/${package_dir}" ${_args[@]} || return 1
 
@@ -1048,13 +1047,13 @@ __sm.package.info()
   trace_filter package || set -o xtrace
   (( $# == 0 )) || __sm.package.cli $@
 
-  typeset _installed _path package_md5 _installed
+  typeset _installed _path package_checksum _installed
   _path="${packages_path}/versions/${package_name}"
 
   true "${package_dir:="${package_name}-${package_version}"}" \
     "${package_url:="${package_base_url}/${package_file}"}"
 
-  [[ -n "${package_md5}" ]] || __sm.config.read "${package_name}" md5 "${package_file}" package_md5
+  [[ -n "${package_checksum}" ]] || __sm.config.read "${package_name}" checksum "${package_file}" package_checksum
 
   log "package_name: ${package_name}"
   if paths exist "${_path}"
@@ -1075,7 +1074,7 @@ __sm.package.info()
   log "  base_url: ${package_base_url}"
   log "  download_url: ${package_url}"
   log "  archive_format: ${package_file}"
-  log "  stored archive_md5: ${package_md5:-}"
+  log "  stored archive_checksum: ${package_checksum:-}"
   log "  source_path: ${source_path}/${package_dir}"
 
   if [[ -n "${package_dependencies}" ]]

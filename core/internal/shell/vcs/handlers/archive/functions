@@ -7,11 +7,13 @@
 # Code Walkthrough
 archive_get()
 {
-  typeset _uri _final_target _package_md5 _archive
+  typeset _uri _final_target _package_checksum _archive _type _sum
+
   _uri="${1:-}"
   _final_target="${2:-}"
-  _package_md5="${3:-${md5:-#}}"
+  _package_checksum="${3:-${checksum:-#}}"
   _archive="${archives_path}/${_uri##*/}"
+
   (( $# )) && shift || __sm.log.fail "uri must be specified as the first parameter."
   (( $# )) && shift || __sm.log.fail "target path must be specified as the second parameter."
 
@@ -33,10 +35,11 @@ archive_get()
 
   [[ -d "${archives_path}" ]] || mkdir -p "${archives_path}"
 
-  # TOD: shasum default instead
-  if [[ -f "${_archive}" && "$(files md5 "${_archive}")" != "${_package_md5}" ]]
+  _type="${_package_checksum%,*}" ; _sum="${_package_checksum#*,}"
+
+  if [[ -f "${_archive}" ]] && ! __sm.checksum "${_type}" "${_archive}" "${_sum}" "" ""
   then
-    __sm.log.debug vcs "${_uri##*/} does not match MD5 checksum ${_package_md5}; removing and downloading."
+    __sm.log.debug vcs "${_uri##*/} does not match ${type} checksum ${_sum}; removing and downloading."
     rm -f "${_archive}"
   fi
 

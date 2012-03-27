@@ -108,10 +108,10 @@ extension_package()
     for file in "${_name}-${_version}".tar.*
     do
       log "  - ${file}"
-      files write string "$( files md5 "${file}" )" to "${file}.md5"
-      log "  - ${file}.md5"
+      files write string "sha256,$( files sha256 "${file}" )" to "${file}.checksum"
+      log "  - ${file}.checksum"
       files move force to "${_path}/pkg" from "${_path}" \
-        "${file}" "${file}.md5"
+        "${file}" "${file}.checksum"
     done
   done
   log "Packaging complete! (Packages are located in '${_path}/pkg'.)"

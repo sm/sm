@@ -69,7 +69,7 @@ fetch_uri()
 #  DEBUG vcs: type: github, params: mpapis/mpapis_test /home/mpapis/tmp/test_uris.
 #  DEBUG vcs: github -> https://github.com/mpapis/mpapis_test/tarball/master
 #  DEBUG vcs: github tarball archive name /home/mpapis/.sm/archives/mpapis_mpapis_test_master.tar.gz.
-#  DEBUG vcs: master does not match MD5 checksum #; removing and downloading.
+#  DEBUG vcs: master does not match checksum #; removing and downloading.
 #
 fetch_uris()
 {
@@ -106,17 +106,16 @@ fetch_uris()
 #
 # # VCS (SCM) Module
 #
-
 fetch_uri_parse_args()
 {
-  typeset -g fetch_error_handler branch remote revision scm_type md5
+  typeset -g fetch_error_handler branch remote revision scm_type checksum
   typeset -ga _uris
   typeset _token _allowed_arg
 
   while (( $# > 0 ))
   do
     _token="$1" && shift
-    for _allowed_arg in branch remote revision scm_type md5
+    for _allowed_arg in branch remote revision scm_type checksum
     do
       case "${_token}" in
         (*${_allowed_arg})

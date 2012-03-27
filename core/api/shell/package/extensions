@@ -12,7 +12,7 @@ api_package_extension_setup()
     echo "#!/bin/sh" > "${_path}/shell/functions"
   fi
 
-  for _template in config/defaults config/md5 shell/functions
+  for _template in config/defaults config/checksum shell/functions
   do
     template install ${_module}/ext/${_template} \
       append to "${_path}/${_template}" \

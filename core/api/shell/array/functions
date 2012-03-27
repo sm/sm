@@ -137,7 +137,5 @@ array()
       __sm.log.fail "Unknown array command '${_command}'"
       ;;
   esac
-
-
 }
 
