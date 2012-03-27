@@ -1,0 +1,59 @@
+#!/bin/sh
+
+__sm.checksum()
+{
+  typeset _type _file _checksum _variable _target _number _command _sum
+
+  _type="${1}" ; _file="${2}" ; _checksum="${3}" ; _variable="${4}" ; _target="${5}"
+
+  case "${_type}" in # First we get the checksum value, regardless.
+    (md5)
+      if __sm.command.exists md5
+      then
+        read _sum < <( md5 -q "${_file}" )
+
+      elif __sm.command.exists md5sum
+      then
+        read _sum < <( md5sum "${_file}" )
+        _sum="${_sum/* = }"
+
+      else
+        __sm.log.fail "Neither md5sum nor md5 were found in PATH."
+      fi
+      ;;
+    (sha*)
+      _number="${_type#sha}"
+      if __sm.command.exists shasum
+      then
+        read _sum < <( shasum -a ${_number} "${_file}" )
+
+      elif __sm.command.exists "sha${_number}sum"
+      then
+        read _sum < <( "sha${_number}sum" "${_file}" )
+        _sum="${_sum/* = }"
+
+      else
+        __sm.log.fail "Neither shasum nor sha${_number}sum were found in PATH."
+      fi
+      ;;
+    (*)
+      log fail "Unknown checksum type '${_type}'."
+      ;;
+  esac
+
+  if [[ -n "${_checksum}" ]]
+  then
+    if "${_checksum}" == "${_sum}" ]]
+    then return 0
+    else return 1 ; fi
+  else
+    if [[ -n "${_variable}" ]]
+    then eval "${_variable}='${_sum}'" ; fi
+
+    if [[ -n "${_target}" ]]
+    then # TODO: Sanity checking / error handling here.
+      echo "${_sum}" > "${_target}"
+    fi
+  fi
+}
+

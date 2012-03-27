@@ -1,0 +1,76 @@
+#!/bin/sh
+
+#
+# api/checksum
+#
+# TODO: apidoc
+#
+# Usage:
+#
+# checksum type sha256 file somefile.tar.bz2
+# asdf...
+#
+# checksum type sha256 file somefile.tar.bz2 variable sum
+# log ${sum}
+# asdf...
+#
+# checksum type sha256 file somefile.tar.bz2 to somefile.tar.bz2.checksum
+# cat somefile.tar.bz2.checksum
+# asdf...
+#
+# if checksum type sha256 file somefile.tar.bz2 checksum asdf...
+# then log 'match!' ; fi
+#
+# NOTE: Without 'checksum X' it writes a file, with it it validates.
+#
+checksum()
+{
+  trace_filter checksum || set -o xtrace
+
+  typeset _token _command _subcommand _type _file _checksum _variable _target
+
+  while (( $# ))
+  do
+    _token="$1" && shift
+    case "${_token}" in
+      (type)
+        _type="$1"
+        (( $# )) && shift || __sm.log.fail "A checksum type must follow keyword '${_token}'"
+        ;;
+      (file)
+        _file="$1"
+        (( $# )) && shift || __sm.log.fail "A string prefix must follow keyword 'prefix'"
+        ;;
+      (sum|checksum)
+        _checksum="$1"
+        (( $# )) && shift || __sm.log.fail "A checksum must follow keyword '${_token}'"
+        ;;
+      (variable|as|into)
+        _variable="$1"
+        (( $# )) && shift || __sm.log.fail "A variable name must follow keyword '${_token}'"
+        ;;
+      (to)
+        _target="$1"
+        (( $# )) && shift || __sm.log.fail "A filename must follow keyword '${_token}'"
+        ;;
+      (*)
+        __sm.log.fail "'${_token}' is not handled/known by the checksum api"
+        ;;
+    esac
+  done
+
+  if [[ -z "${_file}" ]]
+  then
+    __sm.log.fail "A filename must be specified via 'file X' in order to use checksum."
+  elif [[ -z "${_type}" ]]
+  then
+    __sm.log.fail \
+      "A checksum type must be specified via 'type X' in order to use checksum."\
+      "  types: md5,sha1sum,sha224sum,sha256sum,sha384sum,sha512sum"
+  fi
+
+  if __sm.checksum "${_type}" "${_file}" "${_checksum}" "${_variable}" "${_target}"
+  then return 0
+  else return 1 ; fi
+}
+
