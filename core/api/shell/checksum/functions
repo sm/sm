@@ -1,28 +1,5 @@
 #!/bin/sh
 
-#
-# api/checksum
-#
-# TODO: apidoc
-#
-# Usage:
-#
-# checksum type sha256 file somefile.tar.bz2
-# asdf...
-#
-# checksum type sha256 file somefile.tar.bz2 variable sum
-# log ${sum}
-# asdf...
-#
-# checksum type sha256 file somefile.tar.bz2 to somefile.tar.bz2.checksum
-# cat somefile.tar.bz2.checksum
-# asdf...
-#
-# if checksum type sha256 file somefile.tar.bz2 checksum asdf...
-# then log 'match!' ; fi
-#
-# NOTE: Without 'checksum X' it writes a file, with it it validates.
-#
 checksum()
 {
   trace_filter checksum || set -o xtrace
