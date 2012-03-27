@@ -50,10 +50,11 @@ __sm.checksum()
     if [[ -n "${_variable}" ]]
     then eval "${_variable}='${_sum}'" ; fi
 
-    if [[ -n "${_target}" ]]
-    then # TODO: Sanity checking / error handling here.
-      echo "${_sum}" > "${_target}"
-    fi
+    if [[ -n "${_target}" ]] # TODO: Sanity checking / error handling here.
+    then echo "${_sum}" > "${_target}" ; fi
+
+    if [[ -z "${_variable}" && -z "${_target}" ]]
+    then echo "${_sum}" ; fi
   fi
 }
 
