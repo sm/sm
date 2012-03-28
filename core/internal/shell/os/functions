@@ -107,24 +107,27 @@ __sm.os.version()
 
 __sm.os.version.major()
 {
-  os_version_major=$(__sm.os.version)
-  os_version_major="${os_version_major//\.*}"
-  printf "%s\n" "${os_version_major}"
+  typeset _version
+  _version=$(__sm.os.version)
+  _version="${_version//\.*}"
+  printf "%s\n" "${_version}"
 }
 
 __sm.os.version.minor()
 {
-  os_version_minor=$(__sm.os.version)
-  os_version_minor="${os_version_minor#*\.}"
-  os_version_minor="${os_version_minor%\.*}"
-  printf "%s\n" "${os_version_minor}"
+  typeset _version
+  _version=$(__sm.os.version)
+  _version="${_version#*\.}"
+  _version="${_version%\.*}"
+  printf "%s\n" "${_version}"
 }
 
 __sm.os.version.patch()
 {
-  os_version_patch=$(__sm.os.version)
-  os_version_patch="${os_version_patch//*\.}"
-  printf "%s\n" "${os_version_patch}"
+  typeset _version
+  _version=$(__sm.os.version)
+  _version="${_version//*\.}"
+  printf "%s\n" "${_version}"
 }
 
 __sm.os.arch.type()
