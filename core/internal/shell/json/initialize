@@ -3,7 +3,6 @@
 typeset -gx json_uri
 typeset -gax extension_args
 
-if (( $# )) ; then
-  __sm.json.cli ${extension_args[@]}
-fi
+if (( $# ))
+then __sm.json.cli ${extension_args[@]} ; fi
 
