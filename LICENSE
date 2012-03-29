@@ -23,6 +23,8 @@ web at http://www.gnu.org/licenses/gpl.html
 JSON.pm and associated files are from CPAN written by Makamaka Hannyaharamitu
 and carries the same license as Perl itself.
 
+Mustache.pm is from CPAN [3] Template::Mustache written by Pieter van de Bruggen
+and carries the same license as Perl itself.
 
 = References
 
@@ -31,4 +33,6 @@ The USENIX Magazine, February 2011:42-47.
 
 [2] O. Tange (2011): GNU SQL - A Command Line Tool for Accessing Different
 Databases Using DBURLs, ;login: The USENIX Magazine, April 2011:29-32.
+
+[3] http://search.cpan.org/~pvande/Template-Mustache-v0.5.1/lib/Template/Mustache.pod
 

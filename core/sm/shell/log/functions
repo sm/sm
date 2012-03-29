@@ -83,62 +83,6 @@ log()
   fi
 }
 
-log_search()
-{
-  trace_filter log || set -o xtrace
-  __sm.log.warn "log_search is depreciated and will be removed at release 0.11.0, use 'log search instead'\n"
-  __sm.log.search "$@"
-}
-
-todo()
-{
-  trace_filter log || set -o xtrace
-  __sm.log.warn "todo is depreciated and will be removed at release 0.11.0, use 'log todo instead'\n"
-  __sm.log.todo "$@"
-}
-
-warn()
-{
-  trace_filter log || set -o xtrace
-  __sm.log.warn "warn is depreciated and will be removed at release 0.11.0, use 'log warn instead'\n"
-  __sm.log.warn "$@"
-}
-
-debug()
-{
-  trace_filter log || set -o xtrace
-  __sm.log.warn "debug is depreciated and will be removed at release 0.11.0, use 'log debug instead'\n"
-  __sm.log.debug "$@"
-}
-
-error()
-{
-  trace_filter log || set -o xtrace
-  __sm.log.warn "error is depreciated and will be removed at release 0.11.0, use 'log error instead'\n"
-  __sm.log.error "$@"
-}
-
-succeed()
-{
-  trace_filter log || set -o xtrace
-  __sm.log.warn "succeed is depreciated and will be removed at release 0.11.0, use 'log succeed instead'\n"
-  __sm.log.succeed "$@"
-}
-
-fail()
-{
-  trace_filter log || set -o xtrace
-  __sm.log.warn "fail is depreciated and will be removed at release 0.11.0, use 'log fail instead'\n"
-  __sm.log.fail "$@"
-}
-
-log_step()
-{
-  trace_filter log || set -o xtrace
-  __sm.log.warn "log_step is depreciated and will be removed at release 0.11.0, use 'log step instead'"
-  __sm.log.step "$@"
-}
-
 # Examples
 #
 #     user$ cat ./test
