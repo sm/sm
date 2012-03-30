@@ -1,0 +1,137 @@
+#!/usr/bin/env perl -w
+
+=head1 NAME
+
+mustache - Mustache template command line.
+
+=head1 SYNOPSIS
+
+mustache [options] [file ...]
+
+ options:
+  -t|--template {file}       path to template file
+  -o|--output {file}         path to output file
+  -j|--json '{file}'         path to json data file
+  -help                      brief help message
+  -man                       full documentation
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-t|--template {file}>
+
+specify the template file to use
+
+=item B<-d|--data {key}={value}>
+
+Assign a value to a given key for the template rendering.
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-man>
+
+Prints the manual page and exits.
+
+=back
+
+=head1 DESCRIPTION
+
+B<mustache> will read the given template file, and using the given data render it
+to the specified output file location.
+
+useful with the contents thereof.
+
+=head1 Testing
+
+echo '[ {{1}}, {{#sub}}{{2}}, {{3}}{{/sub}}, {{4}} ]' > /tmp/mustache.template
+
+echo '{ "1": "a, b", "sub": {"2": "c", "3": "d"}, "4": "e, f" }' > /tmp/mustache.json
+
+mustache --debug \
+  --template /tmp/mustache.template \
+  --json /tmp/mustache.json \
+  --output /tmp/mustache.out
+
+for file in /tmp/mustache.* ; do echo "${file}:\n$(cat ${file})" ; done
+
+=cut
+
+BEGIN{
+  push @INC, ($ENV{'sm_path'}||$ENV{'PWD'})."/core/internal/perl";
+}
+
+use strict;
+use Getopt::Long;
+use Pod::Usage;
+use Mustache;
+use JSON;
+
+sub fail { print STDERR join(" ", @_)."\n"; exit 1; }
+
+my $options;
+my $man = 0;
+my $help = 0;
+my $debug = 0;
+my $verbose = 0;
+my $template = '';
+my $template_file = '';
+my $output_file = '';
+my $json = '{}';
+my $json_file = '';
+my $data = {};
+my $key = '';
+my $value = '';
+my $output = '';
+my $json_object = new JSON;
+
+$options = GetOptions(
+  'j|json=s'     => \$json_file,
+  't|template=s' => \$template_file,
+  'o|output=s'   => \$output_file,
+  'v|verbose+'   => \$verbose,
+  'debug+'       => \$debug,
+  'help|?'       => \$help,
+  'man'          => \$man
+) or pod2usage(2);
+
+pod2usage(1) if $help;
+
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+
+if ( ! $template_file ) {
+  fail "ERROR: A template file must be given!"
+} elsif( ! -e $template_file ) {
+  fail "ERROR: The template file $template_file does not exist!"
+}
+
+open(my $template_file_handle, '<', $template_file);
+$template = join("", <$template_file_handle>);
+close($template_file_handle);
+
+open(my $json_file_handle, '<', $json_file);
+$json = join("", <$json_file_handle>);
+close($json_file_handle);
+
+$data = $json_object->allow_nonref->utf8->relaxed->escape_slash->loose->allow_singlequote->allow_barekey->decode($json);
+
+if( $debug ) {
+  use Data::Dumper;
+  print "template file: $template_file\n";
+  print "output file: $output_file" if $output_file;
+  print "json: $json\ndata:\n";
+  print Dumper($data);
+}
+
+$output = Template::Mustache->render( $template, $data );
+
+if ( $output_file ) {
+  open(my $output_file_handle, '>', $output_file);
+  print($output_file_handle "$output");
+  close($output_file_handle);
+} else {
+  print "output:\n$output";
+}
+

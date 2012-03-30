@@ -266,40 +266,26 @@ sub generate {
 # @return [(Any, Any)] The context element and value for the given `$field`.
 # @api private
 sub lookup {
-    my ($name, @stack) = @_;
-    return pop(@stack) if $name eq '.';
-    my @names = split(/\./, $name);
+    my ($field, @context) = @_;
+    my ($value, $ctx) = '';
 
-    my $lastIndex =scalar(@names) - 1;
-    my $target = pop(@names);
-    my @localstack;
-
-    my $i = scalar(@stack);
-    my ($context, $value);
-
-    while($i){
-      my @localStack = @stack;
-      $context = $stack[--$i];
-
-      for(@names){
-        $context = exists $context->{$_}? $context->{$_} : undef;
-        last unless $context;
-      }
-
-      if($context){
-        if(ref $context eq 'HASH' && exists($context->{$target})){
-          $value = $context->{$target};
-          last;
-        }elsif($context->can($target)){
-          $value = $context->$target();
-          last;
+    for my $index (0..$#{[@context]}) {
+        $ctx = $context[$index];
+        if (ref $ctx eq 'HASH') {
+            next unless exists $ctx->{$field};
+            $value = $ctx->{$field};
+            last;
+        } else {
+            next unless UNIVERSAL::can($ctx, $field);
+            $value = $ctx->$field();
+            last;
         }
-      }
     }
-    return ($context, $value);
+
+    return ($ctx, $value);
 }
 
-use namespace::clean;
+#use namespace::clean; # Why??? ~ Wayne
 
 # Standard hash constructor.
 # @param %args Initialization data.
