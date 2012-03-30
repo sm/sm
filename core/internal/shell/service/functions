@@ -796,7 +796,7 @@ __sm.service.status()
 
 __sm.service.signal()
 {
-  log warn "__sm.service.signal is depreciated, instead use __sm.process.signal from api/process"
+  log warn "__sm.service.signal is deprecated, instead use __sm.process.signal from api/process"
   __sm.process.signal $@
 }
 
