@@ -126,7 +126,7 @@ __sm.extension.paths.initialize()
 
 modules()
 {
-  __sm.log.warn "modules() is depreciated, instead use includes()"
+  __sm.log.warn "modules() is deprecated, instead use includes()"
   __sm.includes "$@"
 }
 
