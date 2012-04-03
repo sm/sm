@@ -11,7 +11,8 @@ mustache [options] [file ...]
  options:
   -t|--template {file}       path to template file
   -o|--output {file}         path to output file
-  -j|--json '{file}'         path to json data file
+  -j|--json '{string}'       json data string
+  -d|--data '{key}={value}'  key=value data pair, overrides json file data
   -help                      brief help message
   -man                       full documentation
 
@@ -23,9 +24,18 @@ mustache [options] [file ...]
 
 specify the template file to use
 
+=item B<-o|--output {file}>
+
+specify the output file to write the rendered template to
+
+=item B<-j|--json {string}>
+
+specify a json string from which to pull data from
+
 =item B<-d|--data {key}={value}>
 
 Assign a value to a given key for the template rendering.
+These key=value pairs override those specified in json data string/file.
 
 =item B<-help>
 
@@ -39,8 +49,8 @@ Prints the manual page and exits.
 
 =head1 DESCRIPTION
 
-B<mustache> will read the given template file, and using the given data render it
-to the specified output file location.
+B<mustache> will read the given template file, and using the given data render
+it to the specified output file location.
 
 useful with the contents thereof.
 
@@ -50,7 +60,7 @@ echo '[ {{1}}, {{#sub}}{{2}}, {{3}}{{/sub}}, {{4}} ]' > /tmp/mustache.template
 
 echo '{ "1": "a, b", "sub": {"2": "c", "3": "d"}, "4": "e, f" }' > /tmp/mustache.json
 
-mustache --debug \
+sm-mustache --debug \
   --template /tmp/mustache.template \
   --json /tmp/mustache.json \
   --output /tmp/mustache.out
@@ -69,7 +79,7 @@ use Pod::Usage;
 use Mustache;
 use JSON;
 
-sub fail { print STDERR join(" ", @_)."\n"; exit 1; }
+sub fail { print STDERR "ERROR(sm-mustache): ".join(" ", @_)."\n"; exit 1; }
 
 my $options;
 my $man = 0;
@@ -81,27 +91,31 @@ my $template_file = '';
 my $output_file = '';
 my $json = '{}';
 my $json_file = '';
+my %params;
 my $data = {};
 my $key = '';
 my $value = '';
+my @keys;
+my @values;
 my $output = '';
 my $json_object = new JSON;
 
 $options = GetOptions(
-  'j|json=s'     => \$json_file,
-  't|template=s' => \$template_file,
-  'o|output=s'   => \$output_file,
-  'v|verbose+'   => \$verbose,
-  'debug+'       => \$debug,
-  'help|?'       => \$help,
-  'man'          => \$man
+  'j|json=s'      => \$json,
+  'data=s%'       => sub { $params{$_[1]}=$_[2]; },
+  'debug+'        => \$debug,
+  't|template=s'  => \$template_file,
+  'o|output=s'    => \$output_file,
+  'v|verbose+'    => \$verbose,
+  'a|append!'     => \$verbose,
+  'help|?'        => \$help,
+  'man'           => \$man
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
-
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 
-if ( ! $template_file ) {
+if( ! $template_file ) {
   fail "ERROR: A template file must be given!"
 } elsif( ! -e $template_file ) {
   fail "ERROR: The template file $template_file does not exist!"
@@ -111,18 +125,34 @@ open(my $template_file_handle, '<', $template_file);
 $template = join("", <$template_file_handle>);
 close($template_file_handle);
 
-open(my $json_file_handle, '<', $json_file);
-$json = join("", <$json_file_handle>);
-close($json_file_handle);
+if( $json && -f $json) { $json_file=$json ; $json='' ; }
+
+if( ! $json && -f $json_file ) {
+  open(my $json_file_handle, '<', $json_file);
+  $json = join("", <$json_file_handle>);
+  close($json_file_handle);
+} elsif ( $json_file && ! $json_file ) {
+  fail "ERROR: A json_file was given and yet the file does not exist!"
+}
 
 $data = $json_object->allow_nonref->utf8->relaxed->escape_slash->loose->allow_singlequote->allow_barekey->decode($json);
 
 if( $debug ) {
-  use Data::Dumper;
   print "template file: $template_file\n";
-  print "output file: $output_file" if $output_file;
-  print "json: $json\ndata:\n";
-  print Dumper($data);
+  print "output file: $output_file\n" if $output_file;
+  print "json_file: $json_file\n" if $json_file;
+  print "json: $json\n" if $json;
+  print "params: ";
+  @keys = keys %params; @values = values %params;
+  while (@keys) { print pop(@keys), '=', pop(@values), "\n"; }
+}
+
+while (($key,$value) = each %params) { ${$data}{$key}=$value; }
+
+if( $debug ) {
+  print "data: ";
+  @keys = keys %$data; @values = values %$data;
+  while (@keys) { print pop(@keys), '=', pop(@values), "\n"; }
 }
 
 $output = Template::Mustache->render( $template, $data );

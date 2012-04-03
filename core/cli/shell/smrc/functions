@@ -50,10 +50,11 @@ smrc_update()
   : \
     "${repository_url:="username/repository"}"
 
-  templates update "${template}" "${target}" "${incoming}" \
-    project "$project" \
-    repository_url "$repository_url" \
-    environment "$environment"
+  # todo: redo this using new template engine.
+  # templates update "${template}" "${target}" "${incoming}" \
+  #   project "$project" \
+  #   repository_url "$repository_url" \
+  #   environment "$environment"
 
   if [[ -s "${incoming}" ]]
   then

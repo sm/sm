@@ -1,39 +1,19 @@
 #!/bin/sh
 
-# TODO: Rework this into a 1.0.0 module API
-
-#
-#    user$ templates install "nginx.conf" \
-#            to "${nginx_path}/nginx.conf" \
-#            mode 0644 owner "${nginx_user}"
-#
-#    user$ templates seed "/etc/conf.d/${extension}.conf" \
-#            prefix_path "${prefix_path}" \
-#            init_scripts_path "${init_scripts_path}" \
-#            data_path "${data_path}" \
-#            confd_path "${confd_path}" \
-#            extension "${extension}"
-#
-# Note that if you wish to eliminate all unset strings, pass the pair
-#     ".*" ""
-# as the last pair of arguments to templates seed.
-#
 template() { templates "$@" ; }
 templates()
 {
   trace_filter templates || set -o xtrace
 
   typeset _command _name _target _source _mode _owner _group _template _params \
-    __templates_commands _token _variable_name
-  typeset -g _templates_append_flag
+    __templates_commands _token _variable _json _json_file
+  typeset -i _append
+  typeset -a _params
 
-  _templates_append_flag=0
-  _source="${extension_templates_path}"
-  _mode=0644
-  _owner=$USER
+  _source="${extension_templates_path}" ; _append=0 ; _mode=0644 ; _owner=$USER
   _params=()
   __templates_commands=(
-    "exists=exist"
+  "exists=exist"
   )
 
   if __sm.command.detect "$*" "${__templates_commands[@]}"
@@ -54,38 +34,48 @@ templates()
       (to)
         _target="$1"
         (( $# )) && shift ||
-          __sm.log.fail "A target path must follow keyword 'to'"
+          __sm.log.fail "A target filename including path must follow 'to'"
         ;;
       (mode)
         _mode="$1"
         (( $# )) && shift ||
-          __sm.log.fail "A file mode must follow keyword 'mode'"
+          __sm.log.fail "A file mode must follow 'mode'"
         ;;
       (owner)
         _owner="$1"
         (( $# )) && shift ||
-          __sm.log.fail "An owner name must follow keyword 'owner'"
+          __sm.log.fail "An owner name must follow 'owner'"
         ;;
       (group)
         _group="$1"
         (( $# )) && shift ||
-          __sm.log.fail "A group name must follow keyword 'group'"
+          __sm.log.fail "A group name must follow 'group'"
         ;;
       (from)
-        __sm.log.fail "'from' keyword is no longer supported"
+        __sm.log.fail "'from' is no longer supported"
+        ;;
+      (json)
+        _json="${1}"
+        (( $# )) && shift ||
+          __sm.log.fail "A json string must follow 'json'"
+        ;;
+      (json_file)
+        _json_file="${1}"
+        (( $# )) && shift ||
+          __sm.log.fail "A json file location must follow 'json_file'"
         ;;
       (with|variables)
         if [[ "${1}" == "from" ]]
         then
           shift
-          _variable_name="${1}"
+          _variable="${1}"
         else
           _params+=("$@")
           break
         fi
         ;;
       (append)
-        _templates_append_flag=1
+        _append=1
         ;;
       (*)
         _params+=("${_token}")
@@ -97,27 +87,21 @@ templates()
 
   case "${_command}" in
     (install)
-      __sm.templates.${_command} "${_name}" "${_variable_name}" "${_params[@]}"
-      if (( ${#_params[@]} ))
-      then
-        __sm.templates.seed "${_target}" "${_owner}" "${_mode}" "${_variable_name}" "${_params[@]}"
-      fi
+      __sm.templates.install "${_name}" "${_target}" "${_owner}" "${_mode}" \
+        "${_variable}" "${_json}" "${_json_file}" "${_append}" "${_params[@]}"
       ;;
     (exist|exists)
       __sm.templates.exists "${_name}" "${_params[@]}"
       ;;
     (seed)
-      __sm.templates.seed "${_name}" "${_owner}" "${_mode}" "${_variable_name}" "${_params[@]}"
-      ;;
-    (update)
-      __sm.templates.${_command} "${_name}" "${_params[@]}"
+      __sm.log.fail \
+        "'seed' was removed, please use 'install' with 'variables'."
       ;;
     (diff)
       # change the target, do the actual install then do diff.
       __sm.templates.diff "${_name}" "${_owner}" "${_mode}" "" "" "" "${_params[@]}"
       if (( ${#_params[@]} ))
-      then
-        __sm.templates.seed "${_target}" "${_owner}" "${_mode}" "${_params[@]}"
+      then __sm.templates.seed "${_target}" "${_owner}" "${_mode}" "${_params[@]}"
       fi
       ;;
     (*)
@@ -125,3 +109,4 @@ templates()
       ;;
   esac
 }
+

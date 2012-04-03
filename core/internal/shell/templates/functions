@@ -47,144 +47,55 @@ __sm.templates.exists()
 
 __sm.templates.install()
 {
-  __sm.templates.exists "${_name}" || __sm.log.fail "No template found matching '${_name}'."
+  typeset _template _target _owner _mode _variable _path _append \
+    _json _json_file _tmp_file _target_path
+  typeset -a _params _data _strings
 
-  _template="${template_path}"
-  _name="$(basename "${_name}")"
+  _template="${1}" ; _target="${2}" ; _owner="${3}" ; _mode="${4}" ;
+  _variable="${5}" ; _json="${6}" ; _json_file="${7}" ; _append="${8:-0}"
+  shift 8
+  _data=("$@")
+  _tmp_file=${_template}.${timestamp}.$$
+  _target_path="$(dirname "${_target}")"
 
-  path create "$(dirname "${_target}")"
-
-  if path exists "${_target}"
-  then
-    if path exists "${_target}/${_name}"
-    then
-      __sm.log.fail "Cannot install the template '${_template}' to ${_target}/${_name}, as it is a directory."
-    fi
-    file copy \
-      from "${_template}" \
-      to "${_target}/${_name}" \
-      mode "${_mode}" \
-      owner "${_owner}"
-  else
-    if (( ${_templates_append_flag:-0} == 0 ))
-    then
-      file copy force \
-        from "${_template}" \
-        to "${_target}" \
-        mode "${_mode}" \
-        owner "${_owner}"
-    else
-      cat "${_template}" >> "${_target}"
-      file change mode "${_mode}" "${_target}"
-      file change owner "${_owner}" "${_target}"
-    fi
-  fi
-}
-
-__sm.templates.seed()
-{
-  typeset _template _owner _mode _hash _strings temporary _key _value _variable_name
-
-  _template="${1}"
-  _owner="${2}"
-  _mode="${3}"
-  _variable_name="${4}"
-  shift 4
-  _hash=("$@")
-  _strings=()
-  temporary=${_template}.${timestamp}.$$
-
-  if ! file exists "${_template}"
-  then __sm.log.fail "template file '${_template}' does not exist." ; fi
-
-  if array is empty ${_variable_name:-"_hash"}
-  then
-    __sm.log.fail "Cannot seed template '${_template}';"\
-      " No replacement keys were specified."
+  if [[ -n "${_variable}" ]] && eval "(( ( \${#${_variable}} % 2 ) != 0 ))"
+  then __sm.log.fail "Cannot render template: every key must have a value."
   fi
 
-  if ! array is even ${_variable_name:-"_hash"}
-  then
-    __sm.log.fail "Cannot seed template;"\
-      " Every replacement key must have a replacement value."
-  fi
+  __sm.templates.exists "${_template}" ||
+    __sm.log.fail "No template found matching '${_template}'."
 
-  eval "
-  for (( index=1 ; index <= \${#${_variable_name:-"_hash"}[@]} ; index++ ))
-  do
-    _key=\"\${${_variable_name:-"_hash"}[\${index}]}\"
-    _value=\"\${${_variable_name:-"_hash"}[\$((++index))]}\"
-    _strings+=(-e \"s#{{\${_key}}}#\${_value}#g\")
-  done"
+  [[ ! -d "${_target}" ]] ||
+    __sm.log.fail "Cannot install the template '${_template}' to '${_target}',"\
+      " which exists and is a directory."
 
-  sed "${_strings[@]}" ${_template} > ${temporary} ||
-    __sm.log.error "There was an error (?) seeding the template '${_template}';" \
-    " Most often this is due to filesystem permissions / disk full."
+  [[ -d "${_target_path}" ]] || mkdir -p "${_target_path}"
 
-  if ! files exist "${temporary}"
-  then
-    __sm.log.fail "Something went very wrong;"\
-      " the template intermediate file '${temporary}' does not exist?! "
-  fi
+  _params+=( --template "${template_path}" --output "${_target}" )
+  [[ -z "${_json}" ]] || _params+=( --json "${_json}" )
+  [[ -z "${_json_file}" ]] || _params+=( --json "${_json_file}" )
 
-  file move \
-    from "${temporary}" \
-    to "${_template}" \
-    mode "${_mode}" \
-    owner "${_owner}"
-}
+  (( _append == 0 )) || _params+=(--append)
 
-__sm.templates.update()
-{
-  typeset _template _target _incoming _hash _strings _variables
-  _template="${1:-}"
-  _target="${2:-}"
-  (( $# )) && shift || __sm.log.fail "Cannot update seed template;"\
-    " Template name was not given as the first parameter."
-  (( $# )) && shift || __sm.log.fail "Cannot update seed template;"\
-    " Template target was not given as the second parameter."
-
-  _incoming="${1:-${_target}.incoming}"
-  (( $# )) && shift || true
-  _hash=("$@")
-  _strings=()
-  _variables="${_target}.var.$$"
-
-  if ! __sm.templates.exists "${_template}"
-  then
-    __sm.log.fail "Cannot update seed template;"\
-      " No template was found matching '${_template}'."
-  fi
-
-  _template="${template_path}"
-
-  for (( index=1 ; index <= ${#_hash[@]} ; index++ ))
-  do
-    _strings+=(-e "s#{{${_hash[${index}]}}}#${_hash[$((++index))]}#g")
+  for (( _index=1 ; _index <= ${#_data} ; _index = _index + 2 ))
+  do _params+=( --data "${_data[${_index}]}=${_data[$((_index+1))]}" )
   done
 
-  sed "${_strings[@]}" ${_template} | grep -E '^[^#]+=' > "${_variables}"
+  if ! "${sm_path}/bin/sm-mustache" "${_params[@]}"
+  then log error "There was an error rendering the template!"
+  fi
 
-  diff -wN --left-column \
-    <( grep -Eo '(^[^#]+=)' "${_target}" 2>/dev/null | sed 's/export //' | sort ) \
-    <( grep -Eo '(^[^#]+=)' "${_variables}" | sed 's/export //' | sort ) | \
-    awk -F '> ' '/^>/ {print$2}' | \
-    xargs -n 1 | \
-    xargs -I {} grep "^[^#]*{}" "${_variables}" > "${_incoming}"
-
-  rm "${_variables}"
+  chmod "${_mode}" "${_target}"
+  chown "${_owner}" "${_target}"
 }
-
 
 # template diff {name}
 # Identical to install except that instead of doing the install it will check the files for differences.
 # 0 - identical
-# 1 - difference ; show diff changes as well
+# 1 - difference ; print diff to STDERR
 #
 # template diff \
-#   "${extension}/before_release" \
-#   to "${shared_path}/deploy/before_release" \
-#   mode 0755
+#   {{ all of the same args that you can pass to template install }}
 #
 __sm.templates.diff()
 {
@@ -204,3 +115,4 @@ __sm.templates.diff()
   # 3. different owner than specified (if specified)
   # 4. different mode than specified (if specified)
 }
+

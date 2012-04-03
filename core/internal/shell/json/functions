@@ -46,10 +46,11 @@ __sm.json.get()
   while (( $# ))
   do
     _variable= # Ensure _variable is empty for each next round.
-    _default= # Ensure _default is empty for each next round.
+    _default=  # Ensure _default is empty for each next round.
     _type="$1" && shift
     _path="$1" && shift
     _default=""
+
     case "${_type}" in
       (into)
         _array_name="${_path}"
@@ -73,23 +74,21 @@ __sm.json.get()
         done
 
         if [[ -z "${_variable}" ]]
-        then _variable="${_path//\//_}" ; fi
+        then _variable="${_path//\//_}"
+        fi
 
         typeset -g ${_variable} >/dev/null
 
-        if ! eval "${_variable}=$("${sm_path}/core/cli/bin/json/get" "${_path}" "${_json_uri}")"
-        then
-          eval "${_variable}=\"\""
+        if ! eval "${_variable}=$("${sm_path}/bin/sm-json" "${_path}" "${_json_uri}")"
+        then eval "${_variable}=\"\""
         fi
 
         if eval "[[ -z \"\${${_variable}}\" ]]"
-        then
-          eval "${_variable}=\"${_default}\""
+        then eval "${_variable}=\"${_default}\""
         fi
 
         if [[ -n "${_array_name}" ]]
-        then
-          eval "${_array_name}+=(${_variable} \"\${${_variable}}\")"
+        then eval "${_array_name}+=(${_variable} \"\${${_variable}}\")"
         fi
         ;;
       (array)
@@ -110,23 +109,21 @@ __sm.json.get()
         done
 
         if [[ -z "${_variable}" ]]
-        then _variable="${_path//\//_}" ; fi
+        then _variable="${_path//\//_}"
+        fi
 
         typeset -ga ${_variable} >/dev/null
 
-        if ! eval "${_variable}=($("${sm_path}/core/cli/bin/json/get" "${_path}" "${_json_uri}"))"
-        then
-          eval "${_variable}=()"
+        if ! eval "${_variable}=($("${sm_path}/bin/sm-json" "${_path}" "${_json_uri}"))"
+        then eval "${_variable}=()"
         fi
 
         if eval "[[ -z \"\${${_variable}}\" ]]"
-        then
-          eval "${_variable}=(\"${_default}\")"
+        then eval "${_variable}=(\"${_default}\")"
         fi
 
         if [[ -n "${_array_name}" ]]
-        then
-          eval "${_array_name}+=(${_variable} \${${_variable}})"
+        then eval "${_array_name}+=(${_variable} \${${_variable}})"
         fi
         ;;
     esac
