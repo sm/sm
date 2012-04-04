@@ -1,4 +1,4 @@
-#!/usr/bin/env perl -w
+#!/usr/bin/perl -w
 
 =head1 NAME
 
@@ -81,25 +81,10 @@ use JSON;
 
 sub fail { print STDERR "ERROR(sm-mustache): ".join(" ", @_)."\n"; exit 1; }
 
-my $options;
-my $man = 0;
-my $help = 0;
-my $debug = 0;
-my $verbose = 0;
-my $append = 0;
-my $template = '';
-my $template_file = '';
-my $output_file = '';
-my $json = '{}';
-my $json_file = '';
-my %params;
-my $data = {};
-my $key = '';
-my $value = '';
-my @keys;
-my @values;
-my $output = '';
-my $json_object = new JSON;
+my ( $options, $template, $template_file, $output_file, $json, $json_file, $key,
+  $value, $output, $man, $help, $debug, $verbose, $append, @keys, @values,
+  %params, $data, $json_object );
+$data = {}; $json = '{}'; $json_object = new JSON;
 
 $options = GetOptions(
   'j|json=s'      => \$json,
@@ -159,10 +144,11 @@ if( $debug ) {
 $output = Template::Mustache->render( $template, $data );
 
 if ( $output_file ) {
+  my $output_file_handle;
   if($append) {
-    open(my $output_file_handle, '>>', $output_file);
+    open($output_file_handle, '>>', $output_file);
   } else {
-    open(my $output_file_handle, '>', $output_file);
+    open($output_file_handle, '>', $output_file);
   }
   print($output_file_handle "$output");
   close($output_file_handle);
@@ -170,3 +156,4 @@ if ( $output_file ) {
   print "output:\n$output";
 }
 
+exit 0;

@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl -w
 
 BEGIN{ push @INC, $ENV{'sm_path'}."/core/internal/perl"; }
 
