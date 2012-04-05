@@ -111,12 +111,6 @@ __sm.extension.install()
     #
     # TODO: Process extension dependencies...
     #
-
-    if [[ "${exts_system_path}" != "${exts_user_path}" ]]
-    then
-      __sm.log.warn "Installing extension to user directory '${exts_user_path}'."
-    fi
-
     versionedfs create \
       path "${exts_user_path}" \
       strategy name method copy activate first
