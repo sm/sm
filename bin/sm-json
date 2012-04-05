@@ -6,30 +6,34 @@ use JSON -support_by_pp; # http://search.cpan.org/~makamaka/JSON-2.53/lib/JSON.p
 
 sub fail { print STDERR join(" ", @_)."\n"; exit 1; }
 
-my $path = shift @ARGV;
-if (! $path) {
-  fail "ERROR: A json path to extract must be given as the first argument\nexample: 'system/hostname'."
-}
+my (
+  $path, $json_file, $json_file_handle, $json_object, $json, $key, $namespace,
+  $hash, $subhash, $reference
+);
 
-my $json_file = shift @ARGV;
-if ( ! $json_file ) {
+$path      = shift(@ARGV);
+$json_file = shift(@ARGV);
+
+if( ! $path ) {
+  fail "ERROR: A json path to extract must be given as the first argument\nexample: 'system/hostname'."
+} elsif ( ! $json_file ) {
   fail "ERROR: A json file must be given as the second argument."
 } elsif( ! -e $json_file ) {
   fail "ERROR: The json file $json_file does not exist!"
 }
 
-open(my $json_file_handle, '<', $json_file);
+open($json_file_handle, '<', $json_file);
 $json_string = join("", <$json_file_handle>);
 close($json_file_handle);
 
-my $json_object = new JSON;
-my $json = $json_object->allow_nonref->utf8->relaxed->escape_slash->loose->allow_singlequote->allow_barekey->decode($json_string);
+$json_object = new JSON;
+$json = $json_object->allow_nonref->utf8->relaxed->escape_slash->loose->allow_singlequote->allow_barekey->decode($json_string);
 
 @_ = split("/", $path);
-my $key       = pop(@_);
-my $namespace = join("/", @_);
-my $hash      = $json;
-my $subhash   = {};
+$key       = pop(@_);
+$namespace = join("/", @_);
+$hash      = $json;
+$subhash   = {};
 
 if($namespace) {
   foreach(split("/", $namespace)) {
@@ -47,7 +51,7 @@ if($namespace) {
   }
 }
 
-my $reference = \$hash->{$key};
+$reference = \$hash->{$key};
 
 if (ref($reference) eq "SCALAR") {
   printf "%s\n", $hash->{$key};
@@ -57,7 +61,7 @@ if (ref($reference) eq "SCALAR") {
   # This allows for namespace querying to reflect on available keys.
   printf "%s\n", join(" ",keys(%{$hash->{$key}}));
 } else {
-  fail "ERROR: Key '$key' missing under namespace '$namespace' missing for path '".join("/",@path)."'.";
+  fail "ERROR: Key '$key' missing under namespace '$namespace' missing for path '$path'.";
 }
 
 exit 0; # Success!!!
