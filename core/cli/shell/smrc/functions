@@ -19,13 +19,13 @@ smrc_install()
   true \
     "${repository_url:="username/repository"}"
 
-  templates install "cli/smrc" to "$HOME/.smrc"
-
-  templates seed "$HOME/.smrc" \
-    project "$project" \
-    repository_url "$repository_url" \
-    environment "$environment" \
-    project_search_maxdepth "2"
+  templates install "cli/smrc" \
+    to "$HOME/.smrc" \
+    variables \
+      project "$project" \
+      repository_url "$repository_url" \
+      environment "$environment" \
+      project_search_maxdepth "2"
 }
 
 smrc_update()

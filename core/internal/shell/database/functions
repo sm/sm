@@ -67,12 +67,6 @@ database_setup()
 {
   paths create "${data_base_path}"
 
-  if template_exists "/etc/conf.d/${service}.conf"
-  then
-    templates seed "/etc/conf.d/${service}.conf" \
-      data_path "${data_path}"
-  fi
-
   if __sm.command.exists "${extension}_database_setup"
   then
     "${extension}_database_setup"

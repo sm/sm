@@ -442,13 +442,13 @@ __sm.service.initd.install()
     else
       # Use core svc init.d template
       templates install "cli/init.d" \
-        to "${init_scripts_path}/${_service}" mode 0755
-
-      templates seed "${init_scripts_path}/${_service}" \
-        modules_path "${__sm_modules_path}" \
-        service "${service}" \
-        service_user "${service_user}" \
-        service_config_path "${service_config_path}"
+        to "${init_scripts_path}/${_service}" \
+        mode 0755 \
+        variables \
+          modules_path "${__sm_modules_path}" \
+          service "${service}" \
+          service_user "${service_user}" \
+          service_config_path "${service_config_path}"
     fi
 
     __sm.service.activate "${service}" "${service_version}"
@@ -618,18 +618,15 @@ __sm.service.confd()
   templates exist "conf.d" || return 0
 
   templates install "conf.d.template" to "/etc/conf.d/${service}.conf" \
-    mode 0644 owner "${service_user}:${service_user}"
-
-  if templates exist "/etc/conf.d/${service}.conf"
-  then
-    templates seed "/etc/conf.d/${service}.conf" \
+    mode 0644 \
+    owner "${service_user}:${service_user}" \
+    variables \
       prefix_path "${prefix_path}" \
       init_scripts_path "${init_scripts_path}" \
       modules_path "${__sm_modules_path}" \
       confd_path "${confd_path}" \
       extension "${service}" \
       service "${service}"
-  fi
 }
 
 __sm.service.init.action()
