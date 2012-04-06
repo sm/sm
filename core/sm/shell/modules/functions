@@ -1,9 +1,5 @@
 #!/bin/sh
 
-#
-# SM Framework Core Module ~ Modules (modules)
-#
-
 __sm.modules.core.initialize()
 {
   (( ! ${__sm_modules_initialized:=0} )) || return 0

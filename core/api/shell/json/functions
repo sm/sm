@@ -39,7 +39,7 @@ json()
 
   if [[ -z "${_json_uri}" ]]
   then
-    __sm.log.fail "A file name must be given to ${_command} json: 'json ${_command} from {file name}'."
+    __sm.log.fail "A file name or string must be given to ${_command} json: 'json ${_command} from {file name}'."
   elif (( ${#_params} == 0 ))
   then
     __sm.log.fail "json: No parameters given to json api."

@@ -65,10 +65,12 @@ templates()
           __sm.log.fail "A json file location must follow 'json_file'"
         ;;
       (with|variables)
+        shift
         if [[ "${1}" == "from" ]]
-        then
-          shift
-          _variable="${1}"
+        then shift && _variable="${1}" && shift
+
+        elif [[ "${1} ${2}" == "variables from" ]]
+        then shift 2 && _variable="${1}" && shift
         else
           _params+=("$@")
           break
@@ -82,8 +84,11 @@ templates()
     esac
   done
 
+  [[ -n "${_json}" || -n ${_json_file} ]] || _json="{}"
+
   if [[ -n "${_group}" ]] && ! __sm.string.contains ":" "${_owner}"
-  then _owner="${_owner}:${_group}" ; fi
+  then _owner="${_owner}:${_group}"
+  fi
 
   case "${_command}" in
     (install)

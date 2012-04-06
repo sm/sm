@@ -54,6 +54,7 @@ __sm.json.get()
     case "${_type}" in
       (into)
         _array_name="${_path}"
+        unset ${_array_name}
         typeset -ga ${_array_name}
         ;;
       (string)
@@ -112,7 +113,7 @@ __sm.json.get()
         then _variable="${_path//\//_}"
         fi
 
-        typeset -ga ${_variable} >/dev/null
+        typeset -gxa ${_variable} >/dev/null
 
         if ! eval "${_variable}=($("${sm_path}/bin/sm-json" "${_path}" "${_json_uri}"))"
         then eval "${_variable}=()"
@@ -125,6 +126,7 @@ __sm.json.get()
         if [[ -n "${_array_name}" ]]
         then eval "${_array_name}+=(${_variable} \${${_variable}})"
         fi
+        # TODO: when the value is an array the values should be ',' separated
         ;;
     esac
   done

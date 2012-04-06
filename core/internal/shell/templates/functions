@@ -10,8 +10,15 @@ __sm.templates.find()
 
   _params_path="$*"
   _params_path="${_params_path// //}"
-  _extension="${_params_path%%/*}"
-  _params_path="${_params_path#*/}"
+
+  if __sm.string.contains "/" "${_params_path}"
+  then
+    _extension="${_params_path%%/*}"
+    _params_path="${_params_path#*/}"
+  else
+    _extension="${extension}"
+  fi
+
   _template_path="${_extensions_path}/${_extension}/templates/${_params_path}"
 
   if [[ -f "${_template_path}.template" ]]
@@ -47,8 +54,9 @@ __sm.templates.exists()
 
 __sm.templates.install()
 {
-  typeset _template _target _owner _mode _variable _path _append \
-    _json _json_file _tmp_file _target_path
+  typeset _template _target _owner _mode _variable _path _append _json \
+    _json_file _tmp_file _target_path
+
   typeset -a _params _data _strings
 
   _template="${1}" ; _target="${2}" ; _owner="${3}" ; _mode="${4}" ;
@@ -59,7 +67,7 @@ __sm.templates.install()
   _target_path="$(dirname "${_target}")"
 
   if [[ -n "${_variable}" ]] && eval "(( ( \${#${_variable}} % 2 ) != 0 ))"
-  then __sm.log.fail "Cannot render template: every key must have a value."
+  then __sm.log.fail "Cannot render template: every given variable key must have a value."
   fi
 
   __sm.templates.exists "${_template}" ||
@@ -76,6 +84,13 @@ __sm.templates.install()
   [[ -z "${_json_file}" ]] || _params+=( --json "${_json_file}" )
 
   (( _append == 0 )) || _params+=(--append)
+
+  if [[ -n "${_variable}" ]]
+  then eval "
+    for (( _index=1 ; _index <= \${#${_variable}} ; _index = _index + 2 ))
+    do _params+=( --data \"\${${_variable}[\${_index}]}=\${${_variable}[\$((_index+1))]}\" )
+    done"
+  fi
 
   for (( _index=1 ; _index <= ${#_data} ; _index = _index + 2 ))
   do _params+=( --data "${_data[${_index}]}=${_data[$((_index+1))]}" )
