@@ -86,7 +86,7 @@ templates()
 
   [[ -n "${_json}" || -n ${_json_file} ]] || _json="{}"
 
-  if [[ -n "${_group}" ]] && ! __sm.string.contains ":" "${_owner}"
+  if [[ -n "${_group}" ]] && ! __sm.string.contains.word ":" "${_owner}"
   then _owner="${_owner}:${_group}"
   fi
 

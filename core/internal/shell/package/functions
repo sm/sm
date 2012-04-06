@@ -183,7 +183,7 @@ __sm.package.configure.flags()
   typeset _flag
   for _flag in "$@"
   do
-    if ! __sm.string.contains "${_flag}" "${configure_flags[*]}"
+    if ! __sm.string.contains.word "${_flag}" "${configure_flags[*]}"
     then
       configure_flags+=( "${_flag}" )
     fi
@@ -209,7 +209,7 @@ __sm.package.make.flags()
   typeset _flag
   for _flag in "$@"
   do
-    if ! __sm.string.contains "${_flag}" "${make_flags[*]}"
+    if ! __sm.string.contains.word "${_flag}" "${make_flags[*]}"
     then
       make_flags+=( "${_flag}" )
     fi
@@ -223,7 +223,7 @@ __sm.package.package_dependencies()
   typeset -axg package_dependencies
   for _flag in "$@"
   do
-    if ! __sm.string.contains "${_flag}" "${package_dependencies[*]}"
+    if ! __sm.string.contains.word "${_flag}" "${package_dependencies[*]}"
     then
       package_dependencies+=( "${_flag}" )
     fi
@@ -234,7 +234,7 @@ __sm.package.set.cflags()
 {
   trace_filter package || set -o xtrace
   export CFLAGS
-  if ! __sm.string.contains "-I${active_path}/include" "${CFLAGS}"
+  if ! __sm.string.contains.word "-I${active_path}/include" "${CFLAGS}"
   then
     CFLAGS="-I${active_path}/include${CFLAGS:+ }${CFLAGS:-}"
   fi
@@ -244,7 +244,7 @@ __sm.package.set.cpath()
 {
   trace_filter package || set -o xtrace
   export CPATH
-  if ! __sm.string.contains "${active_path}/include" "${CPATH:-}"
+  if ! __sm.string.contains.word "${active_path}/include" "${CPATH:-}"
   then
     CPATH="${CPATH:-}${CPATH:+ }${active_path}/include"
   fi
@@ -254,7 +254,7 @@ __sm.package.set.ldflags()
 {
   trace_filter package || set -o xtrace
   export LDFLAGS
-  if ! __sm.string.contains "-L${active_path}/lib" "${LDFLAGS:-}"
+  if ! __sm.string.contains.word "-L${active_path}/lib" "${LDFLAGS:-}"
   then
     LDFLAGS="-L${active_path}/lib${LDFLAGS:+ }${LDFLAGS:-}"
   fi
@@ -434,7 +434,7 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
     __sm.log.step success
   fi
 
-  if ! __sm.string.contains '__sm.package.update' "${FUNCNAME[*]}"
+  if ! __sm.string.contains.word '__sm.package.update' "${FUNCNAME[*]}"
   then
     __sm.package.activate.first "${package_name}" "${package_version}"
   fi
@@ -509,7 +509,7 @@ __sm.package.init()
 
   if command exists "${package_name}_initialize"
   then
-    __sm.string.contains "${package_name}_initialize" "${FUNCNAME[*]}" ||
+    __sm.string.contains.word "${package_name}_initialize" "${FUNCNAME[*]}" ||
       "${package_name}_initialize"
   fi
 
@@ -711,7 +711,7 @@ __sm.package.gnu.make()
   then
     _command="${build_command}"
   else
-    if ! __sm.string.contains "-j" "${make_flags[*]}"
+    if ! __sm.string.contains.word "-j" "${make_flags[*]}"
     then
       make_flags+=( "-j" "$(__sm.os.cpu.count)" )
     fi
@@ -800,7 +800,7 @@ __sm.package.deactivate()
 
   __sm.log.step success
 
-  if ! __sm.string.contains '__sm.package.activate' "${FUNCNAME[*]}"
+  if ! __sm.string.contains.word '__sm.package.activate' "${FUNCNAME[*]}"
   then
     __sm.package.ldconfig "${_package}"
   fi

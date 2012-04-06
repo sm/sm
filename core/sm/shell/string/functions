@@ -1,7 +1,13 @@
 #!/bin/sh
 
-# Checks if string contains a word
+# Simple matching string
 __sm.string.contains()
+{
+  __sm.string.match "$@"
+}
+
+# Checks if string contains a word
+__sm.string.contains.word()
 {
   [[ " $2 " =~ " $1 " ]]
 }

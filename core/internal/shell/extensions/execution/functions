@@ -128,22 +128,22 @@ __sm.extension.action.prerequisites()
     ${_action}_initialize
   )
 
-  __sm.string.contains "${_action%%_*}.cli" "${_pre[*]}" || _pre+=(
+  __sm.string.contains.word "${_action%%_*}.cli" "${_pre[*]}" || _pre+=(
     ${_action%%_*}_cli
     ${_action%%_*}_initialize
   )
 
-  __sm.string.contains "${_extension}.cli" "${_pre[*]}" || _pre+=(
+  __sm.string.contains.word "${_extension}.cli" "${_pre[*]}" || _pre+=(
     ${_extension}_cli
     ${_extension}_initialize
   )
 
-  __sm.string.contains "__sm.${_action}.cli" "${_pre[*]}" || _pre+=(
+  __sm.string.contains.word "__sm.${_action}.cli" "${_pre[*]}" || _pre+=(
     __sm.${_action}.cli
     __sm.${_action}.initialize
   )
 
-  __sm.string.contains "__sm.${_extension}.cli" "${_pre[*]}" || _pre+=(
+  __sm.string.contains.word "__sm.${_extension}.cli" "${_pre[*]}" || _pre+=(
     __sm.${_extension}.cli
     __sm.${_extension}.initialize
   )

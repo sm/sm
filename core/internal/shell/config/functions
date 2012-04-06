@@ -94,7 +94,7 @@ __sm.config.settings.search.path.update()
   typeset path _uri
   path=$1
 
-  if __sm.string.contains "${path}" "${__sm_settings_search_cache[*]}"
+  if __sm.string.contains.word "${path}" "${__sm_settings_search_cache[*]}"
   then
     return 0
   fi

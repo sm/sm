@@ -10,7 +10,7 @@ __sm.log.trace.filter()
   if __sm.log.options.check "$trace_flags" "$1"
   then
     return 1
-  elif __sm.string.contains "${funcstack[2]}" "${trace_functions[*]}"
+  elif __sm.string.contains.word "${funcstack[2]}" "${trace_functions[*]}"
   then
     return 1
   else
@@ -534,12 +534,12 @@ __sm.log.options.check()
 {
   # Do not trace this function, it is dependency to trace_filter
   # Do not use brackets; they slow things down a lot.
-  if __sm.string.contains "$2" "$1"
+  if __sm.string.contains.word "$2" "$1"
   then
     return 0
   fi
 
-  __sm.string.contains "all" "$1" && ! __sm.string.contains "-$2" "$1"
+  __sm.string.contains.word "all" "$1" && ! __sm.string.contains.word "-$2" "$1"
 }
 
 __sm.log.rotate()

@@ -181,11 +181,11 @@ files()
     (link)
       [[ -e "${_source}" ]]   ||
         __sm.log.fail "Cannot link ${_source} to ${_target}, source does not exist!"
-      if [[ -f "${_target}" ]] && ! __sm.string.contains "-f" "${_flags[*]}"
+      if [[ -f "${_target}" ]] && ! __sm.string.contains.word "-f" "${_flags[*]}"
       then
         __sm.log.fail "Cannot link ${_source} to ${_target} which exists as a file!"
       fi
-      if [[ -d "${_target}" ]] && ! __sm.string.contains "-f" "${_flags[*]}"
+      if [[ -d "${_target}" ]] && ! __sm.string.contains.word "-f" "${_flags[*]}"
       then
         __sm.log.fail "Cannot link ${_source} to ${_target} which exists as a directory"
       fi

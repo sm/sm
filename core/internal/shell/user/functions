@@ -103,7 +103,7 @@ __sm.user.exists()
 
   else # Name
 
-    if __sm.os.type.is darwin && __sm.string.contains "system" "${_flags}"
+    if __sm.os.type.is darwin && __sm.string.contains.word "system" "${_flags}"
     then _user="_${_user#_}" ; fi
 
     if __sm.os.type.is darwin
@@ -120,7 +120,7 @@ __sm.user.create.unless.exists()
 {
   typeset _system
 
-  if __sm.string.contains system "$4"
+  if __sm.string.contains.word system "$4"
   then _system="system"
   else _system=""
   fi

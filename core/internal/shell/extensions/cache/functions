@@ -3,7 +3,7 @@
 __sm.cache.map.add()
 {
   typeset -ga _actions_cache
-  if ! __sm.string.contains "$1" "${_actions_cache[*]}"
+  if ! __sm.string.contains.word "$1" "${_actions_cache[*]}"
   then
     _actions_cache+=( "$1" )
   fi
