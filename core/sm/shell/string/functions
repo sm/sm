@@ -1,10 +1,13 @@
 #!/bin/sh
 
+# Checks if string contains a word
 __sm.string.contains()
 {
   [[ " $2 " =~ " $1 " ]]
 }
 
+
+# Checks if string contains a key
 __sm.string.contains.key()
 {
   [[ " $2 " =~ " $1=" ]]
@@ -59,6 +62,11 @@ __sm.string.to.function.name()
 __sm.string.from.function.name()
 {
   printf "${1//./ }\n"
+}
+
+__sm.string.match()
+{
+  [[ "$2" =~ "$1" ]]
 }
 
 __sm.string.ematch()

@@ -11,7 +11,7 @@ __sm.templates.find()
   _params_path="$*"
   _params_path="${_params_path// //}"
 
-  if __sm.string.contains "/" "${_params_path}"
+  if __sm.string.match "/" "${_params_path}"
   then
     _extension="${_params_path%%/*}"
     _params_path="${_params_path#*/}"
@@ -130,4 +130,3 @@ __sm.templates.diff()
   # 3. different owner than specified (if specified)
   # 4. different mode than specified (if specified)
 }
-
