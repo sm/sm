@@ -9,7 +9,7 @@ set +o noclobber
   ${verbose_flag:=0} \
   ${var_debug_type_flag:="long"}
 
-typeset -a var_debug_flags trace_functions trace_flags
+typeset -a var_debug_flags trace_functions
 
 while (( $# > 0 ))
 do
