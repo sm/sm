@@ -55,8 +55,8 @@ $reference = \$hash->{$key};
 
 if (ref($reference) eq "SCALAR") {
   printf "%s\n", $hash->{$key};
-} elsif (ref($reference) eq "ARRAY") {
-  print STDOUT join("", $hash->{$key}); # TODO: Think this out a bit more.
+} elsif (ref($$reference) eq "ARRAY") {
+  print STDOUT join(" ", @{$hash->{$key}}) . "\n"; # TODO: Think this out a bit more.
 } elsif (ref($hash->{$key}) eq "HASH") {
   # This allows for namespace querying to reflect on available keys.
   printf "%s\n", join(" ",keys(%{$hash->{$key}}));
