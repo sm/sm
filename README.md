@@ -26,7 +26,7 @@ progress. Suggestions on improving the manual are most welcome.
 
 The latest version of the manual is kept at the following url:
 
-    https://sm.beginrescueend.com/sm-manual.pdf
+    https://smf.sh/sm-manual.pdf
 
 Anytime updates are made to the manual a new version is pushed to that url.
 
@@ -61,7 +61,7 @@ Wayne E. Seguin
 * http://github.com/wayneeseguin
 * http://github.com/sm
 * http://twitter.com/wayneeseguin
-* https://bdsm.beginrescueend.com/
+* https://smf.sh/
 * https://rvm.beginrescueend.com/
 
 # Contributing

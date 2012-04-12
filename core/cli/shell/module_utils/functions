@@ -113,7 +113,7 @@ modules_docgen()
     paths exists "${core_development_path}" ||
     __sm.log.error "Set core_development_path in ~/.smrc, and clone the sm core "\
      "repository into it, to run docgen."\
-     "For more information, see https://sm.beginrescueend.com/development/core."
+     "For more information, see https://smf.sh/development/core."
   fi
 
   paths create "${_prefix}"
