@@ -1187,7 +1187,6 @@ __sm.package.reset()
     package_file
     package_name
     package_patches_url
-    packages_path
     package_url
     package_user
     package_version
