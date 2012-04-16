@@ -1160,3 +1160,50 @@ __sm.package.usage()
 
   "
 }
+
+__sm.package.reset()
+{
+  typeset variable
+  typeset -a variables
+
+  variables=(
+    archive_format
+    bin_path
+    configure_flags
+    data_path
+    force_flag
+    install_base_path
+    install_path
+    log_path
+    make_flags
+    package_base_url
+    package_checksum
+    package_checksum_url
+    package_default_version
+    package_dependencies
+    package_dir
+    package_directory
+    package_docs_url
+    package_file
+    package_name
+    package_patches_url
+    packages_path
+    package_url
+    package_user
+    package_version
+    shared_flag
+    source_path
+    src_path
+    static_flag
+    target_path
+    website_url
+    LDFLAGS
+    CFLAGS
+    CPATH
+  )
+
+  for variable in ${variables[@]}
+  do
+    unset ${variable}
+  done
+}
