@@ -63,11 +63,9 @@ __sm.package.cli()
         ;;
       (static)
         static_flag=1
-        __sm.package.configure.flags --static
         ;;
       (shared)
         shared_flag=1
-        __sm.package.configure.flags --enable-shared
         ;;
       (licence)
         extension_license
@@ -88,6 +86,120 @@ __sm.package.cli()
   done
 
   __sm.package.init "${_ignored_args[@]}"
+}
+
+__sm.package.init()
+{
+  trace_filter package || set -o xtrace
+
+  typeset default_configure_flags _flag
+  typeset -ga configure_flags >/dev/null
+
+  true ${package_name:=${1:-${extension}}}
+
+  [[ -n "${package_name}" ]] || __sm.log.fail "Package name must be given.\n"
+
+  case "${package_name}" in
+    (*\=*) # exact version specifier
+      package_version="${package_name#*\=}"
+      package_name="${package_name%%\=*}"
+      ;;
+    (*:*) # minimum version specifier
+      # TODO: concept of 'minimum' ;)
+      package_version="${package_name#*:}"
+      package_name="${package_name%%:*}"
+      ;;
+    (*)
+      true "${package_version:="${2:-}"}" "${archive_format:="${3:-}"}"
+      ;;
+  esac
+
+  true \
+    "${source_path:="${sm_path}/src"}" \
+    "${archives_path:="${sm_path}/archives"}" \
+    ${static_flag:=0}
+
+  __sm.package.exports
+  # Ensure that package_version is set at this point
+
+  for variable in version base_url checksum_url user
+  do
+    if variable is empty "package_${variable}"
+    then
+      config read file defaults from ${package_name} \
+        key ${variable} into ${variable} prefix package
+    fi
+  done
+
+  for variable in website_url archive_format
+  do
+    if variable is empty "${variable}"
+    then
+      config read file defaults from ${package_name} \
+        key ${variable} into ${variable}
+    fi
+  done
+
+  config read file defaults from ${package_name} \
+    key package_dependencies prefix default
+  config read file defaults from ${package_name} \
+    key configure_flags prefix default
+  config read file defaults from ${package_name} \
+    key make_flags prefix default
+  config read file defaults from ${package_name} \
+    key configure_flag_static prefix default
+  config read file defaults from ${package_name} \
+    key configure_flag_shared prefix default
+
+  if command exists "${package_name}_initialize"
+  then
+    __sm.string.contains.word "${package_name}_initialize" "${FUNCNAME[*]}" ||
+      "${package_name}_initialize"
+  fi
+
+  __sm.package.package_dependencies ${=default_package_dependencies[*]}
+  __sm.package.configure.flags ${=default_configure_flags[*]}
+  __sm.package.make.flags ${=default_make_flags[*]}
+  [[ ${static_flag:-0} != 1 ]] || __sm.package.configure.flags ${default_configure_flag_static:---static}
+  [[ ${shared_flag:-0} != 1 ]] || __sm.package.configure.flags ${default_configure_flag_shared:---enable-shared}
+
+  true \
+    "${package_version:="${package_default_version}"}" \
+    "${package_dir:="${package_name}-${package_version}"}" \
+    "${init_scripts_path:="$(init_scripts_path)"}" \
+    "${archive_format:=tar.gz}" \
+    "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
+    "${install_base_path:="${packages_path}/versions/${package_name}"}" \
+    "${install_path:="${install_base_path}/${package_version}"}"
+
+  __sm.package.configure.flag --prefix "${install_path}"
+
+  # This check should only happen in places that require a version...
+  #[[ -n "${package_version}" ]] ||
+  #  __sm.log.fail "Package version must be specified.\n"\
+  #  "(For example version=x.y.z set in extension's config/defaults file.)\n"
+
+  fhs_dirs=( bin etc include lib libexec sbin share man )
+
+  paths create "${active_path}"
+
+  for dir in ${fhs_dirs}
+  do
+    paths create "${active_path}/${dir}"
+  done
+
+  if user is root
+  then
+    true \
+      "${log_path:="/var/log/${package_name}"}" \
+      "${package_user:="${package_name}"}"
+  else
+    true \
+      "${log_path:="${active_path}/log"}" \
+      "${package_user:="$USER"}"
+  fi
+
+  extension_patches_path="${extension_path}/patches"
 }
 
 __sm.package.error()
@@ -447,113 +559,6 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
   fi
 
   __sm.package.setup
-}
-
-__sm.package.init()
-{
-  trace_filter package || set -o xtrace
-
-  typeset default_configure_flags _flag
-
-  true ${package_name:=${1:-${extension}}}
-
-  [[ -n "${package_name}" ]] || __sm.log.fail "Package name must be given.\n"
-
-  case "${package_name}" in
-    (*\=*) # exact version specifier
-      package_version="${package_name#*\=}"
-      package_name="${package_name%%\=*}"
-      ;;
-    (*:*) # minimum version specifier
-      # TODO: concept of 'minimum' ;)
-      package_version="${package_name#*:}"
-      package_name="${package_name%%:*}"
-      ;;
-    (*)
-      true "${package_version:="${2:-}"}" "${archive_format:="${3:-}"}"
-      ;;
-  esac
-
-  true \
-    "${source_path:="${sm_path}/src"}" \
-    "${archives_path:="${sm_path}/archives"}" \
-    ${static_flag:=0}
-
-  __sm.package.exports
-  # Ensure that package_version is set at this point
-
-  for variable in version base_url checksum_url user
-  do
-    if variable is empty "package_${variable}"
-    then
-      config read file defaults from ${package_name} \
-        key ${variable} into ${variable} prefix package
-    fi
-  done
-
-  for variable in website_url archive_format
-  do
-    if variable is empty "${variable}"
-    then
-      config read file defaults from ${package_name} \
-        key ${variable} into ${variable}
-    fi
-  done
-
-  config read file defaults from ${package_name} \
-    key package_dependencies prefix default
-  config read file defaults from ${package_name} \
-    key configure_flags prefix default
-  config read file defaults from ${package_name} \
-    key make_flags prefix default
-
-  if command exists "${package_name}_initialize"
-  then
-    __sm.string.contains.word "${package_name}_initialize" "${FUNCNAME[*]}" ||
-      "${package_name}_initialize"
-  fi
-
-  __sm.package.package_dependencies ${=default_package_dependencies[*]}
-  __sm.package.configure.flags ${=default_configure_flags[*]}
-  __sm.package.make.flags ${=default_make_flags[*]}
-
-  true \
-    "${package_version:="${package_default_version}"}" \
-    "${package_dir:="${package_name}-${package_version}"}" \
-    "${init_scripts_path:="$(init_scripts_path)"}" \
-    "${archive_format:=tar.gz}" \
-    "${package_file:="${package_name}-${package_version}.${archive_format}"}" \
-    "${install_base_path:="${packages_path}/versions/${package_name}"}" \
-    "${install_path:="${install_base_path}/${package_version}"}"
-
-  __sm.package.configure.flag --prefix "${install_path}"
-
-  # This check should only happen in places that require a version...
-  #[[ -n "${package_version}" ]] ||
-  #  __sm.log.fail "Package version must be specified.\n"\
-  #  "(For example version=x.y.z set in extension's config/defaults file.)\n"
-
-  fhs_dirs=( bin etc include lib libexec sbin share man )
-
-  paths create "${active_path}"
-
-  for dir in ${fhs_dirs}
-  do
-    paths create "${active_path}/${dir}"
-  done
-
-  if user is root
-  then
-    true \
-      "${log_path:="/var/log/${package_name}"}" \
-      "${package_user:="${package_name}"}"
-  else
-    true \
-      "${log_path:="${active_path}/log"}" \
-      "${package_user:="$USER"}"
-  fi
-
-  extension_patches_path="${extension_path}/patches"
 }
 
 __sm.package.binary.install()
@@ -1109,6 +1114,12 @@ __sm.packages.list.installed()
 {
   trace_filter package || set -o xtrace
   versionedfs versions path "${packages_path}"
+}
+
+__sm.package.is.installed()
+{
+  trace_filter package || set -o xtrace
+  versionedfs versions path "${packages_path}" name "${package_name}" | grep "${1:-}" >/dev/null
 }
 
 __sm.packages.list.active()
