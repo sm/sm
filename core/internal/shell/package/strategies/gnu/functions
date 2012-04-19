@@ -399,10 +399,9 @@ __sm.package.gnu.deactivate()
 
   (( $# == 0 )) || __sm.package.cli $@
 
-  __sm.log.step "${package_name} ${_version} ~ deactivate"
+  __sm.log.step "${package_name} ${_version:-${package_version}} ~ deactivate"
 
-  versionedfs deactivate \
-    path "${packages_path}" name "${package_name}"
+  versionedfs deactivate path "${packages_path}" name "${package_name}" >/dev/null
 
   __sm.log.step success
 
