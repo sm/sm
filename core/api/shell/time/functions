@@ -23,7 +23,9 @@ timestamp()
   case "${_command}" in
     (show.new|show.current|set)
       if __sm.timestamp.${_command}
-      then return 0 ; else return $? ; fi
+      then return 0
+      else return $?
+      fi
       ;;
     (*) __sm.log.error "Unknown command for extension '${_command}'."
   esac

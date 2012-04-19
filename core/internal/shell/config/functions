@@ -11,11 +11,8 @@ __sm.config.read()
   _prefix="$5"
   _delimiter="${6}"
 
-  if [[ -z "${_variable}" ]]
-  then _variable="${_key}" ; fi
-
-  if [[ -n "${_prefix}" ]]
-  then _variable="${_prefix}_${_variable}" ; fi
+  [[ -n "${_variable}" ]] || _variable="${_key}"
+  [[ -z "${_prefix}" ]]   || _variable="${_prefix}_${_variable}"
 
   # Run search in the same process to initialize cache variables.
   __sm.config.settings.search ${_extension} "${_file}" > /dev/null

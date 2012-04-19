@@ -25,7 +25,10 @@ set -o nounset # do not allow unset variables processing
 initial_pwd="$PWD" # record where the script was run from right away.
 
 # Account for symlinks
-if [[ -L $0 ]] ; then self=$(readlink $0) ; else self=$0 ; fi
+if [[ -L $0 ]]
+then self=$(readlink $0)
+else self=$0
+fi
 
 # SM Framework path, may be overridden on command line or as exported environment variable.
 [[ -n "${sm_path:-}" && -d "${sm_path:-}" ]] || sm_path="$(dirname $(builtin cd $(dirname $self); pwd ))"

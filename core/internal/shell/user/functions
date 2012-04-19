@@ -104,7 +104,8 @@ __sm.user.exists()
   else # Name
 
     if __sm.os.type.is darwin && __sm.string.contains.word "system" "${_flags}"
-    then _user="_${_user#_}" ; fi
+    then _user="_${_user#_}"
+    fi
 
     if __sm.os.type.is darwin
     then
@@ -126,7 +127,8 @@ __sm.user.create.unless.exists()
   fi
 
   if ! __sm.user.exists "$1" ${_system}
-  then __sm.user.add "$@" ; fi
+  then __sm.user.add "$@"
+  fi
 }
 
 __sm.user.add()

@@ -254,6 +254,7 @@ __sm.package.set.ldflags()
 {
   trace_filter package || set -o xtrace
   export LDFLAGS
+
   if ! __sm.string.contains.word "-L${active_path}/lib" "${LDFLAGS:-}"
   then
     LDFLAGS="-L${active_path}/lib${LDFLAGS:+ }${LDFLAGS:-}"
@@ -264,8 +265,10 @@ __sm.package.set.cc()
 {
   trace_filter package || set -o xtrace
   export CC
+
   if __sm.os.type.is darwin && [[ -x /usr/bin/gcc-4.2 ]]
-  then CC=/usr/bin/gcc-4.2 ; fi
+  then CC=/usr/bin/gcc-4.2
+  fi
 }
 
 __sm.package.exports()
@@ -637,7 +640,8 @@ __sm.package.fetch()
   __sm.package.fetch.checksum
 
   if [[ -n "${package_checksum:-}" ]]
-  then _args+=( "checksum" "${package_checksum}" ) ; fi
+  then _args+=( "checksum" "${package_checksum}" )
+  fi
 
   fetch_uris "${package_url}" "${source_path}/${package_dir}" ${_args[@]} || return 1
 

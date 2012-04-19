@@ -128,7 +128,9 @@ process()
       if [[ -n "${_file}" ]]
       then
         if __sm.process.lockfile.lock "${_file}"
-        then return 0 ; else return 1 ; fi # Let caller deal with the choice of how to react.
+        then return 0
+        else return 1
+        fi # Let caller deal with the choice of how to react.
       else
         __sm.log.fail "No lockfile was specified for locking."
   fi

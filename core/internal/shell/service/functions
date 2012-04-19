@@ -116,7 +116,8 @@ __sm.service.setup()
   if user is root
   then
     if ! user exists ${service_user}
-    then user create system user "${service_user}" group "${service_user}" ; fi
+    then user create system user "${service_user}" group "${service_user}"
+    fi
 
     paths create "${service_root_paths[@]}"
 
@@ -475,10 +476,12 @@ __sm.service.init.start()
   _command=( "${service_binary}" )
 
   if [[ -n "${service_start_flags}" ]]
-  then _command+=("${service_start_flags[@]}") ; fi
+  then _command+=("${service_start_flags[@]}")
+  fi
 
   if [[ -n "${service_flags}" ]]
-  then _command+=("${service_flags[@]}") ; fi
+  then _command+=("${service_flags[@]}")
+  fi
 
   if (( service_run_as_root_flag ))
   then
