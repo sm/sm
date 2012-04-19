@@ -139,7 +139,7 @@ package()
   [[ -n "${package_name}" ]]    || __sm.log.fail "Package name must be set/given"
 
   case "${_command}" in
-    (cli|make|make.install|is.active|is.installed|install|uninstall|info|configure|configure.flags)
+    (cli|make|make.install|is.active|is.installed|install|uninstall|info|configure|configure.flags|reset)
       __sm.package.${_command} "${_params[@]}"
       ;;
     (configure.flag)
