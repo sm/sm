@@ -398,9 +398,13 @@ __sm.package.common.methods()
     __sm.package.$method()
     {
       trace_filter package || set -o xtrace
+
+      typeset method
+      method=${0##*.}
+
       case "${package_strategy:=gnu}" in
         (gnu|binary|java)
-          includes package/strategies/${package_strategy}
+          includes internal/package/strategies/${package_strategy}
           __sm.package.${package_strategy}.$method "$@"
           ;;
         *)
