@@ -48,6 +48,7 @@ checksum()
 
   if __sm.checksum "${_type}" "${_file}" "${_checksum}" "${_variable}" "${_target}"
   then return 0
-  else return 1 ; fi
+  else return 1
+  fi
 }
 

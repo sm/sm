@@ -47,13 +47,17 @@ extension()
     (get.uri)
       [[ -n "${_name}" ]] || __sm.log.error "Extension name was not given for get uri."
       if __sm.extension.get.uri "${_name}"
-      then return 0 ; else return $? ; fi
+      then return 0
+      else return $?
+      fi
       ;;
     (install)
       [[ -n "${_name}" ]] || __sm.log.error "Extension name was not given for install."
       __sm.modules.include internal/extensions/manipulation
       if __sm.extension.install "${_name}" "${_uri}"
-      then return 0 ; else return $? ; fi
+      then return 0
+      else return $?
+      fi
       ;;
     (search|find)
       [[ -n "${_name}" ]] || __sm.log.error "Extension name was not given for search."

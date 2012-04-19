@@ -154,18 +154,21 @@ backtrace()
     _string=${functrace[${_index}]}
     _string="${_string%:*}"
     if (( ${#_string} > ${_function_length} ))
-    then _function_length=${#_string} ; fi
+    then _function_length=${#_string}
+    fi
 
     _string=${funcfiletrace[${_index}]}
     _string="${_string%:*}"
     _string="${_string#$initial_pwd\/}"
     if (( ${#_string} > ${_source_length} ))
-    then _source_length=${#_string} ; fi
+    then _source_length=${#_string}
+    fi
 
     _string=${funcfiletrace[${_index}]}
     _string=${_string#*:}
     if (( ${#_string} > ${_digits} ))
-    then _digits=${#_string} ; fi
+    then _digits=${#_string}
+    fi
   done
 
   # Determine the format string output for the backtrace, based on your
@@ -203,7 +206,8 @@ backtrace()
     _function="${_string%:*}"
     _function_line=${_string#*:}
     if [[ "$_source" == "zsh" && "$_function" == "zsh" ]]
-    then _source="(console)"; fi
+    then _source="(console)"
+    fi
     #_line=${funcfiletrace[$(( _index - 1 ))]}
 
 #TODO: make it a switch if required, there is a need to trace internal functions

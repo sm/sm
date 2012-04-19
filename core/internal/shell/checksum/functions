@@ -45,16 +45,20 @@ __sm.checksum()
   then
     if [[ "${_checksum}" == "${_sum}" ]]
     then return 0
-    else return 1 ; fi
+    else return 1
+    fi
   else
     if [[ -n "${_variable}" ]]
-    then eval "${_variable}='${_sum}'" ; fi
+    then eval "${_variable}='${_sum}'"
+    fi
 
     if [[ -n "${_target}" ]] # TODO: Sanity checking / error handling here.
-    then echo "${_sum}" > "${_target}" ; fi
+    then echo "${_sum}" > "${_target}"
+    fi
 
     if [[ -z "${_variable}" && -z "${_target}" ]]
-    then echo "${_sum}" ; fi
+    then echo "${_sum}"
+    fi
   fi
 }
 

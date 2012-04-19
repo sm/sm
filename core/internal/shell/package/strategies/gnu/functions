@@ -242,7 +242,8 @@ __sm.package.fetch()
   __sm.package.fetch.checksum
 
   if [[ -n "${package_checksum:-}" ]]
-  then _args+=( "checksum" "${package_checksum}" ) ; fi
+  then _args+=( "checksum" "${package_checksum}" )
+  fi
 
   fetch_uris "${package_url}" "${source_path}/${package_dir}" ${_args[@]} || return 1
 

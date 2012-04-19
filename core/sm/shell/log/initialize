@@ -15,7 +15,9 @@ trap 'exit 1' USR2 # Exit on USR2 (send by backtrace to $__sm_pid)
 export __sm_pid=$$  # Store process pid for closing from backtrace
 
 if [[ -n "${ZSH_VERSION}" ]] # Persist ERR handler
-then set -e; else set -o errtrace ; fi
+then set -e
+else set -o errtrace
+fi
 
 # Call backtrace on error
 trap "backtrace \"A command has returned error code '(\$?)' without being handled.\"" ERR
