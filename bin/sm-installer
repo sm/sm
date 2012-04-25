@@ -63,13 +63,13 @@ fi
 true sm_owner:${sm_owner:=sm}:
 
 rm -rf "${sm_path}/src/${sm_owner}-sm"
-mkdir -p "${sm_path}/archives" "${sm_path}/bin" "${sm_path}/src/${sm_owner}-sm"
+mkdir -p "${sm_path}/archives" "${sm_path}/zsh-bin" "${sm_path}/src/${sm_owner}-sm"
 
-${sm_curl_command} https://smf.sh/zsh/$platform/zsh -o "${sm_path}/bin/sm-zsh"
-chmod +x "${sm_path}/bin/sm-zsh"
+${sm_curl_command} https://smf.sh/zsh/$platform/zsh -o "${sm_path}/zsh-bin/zsh"
+chmod +x "${sm_path}/zsh-bin/zsh"
 ${sm_curl_command} -L https://github.com/${sm_owner}/sm/tarball/master -o "${sm_path}/archives/${sm_owner}-sm.tar.gz"
 builtin cd "${sm_path}/src/${sm_owner}-sm"
 ${sm_tar_command} xzf "${sm_path}/archives/${sm_owner}-sm.tar.gz"
 mv ${sm_owner}-sm-*/* .
 rm -rf ${sm_owner}-sm-*
-"${sm_path}/bin/sm-zsh" ./install --zsh "${sm_path}/bin/sm-zsh" "${params[@]}"
+"${sm_path}/zsh-bin/zsh" ./install --zsh "${sm_path}/zsh-bin/zsh" "${params[@]}"
