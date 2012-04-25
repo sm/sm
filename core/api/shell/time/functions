@@ -4,9 +4,10 @@ timestamp()
 {
   trace_filter timestamp || set -o xtrace
 
-  typeset _command _params=() _name _uri __extension_commands
-  _params=()
-  __extension_commands=(
+  typeset _command
+  typeset -a __timestamp_commands
+
+  __timestamp_commands=(
     "show new"
     "show current"
     "save=set"
@@ -22,7 +23,7 @@ timestamp()
 
   case "${_command}" in
     (show.new|show.current|set)
-      if __sm.timestamp.${_command}
+      if __sm.timestamp.${_command} "$@"
       then return 0
       else return $?
       fi
