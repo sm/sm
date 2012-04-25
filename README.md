@@ -19,6 +19,12 @@ install and manage a multitude of extensions - and even entire sets of extension
 unprecedented levels of control and automation productivity that are unleashed by the
 creative abilities of SM's energetic community of extension authors :)
 
+# Installation
+
+The easiest way to install is to use following oneliner:
+
+    curl -L https://raw.github.com/sm/sm/master/bin/sm-installer | sh
+
 # Manual
 
 The manual may be downloaded as a PDF. Keep in mind that it is a work in
@@ -62,7 +68,7 @@ Wayne E. Seguin
 * http://github.com/sm
 * http://twitter.com/wayneeseguin
 * https://smf.sh/
-* https://rvm.beginrescueend.com/
+* https://rvm.io/
 
 # Contributing
 
