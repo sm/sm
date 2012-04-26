@@ -2,12 +2,6 @@
 
 extension_args=()
 
-if ! command -v zsh >/dev/null
-then
-  echo "ERROR: ZSH is required for SM."
-  exit 1
-fi
-
 while (( $# ))
 do
   case "$1" in
@@ -53,6 +47,12 @@ do
       ;;
   esac
 done
+
+if [[ -z "${sm_shell:-}" ]] && ! command -v zsh >/dev/null
+then
+  echo "ERROR: ZSH is required for SM."
+  exit 1
+fi
 
 if [[ -n "${prefix_path}" ]]
 then
