@@ -1,7 +1,7 @@
 #core
 releases_url=https://smf.sh/releases
 latest_version_url=https://smf.sh/releases/latest-version.txt
-extensions_url=https://extensions.beginrescueend.com
+extensions_url=https://extensions.smf.sh
 service_url=https://smf.sh/services
 sm_repo_url=git://github.com/sm/sm
 website_url=https://smf.sh/

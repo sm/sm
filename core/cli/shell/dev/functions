@@ -123,7 +123,7 @@ extension_publish()
   _name="${1:-}"
   (( $# )) && shift || __sm.log.fail "Cannot publish an extension; no extension name was given."
 
-  NIY "Extension publishing locally and to extensions.beginrescueend.com has not yet been implemented."
+  NIY "Extension publishing locally and to extensions.smf.sh has not yet been implemented."
 
   _path="${extensions_development_path:-"$extensions_src_path"}"
 

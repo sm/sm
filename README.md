@@ -79,8 +79,8 @@ In the spirit of free software, everyone is encouraged to help improve this proj
 Ways that you may contribute to the project are by:
 
 * using the latest development and release versions
-* reporting bugs in #beginrescueend on irc.freenode.net
-* suggesting new features in #beginrescueend on irc.freenode.net
+* reporting bugs in #smf.sh on irc.freenode.net
+* suggesting new features in #smf.sh on irc.freenode.net
 * writing or editing documentation, which is greatly appreciated
 * translating documentation to a new language, I speek tech and poor engrish
 * writing extensions
