@@ -12,24 +12,17 @@ case $platform in
     ;;
 esac
 
-params=()
-while test $# -gt 0
-do
-  case "${1:-}" in
-    (--from)
-      sm_owner=${2:-}
-      shift 2
-      ;;
-    (--path)
-      sm_path=${2:-}
-      shift 2
-      ;;
-    (*)
-      params+=( "$1" )
-      shift
-      ;;
-  esac
-done
+if test "${1:-}" = "--from"
+then
+  sm_owner=${2:-}
+  shift 2
+fi
+
+if test "${1:-}" = "--path"
+then
+  sm_path=${2:-}
+  shift 2
+fi
 
 if test -z "${sm_curl_command:-}"
 then
@@ -72,4 +65,4 @@ builtin cd "${sm_path}/src/${sm_owner}-sm"
 ${sm_tar_command} xzf "${sm_path}/archives/${sm_owner}-sm.tar.gz"
 mv ${sm_owner}-sm-*/* .
 rm -rf ${sm_owner}-sm-*
-"${sm_path}/zsh-bin/zsh" ./install --zsh "${sm_path}/zsh-bin/zsh" "${params[@]}"
+"${sm_path}/zsh-bin/zsh" ./install --zsh "${sm_path}/zsh-bin/zsh" "$@"
