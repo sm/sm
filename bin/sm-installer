@@ -12,28 +12,21 @@ case $platform in
     ;;
 esac
 
-params=()
-while test $# -gt 0
-do
-  case "${1:-}" in
-    (--from)
-      sm_owner=${2:-}
-      shift 2
-      ;;
-    (--path)
-      sm_path=${2:-}
-      shift 2
-      ;;
-    (*)
-      params+=( "$1" )
-      shift
-      ;;
-  esac
-done
+if test "${1:-}" = "--from"
+then
+  sm_owner=${2:-}
+  shift 2
+fi
+
+if test "${1:-}" = "--path"
+then
+  sm_path=${2:-}
+  shift 2
+fi
 
 if test -z "${sm_curl_command:-}"
 then
-  if builtin command -v curl >/dev/null
+  if command -v curl >/dev/null
   then sm_curl_command=curl
   else
     echo "Could not find curl, please install and try again."
@@ -43,9 +36,9 @@ fi
 
 if test -z "${sm_tar_command:-}"
 then
-  if builtin command -v gtar >/dev/null
+  if command -v gtar >/dev/null
   then sm_tar_command=gtar
-  elif builtin command -v tar >/dev/null
+  elif command -v tar >/dev/null
   then sm_tar_command=tar
   else
     echo "Could not find tar, please install and try again."
@@ -55,7 +48,7 @@ fi
 
 if test -z "${sm_path:-}"
 then
-  if test ${UID:-0} -eq 0
+  if test `ps -p $$ -o uid=` -eq 0
   then sm_path=/opt/sm
   else sm_path="${HOME:-}/.sm"
   fi
@@ -68,8 +61,8 @@ mkdir -p "${sm_path}/archives" "${sm_path}/zsh-bin" "${sm_path}/src/${sm_owner}-
 ${sm_curl_command} https://smf.sh/zsh/$platform/zsh -o "${sm_path}/zsh-bin/zsh"
 chmod +x "${sm_path}/zsh-bin/zsh"
 ${sm_curl_command} -L https://github.com/${sm_owner}/sm/tarball/master -o "${sm_path}/archives/${sm_owner}-sm.tar.gz"
-builtin cd "${sm_path}/src/${sm_owner}-sm"
+cd "${sm_path}/src/${sm_owner}-sm"
 ${sm_tar_command} xzf "${sm_path}/archives/${sm_owner}-sm.tar.gz"
 mv ${sm_owner}-sm-*/* .
 rm -rf ${sm_owner}-sm-*
-"${sm_path}/zsh-bin/zsh" ./install --zsh "${sm_path}/zsh-bin/zsh" "${params[@]}"
+"${sm_path}/zsh-bin/zsh" ./install --zsh "${sm_path}/zsh-bin/zsh" "$@"
