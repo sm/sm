@@ -36,6 +36,9 @@ __sm.checksum()
         __sm.log.fail "Neither shasum nor sha${_number}sum were found in PATH."
       fi
       ;;
+    (\#)
+      log debug vcs "Missing checksum '${_type}'."
+      ;;
     (*)
       log fail "Unknown checksum type '${_type}'."
       ;;
@@ -61,4 +64,3 @@ __sm.checksum()
     fi
   fi
 }
-
