@@ -75,6 +75,10 @@ __sm.package.cli()
         __sm.package.usage
         succeed
         ;;
+      (--configure)
+        _token="${_package_args[$((++index))]}"
+        __sm.package.configure.flags "${_token}"
+        ;;
       (--with*|--enable*|--disable*)
         __sm.package.configure.flags "${_token}"
         ;;
