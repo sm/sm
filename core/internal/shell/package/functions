@@ -387,13 +387,6 @@ __sm.package.set.cc()
   fi
 }
 
-__sm.package.exports()
-{
-  export package_name packages_path package_name package_version archive_format \
-    package_file package_url package_checksum_url packages_path bin_path source_path \
-    LDFLAGS CFLAGS package_default_version
-}
-
 __sm.package.common.methods()
 {
   typeset method
@@ -604,6 +597,49 @@ __sm.package.usage()
   "
 }
 
+__sm.package.exports()
+{
+  typeset variable
+  typeset -a variables
+
+  variables=(
+    archive_format
+    bin_path
+    configure_command
+    data_path
+    extension_patches_path
+    force_flag
+    package_base_url
+    package_checksum
+    package_checksum_url
+    package_dir
+    package_directory
+    package_docs_url
+    package_file
+    package_name
+    package_patches_url
+    packages_path
+    package_url
+    package_user
+    package_version
+    shared_flag
+    source_path
+    src_path
+    static_flag
+    target_path
+    CFLAGS
+    CPATH
+    LDFLAGS
+  )
+
+  for variable in ${variables[@]}
+  do
+    typeset -g ${variable}
+  done
+
+  typeset -ga configure_flags make_flags package_dependencies
+}
+
 __sm.package.reset()
 {
   typeset variable
@@ -612,6 +648,7 @@ __sm.package.reset()
   variables=(
     archive_format
     bin_path
+    configure_command
     configure_flags
     data_path
     force_flag
@@ -639,13 +676,15 @@ __sm.package.reset()
     static_flag
     target_path
     website_url
-    LDFLAGS
     CFLAGS
     CPATH
+    LDFLAGS
   )
 
   for variable in ${variables[@]}
   do
     unset ${variable}
   done
+
+  __sm.package.exports
 }

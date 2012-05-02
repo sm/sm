@@ -1,13 +1,6 @@
 #!/bin/sh
 
-typeset -g \
-  src_path data_path package_user package_version package_base_url \
-  package_file package_directory archive_format package_checksum force_flag \
-  static_flag shared_flag package_user configure_flags configure_command \
-  package_name package_dir package_url package_docs_url package_patches_url \
-  package_checksum_url bin_path packages_path source_path target_path \
-  archive_format extension_patches_path
+__sm.package.exports
 
-typeset -ga \
-  configure_flags make_flags package_dependencies fhs_dirs
-
+typeset -g packages_path extension_patches_path
+typeset -ga fhs_dirs
