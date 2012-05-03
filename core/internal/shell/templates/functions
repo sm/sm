@@ -100,7 +100,7 @@ __sm.templates.install()
   _params+="${_data_string}\""
 
   if ! eval "${sm_path}/bin/sm-mustache ${_params[@]}"
-  then log error "There was an error rendering the template gay! ${_params[@]}"
+  then log error "There was an error rendering the template!"
   fi
 
   chmod "${_mode}" "${_target}"
