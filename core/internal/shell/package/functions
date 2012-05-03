@@ -371,9 +371,16 @@ __sm.package.set.ldflags()
   trace_filter package || set -o xtrace
   export LDFLAGS
 
-  if ! __sm.string.contains.word "-L${active_path}/lib" "${LDFLAGS:-}"
+  if __sm.paths.exists "${active_path}/lib" &&
+    ! __sm.string.contains.word "-L${active_path}/lib" "${LDFLAGS:-}"
   then
     LDFLAGS="-L${active_path}/lib${LDFLAGS:+ }${LDFLAGS:-}"
+  fi
+
+  if __sm.paths.exists "${active_path}/lib64" &&
+    ! __sm.string.contains.word "-L${active_path}/lib64" "${LDFLAGS:-}"
+  then
+    LDFLAGS="-L${active_path}/lib64${LDFLAGS:+ }${LDFLAGS:-}"
   fi
 }
 
