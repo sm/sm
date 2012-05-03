@@ -65,7 +65,6 @@ templates()
           __sm.log.fail "A json file location must follow 'json_file'"
         ;;
       (with|variables)
-        shift
         if [[ "${1}" == "from" ]]
         then shift && _variable="${1}" && shift
 

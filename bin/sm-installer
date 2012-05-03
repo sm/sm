@@ -63,6 +63,8 @@ chmod +x "${sm_path}/zsh-bin/zsh"
 ${sm_curl_command} -L https://github.com/${sm_owner}/sm/tarball/master -o "${sm_path}/archives/${sm_owner}-sm.tar.gz"
 cd "${sm_path}/src/${sm_owner}-sm"
 ${sm_tar_command} xzf "${sm_path}/archives/${sm_owner}-sm.tar.gz"
+${sm_curl_command} https://smf.sh/mustache/$platform/sm-mustache -o ${sm_path}/bin/sm-mustache
+chmod +x "${sm_path}/bin/sm-mustache"
 mv ${sm_owner}-sm-*/* .
 rm -rf ${sm_owner}-sm-*
 "${sm_path}/zsh-bin/zsh" ./install --zsh "${sm_path}/zsh-bin/zsh" "$@"
