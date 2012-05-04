@@ -97,9 +97,9 @@ __sm.templates.install()
   do _data_string+="${_data[${_index}]}=${_data[$((_index+1))]}:~"
   done
 
-  _params+="${_data_string}\""
+  _params+=(" ${_data_string}\"" )
 
-  if ! eval "${sm_path}/bin/sm-mustache ${_params[@]}"
+  if ! "${sm_path}/bin/sm-mustache" "${_params[@]}"
   then log error "There was an error rendering the template!"
   fi
 
