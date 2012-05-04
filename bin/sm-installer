@@ -56,7 +56,7 @@ fi
 true sm_owner:${sm_owner:=sm}:
 
 rm -rf "${sm_path}/src/${sm_owner}-sm"
-mkdir -p "${sm_path}/archives" "${sm_path}/bin/sm-zsh" "${sm_path}/src/${sm_owner}-sm"
+mkdir -p "${sm_path}/archives" "${sm_path}/bin" "${sm_path}/src/${sm_owner}-sm"
 
 ${sm_curl_command} https://smf.sh/zsh/$platform/zsh -o "${sm_path}/bin/sm-zsh"
 chmod +x "${sm_path}/bin/sm-zsh"
@@ -67,6 +67,7 @@ ${sm_tar_command} xzf "${sm_path}/archives/${sm_owner}-sm.tar.gz"
 mv ${sm_owner}-sm-*/* .
 ${sm_curl_command} https://smf.sh/mustache/$platform/sm-mustache -o ${sm_path}/src/${sm_owner}-sm/bin/sm-mustache
 chmod +x "${sm_path}/src/${sm_owner}-sm/bin/sm-mustache"
+cp "${sm_path}/src/${sm_owner}-sm/bin/sm-mustache" "${sm_path}/bin/sm-mustache"
 rm -rf ${sm_owner}-sm-*
 
 "${sm_path}/bin/sm-zsh" ./install --zsh "${sm_path}/bin/sm-zsh" "$@"
