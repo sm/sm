@@ -48,6 +48,7 @@ cleanse_targets()
   (( $# )) && shift || __sm.log.fail "Usage:\n\n  cleanse_targets {target} {paths/files under target}"
   for _entity in "$@"
   do
+    [[ -n "${_entity}" ]] || continue
     _target="${_path}/${_entity}"
     [[ "${_target%/}" != "${install_path}" ]] || continue
     rm -rf "${_target}"
