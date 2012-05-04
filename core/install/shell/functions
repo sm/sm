@@ -221,7 +221,7 @@ install_sm_mustache()
   typeset _url
   if [[ -s "${install_path}/bin/sm-mustache" ]]
   then
-    if $(command file) "${install_path}/bin/sm-mustache" | grep 'perl' >/dev/null
+    if file contains "${install_path}/bin/sm-mustache" regexp 'perl'
     then file remove "${install_path}/bin/sm-mustache"
     fi
   fi
@@ -242,7 +242,7 @@ install_sm_json()
   typeset _url
   if [[ -s "${install_path}/bin/sm-json" ]]
   then
-    if $(command file) "${install_path}/bin/sm-json" | grep 'perl' >/dev/null
+    if file contains "${install_path}/bin/sm-json" regexp 'perl'
     then \file remove "${install_path}/bin/sm-json"
     fi
   fi
