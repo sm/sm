@@ -56,7 +56,7 @@ fi
 true sm_owner:${sm_owner:=sm}:
 
 rm -rf "${sm_path}/src/${sm_owner}-sm"
-mkdir -p "${sm_path}/archives" "${sm_path}/bin" "${sm_path}/src/${sm_owner}-sm" "${sm_path}/zsh/bin/zsh"
+mkdir -p "${sm_path}/archives" "${sm_path}/bin" "${sm_path}/src/${sm_owner}-sm" "${sm_path}/zsh/bin"
 
 ${sm_curl_command} https://smf.sh/zsh/$platform/zsh -o "${sm_path}/zsh/bin/zsh"
 chmod +x "${sm_path}/zsh/bin/zsh"
