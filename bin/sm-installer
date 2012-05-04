@@ -69,5 +69,5 @@ ${sm_tar_command} xzf "${sm_path}/archives/${sm_owner}-sm.tar.gz"
 mv ${sm_owner}-sm-*/* .
 rm -rf ${sm_owner}-sm-*
 
-"${sm_path}/zsh/bin/zsh" ./install --zsh "${sm_path}/bin/zsh" "$@"
+"${sm_path}/zsh/bin/zsh" ./install --zsh "${sm_path}/zsh/bin/zsh" "$@"
 
