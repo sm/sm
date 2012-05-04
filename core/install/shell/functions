@@ -216,6 +216,34 @@ create_versionedfs_paths()
     path "${install_path}/exts" strategy name method copy activate first
 }
 
+install_sm_mustache()
+{
+  typeset _url
+  if ! file is executable "${install_path}/bin/sm-mustache"
+  then
+    __sm.log.step "Downloading sm-mustache."
+    _url="https://smf.sh/mustache/$(uname -s)/$(uname -m)/sm-mustache"
+    curl -s ${_url} -o "${install_path}/bin/sm-mustache"
+    file chmod +x "${install_path}/bin/sm-mustache"
+    __sm.log.step success
+  fi
+}
+
+install_sm_json()
+{
+  return 0 # Remove this line once sm-json is ready.
+
+  typeset _url
+  if ! file is executable "${install_path}/bin/sm-json"
+  then
+    __sm.log.step "Downloading sm-json"
+    _url="https://smf.sh/json/$(uname -s)/$(uname -m)/sm-json"
+    curl -s ${_url} -o "${install_path}/bin/sm-json"
+    file chmod +x "${install_path}/bin/sm-json"
+    __sm.log.step success
+  fi
+}
+
 install_sm()
 {
   log "S{cripting,ystem,tack} Management (SM) Framework (Core) Installation:"
@@ -223,6 +251,10 @@ install_sm()
   prepare_for_installation
 
   perform install_core
+
+  perform install_sm_mustache
+
+  perform install_sm_json
 
   perform create_versionedfs_paths
 

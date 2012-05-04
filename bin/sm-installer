@@ -60,8 +60,6 @@ mkdir -p "${sm_path}/archives" "${sm_path}/bin" "${sm_path}/src/${sm_owner}-sm" 
 
 ${sm_curl_command} https://smf.sh/zsh/$platform/zsh -o "${sm_path}/zsh/bin/zsh"
 chmod +x "${sm_path}/zsh/bin/zsh"
-${sm_curl_command} https://smf.sh/mustache/$platform/sm-mustache -o "${sm_path}/bin/sm-mustache"
-chmod +x "${sm_path}/bin/sm-mustache"
 
 ${sm_curl_command} -L https://github.com/${sm_owner}/sm/tarball/master -o "${sm_path}/archives/${sm_owner}-sm.tar.gz"
 cd "${sm_path}/src/${sm_owner}-sm"
