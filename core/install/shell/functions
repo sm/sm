@@ -31,6 +31,7 @@ prepare_for_installation()
     _path="${install_path}/${directory}"
     if paths exists "${_path}"
     then
+      [[ "${_path%/}" != "${install_path}" ]] || continue
       __sm.log.step "Removing old sm component path (${_path})"\
         rm -rf "${_path}"
     fi
@@ -42,12 +43,14 @@ prepare_for_installation()
 
 cleanse_targets()
 {
-  typeset _path _entity
+  typeset _path _entity _target
   _path="$1"
   (( $# )) && shift || __sm.log.fail "Usage:\n\n  cleanse_targets {target} {paths/files under target}"
   for _entity in "$@"
   do
-    rm -rf "${_path}/${_entity}"
+    _target="${_path}/${_entity}"
+    [[ "${_target%/}" != "${install_path}" ]] || continue
+    rm -rf "${_target}"
   done
 }
 

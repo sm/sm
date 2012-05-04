@@ -47,7 +47,7 @@ then
 fi
 
 if test -z "${sm_path:-}"
-then
+then # NOTE: We are using the bad practice of '`' here only for full POSIX compat
   if test `ps -p $$ -o uid=` -eq 0
   then sm_path=/opt/sm
   else sm_path="${HOME:-}/.sm"
@@ -56,15 +56,19 @@ fi
 true sm_owner:${sm_owner:=sm}:
 
 rm -rf "${sm_path}/src/${sm_owner}-sm"
-mkdir -p "${sm_path}/archives" "${sm_path}/zsh-bin" "${sm_path}/src/${sm_owner}-sm"
+mkdir -p "${sm_path}/archives" "${sm_path}/bin/sm-zsh" "${sm_path}/src/${sm_owner}-sm"
 
-${sm_curl_command} https://smf.sh/zsh/$platform/zsh -o "${sm_path}/zsh-bin/zsh"
-chmod +x "${sm_path}/zsh-bin/zsh"
+${sm_curl_command} https://smf.sh/zsh/$platform/zsh -o "${sm_path}/bin/sm-zsh"
+chmod +x "${sm_path}/bin/sm-zsh"
+
 ${sm_curl_command} -L https://github.com/${sm_owner}/sm/tarball/master -o "${sm_path}/archives/${sm_owner}-sm.tar.gz"
 cd "${sm_path}/src/${sm_owner}-sm"
 ${sm_tar_command} xzf "${sm_path}/archives/${sm_owner}-sm.tar.gz"
+
 ${sm_curl_command} https://smf.sh/mustache/$platform/sm-mustache -o ${sm_path}/bin/sm-mustache
 chmod +x "${sm_path}/bin/sm-mustache"
 mv ${sm_owner}-sm-*/* .
 rm -rf ${sm_owner}-sm-*
-"${sm_path}/zsh-bin/zsh" ./install --zsh "${sm_path}/zsh-bin/zsh" "$@"
+
+"${sm_path}/bin/sm-zsh" ./install --zsh "${sm_path}/bin/sm-zsh" "$@"
+
