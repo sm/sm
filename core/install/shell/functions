@@ -219,6 +219,10 @@ create_versionedfs_paths()
 install_sm_mustache()
 {
   typeset _url
+  if file "${install_path}/bin/sm-mustache" | grep 'perl' >/dev/null
+  then file remove "${install_path}/bin/sm-mustache"
+  fi
+
   if ! file is executable "${install_path}/bin/sm-mustache"
   then
     __sm.log.step "Downloading sm-mustache."
@@ -232,8 +236,11 @@ install_sm_mustache()
 install_sm_json()
 {
   return 0 # Remove this line once sm-json is ready.
-
   typeset _url
+  if file "${install_path}/bin/sm-json" | grep 'perl' >/dev/null
+  then file remove "${install_path}/bin/sm-json"
+  fi
+
   if ! file is executable "${install_path}/bin/sm-json"
   then
     __sm.log.step "Downloading sm-json"
