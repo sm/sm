@@ -172,7 +172,7 @@ __sm.user.add()
         groupadd -f "$_group"
       fi
 
-      useradd -s /bin/bash -d "${_home:-"/home/${_user}"}" -g "${_group}" "${_user}"
+      useradd -m -s /bin/bash -d "${_home:-"/home/${_user}"}" -g "${_group}" "${_user}"
     ;;
 
     "Darwin")
