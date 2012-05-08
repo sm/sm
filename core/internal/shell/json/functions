@@ -30,7 +30,7 @@ __sm.json.cli()
 __sm.json.get()
 {
   trace_filter json || set -o xtrace
-  typeset _type _path _default _variable _json_uri _json_uri_src _array_name
+  typeset _type _path _default _variable _json_uri _json_uri_src _array_name _value
 
   _json_uri_src="$1" && shift
   _json_uri="${sm_temp_path}/${_json_uri_src##*/}"
@@ -79,9 +79,10 @@ __sm.json.get()
         fi
 
         typeset -g ${_variable} >/dev/null
-
-        if ! eval "${_variable}=$("${sm_path}/bin/sm-json" "${_path}" "${_json_uri}")"
-        then eval "${_variable}=\"\""
+  
+        if _value="$( "${sm_path}/bin/sm-json" -path "${_path}" -uri "${_json_uri}" )"
+        then eval "${_variable}=\"${_value}\""  
+        else eval "${_variable}=\"${_default}\""  
         fi
 
         if eval "[[ -z \"\${${_variable}}\" ]]"
@@ -115,9 +116,10 @@ __sm.json.get()
 
         typeset -gxa ${_variable} >/dev/null
 
-        if ! eval "${_variable}=($("${sm_path}/bin/sm-json" "${_path}" "${_json_uri}"))"
-        then eval "${_variable}=()"
-        fi
+        if _value="$( "${sm_path}/bin/sm-json" -path "${_path}" -uri "${_json_uri}" )"
+        then eval "${_variable}=\"${_value}\""  
+        else eval "${_variable}=\"${_default}\""  
+        fi 
 
         if eval "[[ -z \"\${${_variable}}\" ]]"
         then eval "${_variable}=(\"${_default}\")"
