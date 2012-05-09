@@ -85,19 +85,20 @@ __sm.templates.install()
 
   (( _append == 0 )) || _params+=(--append)
 
+  _data_string+=""
+  
   if [[ -n "${_variable}" ]]
   then eval "
     for (( _index=1 ; _index <= \${#${_variable}} ; _index = _index + 2 ))
-    do _params+=( --data \"\${${_variable}[\${_index}]}=\${${_variable}[\$((_index+1))]}\" )
+    do _data_string+=\"\${${_variable}[\${_index}]}=\${${_variable}[\$((_index+1))]}:~\"
     done"
   fi
 
-  _data_string+="--data \""
   for (( _index=1 ; _index <= ${#_data} ; _index = _index + 2 ))
   do _data_string+="${_data[${_index}]}=${_data[$((_index+1))]}:~"
   done
 
-  _params+=(" ${_data_string}\"" )
+  _params+=( --data "${_data_string}\"" )
 
   if ! "${sm_path}/bin/sm-mustache" "${_params[@]}"
   then log error "There was an error rendering the template!"
