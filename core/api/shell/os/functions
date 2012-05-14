@@ -12,7 +12,9 @@
 # os is <linux|darwin|bsd|solaris|aix>
 # os cpu count
 # os open {uri}
+# os name
 # os type
+# os subtype
 # os version
 # os version major
 # os version minor
@@ -76,7 +78,7 @@ os()
           ;;
       esac
       ;;
-    (arch*|cpu.count|open|type|version*)
+    (arch*|cpu.count|name|open|subtype|type|version*)
       __sm.os.${_command} "${_params[@]}"
       ;;
     (*)
