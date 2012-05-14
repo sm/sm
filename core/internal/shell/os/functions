@@ -66,6 +66,79 @@ __sm.os.type.is()
   __sm.os.type "$1"
 }
 
+__sm.os.name()
+{
+  typeset _type _name
+  _type=$(__sm.os.type)
+  case ${_type} in
+    (aix)
+      _name="AIX $(oslevel)"
+      ;;
+    (bsd)
+      _bsd_type=$(uname -s)
+      case ${_bsd_type} in
+        (DragonFly)
+          _name="DragonFly $(uname -r | sed -e 's/ .*//')"
+          ;;
+        (*)
+          _name=$(uname -rs)
+          ;;
+      esac
+      ;;
+    (darwin)
+      _name="Mac OS X"
+      ;;
+    (linux)
+      if which lsb_release > /dev/null 2>&1
+      then
+        _name=$(lsb_release -sd)
+      elif [[ -f /etc/debian_{release,version} ]]
+      then
+        _name="Debian $(cat /etc/debian_{release,version})"
+      elif [[ -f /etc/fedora-release ]]
+      then
+        _name=$(sed -E 's/^(.*) release ([0-9]+).*/\1 \2/' < /etc/fedora-release)
+      elif [[ -f /etc/gentoo-release ]]
+      then
+        _name="Gentoo $(sed -e 's/^.* //' < /etc/gentoo-release)"
+      elif [[ -f /etc/redhat-release ]]
+      then
+        _name=$(sed -E 's/^(.*) release ([0-9]+).*/\1 \2/' < /etc/redhat-release)
+      elif [[ -f /etc/SuSE-release ]]
+      then
+        _name=$(head -1 /etc/SuSE-release | cut -d' ' -f1,2)
+      else
+        __sm.log.warn "Uknown Linux distribution; returning 1."
+        return 1
+      fi
+      ;;
+    (solaris)
+      if [[ -f /etc/release ]]
+      then
+        _name=$(head -1 /etc/release | sed -e 's/^ *//' -e 's/\([0-9][0-9]*\).*/\1/')
+      else
+        __sm.log.warn "Unknown Solaris version; returning 1."
+        return 1
+      fi
+    (*)
+      __sm.log.warn "OS name detection for ${_type} has not yet been implemented; returning 1."
+      return 1
+      ;;
+  esac
+  echo ${_name}
+}
+
+__sm.os.subtype()
+{
+  typeset _name
+  _name=$(__sm.os.name)
+
+  # Make sure we got a name
+  [ $? ] || return 1
+
+  echo ${_name} | sed -e 's/ [0-9.][0-9.]*$//' -e 's/ /_/g' | tr 'A-Z' 'a-z'
+}
+
 __sm.os.cpu.count()
 {
   typeset _cpu_count
