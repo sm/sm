@@ -99,7 +99,7 @@ Please read 'sm man curl' for instructions how to solve this problem.\n"
       (( ${pipestatus[1]} == 0 )) || fetch_error extracting_archive_failed
       ;;
     (*.tar.xz) # LZMA
-      xz -dc "${_archive}" | tar -mxC "${_archive}" 2>&1 | __sm.log.debug vcs -
+      xz -dc "${_archive}" | tar -mxC "${_final_target}" 2>&1 | __sm.log.debug vcs -
       (( ${pipestatus[1]} == 0 )) || fetch_error extracting_archive_failed
       ;;
     (*.zip)
