@@ -251,6 +251,7 @@ install_sm_mustache()
     _url="https://smf.sh/mustache/$(get_platform)/sm-mustache" || return $?
     curl -s ${_url} -o "${install_path}/bin/sm-mustache"
     file chmod +x "${install_path}/bin/sm-mustache"
+    file link symbolic force from "${install_path}/bin/sm-mustache" to "${sm_path}/bin/sm-mustache"
     __sm.log.step success
   fi
 }
@@ -271,6 +272,7 @@ install_sm_json()
     _url="https://smf.sh/json/$(get_platform)/sm-json" || return $?
     curl -s ${_url} -o "${install_path}/bin/sm-json"
     file chmod +x "${install_path}/bin/sm-json"
+    file link symbolic force from "${install_path}/bin/sm-json" to "${sm_path}/bin/sm-json"
     __sm.log.step success
   fi
 }
