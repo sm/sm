@@ -1,23 +1,24 @@
 # S{cripting,ystem,tack} Management (SM) Framework (Core)
 
-SM is a system scripting and DSL & management framework for managing software,
-systems and stacks!
+SM is a system scripting & management framework together with a domain
+specific language API (DSL) for managing software, systems and stacks!
 
 # Goal
 
-SM delivers an extensible scripting framework providing a very robust DSL.
+SM delivers an extensible scripting framework providing a very robust DSL API.
 A primary tenet of SM is that it must handle as much pain as possible, so you don't have to!
-With SM's DSL modules, you can quickly create your own high-quality extensions,
-and expose their commands through SM's flexible command line interface (CLI).
+With SM's DSL APIs, you can quickly create your own high-quality extensions,
+and expose their commands through SM's command line interface (CLI).
 
 # Architecture
 
-SM itself is a scripting framework that enables very rich DSL sets known as
-modules. SM lets you use the DSL to painlessly write powerful 'extensions', which are
-essentially named sets of scripts (directories!). With SM, you'll find you can
-install and manage a multitude of extensions - and even entire sets of extensions - providing
-unprecedented levels of control and automation productivity that are unleashed by the
-creative abilities of SM's energetic community of extension authors :)
+SM itself is a scripting framework that enables very rich DSL commands known as
+'apis'. SM lets you use the DSL APIs to painlessly write powerful 'extensions',
+which are essentially named sets of scripts (directories!). With SM, you'll find
+you can install and manage a multitude of extensions - and even entire sets of
+extensions - providing unprecedented levels of control and automation
+productivity that are unleashed by the creative abilities of SM's energetic
+community of extension authors :)
 
 # Installation
 
