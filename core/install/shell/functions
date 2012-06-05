@@ -216,6 +216,25 @@ create_versionedfs_paths()
     path "${install_path}/exts" strategy name method copy activate first
 }
 
+get_platform()
+{
+  typeset platform
+  platform="`uname -s`/`uname -m`"
+
+  case $platform in
+    (Darwin/i386|Darwin/x86_64|Linux/i386|Linux/x86_64)
+      echo "$platform"
+      ;;
+    (Linux/i[456]86)
+      echo "Linux/i386"
+      ;;
+    (*)
+      echo "Unsupported platform: $platform." >&2
+      exit 1
+      ;;
+  esac
+}
+
 install_sm_mustache()
 {
   typeset _url
@@ -229,9 +248,10 @@ install_sm_mustache()
   if ! file is executable "${install_path}/bin/sm-mustache"
   then
     __sm.log.step "Downloading sm-mustache."
-    _url="https://smf.sh/mustache/$(uname -s)/$(uname -m)/sm-mustache"
+    _url="https://smf.sh/mustache/$(get_platform)/sm-mustache" || return $?
     curl -s ${_url} -o "${install_path}/bin/sm-mustache"
     file chmod +x "${install_path}/bin/sm-mustache"
+    file link symbolic force from "${install_path}/bin/sm-mustache" to "${sm_path}/bin/sm-mustache"
     __sm.log.step success
   fi
 }
@@ -249,9 +269,10 @@ install_sm_json()
   if ! file is executable "${install_path}/bin/sm-json"
   then
     __sm.log.step "Downloading sm-json"
-    _url="https://smf.sh/json/$(uname -s)/$(uname -m)/sm-json"
+    _url="https://smf.sh/json/$(get_platform)/sm-json" || return $?
     curl -s ${_url} -o "${install_path}/bin/sm-json"
     file chmod +x "${install_path}/bin/sm-json"
+    file link symbolic force from "${install_path}/bin/sm-json" to "${sm_path}/bin/sm-json"
     __sm.log.step success
   fi
 }
