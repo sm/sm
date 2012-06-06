@@ -6,7 +6,7 @@ install_initialize()
   cleanse_paths=( external completion modules extensions )
   directories=( bin )
   binaries=( sm sm-ll smp )
-  files=( LICENSE VERSION README.md )
+  files=( LICENSE VERSION README.md local )
   aux_paths=( log tmp src )
   configs=( user ) # TODO move this to /etc/sm/ and/or $HOME/.sm/
 }
