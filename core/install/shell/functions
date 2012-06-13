@@ -248,6 +248,7 @@ install_sm_mustache()
 
   if ! file is executable "${install_path}/bin/sm-mustache"
   then
+    file remove "${install_path}/bin/sm-mustache"
     __sm.log.step "Downloading sm-mustache."
     _url="https://smf.sh/mustache/$(get_platform)/sm-mustache" || return $?
     curl -s ${_url} -o "${install_path}/bin/sm-mustache"
@@ -270,6 +271,7 @@ install_sm_json()
 
   if ! file is executable "${install_path}/bin/sm-json"
   then
+    file remove "${install_path}/bin/sm-json"
     __sm.log.step "Downloading sm-json"
     _url="https://smf.sh/json/$(get_platform)/sm-json" || return $?
     curl -s ${_url} -o "${install_path}/bin/sm-json"
