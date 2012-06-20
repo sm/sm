@@ -95,6 +95,16 @@ __sm.string.ematch()
   esac
 }
 
+__sm.string.equals()
+{
+  [[ "$1" == "$2" ]]
+}
+
+__sm.string.different()
+{
+  [[ "$1" != "$2" ]]
+}
+
 __sm.string.is.number()
 {
   if [[ -n "$1" ]]

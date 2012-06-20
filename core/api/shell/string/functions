@@ -23,7 +23,7 @@
 #
 string()
 {
-  typeset _token _command _string _search
+  typeset _token _command _string _search _other
   typeset -a __commands _searches
 
   __commands=(
@@ -53,6 +53,12 @@ string()
       (( $# )) && shift || __sm.log.fail "Search term must follow '${__sm_command_detected}'."
       _string="$1"
       (( $# )) && shift || __sm.log.fail "Content must follow '${__sm_command_detected} \"${_search}\"'."
+      ;;
+    (equals|different)
+      _string="$1"
+      (( $# )) && shift || __sm.log.fail "String must follow '${__sm_command_detected}'."
+      _other="$1"
+      (( $# )) && shift || __sm.log.fail "Other string must follow '${__sm_command_detected} \"${_string}\"'."
       ;;
     (contains.key)
       _search="$1"
@@ -86,6 +92,9 @@ string()
       ;;
     (ematch)
       __sm.string.${_command} "${_string}" "${_search}" || return $?
+      ;;
+    (equals|different)
+      __sm.string.${_command} "${_string}" "${_other}" || return $?
       ;;
     (is.*)
       __sm.string.${_command} "${_string}" || return $?
