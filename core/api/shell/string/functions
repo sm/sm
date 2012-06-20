@@ -23,6 +23,8 @@
 #
 string()
 {
+  trace_filter string || set -o xtrace
+
   typeset _token _command _string _search _other
   typeset -a __commands _searches
 
