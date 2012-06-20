@@ -62,9 +62,9 @@ elif [[ -z "${sm_path:-}" ]]
 then
   if (( UID ))
   then
-    sm_path="${DESTROOT:-}$HOME/.sm"
+    sm_path="${DESTROOT:-/}${HOME#/}/.sm"
   else
-    sm_path="${DESTROOT:-}/opt/sm"
+    sm_path="${DESTROOT:-/}opt/sm"
   fi
 fi
 

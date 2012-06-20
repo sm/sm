@@ -6,7 +6,7 @@ setopt EXTENDED_GLOB NULL_GLOB HASH_CMDS WARN_CREATE_GLOBAL
 saved_sm_path="${sm_path:-"/sm"}"
 
 # Load SM Framework configuration files, if they exist.
-for file in /etc/smrc "$HOME/.smrc"
+for file in "${DESTROOT:-/}etc/smrc" "${DESTROOT:-/}${HOME#/}/.smrc"
 do
   if [[ -s "${file}" ]]
   then
@@ -22,10 +22,10 @@ sm_path="${saved_sm_path}"
 if (( UID == 0 ))
 then # FHS
   true \
-    "${var_path:="/var"}" \
-    "${etc_path:="/etc"}" \
-    "${profile_path:="/etc/profile"}" \
-    "${profile_d_path:="/etc/profile.d"}"
+    "${var_path:="${DESTROOT:-/}var"}" \
+    "${etc_path:="${DESTROOT:-/}etc"}" \
+    "${profile_path:="${DESTROOT:-/}etc/profile"}" \
+    "${profile_d_path:="${DESTROOT:-/}etc/profile.d"}"
 else
   true \
     "${var_path:="${sm_path}/var"}" \

@@ -8,7 +8,7 @@ install_initialize()
   binaries=( sm sm-ll smp )
   files=( LICENSE VERSION README.md local )
   aux_paths=( log tmp src )
-  configs=( user ) # TODO move this to /etc/sm/ and/or $HOME/.sm/
+  configs=( user ) # TODO: cleanup, this might be irrelevant
 }
 
 perform()
@@ -87,19 +87,20 @@ install_configuration_files()
 
 setup_shell_completion()
 {
-  typeset _prefix _mode _name completion_prefix
-  _prefix="/etc"
-
-  paths exists "${_prefix}/bash_completion.d" || return 0
-
-  completion_prefix="${_prefix}/bash_completion.d"
+  typeset _mode _name completion_prefix
+  completion_prefix="${etc_path}/bash_completion.d"
   _name="sm.bash"
   _mode="0644"
+
+  if string equals "${DESTROOT:-/}" "/"
+  then paths exists "${completion_prefix}" || return 0
+  else paths create "${completion_prefix}"
+  fi
 
   templates install "install/sm-completion.sh" \
     to "${completion_prefix}/${_name}" \
     variables \
-      sm_path "${install_path}"
+      sm_path "${install_path/${DESTROOT:-\/}/\/}"
 
   files chmod "${_mode}" "${completion_prefix}/${_name}"
 }
@@ -107,30 +108,26 @@ setup_shell_completion()
 setup_profile_d()
 {
   typeset _PATH
-  _PATH="PATH=\"\${PATH}:${install_path}/bin:${install_path}/pkg/active/bin:${install_path}/pkg/active/sbin\""
+  _PATH="PATH=\"\${PATH}:${install_path/${DESTROOT:-\/}/\/}/bin:${install_path/${DESTROOT:-\/}/\/}/pkg/active/bin:${install_path/${DESTROOT:-\/}/\/}/pkg/active/sbin\""
 
   if user is root
   then
     paths create "${profile_d_path}"
     if os is darwin
     then
-      if ! files exist "/etc/profile" ||
-        ! files contain string "${profile_d_path}" "/etc/profile"
+      if ! files exist "${etc_path}/profile" ||
+        ! files contain string "${profile_d_path}" "${etc_path}/profile"
       then
         templates install "install/etc_profile" \
-          to "/etc/profile" \
+          to "${etc_path}/profile" \
           variables \
-            profile_d_path "${profile_d_path}"
+            profile_d_path "${profile_d_path/${DESTROOT:-\/}/\/}"
       fi
     fi
 
-    if files exist "${profile_d_path}/sm.sh"
+    if ! files exist "${profile_d_path}/sm.sh" ||
+      ! files contain string "${install_path}/pkg/active/sbin" "${profile_d_path}/sm.sh"
     then
-      if ! files contain string "${install_path}/pkg/active/sbin" "${profile_d_path}/sm.sh"
-      then
-        files write string "${_PATH}" to "${profile_d_path}/sm.sh"
-      fi
-    else
       files write string "${_PATH}" to "${profile_d_path}/sm.sh"
     fi
 
@@ -171,15 +168,15 @@ setup_profile_d()
 set_sm_path()
 {
   files replace regex "^.*sm_path=.*" \
-    with "sm_path=\"${install_path}\"" \
+    with "sm_path=\"${install_path/${DESTROOT:-\/}/\/}\"" \
     "${install_path}/bin/sm"
 
   files replace regex "^sm_path=.*" \
-    with "sm_path=\"${install_path}\"" \
+    with "sm_path=\"${install_path/${DESTROOT:-\/}/\/}\"" \
     "${install_path}/bin/smp"
 
   files replace regex "^saved_sm_path=.*" \
-    with "saved_sm_path=\"\${sm_path:-${install_path}}\"" \
+    with "saved_sm_path=\"\${sm_path:-${install_path/${DESTROOT:-\/}/\/}}\"" \
     "${install_path}/core/sm/shell/core/initialize"
 }
 
