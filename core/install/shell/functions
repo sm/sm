@@ -108,7 +108,7 @@ setup_shell_completion()
 setup_profile_d()
 {
   typeset _PATH
-  _PATH="PATH=\"\${PATH}:${install_path/${DESTROOT:-\/}/\/}/bin:${install_path/${DESTROOT:-\/}/\/}/pkg/active/bin:${install_path/${DESTROOT:-\/}/\/}/pkg/active/sbin\""
+  _PATH="PATH=\"\${PATH}:${install_path/${DESTROOT:-'/'}/\/}/bin:${install_path/${DESTROOT:-'/'}/\/}/pkg/active/bin:${install_path/${DESTROOT:-'/''}/\/}/pkg/active/sbin\""
 
   if user is root
   then
