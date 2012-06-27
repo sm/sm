@@ -41,7 +41,7 @@ __sm.process.status()
     log "  process: "
     log "    pid: ${_pid}"
 
-    if os is linux
+    if __sm.os.type.is linux
     then
       log "    parent_pid: $(awk  '/^PPid:/{print $2}' /proc/${_pid}/status)"
       log "    state: $(printf "$_ps" | awk '{print $1}')"
@@ -87,48 +87,36 @@ __sm.process.status()
       log "    cwd: ${cwd}"
       log "    binary: ${binary}"
 
-      if (( ${#logs[@]} > 0 ))
+      if __sm.array.is.nonempty logs
       then
         log "    logs:"
-        array sort asc logs
-        array unique logs
-        for log in "${logs[@]}"
-        do
-          printf "      - %s\n" "${log}"
-        done
+        __sm.array.sort asc logs
+        __sm.array.unique logs
+        __sm.array.each logs 'printf "      - %s\n" "${element}"'
       fi
 
-      if (( ${#libraries[@]} > 0 ))
+      if __sm.array.is.nonempty libraries
       then
         log "    libraries:"
-        array sort asc libraries
-        array unique libraries
-        for library in "${libraries[@]}"
-        do
-          printf "      - %s\n" "${library}"
-        done
+        __sm.array.sort asc libraries
+        __sm.array.unique libraries
+        __sm.array.each libraries 'printf "      - %s\n" "${element}"'
       fi
 
-      if (( ${#tcp_ports[@]} > 0 ))
+      if __sm.array.is.nonempty tcp_ports
       then
         log "    tcp_ports:"
-        array sort asc tcp_ports
-        array unique tcp_ports
-        for tcp_port in "${tcp_ports[@]}"
-        do
-          printf "      - %s\n" "${tcp_port}"
-        done
+        __sm.array.sort asc tcp_ports
+        __sm.array.unique tcp_ports
+        __sm.array.each tcp_ports 'printf "      - %s\n" "${element}"'
       fi
 
-      if (( ${#sockets[@]} > 0 ))
+      if __sm.array.is.nonempty sockets
       then
         log "    sockets:"
-        array sort asc sockets
-        array unique sockets
-        for socket in "${sockets[@]}"
-        do
-          printf "      - %s\n" "${socket}"
-        done
+        __sm.array.sort asc sockets
+        __sm.array.unique sockets
+        __sm.array.each sockets 'printf "      - %s\n" "${element}"'
       fi
     fi
   else
