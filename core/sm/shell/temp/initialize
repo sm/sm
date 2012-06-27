@@ -5,5 +5,5 @@ sm_temp_path="${TMP_PATH:-/tmp}/sm-tmp-$$"
 
 mkdir -p "${sm_temp_path}"
 
-#TODO: allow multiple EXIT traps ?
+# this will be automatically included in internal/traps
 trap "rm -rf \"${sm_temp_path}\"" EXIT

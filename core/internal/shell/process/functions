@@ -161,7 +161,7 @@ __sm.process.lockfile.lock()
   # The currently running process has the lock; immediately add an on-exit
   # hook that removes the lockfile when the process exits, thus relinquishing
   # the filesystem-level lock. This also preserves existing EXIT code.
-  traps on exit "cd '$PWD';rm -f ${_lockfile}"
+  __sm.traps.on.exit "cd '$PWD';rm -f ${_lockfile}"
 
   return 0 # The lock has been obtained! Proceed with nefarious things!
 }

@@ -1,0 +1,4 @@
+#!/usr/bin/env zsh
+
+export -a __sm_traps_exit_commands
+__sm_traps_exit_commands=()

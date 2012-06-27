@@ -1,15 +1,35 @@
-#!/bin/sh
+#!/usr/bin/env zsh
 
 __sm.traps.on.exit()
 {
-  typeset _result _command
-  _result="$?"
-  for _command in "${on_exit_commands[@]}"
+  typeset _token _signal _code __traps_code
+  _token="$1"
+  _signal="$2"
+  _code="$3"
+
+  # ensure that handler is called on exit whilst preserving any original on-exit code.
+  __traps_code="$( trap | awk '/ EXIT$/' | sed -e "s#' EXIT##" -e "s#.*'##")"
+  if [[ "${__traps_code}" != *__sm.traps.run.exit* ]]
+  then
+    trap "__sm.traps.run.exit;${__traps_code}" EXIT
+  fi
+
+  # Append the code passed to process_on_exit()
+  __sm_traps_exit_commands+=( "${_code}" )
+}
+
+__sm.traps.run.exit()
+{
+  typeset _result="$?"
+  typeset _command
+
+  for _command in "${__sm_traps_exit_commands[@]}"
   do
     if ! eval "${_command}"
     then
       __sm.log.warn "traps on exit; command failed: '${_command}'"
     fi
   done
+
   return "${_result}" # Return the original process exit status.
 }

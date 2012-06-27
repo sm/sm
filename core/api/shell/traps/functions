@@ -5,12 +5,7 @@
 #
 traps()
 {
-  typeset _token _signal _code __traps_code
-
-  if [[ -z "${__sm_traps_exit_commands:-}" ]]
-  then
-    __sm_traps_exit_commands=()
-  fi
+  typeset _token _signal _code
 
   while (( $# ))
   do
@@ -23,19 +18,7 @@ traps()
           (exit|EXIT)
             _code="$*"
             (( $# )) && shift || __sm.log.fail "The code to be run on EXIT must be given after keyword 'EXIT'."
-            __traps_code="$(trap)"
-            __traps_code="$( echo "${__traps_code}" | awk '/ EXIT$/' |
-                             sed -e "s#' EXIT##" -e "s#.*'##")"
-
-            if [[ "${__traps_code}" != *__sm.process.exit* ]]
-            then
-              # ensure that process_exit_commands() is called on exit
-              # whilst preserving any original on-exit code.
-              trap "__sm.process.exit;${__traps_code}" EXIT
-            fi
-
-            # Append the code passed to process_on_exit()
-            __sm_traps_exit_commands+=( "${_code}" )
+            __sm.traps.on.exit "${_token}" "${_signal}" "${_code}"
             ;;
           (*)
             __sm.log.fail "Unknown signal '${_signal}'"
