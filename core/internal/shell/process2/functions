@@ -1,0 +1,124 @@
+#!/usr/bin/env zsh
+
+# start process
+# ex. __sm.process2.start NAME TIMEOUT COMMAND ...
+__sm.process2.start()
+{
+  typeset _name _pid _counter _counter_value
+  _name="$1"
+  _counter_value="$2"
+  shift 2
+  if __sm.process2.is.running "${_name}"
+  then
+    return 0
+  fi
+
+  nohup "$@" </dev/null >"${_name}_out.log" 2>"${_name}_err.log" &
+  _pid=$!
+
+  _counter=${_counter_value}
+  while (( _counter-- )) && __sm.process2.pid.running ${_pid}
+  do
+    sleep 1s
+  done
+
+  if __sm.process2.pid.running ${_pid}
+  then __sm.process2.pid.write "${_name}" ${_pid}
+  else return $?
+  fi
+}
+
+# stop process
+# ex. __sm.process2.stop NAME TIMEOUT
+__sm.process2.stop()
+{
+  typeset _pid _counter
+  if _pid=$(__sm.process2.pid.read "${1}")
+  then
+    _counter=$2
+    while (( _counter-- )) && __sm.process2.pid.running ${_pid}
+    do
+      kill ${_pid}
+      sleep 1s
+    done
+    if __sm.process2.pid.running ${_pid}
+    then
+      kill -9  ${_pid}
+    fi
+    if ! __sm.process2.pid.running ${_pid}
+    then
+      __sm.process2.pid.write "${1}"
+    fi
+  else return 0
+  fi
+}
+
+# stop if running ; start
+# ex. __sm.process2.restart NAME TIMEOUT_START TIMEOUT_STOP COMMAND ...
+__sm.process2.restart()
+{
+  typeset _name _counter_start _counter_stop
+  _name="$1"
+  _counter_start="$2"
+  _counter_stop="$3"
+  shift 3
+
+  if __sm.process2.stop "${_name}" ${_counter_stop}
+  then true #continue
+  else return $?
+  fi
+
+  if __sm.process2.start "${_name}" ${_counter_start} "$@"
+  then return 0
+  else return $?
+  fi
+}
+
+# Check if a process with a given NAME is working
+# ex. __sm.process2.is.running NAME
+__sm.process2.is.running()
+{
+  typeset _pid
+  if _pid=$(__sm.process2.pid.read "$1")
+  then
+    if __sm.process2.pid.running ${_pid}
+    then return 0
+    else return $?
+    fi
+  else return $?
+  fi
+}
+
+## Private?
+
+# read a pid from pid file NAME
+# ex. __sm.process2.pid.read NAME
+__sm.process2.pid.read()
+{
+  if cat ".${1}.pid" 2>/dev/null
+  then return 0
+  else return $?
+  fi
+}
+
+# write a PID to pid file NAME
+# ex: __sm.process2.pid.write NAME PID
+# delete pid file NAME if no PID
+# ex: __sm.process2.pid.write NAME
+__sm.process2.pid.write()
+{
+  if [[ -n "${2:-}" ]]
+  then echo "$2" > ".${1}.pid" 2>/dev/null
+  else rm -f ".${1}.pid" 2>/dev/null
+  fi
+}
+
+# Check if a process with a given PID is working
+# ex. __sm.process2.pid.running PID
+__sm.process2.pid.running()
+{
+  if kill -0 $1 2>/dev/null
+  then return 0
+  else return $?
+  fi
+}

@@ -89,3 +89,7 @@ package=dev/package
 publish=dev/publish
 create=dev/create
 json/get=json/get
+process2/start=process2/process2_start()
+process2/stop=process2/process2_stop()
+process2/restart=process2/process2_restart()
+process2/running=process2/process2_running()

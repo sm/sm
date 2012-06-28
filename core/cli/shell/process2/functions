@@ -1,0 +1,38 @@
+#!/usr/bin/env zsh
+
+process2_start()
+{
+  log step "Starting $1" \
+    process2 start \
+    name $1 \
+    timeout 10 \
+    command "$@"
+}
+
+process2_stop()
+{
+  log step "Stoping $1" \
+    process2 stop \
+    name $1 \
+    timeout 10
+}
+
+process2_restart()
+{
+  log step "Stoping $1" \
+    process2 stop \
+    name $1 \
+    timeout 10
+  log step "Starting $1" \
+    process2 start \
+    name $1 \
+    timeout 10 \
+    command "$@"
+}
+
+process2_running()
+{
+  log step "Running? $1" \
+    process2 running \
+    name $1 || return $?
+}
