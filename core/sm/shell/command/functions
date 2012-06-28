@@ -42,6 +42,7 @@ __sm.command.run()
 
 __sm.command.detect()
 {
+  set +x
   typeset -g __sm_command_detected __sm_command_dotted __sm_command_words
   typeset __string __key __value
   __string="$1"
