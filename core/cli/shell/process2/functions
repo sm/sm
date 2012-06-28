@@ -45,3 +45,36 @@ process2_running()
     return ${_status}
   fi
 }
+
+process2_shedule()
+{
+  log step "Adding to cron every 5 minutes check $1"
+  if echo "*/5 * * * * cd \"$PWD\" ; \"$(which sm)\" process2 start $*" | cron edit group $1
+  then log step succ
+  else
+    typeset _status=$?
+    log step fail
+    return ${_status}
+  fi
+}
+
+process2_unshedule()
+{
+  log step "Removing from cron checking $1" \
+    cron remove group $1
+}
+
+process2_sheduled()
+{
+  log step "$1 ..."
+  if cron group $1 | grep "" >/dev/null
+  then
+    log_step_message="$1 sheduled."
+    log step succ
+  else
+    typeset _status=$?
+    log_step_message="$1 not sheduled"
+    log step fail
+    return ${_status}
+  fi
+}
