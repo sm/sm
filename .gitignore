@@ -6,3 +6,5 @@ html/
 tags
 .rvmrc
 .idea
+bin/sm-json
+bin/sm-mustache
