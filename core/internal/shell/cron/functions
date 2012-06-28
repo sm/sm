@@ -1,0 +1,40 @@
+#!/usr/bin/env zsh
+
+# show current crontab
+__sm.cron.show()
+{
+  # `crontab -l` can show additional comment lines
+  EDITOR=cat crontab -e 2>/dev/null
+}
+
+# show installed groups in crontab
+__sm.cron.list.groups()
+{
+  __sm.cron.show | awk '/^#sm start/{print $3}'
+}
+
+# show given group from cron
+# ex. __sm.cron.show.group group1
+__sm.cron.show.group()
+{
+  __sm.cron.show | __sm.filter.show.group "^#sm start $1$" "^#sm end $1$"
+}
+
+# remove given group from cron
+# ex. __sm.cron.remove.group group1
+__sm.cron.remove.group()
+{
+  __sm.cron.show | __sm.filter.remove.group "^#sm start $1$" "^#sm end $1$" | crontab -
+}
+
+# add/replace content of given group in cron with stdin
+# ex. echo "* * * * * echo cat > /tmp/test.cat" | __sm.cron.remove.group group1
+__sm.cron.edit.group()
+{
+  {
+    __sm.cron.show | __sm.filter.remove.group "^#sm start $1$" "^#sm end $1$"
+    echo "#sm start $1"
+    cat
+    echo "#sm end $1"
+  } | crontab -
+}
