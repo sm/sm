@@ -19,7 +19,7 @@ process2()
     _command="${__sm_command_dotted}"
     shift "${__sm_command_words}"
   else
-    __sm.log.__sm.log.fail "No command given.\nUsage:  \npaths <command> ..."
+    __sm.log.fail "No command given.\nUsage:  \nprocess2 <command> ..."
   fi
 
   while (( $# ))
@@ -48,10 +48,10 @@ process2()
         ;;
       (command)
         _command_arr=( "$@" )
-        shift || __sm.log.fail "Command must be given after keyword '${_token}'"
+        shift $# || __sm.log.fail "Command must be given after keyword '${_token}'"
         ;;
       (*)
-        __sm.log.__sm.log.fail "Unknown token '${_token}'"
+        __sm.log.fail "Unknown token '${_token}'"
         ;;
     esac
   done
@@ -95,7 +95,7 @@ process2()
       fi
       ;;
     (*)
-      __sm.log.__sm.log.fail "Process API command '${_command}' s not handled."
+      __sm.log.fail "Process2 API command '${_command}' s not handled."
       ;;
   esac
 }
