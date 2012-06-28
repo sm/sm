@@ -133,7 +133,7 @@ process()
         fi # Let caller deal with the choice of how to react.
       else
         __sm.log.fail "No lockfile was specified for locking."
-  fi
+      fi
       ;;
     (exit)
       NIY "Process on exit"
