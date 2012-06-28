@@ -1,0 +1,45 @@
+#!/usr/bin/env zsh
+
+cron()
+{
+  trace_filter process2 || set -o xtrace
+  typeset _command _name
+  typeset -a __process_commands
+
+  __process_commands=(
+    "show"
+    "groups=list groups"
+    "group=show group"
+    "del group=remove group"
+    "add group=edit group"
+  )
+
+  if __sm.command.detect "$*" "${__process_commands[@]}"
+  then
+    _command="${__sm_command_dotted}"
+    shift "${__sm_command_words}"
+  else
+    __sm.log.fail "No command given.\nUsage:  \ncron <command> ..."
+  fi
+
+  case "${_command}" in
+    (show|list.groups)
+      if __sm.cron.${_command}
+      then return 0
+      else return $?
+      fi
+      ;;
+    (show.group|remove.group|edit.group)
+      _name="$1"
+      shift || __sm.log.fail "Name name must be given after keyword '${_token}'"
+
+      if __sm.cron.${_command} "${_name}"
+      then return 0
+      else return $?
+      fi
+      ;;
+    (*)
+      __sm.log.fail "Cron API command '${_command}' s not handled."
+      ;;
+  esac
+}
