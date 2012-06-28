@@ -32,7 +32,16 @@ process2_restart()
 
 process2_running()
 {
-  log step "Running? $1" \
-    process2 running \
-    name $1 || return $?
+  log step "$1 ..."
+  if
+    process2 running name $1
+  then
+    log_step_message="$1 running."
+    log step succ
+  else
+    typeset _status=$?
+    log_step_message="$1 not running"
+    log step fail
+    return ${_status}
+  fi
 }
