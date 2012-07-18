@@ -13,3 +13,19 @@ __sm.filter.remove.group()
 {
   awk 'BEGIN{in_group=0} /'"$1"'/ {in_group=1} in_group==0 {print} /'"$2"'/ {in_group=0}'
 }
+
+# filter show lines matching pattern
+# ex. __sm.filter.show.matching "patter with spaces" pattern2
+__sm.filter.show.matching()
+{
+  typeset IFS="|"
+  GREP_OPTIONS="" \grep -E "$*"
+}
+
+# filter remove lines matching pattern
+# ex. __sm.filter.remove.matching "patter with spaces" pattern2
+__sm.filter.remove.matching()
+{
+  typeset IFS="|"
+  GREP_OPTIONS="" \grep -Ev "$*"
+}
