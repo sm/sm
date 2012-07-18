@@ -1,0 +1,65 @@
+#!/usr/bin/env zsh
+
+filter()
+{
+  trace_filter filter || set -o xtrace
+
+  typeset -a __filter_commands _patterns
+  typeset _token _command _start _end
+
+  __filter_commands=(
+    "show group"
+    "remove group"
+    "show matching"
+    "remove matching"
+  )
+
+  if __sm.command.detect "$*" "${__filter_commands[@]}"
+  then
+    _command="${__sm_command_dotted}"
+    shift "${__sm_command_words}"
+  else
+    __sm.log.fail "No command given.\nUsage:  \n$0 <command> ..."
+  fi
+
+  while (( $# > 0 ))
+  do
+    _token="$1" && shift
+    case "${_token}" in
+      (start)
+        _start="${1}"
+        (( $# )) && shift || __sm.log.fail "Start pattern must be provided after keyword '${_token}'"
+        ;;
+      (end)
+        _end="${1}"
+        (( $# )) && shift || __sm.log.fail "Start pattern must be provided after keyword '${_token}'"
+        ;;
+      (*)
+        _patterns+=("${_token}")
+        ;;
+    esac
+  done
+
+  case "${_command}" in
+    (show.group|remove.group)
+      [[ -n "${_start}" ]] || __sm.log.fail "start must be given for '$0 ${__sm_command_detected}'."
+      [[ -n "${_end}" ]]   || __sm.log.fail "end must be given for '$0 ${__sm_command_detected}'."
+      if __sm.filter.${_command%s} "${_start}" "${_end}"
+      then return 0
+      else return 1
+      fi
+      ;;
+    (show.matching|remove.matching)
+      (( ${#_patterns[@]} > 0 )) || __sm.log.fail "No pattern given for '$0 ${__sm_command_detected}'."
+      if __sm.filter.${_command%s} "${_patterns[@]}"
+      then return 0
+      else return 1
+      fi
+      ;;
+    (*)
+      __sm.log.fail "Unknown command for $0: '${__sm_command_detected}' "\
+        "A $0 command must be specified as the first parameter: "\
+        "{show group,remove group,show matching,remove matching}"
+      ;;
+  esac
+}
