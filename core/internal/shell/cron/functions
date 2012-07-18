@@ -28,7 +28,7 @@ __sm.cron.remove.group()
 }
 
 # add/replace content of given group in cron with stdin
-# ex. echo "* * * * * echo cat > /tmp/test.cat" | __sm.cron.remove.group group1
+# ex. echo "* * * * * echo cat > /tmp/test.cat" | __sm.cron.edit.group group1
 __sm.cron.edit.group()
 {
   {
