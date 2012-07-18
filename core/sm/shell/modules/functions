@@ -134,6 +134,7 @@ includes()
 
 __sm.includes()
 {
+  trace_filter log || set -o xtrace
   case "$1" in
     (include|load)
       shift #compatibility mode
