@@ -24,7 +24,7 @@ community of extension authors :)
 
 The easiest way to install is to use following oneliner:
 
-    curl -L https://raw.github.com/sm/sm/master/bin/sm-installer | sh
+    curl -L https://get.smf.sh | sh
 
 # Manual
 
