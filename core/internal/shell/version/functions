@@ -1,0 +1,61 @@
+#!/usr/bin/env zsh
+
+# read version from file $1 to variable $2
+__sm.version.read.file()
+{
+  eval "$2=$(__sm.version.stream.read.file "$1")"
+}
+
+# write version to file $1 from variable $2
+__sm.version.write.file()
+{
+  eval "echo \$$2" | __sm.version.stream.write.file "$1"
+}
+
+# increase major version part of variable $1, in case of any -rc relases just drop it
+__sm.version.increase.major()
+{
+  eval "$1=$( eval "echo \$$1" | __sm.version.stream.increase.major )"
+}
+
+# increase minor version part of variable $1, in case of any -rc relases just drop it
+__sm.version.increase.minor()
+{
+  eval "$1=$( eval "echo \$$1" | __sm.version.stream.increase.minor )"
+}
+
+# increase tiny version part of variable $1, in case of any -rc relases just drop it
+__sm.version.increase.tiny()
+{
+  eval "$1=$( eval "echo \$$1" | __sm.version.stream.increase.tiny )"
+}
+
+# compare two versions using -lt / -eq / -gt comparison
+# ex: __sm.version.compare 1.2.3 -gt 1.1
+__sm.version.compare()
+{
+  typeset v1d v2d dots counter IFS GREP_OPTIONS
+  typeset -a transformer
+
+  counter=1
+  IFS="+" # to put + in transformer ;)
+  v1d=$( printf -- $1 | GREP_OPTIONS="" \grep -o '\.' | wc -l )
+  v2d=$( printf -- $3 | GREP_OPTIONS="" \grep -o '\.' | wc -l )
+
+  if [[ $v1d -ge $v2d ]]
+  then dots=$v1d
+  else dots=$v2d
+  fi
+
+  while (( dots >= 0 ))
+  do transformer+=( "$(( 256 ** dots-- ))*\$$((counter++))" )
+  done
+
+  eval "$(
+    printf '[[ ';
+    printf $1 | \awk -F. "{ printf ${transformer[*]} }";
+    printf -- " $2 ";
+    printf $3 | \awk -F. "{ printf ${transformer[*]} }";
+    printf ' ]]'
+  )"
+}

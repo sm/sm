@@ -1,0 +1,33 @@
+#!/usr/bin/env zsh
+
+## functions to manipulate version in pipe
+
+# read version from file (do not use together in one pipeline with write)
+__sm.version.stream.read.file()
+{
+  cat "$1"
+}
+
+# write version to file (do not use together in one pipeline with read)
+__sm.version.stream.write.file()
+{
+  > "$1"
+}
+
+# increase major version part, in case of any -rc relases just drop it
+__sm.version.stream.increase.major()
+{
+  awk -F "[.-]" '$4 !~ "^[a-Z]" { print $1+1".0.0" } $4 ~ "^[a-Z]" { print $1"."$2"."$3;}'
+}
+
+# increase minor version part, in case of any -rc relases just drop it
+__sm.version.stream.increase.minor()
+{
+  awk -F "[.-]" '$4 !~ "^[a-Z]" { print $1"."$2+1".0" } $4 ~ "^[a-Z]" { print $1"."$2"."$3;}'
+}
+
+# increase tiny version part, in case of any -rc relases just drop it
+__sm.version.stream.increase.tiny()
+{
+  awk -F "[.-]" '$4 !~ "^[a-Z]" { print $1"."$2"."$3+1 } $4 ~ "^[a-Z]" { print $1"."$2"."$3;}'
+}
