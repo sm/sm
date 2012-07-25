@@ -1,36 +1,13 @@
 #!/bin/sh
 
-__sm.process.is.running()
-{
-  typeset _pid _pid_file
-  _pid=${1:-0} ; _pid_file="$2"
-
-  if (( _pid < 1 )) && [[ -s "${_pid_file}" ]]
-  then read -r _pid < ${_pid_file}
-  fi
-
-  kill -0 $_pid
-}
-
-__sm.process.run()
-{
-  typeset _command ; _command="$1"
-  typeset -g process_pid >/dev/null 2>&1
-  ${_command} &
-  process_pid=$!
-  return 0
-}
-
+#TODO: old code - validate
 __sm.process.status()
 {
-  typeset _name _pid_file _pid _ps
-  _name="$1"; _pid_file="$2"; _pid="${3:-0}"
+  typeset _name _pid _ps
+  _name="$1"
+  _pid="$2"
 
   log "${name:-"process"}:"
-
-  if [[ -s "${_pid_file}" ]]
-  then read -r _pid < ${_pid_file}
-  fi
 
   if (( ${_pid} > 0 ))
   then
@@ -124,16 +101,14 @@ __sm.process.status()
   fi
 }
 
+#TODO: old code - validate
 __sm.process.signal()
 {
-  typeset _signal _pid _pid_file
-  _signal="${1}" ; _pid="${2:-0}" ; _pid_file="${3:-}"
+  typeset _signal _pid
+  _signal="$1"
+  _pid="$2"
 
-  if (( _pid < 1 )) && [[ -s "${_pid_file}" ]]
-  then read -r _pid < ${_pid_file}
-  fi
-
-  if (( _pid > 0 ))
+  if [[ -n "${_pid}" ]] && (( _pid > 0 ))
   then
     kill -${_signal} ${_pid}
   else
@@ -141,6 +116,8 @@ __sm.process.signal()
   fi
 }
 
+#TODO: old code - validate
+#TODO: add lockfile.init, lockfile.unlock, lockfile.finish
 __sm.process.lockfile.lock()
 {
   typeset _lockfile
@@ -166,3 +143,125 @@ __sm.process.lockfile.lock()
   return 0 # The lock has been obtained! Proceed with nefarious things!
 }
 
+# start process
+# ex. __sm.process.start NAME TIMEOUT COMMAND ...
+__sm.process.start()
+{
+  typeset _name _pid _counter _counter_value
+  _name="$1"
+  _counter_value="$2"
+  shift 2
+  if __sm.process.is.running "${_name}"
+  then
+    return 0
+  fi
+
+  nohup "$@" </dev/null >"${_name}_out.log" 2>"${_name}_err.log" &
+  _pid=$!
+
+  _counter=${_counter_value}
+  while (( _counter-- )) && __sm.process.pid.running ${_pid}
+  do
+    sleep 1s
+  done
+
+  if __sm.process.pid.running ${_pid}
+  then __sm.process.pid.write "${_name}" ${_pid}
+  else return $?
+  fi
+}
+
+# stop process
+# ex. __sm.process.stop NAME TIMEOUT
+__sm.process.stop()
+{
+  typeset _pid _counter
+  if _pid=$(__sm.process.pid.read "${1}")
+  then
+    _counter=$2
+    while (( _counter-- )) && __sm.process.pid.running ${_pid}
+    do
+      kill ${_pid}
+      sleep 1s
+    done
+    if __sm.process.pid.running ${_pid}
+    then
+      kill -9  ${_pid}
+    fi
+    if ! __sm.process.pid.running ${_pid}
+    then
+      __sm.process.pid.write "${1}"
+    fi
+  else return 0
+  fi
+}
+
+# stop if running ; start
+# ex. __sm.process.restart NAME TIMEOUT_START TIMEOUT_STOP COMMAND ...
+__sm.process.restart()
+{
+  typeset _name _counter_start _counter_stop
+  _name="$1"
+  _counter_start="$2"
+  _counter_stop="$3"
+  shift 3
+
+  if __sm.process.stop "${_name}" ${_counter_stop}
+  then true #continue
+  else return $?
+  fi
+
+  if __sm.process.start "${_name}" ${_counter_start} "$@"
+  then return 0
+  else return $?
+  fi
+}
+
+# Check if a process with a given NAME is working
+# ex. __sm.process.is.running NAME
+__sm.process.is.running()
+{
+  typeset _pid
+  if _pid=$(__sm.process.pid.read "$1")
+  then
+    if __sm.process.pid.running ${_pid}
+    then return 0
+    else return $?
+    fi
+  else return $?
+  fi
+}
+
+## Private?
+
+# read a pid from pid file NAME
+# ex. __sm.process.pid.read NAME
+__sm.process.pid.read()
+{
+  if cat ".${1}.pid" 2>/dev/null
+  then return 0
+  else return $?
+  fi
+}
+
+# write a PID to pid file NAME
+# ex: __sm.process.pid.write NAME PID
+# delete pid file NAME if no PID
+# ex: __sm.process.pid.write NAME
+__sm.process.pid.write()
+{
+  if [[ -n "${2:-}" ]]
+  then echo "$2" > ".${1}.pid" 2>/dev/null
+  else rm -f ".${1}.pid" 2>/dev/null
+  fi
+}
+
+# Check if a process with a given PID is working
+# ex. __sm.process.pid.running PID
+__sm.process.pid.running()
+{
+  if kill -0 $1 2>/dev/null
+  then return 0
+  else return $?
+  fi
+}

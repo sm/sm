@@ -3,52 +3,32 @@
 #
 # SM Process API
 #
-# process run "command to run"
-# echo $process_pid # this will be set to the command's pid
-#
-# process on exit "some commands to run"
-#
-# if process is running pid $pid
-# then ...
-#
-# if process is running pidfile $pid_file
-# then ...
-#
-# process status pid $pid
-#
-# process status name postgresql pid $pid
-#
-# process status name nginx pidfile /var/run/nginx/nginx.pid
-#
-# process signal $signal pidfile $pid_file
-# process signal $signal pid $pid
-# process $signal pid $pid
-# process $signal pidfile $pid_file
-#
-#   where "signal" is one of (all upper or lower case):
+# process start name <name> timeout <timeout> command <command> [params...]
+# process stop name <name> timeout <timeout>
+# process is running name <name>
+# process restart name <name> timeout_start <timeout> timeout_stop <timeout> command <command> [params...]
+# process status <pid>
+# process lock </path/to/myprocess.lock>
+# process send signal <signal> pid <pid>
+#   where <signal> is one of (all upper or lower case):
 #     kill,quit,term,usr2,usr2,ttin,ttou,winch,hup
 #     OR a hyphen followed by a number ex: "-15"
-#
-# Example:
-#   process signal hup 1234
-#   process signal hup pidfile /var/run/nginx/nginx.pid
-#   process term pidfile $HOME/shared/pids/unicorn.pid
-#
-# while : ; do
-#   if process lock lockfile /var/run/myprocess.lock
-#   then ... # Obtained the lock, continue!
-#   fi
-# done
 #
 process()
 {
   trace_filter process || set -o xtrace
-  typeset _token _command _process _command _user _flags __process_commands _signal _pid _name _file
-  _pid=0
+  typeset _command _token _name _timeout_start _timeout_stop _pid _signal _lock_path
+  typeset -a __process_commands _command_arr
 
   __process_commands=(
-  "on exit=exit"
-  "is running=running"
+    "start"
+    "stop"
+    "restart"
+    "running=is running"
+    "pid=pid read"
+    "status"
+    "send signal=signal"
+    "lock=lockfile lock"
   )
 
   if __sm.command.detect "$*" "${__process_commands[@]}"
@@ -56,8 +36,23 @@ process()
     _command="${__sm_command_dotted}"
     shift "${__sm_command_words}"
   else
-    __sm.log.fail "No command given.\nUsage:  \npaths <command> ..."
+    __sm.log.fail "No command given.\nUsage:  \nprocess <command> ..."
   fi
+
+  case "${_command}" in
+    (status)
+      _pid=$1
+      shift || __sm.log.fail "Process pid must be given after 'status'"
+      ;;
+    (signal)
+      _signal=$1
+      shift || __sm.log.fail "Signal must be given after 'signal' command"
+      ;;
+    (lockfile.lock)
+      _lock_path=$1
+      shift || __sm.log.fail "Signal must be given after 'signal' command"
+      ;;
+  esac
 
   while (( $# ))
   do
@@ -65,28 +60,31 @@ process()
     case ${_token} in
       (name)
         _name="$1"
-        shift || fail "Process name must be given after keyword 'name'"
+        shift || __sm.log.fail "Process name must be given after keyword '${_token}'"
+        ;;
+      (timeout)
+        case "${_command}" in
+          (start) _timeout_start="$1" ;;
+          (stop)  _timeout_stop="$1"  ;;
+          (*) __sm.log.fail "Keyword '${_token}' can not be used with '${_command}'." ;;
+        esac
+        shift || __sm.log.fail "Timeout must be given after keyword '${_token}'"
+        ;;
+      (timeout_start)
+        _timeout_start="$1"
+        shift || __sm.log.fail "Start timeout must be given after keyword '${_token}'"
+        ;;
+      (timeout_stop)
+        _timeout_stop="$1"
+        shift || __sm.log.fail "Stop timeout must be given after keyword '${_token}'"
         ;;
       (pid)
         _pid=$1
-        shift || fail "Process id (pid) must be given after keyword 'pid'"
+        shift || __sm.log.fail "Process pid must be given after 'status'"
         ;;
-      (pidfile|lockfile)
-        _file="$1"
-        shift || fail "File path/name must follow keyword '${_token}'"
-        ;;
-      (status|signal|lock)
-        _command="${_token}"
-        ;;
-      ([[:digit:]]##)
-        _pid=${_token}
-        ;;
-      (kill|KILL|quit|QUIT|term|TERM|usr1|USR1|usr2|USR2|ttin|TTIN|ttou|TTOU|winch|WINCH|hup|HUP|-[[:digit:]]##)
-        _command=signal
-        _signal=${_token}
-        ;;
-      (*.pid)
-        _file="${_token}"
+      (command)
+        _command_arr=( "$@" )
+        shift $# || __sm.log.fail "Command must be given after keyword '${_token}'"
         ;;
       (*)
         __sm.log.fail "Unknown token '${_token}'"
@@ -95,58 +93,67 @@ process()
   done
 
   case "${_command}" in
-    (signal)
-      if ! (( _pid ))
-      then
-        __sm.log.fail "pid to signal must be given;"\
-          " please check your code (see trace below.)"
-      fi
+    (start)
+      [[ -n "${_name}"          ]] || __sm.log.fail "Name must be given for '__sm.process.${_command}'."
+      [[ -n "${_timeout_start}" ]] || __sm.log.fail "Start timeout must be given for '__sm.process.${_command}'."
+      __sm.array.is.nonempty _command_arr || __sm.log.fail "Command must be given for '__sm.process.${_command}'."
 
-      case "${_signal}" in
-        (KILL|QUIT|TERM|USR1|USR2|TTIN|TTOU|WINCH|HUP|[[:digit:]]##)
-          __sm.process.signal ${_signal} ${_pid}
-          ;;
-        (*)
-          __sm.log.fail "Cannot signal service;"\
-            " Signal must be given as the first parameter and be one of:"\
-            " {KILL,QUIT,TERM,USR1,USR2,TTIN,TTOU,a digit})."
-          ;;
-      esac
+      if __sm.process.${_command} "${_name}" "${_timeout_start}" "${_command_arr[@]}"
+      then return 0
+      else return $?
+      fi
+      ;;
+    (stop)
+      [[ -n "${_name}"          ]] || __sm.log.fail "Name must be given for '__sm.process.${_command}'."
+      [[ -n "${_timeout_stop}"  ]] || __sm.log.fail "Stop timeout must be given for '__sm.process.${_command}'."
+
+      if __sm.process.${_command} "${_name}" "${_timeout_stop}"
+      then return 0
+      else return $?
+      fi
+      ;;
+    (restart)
+      [[ -n "${_name}"          ]] || __sm.log.fail "Name must be given for '__sm.process.${_command}'."
+      [[ -n "${_timeout_start}" ]] || __sm.log.fail "Start timeout must be given for '__sm.process.${_command}'."
+      [[ -n "${_timeout_stop}"  ]] || __sm.log.fail "Stop timeout must be given for '__sm.process.${_command}'."
+      __sm.array.is.nonempty _command_arr || __sm.log.fail "Command must be given for '__sm.process.${_command}'."
+
+      if __sm.process.${_command} "${_name}" "${_timeout_start}" "${_timeout_stop}" "${_command_arr[@]}"
+      then return 0
+      else return $?
+      fi
+      ;;
+    (is.running|pid.read)
+      [[ -n "${_name}" ]] || __sm.log.fail "Name must be given for '__sm.process.${_command}'."
+      if __sm.process.${_command} "${_name}"
+      then return 0
+      else return $?
+      fi
       ;;
     (status)
-      if [[ -n "${_file}" || -n "${_pid}" ]]
-      then
-        __sm.process.status "${_name}" "${_file}" "${_pid}"
-      else
-        __sm.log.fail "Either a pidfile or a process id (pid) must be given in order to show process status."
+      [[ -n "${_pid}" ]] || __sm.log.fail "Process pid must be given for '__sm.process.${_command}'."
+      if __sm.process.${_command} "${_pid}"
+      then return 0
+      else return $?
       fi
       ;;
-    (running)
-      __sm.process.is.running "${_pid}" "${_file}"
-      ;;
-    (lock)
-      if [[ -n "${_file}" ]]
-      then
-        if __sm.process.lockfile.lock "${_file}"
-        then return 0
-        else return 1
-        fi # Let caller deal with the choice of how to react.
-      else
-        __sm.log.fail "No lockfile was specified for locking."
+    (signal)
+      [[ -n "${_pid}" ]] || __sm.log.fail "Process pid must be given for '__sm.process.${_command}'."
+      [[ -n "${_signal}" ]] || __sm.log.fail "Signal must be given for '__sm.process.${_command}'."
+      if __sm.process.${_command} "${_signal}" "${_pid}"
+      then return 0
+      else return $?
       fi
       ;;
-    (exit)
-      NIY "Process on exit"
-      __sm.process.on.exit ...
+    (lockfile.lock)
+      [[ -n "${_lock_path}" ]] || __sm.log.fail "Lockfile must be given for '__sm.process.${_command}'."
+      if __sm.process.${_command} "${_lock_path}"
+      then return 0
+      else return $?
+      fi
       ;;
     (*)
-      if [[ -n "${_command}" ]]
-      then
-        __sm.log.fail "Process API command '${_command}' s not handled."
-      else
-        __sm.log.fail "Process API command must be given."
-      fi
+      __sm.log.fail "Process2 API command '${_command}' s not handled."
       ;;
   esac
 }
-
