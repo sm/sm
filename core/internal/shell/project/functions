@@ -1,2 +1,27 @@
 #!/bin/sh
 
+__sm_project_version_start()
+{
+  typeset type flow_type
+  type="${1:-}"
+
+  __sm_project_config_read flow_type
+}
+
+__sm_project_version_finish()
+{
+}
+
+__sm_project_version_show()
+{
+}
+
+__sm_project_config_read()
+{
+  __sm_variables_file_read "$1" "./.sm.project/${2:-$1}"
+}
+
+__sm_project_config_write()
+{
+  __sm_variables_file_write "$1" "./.sm.project/${2:-$1}"
+}
