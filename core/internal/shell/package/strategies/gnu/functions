@@ -204,7 +204,9 @@ __sm.package.fetch.checksum()
 
       package_checksum=$(cat "${archives_path}/${package_file}.checksum")
 
-      rm "${archives_path}/${package_file}.checksum"
+      if [[ -f "${archives_path}/${package_file}.checksum" ]]
+      then rm "${archives_path}/${package_file}.checksum"
+      fi
 
       if (( ${#package_checksum} == 32 ))
       then
