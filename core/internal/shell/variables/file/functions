@@ -1,0 +1,52 @@
+#!/usr/bin/env zsh
+
+__sm_variables_file_read()
+{
+  eval "\$$1=\"\$(cat \"\${2:-\$1}\")\""
+}
+
+__sm_variables_file_write()
+{
+  eval "echo \"\$$1\"" > "${2:-$1}"
+}
+
+__sm_variables_file_read_many()
+{
+  typeset __sm_variables_file
+  __sm_variables_file="$1"
+  shift
+
+  while
+    (( $# ))
+  do
+    eval "${1//-/_}=\"\$(awk -F= '\$1==\"$1\" {sub(\"^$1=\",\"\"); print}' < \"\${__sm_variables_file}\")\""
+    shift
+  done
+}
+
+__sm_variables_file_read_all()
+{
+  typeset __sm_variables_file
+  __sm_variables_file="$1"
+  shift
+
+  while read name
+  do
+    eval "${name//-/_}=\"\$(awk -F= '\$1==\"$name\" {sub(\"^$name=\",\"\"); print}' < \"\${__sm_variables_file}\")\""
+  done < <( awk -F= '{print $1}' < "${__sm_variables_file}" )
+  # n+1 awk is slow but it's also safe
+}
+
+__sm_variables_file_write_many()
+{
+  typeset __sm_variables_file
+  __sm_variables_file="$1"
+  shift
+
+  while
+    (( $# ))
+  do
+    eval "sed -i '/^$1=/ s/^.*$/$1='\"\${${1//-/_}}\"'/' \"\${__sm_variables_file}\""
+    shift
+  done
+}
