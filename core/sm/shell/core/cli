@@ -106,7 +106,7 @@ do
       ;;
 
     (*)
-      if [[ -f "$token" && -z "$sm_script" ]]
+      if [[ -z "$sm_script" ]] && [[ -f "$token" || "$token" == / ]]
       then
         sm_script=$1
       else
