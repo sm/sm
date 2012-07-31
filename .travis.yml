@@ -1,0 +1,13 @@
+language: ruby
+rvm:
+  - 1.9.3
+script: find core/ -name '*_comment_test.sh' | xargs tf --text
+notifications:
+  irc:
+    channels:
+      - "irc.freenode.org#rvm-test"
+  email:
+    recipients:
+      - mpapis@gmail.com
+    on_failure: change
+
