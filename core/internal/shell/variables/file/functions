@@ -2,12 +2,17 @@
 
 __sm_variables_file_read()
 {
-  eval "\$$1=\"\$(cat \"\${2:-\$1}\")\""
+  eval "$1=\"\$(cat \"\${2:-\$1}\")\""
 }
 
 __sm_variables_file_write()
 {
   eval "echo \"\$$1\"" > "${2:-$1}"
+}
+
+__sm_variables_file_read_one()
+{
+  eval "${2//-/_}=\"\$(sed '/^$2=/! d; s/^$2=//' < \"\$1\")\""
 }
 
 __sm_variables_file_read_many()
@@ -16,11 +21,9 @@ __sm_variables_file_read_many()
   __sm_variables_file="$1"
   shift
 
-  while
-    (( $# ))
+  for name
   do
-    eval "${1//-/_}=\"\$(awk -F= '\$1==\"$1\" {sub(\"^$1=\",\"\"); print}' < \"\${__sm_variables_file}\")\""
-    shift
+    __sm_variables_file_read_one "${__sm_variables_file}" "$name"
   done
 }
 
@@ -32,9 +35,15 @@ __sm_variables_file_read_all()
 
   while read name
   do
-    eval "${name//-/_}=\"\$(awk -F= '\$1==\"$name\" {sub(\"^$name=\",\"\"); print}' < \"\${__sm_variables_file}\")\""
-  done < <( awk -F= '{print $1}' < "${__sm_variables_file}" )
-  # n+1 awk is slow but it's also safe
+    __sm_variables_file_read_one "${__sm_variables_file}" "$name"
+  done \
+    < <( awk -F= '{print $1}' < "${__sm_variables_file}" )
+  # n+1 read is slow but it's the only safe one
+}
+
+__sm_variables_file_write_one()
+{
+    eval "sed -i '/^$1=/ s/^.*$/$1='\"\${${1//-/_}}\"'/' \"\${__sm_variables_file}\""
 }
 
 __sm_variables_file_write_many()
@@ -46,7 +55,7 @@ __sm_variables_file_write_many()
   while
     (( $# ))
   do
-    eval "sed -i '/^$1=/ s/^.*$/$1='\"\${${1//-/_}}\"'/' \"\${__sm_variables_file}\""
+    __sm_variables_file_write_one "${__sm_variables_file}" "$1"
     shift
   done
 }

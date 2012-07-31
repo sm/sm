@@ -1,0 +1,5 @@
+export sm_script=/
+source ./local
+set -o  NO_ERR_EXIT ERR_RETURN
+trap - USR2
+trap - ZERR
