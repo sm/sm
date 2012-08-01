@@ -1,6 +1,7 @@
 language: ruby
 rvm:
   - 1.9.3
+install: gem install tf
 script: find core/ -name '*_comment_test.sh' | xargs tf --text
 notifications:
   irc:
