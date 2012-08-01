@@ -633,5 +633,5 @@ __sm.log.dotted()
   then flush=flush
   else flush=fflush
   fi
-  awk '{printf "."; '$flush'}'
+  awk '{printf "."; '$flush';}'
 }
