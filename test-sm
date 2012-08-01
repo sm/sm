@@ -1,5 +1,7 @@
 export sm_script=/
 source ./local
+__sm.log.fail() { __sm.log.fail.no_exit "$@" ; return 121 ; }
+__sm.log.error() { __sm.log.error.no_exit "$@" ; return 122 ; }
 set -o  NO_ERR_EXIT ERR_RETURN
 trap - USR2
 trap - ZERR
