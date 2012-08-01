@@ -62,7 +62,7 @@ log()
   do
     _token="$1" && shift
     case "${_token}" in
-      (eval|search|todo|warn|error|succeed|step|rotate|streams|dotted)
+      (search|todo|warn|error|succeed|fail|step|rotate|streams|dotted)
         _command="${_token}"
         ;;
       (debug)
