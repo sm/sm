@@ -629,7 +629,7 @@ __sm.log.streams()
 __sm.log.dotted()
 {
   typeset flush
-  if awk --version | grep -i gnu >/dev/null
+  if awk --version 2>/dev/null | grep -i gnu >/dev/null
   then flush=flush
   else flush=fflush
   fi
