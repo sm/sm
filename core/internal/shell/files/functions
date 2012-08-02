@@ -512,3 +512,13 @@ __sm.files.touch()
   done
   return 0
 }
+
+__sm.files.readlinks()
+{
+  typeset _file_name
+  _file_name="$1"
+  while [[ -L "$_file_name" ]]
+  do _file_name="$( readlink "${_file_name}" )"
+  done
+  printf "${_file_name}\n"
+}

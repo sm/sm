@@ -35,6 +35,7 @@
 # file open {file}
 # file md5 {file}
 # file(s) expand {file} # eg. expand to include 'full/absolute' path
+# file readlinks {file}
 # file search {file} # NIY
 # file(s) source {file}
 # file remove {file}
@@ -177,7 +178,7 @@ files()
       else return 1
       fi
       ;;
-    (open|md5|enter|join|expand|search|within|in|source|empty|nonempty|exist|exists|remove|create|touch|are.*|sha.*)
+    (open|md5|enter|join|expand|readlinks|search|within|in|source|empty|nonempty|exist|exists|remove|create|touch|are.*|sha.*)
       [[ -n "${_files}" ]] || __sm.log.fail "files must be given for 'files ${_command}'."
       if __sm.files.${_command} "${_files[@]}"
       then return 0
