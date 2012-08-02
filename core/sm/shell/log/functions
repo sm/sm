@@ -629,9 +629,9 @@ __sm.log.streams()
 __sm.log.dotted()
 {
   typeset flush
-  if awk --version 2>/dev/null | grep -i gnu >/dev/null
-  then flush=flush
-  else flush=fflush
+  if awk '{fflush;}' <<<EO 2>/dev/null
+  then flush=fflush
+  else flush=flush
   fi
   awk '{printf "."; '$flush';}'
 }
