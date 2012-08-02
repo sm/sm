@@ -43,7 +43,7 @@ __sm_variables_file_read_all()
 
 __sm_variables_file_write_one()
 {
-    eval "sed -i '/^$1=/ s/^.*$/$1='\"\${${1//-/_}}\"'/' \"\${__sm_variables_file}\""
+  eval "sed -i '/^$2=/ s/^.*$/$2='\"\${${2//-/_}}\"'/' \"\${1}\""
 }
 
 __sm_variables_file_write_many()
