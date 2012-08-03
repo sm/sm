@@ -17,17 +17,17 @@ __sm.version.stream.write.file()
 # increase major version part, in case of any -rc relases just drop it
 __sm.version.stream.increase.major()
 {
-  awk -F "[.-]" '$4 !~ "^[a-Z]" { print $1+1".0.0" } $4 ~ "^[a-Z]" { print $1"."$2"."$3;}'
+  awk -F "[.-]" '{ if ($4 ~ "^[a-zA-Z]") { print $1"."$2"."$3; } else { print $1+1".0.0"; } }'
 }
 
 # increase minor version part, in case of any -rc relases just drop it
 __sm.version.stream.increase.minor()
 {
-  awk -F "[.-]" '$4 !~ "^[a-Z]" { print $1"."$2+1".0" } $4 ~ "^[a-Z]" { print $1"."$2"."$3;}'
+  awk -F "[.-]" '{ if ($4 ~ "^[a-zA-Z]") { print $1"."$2"."$3; } else { print $1"."$2+1".0";} }'
 }
 
 # increase tiny version part, in case of any -rc relases just drop it
 __sm.version.stream.increase.tiny()
 {
-  awk -F "[.-]" '$4 !~ "^[a-Z]" { print $1"."$2"."$3+1 } $4 ~ "^[a-Z]" { print $1"."$2"."$3;}'
+  awk -F "[.-]" '{ if ($4 ~ "^[a-zA-Z]") { print $1"."$2"."$3; } else { print $1"."$2"."$3+1; } }'
 }
