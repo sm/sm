@@ -1,0 +1,32 @@
+#!/usr/bin/env zsh
+
+
+__sm.cli.test.help()
+{
+}
+
+__sm.cli.test.sm()
+{
+  printf "%b" "
+pushd \"$sm_path\" >/dev/null ;
+export sm_script=/ ;
+source ./local ;
+__sm.log.fail() { __sm.log.fail.no_exit \"\$@\" ; return 121 ; } ;
+__sm.log.error() { __sm.log.error.no_exit \"\$@\" ; return 122 ; } ;
+set -o  NO_ERR_EXIT ERR_RETURN ;
+trap - USR2 ;
+trap - ZERR ;
+popd >/dev/null ;
+"
+}
+
+__sm.cli.test.extension()
+{
+  printf "%b" "
+export extensions_search_paths_here=\"\$PWD\";
+"
+  __sm.cli.test.sm
+  printf "%b" "
+initial_pwd=\"\$PWD\";
+"
+}

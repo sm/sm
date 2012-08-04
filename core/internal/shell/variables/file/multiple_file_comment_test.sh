@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
-source   test-sm
+eval $(./local test sm)
 includes internal/variables/file
 
 : read one
