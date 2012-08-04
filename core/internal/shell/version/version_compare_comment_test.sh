@@ -3,7 +3,6 @@
 source   test-sm
 includes internal/version
 
-
 : basic comparision
 __sm.version.compare 1 -gt 2 # status!=0
 __sm.version.compare 2 -gt 2 # status!=0
