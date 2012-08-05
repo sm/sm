@@ -74,3 +74,8 @@ __sm.variables.must.be.empty()
     ${_error} "Variables '${__sm_variables_nonempty[@]}' are suposed to be empty but are not."
   fi
 }
+
+__sm.variable.is.array()
+{
+  set | grep "^$1=(" >/dev/null
+}
