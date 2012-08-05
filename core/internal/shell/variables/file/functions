@@ -12,7 +12,18 @@ __sm_variables_file_write()
 
 __sm_variables_file_read_one()
 {
-  eval "${2//-/_}=\"\$(sed '/^$2=/! d; s/^$2=//' < \"\$1\")\""
+  typeset GREP_OPTIONS
+  case "$(GREP_OPTIONS="" \grep -o "^$2=.*$" < "$1")" in
+    ($2=\(*\))
+      eval "${2//-/_}=( \$(sed '/^$2=/! d; s/^$2=(//; s/)$//' < \"\$1\") )"
+      ;;
+    ($2=\(*)
+      eval "${2//-/_}=( \$(awk 'BEGIN {m=0} /^$2=/ {m=1; sub(/^$2=\(/,\"\");} /^)/ {m=0;} m==1 {print;}' < \"\$1\") )"
+      ;;
+    ($2=*)
+      eval "${2//-/_}=\"\$(sed '/^$2=/! d; s/^$2=//' < \"\$1\")\""
+      ;;
+  esac
 }
 
 __sm_variables_file_read_many()
@@ -43,7 +54,24 @@ __sm_variables_file_read_all()
 
 __sm_variables_file_write_one()
 {
-  eval "sed -i '/^$2=/ s/^.*$/$2='\"\${${2//-/_}}\"'/' \"\${1}\""
+  typeset GREP_OPTIONS
+  if
+    [[ -f "${1}" ]] && GREP_OPTIONS="" \grep "^$2=" < "$1" >/dev/null
+  then
+    if __sm.variable.is.array "${2//-/_}"
+    then
+      eval "sed -i '/^$2=/ s/^.*$/$2=( '\"\${${2//-/_}}\"' )/' \"\${1}\""
+    else
+      eval "sed -i '/^$2=/ s/^.*$/$2='\"\${${2//-/_}}\"'/' \"\${1}\""
+    fi
+  else
+    if __sm.variable.is.array "${2//-/_}"
+    then
+      eval "printf \"$2=( \${${2//-/_}} )\"" > "${1}"
+    else
+      eval "printf \"$2=\${${2//-/_}}\"" > "${1}"
+    fi
+  fi
 }
 
 __sm_variables_file_write_many()
