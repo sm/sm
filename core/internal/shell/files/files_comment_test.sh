@@ -1,7 +1,6 @@
 #!/usr/bin/env zsh
 
-eval $(./local test sm)
-includes internal/files
+eval $(./local test sm internal/files )
 
 : readlinks
 touch "${sm_temp_path}/a"

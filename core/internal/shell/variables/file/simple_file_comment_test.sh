@@ -1,7 +1,6 @@
 #!/usr/bin/env zsh
 
-eval $(./local test sm)
-includes internal/variables/file
+eval $(./local test sm internal/variables/file )
 
 export _sm_version_read1 _sm_version_read2
 __sm_variables_file_read _sm_version_read1 VERSION

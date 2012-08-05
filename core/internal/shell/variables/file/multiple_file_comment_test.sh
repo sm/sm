@@ -1,7 +1,6 @@
 #!/usr/bin/env zsh
 
-eval $(./local test sm)
-includes internal/variables/file
+eval $(./local test sm internal/variables/file )
 
 : read one
 unset var1 var2

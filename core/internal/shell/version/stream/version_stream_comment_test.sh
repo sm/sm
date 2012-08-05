@@ -1,7 +1,6 @@
 #!/usr/bin/env zsh
 
-eval $(./local test sm)
-includes internal/version/stream
+eval $(./local test sm internal/version/stream )
 
 : simple read/write
 

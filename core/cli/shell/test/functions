@@ -3,6 +3,29 @@
 
 __sm.cli.test.help()
 {
+  printf "%b" "
+Helper for testing SM Framework and extensions.
+
+Usage - help:
+
+    sm test [help]
+
+Usage - testing sm (has to be run from sm root):
+
+    #!/usr/bin/env zsh
+    eval \$( ./local test sm [module/to/include ...] )
+
+Usage - testing extension sets (has to be run from set root):
+
+    #!/usr/bin/env zsh
+    eval \$( sm test set [module/to/include ...] )
+
+Usage - testing extensions (has to be run from extensions root):
+
+    #!/usr/bin/env zsh
+    eval \$( sm test ext [module/to/include ...] )
+
+"
 }
 
 __sm.cli.test.sm()
@@ -18,6 +41,11 @@ trap - USR2 ;
 trap - ZERR ;
 popd >/dev/null ;
 "
+  while (( $# ))
+  do
+    printf "%b" "includes \"$1\" ;\n"
+    shift
+  done
 }
 
 __sm.cli.test.extension()
@@ -25,8 +53,13 @@ __sm.cli.test.extension()
   printf "%b" "
 export extensions_search_paths_here=\"\$PWD\";
 "
-  __sm.cli.test.sm
+  __sm.cli.test.sm "$@"
   printf "%b" "
 initial_pwd=\"\$PWD\";
 "
+}
+
+__sm.cli.test.set()
+{
+  __sm.cli.test.extension "$@"
 }

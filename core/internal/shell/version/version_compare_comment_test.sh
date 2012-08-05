@@ -1,7 +1,6 @@
 #!/usr/bin/env zsh
 
-eval $(./local test sm)
-includes internal/version
+eval $(./local test sm internal/version )
 
 : basic comparision
 __sm.version.compare 1 -gt 2 # status!=0
