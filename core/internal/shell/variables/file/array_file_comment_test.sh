@@ -6,14 +6,14 @@ eval $(./local test sm internal/variables/file )
 unset var1 var2
 export -a var1 var2
 
-printf "var1=(a b)" > "${sm_temp_path}/test-me"
+printf "var1=(a1 b2)" > "${sm_temp_path}/test-me"
 __sm_variables_file_read_one "${sm_temp_path}/test-me" var1
 # status=0; env[var2]=/^$/
 
 echo ${var1[1]}
-# match=/^a$/
+# match=/^a1$/
 echo ${var1[@]}
-# match=/^a b$/
+# match=/^a1 b2$/
 
 : multi line read
 unset var1 var2
@@ -45,13 +45,13 @@ echo ${var1[@]}
 unset var1 var2
 export -a var1 var2
 
-var1=(a b)
+var1=(a1 b2)
 rm -f "${sm_temp_path}/test-me"
 __sm_variables_file_write_one "${sm_temp_path}/test-me" var1 # status=0
 [[ -f "${sm_temp_path}/test-me" ]]                           # status=0
 
 cat "${sm_temp_path}/test-me"
-# match=/^var1=\( a b \)$/
+# match=/^var1=\( a1 b2 \)$/
 
 : one line update
 unset var1 var2
