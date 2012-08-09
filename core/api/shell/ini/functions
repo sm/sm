@@ -1,0 +1,39 @@
+#!/bin/sh
+
+ini() {
+  local _action _file _token
+
+  while (( $# ))
+  do
+    _token="$1"
+    shift
+    case ${_token} in
+      (parse|load)
+        _action=${_token}
+        ;;
+      (file)
+        _file="${1}"
+        if [[ -z "${_file}" ]]
+        then log fail "A file path/name must be given after keyword 'file' for ini()"
+        else shift
+        fi
+        ;;
+      (*)
+        log fail "Unknown or unhandled token for ini() '${_token}'."
+        ;;
+    esac
+  done
+
+  if [[ -z "${_action}" ]]
+  then log fail "ini must be called with an action: {load|parse}"
+  fi
+
+  case ${_action} in
+    (parse)
+			__sm.ini.parse ${_file}
+      ;;
+    (load)
+			__sm.ini.load ${_file}
+      ;;
+  esac
+}

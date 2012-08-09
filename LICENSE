@@ -20,10 +20,10 @@ bin/sm-{ll,sql,sem,nl} are all part of the GNU Parallel [1,2] project and are
 licensed under the GNU GPL v3 which can be read at either LICENSE.gpl3 or on the
 web at http://www.gnu.org/licenses/gpl.html
 
-JSON.pm and associated files are from CPAN written by Makamaka Hannyaharamitu
-and carries the same license as Perl itself.
+pini.py is licensed under the GNU GPL v3 which can be read at either
+LICENSE.gpl3 or on the web at http://www.gnu.org/licenses/gpl.html
 
-Mustache.pm is from CPAN [3] Template::Mustache written by Pieter van de Bruggen
+JSON.pm and associated files are from CPAN written by Makamaka Hannyaharamitu
 and carries the same license as Perl itself.
 
 = References
