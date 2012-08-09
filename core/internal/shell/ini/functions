@@ -15,6 +15,16 @@ __sm.ini.parse() {
 }
 
 __sm.ini.load() {
-	eval "$(__sm.ini.parse "${1}")"
+	local _content _keys
+
+	_content=$(__sm.ini.parse "${1}")
+
+	_keys=($( echo ${_content} | sed -e 's/=[^;]*//g' -e 's/;//g'))
+
+	for _key in ${_keys[@]}
+	do typeset -g ${_key}
+	done
+
+	eval "${_content}"
 }
 
