@@ -3,7 +3,7 @@ rvm:
   - 1.9.3
 before_script:
   - sudo apt-get install zsh
-install: gem install tf
+install: gem install tf -v '>=0.4.1'
 script: find core/ -name '*_comment_test.sh' | xargs tf --text
 notifications:
   irc:

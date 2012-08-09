@@ -7,13 +7,12 @@ unset var1 var2
 export -a var1 var2
 
 printf "var1=(a1 b2)" > "${sm_temp_path}/test-me"
+# env[var1][]=0
 __sm_variables_file_read_one "${sm_temp_path}/test-me" var1
-# status=0; env[var2]=/^$/
-
-echo ${var1[1]}
-# match=/^a1$/
-echo ${var1[@]}
-# match=/^a1 b2$/
+# status=0
+# env[var1][]=2
+# env[var1][]=/^a1 b2$/
+# env[var2][]=/^$/
 
 : multi line read
 unset var1 var2
@@ -21,12 +20,10 @@ export -a var1 var2
 
 printf "var1=(\nc\nd\n)" > "${sm_temp_path}/test-me"
 __sm_variables_file_read_one "${sm_temp_path}/test-me" var1
-# status=0; env[var2]=/^$/
-
-echo ${var1[1]}
-# match=/^c$/
-echo ${var1[@]}
-# match=/^c d$/
+# status=0
+# env[var1][]=2
+# env[var1][]=/^c d$/
+# env[var2][]=/^$/
 
 : multi line read ... not quoted
 unset var1 var2
@@ -34,12 +31,10 @@ export -a var1 var2
 
 printf "var1=(\ne f\ng h\n)" > "${sm_temp_path}/test-me"
 __sm_variables_file_read_one "${sm_temp_path}/test-me" var1
-# status=0; env[var2]=/^$/
-
-echo ${var1[1]}
-# match=/^e$/
-echo ${var1[@]}
-# match=/^e f g h$/
+# status=0
+# env[var1][]=4
+# env[var1][]=/^e f g h$/
+# env[var2][]=/^$/
 
 : one line write
 unset var1 var2
