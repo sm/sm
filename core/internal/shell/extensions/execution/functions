@@ -3,7 +3,7 @@
 __sm.extension.actions.type()
 {
   typeset -g action_type
-  typeset _path _path_type extension shebang
+  typeset _path _path_type extension shebang binary
   _path="${action_path:-}"
 
   case "${action}" in
