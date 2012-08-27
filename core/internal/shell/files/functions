@@ -205,30 +205,30 @@ __sm.files.exists()
   return 0
 }
 
-__sm.files.contain()
+__sm.files.shebang.is()
 {
-  typeset _string _regex _file
-  _string="$1"
-  _regex="$2"
+  typeset _string _file
+  _string="${1:-$2}"
   shift 2
 
   for _file in $@
   do
     [[ -f "${_file}" ]] || return 1
+    head -n 1 "${_file}" | grep "#\!${_string}" >/dev/null 2>&1 || return 1
   done
+}
 
-  if [[ -n "${_regex}" ]]
-  then
-    for _file in "${_files[@]}"
-    do
-      grep "${_regex}" "${_file}" >/dev/null 2>&1 || return 1
-    done
-  else
-    for _file in "${_files[@]}"
-    do
-      grep "${_string}" "${_file}" >/dev/null 2>&1 || return 1
-    done
-  fi
+__sm.files.contain()
+{
+  typeset _string _file
+  _string="${1:-$2}"
+  shift 2
+
+  for _file in $@
+  do
+    [[ -f "${_file}" ]] || return 1
+    grep "${_string}" "${_file}" >/dev/null 2>&1 || return 1
+  done
 }
 
 __sm.files.containing()

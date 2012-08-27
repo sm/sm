@@ -67,6 +67,7 @@ files()
     "change owner to=chown"
     "change permissions to=chmod"
     "change rights to=chmod"
+    "shebang is"
   )
 
   if __sm.command.detect "$*" "${__files_commands[@]}"
@@ -83,11 +84,15 @@ files()
       ;;
     (chmod)
       _mode="${1}"
-      (( $# )) && shift || __sm.log.fail "Mode must follow keywords 'chmod'"
+      (( $# )) && shift || __sm.log.fail "Mode must follow keyword 'chmod'"
       ;;
     (chown)
       _owner="${1}"
-      (( $# )) && shift || __sm.log.fail "Owner must be provided after keyword 'owner'"
+      (( $# )) && shift || __sm.log.fail "Owner must follow keyword 'chown'"
+      ;;
+    (shebang.is)
+      _string="${1}"
+      (( $# )) && shift || __sm.log.fail "Shebang must be provided after 'shebang is'"
       ;;
   esac
 
@@ -159,7 +164,7 @@ files()
   done
 
   case "${_command}" in
-    (contain|containing|contains)
+    (contain|containing|contains|shebang.is)
       [[ -n "${_string}" ]] || [[ -n "${_regex}" ]] ||
         __sm.log.fail "regexp or string must be given for 'files ${_command}'."
       [[ -n "${_files}" ]] || __sm.log.fail "files must be given for 'files ${_command}'."
