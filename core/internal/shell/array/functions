@@ -112,7 +112,7 @@ __sm.array.pop()
     eval "echo \${${_name}[-1]}"
   fi
 
-  eval "if (( \${#${_name}[@]} == 1 )) ; then ${_name}=() ; else ${_name}=( \"\${${_name}[1,-2]}\" ) ; fi"
+  eval "if (( \${#${_name}[@]} == 1 )) ; then ${_name}=() ; else ${_name}=( \${${_name}[1,-2]} ) ; fi"
 }
 
 __sm.array.shift()
