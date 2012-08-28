@@ -1,0 +1,5 @@
+typeset -ag log_step_messages
+typeset -g  log_step_messages_last_level
+
+log_step_messages=()
+log_step_messages_last_level=1
