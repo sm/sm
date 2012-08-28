@@ -1,5 +1,43 @@
 typeset -ag log_step_messages
 typeset -g  log_step_messages_last_level
+typeset -g  log_step_succ_char log_step_fail_char log_step_empty_char
+typeset -g  sm_use_colors  sm_color_red sm_color_green sm_color_reset
 
 log_step_messages=()
 log_step_messages_last_level=1
+
+if #unicode?
+  [[ -z "${LANG:-}" || "${LANG:-}" = *UTF* || "${LANG:-}" = *utf8* ]]
+then
+  log_step_succ_char="✔"
+  log_step_fail_char="✘"
+else
+  log_step_succ_char="V"
+  log_step_fail_char="X"
+fi
+log_step_empty_char=" "
+
+# record outputs!
+exec 7>&1 8>&2 9>&0
+
+[[ -n "${sm_use_colors:-}" ]] || {
+  sm_use_colors=1
+  case "${TERM:-dumb}" in
+    (dumb|unknown)
+      sm_use_colors=0
+      ;;
+    (*)
+      builtin command -v tput >/dev/null && tput sgr0 >/dev/null || sm_use_colors=0
+      ;;
+  esac
+}
+
+(( sm_use_colors == 0 )) || {
+  sm_color_red="$(  tput setaf 1)"
+  sm_color_green="$(tput setaf 2)"
+  sm_color_reset="$(tput sgr0   )"
+  exec 2>>( awk '{print "'"$sm_color_red"'"$0"'"$sm_color_reset"'"}' >&2 & ) >>( awk '{print "'"$sm_color_green"'"$0"'"$sm_color_reset"'"}' & )
+}
+
+# colored outputs
+exec 5>&1 6>&2

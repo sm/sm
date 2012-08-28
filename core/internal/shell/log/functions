@@ -8,30 +8,20 @@ __sm.log.piece.tree()
   _unicode=0
   true ${COLUMNS:=80}
 
-  if [[ -z "${LANG:-}" || "${LANG:-}" = *UTF* || "${LANG:-}" = *utf8* ]]
-  then _unicode=1
-  fi
-
   case "${__message}" in
     fail*)
       log_step_messages_last_level=$(( ${#log_step_messages[*]} ))
       printf "\r%${COLUMNS}s\r" " "
       _ident=$(( ${#log_step_messages[*]} * 2 ))
       __sm.array.pop log_step_messages __message
-      if (( _unicode == 1 ))
-      then printf "%${_ident}s[\033[31m✘\033[0m] %s\n" " " "${__message:-"done"}!"
-      else printf "%${_ident}s[\033[31mX\033[0m] %s\n" " " "${__message:-"done"}!"
-      fi
+      printf "%${_ident}s[${sm_color_red:-}${log_step_fail_char:-X}${sm_color_reset:-}] %s\n" " " "${__message:-"done"}!"
       ;;
     succ*)
       log_step_messages_last_level=$(( ${#log_step_messages[*]} ))
       printf "\r%${COLUMNS}s\r" " "
       _ident=$(( ${#log_step_messages[*]} * 2 ))
       __sm.array.pop log_step_messages __message
-      if (( _unicode == 1 ))
-      then printf "%${_ident}s[\033[32m✔\033[0m] %s\n" " " "${__message:-"done"}"
-      else printf "%${_ident}s[\033[32mV\033[0m] %s\n" " " "${__message:-"done"}"
-      fi
+      printf "%${_ident}s[${sm_color_green:-}${log_step_succ_char:-V}${sm_color_reset:-}] %s\n" " " "${__message:-"done"}"
       ;;
     *)
       __sm.array.push log_step_messages "${__message}"
@@ -42,65 +32,36 @@ __sm.log.piece.tree()
       printf "%${_ident}s[ ] %s " " " "${__message}..."
       log_step_messages_last_level=$(( ${#log_step_messages[*]} ))
       ;;
-  esac
+  esac >&7
 }
 
 __sm.log.step.tree()
 {
   trace_filter log || set -o xtrace
-  typeset _message _output _log_file _status
+  typeset _message _log_file _status
+
   _message="${1:-}"
+  (( $# > 1 )) || fail "Missing command!"
+  shift
 
-  if (( $# > 1 ))
+  [[ -d "${sm_temp_path}/steps" ]] || mkdir "${sm_temp_path}/steps"
+  _log_file="${sm_temp_path}/steps/$$.${outlog_step_messages_last_level}.log"
+  touch "${_log_file}"
+
+  __sm.log.piece.tree "${_message}"
+  if "$@" > "${_log_file}" 2>&1
   then
-    shift
-    __sm.log.piece.tree "${_message}"
-
-    [[ -d "${sm_temp_path}/steps" ]] || mkdir "${sm_temp_path}/steps"
-    _log_file="${sm_temp_path}/steps/$$.stderr.log"
-
-    touch "${_log_file}"
-    if "$@" # > "${_log_file}"
-    then
-      __sm.log.piece.tree succ
-      return 0
-    else
-      _status="$?"
-      __sm.log.piece.tree fail
-      return ${_status} # pass __sm.log.error return status code up !
+    __sm.log.piece.tree succ
+    if [[ -s "${_log_file}" ]]
+    then cat "${_log_file}" >&5
     fi
+    return 0
   else
-    __sm.log.piece "${_message}"
+    _status="$?"
+    __sm.log.piece.tree fail
+    if [[ -s "${_log_file}" ]]
+    then cat "${_log_file}" >&6
+    fi
+    return ${_status} # pass __sm.log.error return status code up !
   fi
-}
-
-# ./local --call=internal/log/tree_test
-ala1()
-{
-  __sm.log.step.tree 0:$0 ala2
-}
-
-ala2()
-{
-  __sm.log.step.tree 0:$0 ala3
-  __sm.log.step.tree 1:$0 ala3
-  __sm.log.step.tree 2:$0 ala3
-}
-
-ala3()
-{
-  __sm.log.step.tree 0:$0 true
-  __sm.log.step.tree 1:$0 false
-  __sm.log.step.tree 2:$0 true
-}
-
-tree_test()
-{
-  __sm.log.step.tree a true
-  ala3
-  __sm.log.step.tree b false
-  ala1
-  __sm.log.step.tree c false
-  ala2
-  __sm.log.step.tree d true
 }
