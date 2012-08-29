@@ -164,12 +164,16 @@ files()
   done
 
   case "${_command}" in
-    (contain|containing|contains|shebang.is)
+    (contains) _command=contain ;;
+  esac
+
+  case "${_command}" in
+    (contain|containing|shebang.is)
       [[ -n "${_string}" ]] || [[ -n "${_regex}" ]] ||
         __sm.log.fail "regexp or string must be given for 'files ${_command}'."
       [[ -n "${_files}" ]] || __sm.log.fail "files must be given for 'files ${_command}'."
 
-      if __sm.files.${_command%s} "${_string}" "${_regex}" "${_files[@]}"
+      if __sm.files.${_command} "${_string}" "${_regex}" "${_files[@]}"
       then return 0
       else return 1
       fi
