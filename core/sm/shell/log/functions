@@ -276,7 +276,7 @@ __sm.log.step()
 __sm.log.log()
 {
   trace_filter log || set -o xtrace
-  printf "$*\n"
+  printf "%b" "$*\n"
 }
 
 __sm.log.todo()
@@ -287,8 +287,8 @@ __sm.log.todo()
   then
     file="${BASH_SOURCE[2]}"
     line="${BASH_LINENO[1]}"
-    printf "DEBUG todo: ${file##${sm_path}\/}:${line}:\n"
-    printf "$*" | xargs -s 72 | xargs -I {} printf "DEBUG todo: # {}\n"
+    printf "%b" "DEBUG todo: ${file##${sm_path}\/}:${line}:\n"
+    printf "%b" "$*" | xargs -s 72 | xargs -I {} printf "DEBUG todo: # {}\n"
   else
     return 0
   fi
@@ -296,7 +296,7 @@ __sm.log.todo()
 
 __sm.log.error.no_exit()
 {
-  printf "ERROR(${funcstack[3]}): $*\n" >&2
+  printf "%b" "ERROR(${funcstack[3]}): $*\n" >&2
 }
 
 __sm.log.error()
@@ -311,7 +311,7 @@ __sm.log.succeed()
   set +o xtrace
   if [[ -n "$*" ]]
   then
-    printf "$*\n"
+    printf "%b" "$*\n"
   fi
   #exit 0
 }
@@ -348,7 +348,7 @@ __sm.set.ps4()
 __sm.log.warn()
 {
   trace_filter log || set -o xtrace
-  printf "WARNING: $*\n" >&2
+  printf "%b" "WARNING: $*\n" >&2
 }
 
 __sm.log.debug()
@@ -366,11 +366,11 @@ __sm.log.debug.not.traced()
   then
     if [[ "$1" == "-" ]]
     then
-      printf "DEBUG $type --> \n"
+      printf "%b" "DEBUG $type --> \n"
       cat -
-      printf "DEBUG $type <-- \n"
+      printf "%b" "DEBUG $type <-- \n"
     else
-      printf "DEBUG $type: $*\n"
+      printf "%b" "DEBUG $type: $*\n"
     fi
   else
     return 0
@@ -388,7 +388,7 @@ __sm.log.search()
 
   if (( debug_flag )) && __sm.log.options.check "$debug_flags" "search"
   then
-    printf "DEBUG search: %9s %-25s in $*.\n" "$name" "$value"
+    printf "%b" "DEBUG search: %9s %-25s in $*.\n" "$name" "$value"
   else
     return 0
   fi
