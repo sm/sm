@@ -388,7 +388,7 @@ __sm.log.search()
 
   if (( debug_flag )) && __sm.log.options.check "$debug_flags" "search"
   then
-    printf "%b" "DEBUG search: %9s %-25s in $*.\n" "$name" "$value"
+    printf "DEBUG search: %9s %-25s in $*.\n" "$name" "$value"
   else
     return 0
   fi
