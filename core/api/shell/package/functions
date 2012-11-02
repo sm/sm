@@ -53,7 +53,7 @@ package()
     "configure flag"
     "configure flags"
     "make install"
-    "acvtivate first"
+    "activate first"
   )
 
   if __sm.command.detect "$*" "${__package_commands[@]}"
