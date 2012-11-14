@@ -130,30 +130,20 @@ __sm.package.init()
   do
     if variable is empty "package_${variable}"
     then
-      config read file defaults from ${package_name} \
-        key ${variable} into ${variable} prefix package
+      config read file defaults from ${package_name} key ${variable} into ${variable} prefix package
     fi
   done
-
   for variable in website_url archive_format
   do
     if variable is empty "${variable}"
     then
-      config read file defaults from ${package_name} \
-        key ${variable} into ${variable}
+      config read file defaults from ${package_name} key ${variable} into ${variable}
     fi
   done
-
-  config read file defaults from ${package_name} \
-    key package_dependencies prefix default
-  config read file defaults from ${package_name} \
-    key configure_flags prefix default
-  config read file defaults from ${package_name} \
-    key make_flags prefix default
-  config read file defaults from ${package_name} \
-    key configure_flag_static prefix default
-  config read file defaults from ${package_name} \
-    key configure_flag_shared prefix default
+  for variable in package_dependencies configure_flags make_flags configure_flag_static configure_flag_shared
+  do
+    config read file defaults from ${package_name} key ${variable} into ${variable} prefix default
+  done
 
   if command exists "${package_name}_initialize"
   then
