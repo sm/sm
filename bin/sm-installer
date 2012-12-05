@@ -9,6 +9,9 @@ case $platform in
   (Linux/i[456]86)
     platform=Linux/i386
     ;;
+  (Linux/armv6l)
+    platform=Linux/arm
+    ;;
   (*)
     echo "Unsupported platform: $platform."
     exit 1
