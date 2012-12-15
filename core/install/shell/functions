@@ -225,6 +225,9 @@ get_platform()
     (Linux/i[456]86)
       echo "Linux/i386"
       ;;
+    (Linux/armv6l)
+      echo "Linux/arm"
+      ;;
     (*)
       echo "Unsupported platform: $platform." >&2
       exit 1
