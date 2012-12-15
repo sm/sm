@@ -274,6 +274,15 @@ __sm.package.gnu.update()
   fi
 }
 
+__sm.package.configure.flag.if.supported()
+{
+  if
+    "$1" --help 2>/dev/null | \grep -- "$2" >/dev/null
+  then
+    __sm.package.configure.flag "$2" "$3"
+  fi
+}
+
 __sm.package.configure()
 {
   trace_filter package || set -o xtrace
@@ -291,10 +300,8 @@ __sm.package.configure()
   fi
 
   __sm.package.configure.flag "--prefix" "${install_path}"
-  if "${_command%% *}" --help 2>/dev/null | \grep -- --sysconfdir >/dev/null
-  then
-    __sm.package.configure.flag "--sysconfdir" "/etc"
-  fi
+  __sm.package.configure.flag.if.supported "${_command%% *}" "--sysconfdir" "/etc"
+  __sm.package.configure.flag.if.supported "${_command%% *}" "--datadir" "${active_path}/share"
 
   _command="${_command} ${configure_flags[*]}"
   __sm.log.debug package "__sm.package.configure: ${_command}"
