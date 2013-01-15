@@ -141,6 +141,7 @@ __sm.os.subtype()
 
 __sm.os.cpu.count()
 {
+  # TODO: https://github.com/fnichol/mc_nic12/blob/master/config/unicorn.rb#L4-L24
   typeset _cpu_count
   _cpu_count=1
 
