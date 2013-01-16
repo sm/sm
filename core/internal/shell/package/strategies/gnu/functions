@@ -161,6 +161,14 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
   __sm.package.setup
 }
 
+# helper for gnu package forks, usage: __sm.gnu.tarball.version [file [version]]
+__sm.gnu.tarball.version()
+{
+  [[ -f ${1:-.tarball-version} ]] &&
+  grep "${2:-$package_version}" < ${1:-.tarball-version} > /dev/null ||
+  echo "${2:-$package_version}" > ${1:-.tarball-version}
+}
+
 __sm.package.binary.install()
 {
   trace_filter package || set -o xtrace
@@ -306,6 +314,7 @@ __sm.package.configure()
   _command="${_command} ${configure_flags[*]}"
   __sm.log.debug package "__sm.package.configure: ${_command}"
 
+  PATH="${active_path}/bin:$PATH"
   PREFIX="${install_base_path}/${package_version}"
   PKG_CONFIG_PATH=${active_path}/lib/pkgconfig
 
