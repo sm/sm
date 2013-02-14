@@ -41,7 +41,7 @@ __sm.log.step.tree()
   typeset _message _log_file _status
 
   _message="${1:-}"
-  (( $# > 1 )) || fail "Missing command!"
+  (( $# > 1 )) || log fail "Missing command!"
   shift
 
   [[ -d "${sm_temp_path}/steps" ]] || mkdir "${sm_temp_path}/steps"
