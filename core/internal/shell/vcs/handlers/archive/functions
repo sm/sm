@@ -78,15 +78,15 @@ Please read 'sm man curl' for instructions how to solve this problem.\n"
 
   case "${_uri}" in
     (*.tar) # tar
-      tar -mxf "${_archive}"  2>&1 | __sm.log.debug vcs -
+      tar -xf "${_archive}"  2>&1 | __sm.log.debug vcs -
       (( ${pipestatus[1]} == 0 )) || fetch_error extracting_archive_failed
       ;;
     (*.tar.gz|*.tgz) # gzip
-      tar -mzxf "${_archive}" 2>&1 | __sm.log.debug vcs -
+      tar -zxf "${_archive}" 2>&1 | __sm.log.debug vcs -
       (( ${pipestatus[1]} == 0 )) || fetch_error extracting_archive_failed
       ;;
     (*github.com/*/tarball/*)
-      tar -mzxf "${_archive}" 2>&1 | __sm.log.debug vcs -
+      tar -zxf "${_archive}" 2>&1 | __sm.log.debug vcs -
       (( ${pipestatus[1]} == 0 )) || fetch_error extracting_archive_failed
       typeset name_pattern="${_uri#https://github.com/}"
       name_pattern="${name_pattern%tarball/*}"
@@ -95,11 +95,11 @@ Please read 'sm man curl' for instructions how to solve this problem.\n"
       rm -rf ${name_pattern}*
       ;;
     (*.tar.bz2|*.tbz2) # bzip
-      tar -mjxf "${_archive}" 2>&1 | __sm.log.debug vcs -
+      tar -jxf "${_archive}" 2>&1 | __sm.log.debug vcs -
       (( ${pipestatus[1]} == 0 )) || fetch_error extracting_archive_failed
       ;;
     (*.tar.xz) # LZMA
-      xz -dc "${_archive}" | tar -mxC "${_final_target}" 2>&1 | __sm.log.debug vcs -
+      xz -dc "${_archive}" | tar -xC "${_final_target}" 2>&1 | __sm.log.debug vcs -
       (( ${pipestatus[1]} == 0 )) || fetch_error extracting_archive_failed
       ;;
     (*.zip)
