@@ -19,17 +19,17 @@ archive_get()
 
   case "${_uri}" in
     # fix github archive names
-    (*github.com/*/tarball/*)
+    (*github.com/*/archive/*.tar.gz)
       _archive="${_uri#*github.com/}"
-      _archive="${_archive%/tarball*}"
-      _archive="${archives_path}/${_archive//\//_}_${_uri##*/}.tar.gz"
-      __sm.log.debug vcs "github tarball archive name ${_archive}."
+      _archive="${_archive%/archive*}"
+      _archive="${archives_path}/${_archive//\//_}_${_uri##*/}"
+      __sm.log.debug vcs "github tar.gz archive name ${_archive}."
       ;;
-    (*github.com/*/zipball/*)
+    (*github.com/*/archive/*.zip)
       _archive="${_uri#*github.com/}"
-      _archive="${_archive%/zipball*}"
+      _archive="${_archive%/archive*}"
       _archive="${archives_path}/${_archive//\//_}_${_uri##*/}.zip"
-      __sm.log.debug vcs "github zipball archive name ${_archive}."
+      __sm.log.debug vcs "github zip archive name ${_archive}."
       ;;
   esac
 
@@ -77,6 +77,15 @@ Please read 'sm man curl' for instructions how to solve this problem.\n"
   builtin cd "${_final_target}"
 
   case "${_uri}" in
+    (*github.com/*/archive/*.tar.gz)
+      tar -zxf "${_archive}" 2>&1 | __sm.log.debug vcs -
+      (( ${pipestatus[1]} == 0 )) || fetch_error extracting_archive_failed
+      typeset name_pattern="${_uri#*github.com/}"
+      name_pattern="${name_pattern%archive/*}"
+      name_pattern="${name_pattern//\//-}"
+      mv ${name_pattern}*/* .
+      rm -rf ${name_pattern}*
+      ;;
     (*.tar) # tar
       tar -xf "${_archive}"  2>&1 | __sm.log.debug vcs -
       (( ${pipestatus[1]} == 0 )) || fetch_error extracting_archive_failed
@@ -84,15 +93,6 @@ Please read 'sm man curl' for instructions how to solve this problem.\n"
     (*.tar.gz|*.tgz) # gzip
       tar -zxf "${_archive}" 2>&1 | __sm.log.debug vcs -
       (( ${pipestatus[1]} == 0 )) || fetch_error extracting_archive_failed
-      ;;
-    (*github.com/*/tarball/*)
-      tar -zxf "${_archive}" 2>&1 | __sm.log.debug vcs -
-      (( ${pipestatus[1]} == 0 )) || fetch_error extracting_archive_failed
-      typeset name_pattern="${_uri#https://github.com/}"
-      name_pattern="${name_pattern%tarball/*}"
-      name_pattern="${name_pattern//\//-}"
-      mv ${name_pattern}*/* .
-      rm -rf ${name_pattern}*
       ;;
     (*.tar.bz2|*.tbz2) # bzip
       tar -jxf "${_archive}" 2>&1 | __sm.log.debug vcs -
@@ -102,18 +102,18 @@ Please read 'sm man curl' for instructions how to solve this problem.\n"
       xz -dc "${_archive}" | tar -xC "${_final_target}" 2>&1 | __sm.log.debug vcs -
       (( ${pipestatus[1]} == 0 )) || fetch_error extracting_archive_failed
       ;;
-    (*.zip)
+    (*github.com/*/archive/*.zip)
       unzip -q "${_archive}" 2>&1 | __sm.log.debug vcs -
       (( ${pipestatus[1]} == 0 )) || fetch_error extracting_archive_failed
-      ;;
-    (*github.com/*/zipball/*)
-      unzip -q "${_archive}" 2>&1 | __sm.log.debug vcs -
-      (( ${pipestatus[1]} == 0 )) || fetch_error extracting_archive_failed
-      typeset name_pattern="${_uri#https://github.com/}"
-      name_pattern="${name_pattern%zipball/*}"
+      typeset name_pattern="${_uri#*github.com/}"
+      name_pattern="${name_pattern%archive/*}"
       name_pattern="${name_pattern//\//-}"
       mv ${name_pattern}*/* .
       rm -rf ${name_pattern}*
+      ;;
+    (*.zip)
+      unzip -q "${_archive}" 2>&1 | __sm.log.debug vcs -
+      (( ${pipestatus[1]} == 0 )) || fetch_error extracting_archive_failed
       ;;
     (*)
       #TODO: add detection based on $( file ${_archive} ) type

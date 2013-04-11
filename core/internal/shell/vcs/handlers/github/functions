@@ -29,12 +29,12 @@ github_get()
   do
     case "${_method}" in
       (tgz)
-        __sm.log.debug vcs "github -> https://github.com/${_uri}/tarball/${branch}"
-        archive_get "https://github.com/${_uri}/tarball/${branch}" "${_target}" "$@"
+        __sm.log.debug vcs "github -> https://github.com/${_uri}/archive/${branch}.tar.gz"
+        archive_get "https://github.com/${_uri}/archive/${branch}.tar.gz" "${_target}" "$@"
         ;;
       (zip)
-        __sm.log.debug vcs "github -> https://github.com/${_uri}/zipball/${branch}"
-        archive_get "https://github.com/${_uri}/zipball/${branch}" "${_target}" "$@"
+        __sm.log.debug vcs "github -> https://github.com/${_uri}/archive/${branch}.zip"
+        archive_get "https://github.com/${_uri}/archive/${branch}.zip" "${_target}" "$@"
         ;;
       (git)
         __sm.log.debug vcs "github -> git://github.com/${_uri}.git"
