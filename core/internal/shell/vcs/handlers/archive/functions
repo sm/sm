@@ -80,7 +80,7 @@ Please read 'sm man curl' for instructions how to solve this problem.\n"
     (*github.com/*/archive/*.tar.gz)
       tar -zxf "${_archive}" 2>&1 | __sm.log.debug vcs -
       (( ${pipestatus[1]} == 0 )) || fetch_error extracting_archive_failed
-      typeset name_pattern="${_uri#*github.com/}"
+      typeset name_pattern="${_uri#*github.com/*/}"
       name_pattern="${name_pattern%archive/*}"
       name_pattern="${name_pattern//\//-}"
       mv ${name_pattern}*/* .
@@ -105,7 +105,7 @@ Please read 'sm man curl' for instructions how to solve this problem.\n"
     (*github.com/*/archive/*.zip)
       unzip -q "${_archive}" 2>&1 | __sm.log.debug vcs -
       (( ${pipestatus[1]} == 0 )) || fetch_error extracting_archive_failed
-      typeset name_pattern="${_uri#*github.com/}"
+      typeset name_pattern="${_uri#*github.com/*/}"
       name_pattern="${name_pattern%archive/*}"
       name_pattern="${name_pattern//\//-}"
       mv ${name_pattern}*/* .
