@@ -348,6 +348,9 @@ __sm.package.set.cflags()
     __sm.string.match         " -m"  " ${CFLAGS}" ||
     __sm.string.contains.word "-arch" "${CFLAGS}" ||
       CFLAGS="-arch x86_64${CFLAGS:+ }${CFLAGS:-}"
+    __sm.string.match         " -m"  " ${LDFLAGS}" ||
+    __sm.string.contains.word "-arch" "${LDFLAGS}" ||
+      LDFLAGS="-arch x86_64${LDFLAGS:+ }${LDFLAGS:-}"
   fi
 }
 
