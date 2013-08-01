@@ -210,9 +210,9 @@ __sm.package.fetch.checksum()
         ${curl} -L "${download_url}" -o "${archives_path}/${package_file}.checksum" 2>/dev/null || return 1
       fi
 
-      package_checksum=$(cat "${archives_path}/${package_file}.checksum")
-
-      if [[ -f "${archives_path}/${package_file}.checksum" ]]
+      if [[ -s "${archives_path}/${package_file}.checksum" ]]
+      then package_checksum=$(cat "${archives_path}/${package_file}.checksum")
+      elif [[ -f "${archives_path}/${package_file}.checksum" ]]
       then rm "${archives_path}/${package_file}.checksum"
       fi
 

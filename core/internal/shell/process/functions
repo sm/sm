@@ -7,6 +7,17 @@ __sm.process.status()
   _name="$1"
   _pid="$2"
 
+  case "${_pid}" in
+    ([0-9]+)
+    ;;
+    (*)
+      if [[ -n "${_pid}" && -f "${_pid}" ]]
+      then _pid=$(cat ${_pid})
+      else _pid=0
+      fi
+    ;;
+  esac
+
   log "${name:-"process"}:"
 
   if (( ${_pid} > 0 ))
