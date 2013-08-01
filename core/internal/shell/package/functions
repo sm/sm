@@ -340,16 +340,14 @@ __sm.package.set.cflags()
 {
   trace_filter package || set -o xtrace
   export CFLAGS
-  if
-    ! __sm.string.contains.word "-I${active_path}/include" "${CFLAGS}"
-  then
+  __sm.string.contains.word "-I${active_path}/include" "${CFLAGS}" ||
     CFLAGS="-I${active_path}/include${CFLAGS:+ }${CFLAGS:-}"
-  fi
   if
-    ! __sm.string.match " -m" " ${CFLAGS}" &&
     __sm.os.type.is darwin && __sm.os.arch.type.is x86_64
   then
-    CFLAGS="-m64${CFLAGS:+ }${CFLAGS:-}"
+    __sm.string.match         " -m"  " ${CFLAGS}" ||
+    __sm.string.contains.word "-arch" "${CFLAGS}" ||
+      CFLAGS="-arch x86_64${CFLAGS:+ }${CFLAGS:-}"
   fi
 }
 
