@@ -110,10 +110,6 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
     __sm.log.step "${package_name} ${package_version} ~ preinstall"
       "${package_name//-/_}_preinstall"
     __sm.log.step success
-  else
-    __sm.log.step "${package_name} ${package_version} ~ preinstall"
-      __sm.package.preinstall
-    __sm.log.step success
   fi
 
   versionedfs add \
@@ -139,10 +135,6 @@ To force it to reinstall, call:\n\tsm ${package_name} package install force\n"
   then
     __sm.log.step "${package_name} ${package_version} ~ postinstall"
     "${package_name//-/_}_postinstall"
-    __sm.log.step success
-  else
-    __sm.log.step "${package_name} ${package_version} ~ postinstall"
-    __sm.package.postinstall
     __sm.log.step success
   fi
 
@@ -349,12 +341,6 @@ __sm.package.gnu.make()
     "Compilation of ${package_name} ${package_version} failed! " "$PWD/build.log"
 }
 
-__sm.package.preinstall()
-{
-  trace_filter package || set -o xtrace
-  true # nothing to be done for now.
-}
-
 __sm.package.make.install()
 {
   trace_filter package || set -o xtrace
@@ -371,12 +357,6 @@ __sm.package.make.install()
     __sm.package.error \
       "Installation of ${package_name} ${package_version} failed! " \
       "$PWD/make.install.log"
-}
-
-__sm.package.postinstall()
-{
-  trace_filter package || set -o xtrace
-  true
 }
 
 __sm.package.gnu.activate()
