@@ -225,7 +225,7 @@ get_platform()
     (Linux/i[456]86)
       echo "Linux/i386"
       ;;
-    (Linux/armv6l)
+    (Linux/armv[67]l)
       echo "Linux/arm"
       ;;
     (*)
