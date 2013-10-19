@@ -9,7 +9,7 @@ case $platform in
   (Linux/i[456]86)
     platform=Linux/i386
     ;;
-  (Linux/armv6l)
+  (Linux/armv[67]l)
     platform=Linux/arm
     ;;
   (*)
