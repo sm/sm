@@ -79,11 +79,11 @@ __sm.templates.install()
 
   [[ -d "${_target_path}" ]] || mkdir -p "${_target_path}"
 
-  _params+=( --template "${template_path}" --output "${_target}" )
-  [[ -z "${_json}" ]] || _params+=( --json "${_json}" )
-  [[ -z "${_json_file}" ]] || _params+=( --json "${_json_file}" )
+  _params+=( -template "${template_path}" -output "${_target}" )
+  [[ -z "${_json}" ]] || _params+=( -json "${_json}" )
+  [[ -z "${_json_file}" ]] || _params+=( -json "${_json_file}" )
 
-  (( _append == 0 )) || _params+=(--append)
+  (( _append == 0 )) || _params+=(-append)
 
   _data_string+=""
   
@@ -98,9 +98,10 @@ __sm.templates.install()
   do _data_string+="${_data[${_index}]}=${_data[$((_index+1))]}:~"
   done
 
-  _params+=( --data "${_data_string}\"" )
+  _params+=( -data "${_data_string}\"" )
 
-  if ! "${sm_path}/bin/sm-mustache" "${_params[@]}"
+  #if ! "${sm_path}/bin/sm-mustache" "${_params[@]}"
+  if ! "${sm_path}/bin/sm-util" -c mustache "${_params[@]}"
   then log error "There was an error rendering the template!"
   fi
 

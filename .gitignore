@@ -8,3 +8,5 @@ tags
 .idea
 bin/sm-json
 bin/sm-mustache
+bin/sm-util
+.vagrant/

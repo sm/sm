@@ -235,6 +235,38 @@ get_platform()
   esac
 }
 
+install_sm_util()
+{
+  typeset _url _util_version _unm _un _file
+  _un=$(uname  | tr '[A-Z]' '[a-z]')
+  _unm=$(uname -m | sed -e 's/x86_64/amd64/')
+  _util_version=0.1.0
+
+  if [[ -s "${install_path}/bin/sm-util" ]]
+  then
+    if file is symlink "${install_path}/bin/sm-util" ||
+      file contains "${install_path}/bin/sm-util" regexp 'perl'
+    then file remove "${install_path}/bin/sm-util"
+    fi
+  fi
+
+  if ! file is executable "${install_path}/bin/sm-util"
+  then
+    file remove "${install_path}/bin/sm-util"
+    __sm.log.step "Downloading sm-util."
+    # TODO: Handle archive extensions based on OS.
+
+    _file="sm-util_${_util_version}_${_un}_${_unm}"
+    _url="https://files.smf.sh/util/${_util_version}/${_file}.tar.gz" || return $?
+    curl -s ${_url} -o "${install_path}/src/${_file}.tar.gz"
+    tar zxf "${install_path}/src/${_file}.tar.gz" -C "${install_path}/src/"
+    cp "${install_path}/src/${_file}/sm-util" "${install_path}/bin/sm-util"
+    file chmod +x "${install_path}/bin/sm-util"
+    file link symbolic force from "${install_path}/bin/sm-util" to "${sm_path}/bin/sm-util"
+    __sm.log.step success
+  fi
+}
+
 install_sm_mustache()
 {
   typeset _url
@@ -289,9 +321,11 @@ install_sm()
 
   perform install_core
 
-  perform install_sm_mustache
+  perform install_sm_util
 
-  perform install_sm_json
+  #perform install_sm_mustache
+
+  #perform install_sm_json
 
   perform create_versionedfs_paths
 

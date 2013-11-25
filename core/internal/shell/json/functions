@@ -80,7 +80,8 @@ __sm.json.get()
 
         typeset -g ${_variable} >/dev/null
   
-        if _value="$( "${sm_path}/bin/sm-json" -path "${_path}" -uri "${_json_uri}" )"
+        #if _value="$( "${sm_path}/bin/sm-json" -path "${_path}" -uri "${_json_uri}" )"
+        if _value="$( "${sm_path}/bin/sm-util" -c json -path "${_path}" -uri "${_json_uri}" )"
         then eval "${_variable}=\"${_value}\""  
         else eval "${_variable}=\"${_default}\""  
         fi
@@ -116,7 +117,8 @@ __sm.json.get()
 
         typeset -gxa ${_variable} >/dev/null
 
-        if _value="$( "${sm_path}/bin/sm-json" -path "${_path}" -uri "${_json_uri}" )"
+        #if _value="$( "${sm_path}/bin/sm-json" -path "${_path}" -uri "${_json_uri}" )"
+        if _value="$( "${sm_path}/bin/sm-util" -c json -path "${_path}" -uri "${_json_uri}" )"
         then eval "${_variable}=\"${_value}\""  
         else eval "${_variable}=\"${_default}\""  
         fi 
