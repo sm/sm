@@ -1,5 +1,6 @@
 postgresql=sm/sm-postgresql
 databases=sm/sm-databases
+mariadb=sm/sm-mariadb
 mysql=sm/sm-mysql
 backups=sm/sm-backups
 gnu=sm/sm-gnu
