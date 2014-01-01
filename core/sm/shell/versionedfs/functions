@@ -242,10 +242,10 @@ __sm.versionedfs.activate()
         (link)
           _files=( ${_version_path}/**/* )
           _count="${#_files[@]}"
+          printf "\r  [ ] ${_name} ${_version} ~ symlinking ${_count} files.."
           for _file in "${_files[@]}"
           do
             : $(( _index++ ))
-            printf "\r  [ ] ${_name} ${_version} ~ linking (${_index}/${_count})..."
             _target="${_active_path}/${_file##${_version_path}/}"
             if [[ -d "${_file}" ]]
             then
