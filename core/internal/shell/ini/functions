@@ -7,7 +7,7 @@ __sm.ini.parse() {
 	if [[ -f ${_file} ]]
 	then
 		[[ -s ${_file} ]] || return 0
-		# TODO: Replace with sm-ini
+		# TODO: Replace with sm-util
 		python ${sm_path}/core/internal/python/pini.py -b ${_file}
 	else
 		log fail "File '${_file}' does not exist."
