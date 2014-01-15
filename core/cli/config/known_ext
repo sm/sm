@@ -1,4 +1,6 @@
 apidoc=sm/sm_apidoc
 deploy=sm/sm_deploy
+appfirst=sm/sm_appfirst
+openvpn=sm/sm_openvpn
 # mux=sm/sm_mux
 mp_backup=mpapis/sm_backup
