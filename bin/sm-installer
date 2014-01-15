@@ -74,3 +74,9 @@ mv ${sm_owner}-sm-*/* .
 rm -rf ${sm_owner}-sm-*
 
 "${sm_path}/zsh/bin/zsh" ./install --zsh "${sm_path}/zsh/bin/zsh" "$@"
+
+if test "${UID}" = '0' 
+then ln -fs ${sm_path}/bin/sm /bin/sm
+fi
+
+exit 0
