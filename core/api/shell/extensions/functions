@@ -9,7 +9,8 @@ extension()
 {
   trace_filter extensions || set -o xtrace
 
-  typeset _command _params _name _uri __extension_commands
+  typeset _command _params _name _uri __extension_commands 
+	typeset _version _branch _tag _revision _remote
   _params=()
   __extension_commands=(
     "in extension sets do=extension sets iterator"
@@ -28,12 +29,32 @@ extension()
   while (( $# ))
   do
     case "$1" in
-      (name|for|as)
-        _name=$2
-        (( $# >= 2 )) && shift 2 || __sm.log.fail "Extension name was not given after <$1> param."
-        ;;
-      (uri|from)
-        _uri=$2
+			(version)
+				_version="$2"
+				(( $# >= 2 )) && shift 2 || __sm.log.fail "Extension version was not given after <$1> param."
+				;;
+			(branch)
+				_branch="$2"
+				(( $# >= 2 )) && shift 2 || __sm.log.fail "Extension branch was not given after <$1> param."
+				;;
+			(tag)
+				_tag="$2"
+				(( $# >= 2 )) && shift 2 || __sm.log.fail "Extension tag was not given after <$1> param."
+				;;
+			(remote)
+				_remote="$2"
+				(( $# >= 2 )) && shift 2 || __sm.log.fail "Extension remote was not given after <$1> param."
+				;;
+			(revision)
+				_revision="$2"
+				(( $# >= 2 )) && shift 2 || __sm.log.fail "Extension revision was not given after <$1> param."
+				;;
+			(name|for|as)
+				_name=$2
+				(( $# >= 2 )) && shift 2 || __sm.log.fail "Extension name was not given after <$1> param."
+				;;
+			(uri|from)
+				_uri=$2
         (( $# >= 2 )) && shift 2 || __sm.log.fail "Extension uri was not given after <$1> param."
         ;;
       (*)
@@ -54,7 +75,7 @@ extension()
     (install)
       [[ -n "${_name}" ]] || __sm.log.error "Extension name was not given for install."
       __sm.modules.include internal/extensions/manipulation
-      if __sm.extension.install "${_name}" "${_uri}"
+      if __sm.extension.install "${_name}" "${_version}" "${_uri}" "${_branch}" "${_tag}" "${_revision}" "${_remote}"
       then return 0
       else return $?
       fi

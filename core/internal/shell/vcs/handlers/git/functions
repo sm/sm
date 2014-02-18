@@ -12,9 +12,10 @@ git_get()
   _uri="${1:-}"
   # place/dir where user wishes to see output
   _final_target="${2:-}"
-  branch=${3:-master}
-  remote=${4:-origin}
-  revision=${5:-HEAD}
+  branch=${3:-${branch:-master}}
+  remote=${4:-${remote:-origin}}
+  revision=${5:-${revision:-HEAD}}
+  tag=${5:-${tag:-}}
 
   (( $# )) && shift || __sm.log.fail "url must be the first parameter to git_get()."
   (( $# )) && shift || __sm.log.fail "target path must be the second parameter to git_get()."

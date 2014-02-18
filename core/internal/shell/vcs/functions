@@ -25,9 +25,9 @@ fetch_uri()
   vcs_initial_pwd="$PWD"
   _uri="${1:-}"
   _target="${2:-}"
-  _args=()
   (( $# )) && shift || __sm.log.fail "uri must be specified as the first parameter."
   (( $# )) && shift || __sm.log.fail "target path must be specified as the second parameter."
+  _args=()
 
   builtin cd "$initial_pwd"
 
@@ -115,7 +115,7 @@ fetch_uri_parse_args()
   while (( $# > 0 ))
   do
     _token="$1" && shift
-    for _allowed_arg in branch remote revision scm_type checksum
+    for _allowed_arg in branch remote revision scm_type checksum tag
     do
       case "${_token}" in
         (*${_allowed_arg})

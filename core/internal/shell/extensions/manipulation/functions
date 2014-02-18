@@ -84,25 +84,43 @@ __sm.extension.install()
 {
   typeset _name _uri _version _identifier
   _name="${1:-}"
-  (( $# )) && shift || __sm.log.fail "No extension name was given."
+  [[ -n ${_name} ]] || __sm.log.fail "No extension name was given."
+	shift || __sm.log.error "Extension name must be given."
 
   _uri="${1:-}"
-  (( $# )) && shift || true
+  shift || __sm.log.error "URI must be given after 'uri'"
   [[ -n "${_uri}" ]] || _uri=$( __sm.extension.get.uri "${_name}" )
 
   [[ -n "${_uri}" ]] ||
     __sm.log.error "uri not given and cannot find ${_name} in known extensions."
 
-  _version="head"
-  if [[ "${_name}" == *:* ]]
-  then
-    _version="${_name/*:}"
-  fi
+	_version="${1:-"head"}"
+  shift || __sm.log.error "URI must be given after 'version'"
 
-  _identifier="$(scm_identifier "${_uri}")"
+	_branch="${1:-}"
+	_tag="${2:-}"
+	_revision="${3:-}"
 
+	if [[ "${_name}" == *:* ]]
+	then 
+		_version="${_name/*:}"
+		_name="${_name/:*}"
+	fi
+	_identifier="$(scm_identifier "${_uri}")"
+
+	declare -a _args
+	_args=()
+	if [[ -n ${_branch} ]] 
+	then _args+=(branch ${_branch})
+	fi
+	if [[ -n ${_tag} ]] 
+	then _args+=(tag ${_tag})
+	fi
+	if [[ -n ${_revision} ]] 
+	then _args+=(revision ${_revision})
+	fi
   __sm.log.step "${_name} ${_version}"
-  if fetch_uri "${_uri}" "${src_path}/${_identifier}" "$@"
+	if fetch_uri "${_uri}" "${src_path}/${_identifier}" ${_args[@]}
   then
     __sm.extension.is.valid "${src_path}/${_identifier}" ||
       __sm.log.error "${src_path}/${_identifier} is not a valid extension;"\
