@@ -26,6 +26,8 @@ extension()
     __sm.log.fail "No command given.\nUsage:  \nextension <command> ..."
   fi
 
+	_version="head"
+
   while (( $# ))
   do
     case "$1" in
@@ -75,7 +77,7 @@ extension()
     (install)
       [[ -n "${_name}" ]] || __sm.log.error "Extension name was not given for install."
       __sm.modules.include internal/extensions/manipulation
-      if __sm.extension.install "${_name}" "${_version}" "${_uri}" "${_branch}" "${_tag}" "${_revision}" "${_remote}"
+      if __sm.extension.install "${_name}" "${_uri}" "${_version}" "${_branch}" "${_tag}" "${_revision}" "${_remote}"
       then return 0
       else return $?
       fi

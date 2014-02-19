@@ -5,20 +5,23 @@ VAGRANTFILE_API_VERSION="2"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   RAM = 512
   CPU = 2
-  NETWORK="192.168.69"
+  NETWORK="192.168.169"
   BOXES = ENV["BOXES"] ? ENV["BOXES"].to_i : 1
   ROLE = ENV["ROLE"] ? ENV["ROLE"] : "sm"
 
-  config.vm.box = "centos64"
-  config.vm.box_url = "https://github.com/2creatives/vagrant-centos/releases/download/v0.1.0/centos64-x86_64-20131030.box"
+  config.vm.box = "centos65"
+  config.vm.box_url = "https://github.com/2creatives/vagrant-centos/releases/download/v6.5.2/centos65-x86_64-20131219.box"
 
   (0..(BOXES-1)).to_a.each do |index|
     ip= 100 + index
     config.vm.define "#{ROLE}-#{index}", primary: true do |v|
       v.vm.network "private_network", ip: "#{NETWORK}.#{ip}"
       v.vm.hostname = "#{ROLE}-#{index}"
-
-      v.vm.provision "shell",inline: %Q| yum install -y zsh openssl-devel readline-devel zlib-devel ; cd /vagrant/ ; ./install |
+      v.vm.provision "shell",inline: %Q| 
+      yum install -y zsh openssl-devel readline-devel zlib-devel pcre pcre-devel lsof strace rsync git; 
+         git clone git://github.com/sm/sm.git && cd sm && ./install &&
+               ln -fs /opt/sm/bin/sm /bin/sm
+      |
     end
   end
 

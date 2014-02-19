@@ -250,6 +250,13 @@ install_sm_util()
     fi
   fi
 
+  if file is executable ./bin/sm-util
+  then
+    # TODO: Validate arch
+    cp ./bin/sm-util ${install_path}/bin/sm-util
+    chmod a+x ${install_path}/bin/sm-util
+  fi
+
   if ! file is executable "${install_path}/bin/sm-util"
   then
     file remove "${install_path}/bin/sm-util"
