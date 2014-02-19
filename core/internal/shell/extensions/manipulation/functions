@@ -111,7 +111,7 @@ __sm.extension.install()
 	declare -a _args
 	_args=()
 	if [[ -n ${_branch} ]] 
-	then _args+=(branch ${_branch})
+	then _args+=(--branch ${_branch})
 	fi
 	if [[ -n ${_tag} ]] 
 	then _args+=(tag ${_tag})
