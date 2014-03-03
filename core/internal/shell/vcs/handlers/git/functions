@@ -76,7 +76,7 @@ git_get()
     fi
   else
     mkdir -p "${_target%/*}"
-    if git clone --depth 1 ${_uri} "${_target}" >/dev/null 2>&1
+    if git clone ${_uri} "${_target}" >/dev/null 2>&1
     then
       echo "${_uri}" > "${_target}/.uri"
     else
@@ -93,7 +93,7 @@ git_get()
       fi
 
       __sm.log.debug vcs "git uri: ${_uri} failed, trying: ${_uri_https}"
-      if git clone --depth 1 ${_uri_https} "${_target}" >/dev/null 2>&1
+      if git clone ${_uri_https} "${_target}" >/dev/null 2>&1
       then
         echo "${_uri_https}" > "${_target}/.uri"
       else
