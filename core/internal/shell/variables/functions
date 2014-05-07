@@ -9,7 +9,7 @@ __sm.variables.are.nonempty()
 
   for _variable in "${_variables[@]}"
   do
-    eval "[[ -n \"\${_variable:-}\" ]]" || return 1
+    eval "[[ -n \"\${${_variable}:-}\" ]]" || return 1
   done
   return 0
 }
