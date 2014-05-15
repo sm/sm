@@ -4,8 +4,18 @@
 # SM Process API
 #
 # process start name <name> timeout <timeout> command <command> [params...]
+#   Where timeout in start is the timeout to watch the process to ensure the 
+#   process stays running and then write a pidfile or return error if process
+#   is no longer running.
+#
 # process stop name <name> timeout <timeout>
+#   Timeout in stop is the amount of time in seconds to wait for a process to 
+#   stop gracefully before sending SIGKILL.
+#
 # process is running name <name>
+#  returns 0 if the named process (via process start name ) is running and 
+#  returns 1 if the process is not found running.
+#
 # process restart name <name> timeout_start <timeout> timeout_stop <timeout> command <command> [params...]
 # process status <pid>
 # process lock </path/to/myprocess.lock>
