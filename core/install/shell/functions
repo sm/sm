@@ -240,7 +240,7 @@ install_sm_util()
   typeset _url _util_version _unm _un _file
   _un=$(uname  | tr '[A-Z]' '[a-z]')
   _unm=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/i386|i586|i686/386/')
-  _util_version=0.1.1
+  _util_version=0.5.1
 
   if [[ -s "${install_path}/bin/sm-util" ]]
   then
