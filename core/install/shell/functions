@@ -267,6 +267,7 @@ install_sm_util()
     __sm.log.step success ||
     {
       typeset __status=$?
+      paths remove "${install_path}/src/${_file}"
       __sm.log.step fail
       return $__status
     }
