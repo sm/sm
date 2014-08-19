@@ -260,7 +260,7 @@ install_sm_util()
     _url="https://files.smf.sh/util/${_util_version}/${_file}.tar.gz"
     curl -s ${_url} -o "${install_path}/src/${_file}.tar.gz" &&
     tar zxf "${install_path}/src/${_file}.tar.gz" -C "${install_path}/src/" &&
-    cp "${install_path}/src/${_file}/sm-util" "${install_path}/bin/sm-util" &&
+    cp "${install_path}/src/${_file}"/*util "${install_path}/bin/sm-util" &&
     paths remove "${install_path}/src/${_file}" &&
     file chmod +x "${install_path}/bin/sm-util" &&
     file link symbolic force from "${install_path}/bin/sm-util" to "${sm_path}/bin/sm-util" &&
