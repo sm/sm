@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # ## git\_get()
 #
@@ -8,13 +8,14 @@
 git_get()
 {
   typeset initial_pwd _uri _final_target branch remote revision _target _uri_https
-  initial_pwd="$PWD"
-  _uri="${1:-}"
+
+  initial_pwd="${PWD}"
+  _uri="${1:-""}"
   # place/dir where user wishes to see output
-  _final_target="${2:-}"
-  branch=${3:-master}
-  remote=${4:-origin}
-  revision=${5:-HEAD}
+  _final_target="${2:-""}"
+  branch="${3:-"master"}"
+  remote="${4:-"origin"}"
+  revision="${5:-"HEAD"}"
 
   (( $# )) && shift || __sm.log.fail "url must be the first parameter to git_get()."
   (( $# )) && shift || __sm.log.fail "target path must be the second parameter to git_get()."
@@ -42,23 +43,22 @@ git_get()
   if [[ -d "$_target/.git" ]]
   then
     builtin cd "${_target}"
-    git checkout master -f -q >/dev/null 2>&1
     git reset --hard HEAD >/dev/null 2>&1
-    git fetch ${remote} >/dev/null 2>&1
-    if [[ -z "$(git branch --no-color | awk "/${branch}\$/" 2>/dev/null)" ]]
+    git fetch "${remote}" >/dev/null 2>&1
+    if [[ -z "$(awk "/${branch}\$/" 2>/dev/null <( git branch --no-color ) )" ]]
     then
       if ! (
         builtin cd "${repo_path}"
-        git checkout -b "${branch}" --track "${remote}/${branch}" 2>&1 >/dev/null
+        git checkout --track "${remote}/${branch}" "${revision:-"HEAD"}" 2>&1 >/dev/null
         )
       then
         fetch_error remote_branch_not_found
       fi
-    elif [[ -z "$(git branch --no-color | awk "/\* $branch\$/{print \$2}" 2>/dev/null)" ]]
+    elif [[ -z "$(awk "/\* ${branch}\$/{print \$2}" <( git branch --no-color ) 2>/dev/null)" ]]
     then
       if ! (
         builtin cd "${repo_path}"
-        git checkout $branch >/dev/null 2>&1
+        git checkout "${branch}" >/dev/null 2>&1
         )
       then
         fetch_error cannot_checkout_branch
@@ -68,14 +68,14 @@ git_get()
 
     if ! (
       builtin cd "${repo_path}"
-      git pull --rebase origin $branch >/dev/null 2>&1
+      git pull --rebase origin "${branch}" >/dev/null 2>&1
       )
     then
       fetch_error pull_failed
     fi
   else
     mkdir -p "${_target%/*}"
-    if git clone --depth 1 ${_uri} "${_target}" >/dev/null 2>&1
+    if git clone "${_uri}" "${_target}" >/dev/null 2>&1
     then
       echo "${_uri}" > "${_target}/.uri"
     else
@@ -92,7 +92,7 @@ git_get()
       fi
 
       __sm.log.debug vcs "git uri: ${_uri} failed, trying: ${_uri_https}"
-      if git clone --depth 1 ${_uri_https} "${_target}" >/dev/null 2>&1
+      if git clone "${_uri_https}" "${_target}" >/dev/null 2>&1
       then
         echo "${_uri_https}" > "${_target}/.uri"
       else
@@ -103,9 +103,9 @@ git_get()
   [[ -z "${__vcs_failed}" ]] || return 0
 
   [[ ! -d "${_final_target}" ]] || rm -rf "${_final_target}" || \
-    fetch_error cannot_remove path=${_final_target}
+    fetch_error cannot_remove path="${_final_target}"
 
   cp -fR "${_target}" "${_final_target}" >/dev/null 2>&1 || \
-    fetch_error copy_failed from=${_target} to=${_final_target}
+    fetch_error copy_failed from="${_target}" to="${_final_target}"
 }
 
