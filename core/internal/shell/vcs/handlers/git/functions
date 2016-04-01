@@ -49,7 +49,7 @@ git_get()
     then
       if ! (
         builtin cd "${repo_path}"
-        git checkout --track "${remote}/${branch}" "${revision:-"HEAD"}" 2>&1 >/dev/null
+        git checkout "${remote}/${branch}" "${revision}" 2>&1 >/dev/null
         )
       then
         fetch_error remote_branch_not_found
@@ -78,6 +78,15 @@ git_get()
     if git clone "${_uri}" "${_target}" >/dev/null 2>&1
     then
       echo "${_uri}" > "${_target}/.uri"
+      # Ensure expected branch gets checked out.
+      if ! (
+        builtin cd "${_target}"
+        git fetch "${remote}" >/dev/null 2>&1
+        git checkout --track "${remote}/${branch}" 2>&1 >/dev/null
+        )
+      then
+        fetch_error remote_branch_not_found
+      fi
     else
       _uri_https="${_uri/git:\/\//https://}"
 
